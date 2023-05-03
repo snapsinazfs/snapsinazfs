@@ -1,87 +1,67 @@
-﻿{
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://raw.githubusercontent.com/dodexahedron/sanoid/dotnet-port-master/dotnet/Sanoid/Sanoid.schema.json",
-  "title": "Sanoid.net configuration",
-  "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$id": {
+      "type": "string"
+    },
     "UseSanoidConfiguration": {
-      "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
-      "type": "boolean",
-      "$comment": "At this time, only \"true\" is acceptable, as alternate configuration has not been implemented yet.",
-      "default": true
+      "type": "boolean"
     },
     "SanoidConfigurationPathBase": {
-      "description": "The base directory where the ini-formatted sanoid configuration files are located, without trailing slash.",
-      "type": "string",
-      "default": "/etc/sanoid"
+      "type": "string"
     },
     "SanoidConfigurationDefaultsFile": {
-      "description": "The name of the file containing configuration defaults for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-      "type": "string",
-      "default": "sanoid.defaults.conf"
+      "type": "string"
     },
     "SanoidConfigurationLocalFile": {
-      "description": "The name of the local configuration file for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-      "type": "string",
-      "default": "sanoid.defaults.conf"
+      "type": "string"
     },
     "Formatting": {
-      "description": "Configuration section for configurable formatting options for output, naming, etc.",
+      "$ref": "#/definitions/Formatting"
+    }
+  },
+  "definitions": {
+    "Formatting": {
       "type": "object",
       "properties": {
         "SnapshotNaming": {
-          "description": "Formatting configuration section for composing snapshot names.",
-          "type": "object",
-          "properties": {
-            "ComponentSeparator": {
-              "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name.",
-              "type": "string",
-              "default": "_" 
-            },
-            "Prefix": {
-              "description": "The prefix component of all snapshot names.",
-              "type": "string",
-              "default": "autosnap" 
-            },
-            "TimestampFormatString": {
-              "description": ".net-style DateTime format string for the timestamp component of snapshot names.",
-              "type": "string",
-              "$comment":
-                "Note that many characters have special meanings. See https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings for details on composing this string. Passed to the DateTime.ToString() method. This string MUST be valid for use as a component of a ZFS snapshot name.",
-              "default": "yyyy-MM-dd_HH\\:mm\\:ss"
-            },
-            "FrequentSuffix": {
-              "description": "The suffix component of frequent snapshot names.",
-              "type": "string",
-              "default": "frequently" 
-            },
-            "HourlySuffix": {
-              "description": "The suffix component of hourly snapshot names.",
-              "type": "string",
-              "default": "hourly" 
-            },
-            "DailySuffix": {
-              "description": "The suffix component of daily snapshot names.",
-              "type": "string",
-              "default": "daily" 
-            },
-            "WeeklySuffix": {
-              "description": "The suffix component of weekly snapshot names.",
-              "type": "string",
-              "default": "weekly" 
-            },
-            "MonthlySuffix": {
-              "description": "The suffix component of monthly snapshot names.",
-              "type": "string",
-              "default": "monthly" 
-            },
-            "YearlySuffix": {
-              "description": "The suffix component of yearly snapshot names.",
-              "type": "string",
-              "default": "yearly" 
-            }
-          }
+          "$ref": "#/definitions/SnapshotNaming"
+        }
+      }
+    },
+    "SnapshotNaming": {
+      "type": "object",
+      "properties": {
+        "ComponentSeparator": {
+          "type": "string"
+        },
+        "Prefix": {
+          "type": "string"
+        },
+        "TimestampFormatString": {
+          "type": "string"
+        },
+        "FrequentSuffix": {
+          "type": "string"
+        },
+        "HourlySuffix": {
+          "type": "string"
+        },
+        "DailySuffix": {
+          "type": "string"
+        },
+        "WeeklySuffix": {
+          "type": "string"
+        },
+        "MonthlySuffix": {
+          "type": "string"
+        },
+        "YearlySuffix": {
+          "type": "string"
         }
       }
     }
