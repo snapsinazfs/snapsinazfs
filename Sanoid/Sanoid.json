@@ -1,0 +1,9 @@
+{
+  "UseSanoidConfiguration": true,
+  "SanoidConfigurationPathBase": "/etc/sanoid",
+  "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
+  "SanoidConfigurationLocalFile": "sanoid.conf",
+  "Formatting": {
+    "SnapshotTimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss"
+  }
+}
