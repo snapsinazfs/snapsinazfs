@@ -30,11 +30,58 @@
       "description": "Configuration section for configurable formatting options for output, naming, etc.",
       "type": "object",
       "properties": {
-        "SnapshotTimestampFormatString": {
-          "description": ".net-style DateTime format string for the timestamp component of snapshot names.",
-          "type": "string",
-          "$comment": "Note that many characters have special meanings. See https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings for details on composing this string. Passed to the DateTime.ToString() method. This string MUST be valid for use as a component of a ZFS snapshot name.",
-          "default": "yyyy-MM-dd_HH\\:mm\\:ss"
+        "SnapshotNaming": {
+          "description": "Formatting configuration section for composing snapshot names.",
+          "type": "object",
+          "properties": {
+            "ComponentSeparator": {
+              "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name.",
+              "type": "string",
+              "default": "_" 
+            },
+            "Prefix": {
+              "description": "The prefix component of all snapshot names.",
+              "type": "string",
+              "default": "autosnap" 
+            },
+            "TimestampFormatString": {
+              "description": ".net-style DateTime format string for the timestamp component of snapshot names.",
+              "type": "string",
+              "$comment":
+                "Note that many characters have special meanings. See https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings for details on composing this string. Passed to the DateTime.ToString() method. This string MUST be valid for use as a component of a ZFS snapshot name.",
+              "default": "yyyy-MM-dd_HH\\:mm\\:ss"
+            },
+            "FrequentSuffix": {
+              "description": "The suffix component of frequent snapshot names.",
+              "type": "string",
+              "default": "frequently" 
+            },
+            "HourlySuffix": {
+              "description": "The suffix component of hourly snapshot names.",
+              "type": "string",
+              "default": "hourly" 
+            },
+            "DailySuffix": {
+              "description": "The suffix component of daily snapshot names.",
+              "type": "string",
+              "default": "daily" 
+            },
+            "WeeklySuffix": {
+              "description": "The suffix component of weekly snapshot names.",
+              "type": "string",
+              "default": "weekly" 
+            },
+            "MonthlySuffix": {
+              "description": "The suffix component of monthly snapshot names.",
+              "type": "string",
+              "default": "monthly" 
+            },
+            "YearlySuffix": {
+              "description": "The suffix component of yearly snapshot names.",
+              "type": "string",
+              "default": "yearly" 
+            }
+          }
         }
       }
     }
