@@ -1,0 +1,42 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dodexahedron/sanoid/dotnet-port-master/dotnet/Sanoid/Sanoid.schema.json",
+  "title": "Sanoid.net configuration",
+  "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
+  "type": "object",
+  "properties": {
+    "UseSanoidConfiguration": {
+      "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
+      "type": "boolean",
+      "$comment": "At this time, only \"true\" is acceptable, as alternate configuration has not been implemented yet.",
+      "default": true
+    },
+    "SanoidConfigurationPathBase": {
+      "description": "The base directory where the ini-formatted sanoid configuration files are located, without trailing slash.",
+      "type": "string",
+      "default": "/etc/sanoid"
+    },
+    "SanoidConfigurationDefaultsFile": {
+      "description": "The name of the file containing configuration defaults for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
+      "type": "string",
+      "default": "sanoid.defaults.conf"
+    },
+    "SanoidConfigurationLocalFile": {
+      "description": "The name of the local configuration file for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
+      "type": "string",
+      "default": "sanoid.defaults.conf"
+    },
+    "Formatting": {
+      "description": "Configuration section for configurable formatting options for output, naming, etc.",
+      "type": "object",
+      "properties": {
+        "SnapshotTimestampFormatString": {
+          "description": ".net-style DateTime format string for the timestamp component of snapshot names.",
+          "type": "string",
+          "$comment": "Note that many characters have special meanings. See https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-date-and-time-format-strings for details on composing this string. Passed to the DateTime.ToString() method. This string MUST be valid for use as a component of a ZFS snapshot name.",
+          "default": "yyyy-MM-dd_HH\\:mm\\:ss"
+        }
+      }
+    }
+  }
+}
