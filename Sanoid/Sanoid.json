@@ -1,6 +1,6 @@
 {
-  "$schema": "https://raw.githubusercontent.com/dodexahedron/sanoid/dotnet-port-master/dotnet/Sanoid/Sanoid.schema.json",
-  "$id": "https://raw.githubusercontent.com/dodexahedron/sanoid/dotnet-port-master/dotnet/Sanoid/Sanoid.json",
+  "$schema": "Sanoid.schema.json",
+  "$id": "Sanoid.json",
   "UseSanoidConfiguration": true,
   "SanoidConfigurationPathBase": "/etc/sanoid",
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
