@@ -1,5 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "$id": "https://raw.githubusercontent.com/dodexahedron/sanoid/dotnet-port-master/dotnet/Sanoid/Sanoid.schema.json",
   "type": "object",
   "properties": {
     "$schema": {
