@@ -6,6 +6,16 @@
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
   "SanoidConfigurationLocalFile": "sanoid.conf",
   "Formatting": {
-    "SnapshotTimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss"
+    "SnapshotNaming": {
+      "ComponentSeparator": "_",
+      "Prefix": "autosnap",
+      "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+      "FrequentSuffix": "frequently",
+      "HourlySuffix": "hourly",
+      "DailySuffix": "daily",
+      "WeeklySuffix": "weekly",
+      "MonthlySuffix": "monthly",
+      "YearlySuffix": "yearly"
+    }
   }
 }
