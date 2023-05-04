@@ -74,53 +74,8 @@
               "foregroundColor": "Red",
               "backgroundColor": "White"
             }
-          ],
-          "wordHighlightingRules": [
-            {
-              "regex": "on|off",
-              "foregroundColor": "DarkGreen"
-            },
-            {
-              "condition": "level == LogLevel.Debug",
-              "text": "[TEST]",
-              "foregroundColor": "Blue"
-            }
           ]
         }
-      },
-      "database": {
-        "type": "Database",
-        "dbProvider": "System.Data.SqlClient",
-        "connectionString": "Data Source=database server;Initial Catalog=database;Trusted_Connection=False;User Id=AppUser;Password=AppUserPassword;",
-        "keepConnection": "true",
-        "commandText": "insert into dbo.log (Timestamp,Level,Message,Logger,Callsite,Exception) values (@Timestamp, @Level, @Message, @Logger, @Callsite, @Exception);",
-        "parameters": [
-          {
-            "name": "@Timestamp",
-            "layout": "${date:format=o}",
-            "dbType": "DbType.DateTime"
-          },
-          {
-            "name": "@Level",
-            "layout": "${level}"
-          },
-          {
-            "name": "@Message",
-            "layout": "${message}"
-          },
-          {
-            "name": "@Logger",
-            "layout": "${logger}"
-          },
-          {
-            "name": "@Callsite",
-            "layout": "${callsite}"
-          },
-          {
-            "name": "@Exception",
-            "layout": "${exception:tostring}"
-          }
-        ]
       }
     },
     "rules": [
