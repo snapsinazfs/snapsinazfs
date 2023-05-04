@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="JsonSchema.Net" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Ini" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
   </ItemGroup>
 
