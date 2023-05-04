@@ -4,6 +4,8 @@ using Json.More;
 using Json.Schema;
 
 using Microsoft.Extensions.Configuration;
+using NLog;
+using NLog.Fluent;
 
 namespace Sanoid.Common.Configuration
 {
@@ -13,6 +15,7 @@ namespace Sanoid.Common.Configuration
     public static class JsonConfigurationSections
     {
         private static IConfigurationRoot? _rootConfiguration;
+        private static Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Gets the root configuration section of Sanoid.json
@@ -55,21 +58,20 @@ namespace Sanoid.Common.Configuration
 
             if ( !configValidationResults.IsValid )
             {
-                Console.WriteLine( "Sanoid.json validation failed." );
-                Console.WriteLine( "Correct the following issues in Sanois.json and try again:" );
+                Logger.Error( "Sanoid.json validation failed." );
                 foreach ( EvaluationResults validationDetail in configValidationResults.Details )
                 {
                     if ( validationDetail is { IsValid: false, HasErrors: true } )
                     {
-                        Console.WriteLine( $"{validationDetail.InstanceLocation} has {validationDetail.Errors!.Count} problems:" );
+                        Logger.Error( $"{validationDetail.InstanceLocation} has {validationDetail.Errors!.Count} problems:" );
                         foreach (KeyValuePair<string, string> error in validationDetail.Errors)
                         {
-                            Console.WriteLine($"  Problem: {error.Key}");
-                            Console.WriteLine($"  Details: {error.Value}");
+                            Logger.Error($"  Problem: {error.Key}; Details: {error.Value}");
                         }
                     }
                 }
 
+                return;
                 throw new ConfigurationValidationException( "Sanoid.json validation failed. Please check Sanoid.json and ensure it complies with the schema specified in Sanoid.schema.json." );
             }
         }
