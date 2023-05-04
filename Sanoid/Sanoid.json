@@ -1,6 +1,7 @@
 {
   "$schema": "Sanoid.schema.json",
   "$id": "Sanoid.json",
+  "$comments": "Default values are compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
   "UseSanoidConfiguration": true,
   "SanoidConfigurationPathBase": "/etc/sanoid",
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",

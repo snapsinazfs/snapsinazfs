@@ -7,12 +7,20 @@
   "properties": {
     "$schema": {
       "type": "string",
-      "format": "uri-reference"
+      "description": "A uri-reference pointing to Sanoid.schema.json.",
+      "format": "uri-reference",
+      "default": "Sanoid.schema.json"
     },
     "$id": {
       "type": "string",
-      "format": "uri-reference"
+      "description": "The name of the config file. Sanoid expects to see 'Sanoid.json'.",
+      "format": "uri-reference",
+      "default": "Sanoid.json"
     },
+    "$comments": {
+      "type": "string",
+      "description": "Comments about this document. Not used in configuration validation."
+    }, 
     "UseSanoidConfiguration": {
       "type": "boolean",
       "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
