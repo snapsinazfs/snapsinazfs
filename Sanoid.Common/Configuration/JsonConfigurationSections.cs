@@ -62,7 +62,11 @@ namespace Sanoid.Common.Configuration
                     if ( validationDetail is { IsValid: false, HasErrors: true } )
                     {
                         Console.WriteLine( $"{validationDetail.InstanceLocation} has {validationDetail.Errors!.Count} problems:" );
-                        Console.WriteLine( validationDetail.Errors.ToJsonDocument( new JsonSerializerOptions { WriteIndented = true } ).RootElement.ToString( ) );
+                        foreach (KeyValuePair<string, string> error in validationDetail.Errors)
+                        {
+                            Console.WriteLine($"  Problem: {error.Key}");
+                            Console.WriteLine($"  Details: {error.Value}");
+                        }
                     }
                 }
 
