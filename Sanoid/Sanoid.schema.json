@@ -61,7 +61,7 @@
           "type": "string",
           "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name. Can be an empty string.",
           "default": "_",
-          "pattern": "[a-zA-Z0-9_-]{0,2}"
+          "pattern": "^[a-zA-Z0-9_-]{0,2}$"
         },
         "Prefix": {
           "description": "The prefix component of all snapshot names.",
