@@ -1,6 +1,6 @@
 using Sanoid.Common.Configuration;
 
-namespace Sanoid.Common;
+namespace Sanoid.Common.Snapshots;
 
 /// <summary>
 /// A representation of a ZFS snapshot of a dataset or zvol.

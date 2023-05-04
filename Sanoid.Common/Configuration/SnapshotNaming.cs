@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Sanoid.Common.Snapshots;
 
 namespace Sanoid.Common.Configuration;
 

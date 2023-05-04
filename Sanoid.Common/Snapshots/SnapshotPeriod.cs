@@ -1,4 +1,4 @@
-namespace Sanoid.Common;
+namespace Sanoid.Common.Snapshots;
 
 /// <summary>
 /// An enumeration of possible <see cref="Snapshot"/> periods
