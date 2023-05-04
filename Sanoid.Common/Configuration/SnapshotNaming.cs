@@ -43,7 +43,7 @@ public static class SnapshotNaming
 
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Frequent">frequent</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Frequent">frequent</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "frequently"
@@ -55,7 +55,7 @@ public static class SnapshotNaming
 
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of an <see cref="SnapshotKind.Hourly">hourly</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of an <see cref="SnapshotPeriod.Hourly">hourly</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "hourly"
@@ -67,7 +67,7 @@ public static class SnapshotNaming
 
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Daily">daily</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Daily">daily</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "daily"
@@ -79,7 +79,7 @@ public static class SnapshotNaming
 
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Weekly">weekly</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Weekly">weekly</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "weekly"
@@ -91,7 +91,7 @@ public static class SnapshotNaming
 
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Monthly">monthly</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Monthly">monthly</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "monthly"
@@ -102,7 +102,7 @@ public static class SnapshotNaming
     public static string MonthlySuffix { get; set; } = "monthly";
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Manual">manual</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Manual">manual</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "yearly"
@@ -113,7 +113,7 @@ public static class SnapshotNaming
     public static string ManualSuffix { get; set; } = "manual";
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Temporary">temporary</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Temporary">temporary</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "yearly"
@@ -124,7 +124,7 @@ public static class SnapshotNaming
     public static string TemporarySuffix { get; set; } = "temporary";
 
     /// <summary>
-    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotKind.Yearly">yearly</see> snapshot name.
+    /// Gets or sets the string used as the suffix component of a <see cref="SnapshotPeriod.Yearly">yearly</see> snapshot name.
     /// </summary>
     /// <remarks>
     /// Default value is "yearly"
