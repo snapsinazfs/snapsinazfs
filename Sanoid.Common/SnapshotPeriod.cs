@@ -1,9 +1,9 @@
 namespace Sanoid.Common;
 
 /// <summary>
-/// An enumeration of possible <see cref="Snapshot"/> kinds
+/// An enumeration of possible <see cref="Snapshot"/> periods
 /// </summary>
-public enum SnapshotKind
+public enum SnapshotPeriod
 {
     /// <summary>
     /// Temporary snapshots taken by sanoid/syncoid themselves.
