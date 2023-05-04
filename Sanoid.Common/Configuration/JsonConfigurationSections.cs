@@ -79,7 +79,7 @@ namespace Sanoid.Common.Configuration
         /// <summary>
         /// Gets the /Formatting/SnapshotNaming configuration section of Sanoid.json
         /// </summary>
-        public static IConfigurationSection? SnapshotNamingConfiguration => FormattingConfiguration?.GetRequiredSection( "SnapshotNaming" );
+        public static IConfigurationSection SnapshotNamingConfiguration => FormattingConfiguration.GetRequiredSection( "SnapshotNaming" );
 
     }
 }
