@@ -63,8 +63,12 @@
         "messageLimit": 100,
         "target": {
           "type": "ColoredConsole",
-          "layout": "${longdate}|${event-properties:item=EventId_Id:whenEmpty=0}|${uppercase:${level}}|${logger}|${message} ${exception:format=tostring}|${callsite}",
+          "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger}|${message} ${exception:format=tostring}|${callsite}:${callsite-linenumber}",
           "rowHighlightingRules": [
+            {
+              "condition": "level == LogLevel.Warn",
+              "foregroundColor": "Yellow"
+            },
             {
               "condition": "level == LogLevel.Error",
               "foregroundColor": "Red"
