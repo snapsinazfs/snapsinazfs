@@ -126,16 +126,6 @@
     "rules": [
       {
         "logger": "*",
-        "minLevel": "Trace",
-        "writeTo": "all-file"
-      },
-      {
-        "logger": "Microsoft.*",
-        "maxLevel": "Info",
-        "final": true
-      },
-      {
-        "logger": "*",
         "minLevel": "Debug",
         "writeTo": "own-console",
         "filterDefaultAction": "Log",
@@ -145,11 +135,6 @@
             "action": "Ignore"
           }
         }
-      },
-      {
-        "logger": "*",
-        "minLevel": "Debug",
-        "writeTo": "database"
       }
     ]
   }
