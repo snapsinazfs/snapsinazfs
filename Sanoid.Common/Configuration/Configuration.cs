@@ -8,12 +8,12 @@ namespace Sanoid.Common.Configuration;
 public static class Configuration
 {
     /// <summary>
-    /// Gets or sets whether Sanoid.net should use ini-formatted configuration files using PERL sanoid's schema.<para />
+    /// Gets or sets whether Sanoid.net should use ini-formatted configuration files using PERL sanoid's schema.<br />
     /// Corresponds to the /UseSanoidConfiguration property of Sanoid.json.
     /// </summary>
     /// <remarks>
-    /// Default value is true<para />
-    /// If <c>true</c>, uses <see cref="SanoidConfigurationDefaultsFile"/> and <see cref="SanoidConfigurationLocalFile"/> in the <see cref="SanoidConfigurationPathBase"/> directory.<para />
+    /// Default value is true<br />
+    /// If <c>true</c>, uses <see cref="SanoidConfigurationDefaultsFile"/> and <see cref="SanoidConfigurationLocalFile"/> in the <see cref="SanoidConfigurationPathBase"/> directory.<br />
     /// If <c>false</c>, uses configuration in Sanoid.json only - 
     /// </remarks>
     [JsonPropertyName("UseSanoidConfiguration")]
@@ -23,12 +23,12 @@ public static class Configuration
 
 
     /// <summary>
-    /// Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<para />
+    /// Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<br />
     /// Corresponds to the /SanoidConfigurationPathBase property of Sanoid.json.
     /// </summary>
     /// <remarks>
-    /// Default value is "/etc/sanoid"<para />
-    /// Should not contain a trailing slash.<para />
+    /// Default value is "/etc/sanoid"<br />
+    /// Should not contain a trailing slash.<br />
     /// Not guaranteed to work with a relative path. Use an absolute path.
     /// </remarks>
     [JsonPropertyName("SanoidConfigurationPathBase")]
@@ -38,11 +38,11 @@ public static class Configuration
 
 
     /// <summary>
-    /// Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase"/> folder containing PERL sanoid's default configuration.<para />
+    /// Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase"/> folder containing PERL sanoid's default configuration.<br />
     /// Corresponds to the /SanoidConfigurationDefaultsFile property of Sanoid.json.
     /// </summary>
     /// <remarks>
-    /// Default value is "sanoid.defaults.conf"<para />
+    /// Default value is "sanoid.defaults.conf"<br />
     /// Assumed to be a file name only.
     /// </remarks>
     [JsonPropertyName("SanoidConfigurationDefaultsFile")]
@@ -52,11 +52,11 @@ public static class Configuration
 
 
     /// <summary>
-    /// Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase"/> folder containing PERL sanoid's local configuration.<para />
+    /// Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase"/> folder containing PERL sanoid's local configuration.<br />
     /// Corresponds to the /SanoidConfigurationLocalFile property of Sanoid.json.
     /// </summary>
     /// <remarks>
-    /// Default value is "sanoid.conf"<para />
+    /// Default value is "sanoid.conf"<br />
     /// Assumed to be a file name only.
     /// </remarks>
     [JsonPropertyName("SanoidConfigurationLocalFile")]

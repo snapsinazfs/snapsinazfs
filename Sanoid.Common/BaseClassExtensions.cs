@@ -20,7 +20,7 @@ public static class BaseClassExtensions
     }
 
     /// <summary>
-    /// Attempts to convert the current string to a <see cref="bool"/> value.<para />
+    /// Attempts to convert the current string to a <see cref="bool"/> value.<br />
     /// Validation left up to the <see cref="bool.Parse(string)"/> method.
     /// </summary>
     /// <param name="value"></param>

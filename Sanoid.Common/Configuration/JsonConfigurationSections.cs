@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace Sanoid.Common.Configuration
 {
@@ -13,7 +13,7 @@ namespace Sanoid.Common.Configuration
         /// Gets the root configuration section of Sanoid.json
         /// </summary>
         /// <remarks>
-        /// Should only explicitly be used for access to properties in the configuration root.<para />
+        /// Should only explicitly be used for access to properties in the configuration root.<br />
         /// Other static properties are exposed in <see cref="JsonConfigurationSections"/> for sub-sections of Sanoid.json.
         /// </remarks>
         /// <seealso cref="FormattingConfiguration"/>

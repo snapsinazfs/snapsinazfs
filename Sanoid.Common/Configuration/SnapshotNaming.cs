@@ -33,7 +33,7 @@ public static class SnapshotNaming
     /// Gets or sets the format string used to create the timestamp component of a snapshot name.
     /// </summary>
     /// <remarks>
-    /// Default value is "yyyy-MM-dd_HH\:mm\:ss"<para />
+    /// Default value is "yyyy-MM-dd_HH\:mm\:ss"<br />
     /// See <see cref="DateTimeOffset.ToString()"/> documentation for format string details.
     /// </remarks>
     [JsonPropertyName("TimestampFormatString")]
