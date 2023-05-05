@@ -1,4 +1,4 @@
-// /*
+﻿// /*
 // *  LICENSE:
 // *
 // *  This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
@@ -87,21 +87,6 @@ internal class CommandLineArguments
     /// </summary>
     public void Main()
     {
-        if ( Debug )
-        {
-            Configuration.DefaultLoggingLevel = LogLevel.Debug;
-        }
-
-        if ( Verbose )
-        {
-            Configuration.DefaultLoggingLevel = LogLevel.Info;
-        }
-
-        if ( Trace )
-        {
-            Configuration.DefaultLoggingLevel = LogLevel.Trace;
-        }
-
         if ( Quiet )
         {
             Configuration.DefaultLoggingLevel = LogLevel.Off;
@@ -112,14 +97,14 @@ internal class CommandLineArguments
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
         }
 
-        if ( UseSanoidConfig )
+        if ( Trace )
         {
-            Configuration.UseSanoidConfiguration = true;
+            Configuration.DefaultLoggingLevel = LogLevel.Trace;
         }
 
-        if ( ConfigDir is not null )
+        if ( Verbose )
         {
-            Configuration.SanoidConfigurationPathBase = ConfigDir;
+            Configuration.DefaultLoggingLevel = LogLevel.Info;
         }
 
         if ( CacheDir is not null )
@@ -127,9 +112,41 @@ internal class CommandLineArguments
             Configuration.SanoidConfigurationCacheDirectory = CacheDir;
         }
 
+        if ( ConfigDir is not null )
+        {
+            Configuration.SanoidConfigurationPathBase = ConfigDir;
+        }
+
+        if ( Cron )
+        {
+            PruneSnapshots = true;
+            TakeSnapshots = true;
+            //TODO: Implement cron
+        }
+
+        if ( Debug )
+        {
+            Configuration.DefaultLoggingLevel = LogLevel.Debug;
+        }
+
+        if ( PruneSnapshots )
+        {
+            //TODO: Implement PruneSnapshots
+        }
+
         if ( RunDir is not null )
         {
             Configuration.SanoidConfigurationRunDirectory = RunDir;
+        }
+
+        if ( TakeSnapshots )
+        {
+            //TODO: Implement TakeSnapshots
+        }
+
+        if ( UseSanoidConfig )
+        {
+            Configuration.UseSanoidConfiguration = true;
         }
     }
 }
