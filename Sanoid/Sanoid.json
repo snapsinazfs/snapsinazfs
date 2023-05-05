@@ -6,6 +6,8 @@
   "SanoidConfigurationPathBase": "/etc/sanoid",
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
   "SanoidConfigurationLocalFile": "sanoid.conf",
+  "SanoidConfigurationCacheDirectory": "/var/cache/sanoid",
+  "SanoidConfigurationRunDirectory": "/var/run/sanoid",
   "Formatting": {
     "SnapshotNaming": {
       "ComponentSeparator": "_",
