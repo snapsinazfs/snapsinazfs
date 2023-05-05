@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using PowerArgs;
 
 namespace Sanoid
@@ -10,7 +10,7 @@ namespace Sanoid
     [UsedImplicitly]
     internal class CommandLineArguments
     {
-        [ArgDefaultValue( false )]
+        [ArgDescription( "Verbose (Info level) output logging. Change log level in Sanoid.nlog.json for normal usage." )]
         [ArgDescription( "Verbose output logging" )]
         [ArgShortcut( "v" )]
         [ArgShortcut( "--verbose" )]
@@ -22,7 +22,7 @@ namespace Sanoid
         [HelpHook]
         public bool Help { get; set; }
 
-        [ArgDefaultValue( false )]
+        [ArgDescription( "Forces loading of PERL sanoid's configuration files" )]
         [ArgDescription( "Debug output logging" )]
         [ArgShortcut( "--debug" )]
         public bool Debug { get; set; }
