@@ -233,13 +233,10 @@
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForBuiltInTypes/@EntryValue">UseExplicitType</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForOtherTypes/@EntryValue">UseExplicitType</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForSimpleTypes/@EntryValue">UseExplicitType</s:String>
-	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">/*&#xD;
-*  LICENSE:&#xD;
-*&#xD;
-*  This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved&#xD;
-*  from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this&#xD;
-*  project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.&#xD;
-*/&#xD;
-</s:String>
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">LICENSE:&#xD;
+&#xD;
+This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved&#xD;
+from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this&#xD;
+project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=configdir/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Sanoid/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
