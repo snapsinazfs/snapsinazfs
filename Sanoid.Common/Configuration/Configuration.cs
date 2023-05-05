@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+
 using JetBrains.Annotations;
+
 using NLog;
 using NLog.Config;
 
@@ -14,12 +16,14 @@ public static class Configuration
 
     static Configuration( )
     {
+        Log.Debug("Initializing root-level configuration from Sanoid.Json#/.");
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
         SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
         SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationDefaultsFile" ] ?? "sanoid.defaults.conf";
         SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationLocalFile" ] ?? "sanoid.conf";
         SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
         SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        Log.Debug("Root level configuration initialized.");
     }
 
     /// <summary>
@@ -38,7 +42,7 @@ public static class Configuration
             LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min( ) );
             if ( lowestLogLevel is null )
             {
-                Log.Debug( "No logging levels set. Setting to {0}", LogLevel.Info );
+                Log.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
                 lowestLogLevel = LogLevel.Info;
             }
 
@@ -48,18 +52,25 @@ public static class Configuration
         set
         {
             Log.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
-            Log.Debug( $"Setting minimum log severity to {value.Name} for ALL rules." );
-            foreach ( LoggingRule rule in LogManager.Configuration!.LoggingRules )
+            Log.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
+            for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
+                LoggingRule rule = LogManager.Configuration!.LoggingRules[ruleIndex];
                 if ( value == LogLevel.Off )
                 {
+                    Log.Trace( "Disabling logging for rule {0}", ruleIndex );
                     rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off );
+                    Log.Trace( "Disabled logging for rule {0}", ruleIndex );
                 }
                 else
                 {
+                    Log.Trace( "Setting log level to {0} for rule {1}", value.Name, ruleIndex );
                     rule.SetLoggingLevels( value, LogLevel.Fatal );
+                    Log.Trace( "Log level set to {0} for rule {1}", value.Name, ruleIndex );
                 }
             }
+
+            Log.Debug( "Reconfiguring loggers" );
             LogManager.ReconfigExistingLoggers( );
         }
     }
