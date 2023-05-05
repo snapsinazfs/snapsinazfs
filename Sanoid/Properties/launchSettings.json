@@ -3,9 +3,13 @@
     "Sanoid": {
       "commandName": "Project"
     },
-    "Verbose": {
+    "Verbose Logging": {
       "commandName": "Project",
       "commandLineArgs": "--verbose"
+    },
+    "Trace Logging": {
+      "commandName": "Project",
+      "commandLineArgs": "--trace"
     },
     "VerboseAndQuiet": {
       "commandName": "Project",
