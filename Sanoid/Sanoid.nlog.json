@@ -58,7 +58,6 @@
         }
       },
       "own-console": {
-
         "type": "ColoredConsole",
         "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger}|${message} ${exception:format=tostring}|${callsite}:${callsite-linenumber}",
         "rowHighlightingRules": [
@@ -80,16 +79,11 @@
     },
     "rules": [
       {
+        "ruleName": "DefaultRule",
         "logger": "*",
         "minLevel": "Debug",
         "writeTo": "own-console",
-        "filterDefaultAction": "Log",
-        "filters": {
-          "whenRepeated": {
-            "layout": "${message}",
-            "action": "Ignore"
-          }
-        }
+        "filterDefaultAction": "Log"
       }
     ]
   }
