@@ -75,9 +75,36 @@
             "backgroundColor": "White"
           }
         ]
+      },
+      "own-console-messageonly": {
+        "type": "ColoredConsole",
+        "layout": "${message}",
+        "rowHighlightingRules": [
+          {
+            "condition": "level == LogLevel.Warn",
+            "foregroundColor": "Yellow"
+          },
+          {
+            "condition": "level == LogLevel.Error",
+            "foregroundColor": "Red"
+          },
+          {
+            "condition": "level == LogLevel.Fatal",
+            "foregroundColor": "Red",
+            "backgroundColor": "White"
+          }
+        ]
       }
     },
     "rules": [
+      {
+        "ruleName": "MessageOnly",
+        "logger": "MessageOnly",
+        "minLevel": "Debug",
+        "writeTo": "own-console-messageonly",
+        "filterDefaultAction": "Log",
+        "final": true
+      },
       {
         "ruleName": "DefaultRule",
         "logger": "*",

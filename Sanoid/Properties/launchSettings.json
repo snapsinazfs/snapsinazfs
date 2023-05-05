@@ -30,6 +30,10 @@
     "RunDirOverride": {
       "commandName": "Project",
       "commandLineArgs": "--run-dir=/run/somewhere_else"
+    },
+    "Version": {
+      "commandName": "Project",
+      "commandLineArgs": "--version"
     }
   }
 }
