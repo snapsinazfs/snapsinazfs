@@ -20,5 +20,14 @@
       "MonthlySuffix": "monthly",
       "YearlySuffix": "yearly"
     }
+  },
+  "Monitoring": {
+    "Nagios": {
+      "$schema": "Sanoid.monitoring.nagios.schema.json",
+      "$comments": "Nagios-specific monitoring options",
+      "Capacity": false,
+      "Health": false,
+      "Snapshots": false
+    }
   }
 }
