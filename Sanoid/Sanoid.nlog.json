@@ -58,28 +58,24 @@
         }
       },
       "own-console": {
-        "type": "LimitingWrapper",
-        "interval": "00:00:01",
-        "messageLimit": 100,
-        "target": {
-          "type": "ColoredConsole",
-          "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger}|${message} ${exception:format=tostring}|${callsite}:${callsite-linenumber}",
-          "rowHighlightingRules": [
-            {
-              "condition": "level == LogLevel.Warn",
-              "foregroundColor": "Yellow"
-            },
-            {
-              "condition": "level == LogLevel.Error",
-              "foregroundColor": "Red"
-            },
-            {
-              "condition": "level == LogLevel.Fatal",
-              "foregroundColor": "Red",
-              "backgroundColor": "White"
-            }
-          ]
-        }
+
+        "type": "ColoredConsole",
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger}|${message} ${exception:format=tostring}|${callsite}:${callsite-linenumber}",
+        "rowHighlightingRules": [
+          {
+            "condition": "level == LogLevel.Warn",
+            "foregroundColor": "Yellow"
+          },
+          {
+            "condition": "level == LogLevel.Error",
+            "foregroundColor": "Red"
+          },
+          {
+            "condition": "level == LogLevel.Fatal",
+            "foregroundColor": "Red",
+            "backgroundColor": "White"
+          }
+        ]
       }
     },
     "rules": [
