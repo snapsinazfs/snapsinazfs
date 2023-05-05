@@ -30,6 +30,7 @@ namespace Sanoid
         [ArgDefaultValue( "/etc/sanoid or value set in Sanoid.json#/SanoidConfigurationPathBase" )]
         [ArgDescription( "Base configuration directory for sanoid" )]
         [ArgShortcut( "--configdir" )]
+        [ArgShortcut( "--config-dir" )]
         public string? ConfigDir { get; set; }
 
         [ArgDefaultValue( "/var/cache/sanoid or value set in Sanoid.json#/SanoidConfigurationCacheDirectory" )]
