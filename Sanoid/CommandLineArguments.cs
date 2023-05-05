@@ -1,4 +1,4 @@
-﻿// /*
+// /*
 // *  LICENSE:
 // *
 // *  This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
@@ -29,6 +29,10 @@ internal class CommandLineArguments
     [ArgShortcut( "--config-dir" )]
     public string? ConfigDir { get; set; }
 
+    [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
+    [ArgShortcut( "--cron" )]
+    public bool Cron { get; set; }
+
     [ArgDescription( "Debug level output logging. Change log level in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]
     [ArgCantBeCombinedWith( "Verbose|Quiet|ReallyQuiet" )]
@@ -39,6 +43,10 @@ internal class CommandLineArguments
     [ArgShortcut( "--help" )]
     [HelpHook]
     public bool Help { get; set; }
+
+    [ArgDescription( "Prunes expired snapshots." )]
+    [ArgShortcut( "--prune-snapshots" )]
+    public bool PruneSnapshots { get; set; }
 
     [ArgDescription( "No output logging. Change log level to Off in Sanoid.nlog.json for normal usage. WILL WARN BEFORE SETTING IS APPLIED." )]
     [ArgShortcut( "--quiet" )]
@@ -53,6 +61,11 @@ internal class CommandLineArguments
     [ArgDescription( "Runtime directory for sanoid" )]
     [ArgShortcut( "--run-dir" )]
     public string? RunDir { get; set; }
+
+    [ArgDescription( "Will make sanoid take snapshots, but will not prune unless --prune-snapshots is also specified." )]
+    [ArgShortcut( "--take-snapshots" )]
+    [ArgCantBeCombinedWith( "ReadOnly" )]
+    public bool TakeSnapshots { get; set; }
 
     [ArgDescription( "Trace level output logging. Change log level in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "--trace" )]
