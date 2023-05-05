@@ -56,6 +56,21 @@
       "default": "/var/run/sanoid",
       "format": "uri-reference"
     },
+    "TakeSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will take snapshots by default",
+      "default": false 
+    }, 
+    "PruneSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will prune expired snapshots by default",
+      "default": false 
+    },
+    "ForcePruneSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will prune expired snapshots by default, even if their parent datasets are currently involved in a send or receive operation",
+      "default": false
+    },
     "Formatting": {
       "$ref": "#/definitions/Formatting"
     }
