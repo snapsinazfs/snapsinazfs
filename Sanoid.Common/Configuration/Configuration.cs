@@ -31,6 +31,29 @@ public static class Configuration
     }
 
     /// <summary>
+    ///     Gets or sets whether Sanoid.net should take snapshots and prune expired snapshots.
+    /// </summary>
+    /// <value>
+    ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots and prune expired snapshots.
+    /// </value>
+    [JsonPropertyName( "Cron" )]
+    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
+    public static bool Cron
+    {
+        get => _cron;
+        set
+        {
+            if ( value )
+            {
+                _takeSnapshots = true;
+                _pruneSnapshots = true;
+            }
+
+            _cron = value;
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
     /// </summary>
     /// <remarks>
@@ -76,6 +99,28 @@ public static class Configuration
 
             Log.Debug( "Reconfiguring loggers" );
             LogManager.ReconfigExistingLoggers();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets whether Sanoid.net should prune expired snapshots.
+    /// </summary>
+    /// <value>
+    ///     A <see langword="bool" /> indicating whether Sanoid.net will prune expired snapshots.
+    /// </value>
+    [JsonPropertyName( "PruneSnapshots" )]
+    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
+    public static bool PruneSnapshots
+    {
+        get => _pruneSnapshots;
+        set
+        {
+            if ( !value || !_takeSnapshots )
+            {
+                Cron = false;
+            }
+
+            _pruneSnapshots = value;
         }
     }
 
@@ -155,6 +200,28 @@ public static class Configuration
     public static string SanoidConfigurationRunDirectory { get; [NotNull] set; }
 
     /// <summary>
+    ///     Gets or sets whether Sanoid.net should take new snapshots.
+    /// </summary>
+    /// <value>
+    ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots.
+    /// </value>
+    [JsonPropertyName( "TakeSnapshots" )]
+    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
+    public static bool TakeSnapshots
+    {
+        get => _takeSnapshots;
+        set
+        {
+            if ( !value || !_pruneSnapshots )
+            {
+                Cron = false;
+            }
+
+            _takeSnapshots = value;
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets whether Sanoid.net should use ini-formatted configuration files using PERL sanoid's schema.<br />
     ///     Corresponds to the /UseSanoidConfiguration property of Sanoid.json.
     /// </summary>
@@ -172,6 +239,10 @@ public static class Configuration
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
     public static bool UseSanoidConfiguration { get; [NotNull] set; }
+
+    private static bool _cron;
+    private static bool _pruneSnapshots;
+    private static bool _takeSnapshots;
 
     private static readonly Logger Log = LogManager.GetCurrentClassLogger();
 }
