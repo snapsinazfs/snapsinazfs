@@ -1,14 +1,14 @@
-﻿using NLog;
+using NLog;
 using PowerArgs;
 using Sanoid;
 using Sanoid.Common.Configuration;
 
-ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
 
 Logging.ConfigureLogger();
 
-Logger Logger = NLog.LogManager.GetLogger( "Sanoid" );
-Logger.Info( Configuration.UseSanoidConfiguration ? "We are using sanoid.conf" : "We are not using sanoid.conf" );
+Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
+ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
 
 if ( argParseReults.Cancelled )
 {
