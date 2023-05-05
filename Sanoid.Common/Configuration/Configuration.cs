@@ -10,6 +10,8 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 public static class Configuration
 {
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
     static Configuration( )
     {
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
