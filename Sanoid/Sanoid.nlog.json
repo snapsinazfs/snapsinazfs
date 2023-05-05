@@ -59,7 +59,7 @@
       },
       "own-console": {
         "type": "ColoredConsole",
-        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger}|${message} ${exception:format=tostring}|${callsite}:${callsite-linenumber}",
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=tostring}|${callsite}${onexception:inner=\\:${callsite-linenumber}}",
         "rowHighlightingRules": [
           {
             "condition": "level == LogLevel.Warn",
