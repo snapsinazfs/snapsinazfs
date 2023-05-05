@@ -27,10 +27,20 @@ namespace Sanoid
         [ArgShortcut( "--debug" )]
         public bool Debug { get; set; }
 
-        [ArgDefaultValue( "/etc/sanoid" )]
+        [ArgDefaultValue( "/etc/sanoid or value set in Sanoid.json#/SanoidConfigurationPathBase" )]
         [ArgDescription( "Base configuration directory for sanoid" )]
         [ArgShortcut( "--configdir" )]
-        public string ConfigDir { get; set; } = "/etc/sanoid";
+        public string? ConfigDir { get; set; }
+
+        [ArgDefaultValue( "/var/cache/sanoid or value set in Sanoid.json#/SanoidConfigurationCacheDirectory" )]
+        [ArgDescription( "Cache directory for sanoid" )]
+        [ArgShortcut( "--cache-dir" )]
+        public string? CacheDir { get; set; }
+
+        [ArgDefaultValue( "/var/run/sanoid or value set in Sanoid.json#/SanoidConfigurationRunDirectory" )]
+        [ArgDescription( "Runtime directory for sanoid" )]
+        [ArgShortcut( "--run-dir" )]
+        public string? RunDir { get; set; }
 
         /// <summary>
         /// Stub method to allow PowerArgs to run without handing execution over to PowerArgs
