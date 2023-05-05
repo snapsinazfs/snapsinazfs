@@ -23,6 +23,11 @@ public static class JsonConfigurationSections
     public static IConfigurationSection FormattingConfiguration => RootConfiguration.GetRequiredSection( "Formatting" );
 
     /// <summary>
+    ///     Gets the /Monitoring configuration section of Sanoid.json
+    /// </summary>
+    public static IConfigurationSection MonitoringConfiguration => FormattingConfiguration.GetRequiredSection( "Monitoring" );
+
+    /// <summary>
     ///     Gets the root configuration section of Sanoid.json
     /// </summary>
     /// <remarks>
