@@ -70,8 +70,7 @@ namespace Sanoid.Common.Configuration
                         }
                     }
                 }
-
-                return;
+                
                 throw new ConfigurationValidationException( "Sanoid.json validation failed. Please check Sanoid.json and ensure it complies with the schema specified in Sanoid.schema.json." );
             }
         }

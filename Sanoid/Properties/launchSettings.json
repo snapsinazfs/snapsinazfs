@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Sanoid": {
+      "commandName": "Project"
+    },
+    "Help": {
+      "commandName": "Project",
+      "commandLineArgs": "-h"
+    }
+  }
+}
