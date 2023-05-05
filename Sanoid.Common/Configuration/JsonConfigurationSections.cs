@@ -15,7 +15,7 @@ namespace Sanoid.Common.Configuration
     public static class JsonConfigurationSections
     {
         private static IConfigurationRoot? _rootConfiguration;
-        private static Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Gets the root configuration section of Sanoid.json
