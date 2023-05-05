@@ -23,6 +23,11 @@ namespace Sanoid
         [ArgCantBeCombinedWith( expression: "Verbose|Quiet|ReallyQuiet" )]
         public bool Debug { get; set; }
 
+        [ArgDescription( "Trace level output logging. Change log level in Sanoid.nlog.json for normal usage." )]
+        [ArgShortcut( "--trace" )]
+        [ArgCantBeCombinedWith( expression: "Verbose|Debug|Quiet|ReallyQuiet" )]
+        public bool Trace { get; set; }
+
         [ArgDescription( "No output logging. Change log level to Off in Sanoid.nlog.json for normal usage. WILL WARN BEFORE SETTING IS APPLIED." )]
         [ArgShortcut( "--quiet" )]
         [ArgCantBeCombinedWith( expression: "Debug|Verbose" )]
@@ -68,6 +73,10 @@ namespace Sanoid
             if ( Verbose )
             {
                 Configuration.DefaultLoggingLevel = LogLevel.Info;
+            }
+            if (Trace)
+            {
+                Configuration.DefaultLoggingLevel = LogLevel.Trace;
             }
             if ( Quiet )
             {
