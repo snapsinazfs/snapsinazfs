@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Json.Schema.Serialization;
+using NLog;
 
 namespace Sanoid.Common.Configuration;
 
@@ -8,6 +9,8 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 public static class Configuration
 {
+    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
     /// <summary>
     /// Gets whether Sanoid.net should use ini-formatted configuration files using PERL sanoid's schema.<br />
     /// Corresponds to the /UseSanoidConfiguration property of Sanoid.json.
