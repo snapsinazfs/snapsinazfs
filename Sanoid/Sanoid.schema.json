@@ -3,7 +3,7 @@
   "$id": "Sanoid.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
-  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring", "TakeSnapshots", "PruneSnapshots" ],
+  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring", "TakeSnapshots", "PruneSnapshots", "PlatformUtilities" ],
   "properties": {
     "$id": {
       "type": "string",
@@ -70,6 +70,9 @@
     },
     "Monitoring": {
       "$ref": "#/definitions/Monitoring"
+    },
+    "PlatformUtilities": {
+      "$ref": "#/definitions/PlatformUtilities"
     }
   },
   "definitions": {
@@ -145,6 +148,31 @@
         "$ref": "Sanoid.monitoring.schema.json",
         "type": "object"
       }
+    },
+    "PlatformUtilities": {
+      "type": "object",
+      "description": "Paths to platform utilities, either absolute or relative to the $PATH environment variable Sanoid.net is invoked with.",
+      "required": [ "ps", "zfs", "zpool" ],
+      "properties": {
+        "ps": {
+          "type": "string",
+          "description": "The path to the standard 'ps' command or another utility with identical output",
+          "default": "/usr/bin/ps"
+        },
+        "zfs": {
+          "type": "string",
+          "description": "The path to the 'zfs' command",
+          "default": "/usr/local/sbin/zfs"
+        },
+        "zpool": {
+          "type": "string",
+          "description": "The path to the 'zpool' command",
+          "default": "/usr/local/sbin/zpool"
+        }
+      },
+      "additionalProperties": {
+        "type": "string"
+      } 
     }
   }
 }

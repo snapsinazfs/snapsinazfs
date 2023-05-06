@@ -23,6 +23,11 @@
       "YearlySuffix": "yearly"
     }
   },
+  "PlatformUtilities": {
+    "ps": "/usr/bin/ps",
+    "zfs": "/usr/local/sbin/zfs",
+    "zpool": "/usr/local/sbin/zpool"
+  },
   "Monitoring": {
     "Nagios": {
       "$comments": "Nagios-specific monitoring options",
