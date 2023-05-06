@@ -251,4 +251,9 @@ public static class Configuration
     private static bool _takeSnapshots;
 
     private static readonly Logger Log;
+
+    public static void Initialize()
+    {
+        Log.Trace( "Initializing configuration." );
+    }
 }

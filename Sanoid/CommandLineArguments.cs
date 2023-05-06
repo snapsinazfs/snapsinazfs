@@ -8,7 +8,9 @@ using System.Reflection;
 using JetBrains.Annotations;
 using NLog;
 using PowerArgs;
-using Sanoid.Common.Configuration;
+using Sanoid.Common.Configuration.Monitoring;
+using BaseConfiguration = Sanoid.Common.Configuration.Configuration;
+using MonitoringConfiguration = Sanoid.Common.Configuration.Monitoring.Configuration;
 
 namespace Sanoid;
 
@@ -128,9 +130,12 @@ internal class CommandLineArguments
             return;
         }
 
+        //Call this so that settings are first retrieved from configuration, to allow arguments to override them.
+        BaseConfiguration.Initialize();
+
         if ( Quiet )
         {
-            Configuration.DefaultLoggingLevel = LogLevel.Off;
+            BaseConfiguration.DefaultLoggingLevel = LogLevel.Off;
         }
 
         if ( ReallyQuiet )
@@ -140,22 +145,22 @@ internal class CommandLineArguments
 
         if ( Trace )
         {
-            Configuration.DefaultLoggingLevel = LogLevel.Trace;
+            BaseConfiguration.DefaultLoggingLevel = LogLevel.Trace;
         }
 
         if ( Verbose )
         {
-            Configuration.DefaultLoggingLevel = LogLevel.Info;
+            BaseConfiguration.DefaultLoggingLevel = LogLevel.Info;
         }
 
         if ( CacheDir is not null )
         {
-            Configuration.SanoidConfigurationCacheDirectory = CacheDir;
+            BaseConfiguration.SanoidConfigurationCacheDirectory = CacheDir;
         }
 
         if ( ConfigDir is not null )
         {
-            Configuration.SanoidConfigurationPathBase = ConfigDir;
+            BaseConfiguration.SanoidConfigurationPathBase = ConfigDir;
         }
 
         if ( Cron )
@@ -167,7 +172,7 @@ internal class CommandLineArguments
 
         if ( Debug )
         {
-            Configuration.DefaultLoggingLevel = LogLevel.Debug;
+            BaseConfiguration.DefaultLoggingLevel = LogLevel.Debug;
         }
 
         if ( ForcePrune )
@@ -183,22 +188,31 @@ internal class CommandLineArguments
 
         if ( MonitorCapacity )
         {
-            //TODO: Implement MonitorCapacity
+            if ( MonitoringConfiguration.MonitorConfigurations.TryGetValue( "Nagios", out MonitoringConfigurationBase? nagiosConfig ) )
+            {
+                nagiosConfig.MonitorCapacity = true;
+            }
         }
 
         if ( MonitorHealth )
         {
-            //TODO: Implement MonitorHealth
+            if ( MonitoringConfiguration.MonitorConfigurations.TryGetValue( "Nagios", out MonitoringConfigurationBase? nagiosConfig ) )
+            {
+                nagiosConfig.MonitorHealth = true;
+            }
         }
 
         if ( MonitorSnapshots )
         {
-            //TODO: Implement MonitorSnapshots
+            if ( MonitoringConfiguration.MonitorConfigurations.TryGetValue( "Nagios", out MonitoringConfigurationBase? nagiosConfig ) )
+            {
+                nagiosConfig.MonitorSnapshots = true;
+            }
         }
 
         if ( PruneSnapshots )
         {
-            //TODO: Implement PruneSnapshots
+            BaseConfiguration.PruneSnapshots = true;
         }
 
         if ( ReadOnly )
@@ -208,17 +222,17 @@ internal class CommandLineArguments
 
         if ( RunDir is not null )
         {
-            Configuration.SanoidConfigurationRunDirectory = RunDir;
+            BaseConfiguration.SanoidConfigurationRunDirectory = RunDir;
         }
 
         if ( TakeSnapshots )
         {
-            //TODO: Implement TakeSnapshots
+            BaseConfiguration.TakeSnapshots = true;
         }
 
         if ( UseSanoidConfig )
         {
-            Configuration.UseSanoidConfiguration = true;
+            BaseConfiguration.UseSanoidConfiguration = true;
         }
     }
 }
