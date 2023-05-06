@@ -10,5 +10,6 @@ internal class NagiosMonitoringConfiguration : MonitoringConfigurationBase
 {
     public NagiosMonitoringConfiguration( string monitorName ) : base( monitorName )
     {
+
     }
 }
