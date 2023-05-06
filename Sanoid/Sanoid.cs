@@ -15,11 +15,15 @@ Logger logger = LogManager.GetCurrentClassLogger();
 
 ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
 
+//If PowerArgs cancelled the parser invocation, either it handled the help method or it encountered an error.
+//Either way, exit now.
 if ( argParseReults.Cancelled )
 {
     return 0;
 }
 
+//Version output handled by the PowerArgs parser invocation, to avoid unnecessary further setup.
+//Can just exit now without doing anything else.
 if ( argParseReults.Args.Version )
 {
     return 0;
