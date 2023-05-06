@@ -146,12 +146,11 @@
       }
     },
     "Monitoring": {
-      "type": "array",
+      "type": "object",
       "description": "Configuration section for configurable formatting options for monitoring.",
-      "items": {
+      "additionalProperties": {
         "type": "object",
-        "$ref": "Sanoid.monitoring.schema.json#",
-        "uniqueItems": true
+        "$ref": "Sanoid.monitoring.schema.json#"
       }
     }
   }
