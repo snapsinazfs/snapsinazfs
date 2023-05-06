@@ -58,6 +58,16 @@
  applications, either, or any of their dependencies, except for their configuration files. All dependencies of
  these ports will either be included in published releases or included as project references in the dotnet 
  projects, so that they can be automatically restored by the dotnet runtime, from the public NuGet repository.
+ 
+ That said, here are the nuget package dependencies as of right now:
+ 
+  - PowerArgs
+  - JsonSchema.Net
+  - Microsoft.Extensions.Configuration.Json
+  - Microsoft.Extensions.Configuration.Ini
+  - NLog
+  - NLog.Extensions.Logging
+  - NLog.Targets.Journald
 
  ## But seriously... WHY???
 
