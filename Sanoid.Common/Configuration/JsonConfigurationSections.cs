@@ -66,18 +66,21 @@ public static class JsonConfigurationSections
     ///     If the method does not throw, the configuration is valid for use.
     /// </summary>
     /// <exception cref="JsonException">If Sanoid.json is invalid according to Sanoid.schema.json</exception>
-    private static void ValidateSanoidConfiguration()
+    private static void ValidateSanoidConfiguration( )
     {
+        JsonSchema sanoidMonitoringConfigJsonSchema = JsonSchema.FromFile( "Sanoid.monitoring.schema.json" );
         JsonSchema sanoidConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
         using JsonDocument sanoidConfigJsonDocument = JsonDocument.Parse( File.ReadAllText( "Sanoid.json" ) );
         EvaluationOptions evaluationOptions = new()
         {
-            EvaluateAs = SpecVersion.Draft7,
+            EvaluateAs = SpecVersion.Draft201909,
             RequireFormatValidation = true,
             OnlyKnownFormats = true,
             OutputFormat = OutputFormat.List,
             ValidateAgainstMetaSchema = false
         };
+
+        SchemaRegistry.Global.Register( sanoidMonitoringConfigJsonSchema );
 
         EvaluationResults configValidationResults = sanoidConfigJsonSchema.Evaluate( sanoidConfigJsonDocument, evaluationOptions );
 
