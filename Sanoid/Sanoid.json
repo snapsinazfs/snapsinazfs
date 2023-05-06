@@ -21,13 +21,14 @@
       "YearlySuffix": "yearly"
     }
   },
-  "Monitoring": {
-    "Nagios": {
-      "$schema": "Sanoid.monitoring.nagios.schema.json",
+  "Monitoring": [
+    {
+      "Name": "Nagios",
+      "$schema": "Sanoid.monitoring.schema.json",
       "$comments": "Nagios-specific monitoring options",
       "Capacity": false,
       "Health": false,
       "Snapshots": false
     }
-  }
+  ]
 }

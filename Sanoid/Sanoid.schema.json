@@ -3,7 +3,7 @@
   "$id": "Sanoid.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
-  "required": ["UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting"],
+  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring" ],
   "properties": {
     "$schema": {
       "type": "string",
@@ -83,7 +83,7 @@
     "Formatting": {
       "type": "object",
       "description": "Configuration section for configurable formatting options for output, naming, etc.",
-      "required": ["SnapshotNaming"],
+      "required": [ "SnapshotNaming" ],
       "properties": {
         "SnapshotNaming": {
           "$ref": "#/definitions/Formatting/SnapshotNaming"
@@ -92,7 +92,7 @@
       "SnapshotNaming": {
         "type": "object",
         "description": "Formatting configuration section for composing snapshot names.",
-        "required": ["ComponentSeparator", "Prefix", "TimestampFormatString", "FrequentSuffix", "HourlySuffix", "DailySuffix", "WeeklySuffix", "MonthlySuffix", "YearlySuffix"],
+        "required": [ "ComponentSeparator", "Prefix", "TimestampFormatString", "FrequentSuffix", "HourlySuffix", "DailySuffix", "WeeklySuffix", "MonthlySuffix", "YearlySuffix" ],
         "properties": {
           "ComponentSeparator": {
             "type": "string",
@@ -146,12 +146,12 @@
       }
     },
     "Monitoring": {
-      "type": "object",
+      "type": "array",
       "description": "Configuration section for configurable formatting options for monitoring.",
-      "properties": {
-        "Nagios": {
-          "$ref": "Sanoid.monitoring.nagios.schema.json#"
-        }
+      "items": {
+        "type": "object",
+        "$ref": "Sanoid.monitoring.schema.json#",
+        "uniqueItems": true
       }
     }
   }

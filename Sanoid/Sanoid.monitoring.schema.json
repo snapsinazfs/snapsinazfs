@@ -1,20 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "Sanoid.monitoring.nagios.schema.json",
+  "$id": "Sanoid.monitoring.schema.json",
   "type": "object",
-  "description": "Configuration schema for Sanoid.net's nagios monitoring capabilities",
+  "description": "Configuration schema for Sanoid.net's monitoring capabilities",
+  "required": [ "Name" ],
   "properties": {
     "$schema": {
       "type": "string",
-      "description": "A uri-reference pointing to Sanoid.monitoring.nagios.schema.json.",
+      "description": "A uri-reference pointing to Sanoid.monitoring.schema.json.",
       "format": "uri-reference",
-      "default": "Sanoid.monitoring.nagios.schema.json"
+      "default": "Sanoid.monitoring.schema.json"
     },
     "$id": {
       "type": "string",
-      "description": "The name of the config file. Sanoid expects to see 'Sanoid.monitoring.nagios.json'.",
+      "description": "The name of the config file. Sanoid expects to see 'Sanoid.monitoring.json'.",
       "format": "uri-reference",
-      "default": "Sanoid.monitoring.nagios.json"
+      "default": "Sanoid.monitoring.json"
     },
     "$comments": {
       "type": "string",
@@ -34,6 +35,10 @@
       "type": "boolean",
       "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of your snapshots. Corresponds to the --monitor-snapshots command line argument.",
       "default": false
+    },
+    "Name": {
+      "type": "string",
+      "description": "The name of the monitor"
     }
   },
   "additionalProperties": false

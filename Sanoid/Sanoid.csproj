@@ -22,7 +22,7 @@
 
 
   <ItemGroup>
-    <Content Include="Sanoid.monitoring.nagios.schema.json">
+    <Content Include="Sanoid.monitoring.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Sanoid.json">
