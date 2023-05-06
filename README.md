@@ -14,6 +14,17 @@
  that the [dotnet-port-master](../tree/dotnet-port-master) branch is synced with. As of this writing, that is
  sanoid release 2.1.0 plus all sanoid master branch commits up to
  [jimsalterjrs/sanoid@55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0](https://github.com/jimsalterjrs/sanoid/commit/55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0)
+ 
+ ## Compatibility With PERL-based sanoid
+ 
+ Sanoid.net is intended to be compatible with PERL-based sanoid. Invocations of Sanoid.net will accept the same
+ arguments as PERL sanoid, and will behave the same, except for logging output, which is via nlog and is
+ configurable by the end user.
+ 
+ Sanoid.net may also have additional capabilities which are not guaranteed to be available in PERL sanoid.
+ 
+ Thus, sanoid => Sanoid.net portability should be seemless, but Sanoid.net => sanoid portability is only
+ guaranteed if no Sanoid.net enhancements are used.
 
  ## Project Organization
 
