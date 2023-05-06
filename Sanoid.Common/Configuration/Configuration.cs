@@ -1,15 +1,11 @@
-// /*
-// *  LICENSE:
-// *
-// *  This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// *  from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// *  project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
-// */
+// LICENSE:
+// 
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
+// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
+// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Text.Json.Serialization;
-
 using JetBrains.Annotations;
-
 using NLog;
 using NLog.Config;
 
@@ -20,15 +16,15 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 public static class Configuration
 {
-    static Configuration( )
+    static Configuration()
     {
         Log = LogManager.GetCurrentClassLogger();
         Log.Debug( "Initializing root-level configuration from Sanoid.Json#/." );
-        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
-        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationDefaultsFile" ] ?? "sanoid.defaults.conf";
-        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationLocalFile" ] ?? "sanoid.conf";
-        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
-        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationCacheDirectory"] ?? "/var/cache/sanoid";
+        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationDefaultsFile"] ?? "sanoid.defaults.conf";
+        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationLocalFile"] ?? "sanoid.conf";
+        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration["SanoidConfigurationPathBase"] ?? "/etc/sanoid";
+        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationRunDirectory"] ?? "/var/run/sanoid";
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
         TakeSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "TakeSnapshots" );
         PruneSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "PruneSnapshots" );
@@ -104,7 +100,7 @@ public static class Configuration
             }
 
             Log.Debug( "Reconfiguring loggers" );
-            LogManager.ReconfigExistingLoggers( );
+            LogManager.ReconfigExistingLoggers();
         }
     }
 
@@ -252,6 +248,9 @@ public static class Configuration
 
     private static readonly Logger Log;
 
+    /// <summary>
+    ///     Method used to force instatiation of this static class.
+    /// </summary>
     public static void Initialize()
     {
         Log.Trace( "Initializing configuration." );
