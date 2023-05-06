@@ -78,8 +78,8 @@ if ( Configuration.UseSanoidConfiguration )
     }
 }
 
-logger.Error( "Not yet implemented." );
-logger.Error( "Please use the Perl-based sanoid/syncoid for now." );
-logger.Error( "This program will now exit with an error (status -1) to prevent accidental usage in scripts." );
+logger.Fatal( "Not yet implemented." );
+logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
+logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
 
-return -1;
+return (int)Errno.ENOSYS;
