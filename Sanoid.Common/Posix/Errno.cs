@@ -7,177 +7,436 @@
 namespace Sanoid.Common.Posix
 {
     // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///     An enum of POSIX-compliant status codes as defined in errno-base.h and errno.h of Linux kernel version 6.1.9
     ///     headers.
     /// </summary>
     internal enum Errno
     {
-        /// <summary>
-        ///     Operation not permitted
-        /// </summary>
+        /// <summary>Operation not permitted</summary>
         EPERM = 1,
 
-        /// <summary>
-        ///     No such file or directory
-        /// </summary>
+        /// <summary>No such file or directory</summary>
         ENOENT = 2,
 
-        /// <summary>
-        ///     No such process
-        /// </summary>
+        /// <summary>No such process</summary>
         ESRCH = 3,
-        EINTR = 4,         // Interrupted system call
-        EIO = 5,           // I/O error
-        ENXIO = 6,         // No such device or address 
-        E2BIG = 7,         // Arg list too long 
-        ENOEXEC = 8,       // Exec format error 
-        EBADF = 9,         // Bad file number 
-        ECHILD = 10,       // No child processes 
-        EAGAIN = 11,       // Try again 
-        ENOMEM = 12,       // Out of memory 
-        EACCES = 13,       // Permission denied
-        EFAULT = 14,       // Bad address
-        ENOTBLK = 15,      // Block device required 
-        EBUSY = 16,        // Device or resource busy 
-        EEXIST = 17,       // File exists 
-        EXDEV = 18,        // Cross-device link 
-        ENODEV = 19,       // No such device 
-        ENOTDIR = 20,      // Not a directory 
-        EISDIR = 21,       // Is a directory 
-        EINVAL = 22,       // Invalid argument 
-        ENFILE = 23,       // File table overflow 
-        EMFILE = 24,       // Too many open files 
-        ENOTTY = 25,       // Not a typewriter 
-        ETXTBSY = 26,      // Text file busy 
-        ENOSPC = 28,       // No space left on device 
-        ESPIPE = 29,       // Illegal seek 
-        EROFS = 30,        // Read-only file system 
-        EMLINK = 31,       // Too many links 
-        EPIPE = 32,        // Broken pipe 
-        EDOM = 33,         // Math argument out of domain of func 
-        ERANGE = 34,       // Math result not representable 
-        EDEADLK = 35,      // Resource deadlock would occur 
-        ENAMETOOLONG = 36, // File name too long 
-        ENOLCK = 37,       // No record locks available
+
+        ///<summary>Interrupted system call</summary>
+        EINTR = 4,
+
+        ///<summary>I/O error</summary>
+        EIO = 5,
+
+        ///<summary>No such device or address </summary>
+        ENXIO = 6,
+
+        ///<summary>Arg list too long </summary>
+        E2BIG = 7,
+
+        ///<summary>Exec format error </summary>
+        ENOEXEC = 8,
+
+        ///<summary>Bad file number </summary>
+        EBADF = 9,
+
+        ///<summary>No child processes </summary>
+        ECHILD = 10,
+
+        ///<summary>Try again </summary>
+        EAGAIN = 11,
+
+        ///<summary>Out of memory </summary>
+        ENOMEM = 12,
+
+        ///<summary>Permission denied</summary>
+        EACCES = 13,
+
+        ///<summary>Bad address</summary>
+        EFAULT = 14,
+
+        ///<summary>Block device required </summary>
+        ENOTBLK = 15,
+
+        ///<summary>Device or resource busy </summary>
+        EBUSY = 16,
+
+        ///<summary>File exists </summary>
+        EEXIST = 17,
+
+        ///<summary>Cross-device link </summary>
+        EXDEV = 18,
+
+        ///<summary>No such device </summary>
+        ENODEV = 19,
+
+        ///<summary>Not a directory </summary>
+        ENOTDIR = 20,
+
+        ///<summary>Is a directory </summary>
+        EISDIR = 21,
+
+        ///<summary>Invalid argument </summary>
+        EINVAL = 22,
+
+        ///<summary>File table overflow </summary>
+        ENFILE = 23,
+
+        ///<summary>Too many open files </summary>
+        EMFILE = 24,
+
+        ///<summary>Not a typewriter </summary>
+        ENOTTY = 25,
+
+        ///<summary>Text file busy </summary>
+        ETXTBSY = 26,
+
+        ///<summary>No space left on device </summary>
+        ENOSPC = 28,
+
+        ///<summary>Illegal seek </summary>
+        ESPIPE = 29,
+
+        ///<summary>Read-only file system </summary>
+        EROFS = 30,
+
+        ///<summary>Too many links </summary>
+        EMLINK = 31,
+
+        ///<summary>Broken pipe </summary>
+        EPIPE = 32,
+
+        ///<summary>Math argument out of domain of func </summary>
+        EDOM = 33,
+
+        ///<summary>Math result not representable </summary>
+        ERANGE = 34,
+
+        ///<summary>Resource deadlock would occur </summary>
+        EDEADLK = 35,
+
+        ///<summary>File name too long </summary>
+        ENAMETOOLONG = 36,
+
+        ///<summary>No record locks available</summary>
+        ENOLCK = 37,
 
         /// <summary>
         ///     Function not implemented
         /// </summary>
         ENOSYS = 38,
-        ENOTEMPTY = 39,       // Directory not empty 
-        ELOOP = 40,           // Too many symbolic links encountered 
+
+        ///<summary>Directory not empty </summary>
+        ENOTEMPTY = 39,
+
+        ///<summary>Too many symbolic links encountered </summary>
+        ELOOP = 40,
         EWOULDBLOCK = EAGAIN, // Operation would block 
-        ENOMSG = 42,          // No message of desired type 
-        EIDRM = 43,           // Identifier removed 
-        ECHRNG = 44,          // Channel number out of range 
-        EL2NSYNC = 45,        // Level 2 not synchronized 
-        EL3HLT = 46,          // Level 3 halted 
-        EL3RST = 47,          // Level 3 reset 
-        ELNRNG = 48,          // Link number out of range 
-        EUNATCH = 49,         // Protocol driver not attached 
-        ENOCSI = 50,          // No CSI structure available 
-        EL2HLT = 51,          // Level 2 halted 
-        EBADE = 52,           // Invalid exchange 
-        EBADR = 53,           // Invalid request descriptor 
-        EXFULL = 54,          // Exchange full 
-        ENOANO = 55,          // No anode 
-        EBADRQC = 56,         // Invalid request code 
-        EBADSLT = 57,         // Invalid slot
+
+        ///<summary>No message of desired type </summary>
+        ENOMSG = 42,
+
+        ///<summary>Identifier removed </summary>
+        EIDRM = 43,
+
+        ///<summary>Channel number out of range </summary>
+        ECHRNG = 44,
+
+        ///<summary>Level 2 not synchronized </summary>
+        EL2NSYNC = 45,
+
+        ///<summary>Level 3 halted </summary>
+        EL3HLT = 46,
+
+        ///<summary>Level 3 reset </summary>
+        EL3RST = 47,
+
+        ///<summary>Link number out of range </summary>
+        ELNRNG = 48,
+
+        ///<summary>Protocol driver not attached </summary>
+        EUNATCH = 49,
+
+        ///<summary>No CSI structure available </summary>
+        ENOCSI = 50,
+
+        ///<summary>Level 2 halted </summary>
+        EL2HLT = 51,
+
+        ///<summary>Invalid exchange </summary>
+        EBADE = 52,
+
+        ///<summary>Invalid request descriptor </summary>
+        EBADR = 53,
+
+        ///<summary>Exchange full </summary>
+        EXFULL = 54,
+
+        ///<summary>No anode </summary>
+        ENOANO = 55,
+
+        ///<summary>Invalid request code </summary>
+        EBADRQC = 56,
+
+        ///<summary>Invalid slot</summary>
+        EBADSLT = 57,
         EDEADLOCK = EDEADLK,
-        EBFONT = 59,          // Bad font file format 
-        ENOSTR = 60,          // Device not a stream 
-        ENODATA = 61,         // No data available 
-        ETIME = 62,           // Timer expired 
-        ENOSR = 63,           // Out of streams resources 
-        ENONET = 64,          // Machine is not on the network 
-        ENOPKG = 65,          // Package not installed 
-        EREMOTE = 66,         // Object is remote 
-        ENOLINK = 67,         // Link has been severed 
-        EADV = 68,            // Advertise error 
-        ESRMNT = 69,          // Srmount error 
-        ECOMM = 70,           // Communication error on send 
-        EPROTO = 71,          // Protocol error 
-        EMULTIHOP = 72,       // Multihop attempted 
-        EDOTDOT = 73,         // RFS specific error 
-        EBADMSG = 74,         // Not a data message 
-        EOVERFLOW = 75,       // Value too large for defined data type 
-        ENOTUNIQ = 76,        // Name not unique on network 
-        EBADFD = 77,          // File descriptor in bad state 
-        EREMCHG = 78,         // Remote address changed 
-        ELIBACC = 79,         // Can not access a needed shared library 
-        ELIBBAD = 80,         // Accessing a corrupted shared library 
-        ELIBSCN = 81,         // .lib section in a.out corrupted 
-        ELIBMAX = 82,         // Attempting to link in too many shared libraries 
-        ELIBEXEC = 83,        // Cannot exec a shared library directly 
-        EILSEQ = 84,          // Illegal byte sequence 
-        ERESTART = 85,        // Interrupted system call should be restarted 
-        ESTRPIPE = 86,        // Streams pipe error 
-        EUSERS = 87,          // Too many users 
-        ENOTSOCK = 88,        // Socket operation on non-socket 
-        EDESTADDRREQ = 89,    // Destination address required 
-        EMSGSIZE = 90,        // Message too long 
-        EPROTOTYPE = 91,      // Protocol wrong type for socket 
-        ENOPROTOOPT = 92,     // Protocol not available 
-        EPROTONOSUPPORT = 93, // Protocol not supported 
-        ESOCKTNOSUPPORT = 94, // Socket type not supported 
-        EOPNOTSUPP = 95,      // Operation not supported on transport endpoint 
-        EPFNOSUPPORT = 96,    // Protocol family not supported 
-        EAFNOSUPPORT = 97,    // Address family not supported by protocol 
-        EADDRINUSE = 98,      // Address already in use 
-        EADDRNOTAVAIL = 99,   // Cannot assign requested address 
-        ENETDOWN = 100,       // Network is down 
-        ENETUNREACH = 101,    // Network is unreachable 
-        ENETRESET = 102,      // Network dropped connection because of reset 
-        ECONNABORTED = 103,   // Software caused connection abort 
-        ECONNRESET = 104,     // Connection reset by peer 
-        ENOBUFS = 105,        // No buffer space available 
-        EISCONN = 106,        // Transport endpoint is already connected 
-        ENOTCONN = 107,       // Transport endpoint is not connected 
-        ESHUTDOWN = 108,      // Cannot send after transport endpoint shutdown 
-        ETOOMANYREFS = 109,   // Too many references: cannot splice 
-        ETIMEDOUT = 110,      // Connection timed out 
-        ECONNREFUSED = 111,   // Connection refused 
-        EHOSTDOWN = 112,      // Host is down 
-        EHOSTUNREACH = 113,   // No route to host 
-        EALREADY = 114,       // Operation already in progress 
-        EINPROGRESS = 115,    // Operation now in progress 
-        ESTALE = 116,         // Stale NFS file handle 
-        EUCLEAN = 117,        // Structure needs cleaning 
-        ENOTNAM = 118,        // Not a XENIX named type file 
-        ENAVAIL = 119,        // No XENIX semaphores available 
-        EISNAM = 120,         // Is a named type file 
-        EREMOTEIO = 121,      // Remote I/O error 
-        EDQUOT = 122,         // Quota exceeded
-        ENOMEDIUM = 123,      // No medium found 
-        EMEDIUMTYPE = 124,    // Wrong medium type
+
+        ///<summary>Bad font file format </summary>
+        EBFONT = 59,
+
+        ///<summary>Device not a stream </summary>
+        ENOSTR = 60,
+
+        ///<summary>No data available </summary>
+        ENODATA = 61,
+
+        ///<summary>Timer expired </summary>
+        ETIME = 62,
+
+        ///<summary>Out of streams resources </summary>
+        ENOSR = 63,
+
+        ///<summary>Machine is not on the network </summary>
+        ENONET = 64,
+
+        ///<summary>Package not installed </summary>
+        ENOPKG = 65,
+
+        ///<summary>Object is remote </summary>
+        EREMOTE = 66,
+
+        ///<summary>Link has been severed </summary>
+        ENOLINK = 67,
+
+        ///<summary>Advertise error </summary>
+        EADV = 68,
+
+        ///<summary>Srmount error </summary>
+        ESRMNT = 69,
+
+        ///<summary>Communication error on send </summary>
+        ECOMM = 70,
+
+        ///<summary>Protocol error </summary>
+        EPROTO = 71,
+
+        ///<summary>Multihop attempted </summary>
+        EMULTIHOP = 72,
+
+        ///<summary>RFS specific error </summary>
+        EDOTDOT = 73,
+
+        ///<summary>Not a data message </summary>
+        EBADMSG = 74,
+
+        ///<summary>Value too large for defined data type </summary>
+        EOVERFLOW = 75,
+
+        ///<summary>Name not unique on network </summary>
+        ENOTUNIQ = 76,
+
+        ///<summary>File descriptor in bad state </summary>
+        EBADFD = 77,
+
+        ///<summary>Remote address changed </summary>
+        EREMCHG = 78,
+
+        ///<summary>Can not access a needed shared library </summary>
+        ELIBACC = 79,
+
+        ///<summary>Accessing a corrupted shared library </summary>
+        ELIBBAD = 80,
+
+        ///<summary>.lib section in a.out corrupted </summary>
+        ELIBSCN = 81,
+
+        ///<summary>Attempting to link in too many shared libraries </summary>
+        ELIBMAX = 82,
+
+        ///<summary>Cannot exec a shared library directly </summary>
+        ELIBEXEC = 83,
+
+        ///<summary>Illegal byte sequence </summary>
+        EILSEQ = 84,
+
+        ///<summary>Interrupted system call should be restarted </summary>
+        ERESTART = 85,
+
+        ///<summary>Streams pipe error </summary>
+        ESTRPIPE = 86,
+
+        ///<summary>Too many users </summary>
+        EUSERS = 87,
+
+        ///<summary>Socket operation on non-socket </summary>
+        ENOTSOCK = 88,
+
+        ///<summary>Destination address required </summary>
+        EDESTADDRREQ = 89,
+
+        ///<summary>Message too long </summary>
+        EMSGSIZE = 90,
+
+        ///<summary>Protocol wrong type for socket </summary>
+        EPROTOTYPE = 91,
+
+        ///<summary>Protocol not available </summary>
+        ENOPROTOOPT = 92,
+
+        ///<summary>Protocol not supported </summary>
+        EPROTONOSUPPORT = 93,
+
+        ///<summary>Socket type not supported </summary>
+        ESOCKTNOSUPPORT = 94,
+
+        ///<summary>Operation not supported on transport endpoint </summary>
+        EOPNOTSUPP = 95,
+
+        ///<summary>Protocol family not supported </summary>
+        EPFNOSUPPORT = 96,
+
+        ///<summary>Address family not supported by protocol </summary>
+        EAFNOSUPPORT = 97,
+
+        ///<summary>Address already in use </summary>
+        EADDRINUSE = 98,
+
+        ///<summary>Cannot assign requested address </summary>
+        EADDRNOTAVAIL = 99,
+
+        ///<summary>Network is down </summary>
+        ENETDOWN = 100,
+
+        ///<summary>Network is unreachable </summary>
+        ENETUNREACH = 101,
+
+        ///<summary>Network dropped connection because of reset </summary>
+        ENETRESET = 102,
+
+        ///<summary>Software caused connection abort </summary>
+        ECONNABORTED = 103,
+
+        ///<summary>Connection reset by peer </summary>
+        ECONNRESET = 104,
+
+        ///<summary>No buffer space available </summary>
+        ENOBUFS = 105,
+
+        ///<summary>Transport endpoint is already connected </summary>
+        EISCONN = 106,
+
+        ///<summary>Transport endpoint is not connected </summary>
+        ENOTCONN = 107,
+
+        ///<summary>Cannot send after transport endpoint shutdown </summary>
+        ESHUTDOWN = 108,
+
+        ///<summary>Too many references: cannot splice </summary>
+        ETOOMANYREFS = 109,
+
+        ///<summary>Connection timed out </summary>
+        ETIMEDOUT = 110,
+
+        ///<summary>Connection refused </summary>
+        ECONNREFUSED = 111,
+
+        ///<summary>Host is down </summary>
+        EHOSTDOWN = 112,
+
+        ///<summary>No route to host </summary>
+        EHOSTUNREACH = 113,
+
+        ///<summary>Operation already in progress </summary>
+        EALREADY = 114,
+
+        ///<summary>Operation now in progress </summary>
+        EINPROGRESS = 115,
+
+        ///<summary>Stale NFS file handle </summary>
+        ESTALE = 116,
+
+        ///<summary>Structure needs cleaning </summary>
+        EUCLEAN = 117,
+
+        ///<summary>Not a XENIX named type file </summary>
+        ENOTNAM = 118,
+
+        ///<summary>No XENIX semaphores available </summary>
+        ENAVAIL = 119,
+
+        ///<summary>Is a named type file </summary>
+        EISNAM = 120,
+
+        ///<summary>Remote I/O error </summary>
+        EREMOTEIO = 121,
+
+        ///<summary>Quota exceeded</summary>
+        EDQUOT = 122,
+
+        ///<summary>No medium found </summary>
+        ENOMEDIUM = 123,
+
+        ///<summary>Wrong medium type</summary>
+        EMEDIUMTYPE = 124,
         ECANCELED = 125,
         ENOKEY = 126,
         EKEYEXPIRED = 127,
         EKEYREVOKED = 128,
         EKEYREJECTED = 129,
         EOWNERDEAD = 130,
+
+        ///<summary>OS X-specific values: OS X value + 1000</summary>
         ENOTRECOVERABLE = 131,
 
-        // OS X-specific values: OS X value + 1000
-        EPROCLIM = 1067,      // Too many processes
-        EBADRPC = 1072,       // RPC struct is bad
-        ERPCMISMATCH = 1073,  // RPC version wrong
-        EPROGUNAVAIL = 1074,  // RPC prog. not avail
-        EPROGMISMATCH = 1075, // Program version wrong
-        EPROCUNAVAIL = 1076,  // Bad procedure for program
-        EFTYPE = 1079,        // Inappropriate file type or format
-        EAUTH = 1080,         // Authentication error
-        ENEEDAUTH = 1081,     // Need authenticator
-        EPWROFF = 1082,       // Device power is off
-        EDEVERR = 1083,       // Device error, e.g. paper out
-        EBADEXEC = 1085,      // Bad executable
-        EBADARCH = 1086,      // Bad CPU type in executable
-        ESHLIBVERS = 1087,    // Shared library version mismatch
-        EBADMACHO = 1088,     // Malformed Macho file
-        ENOATTR = 1093,       // Attribute not found
-        ENOPOLICY = 1103      // No such policy registered
+        ///<summary>Too many processes</summary>
+        EPROCLIM = 1067,
+
+        ///<summary>RPC struct is bad</summary>
+        EBADRPC = 1072,
+
+        ///<summary>RPC version wrong</summary>
+        ERPCMISMATCH = 1073,
+
+        ///<summary>RPC prog. not avail</summary>
+        EPROGUNAVAIL = 1074,
+
+        ///<summary>Program version wrong</summary>
+        EPROGMISMATCH = 1075,
+
+        ///<summary>Bad procedure for program</summary>
+        EPROCUNAVAIL = 1076,
+
+        ///<summary>Inappropriate file type or format</summary>
+        EFTYPE = 1079,
+
+        ///<summary>Authentication error</summary>
+        EAUTH = 1080,
+
+        ///<summary>Need authenticator</summary>
+        ENEEDAUTH = 1081,
+
+        ///<summary>Device power is off</summary>
+        EPWROFF = 1082,
+
+        ///<summary>Device error, e.g. paper out</summary>
+        EDEVERR = 1083,
+
+        ///<summary>Bad executable</summary>
+        EBADEXEC = 1085,
+
+        ///<summary>Bad CPU type in executable</summary>
+        EBADARCH = 1086,
+
+        ///<summary>Shared library version mismatch</summary>
+        ESHLIBVERS = 1087,
+
+        ///<summary>Malformed Macho file</summary>
+        EBADMACHO = 1088,
+
+        ///<summary>Attribute not found</summary>
+        ENOATTR = 1093,
+        ENOPOLICY = 1103 // No such policy registered
     }
     // ReSharper enable InconsistentNaming
 }
