@@ -1,16 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "Sanoid.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
-  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring" ],
+  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring", "TakeSnapshots", "PruneSnapshots" ],
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "A uri-reference pointing to Sanoid.schema.json.",
-      "format": "uri-reference",
-      "default": "Sanoid.schema.json"
-    },
     "$id": {
       "type": "string",
       "description": "The name of the config file. Sanoid expects to see 'Sanoid.json'.",
@@ -78,7 +71,6 @@
       "$ref": "#/definitions/Monitoring"
     }
   },
-  "additionalProperties": false,
   "definitions": {
     "Formatting": {
       "type": "object",
@@ -149,8 +141,8 @@
       "type": "object",
       "description": "Configuration section for configurable formatting options for monitoring.",
       "additionalProperties": {
-        "type": "object",
-        "$ref": "Sanoid.monitoring.schema.json#"
+        "$ref": "Sanoid.monitoring.schema.json",
+        "type": "object"
       }
     }
   }

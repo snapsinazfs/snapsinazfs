@@ -3,6 +3,8 @@
   "$id": "Sanoid.json",
   "$comments": "Default values are compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
   "UseSanoidConfiguration": true,
+  "TakeSnapshots": false,
+  "PruneSnapshots": false,
   "SanoidConfigurationPathBase": "/etc/sanoid",
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
   "SanoidConfigurationLocalFile": "sanoid.conf",

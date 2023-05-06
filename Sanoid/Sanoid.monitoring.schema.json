@@ -1,16 +1,9 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "Sanoid.monitoring.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net's monitoring capabilities",
   "required": [ "MonitorType" ],
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "A uri-reference pointing to Sanoid.monitoring.schema.json.",
-      "format": "uri-reference",
-      "default": "Sanoid.monitoring.schema.json"
-    },
     "$comments": {
       "type": "string",
       "description": "Comments about this document. Not used in configuration validation."
