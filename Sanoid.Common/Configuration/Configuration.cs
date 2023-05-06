@@ -7,7 +7,9 @@
 // */
 
 using System.Text.Json.Serialization;
+
 using JetBrains.Annotations;
+
 using NLog;
 using NLog.Config;
 
@@ -18,15 +20,19 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 public static class Configuration
 {
-    static Configuration()
+    static Configuration( )
     {
+        Log = LogManager.GetCurrentClassLogger();
         Log.Debug( "Initializing root-level configuration from Sanoid.Json#/." );
+        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationDefaultsFile" ] ?? "sanoid.defaults.conf";
+        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationLocalFile" ] ?? "sanoid.conf";
+        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
-        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration["SanoidConfigurationPathBase"] ?? "/etc/sanoid";
-        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationDefaultsFile"] ?? "sanoid.defaults.conf";
-        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationLocalFile"] ?? "sanoid.conf";
-        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationCacheDirectory"] ?? "/var/cache/sanoid";
-        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationRunDirectory"] ?? "/var/run/sanoid";
+        TakeSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "TakeSnapshots" );
+        PruneSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "PruneSnapshots" );
+
         Log.Debug( "Root level configuration initialized." );
     }
 
@@ -98,7 +104,7 @@ public static class Configuration
             }
 
             Log.Debug( "Reconfiguring loggers" );
-            LogManager.ReconfigExistingLoggers();
+            LogManager.ReconfigExistingLoggers( );
         }
     }
 
@@ -135,7 +141,7 @@ public static class Configuration
     [JsonPropertyName( "SanoidConfigurationCacheDirectory" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string SanoidConfigurationCacheDirectory { get; [NotNull] set; }
+    public static string SanoidConfigurationCacheDirectory { get; set; }
 
     /// <summary>
     ///     Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase" /> folder
@@ -150,7 +156,7 @@ public static class Configuration
     [JsonPropertyName( "SanoidConfigurationDefaultsFile" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string SanoidConfigurationDefaultsFile { get; [NotNull] set; }
+    public static string SanoidConfigurationDefaultsFile { get; set; }
 
 
     /// <summary>
@@ -166,7 +172,7 @@ public static class Configuration
     [JsonPropertyName( "SanoidConfigurationLocalFile" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string SanoidConfigurationLocalFile { get; [NotNull] set; }
+    public static string SanoidConfigurationLocalFile { get; set; }
 
     /// <summary>
     ///     Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<br />
@@ -184,7 +190,7 @@ public static class Configuration
     [JsonPropertyName( "SanoidConfigurationPathBase" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string SanoidConfigurationPathBase { get; [NotNull] set; }
+    public static string SanoidConfigurationPathBase { get; set; }
 
     /// <summary>
     ///     Gets or sets sanoid's run path.<br />
@@ -197,7 +203,7 @@ public static class Configuration
     [JsonPropertyName( "SanoidConfigurationRunDirectory" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string SanoidConfigurationRunDirectory { get; [NotNull] set; }
+    public static string SanoidConfigurationRunDirectory { get; set; }
 
     /// <summary>
     ///     Gets or sets whether Sanoid.net should take new snapshots.
@@ -244,5 +250,5 @@ public static class Configuration
     private static bool _pruneSnapshots;
     private static bool _takeSnapshots;
 
-    private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+    private static readonly Logger Log;
 }
