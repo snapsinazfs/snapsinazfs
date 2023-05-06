@@ -25,7 +25,7 @@ public static class JsonConfigurationSections
     /// <summary>
     ///     Gets the /Monitoring configuration section of Sanoid.json
     /// </summary>
-    public static IConfigurationSection MonitoringConfiguration => FormattingConfiguration.GetRequiredSection( "Monitoring" );
+    public static IConfigurationSection MonitoringConfiguration => RootConfiguration.GetRequiredSection( "Monitoring" );
 
     /// <summary>
     ///     Gets the root configuration section of Sanoid.json
