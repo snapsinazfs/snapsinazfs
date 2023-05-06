@@ -42,6 +42,6 @@ public static class BaseClassExtensions
     {
         if ( string.IsNullOrWhiteSpace( settingKey ) )
             throw new ArgumentException( "settingKey must be a non-null, non-empty string.", settingKey );
-        return configurationSection[ settingKey ]!.AsBoolean( );
+        return (configurationSection[settingKey] ?? "False").AsBoolean( );
     }
 }
