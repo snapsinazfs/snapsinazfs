@@ -41,17 +41,15 @@ public static class JsonConfigurationSections
     {
         get
         {
-            if ( !ConfigIsValid )
+            if ( !IsConfigValid )
             {
                 ValidateSanoidConfiguration();
-                ConfigIsValid = true;
+                IsConfigValid = true;
             }
 
-            return _rootConfiguration ??= new ConfigurationManager( ).AddJsonFile( "Sanoid.json", false, true ).Build( );
+            return _rootConfiguration ??= new ConfigurationManager().AddJsonFile( "Sanoid.json", false, true ).Build();
         }
     }
-
-    private static bool ConfigIsValid;
 
     /// <summary>
     ///     Gets the /Formatting/SnapshotNaming configuration section of Sanoid.json
@@ -59,6 +57,8 @@ public static class JsonConfigurationSections
     public static IConfigurationSection SnapshotNamingConfiguration => FormattingConfiguration.GetRequiredSection( "SnapshotNaming" );
 
     private static IConfigurationRoot? _rootConfiguration;
+
+    private static bool IsConfigValid;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     /// <summary>
@@ -66,7 +66,7 @@ public static class JsonConfigurationSections
     ///     If the method does not throw, the configuration is valid for use.
     /// </summary>
     /// <exception cref="JsonException">If Sanoid.json is invalid according to Sanoid.schema.json</exception>
-    private static void ValidateSanoidConfiguration( )
+    private static void ValidateSanoidConfiguration()
     {
         JsonSchema sanoidMonitoringConfigJsonSchema = JsonSchema.FromFile( "Sanoid.monitoring.schema.json" );
         JsonSchema sanoidConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
