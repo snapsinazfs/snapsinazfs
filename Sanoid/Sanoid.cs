@@ -38,7 +38,6 @@ if ( Configuration.UseSanoidConfiguration )
         if ( argParseReults.Args.ConfigDir != null )
         {
             logger.Fatal( "UseSanoidConfiguration specified, but directory '{0}' specified in --configdir argument does not exist. Sanoid will now exit.", argParseReults.Args.ConfigDir );
-            // 2 is typically ENOENT on linux systems, indicating file or directory not found.
             return (int)Errno.ENOENT;
         }
 
@@ -47,35 +46,37 @@ if ( Configuration.UseSanoidConfiguration )
     }
 
     //ConfigDir exists. Now check for files.
-    string sanoidDefaultsFileFullPath = Path.Combine( Configuration.SanoidConfigurationPathBase, Configuration.SanoidConfigurationDefaultsFile );
-    FileInfo defaultsFileInfo = new( sanoidDefaultsFileFullPath );
-    logger.Debug( "Checking for existence of {0}", sanoidDefaultsFileFullPath );
+    FileInfo defaultsFileInfo = new( Path.Combine( Configuration.SanoidConfigurationPathBase, Configuration.SanoidConfigurationDefaultsFile ) );
+    logger.Debug( "Checking for existence of {0}", defaultsFileInfo.FullName );
     if ( !defaultsFileInfo.Exists )
     {
         if ( argParseReults.Args.ConfigDir is not null )
         {
-            logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} does not exist. Sanoid will now exit.", Path.Combine( argParseReults.Args.ConfigDir, Configuration.SanoidConfigurationDefaultsFile ) );
+            logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} does not exist. Sanoid will now exit.", defaultsFileInfo.FullName );
             return (int)Errno.ENOENT;
         }
 
         logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} specified in Sanoid.json#/SanoidConfigurationDefaultsFile does not exist in directory {1} specified in Sanoid.json#/SanoidConfigurationPathBase.", Configuration.SanoidConfigurationDefaultsFile, Configuration.SanoidConfigurationPathBase );
         return (int)Errno.ENOENT;
     }
+    logger.Debug( "{0} exists.", defaultsFileInfo.FullName );
 
-    logger.Debug( "{0} exists.", sanoidDefaultsFileFullPath );
-    logger.Debug( "Checking for existence of {0}" );
     //Defaults file exists. Now check for local config file.
-    if ( !File.Exists( Path.Combine( Configuration.SanoidConfigurationPathBase, Configuration.SanoidConfigurationLocalFile ) ) )
+    FileInfo localConfigFileInfo = new( Path.Combine( Configuration.SanoidConfigurationPathBase, Configuration.SanoidConfigurationLocalFile ) );
+    logger.Debug( "Checking for existence of {0}" );
+    if ( !localConfigFileInfo.Exists )
     {
         if ( argParseReults.Args.ConfigDir is not null )
         {
-            logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} does not exist. Sanoid will now exit.", Path.Combine( argParseReults.Args.ConfigDir, Configuration.SanoidConfigurationLocalFile ) );
+            logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} does not exist. Sanoid will now exit.", localConfigFileInfo.FullName );
             return (int)Errno.ENOENT;
         }
 
         logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} specified in Sanoid.json#/SanoidConfigurationLocalFile does not exist in directory {1} specified in Sanoid.json#/SanoidConfigurationPathBase.", Configuration.SanoidConfigurationLocalFile, Configuration.SanoidConfigurationPathBase );
         return (int)Errno.ENOENT;
     }
+    logger.Debug( "{0} exists.", localConfigFileInfo.FullName );
+
 }
 
 logger.Fatal( "Not yet implemented." );
