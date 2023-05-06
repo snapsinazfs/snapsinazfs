@@ -4,6 +4,9 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json;
+using Json.More;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using PowerArgs;
 using Sanoid;
@@ -59,11 +62,12 @@ if ( Configuration.UseSanoidConfiguration )
         logger.Fatal( "UseSanoidConfiguration specified, but sanoid defaults file {0} specified in Sanoid.json#/SanoidConfigurationDefaultsFile does not exist in directory {1} specified in Sanoid.json#/SanoidConfigurationPathBase.", Configuration.SanoidConfigurationDefaultsFile, Configuration.SanoidConfigurationPathBase );
         return (int)Errno.ENOENT;
     }
+
     logger.Debug( "{0} exists.", defaultsFileInfo.FullName );
 
     //Defaults file exists. Now check for local config file.
     FileInfo localConfigFileInfo = new( Path.Combine( Configuration.SanoidConfigurationPathBase, Configuration.SanoidConfigurationLocalFile ) );
-    logger.Debug( "Checking for existence of {0}" );
+    logger.Debug( "Checking for existence of {0}", localConfigFileInfo.FullName );
     if ( !localConfigFileInfo.Exists )
     {
         if ( argParseReults.Args.ConfigDir is not null )
