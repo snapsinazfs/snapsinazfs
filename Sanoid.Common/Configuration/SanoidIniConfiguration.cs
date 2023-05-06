@@ -8,7 +8,7 @@ namespace Sanoid.Common.Configuration
     /// Uses the ini-formatted files that PERL sanoid uses if <see cref="Common.Configuration.Configuration.UseSanoidConfiguration"/> is <see langword="true" />.
     /// Uses values specified in Sanoid.json if <see cref="Common.Configuration.Configuration.UseSanoidConfiguration"/> is <see langword="false" />.
     /// </summary>
-    internal static class SanoidConfiguration
+    internal static class SanoidIniConfiguration
     {
         private static IConfigurationRoot? _configuration;
 
@@ -17,9 +17,5 @@ namespace Sanoid.Common.Configuration
                 .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationDefaultsFile ) )
                 .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationLocalFile ) )
                 .Build();
-
-        internal static string ConfigDir { get; set; } = Common.Configuration.Configuration.SanoidConfigurationPathBase;
-        internal static string CacheDir { get; set; } = "/var/cache/sanoid";
-        internal static string RunDir { get; set; } = "/var/run/sanoid";
     }
 }
