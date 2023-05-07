@@ -12,7 +12,7 @@ using NLog;
 namespace Sanoid.Common.Configuration
 {
     /// <summary>
-    ///     Singleton class for easy global access to utility functions and properties such as configuration.
+    ///     Singleton class for easy global access to Sanoid.json configuration.
     /// </summary>
     public static class JsonConfigurationSections
     {
