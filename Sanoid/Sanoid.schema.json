@@ -13,7 +13,7 @@
     },
     "$comments": {
       "type": "string",
-      "description": "Comments about this document. Not used in configuration validation."
+      "description": "Comments about this document."
     },
     "UseSanoidConfiguration": {
       "type": "boolean",

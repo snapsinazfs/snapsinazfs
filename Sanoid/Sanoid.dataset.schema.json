@@ -10,8 +10,9 @@
       "description": "Comments about this item."
     },
     "Template": {
-      "type": "uri-reference",
-      "description": "The JSON pointer to a configured template to use."
+      "type": "string",
+      "description": "The JSON pointer to a configured template to use.",
+      "format": "uri-reference"
     },
     "Overrides": {
       "$ref": "Sanoid.template.schema.json"

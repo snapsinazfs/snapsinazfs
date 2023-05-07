@@ -39,7 +39,7 @@
   },
   "Datasets": {
     "pool1/dataset1": {
-      "Template": "/Templates/production",
+      "Template": "#/Templates/production",
       "Overrides": {
         "Recursive": true 
       }
