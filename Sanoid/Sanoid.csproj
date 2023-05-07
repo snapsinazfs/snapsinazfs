@@ -57,4 +57,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NLog" />
+    <Using Include="JetBrains.Annotations" />
+  </ItemGroup>
 </Project>
