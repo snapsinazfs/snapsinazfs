@@ -80,6 +80,7 @@ namespace Sanoid.Common.Configuration
 
             SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.monitoring.schema.json" ) );
             SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.template.schema.json" ) );
+            SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.dataset.schema.json" ) );
 
             JsonSchema sanoidConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
             EvaluationResults configValidationResults = sanoidConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( "Sanoid.json" ) ), evaluationOptions );

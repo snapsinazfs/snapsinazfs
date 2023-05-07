@@ -76,15 +76,24 @@
     },
     "Templates": {
       "$ref": "#/definitions/Templates"
+    },
+    "Datasets": {
+      "$ref": "#/definitions/Datasets"
     }
   },
   "definitions": {
+    "Datasets": {
+      "type": "object",
+      "description": "Datasets for sanoid to process",
+      "additionalProperties": {
+        "#ref": "Sanoid.dataset.schema.json"
+      } 
+    },
     "Templates": {
       "type": "object",
       "description": "Templates to apply to dataset nodes",
       "additionalProperties": {
-        "$ref": "Sanoid.template.schema.json",
-        "type": "object"
+        "$ref": "Sanoid.template.schema.json"
       }
     },
     "Formatting": {

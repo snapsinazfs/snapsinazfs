@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "Sanoid.dataset.schema.json",
+  "type": "object",
+  "description": "Configuration schema for Sanoid.net dataset configuration items",
+  "required": [ "Template" ],
+  "properties": {
+    "$comments": {
+      "type": "string",
+      "description": "Comments about this item."
+    },
+    "Template": {
+      "type": "uri-reference",
+      "description": "The JSON pointer to a configured template to use."
+    },
+    "Overrides": {
+      "$ref": "Sanoid.template.schema.json"
+    } 
+  }
+}

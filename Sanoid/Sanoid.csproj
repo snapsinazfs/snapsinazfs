@@ -49,6 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Sanoid.dataset.schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Sanoid.template.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
