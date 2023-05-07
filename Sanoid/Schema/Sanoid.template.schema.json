@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "Sanoid.template.schema.json",
+  "type": "object",
+  "description": "Configuration schema for Sanoid.net snapshot templates",
+  "properties": {
+    "$comments": {
+      "type": "string",
+      "description": "Comments about this document. Not used in configuration validation."
+    },
+    "AutoSnapshot": {
+      "type": "boolean",
+      "description": "Whether snapshots are taken for this template.",
+      "default": true
+    },
+    "AutoPrune": {
+      "type": "boolean",
+      "description": "Whether expired snapshots will be pruned for this template.",
+      "default": false
+    },
+    "Recursive": {
+      "type": "boolean",
+      "description": "Whether recursive processing will be used for this template and its descendents.",
+      "default": false
+    },
+    "UseTemplate": {
+      "type": "string",
+      "description": "The name of another template to inherit settings from. Settings set explicitly in the current template will still override inherited settings for the current template.",
+      "minLength": 1,
+      "default": "default"
+    },
+    "SkipChildren": {
+      "type": "boolean",
+      "description": "Whether to apply this template to the specified path only.",
+      "default": false
+    },
+    "FrequentPeriod": {
+      "type": "integer",
+      "description": "The time, in minutes, between 'frequent' snapshots. Should be a whole number factor of 60.",
+      "default": 15
+    },
+    "SnapshotRetention": {
+      "type": "object",
+      "$ref": "#/definitions/SnapshotRetention"
+    },
+    "SnapshotTiming": {
+      "type": "object",
+      "$ref": "#/definitions/SnapshotTiming"
+    }
+  },
+  "definitions": {
+    "SnapshotRetention": {
+      "type": "object",
+      "description": "Snapshot retention options for defined snapshot periods.",
+      "properties": {
+        "Frequent": {
+          "type": "integer",
+          "description": "How many frequent snapshots to keep for this template.",
+          "default": 0,
+          "minimum": 0
+        },
+        "Hourly": {
+          "type": "integer",
+          "description": "How many hourly snapshots to keep for this template.",
+          "default": 48,
+          "minimum": 0
+        },
+        "Daily": {
+          "type": "integer",
+          "description": "How many daily snapshots to keep for this template.",
+          "default": 90,
+          "minimum": 0
+        },
+        "Weekly": {
+          "type": "integer",
+          "description": "How many weekly snapshots to keep for this template.",
+          "default": 0,
+          "minimum": 0
+        },
+        "Monthly": {
+          "type": "integer",
+          "description": "How many monthly snapshots to keep for this template.",
+          "default": 6,
+          "minimum": 0
+        },
+        "Yearly": {
+          "type": "integer",
+          "description": "How many yearly snapshots to keep for this template.",
+          "default": 0,
+          "minimum": 0
+        },
+        "PruneDeferral": {
+          "type": "integer",
+          "description": "Pruning can be skipped based on the used capacity of the pool. (0: always prune, 1-100: only prune if used capacity is greater than this value)",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "SnapshotTiming": {
+      "type": "object",
+      "description": "The times at which the corresponding snapshot periods will be taken.",
+      "$comment": "Note that we will not take snapshots for a given type if that type is set to 0 in SnapshotRetention, regardless of the autosnap setting. For example, if yearly = 0, we will not take yearly snapshots, even if we've defined a preferred time for yearlies and autosnap is on. If multiple snapshots are scheduled to be taken at the same time of day, they will be taken in order of shortest to longest period, so that a Yearly always contains Monthlies, Monthlies contain Weeklies, and so on.",
+      "properties": {
+        "UseLocalTime": {
+          "type": "boolean",
+          "description": "Whether snapshot timing uses local time (true - default) or UTC (false).",
+          "default": true
+        },
+        "HourlyMinute": {
+          "type": "integer",
+          "description": "The minute of the hour to take hourly snapshots. 0 means top of the hour.",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 59
+        },
+        "DailyTime": {
+          "type": "string",
+          "description": "The time of day at which to take daily snapshots. Default is 23:59, since most people expect a daily snapshot to contain everything done DURING that day",
+          "default": "23:59",
+          "format": "time"
+        },
+        "WeeklyDay": {
+          "type": "integer",
+          "description": "The day a weekly snapshot will be taken on, as a 0-indexed day of the week, interpreted according to system locale rules.",
+          "$comment": "In US locale rules, the default value '1' is Monday",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 6
+        },
+        "WeeklyTime": {
+          "type": "string",
+          "description": "The time of day at which to take weekly snapshots.",
+          "$comment": "Default is 23:59, which is different from perl sanoid's default of 23:30, so that weeklies contain all their dailies, as noted in the SnapshotTiming comment in this schema.",
+          "default": "23:59",
+          "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$"
+        },
+        "MonthlyDay": {
+          "type": "integer",
+          "description": "The 1-indexed day of the month on which to take monthly snapshots.",
+          "$comment": "If set to 30 or 31, and the current month does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 31, which is different from perl sanoid, which defaults to 1. This is so that Monthly snapshots contain everything from the named month.",
+          "default": 31,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "MonthlyTime": {
+          "type": "string",
+          "description": "The time of day at which to take monthly snapshots. Must be parseable as a 24-hour time in the format HH:mm or HH:mm:ss. Ability to use seconds depends on your scheduling mechanism.",
+          "$comment": "Default is 23:59, which is different from perl sanoid's default of 23:30, so that monthlies contain all their weeklies and dailies, as noted in the SnapshotTiming comment in this schema.",
+          "default": "23:59",
+          "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$"
+        },
+        "YearlyMonth": {
+          "type": "integer",
+          "description": "The month of the year in which to take yearly snapshots.",
+          "$comment": "Default is 12, which is different from perl sanoid's default of 1, so that yearlies contain all their monthlies, as noted in the SnapshotTiming comment in this schema.",
+          "default": 12,
+          "minimum": 1,
+          "maximum": 12
+        },
+        "YearlyDay": {
+          "type": "integer",
+          "description": "The 1-indexed day of the month on which to take monthly snapshots.",
+          "$comment": "If set to 30 or 31, and the month specified in DailyMonth does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 31, which is different from perl sanoid, which defaults to 1.",
+          "default": 31,
+          "minimum": 1,
+          "maximum": 31
+        },
+        "YearlyTime": {
+          "type": "string",
+          "description": "The time of day at which to take yearly snapshots.",
+          "$comment": "Default is 23:59, which is different from perl sanoid's default of 00:00, so that yearlies contain all their monthlies, as noted in the SnapshotTiming comment in this schema.",
+          "default": "23:59",
+          "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$"
+        }
+      }
+    }
+  }
+}
