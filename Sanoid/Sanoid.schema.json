@@ -86,7 +86,7 @@
       "type": "object",
       "description": "Datasets for sanoid to process",
       "additionalProperties": {
-        "#ref": "Sanoid.dataset.schema.json"
+        "$ref": "Sanoid.dataset.schema.json"
       } 
     },
     "Templates": {
