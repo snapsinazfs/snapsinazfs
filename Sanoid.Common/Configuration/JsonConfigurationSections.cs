@@ -69,7 +69,6 @@ namespace Sanoid.Common.Configuration
         /// <exception cref="JsonException">If Sanoid.json is invalid according to Sanoid.schema.json</exception>
         private static void ValidateSanoidConfiguration()
         {
-            using JsonDocument sanoidConfigJsonDocument = JsonDocument.Parse( File.ReadAllText( "Sanoid.json" ) );
             EvaluationOptions evaluationOptions = new()
             {
                 EvaluateAs = SpecVersion.Draft201909,
@@ -83,7 +82,7 @@ namespace Sanoid.Common.Configuration
             SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.template.schema.json" ) );
 
             JsonSchema sanoidConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
-            EvaluationResults configValidationResults = sanoidConfigJsonSchema.Evaluate( sanoidConfigJsonDocument, evaluationOptions );
+            EvaluationResults configValidationResults = sanoidConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( "Sanoid.json" ) ), evaluationOptions );
 
             if ( !configValidationResults.IsValid )
             {
