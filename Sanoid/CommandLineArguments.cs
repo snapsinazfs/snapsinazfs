@@ -1,22 +1,21 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Reflection;
-using JetBrains.Annotations;
-using NLog;
+using NLog.Config;
 using PowerArgs;
 using Sanoid.Common.Configuration.Monitoring;
 using BaseConfiguration = Sanoid.Common.Configuration.Configuration;
 using MonitoringConfiguration = Sanoid.Common.Configuration.Monitoring.Configuration;
 
-namespace Sanoid;
-
-/// <summary>
-///     The command line arguments that sanoid can accept
-/// </summary>
+namespace Sanoid
+{
+    /// <summary>
+    ///     The command line arguments that sanoid can accept
+    /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
 [UsedImplicitly]
 internal class CommandLineArguments
@@ -138,12 +137,15 @@ internal class CommandLineArguments
             BaseConfiguration.DefaultLoggingLevel = LogLevel.Off;
         }
 
-        if ( ReallyQuiet )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
-        }
+            if ( ReallyQuiet )
+            {
+                foreach ( LoggingRule? rule in LogManager.Configuration!.LoggingRules )
+                {
+                    rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off );
+                }
+            }
 
-        if ( Trace )
+            if ( Trace )
         {
             BaseConfiguration.DefaultLoggingLevel = LogLevel.Trace;
         }
@@ -233,6 +235,7 @@ internal class CommandLineArguments
         if ( UseSanoidConfig )
         {
             BaseConfiguration.UseSanoidConfiguration = true;
+            }
         }
     }
 }
