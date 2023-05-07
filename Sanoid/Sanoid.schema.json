@@ -73,9 +73,20 @@
     },
     "PlatformUtilities": {
       "$ref": "#/definitions/PlatformUtilities"
+    },
+    "Templates": {
+      "$ref": "#/definitions/Templates"
     }
   },
   "definitions": {
+    "Templates": {
+      "type": "object",
+      "description": "Templates to apply to dataset nodes",
+      "additionalProperties": {
+        "$ref": "Sanoid.template.schema.json",
+        "type": "object"
+      }
+    },
     "Formatting": {
       "type": "object",
       "description": "Configuration section for configurable formatting options for output, naming, etc.",
@@ -172,7 +183,7 @@
       },
       "additionalProperties": {
         "type": "string"
-      } 
+      }
     }
   }
 }

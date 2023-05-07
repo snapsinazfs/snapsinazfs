@@ -27,8 +27,8 @@
     "MonitorType": {
       "type": "string",
       "description": "The type of the monitor",
+      "$comment": "If a module is written to extend to another monitoring system, add a type specifier for it to the enum below, for configuration validation.",
       "enum": [ "Nagios" ]
     }
-  },
-  "additionalProperties": false
+  }
 }

@@ -47,4 +47,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Sanoid.Common\Sanoid.Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Sanoid.template.schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
