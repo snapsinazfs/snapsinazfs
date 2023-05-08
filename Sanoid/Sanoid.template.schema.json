@@ -119,7 +119,7 @@
           "type": "string",
           "description": "The time of day at which to take daily snapshots. Default is 23:59, since most people expect a daily snapshot to contain everything done DURING that day",
           "default": "23:59",
-          "format": "time"
+          "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$"
         },
         "WeeklyDay": {
           "type": "integer",

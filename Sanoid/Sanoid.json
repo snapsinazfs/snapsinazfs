@@ -72,7 +72,7 @@
         "FrequentPeriod": 15,
         "UseLocalTime": true,
         "HourlyMinute": 59,
-        "Daily": "23:59",
+        "DailyTime": "23:59",
         "WeeklyDay": 1,
         "WeeklyTime": "23:59",
         "MonthlyDay": 31,
@@ -107,8 +107,9 @@
     },
     "production_noHourly": {
       "$comments": "Sample template. Inherits all settings from the 'production' template (and its parent, 'default', but overrides how many hourly snapshots are retained.",
+      "UseTemplate": "production", 
       "SnapshotRetention": {
-        "Hourly": 0 
+        "Hourly": 0
       }
     } 
   }
