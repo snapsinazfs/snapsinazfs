@@ -20,11 +20,11 @@ public static class Logging
     public static void ConfigureLogger( )
     {
 #pragma warning disable CA2000
-        IConfigurationRoot jsonConfigRoot = new ConfigurationManager( )
+        IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
                                             .SetBasePath( Directory.GetCurrentDirectory( ) )
                                             .AddJsonFile( "Sanoid.nlog.json", false, true )
                                             .Build( );
 #pragma warning restore CA2000
-        LogManager.Configuration = new NLogLoggingConfiguration( jsonConfigRoot.GetSection( "NLog" ) );
+        LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
     }
 }
