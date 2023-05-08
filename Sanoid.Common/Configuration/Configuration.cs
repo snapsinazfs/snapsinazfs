@@ -40,31 +40,33 @@ public static class Configuration
         IConfigurationSection defaultTemplateSnapshotTimingSection;
         try
         {
-            Log.Trace("Checking for existence of 'default' Template"  );
+            Log.Trace( "Checking for existence of 'default' Template" );
             defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
-            Log.Trace("'default' Template found"  );
+            Log.Trace( "'default' Template found" );
         }
         catch ( InvalidOperationException ex )
         {
             Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
             throw;
         }
+
         try
         {
-            Log.Trace("Checking for existence of 'SnapshotRetention' section in 'default' Template"  );
+            Log.Trace( "Checking for existence of 'SnapshotRetention' section in 'default' Template" );
             defaultTemplateSnapshotRetentionSection = defaultTemplateSection.GetRequiredSection( "SnapshotRetention" );
-            Log.Trace("'SnapshotRetention' section found"  );
+            Log.Trace( "'SnapshotRetention' section found" );
         }
         catch ( InvalidOperationException ex )
         {
             Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
             throw;
         }
+
         try
         {
-            Log.Trace("Checking for existence of 'SnapshotTiming' section in 'default' Template"  );
+            Log.Trace( "Checking for existence of 'SnapshotTiming' section in 'default' Template" );
             defaultTemplateSnapshotTimingSection = defaultTemplateSection.GetRequiredSection( "SnapshotTiming" );
-            Log.Trace("'SnapshotTiming' section found"  );
+            Log.Trace( "'SnapshotTiming' section found" );
         }
         catch ( InvalidOperationException ex )
         {
@@ -72,7 +74,57 @@ public static class Configuration
             throw;
         }
 
+        LoadTemplates( defaultTemplateSection, defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
+        BuildTemplateHierarchy( );
+        Log.Debug( "Template configuration initialized." );
+    }
 
+    private static void LoadTemplates( IConfigurationSection defaultTemplateSection, IConfigurationSection defaultTemplateSnapshotRetentionSection, IConfigurationSection defaultTemplateSnapshotTimingSection )
+    {
+        Log.Debug( "Creating Template objects from configuration" );
+        IEnumerable<IConfigurationSection> templateSections = JsonConfigurationSections.TemplatesConfiguration.GetChildren( );
+        foreach ( IConfigurationSection templateSection in templateSections )
+        {
+            bool isDefaultSection = templateSection.Key == "default";
+            Template newTemplate = new( templateSection.Key, defaultTemplateSection[ "UseTemplate" ] ?? "default" )
+            {
+                AutoPrune = defaultTemplateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
+                AutoSnapshot = defaultTemplateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
+                Recursive = defaultTemplateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
+                SnapshotRetention = SnapshotRetention.FromConfiguration( defaultTemplateSnapshotRetentionSection ),
+                SnapshotTiming = SnapshotTiming.FromConfiguration( defaultTemplateSnapshotTimingSection ),
+                SkipChildren = defaultTemplateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
+            };
+            Templates.Add( templateSection.Key, newTemplate );
+        }
+
+        Log.Debug( "Templates loaded." );
+    }
+
+    private static void BuildTemplateHierarchy( )
+    {
+        Log.Debug( "Building template hierarchy." );
+        foreach ( ( string key, Template value ) in Templates )
+        {
+            Log.Trace( "Attempting to assign template {0} as parent of template {1}", value.UseTemplateName, key );
+            if ( key == "default" || value.UseTemplateName == "default" )
+            {
+                Log.Trace( "Default template. Not assigning a parent." );
+                continue;
+            }
+
+            if ( Templates.TryGetValue( value.UseTemplateName, out Template? parentTemplate ) )
+            {
+                Log.Trace( "Parent template {0} of template {1} found. Assigning parent." );
+                value.UseTemplate = parentTemplate;
+            }
+            else
+            {
+                Log.Fatal( "Parent template {0} of template {1} not defined in Sanoid.json. Program will terminate.", value.UseTemplateName, key );
+                throw new KeyNotFoundException( $"Parent template {value.UseTemplateName} of template {value.Name} not defined in configuration." );
+            }
+        }
+        Log.Debug( "Template hierarchy built." );
     }
 
     /// <summary>
@@ -278,6 +330,15 @@ public static class Configuration
     }
 
     /// <summary>
+    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Template" />s, indexed by <see langword="string" />.
+    /// </summary>
+    /// <remarks>
+    ///     First initialized to an empty dictionary on instantiation of the static <see cref="Configuration" /> class,
+    ///     and then any <see cref="Template" />s found in Sanoid.json are added to the collection.
+    /// </remarks>
+    public static Dictionary<string, Template> Templates { get; } = new( );
+
+    /// <summary>
     ///     Gets or sets whether Sanoid.net should use ini-formatted configuration files using PERL sanoid's schema.<br />
     ///     Corresponds to the /UseSanoidConfiguration property of Sanoid.json.
     /// </summary>
@@ -295,15 +356,6 @@ public static class Configuration
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
     public static bool UseSanoidConfiguration { get; [NotNull] set; }
-
-    /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Template"/>s, indexed by <see langword="string" />.
-    /// </summary>
-    /// <remarks>
-    ///     First initialized to an empty dictionary on instantiation of the static <see cref="Configuration"/> class,
-    ///     and then any <see cref="Template"/>s found in Sanoid.json are added to the collection.
-    /// </remarks>
-    public static Dictionary<string,Template> Templates { get; } = new Dictionary<string,Template>();
 
     private static bool _cron;
     private static bool _pruneSnapshots;
