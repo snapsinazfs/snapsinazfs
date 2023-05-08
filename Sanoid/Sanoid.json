@@ -41,8 +41,8 @@
   "Datasets": {
     "pool1/dataset1": {
       "Template": "production",
-      "Enabled": false, 
-      "Overrides": {
+      "Enabled": false,
+      "TemplateOverrides": {
         "Recursive": true
       }
     },
@@ -52,7 +52,7 @@
     "pool1/zvol1": {
       "Template": "production_noHourly",
       "Enabled": false,
-      "Overrides": {
+      "TemplateOverrides": {
         "SkipChildren": true,
         "SnapshotRetention": {
           "Yearly": 1 

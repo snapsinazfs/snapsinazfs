@@ -18,7 +18,7 @@
       "description": "Whether this dataset will be processed (true - default) or not (false). Affects both new snapshots and pruning of expired snapshots.",
       "default": true 
     },
-    "Overrides": {
+    "TemplateOverrides": {
       "$ref": "Sanoid.template.schema.json",
       "description": "Overrides to apply to this dataset." 
     } 
