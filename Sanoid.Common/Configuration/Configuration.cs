@@ -5,8 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Text.Json.Serialization;
-using JetBrains.Annotations;
-using NLog;
 using NLog.Config;
 
 namespace Sanoid.Common.Configuration;
@@ -16,15 +14,15 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 public static class Configuration
 {
-    static Configuration()
+    static Configuration( )
     {
-        Log = LogManager.GetCurrentClassLogger();
+        Log = LogManager.GetCurrentClassLogger( );
         Log.Debug( "Initializing root-level configuration from Sanoid.Json#/." );
-        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationCacheDirectory"] ?? "/var/cache/sanoid";
-        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationDefaultsFile"] ?? "sanoid.defaults.conf";
-        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration["SanoidConfigurationLocalFile"] ?? "sanoid.conf";
-        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration["SanoidConfigurationPathBase"] ?? "/etc/sanoid";
-        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration["SanoidConfigurationRunDirectory"] ?? "/var/run/sanoid";
+        SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationDefaultsFile" ] ?? "sanoid.defaults.conf";
+        SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationLocalFile" ] ?? "sanoid.conf";
+        SanoidConfigurationPathBase = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        SanoidConfigurationRunDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
         TakeSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "TakeSnapshots" );
         PruneSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "PruneSnapshots" );
@@ -68,7 +66,7 @@ public static class Configuration
         get
         {
             Log.Debug( "Getting lowest log level of all rules." );
-            LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min() );
+            LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min( ) );
             if ( lowestLogLevel is null )
             {
                 Log.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
@@ -84,7 +82,7 @@ public static class Configuration
             Log.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
-                LoggingRule rule = LogManager.Configuration!.LoggingRules[ruleIndex];
+                LoggingRule rule = LogManager.Configuration!.LoggingRules[ ruleIndex ];
                 if ( value == LogLevel.Off )
                 {
                     Log.Trace( "Disabling logging for rule {0}", ruleIndex );
@@ -100,7 +98,7 @@ public static class Configuration
             }
 
             Log.Debug( "Reconfiguring loggers" );
-            LogManager.ReconfigExistingLoggers();
+            LogManager.ReconfigExistingLoggers( );
         }
     }
 
@@ -111,6 +109,9 @@ public static class Configuration
     ///     A A <see langword="bool" /> indicating if no changes will be made to zfs (<see langword="true" />) or if normal
     ///     processing will occur (<see langword="false" /> - default)
     /// </value>
+    [JsonPropertyName( "DryRun" )]
+    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
+    [JsonRequired]
     public static bool DryRun { get; set; }
 
     /// <summary>
@@ -259,7 +260,7 @@ public static class Configuration
     /// <summary>
     ///     Method used to force instatiation of this static class.
     /// </summary>
-    public static void Initialize()
+    public static void Initialize( )
     {
         Log.Trace( "Initializing configuration." );
     }

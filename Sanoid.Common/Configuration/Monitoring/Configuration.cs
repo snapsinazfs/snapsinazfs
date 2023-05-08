@@ -10,12 +10,12 @@ namespace Sanoid.Common.Configuration.Monitoring;
 
 internal static class Configuration
 {
-    static Configuration()
+    static Configuration( )
     {
-        MonitorConfigurations = new Dictionary<string, MonitoringConfigurationBase>();
-        foreach ( IConfigurationSection section in JsonConfigurationSections.MonitoringConfiguration.GetChildren() )
+        MonitorConfigurations = new Dictionary<string, MonitoringConfigurationBase>( );
+        foreach ( IConfigurationSection section in JsonConfigurationSections.MonitoringConfiguration.GetChildren( ) )
         {
-            string monitorType = section["MonitorType"]!;
+            string monitorType = section[ "MonitorType" ]!;
             string monitorName = section.Key;
             switch ( monitorType )
             {
