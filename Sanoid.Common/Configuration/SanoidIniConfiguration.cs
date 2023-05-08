@@ -18,10 +18,12 @@ namespace Sanoid.Common.Configuration;
 internal static class SanoidIniConfiguration
 {
     internal static IConfigurationRoot Configuration =>
+#pragma warning disable CA2000
         _configuration ??= new ConfigurationManager( )
                            .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationDefaultsFile ) )
                            .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationLocalFile ) )
                            .Build( );
+#pragma warning restore CA2000
 
     private static IConfigurationRoot? _configuration;
 }
