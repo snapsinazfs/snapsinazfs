@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 using Microsoft.Extensions.Configuration;
 
 namespace Sanoid.Common;
@@ -38,7 +36,7 @@ public static class BaseClassExtensions
     /// <param name="settingKey">The key of the value in <paramref name="configurationSection"/> to return as a boolean value</param>
     /// <returns>A boolean parsed from the value with the specicified <paramref name="settingKey"/></returns>
     /// <remarks>Validation of the value retrieved from configuration is delegated to the base class library</remarks>
-    public static bool GetBoolean<T>( [NotNull] this T configurationSection, string settingKey ) where T : IConfiguration
+    public static bool GetBoolean<T>( this T configurationSection, string settingKey ) where T : IConfiguration
     {
         if ( string.IsNullOrWhiteSpace( settingKey ) )
             throw new ArgumentException( "settingKey must be a non-null, non-empty string.", settingKey );
