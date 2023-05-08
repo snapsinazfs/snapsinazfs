@@ -46,7 +46,9 @@ public static class JsonConfigurationSections
     /// <seealso cref="SnapshotNamingConfiguration" />
     /// <seealso cref="MonitoringConfiguration" />
     /// <seealso cref="TemplatesConfiguration" />
+#pragma warning disable CA2000
     public static IConfigurationRoot RootConfiguration => _rootConfiguration ??= new ConfigurationManager( ).AddJsonFile( "Sanoid.json", false, true ).Build( );
+#pragma warning restore CA2000
 
     /// <summary>
     ///     Gets the /Formatting/SnapshotNaming configuration section of Sanoid.json
