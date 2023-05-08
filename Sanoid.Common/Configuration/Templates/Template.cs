@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration.Datasets;
 
 namespace Sanoid.Common.Configuration.Templates;
@@ -39,8 +40,8 @@ public class Template
 
     private bool? _recursive;
     private bool? _skipChildren;
-    private SnapshotRetention? _snapshotRetention;
-    private SnapshotTiming? _snapshotTiming;
+
+    private Template? _useTemplate;
 
     /// <summary>
     ///     Gets or sets whether expired snapshots will be pruned for this template.
@@ -65,6 +66,11 @@ public class Template
         get => _autoSnapshot ?? UseTemplate?.AutoSnapshot;
         set => _autoSnapshot = value;
     }
+
+    /// <summary>
+    ///     Gets a collection of templates that inherit from this template.
+    /// </summary>
+    public Dictionary<string, Template> Children { get; } = new( );
 
     /// <summary>
     ///     Gets or sets the name of the template.
@@ -112,11 +118,7 @@ public class Template
     /// <value>
     ///     A <see cref="SnapshotRetention" /> record specifying the snapshot retention policy for this <see cref="Template" />
     /// </value>
-    public SnapshotRetention? SnapshotRetention
-    {
-        get => _snapshotRetention ?? UseTemplate?.SnapshotRetention;
-        set => _snapshotRetention = value;
-    }
+    public SnapshotRetention? SnapshotRetention { get; set; }
 
     /// <summary>
     ///     Gets or sets the snapshot retention policy for this <see cref="Template" />
@@ -124,11 +126,7 @@ public class Template
     /// <value>
     ///     A <see cref="SnapshotRetention" /> record specifying the snapshot retention policy for this <see cref="Template" />
     /// </value>
-    public SnapshotTiming? SnapshotTiming
-    {
-        get => _snapshotTiming ?? UseTemplate?.SnapshotTiming;
-        set => _snapshotTiming = value;
-    }
+    public SnapshotTiming? SnapshotTiming { get; set; }
 
     /// <summary>
     ///     Gets or sets another configured template to inherit settings from.
@@ -136,7 +134,82 @@ public class Template
     /// <value>
     ///     A <see cref="Template" /> from which settings are inherited.
     /// </value>
-    public Template? UseTemplate { get; set; }
+    public Template? UseTemplate
+    {
+        get => _useTemplate;
+        set
+        {
+            // Add this template as a child of the parent
+            value?.Children.TryAdd( Name, this );
+            _useTemplate = value;
+        }
+    }
 
     internal string UseTemplateName { get; init; }
+
+    internal void InheritSnapshotRetentionAndTimingSettings( )
+    {
+        Logger log = LogManager.GetCurrentClassLogger( );
+        log.Debug( "Inheriting retention and timing settings from Template {0} to children.", Name );
+        foreach ( ( _, Template? value ) in Children )
+        {
+            log.Trace( "Getting configuration section for Template {0}", value.Name );
+            IConfigurationSection childConfigSection = JsonConfigurationSections.TemplatesConfiguration.GetSection( value.Name );
+            IConfigurationSection childRetentionSettings = childConfigSection.GetSection( "SnapshotRetention" );
+            if ( !childRetentionSettings.Exists( ) )
+            {
+                log.Trace( "No SnapshotRetention overrides specified for Template {0}. Copying all SnapshotRetention settings from parent {1}", value.Name, Name );
+                value.SnapshotRetention = SnapshotRetention!.Value;
+            }
+            else
+            {
+                log.Trace( "SnapshotRetention overrides found for Template {0}. Overriding SnapshotRetention settings from parent {1} as configured.", value.Name, Name );
+                value.SnapshotRetention = new SnapshotRetention
+                {
+                    FrequentPeriod = childRetentionSettings.GetInt( "FrequentPeriod", SnapshotRetention!.Value.FrequentPeriod ),
+                    Frequent = childRetentionSettings.GetInt( "Frequent", SnapshotRetention!.Value.Frequent ),
+                    Hourly = childRetentionSettings.GetInt( "Hourly", SnapshotRetention!.Value.Hourly ),
+                    Daily = childRetentionSettings.GetInt( "Daily", SnapshotRetention!.Value.Daily ),
+                    Weekly = childRetentionSettings.GetInt( "Weekly", SnapshotRetention!.Value.Weekly ),
+                    Monthly = childRetentionSettings.GetInt( "Monthly", SnapshotRetention!.Value.Monthly ),
+                    Yearly = childRetentionSettings.GetInt( "Yearly", SnapshotRetention!.Value.Yearly ),
+                    PruneDeferral = childRetentionSettings.GetInt( "PruneDeferral", SnapshotRetention!.Value.PruneDeferral )
+                };
+            }
+
+            IConfigurationSection childTimingSettings = childConfigSection.GetSection( "SnapshotTiming" );
+            if ( !childTimingSettings.Exists( ) )
+            {
+                log.Trace( "No SnapshotTiming overrides specified for Template {0}. Copying all SnapshotTiming settings from parent {1}", value.Name, Name );
+                value.SnapshotTiming = SnapshotTiming!.Value;
+            }
+            else
+            {
+                log.Trace( "SnapshotTiming overrides found for Template {0}. Overriding SnapshotTiming settings from parent {1} as configured.", value.Name, Name );
+                value.SnapshotTiming = new SnapshotTiming
+                {
+                    DailyTime = childTimingSettings[ "DailyTime" ] is null ? SnapshotTiming!.Value.DailyTime : TimeOnly.Parse( childTimingSettings[ "DailyTime" ]! ),
+                    HourlyMinute = childTimingSettings.GetInt( "HourlyMinute", SnapshotTiming!.Value.HourlyMinute ),
+                    MonthlyDay = childTimingSettings.GetInt( "MonthlyDay", SnapshotTiming!.Value.MonthlyDay ),
+                    MonthlyTime = childTimingSettings[ "MonthlyTime" ] is null ? SnapshotTiming!.Value.MonthlyTime : TimeOnly.Parse( childTimingSettings[ "MonthlyTime" ]! ),
+                    UseLocalTime = childTimingSettings.GetBoolean( "UseLocalTime", SnapshotTiming!.Value.UseLocalTime ),
+                    WeeklyDay = childTimingSettings[ "WeeklyDay" ] is null ? SnapshotTiming!.Value.WeeklyDay : Enum.Parse<DayOfWeek>( childTimingSettings[ "WeeklyDay" ]! ),
+                    WeeklyTime = childTimingSettings[ "WeeklyTime" ] is null ? SnapshotTiming!.Value.WeeklyTime : TimeOnly.Parse( childTimingSettings[ "WeeklyTime" ]! ),
+                    YearlyDay = childTimingSettings.GetInt( "YearlyDay", SnapshotTiming!.Value.YearlyDay ),
+                    YearlyMonth = childTimingSettings.GetInt( "YearlyMonth", SnapshotTiming!.Value.YearlyMonth ),
+                    YearlyTime = childTimingSettings[ "YearlyTime" ] is null ? SnapshotTiming!.Value.YearlyTime : TimeOnly.Parse( childTimingSettings[ "YearlyTime" ]! )
+                };
+            }
+
+            log.Trace( "Retention and timing settings loaded for Template {0}.", value.Name );
+            if ( Children.Count > 0 )
+            {
+                log.Trace( "Processing child templates of {0}.", value.Name );
+                value.InheritSnapshotRetentionAndTimingSettings( );
+                log.Trace( "Finished processing child templates of {0}.", value.Name );
+            }
+        }
+
+        log.Debug( "Inheritance complete for all children of Template {0}.", Name );
+    }
 }

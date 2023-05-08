@@ -74,57 +74,10 @@ public static class Configuration
             throw;
         }
 
-        LoadTemplates( defaultTemplateSection, defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
+        LoadTemplates( );
         BuildTemplateHierarchy( );
+        InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
         Log.Debug( "Template configuration initialized." );
-    }
-
-    private static void LoadTemplates( IConfigurationSection defaultTemplateSection, IConfigurationSection defaultTemplateSnapshotRetentionSection, IConfigurationSection defaultTemplateSnapshotTimingSection )
-    {
-        Log.Debug( "Creating Template objects from configuration" );
-        IEnumerable<IConfigurationSection> templateSections = JsonConfigurationSections.TemplatesConfiguration.GetChildren( );
-        foreach ( IConfigurationSection templateSection in templateSections )
-        {
-            bool isDefaultSection = templateSection.Key == "default";
-            Template newTemplate = new( templateSection.Key, defaultTemplateSection[ "UseTemplate" ] ?? "default" )
-            {
-                AutoPrune = defaultTemplateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
-                AutoSnapshot = defaultTemplateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
-                Recursive = defaultTemplateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
-                SnapshotRetention = SnapshotRetention.FromConfiguration( defaultTemplateSnapshotRetentionSection ),
-                SnapshotTiming = SnapshotTiming.FromConfiguration( defaultTemplateSnapshotTimingSection ),
-                SkipChildren = defaultTemplateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
-            };
-            Templates.Add( templateSection.Key, newTemplate );
-        }
-
-        Log.Debug( "Templates loaded." );
-    }
-
-    private static void BuildTemplateHierarchy( )
-    {
-        Log.Debug( "Building template hierarchy." );
-        foreach ( ( string key, Template value ) in Templates )
-        {
-            Log.Trace( "Attempting to assign template {0} as parent of template {1}", value.UseTemplateName, key );
-            if ( key == "default" || value.UseTemplateName == "default" )
-            {
-                Log.Trace( "Default template. Not assigning a parent." );
-                continue;
-            }
-
-            if ( Templates.TryGetValue( value.UseTemplateName, out Template? parentTemplate ) )
-            {
-                Log.Trace( "Parent template {0} of template {1} found. Assigning parent." );
-                value.UseTemplate = parentTemplate;
-            }
-            else
-            {
-                Log.Fatal( "Parent template {0} of template {1} not defined in Sanoid.json. Program will terminate.", value.UseTemplateName, key );
-                throw new KeyNotFoundException( $"Parent template {value.UseTemplateName} of template {value.Name} not defined in configuration." );
-            }
-        }
-        Log.Debug( "Template hierarchy built." );
     }
 
     /// <summary>
@@ -362,6 +315,99 @@ public static class Configuration
     private static bool _takeSnapshots;
 
     private static readonly Logger Log;
+
+    private static void LoadTemplates( )
+    {
+        Log.Debug( "Creating Template objects from configuration" );
+        IEnumerable<IConfigurationSection> templateSections = JsonConfigurationSections.TemplatesConfiguration.GetChildren( );
+        foreach ( IConfigurationSection templateSection in templateSections )
+        {
+            bool isDefaultSection = templateSection.Key == "default";
+            Template newTemplate = new( templateSection.Key, templateSection[ "UseTemplate" ] ?? "default" )
+            {
+                AutoPrune = templateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
+                AutoSnapshot = templateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
+                Recursive = templateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
+                SkipChildren = templateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
+            };
+            Templates.Add( templateSection.Key, newTemplate );
+        }
+
+        Log.Debug( "Templates loaded." );
+    }
+
+    /// <summary>
+    ///     Builds the template hierarchy and assigns <see cref="SnapshotRetention" /> and <see cref="SnapshotTiming" />
+    ///     settings.
+    /// </summary>
+    /// <exception cref="KeyNotFoundException"></exception>
+    /// <exception cref="ConfigurationValidationException"></exception>
+    private static void BuildTemplateHierarchy( )
+    {
+        // To build the inheritance hierarchy, scan the dictionary and set references for UseTemplate
+        // Note that the setter for Template.UseTemplate automatically adds the template to its parent's Children collection
+        Log.Debug( "Building template hierarchy." );
+        foreach ( ( string key, Template value ) in Templates )
+        {
+            Log.Trace( "Attempting to assign template {0} as parent of template {1}", value.UseTemplateName, key );
+            if ( key == "default" )
+            {
+                Log.Trace( "Default template. Not assigning a parent." );
+                continue;
+            }
+
+            if ( string.IsNullOrWhiteSpace( value.UseTemplateName ) )
+            {
+                Log.Fatal( "UseTemplate value specified for Template {0} must refer to an existing template name. Program will terminate.", key );
+                throw new ConfigurationValidationException( $"UseTemplate value specified for Template {key} must refer to an existing template name. Program will terminate." );
+            }
+
+            if ( Templates.TryGetValue( value.UseTemplateName, out Template? parentTemplate ) )
+            {
+                Log.Trace( "Parent template {0} of template {1} found. Assigning parent." );
+                value.UseTemplate = parentTemplate;
+            }
+            else
+            {
+                Log.Fatal( "Parent template {0} of template {1} not defined in Sanoid.json. Program will terminate.", value.UseTemplateName, key );
+                throw new KeyNotFoundException( $"Parent template {value.UseTemplateName} of template {value.Name} not defined in configuration." );
+            }
+        }
+
+        Log.Debug( "Template hierarchy built." );
+    }
+
+    private static void InheritImmutableTemplateSettings( IConfigurationSection retention, IConfigurationSection timing )
+    {
+        // First, set up the default template, as it is the root of inheritance
+        Templates[ "default" ].SnapshotRetention = new SnapshotRetention
+        {
+            Frequent = retention.GetInt( "Frequent" ),
+            Monthly = retention.GetInt( "Monthly" ),
+            PruneDeferral = retention.GetInt( "PruneDeferral" ),
+            Weekly = retention.GetInt( "Weekly" ),
+            Yearly = retention.GetInt( "Yearly" ),
+            FrequentPeriod = retention.GetInt( "FrequentPeriod" ),
+            Daily = retention.GetInt( "Daily" ),
+            Hourly = retention.GetInt( "Hourly" )
+        };
+        Templates[ "default" ].SnapshotTiming = new SnapshotTiming
+        {
+            DailyTime = TimeOnly.Parse( timing[ "DailyTime" ]! ),
+            HourlyMinute = timing.GetInt( "HourlyMinute" ),
+            MonthlyDay = timing.GetInt( "MonthlyDay" ),
+            MonthlyTime = TimeOnly.Parse( timing[ "MonthlyTime" ]! ),
+            UseLocalTime = timing.GetBoolean( "UseLocalTime", true ),
+            WeeklyDay = (DayOfWeek)timing.GetInt( "WeeklyDay" ),
+            WeeklyTime = TimeOnly.Parse( timing[ "WeeklyTime" ]! ),
+            YearlyDay = timing.GetInt( "YearlyDay" ),
+            YearlyMonth = timing.GetInt( "YearlyMonth" ),
+            YearlyTime = TimeOnly.Parse( timing[ "YearlyTime" ]! )
+        };
+
+        // Now recursively set all children's settings
+        Templates[ "default" ].InheritSnapshotRetentionAndTimingSettings( );
+    }
 
     /// <summary>
     ///     Method used to force instatiation of this static class.
