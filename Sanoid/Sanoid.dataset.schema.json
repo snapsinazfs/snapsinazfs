@@ -14,8 +14,14 @@
       "description": "The JSON pointer to a configured template to use.",
       "format": "uri-reference"
     },
+    "Enabled": {
+      "type": "boolean",
+      "description": "Whether this dataset will be processed (true - default) or not (false). Affects both new snapshots and pruning of expired snapshots.",
+      "default": true 
+    },
     "Overrides": {
-      "$ref": "Sanoid.template.schema.json"
+      "$ref": "Sanoid.template.schema.json",
+      "description": "Overrides to apply to this dataset." 
     } 
   }
 }
