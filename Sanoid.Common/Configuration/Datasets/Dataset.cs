@@ -18,4 +18,6 @@ internal class Dataset
     internal Template Template { get; set; }
 
     internal Template? TemplateOverrides { get; set; }
+
+    internal bool Enabled { get; set; }
 }
