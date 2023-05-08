@@ -3,7 +3,6 @@
   "$id": "Sanoid.dataset.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net dataset configuration items",
-  "required": [ "Template" ],
   "properties": {
     "$comments": {
       "type": "string",
@@ -11,8 +10,8 @@
     },
     "Template": {
       "type": "string",
-      "description": "The JSON pointer to a configured template to use.",
-      "format": "uri-reference"
+      "description": "The name of a configured template to use.",
+      "default": "default" 
     },
     "Enabled": {
       "type": "boolean",
