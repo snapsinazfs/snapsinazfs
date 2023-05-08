@@ -105,6 +105,15 @@ public static class Configuration
     }
 
     /// <summary>
+    ///     Gets or sets if the current run is a dry run, where no changes will be made to zfs
+    /// </summary>
+    /// <value>
+    ///     A A <see langword="bool" /> indicating if no changes will be made to zfs (<see langword="true" />) or if normal
+    ///     processing will occur (<see langword="false" /> - default)
+    /// </value>
+    public static bool DryRun { get; set; }
+
+    /// <summary>
     ///     Gets or sets whether Sanoid.net should prune expired snapshots.
     /// </summary>
     /// <value>
@@ -153,7 +162,6 @@ public static class Configuration
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
     public static string SanoidConfigurationDefaultsFile { get; set; }
-
 
     /// <summary>
     ///     Gets or sets the name of the ini-formatted file inside the <see cref="SanoidConfigurationPathBase" /> folder

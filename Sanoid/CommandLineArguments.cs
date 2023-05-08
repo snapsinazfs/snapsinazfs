@@ -20,6 +20,8 @@ namespace Sanoid
     [UsedImplicitly]
     internal class CommandLineArguments
     {
+        private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+
         [ArgDescription( "Cache directory for sanoid" )]
         [ArgShortcut( "--cache-dir" )]
         public string? CacheDir { get; set; }
@@ -41,7 +43,6 @@ namespace Sanoid
         [ArgDescription( "Prunes expired snapshots, even if their parent datasets are currently involved in a send or receive operation. Implies --prune-snapshots as well." )]
         [ArgShortcut( "--force-prune" )]
         [ArgShortcut( "--force-prune-snapshots" )]
-        [ArgCantBeCombinedWith( "ReadOnly" )]
         public bool ForcePrune { get; set; }
 
         [ArgDescription( "This clears out sanoid's zfs snapshot listing cache. This is normally not needed." )]
@@ -75,7 +76,7 @@ namespace Sanoid
 
         [ArgDescription( "Suppress non-error output. WILL WARN BEFORE SETTING IS APPLIED. Configure in Sanoid.nlog.json for normal usage." )]
         [ArgShortcut( "--quiet" )]
-        [ArgCantBeCombinedWith( "Debug|Verbose" )]
+        [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
         public bool Quiet { get; set; }
 
         [ArgDescription( "Skip creation/deletion of snapshots (Simulate)." )]
@@ -87,7 +88,7 @@ namespace Sanoid
 
         [ArgDescription( "No output logging. Change log level to Off in Sanoid.nlog.json to set for normal usage. Will not warn when used." )]
         [ArgShortcut( "--really-quiet" )]
-        [ArgCantBeCombinedWith( "Debug|Verbose" )]
+        [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
         public bool ReallyQuiet { get; set; }
 
         [ArgDescription( "Runtime directory for sanoid" )]
@@ -221,7 +222,8 @@ namespace Sanoid
 
             if ( ReadOnly )
             {
-                //TODO: Implement ReadOnly
+                _logger.Info( "Performing a dry run. No changes will be made to ZFS." );
+                BaseConfiguration.DryRun = true;
             }
 
             if ( RunDir is not null )
