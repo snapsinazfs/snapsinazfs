@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Configuration;
 using NLog.Config;
 
 namespace Sanoid.Common.Configuration;
@@ -17,7 +18,9 @@ public static class Configuration
     static Configuration( )
     {
         Log = LogManager.GetCurrentClassLogger( );
-        Log.Debug( "Initializing root-level configuration from Sanoid.Json#/." );
+
+        // Global configuration initialization
+        Log.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
         SanoidConfigurationCacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
         SanoidConfigurationDefaultsFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationDefaultsFile" ] ?? "sanoid.defaults.conf";
         SanoidConfigurationLocalFile = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationLocalFile" ] ?? "sanoid.conf";
@@ -26,8 +29,49 @@ public static class Configuration
         UseSanoidConfiguration = JsonConfigurationSections.RootConfiguration.GetBoolean( "UseSanoidConfiguration" );
         TakeSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "TakeSnapshots" );
         PruneSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "PruneSnapshots" );
-
         Log.Debug( "Root level configuration initialized." );
+
+        // Template configuration initialization
+        Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
+        // First, find the default tempate
+        IConfigurationSection defaultTemplateSection;
+        IConfigurationSection defaultTemplateSnapshotRetentionSection;
+        IConfigurationSection defaultTemplateSnapshotTimingSection;
+        try
+        {
+            Log.Trace("Checking for existence of 'default' Template"  );
+            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
+            Log.Trace("'default' Template found"  );
+        }
+        catch ( InvalidOperationException ex )
+        {
+            Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
+            throw;
+        }
+        try
+        {
+            Log.Trace("Checking for existence of 'SnapshotRetention' section in 'default' Template"  );
+            defaultTemplateSnapshotRetentionSection = defaultTemplateSection.GetRequiredSection( "SnapshotRetention" );
+            Log.Trace("'SnapshotRetention' section found"  );
+        }
+        catch ( InvalidOperationException ex )
+        {
+            Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
+            throw;
+        }
+        try
+        {
+            Log.Trace("Checking for existence of 'SnapshotTiming' section in 'default' Template"  );
+            defaultTemplateSnapshotTimingSection = defaultTemplateSection.GetRequiredSection( "SnapshotTiming" );
+            Log.Trace("'SnapshotTiming' section found"  );
+        }
+        catch ( InvalidOperationException ex )
+        {
+            Log.Fatal( "Template 'default' does not contain the required SnapshotTiming section. Program will terminate.", ex );
+            throw;
+        }
+
+
     }
 
     /// <summary>
