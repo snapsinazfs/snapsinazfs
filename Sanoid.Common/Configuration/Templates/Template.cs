@@ -21,7 +21,8 @@ public class Template
     ///     Creates a new instance of a <see cref="Template" /> with the specified name.
     /// </summary>
     /// <param name="templateName">The name, as configured in Sanoid.json, to assign to the <see cref="Name" /> property.</param>
-    public Template( string templateName )
+    /// <param name="useTemplateName">The name of a template to use as a parent</param>
+    public Template( string templateName, string useTemplateName )
     {
         if ( string.IsNullOrWhiteSpace( templateName ) )
         {
@@ -29,6 +30,7 @@ public class Template
         }
 
         Name = templateName;
+        UseTemplateName = useTemplateName;
     }
 
     private bool? _autoPrune;
@@ -134,5 +136,7 @@ public class Template
     /// <value>
     ///     A <see cref="Template" /> from which settings are inherited.
     /// </value>
-    public Template? UseTemplate { get; }
+    public Template? UseTemplate { get; set; }
+
+    internal string UseTemplateName { get; init; }
 }
