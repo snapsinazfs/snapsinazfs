@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -37,7 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\sanoid.conf" Link="sanoid.conf">
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
     <PackageReference Include="NLog" Version="5.1.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3" />
