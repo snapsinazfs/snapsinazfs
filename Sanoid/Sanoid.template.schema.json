@@ -123,7 +123,7 @@
         },
         "WeeklyDay": {
           "type": "integer",
-          "description": "The day a weekly snapshot will be taken on, as a 0-indexed day of the week, interpreted according to system locale rules.",
+          "description": "The day a weekly snapshot will be taken on, as a 0-indexed day of the week, with 0 being Sunday.",
           "$comment": "In US locale rules, the default value '1' is Monday",
           "default": 1,
           "minimum": 0,
