@@ -50,6 +50,11 @@
       "default": "/var/run/sanoid",
       "format": "uri-reference"
     },
+    "DryRun": {
+      "type": "boolean",
+      "description": "If Sanoid.net will perform a dry run and make no changes to ZFS.",
+      "default": false 
+    },
     "TakeSnapshots": {
       "type": "boolean",
       "description": "If running Sanoid.net will take snapshots by default",

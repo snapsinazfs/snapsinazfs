@@ -10,6 +10,7 @@
   "SanoidConfigurationLocalFile": "sanoid.conf",
   "SanoidConfigurationCacheDirectory": "/var/cache/sanoid",
   "SanoidConfigurationRunDirectory": "/var/run/sanoid",
+  "DryRun": false,
   "Formatting": {
     "SnapshotNaming": {
       "ComponentSeparator": "_",
