@@ -27,13 +27,24 @@ public static class BaseClassExtensions
 
     /// <summary>
     ///     Attempts to convert the current string to a <see cref="bool" /> value.<br />
-    ///     Validation left up to the <see cref="bool.Parse(string)" /> method.
     /// </summary>
     /// <param name="value"></param>
+    /// <param name="fallback">A fallback value to return if string parsing fails.</param>
     /// <returns></returns>
-    public static bool AsBoolean( this string value )
+    public static bool AsBoolean( this string? value, bool fallback )
     {
-        return bool.Parse( value );
+        return !bool.TryParse( value, out bool returnValue ) ? fallback : returnValue;
+    }
+
+    /// <summary>
+    ///     Attempts to convert the current string to an <see cref="int" /> value.<br />
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="fallback">A fallback value to return if string parsing fails.</param>
+    /// <returns></returns>
+    public static int AsInt( this string? value, int fallback )
+    {
+        return !int.TryParse( value, out int returnValue ) ? fallback : returnValue;
     }
 
     /// <summary>
@@ -51,6 +62,44 @@ public static class BaseClassExtensions
             throw new ArgumentException( "settingKey must be a non-null, non-empty string.", settingKey );
         }
 
-        return ( configurationSection[ settingKey ] ?? "False" ).AsBoolean( );
+        return configurationSection[ settingKey ].AsBoolean( false );
+    }
+
+    /// <summary>
+    ///     Attempts to get a boolean value with the specified key from any type implementing <see cref="IConfiguration" />, with specified fallback value.
+    /// </summary>
+    /// <typeparam name="T">Any type implementing <see cref="IConfiguration" /></typeparam>
+    /// <param name="configurationSection">The current <see cref="IConfiguration" /> object to get the value from</param>
+    /// <param name="settingKey">The key of the value in <paramref name="configurationSection" /> to return as a boolean value</param>
+    /// <param name="fallbackValue">The value to return if the configured value does not exist or is unparseable.</param>
+    /// <returns>A boolean parsed from the value with the specicified <paramref name="settingKey" /></returns>
+    /// <remarks>Validation of the value retrieved from configuration is delegated to the base class library</remarks>
+    public static bool GetBoolean<T>( this T configurationSection, string settingKey, bool fallbackValue ) where T : IConfiguration
+    {
+        if ( string.IsNullOrWhiteSpace( settingKey ) )
+        {
+            throw new ArgumentException( "settingKey must be a non-null, non-empty string.", settingKey );
+        }
+
+        return configurationSection[ settingKey ].AsBoolean( fallbackValue );
+    }
+
+    /// <summary>
+    ///     Attempts to get an <see langword="int"/> value with the specified key from any type implementing <see cref="IConfiguration" />, with specified fallback value.
+    /// </summary>
+    /// <typeparam name="T">Any type implementing <see cref="IConfiguration" /></typeparam>
+    /// <param name="configurationSection">The current <see cref="IConfiguration" /> object to get the value from</param>
+    /// <param name="settingKey">The key of the value in <paramref name="configurationSection" /> to return as an <see langword="int"/> value</param>
+    /// <param name="fallbackValue">The value to return if the configured value does not exist or is unparseable.</param>
+    /// <returns>An <see langword="int"/> parsed from the value with the specicified <paramref name="settingKey" /></returns>
+    /// <remarks>Validation of the value retrieved from configuration is delegated to the base class library</remarks>
+    public static int GetInt<T>( this T configurationSection, string settingKey, int fallbackValue = 0 ) where T : IConfiguration
+    {
+        if ( string.IsNullOrWhiteSpace( settingKey ) )
+        {
+            throw new ArgumentException( "settingKey must be a non-null, non-empty string.", settingKey );
+        }
+
+        return configurationSection[ settingKey ].AsInt( fallbackValue );
     }
 }
