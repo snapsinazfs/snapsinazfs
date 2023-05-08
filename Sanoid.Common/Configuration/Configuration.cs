@@ -7,6 +7,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using NLog.Config;
+using Sanoid.Common.Configuration.Templates;
 
 namespace Sanoid.Common.Configuration;
 
@@ -294,6 +295,15 @@ public static class Configuration
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
     public static bool UseSanoidConfiguration { get; [NotNull] set; }
+
+    /// <summary>
+    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Template"/>s, indexed by <see langword="string" />.
+    /// </summary>
+    /// <remarks>
+    ///     First initialized to an empty dictionary on instantiation of the static <see cref="Configuration"/> class,
+    ///     and then any <see cref="Template"/>s found in Sanoid.json are added to the collection.
+    /// </remarks>
+    public static Dictionary<string,Template> Templates { get; } = new Dictionary<string,Template>();
 
     private static bool _cron;
     private static bool _pruneSnapshots;
