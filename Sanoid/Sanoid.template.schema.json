@@ -34,11 +34,6 @@
       "description": "Whether to apply this template to the specified path only.",
       "default": false
     },
-    "FrequentPeriod": {
-      "type": "integer",
-      "description": "The time, in minutes, between 'frequent' snapshots. Should be a whole number factor of 60.",
-      "default": 15
-    },
     "SnapshotRetention": {
       "type": "object",
       "$ref": "#/definitions/SnapshotRetention"
@@ -53,6 +48,11 @@
       "type": "object",
       "description": "Snapshot retention options for defined snapshot periods.",
       "properties": {
+        "FrequentPeriod": {
+          "type": "integer",
+          "description": "The time, in minutes, between 'frequent' snapshots. Should be a whole number factor of 60.",
+          "default": 15
+        },
         "Frequent": {
           "type": "integer",
           "description": "How many frequent snapshots to keep for this template.",
