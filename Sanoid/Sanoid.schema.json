@@ -53,7 +53,7 @@
     "DryRun": {
       "type": "boolean",
       "description": "If Sanoid.net will perform a dry run and make no changes to ZFS.",
-      "default": false 
+      "default": false
     },
     "TakeSnapshots": {
       "type": "boolean",
@@ -92,11 +92,18 @@
       "description": "Datasets for sanoid to process",
       "additionalProperties": {
         "$ref": "Sanoid.dataset.schema.json"
-      } 
+      }
     },
     "Templates": {
       "type": "object",
       "description": "Templates to apply to dataset nodes",
+      "required": [ "default" ],
+      "properties": {
+        "default": {
+          "type": "object",
+          "$ref": "Sanoid.template.schema.json"
+        }
+      },
       "additionalProperties": {
         "$ref": "Sanoid.template.schema.json"
       }
