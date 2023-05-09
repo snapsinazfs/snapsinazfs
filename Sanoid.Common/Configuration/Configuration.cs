@@ -82,6 +82,12 @@ public static class Configuration
 
         Log.Debug( "Initializing Dataset configuration from Sanoid.json" );
         LoadConfiguredDatasets( );
+        GetZfsDatasets( );
+    }
+
+    private static void GetZfsDatasets( )
+    {
+        Zfs.CommandRunner.ZfsListAll( );
     }
 
     private static void LoadConfiguredDatasets( )
