@@ -118,6 +118,12 @@ public static class JsonConfigurationSections
 
         foreach ( (string? filePath, bool isRootConfig) in configFilePaths )
         {
+            if ( !File.Exists( filePath ) )
+            {
+                continue;
+            }
+
+            Logger.Debug( "Validating {0} configuration file.", filePath );
             EvaluationResults configValidationResults = isRootConfig switch
             {
                 true => sanoidBaseConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( filePath ) ), evaluationOptions ),
