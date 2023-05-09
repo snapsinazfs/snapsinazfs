@@ -1,34 +1,10 @@
 {
   "$schema": "Sanoid.local.schema.json",
   "$id": "Sanoid.local.json",
-  "$comments": "Default values are compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
-  "UseSanoidConfiguration": true,
+  "$comments": "Default values are mostly compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
-  "SanoidConfigurationPathBase": "./",
-  "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
-  "SanoidConfigurationLocalFile": "sanoid.conf",
-  "SanoidConfigurationCacheDirectory": "/var/cache/sanoid",
-  "SanoidConfigurationRunDirectory": "/var/run/sanoid",
   "DryRun": false,
-  "Formatting": {
-    "SnapshotNaming": {
-      "ComponentSeparator": "_",
-      "Prefix": "autosnap",
-      "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
-      "FrequentSuffix": "frequently",
-      "HourlySuffix": "hourly",
-      "DailySuffix": "daily",
-      "WeeklySuffix": "weekly",
-      "MonthlySuffix": "monthly",
-      "YearlySuffix": "yearly"
-    }
-  },
-  "PlatformUtilities": {
-    "ps": "/usr/bin/ps",
-    "zfs": "/usr/local/sbin/zfs",
-    "zpool": "/usr/local/sbin/zpool"
-  },
   "Monitoring": {
     "Nagios": {
       "$comments": "Nagios-specific monitoring options",
