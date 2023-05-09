@@ -34,6 +34,11 @@ public class Template
         UseTemplateName = useTemplateName;
     }
 
+    private Template( string templateName )
+    {
+        Name = templateName;
+    }
+
     private bool? _autoPrune;
 
     private bool? _autoSnapshot;
@@ -146,6 +151,48 @@ public class Template
     }
 
     internal string UseTemplateName { get; init; }
+
+    internal Template CloneForDatasetWithOverrides( Dataset targetDataset, IConfigurationSection overrides )
+    {
+        IConfigurationSection retentionOverrides = overrides.GetSection( "SnapshotRetention" );
+        IConfigurationSection timingOverrides = overrides.GetSection( "SnapshotTiming" );
+        return new Template( $"{targetDataset.Path}_{Name}_Local" )
+        {
+            SnapshotRetention = retentionOverrides.Exists( )
+                ? new SnapshotRetention
+                {
+                    Daily = retentionOverrides.GetInt( "Daily", SnapshotRetention!.Value.Daily ),
+                    Frequent = retentionOverrides.GetInt( "Frequent", SnapshotRetention.Value.Frequent ),
+                    FrequentPeriod = retentionOverrides.GetInt( "FrequentPeriod", SnapshotRetention.Value.FrequentPeriod ),
+                    Hourly = retentionOverrides.GetInt( "Hourly", SnapshotRetention.Value.Hourly ),
+                    Monthly = retentionOverrides.GetInt( "Monthly", SnapshotRetention.Value.Monthly ),
+                    PruneDeferral = retentionOverrides.GetInt( "PruneDeferral", SnapshotRetention.Value.PruneDeferral ),
+                    Weekly = retentionOverrides.GetInt( "Weekly", SnapshotRetention.Value.Weekly ),
+                    Yearly = retentionOverrides.GetInt( "Yearly", SnapshotRetention.Value.Yearly )
+                }
+                : SnapshotRetention!.Value,
+            SnapshotTiming = timingOverrides.Exists( )
+                ? new SnapshotTiming
+                {
+                    DailyTime = timingOverrides[ "DailyTime" ] is null ? SnapshotTiming!.Value.DailyTime : TimeOnly.Parse( timingOverrides[ "DailyTime" ]! ),
+                    HourlyMinute = timingOverrides.GetInt( "HourlyMinute", SnapshotTiming!.Value.HourlyMinute ),
+                    MonthlyDay = timingOverrides.GetInt( "MonthlyDay", SnapshotTiming!.Value.MonthlyDay ),
+                    MonthlyTime = timingOverrides[ "MonthlyTime" ] is null ? SnapshotTiming!.Value.MonthlyTime : TimeOnly.Parse( timingOverrides[ "MonthlyTime" ]! ),
+                    UseLocalTime = timingOverrides.GetBoolean( "UseLocalTime", SnapshotTiming!.Value.UseLocalTime ),
+                    WeeklyDay = timingOverrides[ "WeeklyDay" ] is null ? SnapshotTiming!.Value.WeeklyDay : Enum.Parse<DayOfWeek>( timingOverrides[ "WeeklyDay" ]! ),
+                    WeeklyTime = timingOverrides[ "WeeklyTime" ] is null ? SnapshotTiming!.Value.WeeklyTime : TimeOnly.Parse( timingOverrides[ "WeeklyTime" ]! ),
+                    YearlyDay = timingOverrides.GetInt( "YearlyDay", SnapshotTiming!.Value.YearlyDay ),
+                    YearlyMonth = timingOverrides.GetInt( "YearlyMonth", SnapshotTiming!.Value.YearlyMonth ),
+                    YearlyTime = timingOverrides[ "YearlyTime" ] is null ? SnapshotTiming!.Value.YearlyTime : TimeOnly.Parse( timingOverrides[ "YearlyTime" ]! )
+                }
+                : SnapshotTiming!.Value,
+            AutoPrune = overrides.GetBoolean( "AutoPrune", AutoPrune ),
+            AutoSnapshot = overrides.GetBoolean( "AutoSnapshot", AutoSnapshot ),
+            Recursive = overrides.GetBoolean( "Recursive", Recursive ),
+            SkipChildren = overrides.GetBoolean( "SkipChildren", SkipChildren ),
+            UseTemplate = _useTemplate
+        };
+    }
 
     internal void InheritSnapshotRetentionAndTimingSettings( )
     {
