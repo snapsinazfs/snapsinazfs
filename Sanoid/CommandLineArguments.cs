@@ -172,10 +172,7 @@ internal class CommandLineArguments
 
         if ( ReallyQuiet )
         {
-            foreach ( LoggingRule? rule in LogManager.Configuration!.LoggingRules )
-            {
-                rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off );
-            }
+            BaseConfiguration.DefaultLoggingLevel = LogLevel.Off;
         }
 
         if ( Trace )
