@@ -9,19 +9,19 @@ using Microsoft.Extensions.Configuration;
 namespace Sanoid.Common.Configuration.Templates;
 
 /// <summary>
-///     Snapshot retention policies for use within <see cref="Template" />s
+///     Snapshot retention policy for use within <see cref="Template" />s
 /// </summary>
 public record struct SnapshotRetention
 {
     /// <summary>
     ///     Gets or sets how many daily snapshots will be retained
     /// </summary>
-    public int Daily { get; set; }
+    public int Daily { get; init; }
 
     /// <summary>
     ///     Gets or sets how many frequent snapshots will be retained
     /// </summary>
-    public int Frequent { get; set; }
+    public int Frequent { get; init; }
 
     /// <summary>
     ///     Gets or sets the interval, in minutes, between frequent snapshots
@@ -29,33 +29,33 @@ public record struct SnapshotRetention
     /// <remarks>
     ///     Should be a whole number factor of 60, such as 5, 10, 15, 20, or 30
     /// </remarks>
-    public int FrequentPeriod { get; set; }
+    public int FrequentPeriod { get; init; }
 
     /// <summary>
     ///     Gets or sets how many hourly snapshots will be retained
     /// </summary>
-    public int Hourly { get; set; }
+    public int Hourly { get; init; }
 
     /// <summary>
     ///     Gets or sets how many monthly snapshots will be retained
     /// </summary>
-    public int Monthly { get; set; }
+    public int Monthly { get; init; }
 
     /// <summary>
     ///     Gets or sets what percentage of remaining pool capacity must be reached before snapshots will be pruned by this
     ///     policy
     /// </summary>
-    public int PruneDeferral { get; set; }
+    public int PruneDeferral { get; init; }
 
     /// <summary>
     ///     Gets or sets how many weekly snapshots will be retained
     /// </summary>
-    public int Weekly { get; set; }
+    public int Weekly { get; init; }
 
     /// <summary>
     ///     Gets or sets how many yearly snapshots will be retained
     /// </summary>
-    public int Yearly { get; set; }
+    public int Yearly { get; init; }
 
     /// <summary>
     ///     Gets a new immutable <see cref="SnapshotRetention" /> record, parsed from an <see cref="IConfiguration" /> object
