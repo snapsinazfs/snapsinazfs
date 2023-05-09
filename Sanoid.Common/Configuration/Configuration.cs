@@ -79,6 +79,33 @@ public static class Configuration
         BuildTemplateHierarchy( );
         InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
         Log.Debug( "Template configuration complete." );
+
+        Log.Debug( "Initializing Dataset configuration from Sanoid.json" );
+        LoadConfiguredDatasets( );
+    }
+
+    private static void LoadConfiguredDatasets( )
+    {
+        Log.Debug( "Creating Dataset objects from configuration" );
+        IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
+        foreach ( IConfigurationSection section in datasetSections )
+        {
+            Dataset newDataset = new ( section.Key )
+            {
+                Path = section.Key,
+                Enabled = section.GetBoolean( "Enabled", true ),
+                Template = Templates[section["Template"] ?? "default"]
+            };
+            IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
+            if ( overrides.Exists( ) )
+            {
+                Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, newDataset.Template.Name );
+                newDataset.Template = newDataset.Template.CloneForDatasetWithOverrides( newDataset, overrides );
+            }
+            Datasets.Add( section.Key, newDataset );
+        }
+
+        Log.Debug( "Configured datasets loaded." );
     }
 
     /// <summary>
