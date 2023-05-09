@@ -46,6 +46,7 @@ public static class JsonConfigurationSections
     /// <seealso cref="SnapshotNamingConfiguration" />
     /// <seealso cref="MonitoringConfiguration" />
     /// <seealso cref="TemplatesConfiguration" />
+    /// <seealso cref="DatasetsConfiguration" />
 #pragma warning disable CA2000
     public static IConfigurationRoot RootConfiguration => _rootConfiguration ??= new ConfigurationManager( ).AddJsonFile( "Sanoid.json", false, true ).Build( );
 #pragma warning restore CA2000
@@ -59,6 +60,11 @@ public static class JsonConfigurationSections
     ///     Gets the /Templates configuration section of Sanoid.json
     /// </summary>
     public static IConfigurationSection TemplatesConfiguration => RootConfiguration.GetRequiredSection( "Templates" );
+
+    /// <summary>
+    ///     Gets the /Datasets configuration section of Sanoid.json
+    /// </summary>
+    public static IConfigurationSection DatasetsConfiguration => RootConfiguration.GetRequiredSection( "Datasets" );
 
     private static IConfigurationRoot? _rootConfiguration;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
