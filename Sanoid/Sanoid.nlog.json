@@ -71,8 +71,8 @@
           },
           {
             "condition": "level == LogLevel.Fatal",
-            "foregroundColor": "Red",
-            "backgroundColor": "White"
+            "foregroundColor": "White",
+            "backgroundColor": "DarkRed"
           }
         ]
       },
