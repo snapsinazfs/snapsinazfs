@@ -68,6 +68,36 @@
   - NLog
   - NLog.Extensions.Logging
   - NLog.Targets.Journald
+  - make (optional - to build using Makefile. Otherwise you can manually run the commands in the Makefile to build)
+
+ ## Installing
+ 
+ After cloning this repository, execute the following commands to build and install Sanoid.net using make:
+
+     cd sanoid/dotnet
+     make install-release
+
+ This will fetch all .net dependencies from NuGet, build Sanoid.net in the ./publish/Release-R2R/ folder as a combined 
+ "Ready-to-Run" (partially natively pre-compiled) executable file, install Sanoid.net to `/usr/local/bin/Sanoid`, install all
+ base configuration files to `/usr/local/share/Sanoid.net/`, and install a local configuration file at
+ `/etc/sanoid/Sanoid.local.json`, making backups of any replaced files along the way.
+
+ ## Uninstalling
+
+ To uninstall, run `make uninstall`\
+ This will delete the executable file from `/usr/local/bin`, delete the base configuration files from 
+ `/usr/local/share/Sanoid.net`, and delete the local configuration file at `/etc/sanoid/Sanoid.local.json`.\
+ This will not remove any local configuration files in `~/.config/Sanoid.net`.\
+ This will also not remove the last build artifacts created by `make install`.
+
+ To clean all build artifacts, run `make clean`\
+ To clean specific build target target artifacts, run `make clean-release` or `make clean-debug`
+
+ ## Running
+
+ After runing `make install-release`, Sanoid.net can be run from any shell, so long as your `$PATH` includes the 
+ `/usr/local/bin` directory and the system has the same version of .net installed as Sanoid.net was built on.
+
 
  ## But seriously... WHY???
 
