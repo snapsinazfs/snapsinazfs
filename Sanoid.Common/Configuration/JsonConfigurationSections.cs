@@ -41,6 +41,11 @@ public static class JsonConfigurationSections
     public static IConfigurationSection MonitoringConfiguration => RootConfiguration.GetRequiredSection( "Monitoring" );
 
     /// <summary>
+    ///     Gets the /PlatformUtilities configuration section
+    /// </summary>
+    public static IConfigurationSection PlatformUtilitiesConfiguration => RootConfiguration.GetRequiredSection( "PlatformUtilities" );
+
+    /// <summary>
     ///     Gets the root configuration section of Sanoid.json
     /// </summary>
     /// <remarks>
