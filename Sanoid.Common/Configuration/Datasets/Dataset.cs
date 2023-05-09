@@ -23,4 +23,9 @@ public class Dataset
     internal Template? TemplateOverrides { get; set; }
 
     internal bool Enabled { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the ZFS path of this Dataset
+    /// </summary>
+    public string Path { get; set; }
 }
