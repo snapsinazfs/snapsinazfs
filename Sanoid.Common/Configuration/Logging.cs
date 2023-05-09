@@ -21,9 +21,13 @@ public static class Logging
     {
 #pragma warning disable CA2000
         IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
-                                            .SetBasePath( Directory.GetCurrentDirectory( ) )
-                                            .AddJsonFile( "Sanoid.nlog.json", false, true )
-                                            .Build( );
+                                                .SetBasePath( Directory.GetCurrentDirectory( ) )
+                                                .AddEnvironmentVariables( "Sanoid.net:" )
+                                                .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.nlog.json", false, false )
+                                                .AddJsonFile( "/etc/sanoid/Sanoid.nlog.json", true, false )
+                                                .AddJsonFile( "Sanoid.nlog.json", true, false )
+                                                .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.nlog.json" ), true, false )
+                                                .Build( );
 #pragma warning restore CA2000
         LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
     }
