@@ -15,6 +15,7 @@ using Sanoid.Common.Posix;
 
 Logging.ConfigureLogger();
 
+// Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
 Logger logger = LogManager.GetCurrentClassLogger();
 
 ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
