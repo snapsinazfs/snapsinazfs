@@ -12,20 +12,17 @@
     <DebugType>embedded</DebugType>
     <AssemblyVersion>2.1.0</AssemblyVersion>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Configurations>Debug;Release;Release-R2R</Configurations>
+    <BaseOutputPath>bin\</BaseOutputPath>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-    <DefineDebug>false</DefineDebug>
-    <PublishReadyToRun>true</PublishReadyToRun>
-    <PublishSingleFile>true</PublishSingleFile>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">
+    <Optimize>True</Optimize>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <PublishReadyToRun>True</PublishReadyToRun>
+    <PublishSingleFile>True</PublishSingleFile>
   </PropertyGroup>
-
 
   <ItemGroup>
     <Content Include="Sanoid.monitoring.schema.json">
