@@ -17,58 +17,66 @@
  
  ## Compatibility With PERL-based sanoid
  
- Sanoid.net is intended to be compatible with PERL-based sanoid. Invocations of Sanoid.net will accept the same
- arguments as PERL sanoid, and will behave the same, except for logging output, which is via nlog and is
- configurable by the end user.
+ Sanoid.net is intended to be at least mostly compatible with PERL-based sanoid. Invocations of Sanoid.net will
+ accept the same arguments as PERL sanoid, and will behave the same, except for default timing settings 
+ (explained below) and logging output, which is via nlog.
+ 
+ All settings are configurable by the end user and can be made to match PERL sanoid, if desired.
  
  Sanoid.net may also have additional capabilities which are not guaranteed to be available in PERL sanoid.
  
- Thus, sanoid => Sanoid.net portability should be seemless, but Sanoid.net => sanoid portability is only
+ Thus, sanoid => Sanoid.net portability should be fairly seemless, but Sanoid.net => sanoid portability is only
  guaranteed if no Sanoid.net enhancements are used.
 
  ## Project Organization
 
- I intend to organize the project differently than sanoid/syncoid/findoid.
+ I intend to organize the project differently than sanoid/syncoid/findoid, partially thanks to the benefit of
+ hindsight, but also in an attempt to make it easier to modify and extend.
 
  Most significantly, I intend to separate the code into one or more common library projects, to help avoid code
  duplication and aid in organization.
 
- Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked with
- identical commands and arguments as their PERL parents.
+ Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked
+ with identical commands and arguments as their PERL ancestors.
 
- **Configuration** for the applications will respect the existing configuration files that sanoid/syncoid expect to
- find, by default. However, there will also be json-formatted configuration files for the .net ports. The default 
- configuration will instruct the .net ports to use the ini-styled configuration files that the PERL applications 
- expect to find in `/etc/sanoid/`, but will allow either pointing to a different path and continuing to use the 
- ini-style files or, as a future enhancement, completely override them in the json configuration. Some 
- configuration options not currently exposed by the PERL applications may be added in the json configuration to
- allow for enahnced flexibility, as I see fit while working on the project.
+ **Configuration** for the applications will be a hiearchy of json files, with formal schemas included, 
+ that mirror and, where the motivation strikes, extend the existing configuration capabilities of PERL 
+ sanoid/syncoid.\
+ A command line argument will be provided that enables Sanoid.net to parse PERL sanoid's configuration files
+ and convert them to Sanoid.net's json configuration format.
 
- My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as
- vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in Windows,
- there may end up being some ReSharper-related files and directives in code. However, since ZFS and, therefore,
- sanoid currenly are a Linux-targeted toolset, the project will always be guaranteed to compile and run under Linux
- (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what I have) with the project's
- required version of the dotnet runtime installed.
+ My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well
+ as vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in
+ Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and,
+ therefore, sanoid currenly are a Linux-targeted toolset, the project will always be guaranteed to compile and
+ run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what I have) with
+ the project's required version of the dotnet runtime installed.
 
  ## Dependencies
 
- My intention is for this project to have no dependencies other than the required version of the dotnet runtime 
- that have to be manually installed by the end user. This includes not being reliant on the PERL versions of the
- applications, either, or any of their dependencies, except for their configuration files. All dependencies of
+ My intention is for this project to have no external dependencies other than the required version of the
+ dotnet runtime that have to be manually installed by the end user. This includes not being reliant on the
+ PERL versions of the applications, either, or any of their core dependencies. All compile-time dependencies of
  these ports will either be included in published releases or included as project references in the dotnet 
- projects, so that they can be automatically restored by the dotnet runtime, from the public NuGet repository.
+ projects, so that they can be automatically restored by the dotnet runtime, from the public NuGet repository.\
+ Runtime dependencies, such as mbuffer, ssh, and others that are invoked by sanoid are, of course, still
+ required to be installed and available, if they are used by your configuration.
  
- That said, here are the nuget package dependencies as of right now:
+ That said, here are the nuget package dependencies as of right now (automatically retrieved during build):
  
   - PowerArgs
   - JsonSchema.Net
   - Microsoft.Extensions.Configuration.Json
   - Microsoft.Extensions.Configuration.Ini
+  - Microsoft.Extensions.Configuration.EnvironmentVariables
+  - Microsoft.Extensions.Configuration.CommandLine
   - NLog
   - NLog.Extensions.Logging
   - NLog.Targets.Journald
-  - make (optional - to build using Makefile. Otherwise you can manually run the commands in the Makefile to build)
+
+  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build
+  targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All
+  build targets in the Makefile are bash-compatible scripts that assume standard coreutils are installed.
 
  ## Installing
  
@@ -77,10 +85,11 @@
      cd sanoid/dotnet
      make install-release
 
- This will fetch all .net dependencies from NuGet, build Sanoid.net in the ./publish/Release-R2R/ folder as a combined 
- "Ready-to-Run" (partially natively pre-compiled) executable file, install Sanoid.net to `/usr/local/bin/Sanoid`, install all
- base configuration files to `/usr/local/share/Sanoid.net/`, and install a local configuration file at
- `/etc/sanoid/Sanoid.local.json`, making backups of any replaced files along the way.
+ This will fetch all .net dependencies from NuGet, build Sanoid.net in the ./publish/Release-R2R/ folder as a
+ combined "Ready-to-Run" (partially natively pre-compiled) executable file, install Sanoid.net to
+ `/usr/local/bin/Sanoid`, install all base configuration files to `/usr/local/share/Sanoid.net/`, and install
+ a local configuration file at `/etc/sanoid/Sanoid.local.json`, making backups of any replaced files
+ along the way.
 
  ## Uninstalling
 
@@ -95,8 +104,9 @@
 
  ## Running
 
- After runing `make install-release`, Sanoid.net can be run from any shell, so long as your `$PATH` includes the 
- `/usr/local/bin` directory and the system has the same version of .net installed as Sanoid.net was built on.
+ After runing `make install-release`, Sanoid.net can be run from any shell, so long as your `$PATH` includes
+ the  `/usr/local/bin` directory and the system has the same version of .net installed as Sanoid.net was
+ built on.
 
 
  ## But seriously... WHY???
