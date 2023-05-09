@@ -54,12 +54,13 @@ public static class JsonConfigurationSections
     /// <seealso cref="DatasetsConfiguration" />
 #pragma warning disable CA2000
     public static IConfigurationRoot RootConfiguration => _rootConfiguration ??= new ConfigurationManager( )
-                                                                                 .AddEnvironmentVariables( "Sanoid.net:" )
                                                                              #if WINDOWS
                                                                                  .AddJsonFile( "Sanoid.json", true, false )
+                                                                                 .AddEnvironmentVariables( "Sanoid.net:" )
                                                                                  .AddJsonFile( "Sanoid.local.json", true, false )
                                                                              #else
                                                                                  .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
+                                                                                 .AddEnvironmentVariables( "Sanoid.net:" )
                                                                                  .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
                                                                                  .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
                                                                                  .AddJsonFile( "Sanoid.local.json", true, false )

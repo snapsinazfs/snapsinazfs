@@ -108,6 +108,25 @@
  the  `/usr/local/bin` directory and the system has the same version of .net installed as Sanoid.net was
  built on.
 
+ ## Environment Variables
+ 
+ Sanoid.net will support configuration elements specified in environment variables with the prefix `Sanoid.net:`
+ 
+ So long as an environment variable's name equates to a key in the Sanoid.net global configuration, built by 
+ the various Microsoft.Extensions.Configuration libraries in use, they will be the first (lowest-priority) 
+ options applied to Sanoid.net's running configuration, after the base configuration from Sanoid.json is loaded.
+ 
+ ## Configuration Hierarchy
+ 
+ Configuration is loaded in the following order, with each element in the list superceding the settings defined
+ at the level above it:
+ 
+ - /usr/local/share/Sanoid.json (this is the base configuration and should never be modified by the user)
+ - Environment variables with prefix `Sanoid.net:`
+ - /etc/sanoid/Sanoid.local.json
+ - $HOME/.config/Sanoid.net/Sanoid.user.json
+ - Sanoid.local.json (in the same folder as the Sanoid.net executable assembly)
+ - Command line arguments
 
  ## But seriously... WHY???
 
