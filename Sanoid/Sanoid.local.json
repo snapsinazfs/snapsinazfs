@@ -1,11 +1,11 @@
 {
-  "$schema": "Sanoid.schema.json",
-  "$id": "Sanoid.json",
+  "$schema": "Sanoid.local.schema.json",
+  "$id": "Sanoid.local.json",
   "$comments": "Default values are compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
-  "UseSanoidConfiguration": false,
+  "UseSanoidConfiguration": true,
   "TakeSnapshots": false,
   "PruneSnapshots": false,
-  "SanoidConfigurationPathBase": "/etc/sanoid",
+  "SanoidConfigurationPathBase": "./",
   "SanoidConfigurationDefaultsFile": "sanoid.defaults.conf",
   "SanoidConfigurationLocalFile": "sanoid.conf",
   "SanoidConfigurationCacheDirectory": "/var/cache/sanoid",
@@ -39,35 +39,48 @@
     }
   },
   "Datasets": {
+    "pool1/dataset1": {
+      "Template": "production",
+      "Enabled": false,
+      "TemplateOverrides": {
+        "Recursive": true
+      }
+    },
+    "pool1/dataset2": {
+      "Enabled": false
+    },
+    "pool1/zvol1": {
+      "Template": "production_noHourly",
+      "Enabled": false,
+      "TemplateOverrides": {
+        "SkipChildren": true,
+        "SnapshotRetention": {
+          "Yearly": 1 
+        }
+      } 
+    } 
   },
   "Templates": {
-    "default": {
-      "$comments": "This is the default template. It should not be modified unless you FULLY understand the consequences. Snapshot times for Daily, Weekly, Monthly, and Yearly snapshots differ from PERL sanoid's defaults. See Sanoid.template.schema.json for details. All templates eventually inherit from this template.",
-      "AutoSnapshot": true,
+    "production": {
+      "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template. Note that it inherits from 'default,' even though it does not specify it, as default is the root template",
       "AutoPrune": true,
-      "Recursive": false,
-      "SkipChildren": false,
-      "UseTemplate": "default",
-      "SnapshotTiming": {
-        "FrequentPeriod": 15,
-        "UseLocalTime": true,
-        "HourlyMinute": 59,
-        "DailyTime": "23:59",
-        "WeeklyDay": 1,
-        "WeeklyTime": "23:59",
-        "MonthlyDay": 31,
-        "MonthlyTime": "23:59",
-        "YearlyMonth": 12,
-        "YearlyDay": 31,
-        "YearlyTime": "23:59"
-      },
+      "AutoSnapshot": true,
       "SnapshotRetention": {
         "Frequent": 0,
-        "Hourly": 48,
-        "Daily": 90,
+        "Hourly": 36,
+        "Daily": 30,
         "Weekly": 0,
-        "Monthly": 6,
+        "Monthly": 3,
         "Yearly": 0
+      },
+      "SkipChildren": false,
+      "Recursive": false
+    },
+    "production_noHourly": {
+      "$comments": "Sample template. Inherits all settings from the 'production' template (and its parent, 'default'), but overrides how many hourly snapshots are retained.",
+      "UseTemplate": "production", 
+      "SnapshotRetention": {
+        "Hourly": 0
       }
     }
   }

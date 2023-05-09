@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DefineConstants>JETBRAINS_ANNOTATIONS</DefineConstants>
-		<Configurations>Debug;Release;Release-R2R</Configurations>
+		<Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 		<BaseOutputPath>bin\</BaseOutputPath>
 		<DebugType>embedded</DebugType>
@@ -21,6 +21,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">

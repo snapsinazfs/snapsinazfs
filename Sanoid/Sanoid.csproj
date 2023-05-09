@@ -12,7 +12,7 @@
     <DebugType>embedded</DebugType>
     <AssemblyVersion>2.1.0</AssemblyVersion>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <Configurations>Debug;Release;Release-R2R</Configurations>
+    <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
     <BaseOutputPath>bin\</BaseOutputPath>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
   </PropertyGroup>
@@ -24,7 +24,22 @@
     <PublishSingleFile>True</PublishSingleFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;WINDOWS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
+    <None Remove="Sanoid.local.json" />
+    <None Remove="Sanoid.local.schema.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Sanoid.local.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sanoid.local.schema.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sanoid.monitoring.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

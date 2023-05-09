@@ -25,6 +25,11 @@ public static class JsonConfigurationSections
     }
 
     /// <summary>
+    ///     Gets the /Datasets configuration section of Sanoid.json
+    /// </summary>
+    public static IConfigurationSection DatasetsConfiguration => RootConfiguration.GetRequiredSection( "Datasets" );
+
+    /// <summary>
     ///     Gets the /Formatting configuration section of Sanoid.json
     /// </summary>
     /// <seealso cref="SnapshotNamingConfiguration" />
@@ -48,7 +53,18 @@ public static class JsonConfigurationSections
     /// <seealso cref="TemplatesConfiguration" />
     /// <seealso cref="DatasetsConfiguration" />
 #pragma warning disable CA2000
-    public static IConfigurationRoot RootConfiguration => _rootConfiguration ??= new ConfigurationManager( ).AddJsonFile( "Sanoid.json", false, true ).Build( );
+    public static IConfigurationRoot RootConfiguration => _rootConfiguration ??= new ConfigurationManager( )
+                                                                                 .AddEnvironmentVariables( "Sanoid.net:" )
+                                                                             #if WINDOWS
+                                                                                 .AddJsonFile( "Sanoid.json", true, false )
+                                                                                 .AddJsonFile( "Sanoid.local.json", true, false )
+                                                                             #else
+                                                                                 .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
+                                                                                 .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
+                                                                                 .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
+                                                                                 .AddJsonFile( "Sanoid.local.json", true, false )
+                                                                             #endif
+                                                                                 .Build( );
 #pragma warning restore CA2000
 
     /// <summary>
@@ -60,11 +76,6 @@ public static class JsonConfigurationSections
     ///     Gets the /Templates configuration section of Sanoid.json
     /// </summary>
     public static IConfigurationSection TemplatesConfiguration => RootConfiguration.GetRequiredSection( "Templates" );
-
-    /// <summary>
-    ///     Gets the /Datasets configuration section of Sanoid.json
-    /// </summary>
-    public static IConfigurationSection DatasetsConfiguration => RootConfiguration.GetRequiredSection( "Datasets" );
 
     private static IConfigurationRoot? _rootConfiguration;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
@@ -83,30 +94,53 @@ public static class JsonConfigurationSections
             OutputFormat = OutputFormat.List,
             ValidateAgainstMetaSchema = false
         };
-
+        List< (string FilePath,bool IsRootConfig)> configFilePaths = new( );
+    #if WINDOWS
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.monitoring.schema.json" ) );
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.template.schema.json" ) );
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.dataset.schema.json" ) );
+        SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.local.schema.json" ) );
+        configFilePaths.Add(("Sanoid.json",true)  );
+        configFilePaths.Add(("Sanoid.local.json",false)  );
+        JsonSchema sanoidBaseConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
+        JsonSchema sanoidLocalConfigJsonSchema = JsonSchema.FromFile( "Sanoid.local.schema.json" );
+    #else
+        SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.monitoring.schema.json" ) );
+        SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.template.schema.json" ) );
+        SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.dataset.schema.json" ) );
+        configFilePaths.Add( ( "/usr/local/share/Sanoid.net/Sanoid.json", true ) );
+        configFilePaths.Add( ( "/etc/sanoid/Sanoid.local.json", false ) );
+        configFilePaths.Add((Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ),false)  );
+        configFilePaths.Add( ( "Sanoid.local.json", false ) );
+        JsonSchema sanoidBaseConfigJsonSchema = JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.schema.json" );
+        JsonSchema sanoidLocalConfigJsonSchema = JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.local.schema.json" );
+    #endif
 
-        JsonSchema sanoidConfigJsonSchema = JsonSchema.FromFile( "Sanoid.schema.json" );
-        EvaluationResults configValidationResults = sanoidConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( "Sanoid.json" ) ), evaluationOptions );
-
-        if ( !configValidationResults.IsValid )
+        foreach ( (string? filePath, bool isRootConfig) in configFilePaths )
         {
-            Logger.Error( "Sanoid.json validation failed." );
-            foreach ( EvaluationResults validationDetail in configValidationResults.Details )
+            EvaluationResults configValidationResults = isRootConfig switch
             {
-                if ( validationDetail is { IsValid: false, HasErrors: true } )
+                true => sanoidBaseConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( filePath ) ), evaluationOptions ),
+                _ => sanoidLocalConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( filePath ) ), evaluationOptions )
+            };
+
+            if ( !configValidationResults.IsValid )
+            {
+                Logger.Error( "{0} validation failed.", filePath );
+                foreach ( EvaluationResults validationDetail in configValidationResults.Details )
                 {
-                    Logger.Error( $"{validationDetail.InstanceLocation} has {validationDetail.Errors!.Count} problems:" );
-                    foreach ( KeyValuePair<string, string> error in validationDetail.Errors )
+                    if ( validationDetail is { IsValid: false, HasErrors: true } )
                     {
-                        Logger.Error( $"  Problem: {error.Key}; Details: {error.Value}" );
+                        Logger.Error( $"{validationDetail.InstanceLocation} has {validationDetail.Errors!.Count} problems:" );
+                        foreach ( KeyValuePair<string, string> error in validationDetail.Errors )
+                        {
+                            Logger.Error( $"  Problem: {error.Key}; Details: {error.Value}" );
+                        }
                     }
                 }
-            }
 
-            throw new ConfigurationValidationException( "Sanoid.json validation failed. Please check Sanoid.json and ensure it complies with the schema specified in Sanoid.schema.json." );
+                throw new ConfigurationValidationException( $"{filePath} validation failed. Please check {filePath} and ensure it complies with the schema specified in Sanoid.{( isRootConfig ? string.Empty : "local." )}schema.json." );
+            }
         }
     }
 }

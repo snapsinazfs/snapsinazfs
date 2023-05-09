@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "$id": "Sanoid.local.schema.json",
+  "type": "object",
+  "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
+  "required": [ "Templates", "Datasets" ],
+  "properties": {
+    "$id": {
+      "type": "string",
+      "description": "The name of the config file. Sanoid expects to see 'Sanoid.json'.",
+      "format": "uri-reference",
+      "default": "Sanoid.json"
+    },
+    "$comments": {
+      "type": "string",
+      "description": "Comments about this document."
+    },
+    "UseSanoidConfiguration": {
+      "type": "boolean",
+      "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
+      "default": true
+    },
+    "SanoidConfigurationPathBase": {
+      "type": "string",
+      "description": "The base directory where the ini-formatted sanoid configuration files are located, without trailing slash.",
+      "default": "/etc/sanoid",
+      "format": "uri-reference"
+    },
+    "SanoidConfigurationDefaultsFile": {
+      "type": "string",
+      "description": "The name of the file containing configuration defaults for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
+      "default": "sanoid.defaults.config",
+      "format": "uri-reference"
+    },
+    "SanoidConfigurationLocalFile": {
+      "type": "string",
+      "description": "The name of the local configuration file for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
+      "default": "sanoid.config",
+      "format": "uri-reference"
+    },
+    "SanoidConfigurationCacheDirectory": {
+      "type": "string",
+      "description": "The cache directory sanoid will use",
+      "default": "/var/cache/sanoid",
+      "format": "uri-reference"
+    },
+    "SanoidConfigurationRunDirectory": {
+      "type": "string",
+      "description": "The run directory sanoid will use",
+      "default": "/var/run/sanoid",
+      "format": "uri-reference"
+    },
+    "DryRun": {
+      "type": "boolean",
+      "description": "If Sanoid.net will perform a dry run and make no changes to ZFS.",
+      "default": false
+    },
+    "TakeSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will take snapshots by default",
+      "default": false
+    },
+    "PruneSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will prune expired snapshots by default",
+      "default": false
+    },
+    "ForcePruneSnapshots": {
+      "type": "boolean",
+      "description": "If running Sanoid.net will prune expired snapshots by default, even if their parent datasets are currently involved in a send or receive operation",
+      "default": false
+    },
+    "Formatting": {
+      "$ref": "#/definitions/Formatting"
+    },
+    "Monitoring": {
+      "$ref": "#/definitions/Monitoring"
+    },
+    "PlatformUtilities": {
+      "$ref": "#/definitions/PlatformUtilities"
+    },
+    "Templates": {
+      "$ref": "#/definitions/Templates"
+    },
+    "Datasets": {
+      "$ref": "#/definitions/Datasets"
+    }
+  },
+  "definitions": {
+    "Datasets": {
+      "type": "object",
+      "description": "Datasets for sanoid to process",
+      "additionalProperties": {
+        "$ref": "Sanoid.dataset.schema.json"
+      }
+    },
+    "Templates": {
+      "type": "object",
+      "description": "Templates to apply to dataset nodes",
+      "properties": {
+        "default": {
+          "type": "object",
+          "$ref": "Sanoid.template.schema.json"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "Sanoid.template.schema.json"
+      }
+    },
+    "Formatting": {
+      "type": "object",
+      "description": "Configuration section for configurable formatting options for output, naming, etc.",
+      "properties": {
+        "SnapshotNaming": {
+          "$ref": "#/definitions/Formatting/SnapshotNaming"
+        }
+      },
+      "SnapshotNaming": {
+        "type": "object",
+        "description": "Formatting configuration section for composing snapshot names.",
+        "required": [ "ComponentSeparator", "Prefix", "TimestampFormatString", "FrequentSuffix", "HourlySuffix", "DailySuffix", "WeeklySuffix", "MonthlySuffix", "YearlySuffix" ],
+        "properties": {
+          "ComponentSeparator": {
+            "type": "string",
+            "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name. Can be an empty string.",
+            "default": "_",
+            "pattern": "^[a-zA-Z0-9_-]{0,2}$"
+          },
+          "Prefix": {
+            "description": "The prefix component of all snapshot names.",
+            "type": "string",
+            "default": "autosnap",
+            "pattern": "^[a-zA-Z0-9_-]+$"
+          },
+          "TimestampFormatString": {
+            "type": "string",
+            "description": ".net-style DateTimeOffset format string for the timestamp component of snapshot names.",
+            "default": "yyyy-MM-dd_HH\\:mm\\:ss",
+            "$comment": "See the Microsoft documentation for DateTimeOffset.ToString() format strings."
+          },
+          "FrequentSuffix": {
+            "description": "The suffix component of frequent snapshot names.",
+            "type": "string",
+            "default": "frequently"
+          },
+          "HourlySuffix": {
+            "description": "The suffix component of hourly snapshot names.",
+            "type": "string",
+            "default": "hourly"
+          },
+          "DailySuffix": {
+            "description": "The suffix component of daily snapshot names.",
+            "type": "string",
+            "default": "daily"
+          },
+          "WeeklySuffix": {
+            "description": "The suffix component of weekly snapshot names.",
+            "type": "string",
+            "default": "weekly"
+          },
+          "MonthlySuffix": {
+            "description": "The suffix component of monthly snapshot names.",
+            "type": "string",
+            "default": "monthly"
+          },
+          "YearlySuffix": {
+            "description": "The suffix component of yearly snapshot names.",
+            "type": "string",
+            "default": "yearly"
+          }
+        }
+      }
+    },
+    "Monitoring": {
+      "type": "object",
+      "description": "Configuration section for configurable formatting options for monitoring.",
+      "additionalProperties": {
+        "$ref": "Sanoid.monitoring.schema.json",
+        "type": "object"
+      }
+    },
+    "PlatformUtilities": {
+      "type": "object",
+      "description": "Paths to platform utilities, either absolute or relative to the $PATH environment variable Sanoid.net is invoked with.",
+      "properties": {
+        "ps": {
+          "type": "string",
+          "description": "The path to the standard 'ps' command or another utility with identical output",
+          "default": "/usr/bin/ps"
+        },
+        "zfs": {
+          "type": "string",
+          "description": "The path to the 'zfs' command",
+          "default": "/usr/local/sbin/zfs"
+        },
+        "zpool": {
+          "type": "string",
+          "description": "The path to the 'zpool' command",
+          "default": "/usr/local/sbin/zpool"
+        }
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    }
+  }
+}
