@@ -5,7 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Reflection;
-using NLog.Config;
 using PowerArgs;
 using Sanoid.Common.Configuration.Monitoring;
 using BaseConfiguration = Sanoid.Common.Configuration.Configuration;
@@ -20,7 +19,7 @@ namespace Sanoid;
 [UsedImplicitly]
 internal class CommandLineArguments
 {
-    private readonly Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
 
     [ArgDescription( "Cache directory for sanoid" )]
     [ArgShortcut( "--cache-dir" )]
@@ -99,7 +98,7 @@ internal class CommandLineArguments
     [ArgShortcut( "--take-snapshots" )]
     public bool TakeSnapshots { get; set; }
 
-    [ArgDescription( "Trace level output logging. Change log level in Sanoid.nlog.json for normal usage." )]
+    [ArgDescription( "Trace level output logging. Change log level in Sanoid.nlog.json for normal usage. Has no effect until configuration is parsed." )]
     [ArgShortcut( "--trace" )]
     [ArgCantBeCombinedWith( "Verbose|Debug|Quiet|ReallyQuiet" )]
     public bool Trace { get; set; }
