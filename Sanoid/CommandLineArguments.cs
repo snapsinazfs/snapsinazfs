@@ -124,16 +124,46 @@ internal class CommandLineArguments
     /// <summary>
     ///     Called by main thread to override configured settings with any arguments passed at the command line.
     /// </summary>
-    public void Main()
+    public void Main( )
     {
         if ( Version )
         {
-            LogManager.GetLogger( "MessageOnly" ).Info( "Sanoid.net version {0}", Assembly.GetExecutingAssembly().GetName().Version! );
+            LogManager.GetLogger( "MessageOnly" ).Info( "Sanoid.net version {0}", Assembly.GetExecutingAssembly( ).GetName( ).Version! );
             return;
         }
 
+        if ( ReallyQuiet )
+        {
+            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
+        }
+
+        if ( Quiet )
+        {
+            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Error, LogLevel.Fatal ) );
+        }
+
+        if ( Verbose )
+        {
+            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Info, LogLevel.Fatal ) );
+        }
+
+        if ( Debug )
+        {
+            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Debug, LogLevel.Fatal ) );
+        }
+
+        if ( Trace )
+        {
+            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Trace, LogLevel.Fatal ) );
+        }
+
+        if ( ReallyQuiet || Quiet || Verbose || Debug || Trace )
+        {
+            LogManager.ReconfigExistingLoggers( );
+        }
+
         //Call this so that settings are first retrieved from configuration, to allow arguments to override them.
-        BaseConfiguration.Initialize();
+        BaseConfiguration.Initialize( );
 
         if ( Quiet )
         {
