@@ -90,7 +90,7 @@ public static class JsonConfigurationSections
     ///     Validates Sanoid.json against Sanoid.schema.json.<br />
     ///     If the method does not throw, the configuration is valid for use.
     /// </summary>
-    /// <exception cref="JsonException">If Sanoid.json is invalid according to Sanoid.schema.json</exception>
+    /// <exception cref="JsonException">If Sanoid.json, Sanoid.local.json, or Sanoid.user.json are invalid, according to their respective shemas.</exception>
     private static void ValidateSanoidConfiguration( )
     {
         EvaluationOptions evaluationOptions = new( )
