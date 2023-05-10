@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -151,6 +151,40 @@ public class Template
     }
 
     internal string UseTemplateName { get; init; }
+    private static Template? _defaultTemplate;
+
+    /// <summary>
+    ///     Gets the 'default' template from configuration files or, if it already has been parsed before, returns the existing
+    ///     reference.
+    /// </summary>
+    /// <param name="caller">The calling method</param>
+    /// <returns>
+    ///     The default <see cref="Template" />
+    /// </returns>
+    public static Template GetDefault( [CallerMemberName] string caller = "unknown caller" )
+    {
+        Logger logger = LogManager.GetCurrentClassLogger( );
+        logger.Debug( "Getting default Template for {0}", caller );
+        IConfigurationSection templateConfig = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
+        if ( _defaultTemplate is not null )
+        {
+            return _defaultTemplate;
+        }
+
+        _defaultTemplate = new Template( "default" )
+        {
+            SnapshotRetention = Templates.SnapshotRetention.FromConfiguration( templateConfig.GetRequiredSection( "SnapshotRetention" ) ),
+            Name = "default",
+            SnapshotTiming = Templates.SnapshotTiming.FromConfiguration( templateConfig.GetRequiredSection( "SnapshotTiming" ) ),
+            UseTemplateName = "default",
+            UseTemplate = null,
+            AutoPrune = templateConfig.GetBoolean( "AutoPrune" ),
+            AutoSnapshot = templateConfig.GetBoolean( "AutoSnapshot" ),
+            SkipChildren = templateConfig.GetBoolean( "SkipChildren" ),
+            Recursive = templateConfig.GetBoolean( "Recursive" )
+        };
+        return _defaultTemplate;
+    }
 
     internal Template CloneForDatasetWithOverrides( Dataset targetDataset, IConfigurationSection overrides )
     {
