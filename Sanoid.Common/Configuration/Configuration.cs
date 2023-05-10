@@ -9,11 +9,12 @@ using Microsoft.Extensions.Configuration;
 using NLog.Config;
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
+using Sanoid.Common.Zfs;
 
 namespace Sanoid.Common.Configuration;
 
 /// <summary>
-///     Corresponds to the root section of Sanoid.json
+///     Root class for access to configuration settings
 /// </summary>
 public static class Configuration
 {
@@ -85,35 +86,6 @@ public static class Configuration
         GetZfsDatasets( );
     }
 
-    private static void GetZfsDatasets( )
-    {
-        Zfs.CommandRunner.ZfsListAll( );
-    }
-
-    private static void LoadConfiguredDatasets( )
-    {
-        Log.Debug( "Creating Dataset objects from configuration" );
-        IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
-        foreach ( IConfigurationSection section in datasetSections )
-        {
-            Dataset newDataset = new ( section.Key )
-            {
-                Path = section.Key,
-                Enabled = section.GetBoolean( "Enabled", true ),
-                Template = Templates[section["Template"] ?? "default"]
-            };
-            IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
-            if ( overrides.Exists( ) )
-            {
-                Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, newDataset.Template.Name );
-                newDataset.Template = newDataset.Template.CloneForDatasetWithOverrides( newDataset, overrides );
-            }
-            Datasets.Add( section.Key, newDataset );
-        }
-
-        Log.Debug( "Configured datasets loaded." );
-    }
-
     /// <summary>
     ///     Gets or sets whether Sanoid.net should take snapshots and prune expired snapshots.
     /// </summary>
@@ -141,7 +113,8 @@ public static class Configuration
     ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Dataset" />s, indexed by <see langword="string" />.
     /// </summary>
     /// <remarks>
-    ///     First initialized with a dummy root ("/") dataset on instantiation of the static <see cref="Configuration" /> class,
+    ///     First initialized with a dummy root ("/") dataset on instantiation of the static <see cref="Configuration" />
+    ///     class,
     ///     and then any <see cref="Dataset" />s found in Sanoid.json are added to the collection.
     /// </remarks>
     public static Dictionary<string, Dataset> Datasets { get; } = new( ) { { "/", Dataset.Root } };
@@ -326,11 +299,13 @@ public static class Configuration
     }
 
     /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Template" />s, indexed by <see langword="string" />.
+    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Template" />s, indexed
+    ///     by <see langword="string" />.
     /// </summary>
     /// <remarks>
     ///     First initialized to an empty dictionary on instantiation of the static <see cref="Configuration" /> class,
-    ///     and then any <see cref="Template" />s found in Sanoid.json are added to the collection.
+    ///     and then any <see cref="Template" />s found in Sanoid.json are added to the
+    ///     collection.
     /// </remarks>
     public static Dictionary<string, Template> Templates { get; } = new( );
 
@@ -358,6 +333,36 @@ public static class Configuration
     private static bool _takeSnapshots;
 
     private static readonly Logger Log;
+
+    private static void GetZfsDatasets( )
+    {
+        CommandRunner.ZfsListAll( );
+    }
+
+    private static void LoadConfiguredDatasets( )
+    {
+        Log.Debug( "Creating Dataset objects from configuration" );
+        IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
+        foreach ( IConfigurationSection section in datasetSections )
+        {
+            Dataset newDataset = new( section.Key )
+            {
+                Path = section.Key,
+                Enabled = section.GetBoolean( "Enabled", true ),
+                Template = Templates[ section[ "Template" ] ?? "default" ]
+            };
+            IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
+            if ( overrides.Exists( ) )
+            {
+                Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, newDataset.Template.Name );
+                newDataset.Template = newDataset.Template.CloneForDatasetWithOverrides( newDataset, overrides );
+            }
+
+            Datasets.Add( section.Key, newDataset );
+        }
+
+        Log.Debug( "Configured datasets loaded." );
+    }
 
     private static void LoadTemplates( )
     {
