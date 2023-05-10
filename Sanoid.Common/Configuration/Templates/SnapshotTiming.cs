@@ -21,6 +21,7 @@ public record struct SnapshotTiming
     /// <summary>
     ///     Gets or sets the minute of the hour that hourly snapshots are taken
     /// </summary>
+    [ValueRange(0,59)]
     public int HourlyMinute { get; set; }
 
     /// <summary>
@@ -30,6 +31,7 @@ public record struct SnapshotTiming
     ///     If the current month has fewer days than the specified value, monthly snapshots will be taken on the last day of
     ///     the month
     /// </remarks>
+    [ValueRange(1,31)]
     public int MonthlyDay { get; set; }
 
     /// <summary>
@@ -59,11 +61,13 @@ public record struct SnapshotTiming
     ///     If the current month has fewer days than the specified value, yearly snapshots will be taken on the last day of
     ///     <see cref="YearlyMonth" />
     /// </remarks>
+    [ValueRange(1,31)]
     public int YearlyDay { get; set; }
 
     /// <summary>
     ///     Gets or sets the month of the year in which yearly snapshots will be taken
     /// </summary>
+    [ValueRange(1,12)]
     public int YearlyMonth { get; set; }
 
     /// <summary>
