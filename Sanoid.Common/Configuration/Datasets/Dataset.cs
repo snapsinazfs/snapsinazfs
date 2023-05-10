@@ -53,6 +53,20 @@ public class Dataset
     /// </summary>
     public string Path { get; set; }
 
+    /// <summary>
+    ///     Gets the root <see cref="Dataset"/>, which is a dummy Dataset that serves as the single root for all ZFS pools.
+    /// </summary>
+    /// <value>
+    ///     A <see cref="Dataset"/> with no parent, no overrides, the default template, and set as disabled.
+    /// </value>
+    public static Dataset Root { get; } = new( "/" )
+    {
+        Template = Template.GetDefault( ),
+        Enabled = false,
+        Parent = null,
+        TemplateOverrides = null
+    };
+
     internal Template? Template { get; set; }
 
     internal Template? TemplateOverrides { get; set; }
