@@ -141,10 +141,10 @@ public static class Configuration
     ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Dataset" />s, indexed by <see langword="string" />.
     /// </summary>
     /// <remarks>
-    ///     First initialized to an empty dictionary on instantiation of the static <see cref="Configuration" /> class,
+    ///     First initialized with a dummy root ("/") dataset on instantiation of the static <see cref="Configuration" /> class,
     ///     and then any <see cref="Dataset" />s found in Sanoid.json are added to the collection.
     /// </remarks>
-    public static Dictionary<string, Dataset> Datasets { get; } = new( );
+    public static Dictionary<string, Dataset> Datasets { get; } = new( ) { { "/", Dataset.Root } };
 
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
