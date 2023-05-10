@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration.Datasets;
@@ -28,7 +29,7 @@ public class Template
     {
         if ( string.IsNullOrWhiteSpace( templateName ) )
         {
-            throw new ArgumentNullException( nameof( templateName ), "All templates MUST have a non-null, non-whitespace, non-empty name" );
+            throw new ArgumentException( "All templates MUST have a non-null, non-whitespace, non-empty name", nameof( templateName ) );
         }
 
         Name = templateName;
@@ -40,12 +41,10 @@ public class Template
         Name = templateName;
     }
 
-    private bool? _autoPrune;
-
-    private bool? _autoSnapshot;
-
-    private bool? _recursive;
-    private bool? _skipChildren;
+    private readonly bool? _autoPrune;
+    private readonly bool? _autoSnapshot;
+    private readonly bool? _recursive;
+    private readonly bool? _skipChildren;
 
     private Template? _useTemplate;
 
@@ -58,7 +57,7 @@ public class Template
     public bool? AutoPrune
     {
         get => _autoPrune ?? UseTemplate?.AutoPrune;
-        set => _autoPrune = value;
+        init => _autoPrune = value;
     }
 
     /// <summary>
@@ -70,7 +69,7 @@ public class Template
     public bool? AutoSnapshot
     {
         get => _autoSnapshot ?? UseTemplate?.AutoSnapshot;
-        set => _autoSnapshot = value;
+        init => _autoSnapshot = value;
     }
 
     /// <summary>
@@ -87,7 +86,7 @@ public class Template
     /// <remarks>
     ///     The template MUST be defined in Sanoid.json for initial configuration parsing or an exception will be thrown.
     /// </remarks>
-    public string Name { get; set; }
+    public string Name { get; private init; }
 
     /// <summary>
     ///     Gets or sets whether recursive processing will be used for this template and its descendents.
@@ -99,7 +98,7 @@ public class Template
     public bool? Recursive
     {
         get => _recursive ?? UseTemplate?.Recursive;
-        set => _recursive = value;
+        init => _recursive = value;
     }
 
     /// <summary>
@@ -115,7 +114,7 @@ public class Template
     public bool? SkipChildren
     {
         get => _skipChildren ?? UseTemplate?.SkipChildren;
-        set => _skipChildren = value;
+        init => _skipChildren = value;
     }
 
     /// <summary>
