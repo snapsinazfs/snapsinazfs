@@ -36,7 +36,7 @@ public static class Configuration
 
         // Template configuration initialization
         Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
-        // First, find the default tempate
+        // First, find the default template
         IConfigurationSection defaultTemplateSection;
         IConfigurationSection defaultTemplateSnapshotRetentionSection;
         IConfigurationSection defaultTemplateSnapshotTimingSection;
@@ -48,7 +48,9 @@ public static class Configuration
         }
         catch ( InvalidOperationException ex )
         {
+            // ReSharper disable FormatStringProblem
             Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
+            // ReSharper restore FormatStringProblem
             throw;
         }
 
@@ -60,7 +62,9 @@ public static class Configuration
         }
         catch ( InvalidOperationException ex )
         {
+            // ReSharper disable FormatStringProblem
             Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
+            // ReSharper restore FormatStringProblem
             throw;
         }
 
@@ -72,7 +76,9 @@ public static class Configuration
         }
         catch ( InvalidOperationException ex )
         {
+            // ReSharper disable FormatStringProblem
             Log.Fatal( "Template 'default' does not contain the required SnapshotTiming section. Program will terminate.", ex );
+            // ReSharper restore FormatStringProblem
             throw;
         }
 
@@ -148,7 +154,7 @@ public static class Configuration
             Log.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
-                LoggingRule rule = LogManager.Configuration!.LoggingRules[ ruleIndex ];
+                LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
                 if ( value == LogLevel.Off )
                 {
                     Log.Trace( "Disabling logging for rule {0}", ruleIndex );
@@ -376,7 +382,7 @@ public static class Configuration
                 AutoPrune = templateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
                 AutoSnapshot = templateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
                 Recursive = templateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
-                SkipChildren = templateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
+                SkipChildren = templateSection.GetBoolean( "SkipChildren", isDefaultSection ? false : null )
             };
             Templates.Add( templateSection.Key, newTemplate );
         }
@@ -458,7 +464,7 @@ public static class Configuration
     }
 
     /// <summary>
-    ///     Method used to force instatiation of this static class.
+    ///     Method used to force instantiation of this static class.
     /// </summary>
     public static void Initialize( )
     {
