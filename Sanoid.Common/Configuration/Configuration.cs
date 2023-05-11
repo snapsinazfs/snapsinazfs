@@ -348,11 +348,11 @@ public static class Configuration
     private static void BuildDatasetHierarchy( )
     {
         Log.Debug( "Building dataset hiearchy from combination of configured datasets and all datasets on system." );
-        List<string> allDatasets = CommandRunner.ZfsListAll( );
+        List<string> zfsListResults = CommandRunner.ZfsListAll( );
         // List is returned in the form of a path tree already, so we can just scan the list linearly
         // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
         // Datasets diciontary
-        foreach ( string dsName in allDatasets.Skip( 1 ) )
+        foreach ( string dsName in zfsListResults )
         {
             Log.Trace( "Processing dataset {0}.", dsName );
             // First, does the dataset already exist in config?
