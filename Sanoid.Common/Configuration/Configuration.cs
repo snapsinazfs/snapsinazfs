@@ -355,53 +355,45 @@ public static class Configuration
         foreach ( string dsName in zfsListResults )
         {
             Log.Trace( "Processing dataset {0}.", dsName );
-            // First, does the dataset already exist in config?
-            // If so, we need to check inheritance
-            if ( Datasets.ContainsKey( dsName ) )
+            string parentDsName = Path.GetDirectoryName( dsName ) ?? string.Empty;
+            if ( string.IsNullOrEmpty( parentDsName ) )
             {
+                // This is a pool root, and not in the configuration. Skip it.
+                Log.Trace( "Dataset {0} is a pool root and is not in the configuration. Skipping.", dsName );
+                continue;
             }
-            else if ( !Datasets.ContainsKey( dsName ) )
+
+            Log.Trace( "Dataset {0} not in configuration. Checking parent {1}.", dsName, parentDsName );
+            if ( Datasets.ContainsKey( parentDsName ) )
             {
-                string parentDsName = Path.GetDirectoryName( dsName ) ?? string.Empty;
-                if ( string.IsNullOrEmpty( parentDsName ) )
+                // Parent is in configuration.
+                // Check if we need to do anything with this one, based on parent.
+                Dataset parentDs = Datasets[ parentDsName ];
+                if ( !parentDs.Enabled )
                 {
-                    // This is a pool root, and not in the configuration. Skip it.
-                    Log.Trace( "Dataset {0} is a pool root and is not in the configuration. Skipping.", dsName );
-                    continue;
+                    Log.Trace( "Parent dataset ({0}) of dataset {1} is marked disabled. Not inheriting settings to {1}.", parentDsName, dsName );
                 }
 
-                Log.Trace( "Dataset {0} not in configuration. Checking parent {1}.", dsName, parentDsName );
-                if ( Datasets.ContainsKey( parentDsName ) )
+                if ( parentDs.Enabled & !parentDs.Template!.SkipChildren!.Value )
                 {
-                    // Parent is in configuration.
-                    // Check if we need to do anything with this one, based on parent.
-                    Dataset parentDs = Datasets[ parentDsName ];
-                    if ( !parentDs.Enabled )
-                    {
-                        Log.Trace( "Parent dataset ({0}) of dataset {1} is marked disabled. Not inheriting settings to {1}.", parentDsName, dsName );
-                    }
-
-                    if ( parentDs.Enabled & !parentDs.Template!.SkipChildren!.Value )
-                    {
-                    }
                 }
-                else
+            }
+            else
+            {
+                // This dataset is not in the dictionary
+                // and
+                // The parent of this dataset is not in the dictionary.
+                // First, create a Dataset for the parent, assign it default template, disable it, and stick it in the dictionary
+                // Then, create a Dataset for this entry, assign it defaults as well, disable it, and link them up via Parent/Children properties
+                // This specific case shouldn't happen very often except near the root of trees
+                Log.Trace( "Parent dataset ({0}) of dataset {1} not in configuration. Adding {0} as disabled.", dsName, parentDsName );
+                Dataset parentDs = new( parentDsName )
                 {
-                    // This dataset is not in the dictionary
-                    // and
-                    // The parent of this dataset is not in the dictionary.
-                    // First, create a Dataset for the parent, assign it default template, disable it, and stick it in the dictionary
-                    // Then, create a Dataset for this entry, assign it defaults as well, disable it, and link them up via Parent/Children properties
-                    // This specific case shouldn't happen very often except near the root of trees
-                    Log.Trace( "Parent dataset ({0}) of dataset {1} not in configuration. Adding {0} as disabled.", dsName, parentDsName );
-                    Dataset parentDs = new( parentDsName )
-                    {
-                        Enabled = false,
-                        Template = Template.GetDefault( )
-                    };
-                    //TODO: WIP
-                    Dataset thisDs = new( dsName );
-                }
+                    Enabled = false,
+                    Template = Template.GetDefault( )
+                };
+                //TODO: WIP
+                Dataset thisDs = new( dsName );
             }
         }
     }
