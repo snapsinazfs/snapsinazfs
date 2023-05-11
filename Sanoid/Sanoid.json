@@ -4,7 +4,7 @@
   "$comments": "Default values are compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
-  "ConfigurationPathBase": "./",
+  "ConfigurationPathBase": "/etc/sanoid",
   "CacheDirectory": "/var/cache/sanoid",
   "RunDirectory": "/var/run/sanoid",
   "DryRun": false,
