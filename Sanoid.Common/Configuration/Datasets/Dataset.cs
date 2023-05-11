@@ -42,7 +42,7 @@ public class Dataset
         get => _parent;
         init
         {
-            value?.Children.TryAdd( Path, this );
+            value?.Children.TryAdd( VirtualPath, this );
 
             _parent = value;
         }
@@ -52,6 +52,8 @@ public class Dataset
     ///     Gets or sets the ZFS path of this Dataset
     /// </summary>
     public string Path { get; }
+
+    internal string VirtualPath => $"/{Path}";
 
     /// <summary>
     ///     Gets or sets whether this dataset exists explicitly in the configuration

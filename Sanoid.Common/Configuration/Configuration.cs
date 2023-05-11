@@ -354,15 +354,17 @@ public static class Configuration
         // Datasets diciontary
         foreach ( string dsName in zfsListResults )
         {
-            Log.Trace( "Processing dataset {0}.", dsName );
+            Log.Debug( "Processing dataset {0}.", dsName );
             //TODO: Eliminate this line once finished building the tree
-            string parentDsName = Path.GetDirectoryName( dsName ) ?? string.Empty;
-            Datasets.TryAdd( dsName, new( dsName )
+            string? parentName = Path.GetDirectoryName( dsName );
+            string parentDsName = string.IsNullOrEmpty( parentName ) ? "/" : parentName;
+            Dataset newDs = new( dsName )
             {
                 Enabled = false,
                 IsInConfiguration = false,
                 Parent = Datasets[ parentDsName ]
-            } );
+            };
+            Datasets.TryAdd( newDs.VirtualPath, newDs );
         }
     }
 
@@ -373,9 +375,14 @@ public static class Configuration
         IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
         // Scan the datasets collection
         // If an entry exists in configuration, set its settings, following inheritance rules.
-        foreach ( (string? dsName, Dataset? ds) in Datasets )
+        foreach ( (_, Dataset? ds) in Datasets )
         {
-            IConfigurationSection section = JsonConfigurationSections.DatasetsConfiguration.GetSection( dsName );
+            if ( ds.VirtualPath == "/" )
+            {
+                //Skip the root dataset, as it is already configured for defaults.
+                continue;
+            }
+            IConfigurationSection section = JsonConfigurationSections.DatasetsConfiguration.GetSection( ds.Path );
             if ( section.Exists( ) )
             {
                 // Dataset exists in configuration. Set configured settings and inherit everything else

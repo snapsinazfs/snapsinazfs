@@ -9,6 +9,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8213F454-E94F-4F84-B21F-E2B3121FDAB5}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		Makefile = Makefile
 		README.md = README.md
 	EndProjectSection
 EndProject
