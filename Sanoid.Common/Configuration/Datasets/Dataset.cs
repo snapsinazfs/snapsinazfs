@@ -54,6 +54,11 @@ public class Dataset
     public string Path { get; set; }
 
     /// <summary>
+    ///     Gets the virtual path of the dataset in the tree, which is just the ZFS path prefixed with a leading slash
+    /// </summary>
+    public string TreeVirtualPath => $"/{Path}";
+
+    /// <summary>
     ///     Gets the root <see cref="Dataset"/>, which is a dummy Dataset that serves as the single root for all ZFS pools.
     /// </summary>
     /// <value>
