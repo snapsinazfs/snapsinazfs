@@ -14,20 +14,20 @@ public class ConfigurationTests
     [OneTimeSetUp]
     public void Setup( )
     {
-        _fileConfiguration = new ConfigurationBuilder( )
-                             .AddJsonFile( "Sanoid.json" )
-                             .Build( );
-        _fileConfigDictionary = _fileConfiguration.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
+        _fileBaseConfiguration = new ConfigurationBuilder( )
+                                 .AddJsonFile( "Sanoid.json" )
+                                 .Build( );
+        _fileBaseConfigDictionary = _fileBaseConfiguration.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
 
-        _mockConfiguration = new ConfigurationBuilder( ).AddInMemoryCollection( _mockConfigDictionary ).Build( );
+        _mockBaseConfiguration = new ConfigurationBuilder( ).AddInMemoryCollection( _mockBaseConfigDictionary ).Build( );
     }
 
-    private IConfigurationRoot _fileConfiguration;
-    private IConfigurationRoot _mockConfiguration;
+    private IConfigurationRoot _fileBaseConfiguration;
+    private IConfigurationRoot _mockBaseConfiguration;
 
-    private Dictionary<string, string?> _fileConfigDictionary;
+    private Dictionary<string, string?> _fileBaseConfigDictionary;
 
-    private readonly Dictionary<string, string?> _mockConfigDictionary = new( )
+    private readonly Dictionary<string, string?> _mockBaseConfigDictionary = new( )
     {
         { "$schema", "Sanoid.schema.json" },
         { "$id", "Sanoid.json" },
@@ -88,14 +88,15 @@ public class ConfigurationTests
     };
 
     [Test]
+    [Order( 1 )]
     public void BaseConfigurationNotModified( )
     {
         // This test is for making sure that the base configuration hasn't been changed
         // Helps ensure changes to base config don't unintentionally get committed
 
-        foreach ( ( string key, string? value ) in _mockConfigDictionary )
+        foreach ( ( string key, string? value ) in _mockBaseConfigDictionary )
         {
-            if ( _fileConfigDictionary.TryGetValue( key, out string? fileConfigElementValue ) )
+            if ( _fileBaseConfigDictionary.TryGetValue( key, out string? fileConfigElementValue ) )
             {
                 Assert.That( fileConfigElementValue, Is.EqualTo( value ) );
             }
@@ -104,5 +105,11 @@ public class ConfigurationTests
                 Assert.Fail( $"{key} does not exist in Sanoid.json" );
             }
         }
+    }
+
+    [Test]
+    [Order( 2 )]
+    public void AnotherTest( )
+    {
     }
 }
