@@ -20,7 +20,7 @@
     },
     "Recursive": {
       "type": "boolean",
-      "description": "Whether recursive processing will be used for this template and its descendents.",
+      "description": "Whether zfs native recursive processing will be used for this template and its descendents.",
       "default": false
     },
     "UseTemplate": {
