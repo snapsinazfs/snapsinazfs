@@ -13,7 +13,7 @@ public static class ConfigurationValidators
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
-    /// Checks that the SnapshotTiming section exists and is fully configured 
+    ///     Checks that the SnapshotTiming section exists and is fully configured
     /// </summary>
     /// <param name="templateSection"></param>
     /// <param name="templateSnapshotSection"></param>
@@ -51,12 +51,17 @@ public static class ConfigurationValidators
         }
     }
 
-    public static void CheckTemplateSectionExists( string templateName, out IConfigurationSection defaultTemplateSection )
+    /// <summary>
+    ///     Checks that the named template exists in this configuration and returns it as an out parameter.
+    /// </summary>
+    /// <param name="templateName"></param>
+    /// <param name="defaultTemplateSection"></param>
+    public static void CheckTemplateSectionExists( this IConfiguration baseConfiguration, string templateName, out IConfigurationSection defaultTemplateSection )
     {
         try
         {
             Logger.Trace( "Checking for existence of 'default' Template" );
-            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( templateName );
+            defaultTemplateSection = baseConfiguration.GetRequiredSection( templateName );
             Logger.Trace( "'default' Template found" );
         }
         catch ( InvalidOperationException ex )
