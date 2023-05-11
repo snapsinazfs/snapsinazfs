@@ -176,8 +176,9 @@ public class Template
         }
     }
 
-    internal string UseTemplateName { get; init; }
+    internal string UseTemplateName { get; private init; }
     private static Template? _defaultTemplate;
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
     ///     Gets the 'default' template from configuration files or, if it already has been parsed before, returns the existing
@@ -196,12 +197,10 @@ public class Template
             return _defaultTemplate;
         }
 
-        _defaultTemplate = new Template( "default" )
+        _defaultTemplate = new( "default", "default" )
         {
             SnapshotRetention = Templates.SnapshotRetention.FromConfiguration( templateConfig.GetRequiredSection( "SnapshotRetention" ) ),
-            Name = "default",
             SnapshotTiming = Templates.SnapshotTiming.FromConfiguration( templateConfig.GetRequiredSection( "SnapshotTiming" ) ),
-            UseTemplateName = "default",
             UseTemplate = null,
             AutoPrune = templateConfig.GetBoolean( "AutoPrune" ),
             AutoSnapshot = templateConfig.GetBoolean( "AutoSnapshot" ),
@@ -216,10 +215,10 @@ public class Template
         Logger.Debug( "Cloning template {0} to apply overrides in dataset {1}", targetDataset.Template.Name, targetDataset.Path );
         IConfigurationSection retentionOverrides = overrides.GetSection( "SnapshotRetention" );
         IConfigurationSection timingOverrides = overrides.GetSection( "SnapshotTiming" );
-        return new Template( $"{targetDataset.Path}_{Name}_Local" )
+        return new( $"{targetDataset.Path}_{Name}_Local", $"{targetDataset.Path}_{Name}_Local" )
         {
             SnapshotRetention = retentionOverrides.Exists( )
-                ? new SnapshotRetention
+                ? new( )
                 {
                     Daily = retentionOverrides.GetInt( "Daily", SnapshotRetention!.Value.Daily ),
                     Frequent = retentionOverrides.GetInt( "Frequent", SnapshotRetention.Value.Frequent ),
@@ -232,7 +231,7 @@ public class Template
                 }
                 : SnapshotRetention!.Value,
             SnapshotTiming = timingOverrides.Exists( )
-                ? new SnapshotTiming
+                ? new( )
                 {
                     DailyTime = timingOverrides[ "DailyTime" ] is null ? SnapshotTiming!.Value.DailyTime : TimeOnly.Parse( timingOverrides[ "DailyTime" ]! ),
                     HourlyMinute = timingOverrides.GetInt( "HourlyMinute", SnapshotTiming!.Value.HourlyMinute ),

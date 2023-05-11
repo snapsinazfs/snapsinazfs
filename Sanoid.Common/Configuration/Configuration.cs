@@ -371,7 +371,6 @@ public static class Configuration
     {
         //TODO: This can probably be inlined when loading datasets
         Log.Debug( "Setting dataset options from configuration" );
-        IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
         // Scan the datasets collection
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( (_, Dataset? ds) in Datasets )
