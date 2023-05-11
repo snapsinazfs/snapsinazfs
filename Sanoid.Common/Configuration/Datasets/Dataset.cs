@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -40,7 +40,7 @@ public class Dataset
     public Dataset? Parent
     {
         get => _parent;
-        set
+        init
         {
             value?.Children.TryAdd( Path, this );
 
@@ -51,7 +51,7 @@ public class Dataset
     /// <summary>
     ///     Gets or sets the ZFS path of this Dataset
     /// </summary>
-    public string Path { get; set; }
+    public string Path { get; }
 
     /// <summary>
     ///     Gets or sets whether this dataset exists explicitly in the configuration
