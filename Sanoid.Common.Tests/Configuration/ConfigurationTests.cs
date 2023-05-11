@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
+using Sanoid.Common.Configuration;
 
 namespace Sanoid.Common.Tests.Configuration;
 
@@ -19,10 +20,16 @@ public class ConfigurationTests
                                  .Build( );
         _fileBaseConfigDictionary = _fileBaseConfiguration.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
 
+        _fileLocalConfiguration = new ConfigurationBuilder( )
+                                  .AddJsonFile( "Sanoid.json" )
+                                  .AddJsonFile( "Sanoid.local.json" )
+                                  .Build( );
+
         _mockBaseConfiguration = new ConfigurationBuilder( ).AddInMemoryCollection( _mockBaseConfigDictionary ).Build( );
     }
 
     private IConfigurationRoot _fileBaseConfiguration;
+    private IConfigurationRoot _fileLocalConfiguration;
     private IConfigurationRoot _mockBaseConfiguration;
 
     private Dictionary<string, string?> _fileBaseConfigDictionary;
@@ -105,5 +112,33 @@ public class ConfigurationTests
                 Assert.Fail( $"{key} does not exist in Sanoid.json" );
             }
         }
+    }
+
+    [Test]
+    [Order( 2 )]
+
+    public void ConfigurationDefinesAtLeastOneDataset( )
+    {
+        // Check if there's at least one dataset defined by checking there is at least one non-null value in the section
+        _fileLocalConfiguration.CheckTemplateSectionExists( "Datasets", out IConfigurationSection datasetsSection );
+        Dictionary<string, string?> datasetsDictionary = datasetsSection.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
+        Assert.That( datasetsDictionary.Any( kvp => kvp.Value is not null ) );
+    }
+
+    [Test]
+    [Order( 3 )]
+    public void CanAccessEnvironmentVariables( )
+    {
+        // Check if we can access environment variables and that they properly override configuration in files
+        // Original value of the TakeSnapshots setting in Sanoid.json is False
+        // This sets the environment variable Sanoid.net:TakeSnapshots to True and checks for its existence in configuration and that it is correctly overridden.
+        Environment.SetEnvironmentVariable( "Sanoid.net:TakeSnapshots", "True" );
+        IConfigurationRoot configurationWithEnvironmentVariables = new ConfigurationBuilder( )
+                                                                   .AddJsonFile( "Sanoid.json" )
+                                                                   .AddEnvironmentVariables( "Sanoid.net:" )
+                                                                   .Build( );
+        Dictionary<string, string?> datasetsDictionary = configurationWithEnvironmentVariables.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
+        Assert.That( datasetsDictionary, Contains.Key( "TakeSnapshots" ) );
+        Assert.That( datasetsDictionary[ "TakeSnapshots" ], Is.EqualTo( "True" ) );
     }
 }
