@@ -186,12 +186,12 @@ internal class CommandLineArguments
 
         if ( CacheDir is not null )
         {
-            BaseConfiguration.SanoidConfigurationCacheDirectory = CacheDir;
+            BaseConfiguration.CacheDirectory = CacheDir;
         }
 
         if ( ConfigDir is not null )
         {
-            BaseConfiguration.SanoidConfigurationPathBase = ConfigDir;
+            BaseConfiguration.ConfigurationPathBase = ConfigDir;
         }
 
         if ( Cron )
@@ -254,7 +254,7 @@ internal class CommandLineArguments
 
         if ( RunDir is not null )
         {
-            BaseConfiguration.SanoidConfigurationRunDirectory = RunDir;
+            BaseConfiguration.RunDirectory = RunDir;
         }
 
         if ( TakeSnapshots )

@@ -26,8 +26,8 @@ internal static class SanoidIniConfiguration
     internal static IConfigurationRoot IniConfiguration =>
 #pragma warning disable CA2000
         _configuration ??= new ConfigurationManager( )
-                           .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationDefaultsFile ) )
-                           .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationLocalFile ) )
+                           .AddIniFile( Path.Combine( Common.Configuration.Configuration.ConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationDefaultsFile ) )
+                           .AddIniFile( Path.Combine( Common.Configuration.Configuration.ConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationLocalFile ) )
                            .Build( );
 #pragma warning restore CA2000
 
