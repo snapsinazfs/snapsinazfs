@@ -87,7 +87,7 @@ public class Template
     /// <remarks>
     ///     The template MUST be defined in Sanoid.json for initial configuration parsing or an exception will be thrown.
     /// </remarks>
-    public string Name { get; private init; }
+    public string Name { get; }
 
     /// <summary>
     ///     Gets or sets whether recursive processing will be used for this template and its descendents.
