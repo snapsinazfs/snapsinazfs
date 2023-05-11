@@ -368,31 +368,37 @@ public static class Configuration
 
     private static void LoadDatasetConfigurations( )
     {
-        Log.Debug( "Creating Dataset objects from configuration" );
+        //TODO: This can probably be inlined when loading datasets
+        Log.Debug( "Setting dataset options from configuration" );
         IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
-
-        // First, create a dummy root dataset with the name '/', which is illegal as a zfs identifier, so it's safe to use.
-        // This will allow us to represent the entire Dataset hierarchy as a tree, even if there are multiple pools.
-
-        foreach ( IConfigurationSection section in datasetSections )
+        // Scan the datasets collection
+        // If an entry exists in configuration, set its settings, following inheritance rules.
+        foreach ( (string? dsName, Dataset? ds) in Datasets )
         {
-            Dataset newDataset = new( section.Key )
+            IConfigurationSection section = JsonConfigurationSections.DatasetsConfiguration.GetSection( dsName );
+            if ( section.Exists( ) )
             {
-                Path = section.Key,
-                Enabled = section.GetBoolean( "Enabled", true ),
-                Template = Templates[ section[ "Template" ] ?? "default" ]
-            };
-            IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
-            if ( overrides.Exists( ) )
-            {
-                Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, newDataset.Template.Name );
-                newDataset.Template = newDataset.Template.CloneForDatasetWithOverrides( newDataset, overrides );
+                // Dataset exists in configuration. Set configured settings and inherit everything else
+                ds.IsInConfiguration = true;
+                ds.Enabled = section.GetBoolean( "Enabled", true );
+                string? templateName = section[ "Template" ];
+                ds.Template = templateName is null ? ds.Parent!.Template : Templates[ templateName ];
+
+                IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
+                if ( overrides.Exists( ) )
+                {
+                    Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
+                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( ds, overrides );
+                }
             }
-
-            Datasets.Add( section.Key, newDataset );
+            else
+            {
+                // Dataset is not explicitly configured. Inherit relevant properties from parent only.
+                ds.Enabled = ds.Parent!.Enabled;
+                ds.Template = ds.Parent.Template;
+            }
         }
-
-        Log.Debug( "Configured datasets loaded." );
+        Log.Debug( "Dataset options configured." );
     }
 
     private static void GetZfsDatasets( )
