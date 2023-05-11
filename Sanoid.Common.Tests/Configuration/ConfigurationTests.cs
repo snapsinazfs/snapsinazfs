@@ -95,9 +95,9 @@ public class ConfigurationTests
 
         foreach ( ( string key, string? value ) in _mockConfigDictionary )
         {
-            if ( _fileConfigDictionary.TryGetValue( key, out string fileConfigElementValue ) )
+            if ( _fileConfigDictionary.TryGetValue( key, out string? fileConfigElementValue ) )
             {
-                Assert.That( _fileConfigDictionary[ key ], Is.EqualTo( value ) );
+                Assert.That( fileConfigElementValue, Is.EqualTo( value ) );
             }
             else
             {
