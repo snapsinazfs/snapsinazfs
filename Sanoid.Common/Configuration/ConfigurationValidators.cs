@@ -8,16 +8,21 @@ using Microsoft.Extensions.Configuration;
 
 namespace Sanoid.Common.Configuration;
 
-internal static class ConfigurationValidators
+public static class ConfigurationValidators
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    internal static void CheckDefaultTemplateSnapshotTimingSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection )
+    /// <summary>
+    /// Checks that the SnapshotTiming section exists and is fully configured 
+    /// </summary>
+    /// <param name="templateSection"></param>
+    /// <param name="templateSnapshotSection"></param>
+    public static void CheckDefaultTemplateSnapshotTimingSectionExists( IConfigurationSection templateSection, out IConfigurationSection templateSnapshotSection )
     {
         try
         {
             Logger.Trace( "Checking for existence of 'SnapshotTiming' section in 'default' Template" );
-            defaultTemplateSnapshotTimingSection = defaultTemplateSection.GetRequiredSection( "SnapshotTiming" );
+            templateSnapshotSection = templateSection.GetRequiredSection( "SnapshotTiming" );
             Logger.Trace( "'SnapshotTiming' section found" );
         }
         catch ( InvalidOperationException ex )
@@ -29,7 +34,7 @@ internal static class ConfigurationValidators
         }
     }
 
-    internal static void CheckDefaultTemplateSnapshotRetentionSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection )
+    public static void CheckDefaultTemplateSnapshotRetentionSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection )
     {
         try
         {
@@ -46,12 +51,12 @@ internal static class ConfigurationValidators
         }
     }
 
-    internal static void CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection )
+    public static void CheckTemplateSectionExists( string templateName, out IConfigurationSection defaultTemplateSection )
     {
         try
         {
             Logger.Trace( "Checking for existence of 'default' Template" );
-            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
+            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( templateName );
             Logger.Trace( "'default' Template found" );
         }
         catch ( InvalidOperationException ex )

@@ -4,7 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using NLog.Config;
 using Sanoid.Common.Configuration.Datasets;
@@ -388,7 +387,7 @@ public static class Configuration
         // Template configuration initialization
         Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        ConfigurationValidators.CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection );
+        ConfigurationValidators.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
         ConfigurationValidators.CheckDefaultTemplateSnapshotRetentionSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection );
         ConfigurationValidators.CheckDefaultTemplateSnapshotTimingSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection );
 

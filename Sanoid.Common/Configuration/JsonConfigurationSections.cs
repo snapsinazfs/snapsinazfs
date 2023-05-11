@@ -18,10 +18,10 @@ public static class JsonConfigurationSections
     /// <summary>
     ///     Validates json configuration files upon first use
     /// </summary>
-    /// <seealso cref="ValidateSanoidConfiguration()" />
+    /// <seealso cref="ValidateSanoidConfigurationSchema" />
     static JsonConfigurationSections( )
     {
-        ValidateSanoidConfiguration( );
+        ValidateSanoidConfigurationSchema( );
     }
 
     /// <summary>
@@ -91,7 +91,7 @@ public static class JsonConfigurationSections
     ///     If the method does not throw, the configuration is valid for use.
     /// </summary>
     /// <exception cref="JsonException">If Sanoid.json, Sanoid.local.json, or Sanoid.user.json are invalid, according to their respective shemas.</exception>
-    private static void ValidateSanoidConfiguration( )
+    private static void ValidateSanoidConfigurationSchema( )
     {
         EvaluationOptions evaluationOptions = new( )
         {
