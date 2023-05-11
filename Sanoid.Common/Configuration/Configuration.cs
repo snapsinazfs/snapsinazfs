@@ -87,12 +87,11 @@ public static class Configuration
         InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
         Log.Debug( "Template configuration complete." );
 
-        Log.Debug( "Initializing Dataset configuration from Sanoid.json" );
-        LoadConfiguredDatasets( );
         // Diverging from PERL sanoid a bit, here.
         // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
         // than invoking multiple zfs list processes.
         BuildDatasetHierarchy( );
+        LoadConfiguredDatasets( );
     }
 
     /// <summary>
