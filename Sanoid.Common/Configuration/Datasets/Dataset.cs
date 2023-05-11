@@ -1,9 +1,10 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json.Serialization;
 using Sanoid.Common.Configuration.Templates;
 
 namespace Sanoid.Common.Configuration.Datasets;
@@ -29,7 +30,7 @@ public class Dataset
     /// </summary>
     public Dictionary<string, Dataset> Children { get; } = new( );
 
-    internal bool Enabled { get; set; }
+    public bool Enabled { get; set; }
 
     /// <summary>
     ///     Gets or sets the parent of this Dataset
@@ -74,7 +75,7 @@ public class Dataset
         TemplateOverrides = null
     };
 
-    internal Template? Template { get; set; }
+    public Template? Template { get; set; }
 
     internal Template? TemplateOverrides { get; set; }
 }

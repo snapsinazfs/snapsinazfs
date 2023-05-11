@@ -356,8 +356,7 @@ public static class Configuration
         {
             Log.Debug( "Processing dataset {0}.", dsName );
             //TODO: Eliminate this line once finished building the tree
-            string? parentName = Path.GetDirectoryName( dsName );
-            string parentDsName = string.IsNullOrEmpty( parentName ) ? "/" : parentName;
+            string? parentDsName = $"/{Path.GetDirectoryName( dsName )}";
             Dataset newDs = new( dsName )
             {
                 Enabled = false,
@@ -377,7 +376,8 @@ public static class Configuration
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( (_, Dataset? ds) in Datasets )
         {
-            if ( ds.VirtualPath == "/" )
+            Log.Debug( "Processing dataset {0}", ds.Path );
+            if ( ds.Path == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
                 continue;
