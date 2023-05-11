@@ -401,11 +401,6 @@ public static class Configuration
         Log.Debug( "Dataset options configured." );
     }
 
-    private static void GetZfsDatasets( )
-    {
-        CommandRunner.ZfsListAll( );
-    }
-
     private static void LoadTemplates( )
     {
         Log.Debug( "Creating Template objects from configuration" );
