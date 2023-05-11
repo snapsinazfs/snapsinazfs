@@ -101,10 +101,6 @@ internal class CommandLineArguments
     [ArgCantBeCombinedWith( "Verbose|Debug|Quiet|ReallyQuiet" )]
     public bool Trace { get; set; }
 
-    [ArgDescription( "Forces loading of PERL sanoid's configuration files" )]
-    [ArgShortcut( "--use-sanoid-config" )]
-    public bool UseSanoidConfig { get; set; }
-
     [ArgDescription( "Verbose (Info level) output logging. Change log level in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "v" )]
     [ArgShortcut( "--verbose" )]
@@ -260,11 +256,6 @@ internal class CommandLineArguments
         if ( TakeSnapshots )
         {
             BaseConfiguration.TakeSnapshots = true;
-        }
-
-        if ( UseSanoidConfig )
-        {
-            BaseConfiguration.UseSanoidConfiguration = true;
         }
     }
 }

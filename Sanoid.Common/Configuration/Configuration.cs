@@ -30,13 +30,36 @@ public static class Configuration
 #pragma warning restore CS8618
 
     /// <summary>
+    ///     Gets or sets sanoid's cache path.<br />
+    ///     Corresponds to the /CacheDirectory property of Sanoid.json.
+    /// </summary>
+    /// <remarks>
+    ///     Default value is "/var/cache/sanoid"<br />
+    /// </remarks>
+    /// <value>A <see langword="string" /> indicating the path for sanoid-generated cache files</value>
+    public static string CacheDirectory { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<br />
+    ///     Corresponds to the /ConfigurationPathBase property of Sanoid.json.
+    /// </summary>
+    /// <remarks>
+    ///     Default value is "/etc/sanoid"<br />
+    ///     Should not contain a trailing slash.<br />
+    ///     Not guaranteed to work with a relative path. Use an absolute path.
+    /// </remarks>
+    /// <value>
+    ///     A <see langword="string" /> indicating the absolute path to the directory containing PERL sanoid's configuration
+    ///     files
+    /// </value>
+    public static string ConfigurationPathBase { get; set; }
+
+    /// <summary>
     ///     Gets or sets whether Sanoid.net should take snapshots and prune expired snapshots.
     /// </summary>
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots and prune expired snapshots.
     /// </value>
-    [JsonPropertyName( "Cron" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     public static bool Cron
     {
         get => _cron;
@@ -118,9 +141,6 @@ public static class Configuration
     ///     A A <see langword="bool" /> indicating if no changes will be made to zfs (<see langword="true" />) or if normal
     ///     processing will occur (<see langword="false" /> - default)
     /// </value>
-    [JsonPropertyName( "DryRun" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
     public static bool DryRun { get; set; }
 
     /// <summary>
@@ -129,8 +149,6 @@ public static class Configuration
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will prune expired snapshots.
     /// </value>
-    [JsonPropertyName( "PruneSnapshots" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     public static bool PruneSnapshots
     {
         get => _pruneSnapshots;
@@ -146,77 +164,13 @@ public static class Configuration
     }
 
     /// <summary>
-    ///     Gets or sets sanoid's cache path.<br />
-    ///     Corresponds to the /SanoidConfigurationCacheDirectory property of Sanoid.json.
-    /// </summary>
-    /// <remarks>
-    ///     Default value is "/var/cache/sanoid"<br />
-    /// </remarks>
-    /// <value>A <see langword="string" /> indicating the path for sanoid-generated cache files</value>
-    [JsonPropertyName( "SanoidConfigurationCacheDirectory" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
-    public static string CacheDirectory { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the name of the ini-formatted file inside the <see cref="ConfigurationPathBase" /> folder
-    ///     containing PERL sanoid's default configuration.<br />
-    ///     Corresponds to the /SanoidConfigurationDefaultsFile property of Sanoid.json.
-    /// </summary>
-    /// <remarks>
-    ///     Default value is "sanoid.defaults.conf"<br />
-    ///     Assumed to be a file name only.
-    /// </remarks>
-    /// <value>A <see langword="string" /> indicating the file name of the sanoid.defaults.conf file</value>
-    [JsonPropertyName( "SanoidConfigurationDefaultsFile" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
-    public static string SanoidConfigurationDefaultsFile { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the name of the ini-formatted file inside the <see cref="ConfigurationPathBase" /> folder
-    ///     containing PERL sanoid's local configuration.<br />
-    ///     Corresponds to the /SanoidConfigurationLocalFile property of Sanoid.json.
-    /// </summary>
-    /// <remarks>
-    ///     Default value is "sanoid.conf"<br />
-    ///     Assumed to be a file name only.
-    /// </remarks>
-    /// <value>A <see langword="string" /> indicating the file name of the sanoid.conf file</value>
-    [JsonPropertyName( "SanoidConfigurationLocalFile" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
-    public static string SanoidConfigurationLocalFile { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<br />
-    ///     Corresponds to the /SanoidConfigurationPathBase property of Sanoid.json.
-    /// </summary>
-    /// <remarks>
-    ///     Default value is "/etc/sanoid"<br />
-    ///     Should not contain a trailing slash.<br />
-    ///     Not guaranteed to work with a relative path. Use an absolute path.
-    /// </remarks>
-    /// <value>
-    ///     A <see langword="string" /> indicating the absolute path to the directory containing PERL sanoid's configuration
-    ///     files
-    /// </value>
-    [JsonPropertyName( "SanoidConfigurationPathBase" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
-    public static string ConfigurationPathBase { get; set; }
-
-    /// <summary>
     ///     Gets or sets sanoid's run path.<br />
-    ///     Corresponds to the /SanoidConfigurationRunDirectory property of Sanoid.json.
+    ///     Corresponds to the /RunDirectory property of Sanoid.json.
     /// </summary>
     /// <remarks>
     ///     Default value is "/var/run/sanoid"<br />
     /// </remarks>
     /// <value>A <see langword="string" /> indicating the path for sanoid-generated runtime files</value>
-    [JsonPropertyName( "SanoidConfigurationRunDirectory" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
-    [JsonRequired]
     public static string RunDirectory { get; set; }
 
     /// <summary>
@@ -225,8 +179,6 @@ public static class Configuration
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots.
     /// </value>
-    [JsonPropertyName( "TakeSnapshots" )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     public static bool TakeSnapshots
     {
         get => _takeSnapshots;
@@ -289,7 +241,7 @@ public static class Configuration
         Log.Debug( "Setting dataset options from configuration" );
         // Scan the datasets collection
         // If an entry exists in configuration, set its settings, following inheritance rules.
-        foreach ( (_, Dataset? ds) in Datasets )
+        foreach ( ( _, Dataset? ds ) in Datasets )
         {
             Log.Debug( "Processing dataset {0}", ds.Path );
             if ( ds.Path == "/" )
@@ -297,6 +249,7 @@ public static class Configuration
                 //Skip the root dataset, as it is already configured for defaults.
                 continue;
             }
+
             IConfigurationSection section = JsonConfigurationSections.DatasetsConfiguration.GetSection( ds.Path );
             if ( section.Exists( ) )
             {
@@ -320,6 +273,7 @@ public static class Configuration
                 ds.Template = ds.Parent.Template;
             }
         }
+
         Log.Debug( "Dataset options configured." );
     }
 
@@ -434,9 +388,9 @@ public static class Configuration
         // Template configuration initialization
         Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection );
-        CheckDefaultTemplateSnapshotRetentionSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection );
-        CheckDefaultTemplateSnapshotTimingSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection );
+        ConfigurationValidators.CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection );
+        ConfigurationValidators.CheckDefaultTemplateSnapshotRetentionSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection );
+        ConfigurationValidators.CheckDefaultTemplateSnapshotTimingSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection );
 
         LoadTemplates( );
         BuildTemplateHierarchy( );
@@ -448,57 +402,6 @@ public static class Configuration
         // than invoking multiple zfs list processes.
         BuildDatasetHierarchy( );
         LoadDatasetConfigurations( );
-    }
-
-    private static void CheckDefaultTemplateSnapshotTimingSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection )
-    {
-        try
-        {
-            Log.Trace( "Checking for existence of 'SnapshotTiming' section in 'default' Template" );
-            defaultTemplateSnapshotTimingSection = defaultTemplateSection.GetRequiredSection( "SnapshotTiming" );
-            Log.Trace( "'SnapshotTiming' section found" );
-        }
-        catch ( InvalidOperationException ex )
-        {
-            // ReSharper disable FormatStringProblem
-            Log.Fatal( "Template 'default' does not contain the required SnapshotTiming section. Program will terminate.", ex );
-            // ReSharper restore FormatStringProblem
-            throw;
-        }
-    }
-
-    internal static void CheckDefaultTemplateSnapshotRetentionSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection )
-    {
-        try
-        {
-            Log.Trace( "Checking for existence of 'SnapshotRetention' section in 'default' Template" );
-            defaultTemplateSnapshotRetentionSection = defaultTemplateSection.GetRequiredSection( "SnapshotRetention" );
-            Log.Trace( "'SnapshotRetention' section found" );
-        }
-        catch ( InvalidOperationException ex )
-        {
-            // ReSharper disable FormatStringProblem
-            Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
-            // ReSharper restore FormatStringProblem
-            throw;
-        }
-    }
-
-    internal static void CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection )
-    {
-        try
-        {
-            Log.Trace( "Checking for existence of 'default' Template" );
-            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
-            Log.Trace( "'default' Template found" );
-        }
-        catch ( InvalidOperationException ex )
-        {
-            // ReSharper disable FormatStringProblem
-            Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
-            // ReSharper restore FormatStringProblem
-            throw;
-        }
     }
 
     internal static void GetBaseConfiguration( IConfigurationRoot rootConfiguration )
