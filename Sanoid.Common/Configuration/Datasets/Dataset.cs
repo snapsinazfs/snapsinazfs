@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -57,11 +57,6 @@ public class Dataset
     ///     Gets or sets whether this dataset exists explicitly in the configuration
     /// </summary>
     public bool IsInConfiguration { get; set; }
-
-    /// <summary>
-    ///     Gets the virtual path of the dataset in the tree, which is just the ZFS path prefixed with a leading slash
-    /// </summary>
-    public string TreeVirtualPath => $"/{Path}";
 
     /// <summary>
     ///     Gets the root <see cref="Dataset"/>, which is a dummy Dataset that serves as the single root for all ZFS pools.
