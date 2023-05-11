@@ -89,7 +89,10 @@ public static class Configuration
 
         Log.Debug( "Initializing Dataset configuration from Sanoid.json" );
         LoadConfiguredDatasets( );
-        GetZfsDatasets( );
+        // Diverging from PERL sanoid a bit, here.
+        // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
+        // than invoking multiple zfs list processes.
+        BuildDatasetHierarchy( );
     }
 
     /// <summary>
@@ -340,15 +343,78 @@ public static class Configuration
 
     private static readonly Logger Log;
 
-    private static void GetZfsDatasets( )
+    /// <summary>
+    ///     Builds the full dataset path tree from all zfs datasets compared against configuration.<br />
+    /// </summary>
+    private static void BuildDatasetHierarchy( )
     {
-        CommandRunner.ZfsListAll( );
+        Log.Debug( "Building dataset hiearchy from combination of configured datasets and all datasets on system." );
+        List<string> allDatasets = CommandRunner.ZfsListAll( );
+        // List is returned in the form of a path tree already, so we can just scan the list linearly
+        // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
+        // Datasets diciontary
+        foreach ( string dsName in allDatasets.Skip( 1 ) )
+        {
+            Log.Trace( "Processing dataset {0}.", dsName );
+            // First, does the dataset already exist in config?
+            // If so, we need to check inheritance
+            if ( Datasets.ContainsKey( dsName ) )
+            {
+            }
+            else if ( !Datasets.ContainsKey( dsName ) )
+            {
+                string parentDsName = Path.GetDirectoryName( dsName ) ?? string.Empty;
+                if ( string.IsNullOrEmpty( parentDsName ) )
+                {
+                    // This is a pool root, and not in the configuration. Skip it.
+                    Log.Trace( "Dataset {0} is a pool root and is not in the configuration. Skipping.", dsName );
+                    continue;
+                }
+
+                Log.Trace( "Dataset {0} not in configuration. Checking parent {1}.", dsName, parentDsName );
+                if ( Datasets.ContainsKey( parentDsName ) )
+                {
+                    // Parent is in configuration.
+                    // Check if we need to do anything with this one, based on parent.
+                    Dataset parentDs = Datasets[ parentDsName ];
+                    if ( !parentDs.Enabled )
+                    {
+                        Log.Trace( "Parent dataset ({0}) of dataset {1} is marked disabled. Not inheriting settings to {1}.", parentDsName, dsName );
+                    }
+
+                    if ( parentDs.Enabled & !parentDs.Template!.SkipChildren!.Value )
+                    {
+                    }
+                }
+                else
+                {
+                    // This dataset is not in the dictionary
+                    // and
+                    // The parent of this dataset is not in the dictionary.
+                    // First, create a Dataset for the parent, assign it default template, disable it, and stick it in the dictionary
+                    // Then, create a Dataset for this entry, assign it defaults as well, disable it, and link them up via Parent/Children properties
+                    // This specific case shouldn't happen very often except near the root of trees
+                    Log.Trace( "Parent dataset ({0}) of dataset {1} not in configuration. Adding {0} as disabled.", dsName, parentDsName );
+                    Dataset parentDs = new( parentDsName )
+                    {
+                        Enabled = false,
+                        Template = Template.GetDefault( )
+                    };
+                    //TODO: WIP
+                    Dataset thisDs = new( dsName );
+                }
+            }
+        }
     }
 
     private static void LoadConfiguredDatasets( )
     {
         Log.Debug( "Creating Dataset objects from configuration" );
         IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
+
+        // First, create a dummy root dataset with the name '/', which is illegal as a zfs identifier, so it's safe to use.
+        // This will allow us to represent the entire Dataset hierarchy as a tree, even if there are multiple pools.
+
         foreach ( IConfigurationSection section in datasetSections )
         {
             Dataset newDataset = new( section.Key )
@@ -370,6 +436,11 @@ public static class Configuration
         Log.Debug( "Configured datasets loaded." );
     }
 
+    private static void GetZfsDatasets( )
+    {
+        CommandRunner.ZfsListAll( );
+    }
+
     private static void LoadTemplates( )
     {
         Log.Debug( "Creating Template objects from configuration" );
@@ -377,14 +448,21 @@ public static class Configuration
         foreach ( IConfigurationSection templateSection in templateSections )
         {
             bool isDefaultSection = templateSection.Key == "default";
-            Template newTemplate = new( templateSection.Key, templateSection[ "UseTemplate" ] ?? "default" )
+            if ( isDefaultSection )
             {
-                AutoPrune = templateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
-                AutoSnapshot = templateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
-                Recursive = templateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
-                SkipChildren = templateSection.GetBoolean( "SkipChildren", isDefaultSection ? false : null )
-            };
-            Templates.Add( templateSection.Key, newTemplate );
+                Templates.TryAdd( templateSection.Key, Template.GetDefault( ) );
+            }
+            else
+            {
+                Template newTemplate = new( templateSection.Key, templateSection[ "UseTemplate" ] ?? "default" )
+                {
+                    AutoPrune = templateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
+                    AutoSnapshot = templateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
+                    Recursive = templateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
+                    SkipChildren = templateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
+                };
+                Templates.TryAdd( templateSection.Key, newTemplate );
+            }
         }
 
         Log.Debug( "Templates loaded." );
