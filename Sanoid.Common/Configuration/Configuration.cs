@@ -394,7 +394,7 @@ public static class Configuration
                 IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
                 if ( overrides.Exists( ) )
                 {
-                    Log.Trace( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
+                    Log.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
                     ds.Template = ds.Template!.CloneForDatasetWithOverrides( ds, overrides );
                 }
             }
