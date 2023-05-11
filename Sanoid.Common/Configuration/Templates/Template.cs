@@ -212,7 +212,7 @@ public class Template
 
     internal Template CloneForDatasetWithOverrides( Dataset targetDataset, IConfigurationSection overrides )
     {
-        Logger.Debug( "Cloning template {0} to apply overrides in dataset {1}", targetDataset.Template.Name, targetDataset.Path );
+        Logger.Debug( "Cloning template {0} to apply overrides in dataset {1}", targetDataset.Template!.Name, targetDataset.Path );
         IConfigurationSection retentionOverrides = overrides.GetSection( "SnapshotRetention" );
         IConfigurationSection timingOverrides = overrides.GetSection( "SnapshotTiming" );
         return new( $"{targetDataset.Path}_{Name}_Local", $"{targetDataset.Path}_{Name}_Local" )
