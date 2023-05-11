@@ -11,7 +11,7 @@ namespace Sanoid.Common.Configuration.Templates;
 /// <summary>
 ///     Snapshot retention policy for use within <see cref="Template" />s
 /// </summary>
-public record struct SnapshotRetention
+public readonly record struct SnapshotRetention
 {
     /// <summary>
     ///     Gets or sets how many daily snapshots will be retained
