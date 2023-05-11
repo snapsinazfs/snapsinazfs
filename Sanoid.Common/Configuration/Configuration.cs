@@ -91,7 +91,7 @@ public static class Configuration
         // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
         // than invoking multiple zfs list processes.
         BuildDatasetHierarchy( );
-        LoadConfiguredDatasets( );
+        LoadDatasetConfigurations( );
     }
 
     /// <summary>
@@ -343,7 +343,7 @@ public static class Configuration
     private static readonly Logger Log;
 
     /// <summary>
-    ///     Builds the full dataset path tree from all zfs datasets compared against configuration.<br />
+    ///     Builds the full dataset path tree and creates datasets as disabled entries.
     /// </summary>
     private static void BuildDatasetHierarchy( )
     {
@@ -355,50 +355,18 @@ public static class Configuration
         foreach ( string dsName in zfsListResults )
         {
             Log.Trace( "Processing dataset {0}.", dsName );
+            //TODO: Eliminate this line once finished building the tree
             string parentDsName = Path.GetDirectoryName( dsName ) ?? string.Empty;
-            if ( string.IsNullOrEmpty( parentDsName ) )
+            Datasets.TryAdd( dsName, new( dsName )
             {
-                // This is a pool root, and not in the configuration. Skip it.
-                Log.Trace( "Dataset {0} is a pool root and is not in the configuration. Skipping.", dsName );
-                continue;
-            }
-
-            Log.Trace( "Dataset {0} not in configuration. Checking parent {1}.", dsName, parentDsName );
-            if ( Datasets.ContainsKey( parentDsName ) )
-            {
-                // Parent is in configuration.
-                // Check if we need to do anything with this one, based on parent.
-                Dataset parentDs = Datasets[ parentDsName ];
-                if ( !parentDs.Enabled )
-                {
-                    Log.Trace( "Parent dataset ({0}) of dataset {1} is marked disabled. Not inheriting settings to {1}.", parentDsName, dsName );
-                }
-
-                if ( parentDs.Enabled & !parentDs.Template!.SkipChildren!.Value )
-                {
-                }
-            }
-            else
-            {
-                // This dataset is not in the dictionary
-                // and
-                // The parent of this dataset is not in the dictionary.
-                // First, create a Dataset for the parent, assign it default template, disable it, and stick it in the dictionary
-                // Then, create a Dataset for this entry, assign it defaults as well, disable it, and link them up via Parent/Children properties
-                // This specific case shouldn't happen very often except near the root of trees
-                Log.Trace( "Parent dataset ({0}) of dataset {1} not in configuration. Adding {0} as disabled.", dsName, parentDsName );
-                Dataset parentDs = new( parentDsName )
-                {
-                    Enabled = false,
-                    Template = Template.GetDefault( )
-                };
-                //TODO: WIP
-                Dataset thisDs = new( dsName );
-            }
+                Enabled = false,
+                IsInConfiguration = false,
+                Parent = Datasets[ parentDsName ]
+            } );
         }
     }
 
-    private static void LoadConfiguredDatasets( )
+    private static void LoadDatasetConfigurations( )
     {
         Log.Debug( "Creating Dataset objects from configuration" );
         IEnumerable<IConfigurationSection> datasetSections = JsonConfigurationSections.DatasetsConfiguration.GetChildren( );
