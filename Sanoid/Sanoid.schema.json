@@ -3,7 +3,7 @@
   "$id": "Sanoid.schema.json",
   "type": "object",
   "description": "Configuration schema for Sanoid.net's Sanoid.json configuration file",
-  "required": [ "UseSanoidConfiguration", "SanoidConfigurationPathBase", "SanoidConfigurationDefaultsFile", "SanoidConfigurationLocalFile", "Formatting", "Monitoring", "TakeSnapshots", "PruneSnapshots", "PlatformUtilities" ],
+  "required": [ "ConfigurationPathBase", "CacheDirectory","RunDirectory", "Formatting", "Monitoring", "TakeSnapshots", "PruneSnapshots", "PlatformUtilities" ],
   "properties": {
     "$id": {
       "type": "string",
@@ -15,36 +15,19 @@
       "type": "string",
       "description": "Comments about this document."
     },
-    "UseSanoidConfiguration": {
-      "type": "boolean",
-      "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
-      "default": true
-    },
-    "SanoidConfigurationPathBase": {
+    "ConfigurationPathBase": {
       "type": "string",
       "description": "The base directory where the ini-formatted sanoid configuration files are located, without trailing slash.",
       "default": "/etc/sanoid",
       "format": "uri-reference"
     },
-    "SanoidConfigurationDefaultsFile": {
-      "type": "string",
-      "description": "The name of the file containing configuration defaults for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-      "default": "sanoid.defaults.config",
-      "format": "uri-reference"
-    },
-    "SanoidConfigurationLocalFile": {
-      "type": "string",
-      "description": "The name of the local configuration file for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-      "default": "sanoid.config",
-      "format": "uri-reference"
-    },
-    "SanoidConfigurationCacheDirectory": {
+    "CacheDirectory": {
       "type": "string",
       "description": "The cache directory sanoid will use",
       "default": "/var/cache/sanoid",
       "format": "uri-reference"
     },
-    "SanoidConfigurationRunDirectory": {
+    "RunDirectory": {
       "type": "string",
       "description": "The run directory sanoid will use",
       "default": "/var/run/sanoid",
