@@ -429,48 +429,29 @@ public static class Configuration
     public static void Initialize( )
     {
         // Global configuration initialization
-        Log.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
-        CacheDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
-        ConfigurationPathBase = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
-        RunDirectory = JsonConfigurationSections.RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
-        TakeSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "TakeSnapshots" );
-        PruneSnapshots = JsonConfigurationSections.RootConfiguration.GetBoolean( "PruneSnapshots" );
-        Log.Debug( "Root level configuration initialized." );
+        GetBaseConfiguration( JsonConfigurationSections.RootConfiguration );
 
         // Template configuration initialization
         Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        IConfigurationSection defaultTemplateSection;
-        IConfigurationSection defaultTemplateSnapshotRetentionSection;
-        IConfigurationSection defaultTemplateSnapshotTimingSection;
-        try
-        {
-            Log.Trace( "Checking for existence of 'default' Template" );
-            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
-            Log.Trace( "'default' Template found" );
-        }
-        catch ( InvalidOperationException ex )
-        {
-            // ReSharper disable FormatStringProblem
-            Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
-            // ReSharper restore FormatStringProblem
-            throw;
-        }
+        CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection );
+        CheckDefaultTemplateSnapshotRetentionSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection );
+        CheckDefaultTemplateSnapshotTimingSectionExists( defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection );
 
-        try
-        {
-            Log.Trace( "Checking for existence of 'SnapshotRetention' section in 'default' Template" );
-            defaultTemplateSnapshotRetentionSection = defaultTemplateSection.GetRequiredSection( "SnapshotRetention" );
-            Log.Trace( "'SnapshotRetention' section found" );
-        }
-        catch ( InvalidOperationException ex )
-        {
-            // ReSharper disable FormatStringProblem
-            Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
-            // ReSharper restore FormatStringProblem
-            throw;
-        }
+        LoadTemplates( );
+        BuildTemplateHierarchy( );
+        InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
+        Log.Debug( "Template configuration complete." );
 
+        // Diverging from PERL sanoid a bit, here.
+        // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
+        // than invoking multiple zfs list processes.
+        BuildDatasetHierarchy( );
+        LoadDatasetConfigurations( );
+    }
+
+    private static void CheckDefaultTemplateSnapshotTimingSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotTimingSection )
+    {
         try
         {
             Log.Trace( "Checking for existence of 'SnapshotTiming' section in 'default' Template" );
@@ -484,16 +465,50 @@ public static class Configuration
             // ReSharper restore FormatStringProblem
             throw;
         }
+    }
 
-        LoadTemplates( );
-        BuildTemplateHierarchy( );
-        InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
-        Log.Debug( "Template configuration complete." );
+    internal static void CheckDefaultTemplateSnapshotRetentionSectionExists( IConfigurationSection defaultTemplateSection, out IConfigurationSection defaultTemplateSnapshotRetentionSection )
+    {
+        try
+        {
+            Log.Trace( "Checking for existence of 'SnapshotRetention' section in 'default' Template" );
+            defaultTemplateSnapshotRetentionSection = defaultTemplateSection.GetRequiredSection( "SnapshotRetention" );
+            Log.Trace( "'SnapshotRetention' section found" );
+        }
+        catch ( InvalidOperationException ex )
+        {
+            // ReSharper disable FormatStringProblem
+            Log.Fatal( "Template 'default' does not contain the required SnapshotRetention section. Program will terminate.", ex );
+            // ReSharper restore FormatStringProblem
+            throw;
+        }
+    }
 
-        // Diverging from PERL sanoid a bit, here.
-        // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
-        // than invoking multiple zfs list processes.
-        BuildDatasetHierarchy( );
-        LoadDatasetConfigurations( );
+    internal static void CheckDefaultTemplateSectionExists( out IConfigurationSection defaultTemplateSection )
+    {
+        try
+        {
+            Log.Trace( "Checking for existence of 'default' Template" );
+            defaultTemplateSection = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
+            Log.Trace( "'default' Template found" );
+        }
+        catch ( InvalidOperationException ex )
+        {
+            // ReSharper disable FormatStringProblem
+            Log.Fatal( "Template 'default' not found in Sanoid.json#/Templates. Program will terminate.", ex );
+            // ReSharper restore FormatStringProblem
+            throw;
+        }
+    }
+
+    internal static void GetBaseConfiguration( IConfigurationRoot rootConfiguration )
+    {
+        Log.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
+        CacheDirectory = rootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        ConfigurationPathBase = rootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        RunDirectory = rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        TakeSnapshots = rootConfiguration.GetBoolean( "TakeSnapshots" );
+        PruneSnapshots = rootConfiguration.GetBoolean( "PruneSnapshots" );
+        Log.Debug( "Root level configuration initialized." );
     }
 }
