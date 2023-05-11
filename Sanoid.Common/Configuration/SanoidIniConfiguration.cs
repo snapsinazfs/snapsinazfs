@@ -4,7 +4,12 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using Json.More;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+
 using Microsoft.Extensions.Configuration;
+using Sanoid.Common.Posix;
 
 namespace Sanoid.Common.Configuration;
 
@@ -17,7 +22,8 @@ namespace Sanoid.Common.Configuration;
 /// </summary>
 internal static class SanoidIniConfiguration
 {
-    internal static IConfigurationRoot Configuration =>
+    private static Logger Logger = LogManager.GetCurrentClassLogger();
+    internal static IConfigurationRoot IniConfiguration =>
 #pragma warning disable CA2000
         _configuration ??= new ConfigurationManager( )
                            .AddIniFile( Path.Combine( Common.Configuration.Configuration.SanoidConfigurationPathBase, Common.Configuration.Configuration.SanoidConfigurationDefaultsFile ) )
@@ -26,4 +32,5 @@ internal static class SanoidIniConfiguration
 #pragma warning restore CA2000
 
     private static IConfigurationRoot? _configuration;
+
 }

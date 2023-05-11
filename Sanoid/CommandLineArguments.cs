@@ -19,8 +19,6 @@ namespace Sanoid;
 [UsedImplicitly]
 internal class CommandLineArguments
 {
-    private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
-
     [ArgDescription( "Cache directory for sanoid" )]
     [ArgShortcut( "--cache-dir" )]
     public string? CacheDir { get; set; }
@@ -120,6 +118,8 @@ internal class CommandLineArguments
     [ArgEnforceCase]
     public bool Version { get; set; }
 
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <summary>
     ///     Called by main thread to override configured settings with any arguments passed at the command line.
     /// </summary>
@@ -133,7 +133,7 @@ internal class CommandLineArguments
 
         if ( ReallyQuiet )
         {
-            LogManager.Configuration.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
+            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
         }
 
         if ( Quiet )
@@ -248,7 +248,7 @@ internal class CommandLineArguments
 
         if ( ReadOnly )
         {
-            _logger.Info( "Performing a dry run. No changes will be made to ZFS." );
+            Logger.Info( "Performing a dry run. No changes will be made to ZFS." );
             BaseConfiguration.DryRun = true;
         }
 
