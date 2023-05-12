@@ -69,7 +69,7 @@ public readonly record struct SnapshotRetention
     /// </returns>
     public static SnapshotRetention FromConfiguration( IConfiguration config )
     {
-        return new SnapshotRetention
+        return new()
         {
             Daily = config.GetInt( "Daily" ),
             Frequent = config.GetInt( "Frequent" ),
