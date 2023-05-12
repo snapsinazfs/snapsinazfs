@@ -61,7 +61,7 @@ public class ConfigurationTests
     public void ConfigurationDefinesAtLeastOneDataset( )
     {
         // Check if there's at least one dataset defined by checking there is at least one non-null value in the section
-        _fileLocalConfiguration.CheckTemplateSectionExists( "Datasets", out IConfigurationSection datasetsSection );
+        IConfigurationSection datasetsSection = _fileLocalConfiguration.GetRequiredSection( "Datasets" );
         Dictionary<string, string?> datasetsDictionary = datasetsSection.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
         Assert.That( datasetsDictionary.Any( kvp => kvp.Value is not null ) );
     }
