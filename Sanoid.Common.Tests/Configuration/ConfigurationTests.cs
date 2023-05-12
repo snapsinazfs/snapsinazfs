@@ -6,11 +6,12 @@
 
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration;
+using Sanoid.Common.Zfs;
 
 namespace Sanoid.Common.Tests.Configuration;
 
 [TestFixture]
-[Order(1)]
+[Order( 1 )]
 public class ConfigurationTests
 {
     [OneTimeSetUp]
@@ -32,8 +33,8 @@ public class ConfigurationTests
     private IConfigurationRoot _fileBaseConfiguration;
     private IConfigurationRoot _fileLocalConfiguration;
     private IConfigurationRoot _mockBaseConfiguration;
-
-    private Dictionary<string, string?> _fileBaseConfigDictionary;
+    private Dictionary<string, string?>? _fileBaseConfigDictionary;
+    private Common.Configuration.Configuration? _sanoidConfiguration;
 
     [Test]
     [Order( 1 )]
@@ -42,9 +43,11 @@ public class ConfigurationTests
         // This test is for making sure that the base configuration hasn't been changed
         // Helps ensure changes to base config don't unintentionally get committed
 
+        Assert.That( _fileBaseConfigDictionary, Is.Not.Null );
+
         foreach ( ( string key, string? value ) in CommonStatics.MockBaseConfigDictionary )
         {
-            if ( _fileBaseConfigDictionary.TryGetValue( key, out string? fileConfigElementValue ) )
+            if ( _fileBaseConfigDictionary!.TryGetValue( key, out string? fileConfigElementValue ) )
             {
                 Assert.That( fileConfigElementValue, Is.EqualTo( value ) );
             }
@@ -57,7 +60,6 @@ public class ConfigurationTests
 
     [Test]
     [Order( 2 )]
-
     public void ConfigurationDefinesAtLeastOneDataset( )
     {
         // Check if there's at least one dataset defined by checking there is at least one non-null value in the section
@@ -81,5 +83,35 @@ public class ConfigurationTests
         Dictionary<string, string?> datasetsDictionary = configurationWithEnvironmentVariables.AsEnumerable( ).ToDictionary( pair => pair.Key, pair => pair.Value );
         Assert.That( datasetsDictionary, Contains.Key( "TakeSnapshots" ) );
         Assert.That( datasetsDictionary[ "TakeSnapshots" ], Is.EqualTo( "True" ) );
+    }
+
+    private class MockZfsCommandRunner : IZfsCommandRunner
+    {
+    }
+
+    [Test]
+    [Order( 4 )]
+    public void CanConstructConfigurationObject( )
+    {
+        _sanoidConfiguration = new Common.Configuration.Configuration( _fileLocalConfiguration, new MockZfsCommandRunner( ) );
+
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( _sanoidConfiguration, Is.InstanceOf<Common.Configuration.Configuration>( ) );
+            Assert.That( _sanoidConfiguration, Is.Not.Null );
+        } );
+    }
+
+    [Test]
+    [Order( 5 )]
+    public void ExpectedValuesExistInConfigurationAfterLoadingFromIConfiguration( )
+    {
+        _sanoidConfiguration!.LoadConfigurationFromIConfiguration( );
+
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( _sanoidConfiguration.CacheDirectory, Is.EqualTo( "/var/cache/sanoid" ) );
+            Assert.That( _sanoidConfiguration.ConfigurationPathBase, Is.EqualTo( "/etc/sanoid" ) );
+        } );
     }
 }

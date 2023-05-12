@@ -4,13 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 using Microsoft.Extensions.Configuration;
-
 using NLog.Config;
-
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
@@ -20,18 +15,34 @@ namespace Sanoid.Common.Configuration;
 /// <summary>
 ///     Root class for access to configuration settings
 /// </summary>
-public static class Configuration
+public class Configuration
 {
-    // It is ok to disable this warning here, because we explicitly initialize everything in Initialize, which is when this class
-    // first gets instantiated.
+    // It is ok to disable this warning here, because we explicitly initialize everything in LoadConfigurationFromIConfiguration()
     // The code is in that method instead of this constructor because it is bad form to do things that can cause exceptions to be
-    // thrown in a static constructor, if it can be reasonably avoided. So long as we make sure we've called Initialize() before
+    // thrown in a static constructor, if it can be reasonably avoided. So long as we make sure we've called LoadConfigurationFromIConfiguration() before
     // we touch anything else in this class, that is fine.
 #pragma warning disable CS8618
-    static Configuration( )
+    /// <summary>
+    /// Creates a new instance of a <see cref="Configuration"/> object, using the specified IConfigurationRoot
+    /// </summary>
+    /// <param name="rootConfiguration">The root configuration, which conforms to Sanoid.net's configuration schema</param>
+    /// <param name="zfsCommandRunner">The <see cref="IZfsCommandRunner"/> that will call ZFS native commands</param>
+    public Configuration( IConfigurationRoot rootConfiguration, IZfsCommandRunner zfsCommandRunner )
     {
+        _rootConfiguration = rootConfiguration;
+        _zfsCommandRunner = zfsCommandRunner;
     }
 #pragma warning restore CS8618
+
+    private bool _cron;
+
+    private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
+    private bool _pruneSnapshots;
+    private bool _takeSnapshots;
+
+    private readonly IConfigurationRoot _rootConfiguration;
+    private IZfsCommandRunner _zfsCommandRunner;
+    private IConfigurationSection DatasetsConfigurationSection => _rootConfiguration.GetRequiredSection( "Datasets" );
 
     /// <summary>
     ///     Gets or sets sanoid's cache path.<br />
@@ -41,7 +52,7 @@ public static class Configuration
     ///     Default value is "/var/cache/sanoid"<br />
     /// </remarks>
     /// <value>A <see langword="string" /> indicating the path for sanoid-generated cache files</value>
-    public static string CacheDirectory { get; set; }
+    public string CacheDirectory { get; set; }
 
     /// <summary>
     ///     Gets or sets the absolute path to the directory containing PERL sanoid's configuration files.<br />
@@ -56,7 +67,7 @@ public static class Configuration
     ///     A <see langword="string" /> indicating the absolute path to the directory containing PERL sanoid's configuration
     ///     files
     /// </value>
-    public static string ConfigurationPathBase { get; set; }
+    public string ConfigurationPathBase { get; set; }
 
     /// <summary>
     ///     Gets or sets whether Sanoid.net should take snapshots and prune expired snapshots.
@@ -64,7 +75,7 @@ public static class Configuration
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots and prune expired snapshots.
     /// </value>
-    public static bool Cron
+    public bool Cron
     {
         get => _cron;
         set
@@ -85,7 +96,7 @@ public static class Configuration
     /// <remarks>
     ///     First element added should be the virtual root Dataset.
     /// </remarks>
-    public static Dictionary<string, Dataset> Datasets { get; } = new( );
+    public Dictionary<string, Dataset> Datasets { get; } = new( );
 
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
@@ -95,43 +106,43 @@ public static class Configuration
     ///     Setter overrides level for all configured rules.
     /// </remarks>
     /// <value>A <see cref="LogLevel" /> indicating the lowest logging level set of any rule.</value>
-    public static LogLevel DefaultLoggingLevel
+    public LogLevel DefaultLoggingLevel
     {
         get
         {
-            Log.Debug( "Getting lowest log level of all rules." );
+            _logger.Debug( "Getting lowest log level of all rules." );
             LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min( ) );
             if ( lowestLogLevel is null )
             {
-                Log.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
+                _logger.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
                 lowestLogLevel = LogLevel.Info;
             }
 
-            Log.Debug( "Lowest logging level is {0}", lowestLogLevel );
+            _logger.Debug( "Lowest logging level is {0}", lowestLogLevel );
             return lowestLogLevel;
         }
         set
         {
-            Log.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
-            Log.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
+            _logger.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
+            _logger.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
                 LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
                 if ( value == LogLevel.Off )
                 {
-                    Log.Trace( "Disabling logging for rule {0}", ruleIndex );
+                    _logger.Trace( "Disabling logging for rule {0}", ruleIndex );
                     rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off );
-                    Log.Trace( "Disabled logging for rule {0}", ruleIndex );
+                    _logger.Trace( "Disabled logging for rule {0}", ruleIndex );
                 }
                 else
                 {
-                    Log.Trace( "Setting log level to {0} for rule {1}", value.Name, ruleIndex );
+                    _logger.Trace( "Setting log level to {0} for rule {1}", value.Name, ruleIndex );
                     rule.SetLoggingLevels( value, LogLevel.Fatal );
-                    Log.Trace( "Log level set to {0} for rule {1}", value.Name, ruleIndex );
+                    _logger.Trace( "Log level set to {0} for rule {1}", value.Name, ruleIndex );
                 }
             }
 
-            Log.Debug( "Reconfiguring loggers" );
+            _logger.Debug( "Reconfiguring loggers" );
             LogManager.ReconfigExistingLoggers( );
         }
     }
@@ -143,7 +154,7 @@ public static class Configuration
     ///     A A <see langword="bool" /> indicating if no changes will be made to zfs (<see langword="true" />) or if normal
     ///     processing will occur (<see langword="false" /> - default)
     /// </value>
-    public static bool DryRun { get; set; }
+    public bool DryRun { get; set; }
 
     /// <summary>
     ///     Gets or sets whether Sanoid.net should prune expired snapshots.
@@ -151,7 +162,7 @@ public static class Configuration
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will prune expired snapshots.
     /// </value>
-    public static bool PruneSnapshots
+    public bool PruneSnapshots
     {
         get => _pruneSnapshots;
         set
@@ -173,7 +184,7 @@ public static class Configuration
     ///     Default value is "/var/run/sanoid"<br />
     /// </remarks>
     /// <value>A <see langword="string" /> indicating the path for sanoid-generated runtime files</value>
-    public static string RunDirectory { get; set; }
+    public string RunDirectory { get; set; }
 
     /// <summary>
     ///     Gets or sets whether Sanoid.net should take new snapshots.
@@ -181,7 +192,7 @@ public static class Configuration
     /// <value>
     ///     A <see langword="bool" /> indicating whether Sanoid.net will take new snapshots.
     /// </value>
-    public static bool TakeSnapshots
+    public bool TakeSnapshots
     {
         get => _takeSnapshots;
         set
@@ -204,37 +215,31 @@ public static class Configuration
     ///     and then any <see cref="Template" />s found in Sanoid.json are added to the
     ///     collection.
     /// </remarks>
-    public static Dictionary<string, Template> Templates { get; } = new( );
-
-    private static bool _cron;
-    private static bool _pruneSnapshots;
-    private static bool _takeSnapshots;
-
-    private static readonly Logger Log = LogManager.GetCurrentClassLogger( );
+    public Dictionary<string, Template> Templates { get; } = new( );
 
     /// <summary>
     ///     Builds the full dataset path tree and creates datasets as disabled entries.
     /// </summary>
-    private static void BuildDatasetHierarchy( Template defaultTemplateForRoot )
+    private void BuildDatasetHierarchy( Template defaultTemplateForRoot )
     {
-        Log.Debug( "Building dataset hiearchy from combination of configured datasets and all datasets on system." );
+        _logger.Debug( "Building dataset hiearchy from combination of configured datasets and all datasets on system." );
 
         // First, add the virtual root dataset, with the provided template
         Datasets.Add( "/", Dataset.GetRoot( defaultTemplateForRoot ) );
 
-        List<string> zfsListResults = CommandRunner.ZfsListAll( );
+        List<string> zfsListResults = _zfsCommandRunner.ZfsListAll( );
         // List is returned in the form of a path tree already, so we can just scan the list linearly
         // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
-        // Datasets diciontary
+        // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            Log.Debug( "Processing dataset {0}.", dsName );
-            #if WINDOWS
+            _logger.Debug( "Processing dataset {0}.", dsName );
+        #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
-            string? parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\","/" );
-            #else
-            string? parentDsName = $"/{Path.GetDirectoryName( dsName )}";
-            #endif
+            string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
+        #else
+            string parentDsName = $"/{Path.GetDirectoryName( dsName )}";
+        #endif
             Dataset newDs = new( dsName )
             {
                 Enabled = false,
@@ -242,26 +247,26 @@ public static class Configuration
                 Parent = Datasets[ parentDsName ]
             };
             Datasets.TryAdd( newDs.VirtualPath, newDs );
-            Log.Debug( "Dataset {0} added to dictionary.", dsName );
+            _logger.Debug( "Dataset {0} added to dictionary.", dsName );
         }
     }
 
-    private static void LoadDatasetConfigurations( )
+    private void LoadDatasetConfigurations( )
     {
         //TODO: This can probably be inlined when loading datasets
-        Log.Debug( "Setting dataset options from configuration" );
+        _logger.Debug( "Setting dataset options from configuration" );
         // Scan the datasets collection
         // If an entry exists in configuration, set its settings, following inheritance rules.
-        foreach ( (_, Dataset? ds) in Datasets )
+        foreach ( ( _, Dataset? ds ) in Datasets )
         {
-            Log.Debug( "Processing dataset {0}", ds.Path );
+            _logger.Debug( "Processing dataset {0}", ds.Path );
             if ( ds.Path == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
                 continue;
             }
 
-            IConfigurationSection section = JsonConfigurationSections.DatasetsConfiguration.GetSection( ds.Path );
+            IConfigurationSection section = DatasetsConfigurationSection.GetSection( ds.Path );
             if ( section.Exists( ) )
             {
                 // Dataset exists in configuration. Set configured settings and inherit everything else
@@ -273,7 +278,7 @@ public static class Configuration
                 IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
                 if ( overrides.Exists( ) )
                 {
-                    Log.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
+                    _logger.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
                     ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds );
                 }
             }
@@ -285,15 +290,15 @@ public static class Configuration
             }
         }
 
-        Log.Debug( "Dataset options configured." );
+        _logger.Debug( "Dataset options configured." );
     }
 
-    private static void BuildTemplateHierarchy( IConfigurationSection defaultTemplateConfigurationSection )
+    private void BuildTemplateHierarchy( IConfigurationSection defaultTemplateConfigurationSection )
     {
         // We have enforced a tree structure for templates in the configuration, so we can recursively descend down the configuration
         // tree to get template configuration. We will add them to a flat dictionary, as well, for easy access by key.
 
-        Log.Debug( "Creating Template objects from configuration" );
+        _logger.Debug( "Creating Template objects from configuration" );
 
         // First, add the default template
         Template defaultTemplate = Template.GetDefault( defaultTemplateConfigurationSection );
@@ -312,26 +317,26 @@ public static class Configuration
             }
         }
 
-        Log.Debug( "Templates loaded." );
+        _logger.Debug( "Templates loaded." );
     }
 
     /// <summary>
-    ///     Method used to force instantiation of this static class and load Sanoid.net's configuration from various sources.
+    ///     Loads Sanoid.net's configuration from the various sources combined in <see cref="_rootConfiguration" />
     /// </summary>
-    public static void Initialize( )
+    public void LoadConfigurationFromIConfiguration( )
     {
         // Global configuration initialization
-        GetBaseConfiguration( JsonConfigurationSections.RootConfiguration );
+        GetBaseConfiguration( );
 
         // Template configuration initialization
-        Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
+        _logger.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        JsonConfigurationSections.RootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
+        _rootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
         defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection _ );
         defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection _ );
 
         BuildTemplateHierarchy( defaultTemplateSection );
-        Log.Debug( "Template configuration complete." );
+        _logger.Debug( "Template configuration complete." );
 
         // Diverging from PERL sanoid a bit, here.
         // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
@@ -340,14 +345,14 @@ public static class Configuration
         LoadDatasetConfigurations( );
     }
 
-    internal static void GetBaseConfiguration( IConfigurationRoot rootConfiguration )
+    private void GetBaseConfiguration( )
     {
-        Log.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
-        CacheDirectory = rootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
-        ConfigurationPathBase = rootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
-        RunDirectory = rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
-        TakeSnapshots = rootConfiguration.GetBoolean( "TakeSnapshots" );
-        PruneSnapshots = rootConfiguration.GetBoolean( "PruneSnapshots" );
-        Log.Debug( "Root level configuration initialized." );
+        _logger.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
+        CacheDirectory = _rootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        ConfigurationPathBase = _rootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        RunDirectory = _rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        TakeSnapshots = _rootConfiguration.GetBoolean( "TakeSnapshots" );
+        PruneSnapshots = _rootConfiguration.GetBoolean( "PruneSnapshots" );
+        _logger.Debug( "Root level configuration initialized." );
     }
 }
