@@ -117,14 +117,13 @@ public static class BaseClassExtensions
     /// </summary>
     /// <typeparam name="T">Any type implementing <see cref="IConfiguration" /></typeparam>
     /// <param name="configurationSection">The current <see cref="IConfiguration" /> object to get the value from</param>
-    /// <param name="settingKey">The key of the value in <paramref name="configurationSection" /> to return as a boolean value</param>
-    /// <param name="fallbackValue">
-    ///     The value to return if the configured value does not exist or is unparseable. If not
-    ///     specified, uses <see langword="default" />
-    /// </param>
+    /// <param name="settingKey">The key of the value in <paramref name="configurationSection" /> to return as a <see cref="TimeOnly"/> value</param>
+    /// <param name="fallbackHours">Value to use for hours as fallback, if value does not exist or is not parseable</param>
+    /// <param name="fallbackMinutes">Value to use for minutes as fallback, if value does not exist or is not parseable</param>
+    /// <param name="fallbackSeconds">Value to use for seconds as fallback, if value does not exist or is not parseable</param>
     /// <returns>A <see cref="TimeOnly" /> parsed from the value with the specicified <paramref name="settingKey" /></returns>
     /// <remarks>Validation of the value retrieved from configuration is delegated to the base class library</remarks>
-    public static TimeOnly GetTimeOnly<T>( this T configurationSection, string settingKey, TimeOnly? fallbackValue = default ) where T : IConfiguration
+    public static TimeOnly GetTimeOnly<T>( this T configurationSection, string settingKey, int fallbackHours, int fallbackMinutes, int fallbackSeconds = 0 ) where T : IConfiguration
     {
         if ( string.IsNullOrWhiteSpace( settingKey ) )
         {
@@ -133,11 +132,11 @@ public static class BaseClassExtensions
 
         if ( configurationSection[ settingKey ] is null )
         {
-            return default;
+            return new TimeOnly( fallbackHours, fallbackMinutes, fallbackSeconds );
         }
 
         string? timeString = configurationSection[ settingKey ];
-        return TimeOnly.TryParse( timeString ?? "00:00", out TimeOnly returnValue ) ? returnValue : fallbackValue ?? default;
+        return TimeOnly.TryParse( timeString ?? "00:00", out TimeOnly returnValue ) ? returnValue : new TimeOnly( fallbackHours, fallbackMinutes, fallbackSeconds );
     }
 
     /// <summary>
