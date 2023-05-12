@@ -252,7 +252,7 @@ public class Template
 
         if ( string.IsNullOrWhiteSpace( childTemplateName ) )
         {
-            throw new ArgumentException( "All templates MUST have a non-null, non-whitespace, non-empty name", nameof( childTemplateName ) );
+            throw new ArgumentException( "All templates MUST have a non-null, non-whitespace, non-empty name", nameof( childConfigurationSection ) );
         }
 
         Logger.Debug( "Creating child template {0} of template {1}.", childTemplateName, Name );
