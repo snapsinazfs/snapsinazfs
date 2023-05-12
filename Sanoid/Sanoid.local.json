@@ -1,7 +1,7 @@
 {
   "$schema": "Sanoid.local.schema.json",
   "$id": "Sanoid.local.json",
-  "$comments": "Default values are mostly compatible with default operation of PERL sanoid. Any changes made here may break setups that use both Sanoid.net and PERL sanoid.",
+  "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
@@ -36,7 +36,7 @@
     "default": {
       "Templates": {
         "production": {
-          "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template. Note that it inherits from 'default,' even though it does not specify it, as default is the root template",
+          "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template.",
           "AutoPrune": true,
           "AutoSnapshot": true,
           "SnapshotRetention": {
