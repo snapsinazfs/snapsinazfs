@@ -4,10 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Diagnostics;
-using System.Runtime.Versioning;
-using System.Security;
-using Sanoid.Common.Configuration;
+using System.Text.Json;
 
 namespace Sanoid.Common.Zfs;
 
@@ -17,7 +14,11 @@ internal static class CommandRunner
 
     internal static List<string> ZfsListAll( )
     {
-        List<string> dataSets = new( );
+    #if WINDOWS
+        List<string> dataSets = new( ) { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" };
+        Logger.Warn( "Running on windows. Returning fake datasets: {0}",JsonSerializer.Serialize( dataSets ) );
+    #else
+        List<string> dataSets = new();
         ProcessStartInfo zfsListStartInfo = new( JsonConfigurationSections.PlatformUtilitiesConfiguration[ "zfs" ]!, "list -o name -t filesystem,volume -Hr" )
         {
             CreateNoWindow = true,
@@ -51,6 +52,7 @@ internal static class CommandRunner
 
             Logger.Debug( "zfs list process finished" );
         }
+    #endif
 
         return dataSets;
     }
