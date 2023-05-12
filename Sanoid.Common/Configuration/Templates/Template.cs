@@ -288,6 +288,8 @@ public class Template
 
         Logger.Debug( "Template {0} has Templates section. Checking contents of that section.", newChildTemplate.Name );
 
+        Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+
         foreach ( IConfigurationSection grandChildTemplateConfiguration in childTemplatesSection.GetChildren( ) )
         {
             Logger.Debug( "Recursively calling CreateChild on {0} for new template {1}", newChildTemplate.Name, grandChildTemplateConfiguration.Key );
@@ -297,7 +299,6 @@ public class Template
         Logger.Debug( "No more children of {0} remain. Returning template {0} from {1}.CreateChild", newChildTemplate.Name, Name );
         // Once we've exhausted the grandchild list (or if it was simply empty), return the child.
 
-        Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
         return newChildTemplate;
     }
 
