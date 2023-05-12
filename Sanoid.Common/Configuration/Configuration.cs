@@ -327,8 +327,8 @@ public static class Configuration
         Log.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
         JsonConfigurationSections.RootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
-        defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection defaultTemplateSnapshotRetentionSection );
-        defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection defaultTemplateSnapshotTimingSection );
+        defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection _ );
+        defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection _ );
 
         BuildTemplateHierarchy( defaultTemplateSection );
         Log.Debug( "Template configuration complete." );
