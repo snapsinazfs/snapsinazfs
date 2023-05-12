@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -12,11 +12,14 @@ using Sanoid.Common.Configuration.Templates;
 namespace Sanoid.Common.Tests.Configuration.Templates;
 
 [TestFixture]
+[Order(2)]
 public class TemplateTests
 {
     [OneTimeSetUp]
     public void OneTimeSetup( )
     {
+        // Since this test suite is forced to run after the configuration tests, we know configuration is valid,
+        // so we will use file configuration from here on out, with supplements if necessary.
         _configurationRoot = new ConfigurationBuilder( )
                              .AddJsonFile( "Sanoid.json" )
                              .AddJsonFile( "Sanoid.local.json" )
