@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -39,5 +39,27 @@ public class TemplateTests
     {
         _defaultTemplate = Template.GetDefault( _rootTemplatesDefaultConfigurationSection );
         Assert.That( _defaultTemplate, Is.Not.Null );
+    }
+
+    [Test]
+    [Order(2)]
+    public void CreateChildTest_NoRecursion( )
+    {
+        // Get the Templates:default:Templates section
+        IConfigurationSection defaultTemplateTemplatesSection = _rootTemplatesDefaultConfigurationSection.GetRequiredSection( "Templates" );
+
+        // Get the Templates:default:Templates:production template
+        IConfigurationSection productionTemplateSection = _rootTemplatesDefaultConfigurationSection.GetRequiredSection( "production" );
+
+        // Create a child template, but skip recursion. Only interested in testing building a single template.
+        Template newChildTemplate = _defaultTemplate.CreateChild( productionTemplateSection, null, false, true );
+
+        Assert.Multiple( ( ) =>
+        {
+            // Check that our root template has the new child key in its Children dictionary
+            Assert.That( _defaultTemplate.Children, Contains.Key( "production" ) );
+            // Check that the object returned by CreateChild is the same object reference as the object in the Children dictionary
+            Assert.That( _defaultTemplate.Children[ "production" ], Is.SameAs( newChildTemplate ) );
+        } );
     }
 }
