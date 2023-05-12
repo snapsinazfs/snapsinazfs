@@ -12,26 +12,29 @@ namespace Sanoid.Common.Tests.Configuration.Datasets;
 public class DatasetTests
 {
     [Test]
-    [TestCase("/")]
-    [TestCase("zpool1")]
-    [TestCase("zpool1/leaf")]
-    [TestCase("zpool1/zpool1/intermediate/leaf")]
+    [TestCase( "/" )]
+    [TestCase( "pool1" )]
+    [TestCase( "pool1/dataset1" )]
+    [TestCase( "pool1/dataset1/leaf" )]
+    [TestCase( "pool1/dataset2" )]
+    [TestCase( "pool1/dataset3" )]
+    [TestCase( "pool1/zvol1" )]
     public void CheckVirtualPathIsRooted( string datasetZfsPath )
     {
         // Ensure expected virtual path for a dataset is rooted at the fake root '/'
         Dataset testDataset = new( datasetZfsPath );
 
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( Path.IsPathRooted( testDataset.VirtualPath ), Is.True );
-        } );
+        Assert.That( Path.IsPathRooted( testDataset.VirtualPath ), Is.True );
     }
 
     [Test]
     [TestCase( "/", ExpectedResult = false )]
-    [TestCase( "zpool1", ExpectedResult = true )]
-    [TestCase( "zpool1/leaf", ExpectedResult = true )]
-    [TestCase( "zpool1/zpool1/intermediate/leaf", ExpectedResult = true )]
+    [TestCase( "pool1", ExpectedResult = true )]
+    [TestCase( "pool1/dataset1", ExpectedResult = true )]
+    [TestCase( "pool1/dataset1/leaf", ExpectedResult = true )]
+    [TestCase( "pool1/dataset2", ExpectedResult = true )]
+    [TestCase( "pool1/dataset3", ExpectedResult = true )]
+    [TestCase( "pool1/zvol1", ExpectedResult = true )]
     public bool CheckVirtualPathNotEqualsPath( string datasetZfsPath )
     {
         // Except for the virtual root dataset, no dataset's VirtualPath should equal its real Path
