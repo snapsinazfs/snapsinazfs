@@ -243,9 +243,10 @@ public class Template
     ///     Set to <see langword="true" /> if being called to create override settings from a <see cref="Dataset" />.<br />
     ///     Otherwise, false
     /// </param>
+    /// <param name="skipRecursion">Mainly intended for calling from tests. Instructs this function to exit without recursing into sub-templates.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public Template CreateChild( IConfigurationSection childConfigurationSection, string? nameOverride = null, bool isDatasetOverride = false )
+    public Template CreateChild( IConfigurationSection childConfigurationSection, string? nameOverride = null, bool isDatasetOverride = false, bool skipRecursion = false )
     {
         Logger.Trace( "Entered CreateChild from template {0}, with requested new template {1}", Name, nameOverride ?? ( string.IsNullOrEmpty( childConfigurationSection.Key ) ? "INVALID KEY" : childConfigurationSection.Key ) );
         string childTemplateName = nameOverride ?? childConfigurationSection.Key;
@@ -282,6 +283,13 @@ public class Template
         if ( !childTemplatesSection.Exists( ) )
         {
             Logger.Trace( "Template {0} has no Templates section.", newChildTemplate.Name );
+            Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+            return newChildTemplate;
+        }
+
+        if ( skipRecursion )
+        {
+            Logger.Info( "skipRecusion specified while creating template {0}. Returning now.", newChildTemplate.Name );
             Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
             return newChildTemplate;
         }
