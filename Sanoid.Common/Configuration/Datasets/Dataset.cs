@@ -6,7 +6,6 @@
 
 using System.Text.Json.Serialization;
 using Sanoid.Common.Configuration.Templates;
-using Sanoid.Common.JsonSerialization;
 
 namespace Sanoid.Common.Configuration.Datasets;
 
