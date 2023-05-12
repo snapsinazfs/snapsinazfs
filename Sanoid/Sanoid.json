@@ -39,12 +39,11 @@
   },
   "Templates": {
     "default": {
-      "$comments": "This is the default template. It should not be modified unless you FULLY understand the consequences. Snapshot times for Daily, Weekly, Monthly, and Yearly snapshots differ from PERL sanoid's defaults. See Sanoid.template.schema.json for details. All templates eventually inherit from this template.",
+      "$comments": "This is the default template. It is the root of the template inheritance tree. It should not be modified unless you FULLY understand the consequences. Snapshot times for Daily, Weekly, Monthly, and Yearly snapshots differ from PERL sanoid's defaults. See Sanoid.template.schema.json for details. All templates eventually inherit from this template.",
       "AutoSnapshot": true,
       "AutoPrune": true,
       "Recursive": false,
       "SkipChildren": false,
-      "UseTemplate": "default",
       "SnapshotTiming": {
         "FrequentPeriod": 15,
         "UseLocalTime": true,
@@ -64,7 +63,8 @@
         "Daily": 90,
         "Weekly": 0,
         "Monthly": 6,
-        "Yearly": 0
+        "Yearly": 0,
+        "PruneDeferral": 0 
       }
     }
   }

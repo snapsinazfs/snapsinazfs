@@ -23,12 +23,6 @@
       "description": "Whether zfs native recursive processing will be used for this template and its descendents.",
       "default": false
     },
-    "UseTemplate": {
-      "type": "string",
-      "description": "The name of another template to inherit settings from. Settings set explicitly in the current template will still override inherited settings for the current template.",
-      "minLength": 1,
-      "default": "default"
-    },
     "SkipChildren": {
       "type": "boolean",
       "description": "Whether to apply this template to the specified path only.",
@@ -41,6 +35,10 @@
     "SnapshotTiming": {
       "type": "object",
       "$ref": "#/definitions/SnapshotTiming"
+    },
+    "Templates": {
+      "type": "object",
+      "$ref": "Sanoid.template.schema.json"
     }
   },
   "definitions": {

@@ -17,10 +17,7 @@
   "Datasets": {
     "pool1/dataset1": {
       "Template": "production",
-      "Enabled": false,
-      "TemplateOverrides": {
-        "Recursive": true
-      }
+      "Enabled": false
     },
     "pool1/dataset2": {
       "Enabled": false
@@ -29,34 +26,40 @@
       "Template": "production_noHourly",
       "Enabled": false,
       "TemplateOverrides": {
-        "SkipChildren": true,
         "SnapshotRetention": {
-          "Yearly": 1 
+          "Yearly": 1
         }
-      } 
-    } 
+      }
+    }
   },
   "Templates": {
-    "production": {
-      "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template. Note that it inherits from 'default,' even though it does not specify it, as default is the root template",
-      "AutoPrune": true,
-      "AutoSnapshot": true,
-      "SnapshotRetention": {
-        "Frequent": 0,
-        "Hourly": 36,
-        "Daily": 30,
-        "Weekly": 0,
-        "Monthly": 3,
-        "Yearly": 0
-      },
-      "SkipChildren": false,
-      "Recursive": false
-    },
-    "production_noHourly": {
-      "$comments": "Sample template. Inherits all settings from the 'production' template (and its parent, 'default'), but overrides how many hourly snapshots are retained.",
-      "UseTemplate": "production", 
-      "SnapshotRetention": {
-        "Hourly": 0
+    "default": {
+      "Templates": {
+        "production": {
+          "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template. Note that it inherits from 'default,' even though it does not specify it, as default is the root template",
+          "AutoPrune": true,
+          "AutoSnapshot": true,
+          "SnapshotRetention": {
+            "Frequent": 0,
+            "Hourly": 36,
+            "Daily": 30,
+            "Weekly": 0,
+            "Monthly": 3,
+            "Yearly": 0
+          },
+          "SkipChildren": false,
+          "Recursive": false,
+          "Templates": {
+            "production_noHourly": {
+              "$comments": "Sample template. Inherits all settings from the 'production' template (and its parent, 'default'), but overrides how many hourly snapshots are retained.",
+              "UseTemplate": "production",
+              "SnapshotRetention": {
+                "Hourly": 0
+              }
+            }
+
+          }
+        }
       }
     }
   }
