@@ -86,5 +86,5 @@ public class Dataset
     /// <summary>
     ///     Gets the <see cref="Path" /> of this Dataset, prepended with a slash, to represent its location in the virtual tree
     /// </summary>
-    internal string VirtualPath => $"/{Path}";
+    public string VirtualPath => Path == "/" ? "/" : $"/{Path}";
 }
