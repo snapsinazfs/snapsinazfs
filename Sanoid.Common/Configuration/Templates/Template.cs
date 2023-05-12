@@ -184,14 +184,15 @@ public class Template
     ///     Gets the 'default' template from configuration files or, if it already has been parsed before, returns the existing
     ///     reference.
     /// </summary>
+    /// <param name="templateConfigurationSection">The Templates configuration section to pull the default Template from</param>
     /// <param name="caller">The calling method</param>
     /// <returns>
     ///     The default <see cref="Template" />
     /// </returns>
-    public static Template GetDefault( [CallerMemberName] string caller = "unknown caller" )
+    public static Template GetDefault( IConfigurationSection templateConfigurationSection, [CallerMemberName] string caller = "unknown caller" )
     {
         Logger.Debug( "Getting default Template for {0}", caller );
-        IConfigurationSection templateConfig = JsonConfigurationSections.TemplatesConfiguration.GetRequiredSection( "default" );
+        IConfigurationSection templateConfig = templateConfigurationSection.GetRequiredSection( "default" );
         if ( _defaultTemplate is not null )
         {
             return _defaultTemplate;
