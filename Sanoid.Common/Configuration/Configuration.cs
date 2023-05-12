@@ -4,8 +4,13 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 using Microsoft.Extensions.Configuration;
+
 using NLog.Config;
+
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
@@ -78,11 +83,9 @@ public static class Configuration
     ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Dataset" />s, indexed by <see langword="string" />.
     /// </summary>
     /// <remarks>
-    ///     First initialized with a dummy root ("/") dataset on instantiation of the static <see cref="Configuration" />
-    ///     class,
-    ///     and then any <see cref="Dataset" />s found in Sanoid.json are added to the collection.
+    ///     First element added should be the virtual root Dataset.
     /// </remarks>
-    public static Dictionary<string, Dataset> Datasets { get; } = new( ) { { "/", Dataset.Root } };
+    public static Dictionary<string, Dataset> Datasets { get; } = new( );
 
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
@@ -212,9 +215,13 @@ public static class Configuration
     /// <summary>
     ///     Builds the full dataset path tree and creates datasets as disabled entries.
     /// </summary>
-    private static void BuildDatasetHierarchy( )
+    private static void BuildDatasetHierarchy( Template defaultTemplateForRoot )
     {
         Log.Debug( "Building dataset hiearchy from combination of configured datasets and all datasets on system." );
+
+        // First, add the virtual root dataset, with the provided template
+        Datasets.Add( "/", Dataset.GetRoot( defaultTemplateForRoot ) );
+
         List<string> zfsListResults = CommandRunner.ZfsListAll( );
         // List is returned in the form of a path tree already, so we can just scan the list linearly
         // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
@@ -222,8 +229,12 @@ public static class Configuration
         foreach ( string dsName in zfsListResults )
         {
             Log.Debug( "Processing dataset {0}.", dsName );
-            //TODO: Eliminate this line once finished building the tree
+            #if WINDOWS
+            // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
+            string? parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\","/" );
+            #else
             string? parentDsName = $"/{Path.GetDirectoryName( dsName )}";
+            #endif
             Dataset newDs = new( dsName )
             {
                 Enabled = false,
@@ -231,6 +242,7 @@ public static class Configuration
                 Parent = Datasets[ parentDsName ]
             };
             Datasets.TryAdd( newDs.VirtualPath, newDs );
+            Log.Debug( "Dataset {0} added to dictionary.", dsName );
         }
     }
 
@@ -240,7 +252,7 @@ public static class Configuration
         Log.Debug( "Setting dataset options from configuration" );
         // Scan the datasets collection
         // If an entry exists in configuration, set its settings, following inheritance rules.
-        foreach ( ( _, Dataset? ds ) in Datasets )
+        foreach ( (_, Dataset? ds) in Datasets )
         {
             Log.Debug( "Processing dataset {0}", ds.Path );
             if ( ds.Path == "/" )
@@ -276,27 +288,27 @@ public static class Configuration
         Log.Debug( "Dataset options configured." );
     }
 
-    private static void LoadTemplates( )
+    private static void BuildTemplateHierarchy( IConfigurationSection defaultTemplateConfigurationSection )
     {
+        // We have enforced a tree structure for templates in the configuration, so we can recursively descend down the configuration
+        // tree to get template configuration. We will add them to a flat dictionary, as well, for easy access by key.
+
         Log.Debug( "Creating Template objects from configuration" );
-        IEnumerable<IConfigurationSection> templateSections = JsonConfigurationSections.TemplatesConfiguration.GetChildren( );
-        foreach ( IConfigurationSection templateSection in templateSections )
+
+        // First, add the default template
+        Template defaultTemplate = Template.GetDefault( defaultTemplateConfigurationSection );
+        Templates.TryAdd( "default", defaultTemplate );
+
+        // Now, for all children, if any, call recursive function to descend down the tree, respecting inheritance as we go
+        // This is the "Templates" section of the "default" template. It can exist and be empty, exist and have entries, or not exist.
+        // All cases are ok, as the Exists() function handles that for us.
+        IConfigurationSection defaultTemplateChildTemplatesConfigurationSection = defaultTemplateConfigurationSection.GetSection( "Templates" );
+
+        if ( defaultTemplateChildTemplatesConfigurationSection.Exists( ) )
         {
-            bool isDefaultSection = templateSection.Key == "default";
-            if ( isDefaultSection )
+            foreach ( IConfigurationSection childConfigurationSection in defaultTemplateChildTemplatesConfigurationSection.GetChildren( ) )
             {
-                Templates.TryAdd( templateSection.Key, Template.GetDefault( ) );
-            }
-            else
-            {
-                Template newTemplate = new( templateSection.Key, templateSection[ "UseTemplate" ] ?? "default" )
-                {
-                    AutoPrune = templateSection.GetBoolean( "AutoPrune", isDefaultSection ? true : null ),
-                    AutoSnapshot = templateSection.GetBoolean( "AutoSnapshot", isDefaultSection ? true : null ),
-                    Recursive = templateSection.GetBoolean( "Recursive", isDefaultSection ? false : null ),
-                    SkipChildren = templateSection.GetBoolean( "SkipChildrn", isDefaultSection ? false : null )
-                };
-                Templates.TryAdd( templateSection.Key, newTemplate );
+                defaultTemplate.CreateChild( childConfigurationSection );
             }
         }
 
@@ -304,80 +316,7 @@ public static class Configuration
     }
 
     /// <summary>
-    ///     Builds the template hierarchy and assigns <see cref="SnapshotRetention" /> and <see cref="SnapshotTiming" />
-    ///     settings.
-    /// </summary>
-    /// <exception cref="KeyNotFoundException"></exception>
-    /// <exception cref="ConfigurationValidationException"></exception>
-    private static void BuildTemplateHierarchy( )
-    {
-        // To build the inheritance hierarchy, scan the dictionary and set references for UseTemplate
-        // Note that the setter for Template.UseTemplate automatically adds the template to its parent's Children collection
-        Log.Debug( "Building template hierarchy." );
-        foreach ( ( string key, Template value ) in Templates )
-        {
-            Log.Trace( "Attempting to assign template {0} as parent of template {1}", value.UseTemplateName, key );
-            if ( key == "default" )
-            {
-                Log.Trace( "Default template. Not assigning a parent." );
-                continue;
-            }
-
-            if ( string.IsNullOrWhiteSpace( value.UseTemplateName ) )
-            {
-                Log.Fatal( "UseTemplate value specified for Template {0} must refer to an existing template name. Program will terminate.", key );
-                throw new ConfigurationValidationException( $"UseTemplate value specified for Template {key} must refer to an existing template name. Program will terminate." );
-            }
-
-            if ( Templates.TryGetValue( value.UseTemplateName, out Template? parentTemplate ) )
-            {
-                Log.Trace( "Parent template {0} of template {1} found. Assigning parent." );
-                value.UseTemplate = parentTemplate;
-            }
-            else
-            {
-                Log.Fatal( "Parent template {0} of template {1} not defined in Sanoid.json. Program will terminate.", value.UseTemplateName, key );
-                throw new KeyNotFoundException( $"Parent template {value.UseTemplateName} of template {value.Name} not defined in configuration." );
-            }
-        }
-
-        Log.Debug( "Template hierarchy built." );
-    }
-
-    private static void InheritImmutableTemplateSettings( IConfigurationSection retention, IConfigurationSection timing )
-    {
-        // First, set up the default template, as it is the root of inheritance
-        Templates[ "default" ].SnapshotRetention = new SnapshotRetention
-        {
-            Frequent = retention.GetInt( "Frequent" ),
-            Monthly = retention.GetInt( "Monthly" ),
-            PruneDeferral = retention.GetInt( "PruneDeferral" ),
-            Weekly = retention.GetInt( "Weekly" ),
-            Yearly = retention.GetInt( "Yearly" ),
-            FrequentPeriod = retention.GetInt( "FrequentPeriod" ),
-            Daily = retention.GetInt( "Daily" ),
-            Hourly = retention.GetInt( "Hourly" )
-        };
-        Templates[ "default" ].SnapshotTiming = new SnapshotTiming
-        {
-            DailyTime = TimeOnly.Parse( timing[ "DailyTime" ]! ),
-            HourlyMinute = timing.GetInt( "HourlyMinute" ),
-            MonthlyDay = timing.GetInt( "MonthlyDay" ),
-            MonthlyTime = TimeOnly.Parse( timing[ "MonthlyTime" ]! ),
-            UseLocalTime = timing.GetBoolean( "UseLocalTime", true ),
-            WeeklyDay = (DayOfWeek)timing.GetInt( "WeeklyDay" ),
-            WeeklyTime = TimeOnly.Parse( timing[ "WeeklyTime" ]! ),
-            YearlyDay = timing.GetInt( "YearlyDay" ),
-            YearlyMonth = timing.GetInt( "YearlyMonth" ),
-            YearlyTime = TimeOnly.Parse( timing[ "YearlyTime" ]! )
-        };
-
-        // Now recursively set all children's settings
-        Templates[ "default" ].InheritSnapshotRetentionAndTimingSettings( );
-    }
-
-    /// <summary>
-    ///     Method used to force instantiation of this static class.
+    ///     Method used to force instantiation of this static class and load Sanoid.net's configuration from various sources.
     /// </summary>
     public static void Initialize( )
     {
@@ -391,15 +330,13 @@ public static class Configuration
         defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection defaultTemplateSnapshotRetentionSection );
         defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection defaultTemplateSnapshotTimingSection );
 
-        LoadTemplates( );
-        BuildTemplateHierarchy( );
-        InheritImmutableTemplateSettings( defaultTemplateSnapshotRetentionSection, defaultTemplateSnapshotTimingSection );
+        BuildTemplateHierarchy( defaultTemplateSection );
         Log.Debug( "Template configuration complete." );
 
         // Diverging from PERL sanoid a bit, here.
         // We can much more efficiently call zfs list once for everything and just process the strings internally, rather
         // than invoking multiple zfs list processes.
-        BuildDatasetHierarchy( );
+        BuildDatasetHierarchy( Templates[ "default" ] );
         LoadDatasetConfigurations( );
     }
 

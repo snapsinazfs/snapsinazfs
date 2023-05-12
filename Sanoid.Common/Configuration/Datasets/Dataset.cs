@@ -4,7 +4,9 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json.Serialization;
 using Sanoid.Common.Configuration.Templates;
+using Sanoid.Common.JsonSerialization;
 
 namespace Sanoid.Common.Configuration.Datasets;
 
@@ -61,18 +63,7 @@ public class Dataset
     /// </summary>
     public string Path { get; }
 
-    /// <summary>
-    ///     Gets the root <see cref="Dataset" />, which is a dummy Dataset that serves as the single root for all ZFS pools.
-    /// </summary>
-    /// <value>
-    ///     A <see cref="Dataset" /> with no parent, no overrides, the default template, and set as disabled.
-    /// </value>
-    public static Dataset Root { get; } = new( "/" )
-    {
-        Template = Template.GetDefault( ),
-        Enabled = false,
-        Parent = null
-    };
+    internal static Dataset? Root { get; private set; }
 
     /// <summary>
     ///     Gets or sets the <see cref="Templates.Template" /> this <see cref="Dataset" /> will use.
@@ -81,10 +72,28 @@ public class Dataset
     ///     A <see cref="Templates.Template" /> that this Dataset will use, or <see langword="null" /> if it has not yet been
     ///     set.
     /// </value>
+    [JsonIgnore( Condition = JsonIgnoreCondition.WhenWritingNull )]
     public Template? Template { get; set; }
 
     /// <summary>
     ///     Gets the <see cref="Path" /> of this Dataset, prepended with a slash, to represent its location in the virtual tree
     /// </summary>
     public string VirtualPath => Path == "/" ? "/" : $"/{Path}";
+
+    /// <summary>
+    ///     Gets the root <see cref="Dataset" />, which is a dummy Dataset that serves as the single root for all ZFS pools.
+    /// </summary>
+    /// <value>
+    ///     A <see cref="Dataset" /> with no parent, no overrides, the default template, and set as disabled.
+    /// </value>
+    public static Dataset GetRoot( Template defaultTemplate )
+    {
+        Root ??= new( "/" )
+        {
+            Template = defaultTemplate,
+            Enabled = false,
+            Parent = null
+        };
+        return Root;
+    }
 }

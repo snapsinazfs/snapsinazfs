@@ -11,18 +11,18 @@ namespace Sanoid.Common.Configuration.Templates;
 /// <summary>
 ///     Snapshot timing policies for use in <see cref="Template" />s
 /// </summary>
-public record struct SnapshotTiming
+public readonly record struct SnapshotTiming
 {
     /// <summary>
     ///     Gets or sets the time of day that daily snapshots are taken
     /// </summary>
-    public TimeOnly DailyTime { get; set; }
+    public TimeOnly DailyTime { get; init; }
 
     /// <summary>
     ///     Gets or sets the minute of the hour that hourly snapshots are taken
     /// </summary>
     [ValueRange(0,59)]
-    public int HourlyMinute { get; set; }
+    public int HourlyMinute { get; init; }
 
     /// <summary>
     ///     Gets or sets the day of the month that monthly snapshots are taken
@@ -32,27 +32,27 @@ public record struct SnapshotTiming
     ///     the month
     /// </remarks>
     [ValueRange(1,31)]
-    public int MonthlyDay { get; set; }
+    public int MonthlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that monthly snapshots are taken
     /// </summary>
-    public TimeOnly MonthlyTime { get; set; }
+    public TimeOnly MonthlyTime { get; init; }
 
     /// <summary>
     ///     Gets or sets whether local time is used for snapshot naming and processing.
     /// </summary>
-    public bool UseLocalTime { get; set; }
+    public bool UseLocalTime { get; init; }
 
     /// <summary>
     ///     Gets or sets the day of the week on which weekly snapshots are taken
     /// </summary>
-    public DayOfWeek WeeklyDay { get; set; }
+    public DayOfWeek WeeklyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that weekly snapshots are taken
     /// </summary>
-    public TimeOnly WeeklyTime { get; set; }
+    public TimeOnly WeeklyTime { get; init; }
 
     /// <summary>
     ///     Gets or sets the day of the <see cref="YearlyMonth" /> that yearly snapshots are taken
@@ -62,18 +62,18 @@ public record struct SnapshotTiming
     ///     <see cref="YearlyMonth" />
     /// </remarks>
     [ValueRange(1,31)]
-    public int YearlyDay { get; set; }
+    public int YearlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the month of the year in which yearly snapshots will be taken
     /// </summary>
     [ValueRange(1,12)]
-    public int YearlyMonth { get; set; }
+    public int YearlyMonth { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that yearly snapshots are taken
     /// </summary>
-    public TimeOnly YearlyTime { get; set; }
+    public TimeOnly YearlyTime { get; init; }
 
     /// <summary>
     ///     Gets a new immutable <see cref="SnapshotTiming" /> record, parsed from an <see cref="IConfiguration" /> object

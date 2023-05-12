@@ -68,7 +68,8 @@ public static class ConfigurationValidators
         try
         {
             Logger.Trace( "Checking for existence of {0} Template", templateName );
-            defaultTemplateSection = baseConfiguration.GetRequiredSection( templateName );
+            IConfigurationSection templatesSection = baseConfiguration.GetSection( "Templates" );
+            defaultTemplateSection = templatesSection.GetRequiredSection( templateName );
             Logger.Trace( "{0} Template found", templateName );
             return true;
         }
