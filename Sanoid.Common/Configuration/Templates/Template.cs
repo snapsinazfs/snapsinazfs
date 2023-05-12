@@ -245,7 +245,7 @@ public class Template
     /// </param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    internal Template CreateChild( IConfigurationSection childConfigurationSection, string? nameOverride = null, bool isDatasetOverride = false )
+    public Template CreateChild( IConfigurationSection childConfigurationSection, string? nameOverride = null, bool isDatasetOverride = false )
     {
         Logger.Trace( "Entered CreateChild from template {0}, with requested new template {1}", Name, nameOverride ?? ( string.IsNullOrEmpty( childConfigurationSection.Key ) ? "INVALID KEY" : childConfigurationSection.Key ) );
         string childTemplateName = nameOverride ?? childConfigurationSection.Key;
