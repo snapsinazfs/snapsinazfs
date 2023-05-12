@@ -211,7 +211,7 @@ public class Template
         return _defaultTemplate;
     }
 
-    internal Template CloneForDatasetWithOverrides( Dataset targetDataset, IConfigurationSection overrides )
+    internal Template CloneForDatasetWithOverrides( IConfigurationSection overrides, Dataset targetDataset )
     {
         Logger.Debug( "Cloning template {0} to apply overrides in dataset {1}", targetDataset.Template!.Name, targetDataset.Path );
         IConfigurationSection retentionOverrides = overrides.GetSection( "SnapshotRetention" );

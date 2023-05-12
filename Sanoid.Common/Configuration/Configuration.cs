@@ -262,7 +262,7 @@ public static class Configuration
                 if ( overrides.Exists( ) )
                 {
                     Log.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
-                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( ds, overrides );
+                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds );
                 }
             }
             else
