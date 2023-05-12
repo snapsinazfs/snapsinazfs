@@ -72,7 +72,6 @@ public class ConfigurationTests
         { "Templates:default:AutoPrune", "True" },
         { "Templates:default:Recursive", "False" },
         { "Templates:default:SkipChildren", "False" },
-        { "Templates:default:UseTemplate", "default" },
         { "Templates:default:SnapshotTiming", null },
         { "Templates:default:SnapshotTiming:FrequentPeriod", "15" },
         { "Templates:default:SnapshotTiming:UseLocalTime", "True" },
