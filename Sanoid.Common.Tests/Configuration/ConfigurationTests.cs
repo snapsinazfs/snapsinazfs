@@ -10,6 +10,7 @@ using Sanoid.Common.Configuration;
 namespace Sanoid.Common.Tests.Configuration;
 
 [TestFixture]
+[Order(1)]
 public class ConfigurationTests
 {
     [OneTimeSetUp]
@@ -25,7 +26,7 @@ public class ConfigurationTests
                                   .AddJsonFile( "Sanoid.local.json" )
                                   .Build( );
 
-        _mockBaseConfiguration = new ConfigurationBuilder( ).AddInMemoryCollection( _mockBaseConfigDictionary ).Build( );
+        _mockBaseConfiguration = new ConfigurationBuilder( ).AddInMemoryCollection( CommonStatics.MockBaseConfigDictionary ).Build( );
     }
 
     private IConfigurationRoot _fileBaseConfiguration;
@@ -34,65 +35,6 @@ public class ConfigurationTests
 
     private Dictionary<string, string?> _fileBaseConfigDictionary;
 
-    private readonly Dictionary<string, string?> _mockBaseConfigDictionary = new( )
-    {
-        { "$schema", "Sanoid.schema.json" },
-        { "$id", "Sanoid.json" },
-        { "TakeSnapshots", "False" },
-        { "PruneSnapshots", "False" },
-        { "ConfigurationPathBase", "/etc/sanoid" },
-        { "CacheDirectory", "/var/cache/sanoid" },
-        { "RunDirectory", "/var/run/sanoid" },
-        { "DryRun", "False" },
-        { "Formatting", null },
-        { "Formatting:SnapshotNaming", null },
-        { "Formatting:SnapshotNaming:ComponentSeparator", "_" },
-        { "Formatting:SnapshotNaming:Prefix", "autosnap" },
-        { "Formatting:SnapshotNaming:TimestampFormatString", "yyyy-MM-dd_HH\\:mm\\:ss" },
-        { "Formatting:SnapshotNaming:FrequentSuffix", "frequently" },
-        { "Formatting:SnapshotNaming:HourlySuffix", "hourly" },
-        { "Formatting:SnapshotNaming:DailySuffix", "daily" },
-        { "Formatting:SnapshotNaming:WeeklySuffix", "weekly" },
-        { "Formatting:SnapshotNaming:MonthlySuffix", "monthly" },
-        { "Formatting:SnapshotNaming:YearlySuffix", "yearly" },
-        { "PlatformUtilities", null },
-        { "PlatformUtilities:ps", "/usr/bin/ps" },
-        { "PlatformUtilities:zfs", "/usr/local/sbin/zfs" },
-        { "PlatformUtilities:zpool", "/usr/local/sbin/zpool" },
-        { "Monitoring", null },
-        { "Monitoring:Nagios", null },
-        { "Monitoring:Nagios:MonitorType", "Nagios" },
-        { "Monitoring:Nagios:Capacity", "False" },
-        { "Monitoring:Nagios:Health", "False" },
-        { "Monitoring:Nagios:Snapshots", "False" },
-        { "Datasets", null },
-        { "Templates", null },
-        { "Templates:default", null },
-        { "Templates:default:AutoSnapshot", "True" },
-        { "Templates:default:AutoPrune", "True" },
-        { "Templates:default:Recursive", "False" },
-        { "Templates:default:SkipChildren", "False" },
-        { "Templates:default:SnapshotTiming", null },
-        { "Templates:default:SnapshotTiming:FrequentPeriod", "15" },
-        { "Templates:default:SnapshotTiming:UseLocalTime", "True" },
-        { "Templates:default:SnapshotTiming:HourlyMinute", "59" },
-        { "Templates:default:SnapshotTiming:DailyTime", "23:59" },
-        { "Templates:default:SnapshotTiming:WeeklyDay", "1" },
-        { "Templates:default:SnapshotTiming:WeeklyTime", "23:59" },
-        { "Templates:default:SnapshotTiming:MonthlyDay", "31" },
-        { "Templates:default:SnapshotTiming:MonthlyTime", "23:59" },
-        { "Templates:default:SnapshotTiming:YearlyMonth", "12" },
-        { "Templates:default:SnapshotTiming:YearlyDay", "31" },
-        { "Templates:default:SnapshotTiming:YearlyTime", "23:59" },
-        { "Templates:default:SnapshotRetention", null },
-        { "Templates:default:SnapshotRetention:Frequent", "0" },
-        { "Templates:default:SnapshotRetention:Hourly", "48" },
-        { "Templates:default:SnapshotRetention:Daily", "90" },
-        { "Templates:default:SnapshotRetention:Weekly", "0" },
-        { "Templates:default:SnapshotRetention:Monthly", "6" },
-        { "Templates:default:SnapshotRetention:Yearly", "0" }
-    };
-
     [Test]
     [Order( 1 )]
     public void BaseConfigurationNotModified( )
@@ -100,7 +42,7 @@ public class ConfigurationTests
         // This test is for making sure that the base configuration hasn't been changed
         // Helps ensure changes to base config don't unintentionally get committed
 
-        foreach ( ( string key, string? value ) in _mockBaseConfigDictionary )
+        foreach ( ( string key, string? value ) in CommonStatics.MockBaseConfigDictionary )
         {
             if ( _fileBaseConfigDictionary.TryGetValue( key, out string? fileConfigElementValue ) )
             {
