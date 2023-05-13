@@ -244,9 +244,10 @@ public class Template
     ///     Otherwise, false
     /// </param>
     /// <param name="skipRecursion">Mainly intended for calling from tests. Instructs this function to exit without recursing into sub-templates.</param>
+    /// <param name="allTemplates"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public Template CreateChild( IConfigurationSection childConfigurationSection, string? nameOverride = null, bool isDatasetOverride = false, bool skipRecursion = false )
+    public Template CreateChild( IConfigurationSection childConfigurationSection, Dictionary<string, Template> allTemplates, string nameOverride = "", bool isDatasetOverride = false, bool skipRecursion = false )
     {
         Logger.Trace( "Entered CreateChild from template {0}, with requested new template {1}", Name, nameOverride ?? ( string.IsNullOrEmpty( childConfigurationSection.Key ) ? "INVALID KEY" : childConfigurationSection.Key ) );
         string childTemplateName = nameOverride ?? childConfigurationSection.Key;
@@ -272,7 +273,7 @@ public class Template
             // This is just a dataset override.
             // We can exit now, as child templates here would be meaningless.
             Logger.Debug( "Child template {0} of template {1} is a dataset override. Not checking for children.", newChildTemplate.Name, Name );
-            Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+            allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
             return newChildTemplate;
         }
 
@@ -283,25 +284,25 @@ public class Template
         if ( !childTemplatesSection.Exists( ) )
         {
             Logger.Trace( "Template {0} has no Templates section.", newChildTemplate.Name );
-            Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+            allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
             return newChildTemplate;
         }
 
         if ( skipRecursion )
         {
             Logger.Info( "skipRecusion specified while creating template {0}. Returning now.", newChildTemplate.Name );
-            Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+            allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
             return newChildTemplate;
         }
 
         Logger.Debug( "Template {0} has Templates section. Checking contents of that section.", newChildTemplate.Name );
 
-        Configuration.Templates.TryAdd( newChildTemplate.Name, newChildTemplate );
+        allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
 
         foreach ( IConfigurationSection grandChildTemplateConfiguration in childTemplatesSection.GetChildren( ) )
         {
             Logger.Debug( "Recursively calling CreateChild on {0} for new template {1}", newChildTemplate.Name, grandChildTemplateConfiguration.Key );
-            newChildTemplate.CreateChild( grandChildTemplateConfiguration );
+            newChildTemplate.CreateChild( grandChildTemplateConfiguration, allTemplates: allTemplates );
         }
 
         Logger.Debug( "No more children of {0} remain. Returning template {0} from {1}.CreateChild", newChildTemplate.Name, Name );
@@ -362,10 +363,10 @@ public class Template
         }
     }
 
-    internal Template CloneForDatasetWithOverrides( IConfigurationSection overrides, Dataset targetDataset )
+    internal Template CloneForDatasetWithOverrides( IConfigurationSection overrides, Dataset targetDataset, Dictionary<string, Template> allTemplates )
     {
         Logger.Debug( "Cloning template {0} to apply overrides in dataset {1}", targetDataset.Template!.Name, targetDataset.Path );
-        Template clone = CreateChild( overrides, $"{targetDataset.Path}_{Name}_Local" );
+        Template clone = CreateChild( overrides, allTemplates, nameOverride: $"{targetDataset.Path}_{Name}_Local" );
         return clone;
     }
 

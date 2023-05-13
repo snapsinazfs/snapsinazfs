@@ -5,7 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
-
 using Sanoid.Common.Configuration.Templates;
 
 #pragma warning disable CS8618
@@ -46,30 +45,31 @@ public class TemplateTests
     [Order( 2 )]
     public void CreateChildTest_NoRecursion( )
     {
-        // Get the Templates:default:Templates section
-        IConfigurationSection defaultTemplateTemplatesSection = _rootTemplatesDefaultConfigurationSection.GetRequiredSection( "Templates" );
+        Assert.Fail( "Test not implemented" );
+        //// Get the Templates:default:Templates section
+        //IConfigurationSection defaultTemplateTemplatesSection = _rootTemplatesDefaultConfigurationSection.GetRequiredSection( "Templates" );
 
-        // Get the Templates:default:Templates:production template
-        IConfigurationSection productionTemplateSection = defaultTemplateTemplatesSection.GetRequiredSection( "production" );
+        //// Get the Templates:default:Templates:production template
+        //IConfigurationSection productionTemplateSection = defaultTemplateTemplatesSection.GetRequiredSection( "production" );
 
-        // Create a child template, but skip recursion. Only interested in testing building a single template.
-        Template newChildTemplate = _defaultTemplate.CreateChild( productionTemplateSection, null, false, true );
+        //// Create a child template, but skip recursion. Only interested in testing building a single template.
+        //Template newChildTemplate = _defaultTemplate.CreateChild( productionTemplateSection, null, nameOverride: false, true );
 
-        Assert.Multiple( ( ) =>
-        {
-            // Check that our root template has the new child key in its Children dictionary
-            Assert.That( _defaultTemplate.Children, Contains.Key( "production" ) );
+        //Assert.Multiple( ( ) =>
+        //{
+        //    // Check that our root template has the new child key in its Children dictionary
+        //    Assert.That( _defaultTemplate.Children, Contains.Key( "production" ) );
 
-            // Check that the object returned by CreateChild is the same object reference as the object in the Children dictionary
-            Assert.That( _defaultTemplate.Children[ "production" ], Is.SameAs( newChildTemplate ) );
+        //    // Check that the object returned by CreateChild is the same object reference as the object in the Children dictionary
+        //    Assert.That( _defaultTemplate.Children[ "production" ], Is.SameAs( newChildTemplate ) );
 
-            // Now check that all the properties are set and have the expected values
-            Assert.That( newChildTemplate, Has.Property( "Name" ).EqualTo( "production" ) );
-            Assert.That( newChildTemplate, Has.Property( "AutoPrune" ).True );
-            Assert.That( newChildTemplate, Has.Property( "AutoSnapshot" ).True );
-            Assert.That( newChildTemplate, Has.Property( "Recursive" ).False );
-            Assert.That( newChildTemplate, Has.Property( "SkipChildren" ).False );
-            Assert.That( newChildTemplate, Has.Property( "SnapshotRetention" ) );
-        } );
+        //    // Now check that all the properties are set and have the expected values
+        //    Assert.That( newChildTemplate, Has.Property( "Name" ).EqualTo( "production" ) );
+        //    Assert.That( newChildTemplate, Has.Property( "AutoPrune" ).True );
+        //    Assert.That( newChildTemplate, Has.Property( "AutoSnapshot" ).True );
+        //    Assert.That( newChildTemplate, Has.Property( "Recursive" ).False );
+        //    Assert.That( newChildTemplate, Has.Property( "SkipChildren" ).False );
+        //    Assert.That( newChildTemplate, Has.Property( "SnapshotRetention" ) );
+        //} );
     }
 }

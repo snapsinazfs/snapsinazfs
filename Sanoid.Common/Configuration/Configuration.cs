@@ -279,7 +279,7 @@ public class Configuration
                 if ( overrides.Exists( ) )
                 {
                     _logger.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
-                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds );
+                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds, Templates );
                 }
             }
             else
@@ -313,7 +313,7 @@ public class Configuration
         {
             foreach ( IConfigurationSection childConfigurationSection in defaultTemplateChildTemplatesConfigurationSection.GetChildren( ) )
             {
-                defaultTemplate.CreateChild( childConfigurationSection );
+                defaultTemplate.CreateChild( childConfigurationSection, Templates );
             }
         }
 
