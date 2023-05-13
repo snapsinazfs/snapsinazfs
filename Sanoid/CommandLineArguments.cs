@@ -6,7 +6,9 @@
 
 using System.Reflection;
 using PowerArgs;
+using Sanoid.Common.Configuration;
 using Sanoid.Common.Configuration.Monitoring;
+using Sanoid.Common.Zfs;
 using BaseConfiguration = Sanoid.Common.Configuration.Configuration;
 using MonitoringConfiguration = Sanoid.Common.Configuration.Monitoring.Configuration;
 
@@ -92,6 +94,8 @@ internal class CommandLineArguments
     [ArgShortcut( "--run-dir" )]
     public string? RunDir { get; set; }
 
+    internal BaseConfiguration SanoidConfiguration { get; private set; }
+
     [ArgDescription( "Will make sanoid take snapshots, but will not prune unless --prune-snapshots is also specified." )]
     [ArgShortcut( "--take-snapshots" )]
     public bool TakeSnapshots { get; set; }
@@ -119,11 +123,15 @@ internal class CommandLineArguments
     /// <summary>
     ///     Called by main thread to override configured settings with any arguments passed at the command line.
     /// </summary>
+    [UsedImplicitly]
     public void Main( )
     {
+        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( JsonConfigurationSections.PlatformUtilitiesConfiguration );
+        SanoidConfiguration = new BaseConfiguration( JsonConfigurationSections.RootConfiguration, zfsCommandRunner );
+
         if ( Version )
         {
-            LogManager.GetLogger( "MessageOnly" ).Info( "Sanoid.net version {0}", Assembly.GetExecutingAssembly( ).GetName( ).Version! );
+            LogManager.GetLogger( "MessageOnly" ).Info( message: "Sanoid.net version {0}", Assembly.GetExecutingAssembly( ).GetName( ).Version! );
             return;
         }
 
@@ -158,36 +166,36 @@ internal class CommandLineArguments
         }
 
         //Call this so that settings are first retrieved from configuration, to allow arguments to override them.
-        BaseConfiguration.Initialize( );
+        SanoidConfiguration.LoadConfigurationFromIConfiguration( );
 
         if ( Quiet )
         {
-            BaseConfiguration.DefaultLoggingLevel = LogLevel.Off;
+            SanoidConfiguration.DefaultLoggingLevel = LogLevel.Off;
         }
 
         if ( ReallyQuiet )
         {
-            BaseConfiguration.DefaultLoggingLevel = LogLevel.Off;
+            SanoidConfiguration.DefaultLoggingLevel = LogLevel.Off;
         }
 
         if ( Trace )
         {
-            BaseConfiguration.DefaultLoggingLevel = LogLevel.Trace;
+            SanoidConfiguration.DefaultLoggingLevel = LogLevel.Trace;
         }
 
         if ( Verbose )
         {
-            BaseConfiguration.DefaultLoggingLevel = LogLevel.Info;
+            SanoidConfiguration.DefaultLoggingLevel = LogLevel.Info;
         }
 
         if ( CacheDir is not null )
         {
-            BaseConfiguration.CacheDirectory = CacheDir;
+            SanoidConfiguration.CacheDirectory = CacheDir;
         }
 
         if ( ConfigDir is not null )
         {
-            BaseConfiguration.ConfigurationPathBase = ConfigDir;
+            SanoidConfiguration.ConfigurationPathBase = ConfigDir;
         }
 
         if ( Cron )
@@ -199,7 +207,7 @@ internal class CommandLineArguments
 
         if ( Debug )
         {
-            BaseConfiguration.DefaultLoggingLevel = LogLevel.Debug;
+            SanoidConfiguration.DefaultLoggingLevel = LogLevel.Debug;
         }
 
         if ( ForcePrune )
@@ -239,23 +247,23 @@ internal class CommandLineArguments
 
         if ( PruneSnapshots )
         {
-            BaseConfiguration.PruneSnapshots = true;
+            SanoidConfiguration.PruneSnapshots = true;
         }
 
         if ( ReadOnly )
         {
             Logger.Info( "Performing a dry run. No changes will be made to ZFS." );
-            BaseConfiguration.DryRun = true;
+            SanoidConfiguration.DryRun = true;
         }
 
         if ( RunDir is not null )
         {
-            BaseConfiguration.RunDirectory = RunDir;
+            SanoidConfiguration.RunDirectory = RunDir;
         }
 
         if ( TakeSnapshots )
         {
-            BaseConfiguration.TakeSnapshots = true;
+            SanoidConfiguration.TakeSnapshots = true;
         }
     }
 }
