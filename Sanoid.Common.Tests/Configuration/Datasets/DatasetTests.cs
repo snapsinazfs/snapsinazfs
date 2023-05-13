@@ -9,6 +9,7 @@ using Sanoid.Common.Configuration.Datasets;
 namespace Sanoid.Common.Tests.Configuration.Datasets;
 
 [TestFixture]
+[Parallelizable(ParallelScope.All)]
 public class DatasetTests
 {
     [Test]

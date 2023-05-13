@@ -13,7 +13,6 @@ namespace Sanoid.Common.Tests.Configuration.Templates;
 
 [TestFixture]
 [Order( 2 )]
-[NonParallelizable]
 public class TemplateTests
 {
     [OneTimeSetUp]
