@@ -32,7 +32,7 @@ public class Configuration
     {
         _rootConfiguration = rootConfiguration;
         _zfsCommandRunner = zfsCommandRunner;
-        Instance = this;
+        //Instance = this;
     }
 #pragma warning restore CS8618
 
@@ -40,7 +40,7 @@ public class Configuration
     {
     }
 
-    public static Configuration Instance { get; private set; } = new( );
+    //public static Configuration Instance { get; private set; } = new( );
     private bool _cron;
 
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );

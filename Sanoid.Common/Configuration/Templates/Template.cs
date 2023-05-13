@@ -25,16 +25,6 @@ public class Template
         Logger.Debug( "Creating new template {templateName}", templateName );
         if ( configurationSection.Key == "default" && parent is null )
         {
-            Logger.Trace( "Default template creation requested" );
-            if ( _defaultTemplate is not null )
-            {
-                // We already made the default template.
-                // Throw an exception.
-                // This is a programming error.
-                Logger.Fatal( "Default template already exists. Do not call this constructor for default template more than once." );
-                throw new InvalidOperationException( "Constructor for default template can only be called once." );
-            }
-
             // Creating the default template.
             Logger.Debug( "Getting configuration for default template. Hard-coded fallback values will be used for missing or invalid values." );
             Name = "default";
@@ -230,7 +220,6 @@ public class Template
     /// </value>
     public SnapshotTiming SnapshotTiming { get; set; }
 
-    private static Template? _defaultTemplate;
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
@@ -239,7 +228,7 @@ public class Template
     ///     all children of that Template, as well.
     /// </summary>
     /// <param name="childConfigurationSection">The <see cref="IConfigurationSection" /> the child will be created from.</param>
-    /// <param name="templateName">If we're creating the child for a <see cref="Dataset" /> with overrides, use this name.</param>
+    /// <param name="childTemplateNamewe're creating the child for a <see cref="Dataset" /> with overrides, use this name.</param>
     /// <param name="isDatasetOverride">
     ///     Set to <see langword="true" /> if being called to create override settings from a <see cref="Dataset" />.<br />
     ///     Otherwise, false
@@ -248,10 +237,10 @@ public class Template
     /// <param name="allTemplates"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public Template CreateChild( IConfigurationSection childConfigurationSection, Dictionary<string, Template> allTemplates, string templateName, bool isDatasetOverride = false, bool skipRecursion = false )
+    public Template CreateChild( IConfigurationSection childConfigurationSection, Dictionary<string, Template> allTemplates, string childTemplateName, bool isDatasetOverride = false, bool skipRecursion = false )
     {
-        Logger.Trace( message: "Entered CreateChild from template {0}, with requested new template {1}", argument1: Name, argument2: templateName ?? ( string.IsNullOrEmpty( value: childConfigurationSection.Key ) ? "INVALID KEY" : childConfigurationSection.Key ) );
-        string childTemplateName = templateName ?? childConfigurationSection.Key;
+        Logger.Trace( message: "Entered CreateChild from template {0}, with requested new template {1}", argument1: Name, argument2: childTemplateName ?? ( string.IsNullOrEmpty( value: childConfigurationSection.Key ) ? "INVALID KEY" : childConfigurationSection.Key ) );
+        childTemplateName ??= childConfigurationSection.Key;
 
         if ( string.IsNullOrWhiteSpace( value: childTemplateName ) )
         {
@@ -278,6 +267,14 @@ public class Template
             return newChildTemplate;
         }
 
+        // If we are supposed to skip recursion, exit and return this child now
+        if ( skipRecursion )
+        {
+            Logger.Info( message: "skipRecusion specified while creating template {0}. Returning now", argument: newChildTemplate.Name );
+            allTemplates.TryAdd( key: newChildTemplate.Name, value: newChildTemplate );
+            return newChildTemplate;
+        }
+
         // Check if there's a Templates section in the child. If not, return the child now.
         // If so, recurse back into this method using its children
         Logger.Trace( message: "Checking for children of template {0}", argument: newChildTemplate.Name );
@@ -289,12 +286,6 @@ public class Template
             return newChildTemplate;
         }
 
-        if ( skipRecursion )
-        {
-            Logger.Info( message: "skipRecusion specified while creating template {0}. Returning now", argument: newChildTemplate.Name );
-            allTemplates.TryAdd( key: newChildTemplate.Name, value: newChildTemplate );
-            return newChildTemplate;
-        }
 
         Logger.Debug( message: "Template {0} has Templates section. Checking contents of that section", argument: newChildTemplate.Name );
 
@@ -367,25 +358,18 @@ public class Template
     internal Template CloneForDatasetWithOverrides( IConfigurationSection overrides, Dataset targetDataset, Dictionary<string, Template> allTemplates )
     {
         Logger.Debug( message: "Cloning template {0} to apply overrides in dataset {1}", argument1: targetDataset.Template!.Name, argument2: targetDataset.Path );
-        Template clone = CreateChild( childConfigurationSection: overrides, allTemplates: allTemplates, templateName: $"{targetDataset.Path}_{Name}_Local" );
+        Template clone = CreateChild( childConfigurationSection: overrides, allTemplates: allTemplates, childTemplateName: $"{targetDataset.Path}_{Name}_Local",isDatasetOverride:true );
         return clone;
     }
 
     internal static Template GetDefault( IConfigurationSection defaultTemplateSection, [CallerMemberName] string? caller = "unknown" )
     {
         Logger.Trace( message: "Default template requested by {0}", argument: caller );
-        if ( _defaultTemplate is not null )
-        {
-            Logger.Trace( message: "Default template already exists. Returning existing template to {0}", argument: caller );
-            return _defaultTemplate;
-        }
 
-        Logger.Debug( message: "Default template not yet configured. Attempting to build from configuration." );
-
-        _defaultTemplate = new( configurationSection: defaultTemplateSection );
+        Template defaultTemplate = new( configurationSection: defaultTemplateSection );
 
         Logger.Debug( message: "Default template created from configuration. Returning to {0}", argument: caller );
 
-        return _defaultTemplate;
+        return defaultTemplate;
     }
 }
