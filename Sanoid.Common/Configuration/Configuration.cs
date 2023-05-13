@@ -6,6 +6,7 @@
 
 using Microsoft.Extensions.Configuration;
 using NLog.Config;
+using PowerArgs;
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
@@ -31,9 +32,15 @@ public class Configuration
     {
         _rootConfiguration = rootConfiguration;
         _zfsCommandRunner = zfsCommandRunner;
+        Instance = this;
     }
 #pragma warning restore CS8618
 
+    private Configuration( )
+    {
+    }
+
+    public static Configuration Instance { get; private set; } = new( );
     private bool _cron;
 
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
@@ -114,7 +121,7 @@ public class Configuration
             LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min( ) );
             if ( lowestLogLevel is null )
             {
-                _logger.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
+                _logger.Debug( message: "No logging levels set. Setting to {0}", LogLevel.Info.Name );
                 lowestLogLevel = LogLevel.Info;
             }
 
@@ -124,7 +131,7 @@ public class Configuration
         set
         {
             _logger.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
-            _logger.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
+            _logger.Debug( message: "Setting minimum log severity to {0} for ALL rules.", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
                 LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
@@ -186,6 +193,8 @@ public class Configuration
     /// <value>A <see langword="string" /> indicating the path for sanoid-generated runtime files</value>
     public string RunDirectory { get; set; }
 
+    public SnapshotNaming SnapshotNaming { get; set; }
+
     /// <summary>
     ///     Gets or sets whether Sanoid.net should take new snapshots.
     /// </summary>
@@ -233,7 +242,7 @@ public class Configuration
         // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            _logger.Debug( "Processing dataset {0}.", dsName );
+            _logger.Debug( message: "Processing dataset {0}.", dsName );
         #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
@@ -247,7 +256,7 @@ public class Configuration
                 Parent = Datasets[ parentDsName ]
             };
             Datasets.TryAdd( newDs.VirtualPath, newDs );
-            _logger.Debug( "Dataset {0} added to dictionary.", dsName );
+            _logger.Debug( message: "Dataset {0} added to dictionary.", dsName );
         }
     }
 
@@ -259,7 +268,7 @@ public class Configuration
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( ( _, Dataset? ds ) in Datasets )
         {
-            _logger.Debug( "Processing dataset {0}", ds.Path );
+            _logger.Debug( message: "Processing dataset {0}", ds.Path );
             if ( ds.Path == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
@@ -313,7 +322,7 @@ public class Configuration
         {
             foreach ( IConfigurationSection childConfigurationSection in defaultTemplateChildTemplatesConfigurationSection.GetChildren( ) )
             {
-                defaultTemplate.CreateChild( childConfigurationSection, Templates );
+                defaultTemplate.CreateChild( childConfigurationSection, Templates, childConfigurationSection.Key );
             }
         }
 
@@ -353,6 +362,12 @@ public class Configuration
         RunDirectory = _rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
         TakeSnapshots = _rootConfiguration.GetBoolean( "TakeSnapshots" );
         PruneSnapshots = _rootConfiguration.GetBoolean( "PruneSnapshots" );
+        SnapshotNaming = new( _rootConfiguration.GetRequiredSection( "Formatting" ).GetRequiredSection( "SnapshotNaming" ) );
         _logger.Debug( "Root level configuration initialized." );
+    }
+
+    public void SetValuesFromArgs( ArgAction<CommandLineArguments> argParseReults )
+    {
+        //TODO: Might move to using the .net configuration providers to parse the arguments, instead of PowerArgs.
     }
 }

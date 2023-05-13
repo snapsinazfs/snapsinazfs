@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Snapshots;
 
 namespace Sanoid.Common.Configuration;
@@ -12,8 +13,19 @@ namespace Sanoid.Common.Configuration;
 /// <summary>
 ///     Corresponds to the /Formatting/SnapshotNaming section of Sanoid.json
 /// </summary>
-public static class SnapshotNaming
+public class SnapshotNaming
 {
+    private readonly IConfigurationSection _snapshotNamingConfigurationSection;
+
+    /// <summary>
+    /// Creates a new instance of a SnapshotNaming object, for control of Snapshot naming rules, from the specified configuration section
+    /// </summary>
+    /// <param name="snapshotNamingConfigurationSection">An <see cref="IConfigurationSection"/> containing the items specified in the SnapshotNaming schema definition.</param>
+    public SnapshotNaming( IConfigurationSection snapshotNamingConfigurationSection )
+    {
+        _snapshotNamingConfigurationSection = snapshotNamingConfigurationSection;
+    }
+
     /// <summary>
     ///     Gets the string used to separate components of a <see cref="Snapshot" /> name.
     /// </summary>
@@ -22,7 +34,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "ComponentSeparator" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string ComponentSeparator => JsonConfigurationSections.SnapshotNamingConfiguration[ "ComponentSeparator" ] ?? "_";
+    public string ComponentSeparator => _snapshotNamingConfigurationSection[ "ComponentSeparator" ] ?? "_";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Daily">daily</see> snapshot name.
@@ -37,7 +49,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "DailySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string DailySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "DailySuffix" ] ?? "daily";
+    public string DailySuffix => _snapshotNamingConfigurationSection[ "DailySuffix" ] ?? "daily";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Frequent">frequent</see> snapshot name.
@@ -52,7 +64,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "FrequentSuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string FrequentSuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "FrequentSuffix" ] ?? "frequently";
+    public string FrequentSuffix => _snapshotNamingConfigurationSection[ "FrequentSuffix" ] ?? "frequently";
 
     /// <summary>
     ///     Gets the string used as the suffix component of an <see cref="SnapshotPeriod.Hourly">hourly</see> snapshot name.
@@ -67,7 +79,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "HourlySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string HourlySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "HourlySuffix" ] ?? "hourly";
+    public string HourlySuffix => _snapshotNamingConfigurationSection[ "HourlySuffix" ] ?? "hourly";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Manual">manual</see> snapshot name.
@@ -82,7 +94,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "ManualSuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string ManualSuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "ManualSuffix" ] ?? "manual";
+    public string ManualSuffix => _snapshotNamingConfigurationSection[ "ManualSuffix" ] ?? "manual";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Monthly">monthly</see> snapshot name.
@@ -97,7 +109,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "MonthlySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string MonthlySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "MonthlySuffix" ] ?? "monthly";
+    public string MonthlySuffix => _snapshotNamingConfigurationSection[ "MonthlySuffix" ] ?? "monthly";
 
     /// <summary>
     ///     Gets the string used as the first component of a snapshot name.
@@ -109,7 +121,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "Prefix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string Prefix => JsonConfigurationSections.SnapshotNamingConfiguration[ "Prefix" ] ?? "autosnap";
+    public string Prefix => _snapshotNamingConfigurationSection[ "Prefix" ] ?? "autosnap";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Temporary">temporary</see> snapshot
@@ -125,7 +137,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "TemporarySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string TemporarySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "TemporarySuffix" ] ?? "temporary";
+    public string TemporarySuffix => _snapshotNamingConfigurationSection[ "TemporarySuffix" ] ?? "temporary";
 
     /// <summary>
     ///     Gets the format string used to create the timestamp component of a snapshot name.
@@ -143,7 +155,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "TimestampFormatString" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string TimestampFormatString => JsonConfigurationSections.SnapshotNamingConfiguration[ "TimestampFormatString" ] ?? "yyyy-MM-dd_HH\\:mm\\:ss";
+    public string TimestampFormatString => _snapshotNamingConfigurationSection[ "TimestampFormatString" ] ?? "yyyy-MM-dd_HH\\:mm\\:ss";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Weekly">weekly</see> snapshot name.
@@ -158,7 +170,7 @@ public static class SnapshotNaming
     [JsonPropertyName( "WeeklySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string WeeklySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "WeeklySuffix" ] ?? "weekly";
+    public string WeeklySuffix => _snapshotNamingConfigurationSection[ "WeeklySuffix" ] ?? "weekly";
 
     /// <summary>
     ///     Gets the string used as the suffix component of a <see cref="SnapshotPeriod.Yearly">yearly</see> snapshot name.
@@ -173,5 +185,5 @@ public static class SnapshotNaming
     [JsonPropertyName( "YearlySuffix" )]
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
-    public static string YearlySuffix => JsonConfigurationSections.SnapshotNamingConfiguration[ "YearlySuffix" ] ?? "yearly";
+    public string YearlySuffix => _snapshotNamingConfigurationSection[ "YearlySuffix" ] ?? "yearly";
 }

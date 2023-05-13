@@ -4,21 +4,18 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Json.More;
 using Microsoft.Extensions.Configuration;
-using NLog;
 using PowerArgs;
 using Sanoid;
+using Sanoid.Common;
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Posix;
+using Sanoid.Common.Zfs;
 
-Logging.ConfigureLogger();
+Logging.ConfigureLogger( );
 
 // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
-Logger logger = LogManager.GetCurrentClassLogger();
+Logger logger = LogManager.GetCurrentClassLogger( );
 
 ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
 
@@ -35,6 +32,25 @@ if ( argParseReults.Args.Version )
 {
     return 0;
 }
+
+IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
+                                   #if WINDOWS
+                                       .AddJsonFile( "Sanoid.json", true, false )
+                                       .AddJsonFile( "Sanoid.local.json", true, false )
+                                       .AddEnvironmentVariables( "Sanoid.net:" )
+                                   #else
+                                       .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
+                                       .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
+                                       .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
+                                       .AddJsonFile( "Sanoid.local.json", true, false )
+                                       .AddEnvironmentVariables( "Sanoid.net:" )
+                                   #endif
+                                       .Build( );
+
+IZfsCommandRunner zfsCommandRunner = new DummyZfsCommandRunner( );
+Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
+sanoidConfiguration.LoadConfigurationFromIConfiguration( );
+sanoidConfiguration.SetValuesFromArgs( argParseReults );
 
 logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );

@@ -17,10 +17,10 @@ public abstract class MonitoringConfigurationBase
     ///     Creates a new instance of a <see cref="MonitoringConfigurationBase" />
     /// </summary>
     /// <param name="monitorName">The key value for the monitor in Sanoid.json#/Monitoring</param>
-    protected MonitoringConfigurationBase( string monitorName )
+    protected MonitoringConfigurationBase( IConfigurationSection singleMonitorConfigurationSection )
     {
-        MonitorName = monitorName;
-        _monitorConfigurationSection = JsonConfigurationSections.MonitoringConfiguration.GetRequiredSection( monitorName );
+        MonitorName = singleMonitorConfigurationSection.Key;
+        _monitorConfigurationSection = singleMonitorConfigurationSection;
         MonitorCapacity = _monitorConfigurationSection.GetBoolean( "Capacity" );
         MonitorHealth = _monitorConfigurationSection.GetBoolean( "Health" );
         MonitorSnapshots = _monitorConfigurationSection.GetBoolean( "Snapshots" );

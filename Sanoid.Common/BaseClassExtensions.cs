@@ -5,7 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Configuration;
+using Sanoid.Common.Snapshots;
 
 namespace Sanoid.Common;
 
@@ -19,10 +19,14 @@ public static class BaseClassExtensions
     ///     Sanoid.json.
     /// </summary>
     /// <param name="dt">The <see cref="DateTimeOffset" /> being formatted as a string.</param>
+    /// <param name="namingProvider">
+    ///     The format string or other <see cref="IFormatProvider" /> to format this DateTimeOffset
+    ///     with.
+    /// </param>
     /// <returns>A string representation of <paramref name="dt" />, formatted according to configuration in Sanoid.json.</returns>
-    public static string ToSnapshotDateTimeString( this DateTimeOffset dt )
+    public static string ToSnapshotDateTimeString( this DateTimeOffset dt, ISnapshotNamingProvider namingProvider )
     {
-        return dt.ToString( SnapshotNaming.TimestampFormatString );
+        return dt.ToString( namingProvider.TimestampFormatString );
     }
 
     /// <summary>
@@ -117,7 +121,10 @@ public static class BaseClassExtensions
     /// </summary>
     /// <typeparam name="T">Any type implementing <see cref="IConfiguration" /></typeparam>
     /// <param name="configurationSection">The current <see cref="IConfiguration" /> object to get the value from</param>
-    /// <param name="settingKey">The key of the value in <paramref name="configurationSection" /> to return as a <see cref="TimeOnly"/> value</param>
+    /// <param name="settingKey">
+    ///     The key of the value in <paramref name="configurationSection" /> to return as a
+    ///     <see cref="TimeOnly" /> value
+    /// </param>
     /// <param name="fallbackHours">Value to use for hours as fallback, if value does not exist or is not parseable</param>
     /// <param name="fallbackMinutes">Value to use for minutes as fallback, if value does not exist or is not parseable</param>
     /// <param name="fallbackSeconds">Value to use for seconds as fallback, if value does not exist or is not parseable</param>
@@ -132,11 +139,11 @@ public static class BaseClassExtensions
 
         if ( configurationSection[ settingKey ] is null )
         {
-            return new TimeOnly( fallbackHours, fallbackMinutes, fallbackSeconds );
+            return new( fallbackHours, fallbackMinutes, fallbackSeconds );
         }
 
         string? timeString = configurationSection[ settingKey ];
-        return TimeOnly.TryParse( timeString ?? "00:00", out TimeOnly returnValue ) ? returnValue : new TimeOnly( fallbackHours, fallbackMinutes, fallbackSeconds );
+        return TimeOnly.TryParse( timeString ?? "00:00", out TimeOnly returnValue ) ? returnValue : new( fallbackHours, fallbackMinutes, fallbackSeconds );
     }
 
     /// <summary>

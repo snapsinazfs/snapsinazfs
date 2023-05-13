@@ -8,23 +8,23 @@ using Microsoft.Extensions.Configuration;
 
 namespace Sanoid.Common.Configuration.Monitoring;
 
-internal static class Configuration
+internal class Configuration
 {
-    static Configuration( )
+    internal Configuration( IConfigurationSection monitoringConfigurationSection )
     {
-        MonitorConfigurations = new Dictionary<string, MonitoringConfigurationBase>( );
-        foreach ( IConfigurationSection section in JsonConfigurationSections.MonitoringConfiguration.GetChildren( ) )
+        MonitorConfigurations = new( );
+        foreach ( IConfigurationSection section in monitoringConfigurationSection.GetChildren( ) )
         {
             string monitorType = section[ "MonitorType" ]!;
             string monitorName = section.Key;
             switch ( monitorType )
             {
                 case "Nagios":
-                    MonitorConfigurations.Add( monitorName, new NagiosMonitoringConfiguration( monitorName ) );
+                    MonitorConfigurations.Add( monitorName, new NagiosMonitoringConfiguration( section ) );
                     break;
             }
         }
     }
 
-    internal static Dictionary<string, MonitoringConfigurationBase> MonitorConfigurations { get; set; }
+    internal Dictionary<string, MonitoringConfigurationBase> MonitorConfigurations { get; set; }
 }
