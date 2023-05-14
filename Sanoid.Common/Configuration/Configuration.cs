@@ -37,11 +37,6 @@ public class Configuration
     }
 #pragma warning restore CS8618
 
-    private Configuration( )
-    {
-    }
-
-    //public static Configuration Instance { get; private set; } = new( );
     private bool _cron;
 
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
