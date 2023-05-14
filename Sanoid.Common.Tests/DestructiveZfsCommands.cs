@@ -108,7 +108,7 @@ public class DestructiveZfsCommands
             return;
         }
         Console.WriteLine( $"Creating dataset {zpoolName}/Dataset1" );
-        ProcessStartInfo zfsProcess = new( "zfs", $"create -v {zpoolName}/Dataset1" )
+        ProcessStartInfo zfsProcess = new( "zfs", $"create {zpoolName}/Dataset1" )
         {
             CreateNoWindow = true
         };
@@ -164,7 +164,7 @@ public class DestructiveZfsCommands
             return;
         }
         Console.WriteLine( $"Destroying snapshot {zpoolName}/Dataset1@snapshot1" );
-        ProcessStartInfo zpoolStartInfo = new( "zfs", $"destroy -v {zpoolName}/Dataset1@snapshot1" )
+        ProcessStartInfo zpoolStartInfo = new( "zfs", $"destroy {zpoolName}/Dataset1@snapshot1" )
         {
             CreateNoWindow = true
         };
