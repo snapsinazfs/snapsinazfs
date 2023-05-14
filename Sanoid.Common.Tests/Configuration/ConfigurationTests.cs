@@ -12,6 +12,8 @@ namespace Sanoid.Common.Tests.Configuration;
 
 [TestFixture]
 [Order( 1 )]
+[Category("General")]
+[Category("Configuration")]
 public class ConfigurationTests
 {
     [OneTimeSetUp]

@@ -9,7 +9,10 @@ using Sanoid.Common.Configuration.Datasets;
 namespace Sanoid.Common.Tests.Configuration.Datasets;
 
 [TestFixture]
-[Parallelizable(ParallelScope.All)]
+[Parallelizable( ParallelScope.All )]
+[Category( "General" )]
+[Category( "Configuration" )]
+[Category( "Datasets" )]
 public class DatasetTests
 {
     [Test]

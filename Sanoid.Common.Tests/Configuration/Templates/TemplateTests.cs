@@ -13,6 +13,9 @@ namespace Sanoid.Common.Tests.Configuration.Templates;
 
 [TestFixture]
 [Order( 2 )]
+[Category( "General" )]
+[Category( "Configuration" )]
+[Category( "Templates" )]
 public class TemplateTests
 {
     [OneTimeSetUp]
@@ -32,7 +35,7 @@ public class TemplateTests
     private static IConfigurationSection _rootTemplatesConfigurationSection;
     private static IConfigurationSection _rootTemplatesDefaultConfigurationSection;
     private static Template _defaultTemplate;
-    private Dictionary<string, Template> _templatesDictionary = new( );
+    private readonly Dictionary<string, Template> _templatesDictionary = new( );
 
     [Test]
     [Order( 1 )]
