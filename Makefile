@@ -88,3 +88,14 @@ uninstall-release:
 	rm -rfv /etc/sanoid/Sanoid.local.json
 	rm -fv /usr/local/bin/Sanoid
 	@echo "Not removing configuration files in user home directories."
+
+test:	test-everything
+
+test-everything:
+	dotnet test --settings=Sanoid.Common.Tests/everything.runsettings
+
+test-everything-dangerous:
+	dotnet test --settings=Sanoid.Common.Tests/everything-dangerous.runsettings
+
+test-dangerous:
+	dotnet test --settings=Sanoid.Common.Tests/dangerous.runsettings
