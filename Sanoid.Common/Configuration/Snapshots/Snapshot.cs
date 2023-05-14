@@ -4,7 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-namespace Sanoid.Common.Snapshots;
+namespace Sanoid.Common.Configuration.Snapshots;
 
 /// <summary>
 ///     A representation of a ZFS snapshot of a dataset or zvol.
@@ -13,7 +13,7 @@ namespace Sanoid.Common.Snapshots;
 /// <seealso cref="DateTimeOffset" />
 public class Snapshot
 {
-    public Snapshot( ISnapshotNamingProvider namingProvider )
+    public Snapshot(ISnapshotNamingProvider namingProvider)
     {
         _namingProvider = namingProvider;
     }
@@ -45,15 +45,15 @@ public class Snapshot
     public string ShortName =>
         Period switch
         {
-            SnapshotPeriod.Temporary => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.TemporarySuffix}",
-            SnapshotPeriod.Frequent => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.FrequentSuffix}",
-            SnapshotPeriod.Hourly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.HourlySuffix}",
-            SnapshotPeriod.Daily => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.DailySuffix}",
-            SnapshotPeriod.Weekly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.WeeklySuffix}",
-            SnapshotPeriod.Monthly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.MonthlySuffix}",
-            SnapshotPeriod.Yearly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.YearlySuffix}",
-            SnapshotPeriod.Manual => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString( _namingProvider )}{_namingProvider.ComponentSeparator}{_namingProvider.ManualSuffix}",
-            _ => throw new InvalidOperationException( )
+            SnapshotPeriod.Temporary => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.TemporarySuffix}",
+            SnapshotPeriod.Frequent => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.FrequentSuffix}",
+            SnapshotPeriod.Hourly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.HourlySuffix}",
+            SnapshotPeriod.Daily => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.DailySuffix}",
+            SnapshotPeriod.Weekly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.WeeklySuffix}",
+            SnapshotPeriod.Monthly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.MonthlySuffix}",
+            SnapshotPeriod.Yearly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.YearlySuffix}",
+            SnapshotPeriod.Manual => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.ManualSuffix}",
+            _ => throw new InvalidOperationException()
         };
 
     /// <summary>

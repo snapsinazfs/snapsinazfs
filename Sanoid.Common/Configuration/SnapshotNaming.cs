@@ -6,7 +6,7 @@
 
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Snapshots;
+using Sanoid.Common.Configuration.Snapshots;
 
 namespace Sanoid.Common.Configuration;
 

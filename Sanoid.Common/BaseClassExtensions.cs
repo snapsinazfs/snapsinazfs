@@ -5,7 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Snapshots;
+using Sanoid.Common.Configuration.Snapshots;
 
 namespace Sanoid.Common;
 
