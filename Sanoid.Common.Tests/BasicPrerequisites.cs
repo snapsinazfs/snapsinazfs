@@ -1,31 +1,27 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Diagnostics;
-using System.Security.AccessControl;
-using System.Security.Principal;
 using System.Text.RegularExpressions;
-
-using Microsoft.VisualBasic;
-
-using NUnit.Framework.Internal;
 
 namespace Sanoid.Common.Tests;
 
 [TestFixture( Description = "These tests are for basic system-level prerequisites before we even get into bothering with anything specific to Sanoid.net" )]
 [Order( 1 )]
-[Category("General")]
-[Category("Prerequisites")]
+[Category( "General" )]
+[Category( "Prerequisites" )]
 public class BasicPrerequisiteTests
 {
     [Test]
     [Order( 1 )]
     public void CheckPathEnvironmentVariableIsDefined( )
     {
+        Console.Write( "Checking PATH environment variable not null: " );
         string? pathVariable = Environment.GetEnvironmentVariable( "PATH" );
+        Console.Write( pathVariable is not null );
         Assert.That( pathVariable, Is.Not.Null );
     }
 
@@ -33,7 +29,9 @@ public class BasicPrerequisiteTests
     [Order( 2 )]
     public void CheckPathEnvironmentVariableIsNotEmpty( )
     {
+        Console.Write( "Checking PATH environment variable not empty: " );
         string pathVariable = Environment.GetEnvironmentVariable( "PATH" )!;
+        Console.Write( pathVariable );
         Assert.That( pathVariable, Is.Not.Empty );
     }
 
@@ -50,19 +48,17 @@ public class BasicPrerequisiteTests
         // version accurately. Even on .net 7.0.105 on linux (what I have on an Ubuntu 22.10 box), the runtime identifies itself as v3.1 (???)
         // So, we're going to slice up the output from `dotnet --info` and look for the .NET SDK section and
         // grab the version string from there to check if it's ok...
-        ProcessStartInfo psi = new( "dotnet", "--info" )
+        Console.Write( "Checking dotnet --info" );
+        ProcessStartInfo psi = new( "dotnet", "--info..." )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        Process? process = Process.Start( psi );
-        _dotnetInfoOutput = process!.StandardOutput.ReadToEnd( );
-        if ( !process.HasExited )
+        using ( Process? process = Process.Start( psi ) )
         {
-            process.WaitForExit( 2000 );
+            _dotnetInfoOutput = process!.StandardOutput.ReadToEnd( );
+            process?.WaitForExit( 2000 );
         }
-
-        process.Dispose( );
 
         // First, we'll at least check that it's a real string, before we bother continuing
         // The following test will dissect the string and make appropriate assertions on it
@@ -79,6 +75,7 @@ public class BasicPrerequisiteTests
     [Category( ".NET" )]
     public void CheckDotnetSdkVersionIsSupported( )
     {
+        Console.Write( "Checking that dotnet SDK version is supported (7.0 or higher): " );
         Assert.That( _dotnetInfoOutput, Is.Not.Null );
         // This regular expression grabs the ".NET SDKs installed:" section from dotnet --info
         // We expect it to return a collection of Match objects containing exactly one Match,
@@ -115,6 +112,7 @@ public class BasicPrerequisiteTests
             Assert.That( netCoreAppVersions, Is.Not.Null );
             Assert.That( netCoreAppVersions, Has.Some.GreaterThanOrEqualTo( _minimumSupportedDotnetVersion ) );
         } );
+        Console.Write( "Yes" );
     }
 
     [Test]
@@ -123,6 +121,7 @@ public class BasicPrerequisiteTests
     [Category( ".NET" )]
     public void CheckDotnetRuntimeVersionIsSupported( )
     {
+        Console.Write("Checking that dotnet runtime version is supported (7.0 or higher): "  );
         Assert.That( _dotnetInfoOutput, Is.Not.Null );
         // This regular expression matches the entire ".NET runtimes installed:" section, and specifically
         // captures named groups that should capture as many lines as there are in the entire section
