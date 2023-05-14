@@ -32,7 +32,7 @@ public class AccessChecks
             };
             using ( Process? whichProcess = Process.Start( whichStartInfo ) )
             {
-                string programPath = whichProcess.StandardOutput.ReadToEnd( );
+                string? programPath = whichProcess?.StandardOutput?.ReadToEnd( );
                 whichProcess?.WaitForExit( 1000 );
                 ProgramPathDictionary.TryAdd( programName, programPath.Trim( ) );
             }
@@ -65,7 +65,7 @@ public class AccessChecks
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    private string? GetExceptionMessageForExecuteCheck( string command )
+    private static string? GetExceptionMessageForExecuteCheck( string command )
     {
         return $"User cannot execute {command}. Error: {(Errno)Marshal.GetLastPInvokeError( )}";
     }
@@ -88,7 +88,7 @@ public class AccessChecks
         Assert.That( returnValue, Is.EqualTo( 0 ), GetExceptionMessageForWriteCheck( canonicalPath ) );
     }
 
-    private string? GetExceptionMessageForWriteCheck( string path )
+    private static string? GetExceptionMessageForWriteCheck( string path )
     {
         return $"User cannot write to {path}. Error: {(Errno)Marshal.GetLastPInvokeError( )}";
     }
