@@ -83,7 +83,7 @@ public class BasicPrerequisiteTests
         // We expect it to return a collection of Match objects containing exactly one Match,
         // and that Match is expected to contain the named group "versionString" with a non-null,
         // non-empty string that we can then parse as a Version object for comparison.
-        Regex netSdkSectionRegex = new( "(?<header>\\.NET SDKs installed:(\\r\\n|\\r|\\n){1})(?<RuntimeName>(?: +)(?<versionString>[0-9]{1}\\.\\d+\\.\\d+)(?: +\\[.*\\](?:\\r\\n|\\r|\\n){1}))*", RegexOptions.CultureInvariant | RegexOptions.Compiled );
+        Regex netSdkSectionRegex = Regexes.DotnetSdkSectionRegex( );
         MatchCollection matches = netSdkSectionRegex.Matches( _dotnetInfoOutput! );
 
         Assert.Multiple( ( ) =>
@@ -128,7 +128,7 @@ public class BasicPrerequisiteTests
         // This regular expression matches the entire ".NET runtimes installed:" section, and specifically
         // captures named groups that should capture as many lines as there are in the entire section
         // We'll use collection asserts to concisely check for a supported version
-        Regex netRuntimeSectionRegex = new( "(?<header>\\.NET runtimes installed:\\p{C}+)(?<RuntimeLine>(?: +)(?<RuntimeName>(?<NetCore>Microsoft\\.NETCore\\.App (?<versionString>[0-9]{1}\\.\\d+\\.\\d+))|(Microsoft\\.[A-Za-z.]+ \\d+\\.\\d+\\.\\d+)) +(?<pathString>\\[[a-zA-Z0-9:_/\\\\\\. -]+\\])(?:\\p{C}+))*", RegexOptions.CultureInvariant | RegexOptions.Compiled );
+        Regex netRuntimeSectionRegex = Regexes.DotnetRuntimeSectionRegex( );
         MatchCollection matches = netRuntimeSectionRegex.Matches( _dotnetInfoOutput! );
 
         Assert.Multiple( ( ) =>
