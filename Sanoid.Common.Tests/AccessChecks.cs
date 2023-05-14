@@ -7,20 +7,21 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
 using Sanoid.Common.Posix;
 
 namespace Sanoid.Common.Tests;
 
 [TestFixture]
 [Platform( Exclude = "WIN32NT" )]
-[Explicit( "These tests involve creating and deleting files, zpools, datasets, zvols, and snapshots." )]
-[Category( "Dangerous" )]
-public class DestructivePrerequisiteTests
+[Order( 100 )]
+[NonParallelizable]
+public class AccessChecks
 {
     [OneTimeSetUp]
     public void OneTimeSetup( )
     {
-        string[] programNames = { "cp", "install", "ln", "mkdir", "mv", "pwd", "rm", "zfs", "zpool" };
+        string[] programNames = { "cp", "install", "ln", "mkdir", "mv", "rm", "zfs", "zpool" };
         foreach ( string programName in programNames )
         {
             ProcessStartInfo whichStartInfo = new( "which", programName )
@@ -46,7 +47,6 @@ public class DestructivePrerequisiteTests
     [TestCase( "ln" )]
     [TestCase( "mkdir" )]
     [TestCase( "mv" )]
-    [TestCase( "pwd" )]
     [TestCase( "rm" )]
     [TestCase( "zfs" )]
     [TestCase( "zpool" )]
@@ -54,7 +54,7 @@ public class DestructivePrerequisiteTests
     {
         string programPath = ProgramPathDictionary[ command ];
         Console.Write( $"Checking if user can execute {programPath}: " );
-        int returnValue = NativeFunctions.euidaccess( programPath, UnixFileTestFlags.CanExecute );
+        int returnValue = NativeFunctions.euidaccess( programPath, UnixFileTestMode.Execute );
         Console.Write( returnValue == 0 ? "yes" : "no" );
         Assert.That( returnValue, Is.EqualTo( 0 ), GetExceptionMessageForExecuteCheck( programPath ) );
     }
@@ -82,7 +82,7 @@ public class DestructivePrerequisiteTests
     {
         string canonicalPath = NativeFunctions.canonicalize_file_name( path );
         Console.Write( $"Checking if user can write to {canonicalPath}: " );
-        int returnValue = NativeFunctions.euidaccess( canonicalPath, UnixFileTestFlags.CanWrite );
+        int returnValue = NativeFunctions.euidaccess( canonicalPath, UnixFileTestMode.Write );
         Console.Write( returnValue == 0 ? "yes" : "no" );
         Assert.That( returnValue, Is.EqualTo( 0 ), GetExceptionMessageForWriteCheck( canonicalPath ) );
     }
@@ -91,43 +91,4 @@ public class DestructivePrerequisiteTests
     {
         return $"User cannot write to {path}. Error: {(Errno)Marshal.GetLastPInvokeError( )}";
     }
-
-    [TestFixture]
-    [Category( "Dangerous" )]
-    public class ZfsCommands
-    {
-        [OneTimeSetUp]
-        public void Setup( )
-        {
-        }
-    }
-}
-
-public static class NativeFunctions
-{
-    [DllImport( "libc", CharSet = CharSet.Auto )]
-    public static extern string canonicalize_file_name( string path );
-
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int euidaccess( string pathname, UnixFileTestFlags mode );
-}
-
-[Flags]
-public enum UnixFileTestFlags
-{
-    /// <summary>The file exists</summary>
-    /// <remarks>Equivalent to F_OK in unistd.h</remarks>
-    Exists = 0,
-
-    /// <summary>Allowed to execute the file</summary>
-    /// <remarks>Equivalent to X_OK in unistd.h</remarks>
-    CanExecute = 1,
-
-    /// <summary>Allowed to write to the file</summary>
-    /// <remarks>Equivalent to W_OK in unistd.h</remarks>
-    CanWrite = 2,
-
-    /// <summary>Allowed to read the file</summary>
-    /// <remarks>Equivalent to R_OK in unistd.h</remarks>
-    CanRead = 4
 }
