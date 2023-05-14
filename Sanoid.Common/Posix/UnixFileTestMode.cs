@@ -6,6 +6,10 @@
 
 namespace Sanoid.Common.Posix;
 
+/// <summary>
+/// An enumeration of file modes, in standard unix octal form, for a specific component of a file mode
+/// </summary>
+/// <remarks>Used by functions such as <see cref="NativeMethods.EuidAccess"/></remarks>
 [Flags]
 public enum UnixFileTestMode
 {

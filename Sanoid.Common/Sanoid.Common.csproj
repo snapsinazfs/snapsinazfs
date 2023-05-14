@@ -11,6 +11,7 @@
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 		<BaseOutputPath>bin\</BaseOutputPath>
 		<DebugType>embedded</DebugType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">

@@ -20,8 +20,8 @@ public class DestructiveZfsCommands
     [OneTimeSetUp]
     public void Setup( )
     {
-        thisDirectory = NativeFunctions.CanonicalizeFileName( "." ).Trim( );
-        zpoolFileName = Path.Combine( thisDirectory, "Sanoid.net.test.zpool" );
+        _thisDirectory = NativeMethods.CanonicalizeFileName( "." ).Trim( );
+        _zpoolFileName = Path.Combine( _thisDirectory, "Sanoid.net.test.zpool" );
     }
 
     [OneTimeTearDown]
@@ -29,13 +29,13 @@ public class DestructiveZfsCommands
     {
         if ( _state.HasFlag( TestState.ZpoolDestroyed ) && _state.HasFlag( TestState.ZpoolFileCreated ) )
         {
-            NativeFunctions.Unlink( zpoolFileName );
+            NativeMethods.Unlink( _zpoolFileName );
         }
     }
 
-    public static string thisDirectory;
-    public static string zpoolFileName;
-    public static string zpoolName = "SanoidDotnetTestZpool";
+    private static string _thisDirectory;
+    private static string _zpoolFileName;
+    private const string ZpoolName = "SanoidDotnetTestZpool";
 
     private static TestState _state = TestState.Init;
 
@@ -47,15 +47,15 @@ public class DestructiveZfsCommands
         // other critical operations in tests, so that problems can be reported to the user
 
         // Create a 512MB sparse file (if the file system supports it) that we will make our test zpool on
-        int zpoolFileDescriptor = NativeFunctions.Open( zpoolFileName, UnixFileFlags.O_CREAT | UnixFileFlags.O_TRUNC | UnixFileFlags.O_WRONLY, UnixFileMode.UserRead | UnixFileMode.UserWrite );
+        int zpoolFileDescriptor = NativeMethods.Open( _zpoolFileName, UnixFileFlags.O_CREAT | UnixFileFlags.O_TRUNC | UnixFileFlags.O_WRONLY, UnixFileMode.UserRead | UnixFileMode.UserWrite );
         if ( zpoolFileDescriptor > 0 )
         {
             _state |= TestState.ZpoolFileCreated;
-            int closeReturn = NativeFunctions.Close( zpoolFileDescriptor );
+            int closeReturn = NativeMethods.Close( zpoolFileDescriptor );
             if ( closeReturn == 0 )
             {
                 _state |= TestState.ZpoolFileClosed;
-                int truncateReturn = NativeFunctions.Truncate( zpoolFileName, 536870912L );
+                int truncateReturn = NativeMethods.Truncate( _zpoolFileName, 536870912L );
                 if ( truncateReturn == 0 )
                 {
                     _state |= TestState.ZpoolFileTruncated;
@@ -80,8 +80,8 @@ public class DestructiveZfsCommands
             return;
         }
 
-        Console.WriteLine( $"Creating zpool {zpoolName} on {zpoolFileName}" );
-        ProcessStartInfo zpoolStartInfo = new( "zpool", $"create {zpoolName} {zpoolFileName}" )
+        Console.WriteLine( $"Creating zpool {ZpoolName} on {_zpoolFileName}" );
+        ProcessStartInfo zpoolStartInfo = new( "zpool", $"create {ZpoolName} {_zpoolFileName}" )
         {
             CreateNoWindow = true
         };
@@ -107,8 +107,8 @@ public class DestructiveZfsCommands
             Assert.Inconclusive("Zpool doesn't exist.");
             return;
         }
-        Console.WriteLine( $"Creating dataset {zpoolName}/Dataset1" );
-        ProcessStartInfo zfsProcess = new( "zfs", $"create {zpoolName}/Dataset1" )
+        Console.WriteLine( $"Creating dataset {ZpoolName}/Dataset1" );
+        ProcessStartInfo zfsProcess = new( "zfs", $"create {ZpoolName}/Dataset1" )
         {
             CreateNoWindow = true
         };
@@ -118,7 +118,7 @@ public class DestructiveZfsCommands
             zpoolProcess?.WaitForExit( 10000 );
             if ( zpoolProcess?.ExitCode == 0 )
             {
-                Console.WriteLine( $"Dataset {zpoolName}/Dataset1 created" );
+                Console.WriteLine( $"Dataset {ZpoolName}/Dataset1 created" );
                 _state |= TestState.DatasetCreated;
             }
         }
@@ -135,8 +135,8 @@ public class DestructiveZfsCommands
             Assert.Inconclusive( "Dataset doesn't exist." );
             return;
         }
-        Console.WriteLine( $"Creating snapshot {zpoolName}/Dataset1@snapshot1" );
-        ProcessStartInfo zpoolStartInfo = new( "zfs", $"snapshot {zpoolName}/Dataset1@snapshot1" )
+        Console.WriteLine( $"Creating snapshot {ZpoolName}/Dataset1@snapshot1" );
+        ProcessStartInfo zpoolStartInfo = new( "zfs", $"snapshot {ZpoolName}/Dataset1@snapshot1" )
         {
             CreateNoWindow = true
         };
@@ -146,7 +146,7 @@ public class DestructiveZfsCommands
             zfsProcess?.WaitForExit( 10000 );
             if ( zfsProcess?.ExitCode == 0 )
             {
-                Console.WriteLine( $"Snapshot {zpoolName}/Dataset1@snapshot1 created" );
+                Console.WriteLine( $"Snapshot {ZpoolName}/Dataset1@snapshot1 created" );
                 _state |= TestState.SnapshotCreated;
             }
         }
@@ -163,8 +163,8 @@ public class DestructiveZfsCommands
             Assert.Inconclusive( "Snapshot doesn't exist." );
             return;
         }
-        Console.WriteLine( $"Destroying snapshot {zpoolName}/Dataset1@snapshot1" );
-        ProcessStartInfo zpoolStartInfo = new( "zfs", $"destroy {zpoolName}/Dataset1@snapshot1" )
+        Console.WriteLine( $"Destroying snapshot {ZpoolName}/Dataset1@snapshot1" );
+        ProcessStartInfo zpoolStartInfo = new( "zfs", $"destroy {ZpoolName}/Dataset1@snapshot1" )
         {
             CreateNoWindow = true
         };
@@ -174,7 +174,7 @@ public class DestructiveZfsCommands
             zfsProcess?.WaitForExit( 10000 );
             if ( zfsProcess?.ExitCode == 0 )
             {
-                Console.WriteLine( $"Snapshot {zpoolName}/Dataset1@snapshot1 destroyed" );
+                Console.WriteLine( $"Snapshot {ZpoolName}/Dataset1@snapshot1 destroyed" );
                 _state |= TestState.SnapshotDestroyed;
             }
         }
@@ -192,8 +192,8 @@ public class DestructiveZfsCommands
             return;
         }
 
-        Console.WriteLine( $"Destroying zpool {zpoolName} on {zpoolFileName}" );
-        ProcessStartInfo zpoolStartInfo = new( "zpool", $"destroy -f {zpoolName}" )
+        Console.WriteLine( $"Destroying zpool {ZpoolName} on {_zpoolFileName}" );
+        ProcessStartInfo zpoolStartInfo = new( "zpool", $"destroy -f {ZpoolName}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -204,7 +204,7 @@ public class DestructiveZfsCommands
             zpoolProcess?.WaitForExit( 10000 );
             if ( zpoolProcess?.ExitCode == 0 )
             {
-                Console.WriteLine( $"zpool {zpoolName} destroyed" );
+                Console.WriteLine( $"zpool {ZpoolName} destroyed" );
                 _state |= TestState.ZpoolDestroyed;
             }
         }

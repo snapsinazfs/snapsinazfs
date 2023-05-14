@@ -6,6 +6,7 @@
 
 using System.Reflection;
 using PowerArgs;
+#pragma warning disable CS1591
 
 namespace Sanoid.Common;
 
@@ -13,7 +14,6 @@ namespace Sanoid.Common;
 ///     The command line arguments that sanoid can accept
 /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
-[UsedImplicitly]
 public class CommandLineArguments
 {
     /// <summary>

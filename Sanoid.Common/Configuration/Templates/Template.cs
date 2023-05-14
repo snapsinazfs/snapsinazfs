@@ -228,7 +228,7 @@ public class Template
     ///     all children of that Template, as well.
     /// </summary>
     /// <param name="childConfigurationSection">The <see cref="IConfigurationSection" /> the child will be created from.</param>
-    /// <param name="childTemplateName"/><see cref="Template"/> we're creating the child for a <see cref="Dataset" /> with overrides, use this name.</param>
+    /// <param name="childTemplateName"><see cref="Template"/> we're creating the child for a <see cref="Dataset" /> with overrides, use this name.</param>
     /// <param name="isDatasetOverride">
     ///     Set to <see langword="true" /> if being called to create override settings from a <see cref="Dataset" />.<br />
     ///     Otherwise, false

@@ -89,7 +89,7 @@ public class BasicPrerequisiteTests
         {
             // A few things to assert here.
             // First, that we only got one match. Otherwise I can't guarantee this regex matched something expected.
-            Assert.That( matches.Count, Is.EqualTo( 1 ) );
+            Assert.That( matches, Has.Count.EqualTo( 1 ) );
 
             // If that passed, let's make sure the named group is there and that it's valid
             Assert.Multiple( ( ) =>
@@ -108,7 +108,7 @@ public class BasicPrerequisiteTests
             // This collection contains ONLY the version number from lines that matched with the name Microsoft.NETCore.App #.#.#
             CaptureCollection versionGroupCaptures = versionGroup.Captures;
             // Let's make sure there's something in the collection
-            Assert.That( versionGroupCaptures.Count, Is.GreaterThanOrEqualTo( 1 ) );
+            Assert.That( versionGroupCaptures, Has.Count.GreaterThanOrEqualTo( 1 ) );
             Version[] netCoreAppVersions = versionGroupCaptures.Select( c => new Version( c.Value ) ).ToArray( );
             Assert.That( netCoreAppVersions, Is.Not.Null );
             Assert.That( netCoreAppVersions, Has.Some.GreaterThanOrEqualTo( _minimumSupportedDotnetVersion ) );
@@ -133,7 +133,7 @@ public class BasicPrerequisiteTests
         Assert.Multiple( ( ) =>
         {
             // Like the SDK test, we expect this regex to match exactly once, but have named groups
-            Assert.That( matches.Count, Is.EqualTo( 1 ) );
+            Assert.That( matches, Has.Count.EqualTo( 1 ) );
 
             // If that passed, let's make sure the named group is there and that it's valid
             GroupCollection matchedGroups = matches[ 0 ].Groups;

@@ -16,7 +16,7 @@ public abstract class MonitoringConfigurationBase
     /// <summary>
     ///     Creates a new instance of a <see cref="MonitoringConfigurationBase" />
     /// </summary>
-    /// <param name="monitorName">The key value for the monitor in Sanoid.json#/Monitoring</param>
+    /// <param name="singleMonitorConfigurationSection">The configuration section for the monitor in Sanoid.json#/Monitoring</param>
     protected MonitoringConfigurationBase( IConfigurationSection singleMonitorConfigurationSection )
     {
         MonitorName = singleMonitorConfigurationSection.Key;

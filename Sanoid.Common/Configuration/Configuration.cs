@@ -10,6 +10,7 @@ using PowerArgs;
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
+using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid.Common.Configuration;
 
@@ -48,7 +49,7 @@ public class Configuration
     private bool _takeSnapshots;
 
     private readonly IConfigurationRoot _rootConfiguration;
-    private IZfsCommandRunner _zfsCommandRunner;
+    private readonly IZfsCommandRunner _zfsCommandRunner;
     private IConfigurationSection DatasetsConfigurationSection => _rootConfiguration.GetRequiredSection( "Datasets" );
 
     /// <summary>
