@@ -54,7 +54,7 @@ public class AccessChecks
     {
         string programPath = ProgramPathDictionary[ command ];
         Console.Write( $"Checking if user can execute {programPath}: " );
-        int returnValue = NativeFunctions.euidaccess( programPath, UnixFileTestMode.Execute );
+        int returnValue = NativeFunctions.EuidAccess( programPath, UnixFileTestMode.Execute );
         Console.Write( returnValue == 0 ? "yes" : "no" );
         Assert.That( returnValue, Is.EqualTo( 0 ), GetExceptionMessageForExecuteCheck( programPath ) );
     }
@@ -80,9 +80,9 @@ public class AccessChecks
     [TestCase( "/usr/local/share/Sanoid.net" )]
     public void CheckUserCanWriteTo( string path )
     {
-        string canonicalPath = NativeFunctions.canonicalize_file_name( path );
+        string canonicalPath = NativeFunctions.CanonicalizeFileName( path );
         Console.Write( $"Checking if user can write to {canonicalPath}: " );
-        int returnValue = NativeFunctions.euidaccess( canonicalPath, UnixFileTestMode.Write );
+        int returnValue = NativeFunctions.EuidAccess( canonicalPath, UnixFileTestMode.Write );
         Console.Write( returnValue == 0 ? "yes" : "no" );
         Assert.That( returnValue, Is.EqualTo( 0 ), GetExceptionMessageForWriteCheck( canonicalPath ) );
     }

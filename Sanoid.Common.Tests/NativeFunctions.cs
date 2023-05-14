@@ -5,26 +5,27 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Runtime.InteropServices;
+using Sanoid.Common.Posix;
 
 namespace Sanoid.Common.Tests;
 
-public static class NativeFunctions
+public static partial class NativeFunctions
 {
-    [DllImport( "libc", CharSet = CharSet.Auto )]
-    public static extern string canonicalize_file_name( string path );
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "canonicalize_file_name", SetLastError = true)]
+    public static partial string CanonicalizeFileName( string path );
 
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int euidaccess( string pathname, UnixFileTestMode mode );
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "euidaccess", SetLastError = true)]
+    public static partial int EuidAccess( string pathname, UnixFileTestMode mode );
 
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int truncate( string path, long length );
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "truncate", SetLastError = true)]
+    public static partial int Truncate( string path, long length );
 
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int unlink( string path );
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "unlink", SetLastError = true)]
+    public static partial int Unlink( string path );
 
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int open( string path, UnixFileFlags flags, UnixFileMode mode );
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "open", SetLastError = true)]
+    public static partial int Open( string path, UnixFileFlags flags, UnixFileMode mode );
 
-    [DllImport( "libc", CharSet = CharSet.Auto, SetLastError = true )]
-    public static extern int close( int fd );
+    [LibraryImport( "libc",EntryPoint = "close", SetLastError = true)]
+    public static partial int Close( int fd );
 }

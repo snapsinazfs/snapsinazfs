@@ -20,7 +20,7 @@ public class DestructiveZfsCommands
     [OneTimeSetUp]
     public void Setup( )
     {
-        thisDirectory = NativeFunctions.canonicalize_file_name( "." ).Trim( );
+        thisDirectory = NativeFunctions.CanonicalizeFileName( "." ).Trim( );
         zpoolFileName = Path.Combine( thisDirectory, "Sanoid.net.test.zpool" );
     }
 
@@ -29,7 +29,7 @@ public class DestructiveZfsCommands
     {
         if ( _state.HasFlag( TestState.ZpoolDestroyed ) && _state.HasFlag( TestState.ZpoolFileCreated ) )
         {
-            NativeFunctions.unlink( zpoolFileName );
+            NativeFunctions.Unlink( zpoolFileName );
         }
     }
 
@@ -47,15 +47,15 @@ public class DestructiveZfsCommands
         // other critical operations in tests, so that problems can be reported to the user
 
         // Create a 512MB sparse file (if the file system supports it) that we will make our test zpool on
-        int zpoolFileDescriptor = NativeFunctions.open( zpoolFileName, UnixFileFlags.O_CREAT | UnixFileFlags.O_TRUNC | UnixFileFlags.O_WRONLY, UnixFileMode.UserRead | UnixFileMode.UserWrite );
+        int zpoolFileDescriptor = NativeFunctions.Open( zpoolFileName, UnixFileFlags.O_CREAT | UnixFileFlags.O_TRUNC | UnixFileFlags.O_WRONLY, UnixFileMode.UserRead | UnixFileMode.UserWrite );
         if ( zpoolFileDescriptor > 0 )
         {
             _state |= TestState.ZpoolFileCreated;
-            int closeReturn = NativeFunctions.close( zpoolFileDescriptor );
+            int closeReturn = NativeFunctions.Close( zpoolFileDescriptor );
             if ( closeReturn == 0 )
             {
                 _state |= TestState.ZpoolFileClosed;
-                int truncateReturn = NativeFunctions.truncate( zpoolFileName, 536870912L );
+                int truncateReturn = NativeFunctions.Truncate( zpoolFileName, 536870912L );
                 if ( truncateReturn == 0 )
                 {
                     _state |= TestState.ZpoolFileTruncated;
