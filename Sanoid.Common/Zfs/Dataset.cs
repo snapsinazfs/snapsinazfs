@@ -24,6 +24,9 @@ public class Dataset : IZfsObject
         Kind = kind;
     }
 
+    /// <summary>
+    ///     Gets the <see cref="DatasetKind"/> represented by this <see cref="Dataset"/>
+    /// </summary>
     public DatasetKind Kind { get; }
 
     /// <summary>

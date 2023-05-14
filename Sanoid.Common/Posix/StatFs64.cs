@@ -4,13 +4,22 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+// ReSharper disable FieldCanBeMadeReadOnly.Global
+// ReSharper disable MissingXmlDoc.Global
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable MissingXmlDoc
+
 using System.Runtime.InteropServices;
 
 namespace Sanoid.Common.Posix;
 
+/// <summary>
+///     The data structure returned by a call to <see cref="NativeMethods.StatFs64" />
+/// </summary>
 [StructLayout( LayoutKind.Sequential, CharSet = CharSet.Ansi )]
 public struct StatFs64
 {
+#pragma warning disable CS1591
     public ulong f_type;
     public ulong f_bsize;
     public ulong f_blocks;
@@ -28,4 +37,5 @@ public struct StatFs64
 
     [MarshalAs( UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U8, SizeConst = 4 )]
     public ulong[] f_spare;
+#pragma warning restore CS1591
 }
