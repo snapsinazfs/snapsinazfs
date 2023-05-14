@@ -6,6 +6,7 @@
 
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 namespace Sanoid.Common.Tests;
 
@@ -149,5 +150,12 @@ public class BasicPrerequisiteTests
             Assert.That( netCoreAppVersions, Has.Some.GreaterThanOrEqualTo( _minimumSupportedDotnetVersion ) );
         } );
         Console.Write( "Yes" );
+    }
+
+    [Test]
+    [Order( 6 )]
+    public void CheckPlatformIs64Bit( )
+    {
+        Assert.That( Environment.Is64BitOperatingSystem, Is.True );
     }
 }
