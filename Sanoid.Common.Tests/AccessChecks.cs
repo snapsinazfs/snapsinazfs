@@ -16,6 +16,7 @@ namespace Sanoid.Common.Tests;
 [Order( 100 )]
 [NonParallelizable]
 [Category( "General" )]
+[Category( "Access" )]
 public class AccessChecks
 {
     [OneTimeSetUp]
