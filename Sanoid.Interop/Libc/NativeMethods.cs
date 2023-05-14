@@ -35,6 +35,8 @@ public static partial class NativeMethods
 #pragma warning disable SYSLIB1054
     [DllImport( "libc", EntryPoint = "pthread_attr_init", CharSet = CharSet.Ansi, SetLastError = true )]
     internal static extern int pthread_attr_init( out pthread_attr_t attr );
+    [DllImport( "libc", EntryPoint = "pthread_attr_destroy", CharSet = CharSet.Ansi, SetLastError = true )]
+    internal static extern int pthread_attr_destroy( ref pthread_attr_t attr );
 #pragma warning restore SYSLIB1054
 #pragma warning restore CA2101
 
