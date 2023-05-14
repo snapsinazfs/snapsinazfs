@@ -11,15 +11,35 @@ namespace Sanoid.Common.Configuration.Snapshots;
 /// </summary>
 public interface ISnapshotNamingProvider
 {
-    string Prefix { get; }
+    /// <summary>The string that separates each component of a snapshot name</summary>
     string ComponentSeparator { get; }
-    string TemporarySuffix { get; }
-    string FrequentSuffix { get; }
-    string HourlySuffix { get; }
+
+    /// <summary>The last component of a daily snapshot's name</summary>
     string DailySuffix { get; }
-    string WeeklySuffix { get; }
-    string MonthlySuffix { get; }
-    string YearlySuffix { get; }
+
+    /// <summary>The last component of a frequent snapshot's name</summary>
+    string FrequentSuffix { get; }
+
+    /// <summary>The last component of an hourly snapshot's name</summary>
+    string HourlySuffix { get; }
+
+    /// <summary>The last component of a manual snapshot's name</summary>
     string ManualSuffix { get; }
+
+    /// <summary>The last component of a monthly snapshot's name</summary>
+    string MonthlySuffix { get; }
+
+    /// <summary>The first component of the snapshot name</summary>
+    string Prefix { get; }
+
+    /// <summary>The last component of a temporary snapshot's name</summary>
+    string TemporarySuffix { get; }
+
     IFormatProvider TimestampFormatString { get; set; }
+
+    /// <summary>The last component of a weekly snapshot's name</summary>
+    string WeeklySuffix { get; }
+
+    /// <summary>The last component of a yearly snapshot's name</summary>
+    string YearlySuffix { get; }
 }
