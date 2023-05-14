@@ -31,6 +31,13 @@ public static partial class NativeMethods
 #pragma warning restore SYSLIB1054
 #pragma warning restore CA2101
 
+#pragma warning disable CA2101
+#pragma warning disable SYSLIB1054
+    [DllImport( "libc", EntryPoint = "pthread_attr_init", CharSet = CharSet.Ansi, SetLastError = true )]
+    internal static extern int pthread_attr_init( out pthread_attr_t attr );
+#pragma warning restore SYSLIB1054
+#pragma warning restore CA2101
+
     /// <summary>
     ///     The libc canonicalize_file_name function. Takes a path and returns its canonical form.
     /// </summary>
