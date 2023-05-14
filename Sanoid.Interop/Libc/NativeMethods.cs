@@ -5,8 +5,10 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Runtime.InteropServices;
+using Sanoid.Interop.Libc.Enums;
+using Sanoid.Interop.Libc.Structs;
 
-namespace Sanoid.Common.Posix;
+namespace Sanoid.Interop.Libc;
 
 /// <summary>
 ///     Class for access to system calls

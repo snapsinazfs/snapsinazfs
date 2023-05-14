@@ -6,7 +6,8 @@
 
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Sanoid.Common.Posix;
+using Sanoid.Interop.Libc.Enums;
+using NativeMethods = Sanoid.Interop.Libc.NativeMethods;
 
 namespace Sanoid.Common.Tests;
 

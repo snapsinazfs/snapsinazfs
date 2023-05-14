@@ -9,8 +9,8 @@ using PowerArgs;
 using Sanoid;
 using Sanoid.Common;
 using Sanoid.Common.Configuration;
-using Sanoid.Common.Posix;
 using Sanoid.Common.Zfs;
+using Sanoid.Interop.Libc.Enums;
 
 Logging.ConfigureLogger( );
 

@@ -4,7 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-namespace Sanoid.Common.Posix;
+namespace Sanoid.Interop.Libc.Enums;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
@@ -14,7 +14,7 @@ namespace Sanoid.Common.Posix;
 ///     An enum of POSIX-compliant status codes as defined in errno-base.h and errno.h of Linux kernel version 6.1.9
 ///     headers.
 /// </summary>
-internal enum Errno
+public enum Errno
 {
     /// <summary>No error. Not actually defined in errno.h, but here for nice output in tests and such.</summary>
     None = 0,

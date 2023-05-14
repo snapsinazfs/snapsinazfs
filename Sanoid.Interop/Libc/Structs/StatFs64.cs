@@ -11,13 +11,13 @@
 
 using System.Runtime.InteropServices;
 
-namespace Sanoid.Common.Posix;
+namespace Sanoid.Interop.Libc.Structs;
 
 /// <summary>
 ///     The data structure returned by a call to <see cref="NativeMethods.StatFs64" />
 /// </summary>
-[StructLayout( LayoutKind.Sequential, CharSet = CharSet.Ansi )]
-public struct StatFs64
+[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+public class StatFs64
 {
 #pragma warning disable CS1591
     public ulong f_type;
@@ -28,14 +28,14 @@ public struct StatFs64
     public ulong f_files;
     public ulong f_ffree;
 
-    [MarshalAs( UnmanagedType.ByValArray, ArraySubType = UnmanagedType.I4, SizeConst = 2 )]
+    [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.I4, SizeConst = 2)]
     public int[] f_fsid;
 
     public ulong f_namelen;
     public ulong f_frsize;
     public ulong f_flags;
 
-    [MarshalAs( UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U8, SizeConst = 4 )]
+    [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.U8, SizeConst = 4)]
     public ulong[] f_spare;
 #pragma warning restore CS1591
 }

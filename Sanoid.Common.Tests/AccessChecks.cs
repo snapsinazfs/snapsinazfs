@@ -7,7 +7,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Sanoid.Common.Posix;
+using Sanoid.Interop.Libc;
+using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Common.Tests;
 

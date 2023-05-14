@@ -4,10 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Configuration;
-using Sanoid.Common.Posix;
-
 namespace Sanoid;
 
 internal static class ConfigurationConverter
@@ -69,5 +65,4 @@ internal static class ConfigurationConverter
 
     //    return 0;
     //}
-
 }
