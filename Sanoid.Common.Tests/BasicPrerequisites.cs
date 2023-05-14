@@ -48,8 +48,9 @@ public class BasicPrerequisiteTests
         // version accurately. Even on .net 7.0.105 on linux (what I have on an Ubuntu 22.10 box), the runtime identifies itself as v3.1 (???)
         // So, we're going to slice up the output from `dotnet --info` and look for the .NET SDK section and
         // grab the version string from there to check if it's ok...
-        Console.Write( "Checking dotnet --info" );
-        ProcessStartInfo psi = new( "dotnet", "--info..." )
+        Console.Write( "Checking dotnet --info..." );
+        Console.Out.Flush();
+        ProcessStartInfo psi = new( "dotnet", "--info" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
