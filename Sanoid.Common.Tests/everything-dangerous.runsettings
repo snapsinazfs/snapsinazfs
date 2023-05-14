@@ -1,0 +1,6 @@
+﻿<RunSettings>
+    <NUnit>
+        <ExplicitMode>Relaxed</ExplicitMode>
+        <Where>cat == General or cat == Dangerous</Where>
+    </NUnit>
+</RunSettings>
