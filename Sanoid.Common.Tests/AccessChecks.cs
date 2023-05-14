@@ -7,7 +7,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
 using Sanoid.Common.Posix;
 
 namespace Sanoid.Common.Tests;
@@ -16,6 +15,7 @@ namespace Sanoid.Common.Tests;
 [Platform( Exclude = "WIN32NT" )]
 [Order( 100 )]
 [NonParallelizable]
+[Category( "General" )]
 public class AccessChecks
 {
     [OneTimeSetUp]
