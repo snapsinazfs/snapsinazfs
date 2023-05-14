@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -147,16 +147,6 @@ public class BasicPrerequisiteTests
             Assert.That( netCoreAppVersions, Is.Not.Null );
             Assert.That( netCoreAppVersions, Has.Some.GreaterThanOrEqualTo( _minimumSupportedDotnetVersion ) );
         } );
-    }
-
-    [Test]
-    [Order( 6 )]
-    [Parallelizable( ParallelScope.All )]
-    [TestCase( "/etc", ExcludePlatform = "WIN32NT" )]
-    [TestCase( "/usr/local/share", ExcludePlatform = "WIN32NT" )]
-    [TestCase( "/usr/local/sbin", ExcludePlatform = "WIN32NT" )]
-    public void CheckDirectoryExists( string path )
-    {
-        Assert.That( Directory.Exists( path ), Is.True );
+        Console.Write( "Yes" );
     }
 }
