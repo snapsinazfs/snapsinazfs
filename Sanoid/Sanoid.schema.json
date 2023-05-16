@@ -51,28 +51,28 @@
     "ForcePruneSnapshots": {
       "type": "boolean",
       "description": "If running Sanoid.net will prune expired snapshots by default, even if their parent datasets are currently involved in a send or receive operation",
-      "default": false
+            "default": false
+        },
+        "Formatting": {
+            "$ref": "#/$defs/Formatting"
+        },
+        "Monitoring": {
+            "$ref": "#/$defs/Monitoring"
+        },
+        "PlatformUtilities": {
+            "$ref": "#/$defs/PlatformUtilities"
+        },
+        "Templates": {
+            "$ref": "#/$defs/Templates"
+        },
+        "Datasets": {
+            "$ref": "#/$defs/Datasets"
+        }
     },
-    "Formatting": {
-      "$ref": "#/definitions/Formatting"
-    },
-    "Monitoring": {
-      "$ref": "#/definitions/Monitoring"
-    },
-    "PlatformUtilities": {
-      "$ref": "#/definitions/PlatformUtilities"
-    },
-    "Templates": {
-      "$ref": "#/definitions/Templates"
-    },
-    "Datasets": {
-      "$ref": "#/definitions/Datasets"
-    }
-  },
-  "definitions": {
-    "Datasets": {
-      "type": "object",
-      "description": "Datasets for sanoid to process",
+    "$defs": {
+        "Datasets": {
+            "type": "object",
+            "description": "Datasets for sanoid to process",
       "additionalProperties": {
         "$ref": "Sanoid.dataset.schema.json"
       }
