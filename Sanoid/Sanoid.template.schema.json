@@ -52,57 +52,56 @@
           "default": 15
         },
         "Frequent": {
-          "type": "integer",
-          "description": "How many frequent snapshots to keep for this template.",
-          "default": 0,
-          "minimum": 0
+                    "type": "integer",
+                    "description": "How many frequent snapshots to keep for this template.",
+                    "default": 0,
+                    "minimum": -1
+                },
+                "Hourly": {
+                    "type": "integer",
+                    "description": "How many hourly snapshots to keep for this template.",
+                    "default": 48,
+                    "minimum": -1
+                },
+                "Daily": {
+                    "type": "integer",
+                    "description": "How many daily snapshots to keep for this template.",
+                    "default": 90,
+                    "minimum": -1
+                },
+                "Weekly": {
+                    "type": "integer",
+                    "description": "How many weekly snapshots to keep for this template.",
+                    "default": 0,
+                    "minimum": -1
+                },
+                "Monthly": {
+                    "type": "integer",
+                    "description": "How many monthly snapshots to keep for this template.",
+                    "default": 6,
+                    "minimum": -1
+                },
+                "Yearly": {
+                    "type": "integer",
+                    "description": "How many yearly snapshots to keep for this template.",
+                    "default": 0,
+                    "minimum": -1
+                },
+                "PruneDeferral": {
+                    "type": "integer",
+                    "description": "Pruning can be skipped based on the used capacity of the pool. (0: always prune, 1-100: only prune if used capacity is greater than this value)",
+                    "default": 0,
+                    "maximum": 100,
+                    "minimum": 0
+                }
+            }
         },
-        "Hourly": {
-          "type": "integer",
-          "description": "How many hourly snapshots to keep for this template.",
-          "default": 48,
-          "minimum": 0
-        },
-        "Daily": {
-          "type": "integer",
-          "description": "How many daily snapshots to keep for this template.",
-          "default": 90,
-          "minimum": 0
-        },
-        "Weekly": {
-          "type": "integer",
-          "description": "How many weekly snapshots to keep for this template.",
-          "default": 0,
-          "minimum": 0
-        },
-        "Monthly": {
-          "type": "integer",
-          "description": "How many monthly snapshots to keep for this template.",
-          "default": 6,
-          "minimum": 0
-        },
-        "Yearly": {
-          "type": "integer",
-          "description": "How many yearly snapshots to keep for this template.",
-          "default": 0,
-          "minimum": 0
-        },
-        "PruneDeferral": {
-          "type": "integer",
-          "description": "Pruning can be skipped based on the used capacity of the pool. (0: always prune, 1-100: only prune if used capacity is greater than this value)",
-          "default": 0,
-          "minimum": 0,
-          "maximum": 100
-        }
-      }
-    },
-    "SnapshotTiming": {
-      "type": "object",
-      "description": "The times at which the corresponding snapshot periods will be taken.",
-      "$comment": "Note that we will not take snapshots for a given type if that type is set to 0 in SnapshotRetention, regardless of the autosnap setting. For example, if yearly = 0, we will not take yearly snapshots, even if we've defined a preferred time for yearlies and autosnap is on. If multiple snapshots are scheduled to be taken at the same time of day, they will be taken in order of shortest to longest period, so that a Yearly always contains Monthlies, Monthlies contain Weeklies, and so on.",
-      "properties": {
-        "UseLocalTime": {
-          "type": "boolean",
+        "SnapshotTiming": {
+            "type": "object",
+            "description": "The times at which the corresponding snapshot periods will be taken.",
+            "properties": {
+                "UseLocalTime": {
+                    "type": "boolean",
           "description": "Whether snapshot timing uses local time (true - default) or UTC (false).",
           "default": true
         },
