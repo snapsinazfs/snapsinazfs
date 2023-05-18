@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -16,7 +16,39 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Zfs\Enums\LibZfsError.cs" />
+    <Compile Remove="Zfs\Enums\ZfsBoolean.cs" />
+    <Compile Remove="Zfs\Enums\zfs_type_t.cs" />
+    <Compile Remove="Zfs\libuutil\libuutil_impl\uu_avl.cs" />
+    <Compile Remove="Zfs\libuutil\libuutil_impl\uu_avl_pool.cs" />
+    <Compile Remove="Zfs\libuutil\libuutil_impl\uu_avl_walk.cs" />
+    <Compile Remove="Zfs\libuutil\libuutil_impl\uu_compare_fn_t.cs" />
+    <Compile Remove="Zfs\libzfs\libzfs_impl\libzfs_handle.cs" />
+    <Compile Remove="Zfs\libzfs\libzfs_impl\zfs_handle.cs" />
+    <Compile Remove="Zfs\libzfs\libzfs_impl\zpool_handle.cs" />
+    <Compile Remove="Zfs\libzfs_core\Libzfs_core.cs" />
+    <Compile Remove="Zfs\sys\avl_impl\avl_node.cs" />
+    <Compile Remove="Zfs\sys\avl_impl\avl_tree.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Zfs\Structs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Zfs\Enums\LibZfsError.cs" />
+    <None Include="Zfs\Enums\ZfsBoolean.cs" />
+    <None Include="Zfs\Enums\zfs_type_t.cs" />
+    <None Include="Zfs\libuutil\libuutil_impl\uu_avl.cs" />
+    <None Include="Zfs\libuutil\libuutil_impl\uu_avl_pool.cs" />
+    <None Include="Zfs\libuutil\libuutil_impl\uu_avl_walk.cs" />
+    <None Include="Zfs\libuutil\libuutil_impl\uu_compare_fn_t.cs" />
+    <None Include="Zfs\libzfs\libzfs_impl\libzfs_handle.cs" />
+    <None Include="Zfs\libzfs\libzfs_impl\zfs_handle.cs" />
+    <None Include="Zfs\libzfs\libzfs_impl\zpool_handle.cs" />
+    <None Include="Zfs\libzfs_core\Libzfs_core.cs" />
+    <None Include="Zfs\sys\avl_impl\avl_node.cs" />
+    <None Include="Zfs\sys\avl_impl\avl_tree.cs" />
   </ItemGroup>
 
 </Project>

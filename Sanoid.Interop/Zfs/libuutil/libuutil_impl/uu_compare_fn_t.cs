@@ -4,10 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-namespace Sanoid.Interop.Zfs.Enums;
+namespace Sanoid.Interop.Zfs.libuutil.libuutil_impl;
 
-public enum boolean_t
-{
-    False = 0,
-    True = 1
-}
+public unsafe delegate int uu_compare_fn_t( void* __left, void* __right, void* __private );

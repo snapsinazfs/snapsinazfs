@@ -6,8 +6,13 @@
 
 namespace Sanoid.Interop.Zfs.Enums;
 
-public enum boolean_t
+public enum zfs_type_t
 {
-    False = 0,
-    True = 1
+    ZFS_TYPE_INVALID = 0,
+    ZFS_TYPE_FILESYSTEM = 1 << 0,
+    ZFS_TYPE_SNAPSHOT = 1 << 1,
+    ZFS_TYPE_VOLUME = 1 << 2,
+    ZFS_TYPE_POOL = 1 << 3,
+    ZFS_TYPE_BOOKMARK = 1 << 4,
+    ZFS_TYPE_VDEV = 1 << 5
 }
