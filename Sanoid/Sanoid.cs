@@ -36,7 +36,17 @@ if ( argParseReults.Args.Version )
     return 0;
 }
 
-ConfigurationValidators.ValidateSanoidConfigurationSchema( );
+
+// Now, let's validate the configuration files against the configuration schema documents.
+// Any exception will be logged and the program will terminate with status 22 (EINVAL)
+try
+{
+    ConfigurationValidators.ValidateSanoidConfigurationSchema( );
+}
+catch
+{
+    return (int)Errno.EINVAL;
+}
 
 // Configuration is built in the following order from various sources.
 // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
