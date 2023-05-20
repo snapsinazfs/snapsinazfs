@@ -33,21 +33,21 @@ public class CommandLineArguments
 
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]
-    public bool Cron { get; set; }
+    public bool? Cron { get; set; }
 
     [ArgDescription( "Debug level output logging. Change log level in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]
     [ArgCantBeCombinedWith( "Verbose|Quiet|ReallyQuiet" )]
-    public bool Debug { get; set; }
+    public bool? Debug { get; set; }
 
     [ArgDescription( "Prunes expired snapshots, even if their parent datasets are currently involved in a send or receive operation. Implies --prune-snapshots as well." )]
     [ArgShortcut( "--force-prune" )]
     [ArgShortcut( "--force-prune-snapshots" )]
-    public bool ForcePrune { get; set; }
+    public bool? ForcePrune { get; set; }
 
     [ArgDescription( "This clears out sanoid's zfs snapshot listing cache. This is normally not needed." )]
     [ArgShortcut( "--force-update" )]
-    public bool ForceUpdate { get; set; }
+    public bool? ForceUpdate { get; set; }
 
     [ArgDescription( "Shows this help" )]
     [ArgShortcut( "-h" )]
@@ -58,38 +58,38 @@ public class CommandLineArguments
     [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in the sanoid.conf file." )]
     [ArgShortcut( "--monitor-capacity" )]
     [ArgShortcut( "--monitor-capacity-nagios" )]
-    public bool MonitorCapacity { get; set; }
+    public bool? MonitorCapacity { get; set; }
 
     [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on. It only monitors filesystems that are configured in the sanoid.conf file." )]
     [ArgShortcut( "--monitor-health" )]
     [ArgShortcut( "--monitor-health-nagios" )]
-    public bool MonitorHealth { get; set; }
+    public bool? MonitorHealth { get; set; }
 
     [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the health of your snapshots." )]
     [ArgShortcut( "--monitor-snapshots" )]
     [ArgShortcut( "--monitor-snapshots-nagios" )]
-    public bool MonitorSnapshots { get; set; }
+    public bool? MonitorSnapshots { get; set; }
 
     [ArgDescription( "Prunes expired snapshots, except for snapshots of datasets currently involved in a send or receive operation." )]
     [ArgShortcut( "--prune-snapshots" )]
-    public bool PruneSnapshots { get; set; }
+    public bool? PruneSnapshots { get; set; }
 
     [ArgDescription( "Suppress non-error output. WILL WARN BEFORE SETTING IS APPLIED. Configure in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "--quiet" )]
     [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
-    public bool Quiet { get; set; }
+    public bool? Quiet { get; set; }
 
     [ArgDescription( "Skip creation/deletion of snapshots (Simulate)." )]
     [ArgShortcut( "--readonly" )]
     [ArgShortcut( "--read-only" )]
     [ArgShortcut( "--dryrun" )]
     [ArgShortcut( "--dry-run" )]
-    public bool ReadOnly { get; set; }
+    public bool? ReadOnly { get; set; }
 
     [ArgDescription( "No output logging. Change log level to Off in Sanoid.nlog.json to set for normal usage. Will not warn when used." )]
     [ArgShortcut( "--really-quiet" )]
     [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
-    public bool ReallyQuiet { get; set; }
+    public bool? ReallyQuiet { get; set; }
 
     [ArgDescription( "Runtime directory for sanoid" )]
     [ArgShortcut( "--run-dir" )]
@@ -97,19 +97,19 @@ public class CommandLineArguments
 
     [ArgDescription( "Will make sanoid take snapshots, but will not prune unless --prune-snapshots is also specified." )]
     [ArgShortcut( "--take-snapshots" )]
-    public bool TakeSnapshots { get; set; }
+    public bool? TakeSnapshots { get; set; }
 
     [ArgDescription( "Trace level output logging. Change log level in Sanoid.nlog.json for normal usage. Has no effect until configuration is parsed." )]
     [ArgShortcut( "--trace" )]
     [ArgCantBeCombinedWith( "Verbose|Debug|Quiet|ReallyQuiet" )]
-    public bool Trace { get; set; }
+    public bool? Trace { get; set; }
 
     [ArgDescription( "Verbose (Info level) output logging. Change log level in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "v" )]
     [ArgShortcut( "--verbose" )]
     [ArgEnforceCase]
     [ArgCantBeCombinedWith( "Debug|Quiet|ReallyQuiet" )]
-    public bool Verbose { get; set; }
+    public bool? Verbose { get; set; }
 
     [ArgDescription( "Outputs Sanoid.net version to configured logging targets and exits, making no changes." )]
     [ArgShortcut( "V" )]
@@ -130,32 +130,32 @@ public class CommandLineArguments
             return;
         }
 
-        if ( ReallyQuiet )
+        if ( ReallyQuiet ?? false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
         }
 
-        if ( Quiet )
+        if ( Quiet ?? false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Error, LogLevel.Fatal ) );
         }
 
-        if ( Verbose )
+        if ( Verbose ?? false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Info, LogLevel.Fatal ) );
         }
 
-        if ( Debug )
+        if ( ( Debug ?? false ) )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Debug, LogLevel.Fatal ) );
         }
 
-        if ( Trace )
+        if ( Trace??false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Trace, LogLevel.Fatal ) );
         }
 
-        if ( ReallyQuiet || Quiet || Verbose || Debug || Trace )
+        if ( (ReallyQuiet??false) || (Quiet??false) || (Verbose??false) || (Debug??false) || (Trace??false) )
         {
             LogManager.ReconfigExistingLoggers( );
         }
