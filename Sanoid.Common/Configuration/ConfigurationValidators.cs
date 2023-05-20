@@ -123,10 +123,11 @@ public static class ConfigurationValidators
         {
             if ( !File.Exists( filePath ) )
             {
+                Logger.Debug( "File {filePath} does not exist. Skipping validation for {filePath}.", filePath );
                 continue;
             }
 
-            Logger.Debug( "Validating {0} configuration file.", filePath );
+            Logger.Debug( "Validating configuration file {filePath}.", filePath );
             EvaluationResults configValidationResults = isRootConfig switch
             {
                 true => sanoidBaseConfigJsonSchema.Evaluate( JsonDocument.Parse( File.ReadAllText( filePath ) ), evaluationOptions ),
