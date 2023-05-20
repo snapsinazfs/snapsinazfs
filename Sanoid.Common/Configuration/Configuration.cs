@@ -396,19 +396,48 @@ public class Configuration
 
             if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Read ) != 0 )
             {
-                string cantReadCacheDirMessage = $"CacheDir {canonicalCacheDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
-                _logger.Error( cantReadCacheDirMessage );
-                throw new UnauthorizedAccessException( cantReadCacheDirMessage );
+                string cantReadDirMessage = $"CacheDir {canonicalCacheDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantReadDirMessage );
+                throw new UnauthorizedAccessException( cantReadDirMessage );
             }
 
             if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Write ) != 0 )
             {
-                string cantWriteCacheDirMessage = $"CacheDir {canonicalCacheDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
-                _logger.Error( cantWriteCacheDirMessage );
-                throw new UnauthorizedAccessException( cantWriteCacheDirMessage );
+                string cantWriteDirMessage = $"CacheDir {canonicalCacheDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantWriteDirMessage );
+                throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
             CacheDirectory = args.CacheDir;
+            _logger.Debug( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
-        _logger.Debug("{0}",JsonSerializer.Serialize(argParseReults.Value,new JsonSerializerOptions(){DefaultIgnoreCondition = JsonIgnoreCondition.Never, ReferenceHandler = ReferenceHandler.Preserve, WriteIndented = true} )) ;
+
+        if ( !string.IsNullOrEmpty( args.RunDir ) )
+        {
+            _logger.Debug( "RunDir argument specified. Value: {0}.", args.RunDir );
+            string canonicalRunDirPath = NativeMethods.CanonicalizeFileName( args.RunDir );
+            _logger.Debug( "RunDir canonical path: {0}.", canonicalRunDirPath );
+            if( !Directory.Exists( canonicalRunDirPath ))
+            {
+                string badDirectoryMessage = $"RunDir argument value {canonicalRunDirPath} is a non-existent directory. Program will terminate.";
+                _logger.Error( badDirectoryMessage );
+                throw new DirectoryNotFoundException( badDirectoryMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalRunDirPath, UnixFileTestMode.Read ) != 0 )
+            {
+                string cantReadDirMessage = $"RunDir {canonicalRunDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantReadDirMessage );
+                throw new UnauthorizedAccessException( cantReadDirMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalRunDirPath, UnixFileTestMode.Write ) != 0 )
+            {
+                string cantWriteDirMessage = $"RunDir {canonicalRunDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantWriteDirMessage );
+                throw new UnauthorizedAccessException( cantWriteDirMessage );
+            }
+            RunDirectory = args.RunDir;
+            _logger.Debug( "RunDirectory is now {0}", canonicalRunDirPath );
+        }
     }
 }
