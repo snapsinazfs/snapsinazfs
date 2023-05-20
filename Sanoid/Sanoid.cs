@@ -18,9 +18,21 @@ Logging.ConfigureLogger( );
 // Desired logging parameters should be set in Sanoid.nlog.json
 Logger logger = LogManager.GetCurrentClassLogger( );
 
+
 // PowerArgs takes over execution to parse command-line arguments.
 // We're going to cheat and let it parse and then deal with the aftermath.
 ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
+
+if ( argParseReults is null )
+{
+    logger.Debug( "Arg parse results object was null. Exiting." );
+    return 0;
+}
+if(argParseReults.Args is null )
+{
+    logger.Debug( "args object was null. Exiting." );
+    return 0;
+}
 
 // If PowerArgs cancelled the parser invocation, either it handled the help method or it encountered an error.
 // Either way, exit now.
