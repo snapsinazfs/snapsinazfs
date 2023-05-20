@@ -261,12 +261,7 @@ public class Configuration
         #else
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}";
         #endif
-            Dataset newDs = new( dsName )
-            {
-                Enabled = false,
-                IsInConfiguration = false,
-                Parent = Datasets[ parentDsName ]
-            };
+            Dataset newDs = new( dsName, Datasets[ parentDsName ] );
             Datasets.TryAdd( newDs.VirtualPath, newDs );
             if ( newDs.IsPool )
             {
