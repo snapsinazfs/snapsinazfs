@@ -15,21 +15,6 @@ namespace Sanoid.Common;
 public static class BaseClassExtensions
 {
     /// <summary>
-    ///     Gets the string representation of this <see cref="DateTimeOffset" />, formatted according to configuration in
-    ///     Sanoid.json.
-    /// </summary>
-    /// <param name="dt">The <see cref="DateTimeOffset" /> being formatted as a string.</param>
-    /// <param name="namingProvider">
-    ///     The format string or other <see cref="IFormatProvider" /> to format this DateTimeOffset
-    ///     with.
-    /// </param>
-    /// <returns>A string representation of <paramref name="dt" />, formatted according to configuration in Sanoid.json.</returns>
-    public static string ToSnapshotDateTimeString( this DateTimeOffset dt, ISnapshotNamingProvider namingProvider )
-    {
-        return dt.ToString( namingProvider.TimestampFormatString );
-    }
-
-    /// <summary>
     ///     Attempts to convert the current string to a <see cref="bool" /> value.<br />
     /// </summary>
     /// <param name="value"></param>

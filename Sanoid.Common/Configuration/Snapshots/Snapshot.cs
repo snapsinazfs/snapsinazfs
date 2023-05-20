@@ -13,12 +13,16 @@ namespace Sanoid.Common.Configuration.Snapshots;
 /// <seealso cref="DateTimeOffset" />
 public class Snapshot
 {
-    public Snapshot(ISnapshotNamingProvider namingProvider)
+    /// <summary>
+    /// Creates a new Snapshot configuration object, with the specified <see cref="SnapshotNamingProvider"/>
+    /// </summary>
+    /// <param name="namingProvider"></param>
+    public Snapshot(SnapshotNamingProvider namingProvider)
     {
         _namingProvider = namingProvider;
     }
 
-    private readonly ISnapshotNamingProvider _namingProvider;
+    private readonly SnapshotNamingProvider _namingProvider;
 
     /// <summary>
     ///     Gets the full name of this <see cref="Snapshot" />, using configured formatting options.
@@ -42,19 +46,25 @@ public class Snapshot
     ///     A <see langword="string" /> representing the name of the snapshot, without the <see cref="ZfsPath" /> component
     ///     or the @ symbol
     /// </value>
-    public string ShortName =>
-        Period switch
+    public string ShortName
+    {
+        get
         {
-            SnapshotPeriod.Temporary => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.TemporarySuffix}",
-            SnapshotPeriod.Frequent => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.FrequentSuffix}",
-            SnapshotPeriod.Hourly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.HourlySuffix}",
-            SnapshotPeriod.Daily => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.DailySuffix}",
-            SnapshotPeriod.Weekly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.WeeklySuffix}",
-            SnapshotPeriod.Monthly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.MonthlySuffix}",
-            SnapshotPeriod.Yearly => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.YearlySuffix}",
-            SnapshotPeriod.Manual => $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToSnapshotDateTimeString(_namingProvider)}{_namingProvider.ComponentSeparator}{_namingProvider.ManualSuffix}",
-            _ => throw new InvalidOperationException()
-        };
+            string withoutSuffix = $"{_namingProvider.Prefix}{_namingProvider.ComponentSeparator}{Timestamp.ToString( _namingProvider.TimestampFormatString )}{_namingProvider.ComponentSeparator}";
+            return Period switch
+            {
+                SnapshotPeriod.Temporary => $"{withoutSuffix}{_namingProvider.TemporarySuffix}",
+                SnapshotPeriod.Frequent => $"{withoutSuffix}{_namingProvider.FrequentSuffix}",
+                SnapshotPeriod.Hourly => $"{withoutSuffix}{_namingProvider.HourlySuffix}",
+                SnapshotPeriod.Daily => $"{withoutSuffix}{_namingProvider.DailySuffix}",
+                SnapshotPeriod.Weekly => $"{withoutSuffix}{_namingProvider.WeeklySuffix}",
+                SnapshotPeriod.Monthly => $"{withoutSuffix}{_namingProvider.MonthlySuffix}",
+                SnapshotPeriod.Yearly => $"{withoutSuffix}{_namingProvider.YearlySuffix}",
+                SnapshotPeriod.Manual => $"{withoutSuffix}{_namingProvider.ManualSuffix}",
+                _ => throw new InvalidOperationException( )
+            };
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the absolute timestamp of this <see cref="Snapshot" />, as a <see cref="DateTimeOffset" />.<br />
