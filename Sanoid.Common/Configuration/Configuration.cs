@@ -7,7 +7,6 @@
 using Microsoft.Extensions.Configuration;
 using NLog.Config;
 using PowerArgs;
-using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
 using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
@@ -25,10 +24,10 @@ public class Configuration
     // we touch anything else in this class, that is fine.
 #pragma warning disable CS8618
     /// <summary>
-    /// Creates a new instance of a <see cref="Configuration"/> object, using the specified IConfigurationRoot
+    ///     Creates a new instance of a <see cref="Configuration" /> object, using the specified IConfigurationRoot
     /// </summary>
     /// <param name="rootConfiguration">The root configuration, which conforms to Sanoid.net's configuration schema</param>
-    /// <param name="zfsCommandRunner">The <see cref="IZfsCommandRunner"/> that will call ZFS native commands</param>
+    /// <param name="zfsCommandRunner">The <see cref="IZfsCommandRunner" /> that will call ZFS native commands</param>
     public Configuration( IConfigurationRoot rootConfiguration, IZfsCommandRunner zfsCommandRunner )
     {
         _rootConfiguration = rootConfiguration;
@@ -41,11 +40,10 @@ public class Configuration
 
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
     private bool _pruneSnapshots;
-    private bool _takeSnapshots;
 
     private readonly IConfigurationRoot _rootConfiguration;
+    private bool _takeSnapshots;
     private readonly IZfsCommandRunner _zfsCommandRunner;
-    private IConfigurationSection DatasetsConfigurationSection => _rootConfiguration.GetRequiredSection( "Datasets" );
 
     /// <summary>
     ///     Gets or sets sanoid's cache path.<br />
@@ -94,12 +92,15 @@ public class Configuration
     }
 
     /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Dataset" />s, indexed by <see langword="string" />.
+    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Datasets.Dataset" />s, indexed by
+    ///     <see langword="string" />.
     /// </summary>
     /// <remarks>
     ///     First element added should be the virtual root Dataset.
     /// </remarks>
     public Dictionary<string, Dataset> Datasets { get; } = new( );
+
+    private IConfigurationSection DatasetsConfigurationSection => _rootConfiguration.GetRequiredSection( "Datasets" );
 
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
@@ -117,7 +118,7 @@ public class Configuration
             LogLevel? lowestLogLevel = LogManager.Configuration!.LoggingRules.Min( rule => rule.Levels.Min( ) );
             if ( lowestLogLevel is null )
             {
-                _logger.Debug( message: "No logging levels set. Setting to {0}", LogLevel.Info.Name );
+                _logger.Debug( "No logging levels set. Setting to {0}", LogLevel.Info.Name );
                 lowestLogLevel = LogLevel.Info;
             }
 
@@ -127,7 +128,7 @@ public class Configuration
         set
         {
             _logger.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
-            _logger.Debug( message: "Setting minimum log severity to {0} for ALL rules.", value.Name );
+            _logger.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
                 LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
@@ -189,6 +190,9 @@ public class Configuration
     /// <value>A <see langword="string" /> indicating the path for sanoid-generated runtime files</value>
     public string RunDirectory { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the naming policy to use for snapshots.
+    /// </summary>
     public SnapshotNaming SnapshotNaming { get; set; }
 
     /// <summary>
@@ -238,7 +242,7 @@ public class Configuration
         // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            _logger.Debug( message: "Processing dataset {0}.", dsName );
+            _logger.Debug( "Processing dataset {0}.", dsName );
         #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
@@ -252,7 +256,7 @@ public class Configuration
                 Parent = Datasets[ parentDsName ]
             };
             Datasets.TryAdd( newDs.VirtualPath, newDs );
-            _logger.Debug( message: "Dataset {0} added to dictionary.", dsName );
+            _logger.Debug( "Dataset {0} added to dictionary.", dsName );
         }
     }
 
@@ -264,7 +268,7 @@ public class Configuration
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( ( _, Dataset? ds ) in Datasets )
         {
-            _logger.Debug( message: "Processing dataset {0}", ds.Path );
+            _logger.Debug( "Processing dataset {0}", ds.Path );
             if ( ds.Path == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
@@ -362,6 +366,11 @@ public class Configuration
         _logger.Debug( "Root level configuration initialized." );
     }
 
+    /// <summary>
+    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+    ///     the CLI
+    /// </summary>
+    /// <param name="argParseReults"></param>
     public void SetValuesFromArgs( ArgAction<CommandLineArguments> argParseReults )
     {
         //TODO: Might move to using the .net configuration providers to parse the arguments, instead of PowerArgs.
