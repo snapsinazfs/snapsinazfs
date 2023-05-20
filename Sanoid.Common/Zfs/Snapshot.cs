@@ -29,6 +29,4 @@ public class Snapshot : IZfsObject
 
     /// <inheritdoc />
     public IZfsObject? Parent { get; }
-
-    public Template? Template { get; set; }
 }

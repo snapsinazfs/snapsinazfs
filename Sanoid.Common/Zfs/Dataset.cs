@@ -48,7 +48,4 @@ public class Dataset : IZfsObject
 
     /// <inheritdoc />
     public IZfsObject Parent { get; set; }
-
-    /// <inheritdoc />
-    public Template? Template { get; set; }
 }

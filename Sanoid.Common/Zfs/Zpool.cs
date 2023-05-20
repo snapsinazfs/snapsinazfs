@@ -16,5 +16,4 @@ internal class Zpool : IZfsObject
 
     public string Name { get; set; }
     public IZfsObject? Parent => null;
-    public Template? Template { get; set; }
 }

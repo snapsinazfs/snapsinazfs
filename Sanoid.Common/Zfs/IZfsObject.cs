@@ -35,9 +35,4 @@ public interface IZfsObject
     /// Otherwise, a reference to the parent <see cref="IZfsObject"/>
     /// </value>
     IZfsObject? Parent { get; }
-
-    /// <summary>
-    /// Gets or sets the <see cref="Template"/>, if any, that will be used for snapshots for this <see cref="IZfsObject"/>
-    /// </summary>
-    Template? Template { get; set; }
 }
