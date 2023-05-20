@@ -22,11 +22,12 @@ public class Template
     private Template( IConfigurationSection configurationSection, string? nameOverride = null, Template? parent = null )
     {
         string templateName = nameOverride ?? configurationSection.Key;
+        string configurationSectionPath = configurationSection.Path;
         Logger.Debug( "Creating new template {templateName}", templateName );
         if ( configurationSection.Key == "default" && parent is null )
         {
             // Creating the default template.
-            Logger.Debug( "Getting configuration for default template. Hard-coded fallback values will be used for missing or invalid values." );
+            Logger.Debug( "Getting configuration for default template at {configurationSectionPath}. Hard-coded fallback values will be used for missing or invalid values.", configurationSectionPath );
             Name = "default";
             AutoPrune = configurationSection.GetBoolean( "AutoPrune", true );
             AutoSnapshot = configurationSection.GetBoolean( "AutoSnapshot", true );
@@ -85,7 +86,8 @@ public class Template
 
         // Initialize values to the same as the parent
         // Inheritance will be handled by a subsequent call to SetConfigurationOverrides
-        Logger.Trace( "Cloning settings from template {name} as initial values for template {templateName}", parent.Name, templateName );
+        string parentTemplateConfigPath = parent.MyConfigurationSection.Path;
+        Logger.Trace( "Cloning settings from template {name} at {parentTemplateConfigPath} as initial values for template {templateName} at {configurationSectionPath}", parent.Name, parentTemplateConfigPath, templateName, configurationSectionPath );
         Name = templateName;
         Parent = parent;
         SnapshotRetention = parent.SnapshotRetention;
