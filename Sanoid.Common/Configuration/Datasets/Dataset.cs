@@ -28,7 +28,7 @@ public class Dataset
     /// <summary>
     ///     Gets a collection of all child Datasets, indexed by their ZFS paths.
     /// </summary>
-    public Dictionary<string, Dataset> Children { get; } = new( );
+    public SortedDictionary<string, Dataset> Children { get; } = new( );
 
     /// <summary>
     ///     Gets or sets if this Dataset is enabled for explicit processing or not.
@@ -39,6 +39,10 @@ public class Dataset
     ///     Gets or sets whether this dataset exists explicitly in the configuration
     /// </summary>
     public bool IsInConfiguration { get; set; }
+
+    public bool IsPool => !IsRoot && _parent!.IsRoot;
+
+    private bool IsRoot { get; init; }
 
     /// <summary>
     ///     Gets or sets the parent of this Dataset
@@ -91,8 +95,24 @@ public class Dataset
         {
             Template = defaultTemplate,
             Enabled = false,
-            Parent = null
+            Parent = null,
+            IsRoot = true
         };
         return Root;
+    }
+
+    internal Dataset? GetFirstWanted( bool includeSelf = true )
+    {
+        if ( includeSelf && Enabled && ( IsInConfiguration || Template.AutoSnapshot ) )
+        {
+            return this;
+        }
+
+        foreach ( ( string childVPath, Dataset childDs ) in Children )
+        {
+            return childDs.GetFirstWanted( true );
+        }
+
+        return null;
     }
 }

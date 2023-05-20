@@ -113,6 +113,12 @@ Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
 sanoidConfiguration.LoadConfigurationFromIConfiguration( );
 sanoidConfiguration.SetValuesFromArgs( argParseReults );
 
+if ( sanoidConfiguration.TakeSnapshots )
+{
+    logger.Debug("TakeSnapshots is true.");
+    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration );
+}
+
 logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
 logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );

@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -165,6 +166,13 @@ public class Configuration
     public bool DryRun { get; set; }
 
     /// <summary>
+    ///     Gets or sets the maximum number of threads Sanoid.net may attempt to use when taking new snapshots
+    /// </summary>
+    public int MaxSnapshotThreads { get; set; } = 1;
+
+    internal ConcurrentDictionary<string, Dataset> Pools { get; } = new( );
+
+    /// <summary>
     ///     Gets or sets whether Sanoid.net should prune expired snapshots.
     /// </summary>
     /// <value>
@@ -260,6 +268,11 @@ public class Configuration
                 Parent = Datasets[ parentDsName ]
             };
             Datasets.TryAdd( newDs.VirtualPath, newDs );
+            if ( newDs.IsPool )
+            {
+                Pools.TryAdd( newDs.VirtualPath, newDs );
+            }
+
             _logger.Debug( "Dataset {0} added to dictionary.", dsName );
         }
     }
@@ -378,8 +391,8 @@ public class Configuration
     public void SetValuesFromArgs( ArgAction<CommandLineArguments> argParseReults )
     {
         //TODO: Might move to using the .net configuration providers to parse the arguments, instead of PowerArgs.
-        _logger.Debug("Overriding settings from command line.");
-        _logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args,new JsonSerializerOptions(){DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull} ) );
+        _logger.Debug( "Overriding settings from command line." );
+        _logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
         // Let's go through all args in an order that makes sense
         CommandLineArguments args = argParseReults.Args;
         if ( !string.IsNullOrEmpty( args.CacheDir ) )
@@ -387,7 +400,7 @@ public class Configuration
             _logger.Debug( "CacheDir argument specified. Value: {0}.", args.CacheDir );
             string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
             _logger.Debug( "CacheDir canonical path: {0}.", canonicalCacheDirPath );
-            if( !Directory.Exists( canonicalCacheDirPath ))
+            if ( !Directory.Exists( canonicalCacheDirPath ) )
             {
                 string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
                 _logger.Error( badDirectoryMessage );
@@ -407,6 +420,7 @@ public class Configuration
                 _logger.Error( cantWriteDirMessage );
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
+
             CacheDirectory = args.CacheDir;
             _logger.Debug( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
@@ -416,7 +430,7 @@ public class Configuration
             _logger.Debug( "RunDir argument specified. Value: {0}.", args.RunDir );
             string canonicalRunDirPath = NativeMethods.CanonicalizeFileName( args.RunDir );
             _logger.Debug( "RunDir canonical path: {0}.", canonicalRunDirPath );
-            if( !Directory.Exists( canonicalRunDirPath ))
+            if ( !Directory.Exists( canonicalRunDirPath ) )
             {
                 string badDirectoryMessage = $"RunDir argument value {canonicalRunDirPath} is a non-existent directory. Program will terminate.";
                 _logger.Error( badDirectoryMessage );
@@ -436,6 +450,7 @@ public class Configuration
                 _logger.Error( cantWriteDirMessage );
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
+
             RunDirectory = args.RunDir;
             _logger.Debug( "RunDirectory is now {0}", canonicalRunDirPath );
         }
