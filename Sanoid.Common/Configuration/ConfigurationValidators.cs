@@ -151,5 +151,6 @@ public static class ConfigurationValidators
                 throw new ConfigurationValidationException( $"{filePath} validation failed. Please check {filePath} and ensure it complies with the schema specified in Sanoid.{( isRootConfig ? string.Empty : "local." )}schema.json." );
             }
         }
+        Logger.Debug( "Configuration schema validation successful" );
     }
 }
