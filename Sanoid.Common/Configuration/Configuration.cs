@@ -280,8 +280,8 @@ public class Configuration
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( ( _, Dataset? ds ) in Datasets )
         {
-            _logger.Debug( "Processing dataset {0}", ds.Path );
-            if ( ds.Path == "/" )
+            _logger.Debug( "Processing dataset {0}", ds.VirtualPath );
+            if ( ds.VirtualPath == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
                 continue;
@@ -290,6 +290,7 @@ public class Configuration
             IConfigurationSection section = DatasetsConfigurationSection.GetSection( ds.Path );
             if ( section.Exists( ) )
             {
+                _logger.Debug( "Dataset {0} is explicitly configured.", ds.Path );
                 // Dataset exists in configuration. Set configured settings and inherit everything else
                 ds.IsInConfiguration = true;
                 ds.Enabled = section.GetBoolean( "Enabled", true );
@@ -302,12 +303,15 @@ public class Configuration
                     _logger.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
                     ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds, Templates );
                 }
+
+                _logger.Debug( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve } ) );
             }
             else
             {
                 // Dataset is not explicitly configured. Inherit relevant properties from parent only.
                 ds.Enabled = ds.Parent!.Enabled;
                 ds.Template = ds.Parent.Template;
+                _logger.Debug( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
             }
         }
 
