@@ -42,6 +42,7 @@ public class Dataset
     /// <summary>
     ///     Gets a collection of all child Datasets, indexed by their ZFS paths.
     /// </summary>
+    [JsonIgnore( Condition = JsonIgnoreCondition.Always )]
     public SortedDictionary<string, Dataset> Children { get; } = new( );
 
     /// <summary>
@@ -119,15 +120,36 @@ public class Dataset
 
     internal Dataset? GetFirstWanted( bool includeSelf = true )
     {
-        if ( includeSelf && Enabled && ( IsInConfiguration || Template.AutoSnapshot ) )
+        Logger.Debug( includeSelf ? "Getting first wanted of {0}, including self." : "Getting first wanted child of {0}", Path );
+
+        if ( includeSelf )
         {
-            return this;
+            Logger.Debug( "includeSelf true while searching for first wanted of {0}.", Path );
+            if ( Enabled )
+            {
+                Logger.Debug( "Enabled is true while searching for first wanted of {0}.", Path );
+                if ( IsInConfiguration )
+                {
+                    Logger.Debug( "IsInConfiguration is true while searching for first wanted of {0}. Returning {0}.", Path );
+                    return this;
+                }
+
+                if ( Template.AutoSnapshot )
+                {
+                    Logger.Debug( "Template.AutoSnapshot is true while searching for first wanted of {0}. Returning {0}.", Path );
+                    return this;
+                }
+                Logger.Debug( "Neither Template.AutoSnapshot nor IsInConfiguration is true while searching for first wanted of {0}. {0} not a match.", Path );
+            }
+            Logger.Debug( "Enabled is false for {0} while searching for first wanted. {0} not a match.", Path );
         }
 
+        Logger.Debug( "{0} itself is not a match. Checking all children.", Path );
         foreach ( ( string childVPath, Dataset childDs ) in Children )
         {
             return childDs.GetFirstWanted( );
         }
+        Logger.Debug( "No match found in {0} or any of its children.", Path );
 
         return null;
     }

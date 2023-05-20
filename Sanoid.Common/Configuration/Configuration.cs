@@ -254,7 +254,7 @@ public class Configuration
         // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            _logger.Debug( "Processing dataset {0}.", dsName );
+            _logger.Debug( "Processing dataset {0} from zfs list.", dsName );
         #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
@@ -303,8 +303,6 @@ public class Configuration
                     _logger.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
                     ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds, Templates );
                 }
-
-                _logger.Debug( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve } ) );
             }
             else
             {
@@ -313,6 +311,8 @@ public class Configuration
                 ds.Template = ds.Parent.Template;
                 _logger.Debug( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
             }
+
+            _logger.Debug( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull} ) );
         }
 
         _logger.Debug( "Dataset options configured." );
@@ -454,9 +454,9 @@ public class Configuration
             _logger.Debug( "RunDirectory is now {0}", canonicalRunDirPath );
         }
 
-        if ( args.TakeSnapshots is not null)
+        if ( args.TakeSnapshots is not null )
         {
-            _logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots);
+            _logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
 
             TakeSnapshots = args.TakeSnapshots!.Value;
             _logger.Debug( "TakeSnapshots is now {0}", TakeSnapshots );

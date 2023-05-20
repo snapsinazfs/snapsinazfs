@@ -20,8 +20,9 @@ internal static class SnapshotTasks
         Logger.Debug( "Building Dataset queue for snapshots" );
         foreach ( ( string _, Dataset pool ) in config.Pools )
         {
-            Logger.Debug( "Looking for first wanted dataset in pool {0}", pool.Path );
-            if ( pool.GetFirstWanted( ) is { } processRootDs )
+            Logger.Debug( "Looking for first wanted dataset in pool {0} with children {1}", pool.Path, string.Join( ",", pool.Children.Keys ) );
+            Dataset? processRootDs = pool.GetFirstWanted( );
+            if ( processRootDs != null )
             {
                 Logger.Debug( "{0} is highest-level wanted dataset in pool {1}. Adding to queue.",processRootDs.Path, pool.Path );
                 wantedRoots.Enqueue( processRootDs );
