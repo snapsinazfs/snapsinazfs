@@ -26,14 +26,16 @@ ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArgu
 // Either way, exit now.
 if ( argParseReults.Cancelled )
 {
-    return 0;
+    logger.Trace( "Help method invoked by command-line argument. Exiting with status {0}.", Errno.ECANCELED );
+    return (int)Errno.ECANCELED;
 }
 
 // Version output handled by the PowerArgs parser invocation, to avoid unnecessary further setup.
 // Can just exit now without doing anything else.
 if ( argParseReults.Args.Version )
 {
-    return 0;
+    logger.Trace( "Version method invoked by command-line argument. Exiting with status {0}.", Errno.ECANCELED );
+    return (int)Errno.ECANCELED;
 }
 
 
@@ -45,6 +47,7 @@ try
 }
 catch
 {
+    logger.Trace( "Configuration validation threw exception. Exiting with status {0}.", Errno.EINVAL );
     return (int)Errno.EINVAL;
 }
 
@@ -64,6 +67,7 @@ catch
 // 5. Environment variables prefixed with 'Sanoid.net:' and following standard .net configuration nomenclature from there
 // 6. Command-line arguments passed on invocation of Sanoid.net
 
+logger.Debug( "Building base configuration from files and environment variables." );
 IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #if WINDOWS
                                        .AddJsonFile( "Sanoid.json", true, false )
@@ -78,11 +82,21 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #endif
                                        .Build( );
 
+
+Type zfsCommandRunnerType;
 #if WINDOWS
-IZfsCommandRunner zfsCommandRunner = new DummyZfsCommandRunner( );
+zfsCommandRunnerType = typeof( DummyZfsCommandRunner );
 #else
-IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( rootConfiguration.GetRequiredSection( "PlatformUtilities" ) );
+zfsCommandRunnerType = typeof( ZfsCommandRunner );
 #endif
+logger.Debug( "Creating ZFS command runner of type {0}.", zfsCommandRunnerType);
+
+if ( Activator.CreateInstance( zfsCommandRunnerType, rootConfiguration.GetRequiredSection( "PlatformUtilities" ) ) is not IZfsCommandRunner zfsCommandRunner )
+{
+    logger.Error( "ZFS command runner of type {0} was unable to be created. Program will terminate." );
+    return (int)Errno.EINVAL;
+}
+
 Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
 sanoidConfiguration.LoadConfigurationFromIConfiguration( );
 sanoidConfiguration.SetValuesFromArgs( argParseReults );
