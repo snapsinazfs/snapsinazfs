@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -16,6 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Libc\Structs\StatFs64.cs" />
     <Compile Remove="Zfs\Enums\LibZfsError.cs" />
     <Compile Remove="Zfs\Enums\ZfsBoolean.cs" />
     <Compile Remove="Zfs\Enums\zfs_type_t.cs" />
@@ -36,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Libc\Structs\StatFs64.cs" />
     <None Include="Zfs\Enums\LibZfsError.cs" />
     <None Include="Zfs\Enums\ZfsBoolean.cs" />
     <None Include="Zfs\Enums\zfs_type_t.cs" />

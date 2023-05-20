@@ -6,7 +6,6 @@
 
 using System.Runtime.InteropServices;
 using Sanoid.Interop.Libc.Enums;
-using Sanoid.Interop.Libc.Structs;
 
 namespace Sanoid.Interop.Libc;
 
@@ -15,31 +14,6 @@ namespace Sanoid.Interop.Libc;
 /// </summary>
 public static partial class NativeMethods
 {
-    /// <summary>
-    ///     Gets file system information
-    /// </summary>
-    /// <param name="path">Any valid path on the file system to stat</param>
-    /// <param name="buf">A <see cref="StatFs64" /> struct containing the results of the method call, if successful.</param>
-    /// <returns>
-    ///     0 if successful.<br />
-    ///     -1 on error, and LastError will be set.
-    /// </returns>
-#pragma warning disable CA2101
-#pragma warning disable SYSLIB1054
-    [DllImport( "libc", EntryPoint = "statfs64", CharSet = CharSet.Ansi, SetLastError = true )]
-    internal static extern int StatFs64( string path, out StatFs64 buf );
-#pragma warning restore SYSLIB1054
-#pragma warning restore CA2101
-
-#pragma warning disable CA2101
-#pragma warning disable SYSLIB1054
-    [DllImport( "libc", EntryPoint = "pthread_attr_init", CharSet = CharSet.Ansi, SetLastError = true )]
-    internal static extern int pthread_attr_init( out pthread_attr_t attr );
-    [DllImport( "libc", EntryPoint = "pthread_attr_destroy", CharSet = CharSet.Ansi, SetLastError = true )]
-    internal static extern int pthread_attr_destroy( ref pthread_attr_t attr );
-#pragma warning restore SYSLIB1054
-#pragma warning restore CA2101
-
     /// <summary>
     ///     The libc canonicalize_file_name function. Takes a path and returns its canonical form.
     /// </summary>
