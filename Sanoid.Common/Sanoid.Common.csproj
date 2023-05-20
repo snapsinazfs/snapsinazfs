@@ -52,6 +52,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Using Include="NLog" />
 		<Using Include="JetBrains.Annotations" />
 	</ItemGroup>
