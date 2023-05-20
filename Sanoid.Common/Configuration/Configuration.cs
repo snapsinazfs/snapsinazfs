@@ -454,5 +454,13 @@ public class Configuration
             RunDirectory = args.RunDir;
             _logger.Debug( "RunDirectory is now {0}", canonicalRunDirPath );
         }
+
+        if ( args.TakeSnapshots is not null)
+        {
+            _logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots);
+
+            TakeSnapshots = args.TakeSnapshots!.Value;
+            _logger.Debug( "TakeSnapshots is now {0}", TakeSnapshots );
+        }
     }
 }
