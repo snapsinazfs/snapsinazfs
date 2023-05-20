@@ -23,6 +23,20 @@ public class Dataset
         Path = path;
     }
 
+    /// <summary>
+    ///     Creates a new instance of a Dataset having the specified path and parent Dataset.<br />
+    ///     Adds the new dataset to <paramref name="parent" />'s Children collection automatically.
+    /// </summary>
+    /// <param name="path">The zfs path of the new dataset</param>
+    /// <param name="parent">The parent dataset of the new dataset. Must not be null.</param>
+    public Dataset( string path, Dataset parent )
+    {
+        Logger.Debug( "Creating new Dataset {0} with parent {1}", path, parent.VirtualPath );
+        Path = path;
+        _parent = parent;
+        _parent.Children.TryAdd( VirtualPath, this );
+    }
+
     private readonly Dataset? _parent;
 
     /// <summary>
@@ -83,6 +97,8 @@ public class Dataset
     /// </summary>
     public string VirtualPath => Path == "/" ? "/" : $"/{Path}";
 
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <summary>
     ///     Gets the root <see cref="Dataset" />, which is a dummy Dataset that serves as the single root for all ZFS pools.
     /// </summary>
@@ -110,7 +126,7 @@ public class Dataset
 
         foreach ( ( string childVPath, Dataset childDs ) in Children )
         {
-            return childDs.GetFirstWanted( true );
+            return childDs.GetFirstWanted( );
         }
 
         return null;
