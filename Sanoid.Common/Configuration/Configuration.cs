@@ -4,11 +4,15 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using NLog.Config;
 using PowerArgs;
 using Sanoid.Common.Configuration.Templates;
 using Sanoid.Common.Zfs;
+using Sanoid.Interop.Libc;
+using Sanoid.Interop.Libc.Enums;
 using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid.Common.Configuration;
@@ -374,5 +378,37 @@ public class Configuration
     public void SetValuesFromArgs( ArgAction<CommandLineArguments> argParseReults )
     {
         //TODO: Might move to using the .net configuration providers to parse the arguments, instead of PowerArgs.
+        _logger.Debug("Overriding settings from command line.");
+        _logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args,new JsonSerializerOptions(){DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull} ) );
+        // Let's go through all args in an order that makes sense
+        CommandLineArguments args = argParseReults.Args;
+        if ( !string.IsNullOrEmpty( args.CacheDir ) )
+        {
+            _logger.Debug( "CacheDir argument specified. Value: {0}.", args.CacheDir );
+            string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
+            _logger.Debug( "CacheDir canonical path: {0}.", canonicalCacheDirPath );
+            if( !Directory.Exists( canonicalCacheDirPath ))
+            {
+                string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
+                _logger.Error( badDirectoryMessage );
+                throw new DirectoryNotFoundException( badDirectoryMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Read ) != 0 )
+            {
+                string cantReadCacheDirMessage = $"CacheDir {canonicalCacheDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantReadCacheDirMessage );
+                throw new UnauthorizedAccessException( cantReadCacheDirMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Write ) != 0 )
+            {
+                string cantWriteCacheDirMessage = $"CacheDir {canonicalCacheDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
+                _logger.Error( cantWriteCacheDirMessage );
+                throw new UnauthorizedAccessException( cantWriteCacheDirMessage );
+            }
+            CacheDirectory = args.CacheDir;
+        }
+        _logger.Debug("{0}",JsonSerializer.Serialize(argParseReults.Value,new JsonSerializerOptions(){DefaultIgnoreCondition = JsonIgnoreCondition.Never, ReferenceHandler = ReferenceHandler.Preserve, WriteIndented = true} )) ;
     }
 }
