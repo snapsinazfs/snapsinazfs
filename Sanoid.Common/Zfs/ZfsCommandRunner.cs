@@ -6,7 +6,7 @@
 
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Configuration;
+using Sanoid.Common.Configuration.Templates;
 
 namespace Sanoid.Common.Zfs;
 
@@ -15,9 +15,13 @@ namespace Sanoid.Common.Zfs;
 public class ZfsCommandRunner : IZfsCommandRunner
 {
     /// <summary>
-    /// Creates a new instance of the standard <see cref="ZfsCommandRunner"/> class, which uses configured platform commands to get information from ZFS
+    ///     Creates a new instance of the standard <see cref="ZfsCommandRunner" /> class, which uses configured platform
+    ///     commands to get information from ZFS
     /// </summary>
-    /// <param name="platformUtilitiesConfigurationSection">An IConfigurationSection referring directly to a "PlatformUtilities" section of Sanoid.net's configuration.</param>
+    /// <param name="platformUtilitiesConfigurationSection">
+    ///     An IConfigurationSection referring directly to a
+    ///     "PlatformUtilities" section of Sanoid.net's configuration.
+    /// </param>
     public ZfsCommandRunner( IConfigurationSection platformUtilitiesConfigurationSection )
     {
         _platformUtilitiesConfigurationSection = platformUtilitiesConfigurationSection;
@@ -65,5 +69,26 @@ public class ZfsCommandRunner : IZfsCommandRunner
         }
 
         return dataSets;
+    }
+
+    /// <summary>
+    ///     Calls zfs snapshot to create a snapshot of <paramref name="snapshotParent" />.
+    /// </summary>
+    /// <remarks>
+    ///     The <see cref="IZfsObject" /> provided in <paramref name="snapshotParent" /> is expected to be fully configured,
+    ///     with all<br />
+    ///     associated <see cref="Template" />s applied and the full tree path of parents back to a <see cref="Zpool" />
+    ///     already built.
+    /// </remarks>
+    /// <param name="config"></param>
+    /// <param name="snapshotParent"></param>
+    public void ZfsSnapshot( IConfigurationSection config, IZfsObject snapshotParent )
+    {
+        _logger.Debug("Calling `zfs snapshot {0}`");
+        ProcessStartInfo zfsSnapshotStartInfo = new( _platformUtilitiesConfigurationSection[ "zfs" ]!, $"snapshot {snapshotParent.FullName}@{snapshotParent}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
     }
 }

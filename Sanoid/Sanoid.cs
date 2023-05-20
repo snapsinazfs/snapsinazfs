@@ -6,9 +6,11 @@
 
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
+using Sanoid;
 using Sanoid.Common;
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Zfs;
+using Sanoid.Interop.Libc.Enums;
 
 Logging.ConfigureLogger( );
 
@@ -66,7 +68,7 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #endif
                                        .Build( );
 
-#if !WINDOWS
+#if WINDOWS
 IZfsCommandRunner zfsCommandRunner = new DummyZfsCommandRunner( );
 #else
 IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( rootConfiguration.GetRequiredSection( "PlatformUtilities" ) );

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Sanoid.Common.Configuration.Templates;
 
 namespace Sanoid.Common.Zfs;
 internal class Zpool : IZfsObject
@@ -15,4 +16,5 @@ internal class Zpool : IZfsObject
 
     public string Name { get; set; }
     public IZfsObject? Parent => null;
+    public Template? Template { get; set; }
 }

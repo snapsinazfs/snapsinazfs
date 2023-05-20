@@ -4,6 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using Sanoid.Common.Configuration.Templates;
+
 namespace Sanoid.Common.Zfs;
 
 /// <summary>
@@ -33,4 +35,9 @@ public interface IZfsObject
     /// Otherwise, a reference to the parent <see cref="IZfsObject"/>
     /// </value>
     IZfsObject? Parent { get; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="Template"/>, if any, that will be used for snapshots for this <see cref="IZfsObject"/>
+    /// </summary>
+    Template? Template { get; set; }
 }

@@ -89,6 +89,10 @@ public class ConfigurationTests
 
     private class MockZfsCommandRunner : IZfsCommandRunner
     {
+        public void ZfsSnapshot( IConfigurationSection config, IZfsObject snapshotParent )
+        {
+            throw new NotImplementedException( );
+        }
     }
 
     [Test]
