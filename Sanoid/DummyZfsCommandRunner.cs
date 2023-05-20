@@ -10,7 +10,11 @@ namespace Sanoid;
 
 internal class DummyZfsCommandRunner : IZfsCommandRunner
 {
-    public DummyZfsCommandRunner( )
+    /// <summary>
+    ///     Creates a new instance of a dummy command runner that never actually runs ZFS commands.
+    /// </summary>
+    /// <param name="ignoredConfigurationSection">IGNORED</param>
+    public DummyZfsCommandRunner( IConfigurationSection? ignoredConfigurationSection )
     {
         Logger.Warn( "USING DUMMY ZFS COMMAND RUNNER. NO REAL ZFS COMMANDS WILL BE EXECUTED." );
     }
