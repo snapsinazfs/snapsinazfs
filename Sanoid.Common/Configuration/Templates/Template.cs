@@ -33,6 +33,7 @@ public class Template
             AutoSnapshot = configurationSection.GetBoolean( "AutoSnapshot", true );
             Recursive = configurationSection.GetBoolean( "Recursive", false );
             SkipChildren = configurationSection.GetBoolean( "SkipChildren", false );
+            MyConfigurationSection = configurationSection;
 
             Logger.Trace( "Getting SnapshotRetention for default template." );
             IConfigurationSection snapshotRetentionConfigurationSection = configurationSection.GetRequiredSection( "SnapshotRetention" );
