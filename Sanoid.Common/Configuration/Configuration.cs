@@ -255,7 +255,7 @@ public class Configuration
         // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            _logger.Debug( "Processing dataset {0} from zfs list.", dsName );
+            _logger.Trace( "Processing dataset {0} from zfs list.", dsName );
         #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
