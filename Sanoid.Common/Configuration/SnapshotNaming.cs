@@ -186,4 +186,28 @@ public class SnapshotNaming
     [JsonIgnore( Condition = JsonIgnoreCondition.Never )]
     [JsonRequired]
     public string YearlySuffix => _snapshotNamingConfigurationSection[ "YearlySuffix" ] ?? "yearly";
+
+    /// <summary>
+    /// Gets a snapshot name, following the rules in this instance of <see cref="SnapshotNaming"/>
+    /// </summary>
+    /// <param name="period">Which kind of snapshot we are taking</param>
+    /// <param name="timestamp">The timestamp that will be passed to the formatter</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public string GetSnapshotName( SnapshotPeriod period,DateTimeOffset timestamp )
+    {
+        string everythingButSuffix = $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}";
+        return period switch
+        {
+            SnapshotPeriod.Daily => $"{everythingButSuffix}{DailySuffix}",
+            SnapshotPeriod.Monthly => $"{everythingButSuffix}{MonthlySuffix}",
+            SnapshotPeriod.Temporary => $"{everythingButSuffix}{TemporarySuffix}",
+            SnapshotPeriod.Frequent => $"{everythingButSuffix}{FrequentSuffix}",
+            SnapshotPeriod.Hourly => $"{everythingButSuffix}{HourlySuffix}",
+            SnapshotPeriod.Weekly => $"{everythingButSuffix}{WeeklySuffix}",
+            SnapshotPeriod.Yearly => $"{everythingButSuffix}{YearlySuffix}",
+            SnapshotPeriod.Manual => $"{everythingButSuffix}{ManualSuffix}",
+            _ => throw new ArgumentOutOfRangeException( nameof( period ), period, null )
+        };
+    }
 }
