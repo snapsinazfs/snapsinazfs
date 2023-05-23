@@ -10,7 +10,7 @@ namespace Sanoid.Common.Configuration.Monitoring;
 
 internal class Configuration
 {
-    internal Configuration( IConfigurationSection monitoringConfigurationSection )
+    internal Configuration( IConfiguration monitoringConfigurationSection )
     {
         MonitorConfigurations = new( );
         foreach ( IConfigurationSection section in monitoringConfigurationSection.GetChildren( ) )
