@@ -313,7 +313,8 @@ public class Configuration
                 _logger.Debug( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
             }
 
-            _logger.Debug( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull} ) );
+            _logger.Debug( "Finished configuring dataset {0}", ds.Path );
+            _logger.Trace( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
         }
 
         _logger.Debug( "Dataset options configured." );
