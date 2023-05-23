@@ -7,6 +7,7 @@
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Zfs;
+using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid.Common.Tests.Configuration;
 
@@ -93,13 +94,18 @@ public class ConfigurationTests
         {
             throw new NotImplementedException( );
         }
+
+        public void ZfsSnapshot( Dataset snapshotParent, string snapshotName )
+        {
+            throw new NotImplementedException( );
+        }
     }
 
     [Test]
     [Order( 4 )]
     public void CanConstructConfigurationObject( )
     {
-        _sanoidConfiguration = new Common.Configuration.Configuration( _fileLocalConfiguration, new MockZfsCommandRunner( ) );
+        _sanoidConfiguration = new( _fileLocalConfiguration, new MockZfsCommandRunner( ) );
 
         Assert.Multiple( ( ) =>
         {
