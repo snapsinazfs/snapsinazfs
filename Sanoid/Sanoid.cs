@@ -113,6 +113,7 @@ if ( Activator.CreateInstance( zfsCommandRunnerType, rootConfiguration.GetRequir
 Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
 sanoidConfiguration.LoadConfigurationFromIConfiguration( );
 sanoidConfiguration.SetValuesFromArgs( argParseReults );
+sanoidConfiguration.TrimUnwantedDatasetsFromRunningConfiguration( );
 
 if ( sanoidConfiguration.TakeSnapshots )
 {

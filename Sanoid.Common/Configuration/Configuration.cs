@@ -463,4 +463,14 @@ public class Configuration
             _logger.Debug( "TakeSnapshots is now {0}", TakeSnapshots );
         }
     }
+
+    public void TrimUnwantedDatasetsFromRunningConfiguration( )
+    {
+        _logger.Debug( "Pruning all unwanted Datasets from running configuration." );
+        foreach ( ( string? k, Dataset? ds ) in Datasets )
+        {
+            ds.TrimUnwantedChildren(Datasets);
+        }
+        _logger.Debug( "Finished pruning all unwanted Datasets from running configuration." );
+    }
 }
