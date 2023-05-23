@@ -117,8 +117,9 @@ sanoidConfiguration.TrimUnwantedDatasetsFromRunningConfiguration( );
 
 if ( sanoidConfiguration.TakeSnapshots )
 {
-    logger.Debug("TakeSnapshots is true.");
-    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, DateTimeOffset.Now );
+    DateTimeOffset currentTimestamp = DateTimeOffset.Now;
+    logger.Debug("TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}.",currentTimestamp);
+    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
 }
 else
 {
