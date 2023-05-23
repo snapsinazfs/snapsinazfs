@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -35,8 +36,8 @@ public class Configuration
     /// <param name="zfsCommandRunner">The <see cref="IZfsCommandRunner" /> that will call ZFS native commands</param>
     public Configuration( IConfigurationRoot rootConfiguration, IZfsCommandRunner zfsCommandRunner )
     {
-        _rootConfiguration = rootConfiguration;
-        _zfsCommandRunner = zfsCommandRunner;
+        RootConfiguration = rootConfiguration;
+        ZfsCommandRunner = zfsCommandRunner;
         //Instance = this;
     }
 #pragma warning restore CS8618
@@ -46,9 +47,9 @@ public class Configuration
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
     private bool _pruneSnapshots;
 
-    private readonly IConfigurationRoot _rootConfiguration;
+    internal readonly IConfigurationRoot RootConfiguration;
     private bool _takeSnapshots;
-    private readonly IZfsCommandRunner _zfsCommandRunner;
+    internal readonly IZfsCommandRunner ZfsCommandRunner;
 
     /// <summary>
     ///     Gets or sets sanoid's cache path.<br />
@@ -97,15 +98,15 @@ public class Configuration
     }
 
     /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of <see cref="Datasets.Dataset" />s, indexed by
+    ///     Gets a <see cref="SortedDictionary{TKey,TValue}" /> of <see cref="Datasets.Dataset" />s, indexed by
     ///     <see langword="string" />.
     /// </summary>
     /// <remarks>
     ///     First element added should be the virtual root Dataset.
     /// </remarks>
-    public Dictionary<string, Dataset> Datasets { get; } = new( );
+    public SortedDictionary<string, Dataset> Datasets { get; } = new( );
 
-    private IConfigurationSection DatasetsConfigurationSection => _rootConfiguration.GetRequiredSection( "Datasets" );
+    private IConfigurationSection DatasetsConfigurationSection => RootConfiguration.GetRequiredSection( "Datasets" );
 
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
@@ -248,7 +249,7 @@ public class Configuration
         // First, add the virtual root dataset, with the provided template
         Datasets.Add( "/", Dataset.GetRoot( defaultTemplateForRoot ) );
 
-        List<string> zfsListResults = _zfsCommandRunner.ZfsListAll( );
+        ImmutableSortedSet<string> zfsListResults = ZfsCommandRunner.ZfsListAll( );
         // List is returned in the form of a path tree already, so we can just scan the list linearly
         // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
         // Datasets dictionary
@@ -346,7 +347,7 @@ public class Configuration
     }
 
     /// <summary>
-    ///     Loads Sanoid.net's configuration from the various sources combined in <see cref="_rootConfiguration" />
+    ///     Loads Sanoid.net's configuration from the various sources combined in <see cref="RootConfiguration" />
     /// </summary>
     public void LoadConfigurationFromIConfiguration( )
     {
@@ -356,7 +357,7 @@ public class Configuration
         // Template configuration initialization
         _logger.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        _rootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
+        RootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
         defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection _ );
         defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection _ );
 
@@ -373,12 +374,12 @@ public class Configuration
     private void GetBaseConfiguration( )
     {
         _logger.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
-        CacheDirectory = _rootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
-        ConfigurationPathBase = _rootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
-        RunDirectory = _rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
-        TakeSnapshots = _rootConfiguration.GetBoolean( "TakeSnapshots" );
-        PruneSnapshots = _rootConfiguration.GetBoolean( "PruneSnapshots" );
-        SnapshotNaming = new( _rootConfiguration.GetRequiredSection( "Formatting" ).GetRequiredSection( "SnapshotNaming" ) );
+        CacheDirectory = RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        ConfigurationPathBase = RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        RunDirectory = RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        TakeSnapshots = RootConfiguration.GetBoolean( "TakeSnapshots" );
+        PruneSnapshots = RootConfiguration.GetBoolean( "PruneSnapshots" );
+        SnapshotNaming = new( RootConfiguration.GetRequiredSection( "Formatting" ).GetRequiredSection( "SnapshotNaming" ) );
         _logger.Debug( "Root level configuration initialized." );
     }
 
