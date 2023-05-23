@@ -32,13 +32,16 @@ public interface IZfsCommandRunner
     /// </remarks>
     ImmutableSortedSet<string> ZfsListAll( )
     {
-        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union(new []{ "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" });
+        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union( new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" } );
         LogManager.GetCurrentClassLogger( ).Warn( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize( dataSets ) );
         return dataSets;
     }
 
     /// <summary>
-    /// Calls ZFS snapshot, using the provided configuration and parameters
+    ///     Calls ZFS snapshot, using the provided configuration and parameters
     /// </summary>
-    void ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName );
+    /// <returns>
+    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
+    /// </returns>
+    bool ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName );
 }

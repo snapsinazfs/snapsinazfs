@@ -95,9 +95,9 @@ public class ConfigurationTests
             throw new NotImplementedException( );
         }
 
-        public void ZfsSnapshot( Dataset snapshotParent, string snapshotName )
+        public bool ZfsSnapshot( Dataset snapshotParent, string snapshotName )
         {
-            throw new NotImplementedException( );
+            return true;
         }
     }
 

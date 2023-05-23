@@ -83,7 +83,7 @@ public class ZfsCommandRunner : IZfsCommandRunner
     /// </remarks>
     /// <param name="snapshotParent"></param>
     /// <param name="snapshotName"></param>
-    public void ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName )
+    public bool ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName )
     {
         string zfsCommand = _platformUtilitiesConfigurationSection[ "zfs" ]!;
         string arguments = $"snapshot {snapshotParent.Path}@{snapshotName}";
@@ -93,9 +93,19 @@ public class ZfsCommandRunner : IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
-        using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
+        try
         {
-            snapshotProcess?.WaitForExit( );
+            using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
+            {
+                snapshotProcess?.WaitForExit( );
+            }
+
+            return true;
+        }
+        catch ( Exception e )
+        {
+            _logger.Error( "Error running {0} {1}. Snapshot may not exist.", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments, e );
+            return false;
         }
     }
 }
