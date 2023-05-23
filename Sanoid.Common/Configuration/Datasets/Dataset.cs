@@ -122,7 +122,7 @@ public class Dataset
         return Root;
     }
 
-    internal void TrimUnwantedChildren(ConcurrentDictionary<string,Dataset> allDatasets )
+    internal void TrimUnwantedChildren(SortedDictionary<string,Dataset> allDatasets )
     {
         Logger.Debug( "Pruning unwanted children of Dataset {0}", Path );
         ReadOnlyDictionary<string, Dataset> readOnlyDictionary = Children.AsReadOnly();
@@ -134,7 +134,7 @@ public class Dataset
                 Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from parent.", child.Path );
                 Children.Remove( childKey );
                 Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from global collection.", child.Path );
-                if ( !allDatasets.TryRemove( childKey, out _ ) )
+                if ( !allDatasets.Remove( childKey, out _ ) )
                 {
                     Logger.Error( "Dataset {0} could not be removed from the global collection.", child.Path );
                 }
