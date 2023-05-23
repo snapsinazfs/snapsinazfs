@@ -4,8 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Immutable;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace Sanoid.Common.Zfs;
 
@@ -30,9 +30,9 @@ public interface IZfsCommandRunner
     ///     <see cref="IZfsCommandRunner" /><br />
     ///     in new classes.
     /// </remarks>
-    List<string> ZfsListAll( )
+    ImmutableSortedSet<string> ZfsListAll( )
     {
-        List<string> dataSets = new( ) { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" };
+        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union(new []{ "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" });
         LogManager.GetCurrentClassLogger( ).Warn( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize( dataSets ) );
         return dataSets;
     }
@@ -40,5 +40,5 @@ public interface IZfsCommandRunner
     /// <summary>
     /// Calls ZFS snapshot, using the provided configuration and parameters
     /// </summary>
-    void ZfsSnapshot( IConfigurationSection config, IZfsObject snapshotParent );
+    void ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName );
 }

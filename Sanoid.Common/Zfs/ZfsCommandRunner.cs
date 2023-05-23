@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Immutable;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration.Templates;
@@ -31,9 +32,9 @@ public class ZfsCommandRunner : IZfsCommandRunner
     private readonly IConfigurationSection _platformUtilitiesConfigurationSection;
 
     /// <inheritdoc />
-    public List<string> ZfsListAll( )
+    public ImmutableSortedSet<string> ZfsListAll( )
     {
-        List<string> dataSets = new( );
+        ImmutableSortedSet<string>.Builder dataSets = ImmutableSortedSet<string>.Empty.ToBuilder( );
         ProcessStartInfo zfsListStartInfo = new( _platformUtilitiesConfigurationSection[ "zfs" ]!, "list -o name -t filesystem,volume -Hr" )
         {
             CreateNoWindow = true,
@@ -68,7 +69,7 @@ public class ZfsCommandRunner : IZfsCommandRunner
             _logger.Debug( "zfs list process finished" );
         }
 
-        return dataSets;
+        return dataSets.ToImmutable( );
     }
 
     /// <summary>
