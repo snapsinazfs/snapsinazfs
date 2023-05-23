@@ -5,6 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Text.Json;
+
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Configuration.Datasets;
 using Sanoid.Common.Configuration.Snapshots;
@@ -13,30 +15,61 @@ namespace Sanoid;
 
 internal static class SnapshotTasks
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    internal static void TakeAllConfiguredSnapshots( Configuration config )
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    internal static void TakeAllConfiguredSnapshots( Configuration config, SnapshotPeriod period, DateTimeOffset timestamp )
     {
         ConcurrentQueue<Dataset> wantedRoots = new( );
         Logger.Debug( "Building Dataset queue for snapshots" );
-        foreach ( ( string _, Dataset pool ) in config.Pools )
+        foreach ( (string _, Dataset dataset) in config.Datasets )
         {
-            Logger.Debug( "Looking for first wanted dataset in pool {0} with children {1}", pool.Path, string.Join( ",", pool.Children.Keys ) );
-            Dataset? processRootDs = pool.GetFirstWanted( );
-            if ( processRootDs != null )
+            Logger.Debug( "Checking dataset {0} for inclusion.", dataset.Path );
+            switch ( dataset )
             {
-                Logger.Debug( "{0} is highest-level wanted dataset in pool {1}. Adding to queue.",processRootDs.Path, pool.Path );
-                wantedRoots.Enqueue( processRootDs );
-                continue;
+                case { Template.AutoSnapshot: true, Enabled: true }:
+                    {
+                        Logger.Debug( "{0} is wanted for snapshots. Checking period.", dataset.Path );
+                        if ( dataset.IsWantedForPeriod( period ) )
+                        {
+                            Logger.Debug( "{0} is wanted for period. Adding to queue.", dataset.Path );
+                            wantedRoots.Enqueue( dataset );
+                            continue;
+                        }
+                        Logger.Debug( "{0} is not wanted for period.", dataset.Path );
+                    }
+                    break;
+                case { Enabled: false }:
+                    {
+                        Logger.Debug( "{0} is not enabled for snapshots.", dataset.Path );
+                    }
+                    break;
+                case { Template: null }:
+                    {
+                        Logger.Debug( "Dataset {0} has no Template. Skipping." );
+                    }
+                    break;
+                default:
+                    {
+                        Logger.Error( "Dataset {0} did not match any expected conditions. Exiting.",dataset.Path );
+                        wantedRoots.Clear();
+                        throw new InvalidOperationException( $"Dataset {dataset.Path} did not match any expected conditions. Exiting." );
+                    }
+                    break;
             }
-
-            Logger.Debug( "Neither {0} nor any of its children are wanted for snapshots.", pool.Path );
         }
+
         Logger.Debug( "Finished building Dataset queue for snapshots" );
+        Logger.Debug( "SnapshotQueue: {0}", JsonSerializer.Serialize( wantedRoots.Select( wr => wr.VirtualPath ).ToArray( ) ) );
+
+        while ( wantedRoots.TryDequeue( out Dataset? ds ) )
+        {
+            TakeSnapshot( config, ds, period, timestamp );
+        }
     }
 
-    internal static async Task<TakeSnapshotTaskResult> TakeSnapshot(Configuration config, Dataset ds )
+    internal static void TakeSnapshot( Configuration config, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
     {
-        throw new NotImplementedException( );
+        config.ZfsCommandRunner.ZfsSnapshot( ds, config.SnapshotNaming.GetSnapshotName( snapshotPeriod, timestamp ) );
     }
 }
 
