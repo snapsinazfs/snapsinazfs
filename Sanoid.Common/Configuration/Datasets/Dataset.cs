@@ -124,12 +124,12 @@ public class Dataset
         return Template != null && period switch
         {
             SnapshotPeriod.Temporary => true,
-            SnapshotPeriod.Frequent => Template.SnapshotRetention.Frequent>0,
-            SnapshotPeriod.Hourly => Template.SnapshotRetention.Hourly>0,
-            SnapshotPeriod.Daily => Template.SnapshotRetention.Daily>0,
-            SnapshotPeriod.Weekly => Template.SnapshotRetention.Weekly>0,
-            SnapshotPeriod.Monthly => Template.SnapshotRetention.Monthly>0,
-            SnapshotPeriod.Yearly => Template.SnapshotRetention.Yearly>0,
+            SnapshotPeriod.Frequent => Template.SnapshotRetention.Frequent > 0,
+            SnapshotPeriod.Hourly => Template.SnapshotRetention.Hourly > 0,
+            SnapshotPeriod.Daily => Template.SnapshotRetention.Daily > 0,
+            SnapshotPeriod.Weekly => Template.SnapshotRetention.Weekly > 0,
+            SnapshotPeriod.Monthly => Template.SnapshotRetention.Monthly > 0,
+            SnapshotPeriod.Yearly => Template.SnapshotRetention.Yearly > 0,
             SnapshotPeriod.Manual => true,
             _ => throw new ArgumentOutOfRangeException( nameof( period ), period, null )
         };
