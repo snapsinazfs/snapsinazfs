@@ -81,12 +81,14 @@ public class ZfsCommandRunner : IZfsCommandRunner
     ///     associated <see cref="Template" />s applied and the full tree path of parents back to a <see cref="Zpool" />
     ///     already built.
     /// </remarks>
-    /// <param name="config"></param>
     /// <param name="snapshotParent"></param>
-    public void ZfsSnapshot( IConfigurationSection config, IZfsObject snapshotParent )
+    /// <param name="snapshotName"></param>
+    public void ZfsSnapshot( Configuration.Datasets.Dataset snapshotParent, string snapshotName )
     {
-        _logger.Debug("Calling `zfs snapshot {0}`");
-        ProcessStartInfo zfsSnapshotStartInfo = new( _platformUtilitiesConfigurationSection[ "zfs" ]!, $"snapshot {snapshotParent.FullName}@{snapshotParent}" )
+        string zfsCommand = _platformUtilitiesConfigurationSection[ "zfs" ]!;
+        string arguments = $"snapshot {snapshotParent.Path}@{snapshotName}";
+        _logger.Debug( "Calling `{0} {1}`", zfsCommand, arguments );
+        ProcessStartInfo zfsSnapshotStartInfo = new( zfsCommand, arguments )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
