@@ -9,6 +9,7 @@ using PowerArgs;
 using Sanoid;
 using Sanoid.Common;
 using Sanoid.Common.Configuration;
+using Sanoid.Common.Configuration.Snapshots;
 using Sanoid.Common.Zfs;
 using Sanoid.Interop.Libc.Enums;
 
@@ -116,7 +117,11 @@ sanoidConfiguration.SetValuesFromArgs( argParseReults );
 if ( sanoidConfiguration.TakeSnapshots )
 {
     logger.Debug("TakeSnapshots is true.");
-    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration );
+    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, DateTimeOffset.Now );
+}
+else
+{
+    logger.Warn( "TakeSnapshots is false" );
 }
 
 logger.Fatal( "Not yet implemented." );
