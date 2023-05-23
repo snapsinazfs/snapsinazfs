@@ -23,6 +23,8 @@ internal static class SnapshotTasks
         Logger.Debug( "Building Dataset queue for snapshots" );
         foreach ( (string _, Dataset dataset) in config.Datasets )
         {
+            if ( dataset.Path == "/" )
+                continue;
             Logger.Debug( "Checking dataset {0} for inclusion.", dataset.Path );
             switch ( dataset )
             {
