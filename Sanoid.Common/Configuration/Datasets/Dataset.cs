@@ -82,7 +82,7 @@ public class Dataset
     /// </summary>
     public string Path { get; }
 
-    internal static Dataset? Root { get; private set; }
+    private static Dataset? Root { get; set; }
 
     /// <summary>
     ///     Gets or sets the <see cref="Templates.Template" /> this <see cref="Dataset" /> will use.
