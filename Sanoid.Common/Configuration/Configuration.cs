@@ -42,14 +42,14 @@ public class Configuration
     }
 #pragma warning restore CS8618
 
+    internal readonly IConfigurationRoot RootConfiguration;
+    internal readonly IZfsCommandRunner ZfsCommandRunner;
+
     private bool _cron;
 
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
     private bool _pruneSnapshots;
-
-    internal readonly IConfigurationRoot RootConfiguration;
     private bool _takeSnapshots;
-    internal readonly IZfsCommandRunner ZfsCommandRunner;
 
     /// <summary>
     ///     Gets or sets sanoid's cache path.<br />
@@ -465,16 +465,22 @@ public class Configuration
         }
     }
 
+    /// <summary>
+    ///     Removes all datasets from the running configuration that are disabled.
+    /// </summary>
     public void TrimUnwantedDatasetsFromRunningConfiguration( )
     {
         _logger.Debug( "Pruning all unwanted Datasets from running configuration." );
-        string[] allDatasets = Datasets.Where( ( kvp ) => kvp.Value.IsPool ).Select( kvp => kvp.Key ).ToArray( );
+        string[] allDatasets = Datasets.Where( kvp => kvp.Value.IsPool ).Select( kvp => kvp.Key ).ToArray( );
         foreach ( string dsName in allDatasets )
         {
             if ( dsName == "/" )
+            {
                 continue;
-            Datasets.TryGetValue( dsName, out Dataset ds );
-            ds!.TrimUnwantedChildren( Datasets );
+            }
+
+            Datasets.TryGetValue( dsName, out _ );
+            Datasets[ dsName ].TrimUnwantedChildren( Datasets );
             _logger.Debug( "Checking if {0} is enabled.", dsName );
             if ( !Datasets[ dsName ].Enabled )
             {

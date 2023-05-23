@@ -93,7 +93,7 @@ public class ZfsCommandRunner : IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
-        using ( Process snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
+        using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
         {
             snapshotProcess?.WaitForExit( );
         }

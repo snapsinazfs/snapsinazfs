@@ -59,6 +59,12 @@ public class Dataset
     /// </summary>
     public bool IsInConfiguration { get; set; }
 
+    /// <summary>
+    /// Gets whether this Dataset is a zpool
+    /// </summary>
+    /// <value>
+    ///     A <see langword="bool"/> computed from !<see cref="IsRoot"/> &amp;&amp; <see cref="_parent"/>!.<see cref="IsRoot"/>
+    /// </value>
     public bool IsPool => !IsRoot && _parent!.IsRoot;
 
     private bool IsRoot { get; init; }
@@ -128,11 +134,12 @@ public class Dataset
         string[] dsNames = Children.Keys.ToArray( );
         foreach ( string childKey in dsNames )
         {
-            if ( !allDatasets.TryGetValue( childKey, out Dataset child ) )
+            if ( !allDatasets.TryGetValue( childKey, out _) )
             {
                 continue;
             }
 
+            Dataset child = allDatasets[ childKey ];
             child.TrimUnwantedChildren( allDatasets );
             if ( !child.Enabled )
             {
