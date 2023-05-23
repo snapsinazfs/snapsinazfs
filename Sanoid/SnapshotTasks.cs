@@ -73,12 +73,3 @@ internal static class SnapshotTasks
         config.ZfsCommandRunner.ZfsSnapshot( ds, config.SnapshotNaming.GetSnapshotName( snapshotPeriod, timestamp ) );
     }
 }
-
-internal class TakeSnapshotTaskResult
-{
-}
-
-internal class TakeAllConfiguredSnapshotsTaskResult
-{
-    internal ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
-}
