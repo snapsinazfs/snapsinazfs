@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Zfs;
+using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid;
 
@@ -19,8 +20,9 @@ internal class DummyZfsCommandRunner : IZfsCommandRunner
         Logger.Warn( "USING DUMMY ZFS COMMAND RUNNER. NO REAL ZFS COMMANDS WILL BE EXECUTED." );
     }
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( ); 
-    public void ZfsSnapshot( IConfigurationSection config, IZfsObject snapshotParent )
+
+    public void ZfsSnapshot( Dataset snapshotParent, string snapshotName )
     {
-        throw new NotImplementedException(  );
+        throw new NotImplementedException( );
     }
 }
