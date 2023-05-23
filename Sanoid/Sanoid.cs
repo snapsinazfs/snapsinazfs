@@ -24,6 +24,7 @@ Logger logger = LogManager.GetCurrentClassLogger( );
 // We're going to cheat and let it parse and then deal with the aftermath.
 ArgAction<CommandLineArguments> argParseReults = Args.InvokeMain<CommandLineArguments>( args );
 
+// ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 if ( argParseReults is null )
 {
     logger.Debug( "Arg parse results object was null. Exiting." );
@@ -34,6 +35,7 @@ if(argParseReults.Args is null )
     logger.Debug( "args object was null. Exiting." );
     return 0;
 }
+// ReSharper restore ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
 
 // If PowerArgs cancelled the parser invocation, either it handled the help method or it encountered an error.
 // Either way, exit now.
@@ -94,7 +96,6 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                        .AddEnvironmentVariables( "Sanoid.net:" )
                                    #endif
                                        .Build( );
-
 
 Type zfsCommandRunnerType;
 #if WINDOWS
