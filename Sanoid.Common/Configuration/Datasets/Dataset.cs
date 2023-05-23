@@ -4,7 +4,10 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
+using NLog.Fluent;
 using Sanoid.Common.Configuration.Snapshots;
 using Sanoid.Common.Configuration.Templates;
 
@@ -117,6 +120,29 @@ public class Dataset
             IsRoot = true
         };
         return Root;
+    }
+
+    internal void TrimUnwantedChildren(ConcurrentDictionary<string,Dataset> allDatasets )
+    {
+        Logger.Debug( "Pruning unwanted children of Dataset {0}", Path );
+        ReadOnlyDictionary<string, Dataset> readOnlyDictionary = Children.AsReadOnly();
+        foreach ( (string? childKey, Dataset? child) in readOnlyDictionary )
+        {
+            child.TrimUnwantedChildren(allDatasets);
+            if ( !child.Enabled )
+            {
+                Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from parent.", child.Path );
+                Children.Remove( childKey );
+                Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from global collection.", child.Path );
+                if ( !allDatasets.TryRemove( childKey, out _ ) )
+                {
+                    Logger.Error( "Dataset {0} could not be removed from the global collection.", child.Path );
+                }
+                continue;
+            }
+            Logger.Debug( "Dataset {0} is still wanted.", child.Path );
+        }
+        Logger.Debug( "Finished pruning unwanted children of Dataset {0}", Path );
     }
 
     /// <summary>
