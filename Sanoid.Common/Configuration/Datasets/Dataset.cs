@@ -35,7 +35,7 @@ public class Dataset
     /// <param name="parent">The parent dataset of the new dataset. Must not be null.</param>
     public Dataset( string path, Dataset parent )
     {
-        Logger.Debug( "Creating new Dataset {0} with parent {1}", path, parent.VirtualPath );
+        Logger.Trace( "Creating new Dataset {0} with parent {1}", path, parent.VirtualPath );
         Path = path;
         _parent = parent;
         _parent.Children.TryAdd( VirtualPath, this );
@@ -143,9 +143,9 @@ public class Dataset
             child.TrimUnwantedChildren( allDatasets );
             if ( !child.Enabled )
             {
-                Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from parent.", child.Path );
+                Logger.Trace( "Dataset {0} is not wanted. Attempting to remove from parent.", child.Path );
                 Children.Remove( childKey );
-                Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from global collection.", child.Path );
+                Logger.Trace( "Dataset {0} is not wanted. Attempting to remove from global collection.", child.Path );
                 if ( !allDatasets.Remove( childKey, out _ ) )
                 {
                     Logger.Error( "Dataset {0} could not be removed from the global collection.", child.Path );

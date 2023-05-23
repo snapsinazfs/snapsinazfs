@@ -258,14 +258,14 @@ public class Template
 
         // We now have a child template with inherited and overridden properties, as specified in configuration.
         // Add it to this template's children
-        Logger.Debug( "Adding template {0} to children of template {1}", newChildTemplate.Name, Name );
+        Logger.Trace( "Adding template {0} to children of template {1}", newChildTemplate.Name, Name );
         Children.Add( childTemplateName, newChildTemplate );
 
         if ( isDatasetOverride )
         {
             // This is just a dataset override.
             // We can exit now, as child templates here would be meaningless.
-            Logger.Debug( "Child template {0} of template {1} is a dataset override. Not checking for children", newChildTemplate.Name, Name );
+            Logger.Trace( "Child template {0} of template {1} is a dataset override. Not checking for children", newChildTemplate.Name, Name );
             allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
             return newChildTemplate;
         }
@@ -290,17 +290,17 @@ public class Template
         }
 
 
-        Logger.Debug( "Template {0} has Templates section. Checking contents of that section", newChildTemplate.Name );
+        Logger.Trace( "Template {0} has Templates section. Checking contents of that section", newChildTemplate.Name );
 
         allTemplates.TryAdd( newChildTemplate.Name, newChildTemplate );
 
         foreach ( IConfigurationSection grandChildTemplateConfiguration in childTemplatesSection.GetChildren( ) )
         {
-            Logger.Debug( "Recursively calling CreateChild on {0} for new template {1}", newChildTemplate.Name, grandChildTemplateConfiguration.Key );
+            Logger.Trace( "Recursively calling CreateChild on {0} for new template {1}", newChildTemplate.Name, grandChildTemplateConfiguration.Key );
             newChildTemplate.CreateChild( grandChildTemplateConfiguration, allTemplates, grandChildTemplateConfiguration.Key );
         }
 
-        Logger.Debug( "No more children of {0} remain. Returning template {0} from {1}.CreateChild", newChildTemplate.Name, Name );
+        Logger.Trace( "No more children of {0} remain. Returning template {0} from {1}.CreateChild", newChildTemplate.Name, Name );
         // Once we've exhausted the grandchild list (or if it was simply empty), return the child.
 
         return newChildTemplate;
@@ -323,7 +323,7 @@ public class Template
         IConfigurationSection retentionOverrides = templateConfigurationSection.GetSection( key: "SnapshotRetention" );
         if ( retentionOverrides.Exists( ) )
         {
-            Logger.Debug( message: "SnapshotRetention overrides exist for template {0}. Setting explicit settings and inheriting the rest from {1}", argument1: Name, argument2: Parent.Name );
+            Logger.Trace( message: "SnapshotRetention overrides exist for template {0}. Setting explicit settings and inheriting the rest from {1}", argument1: Name, argument2: Parent.Name );
             SnapshotRetention = new( )
             {
                 Daily = retentionOverrides.GetInt( settingKey: "Daily", fallbackValue: SnapshotRetention.Daily ),
@@ -341,7 +341,7 @@ public class Template
         IConfigurationSection timingOverrides = templateConfigurationSection.GetSection( key: "SnapshotTiming" );
         if ( timingOverrides.Exists( ) )
         {
-            Logger.Debug( message: "SnapshotTiming overrides exist for template {0}. Setting explicit settings and inheriting the rest from {1}", argument1: Name, argument2: Parent.Name );
+            Logger.Trace( message: "SnapshotTiming overrides exist for template {0}. Setting explicit settings and inheriting the rest from {1}", argument1: Name, argument2: Parent.Name );
             SnapshotTiming = new( )
             {
                 DailyTime = timingOverrides[ key: "DailyTime" ] is null ? SnapshotTiming.DailyTime : TimeOnly.Parse( s: timingOverrides[ key: "DailyTime" ]! ),
@@ -360,7 +360,7 @@ public class Template
 
     internal Template CloneForDatasetWithOverrides( IConfigurationSection overrides, Dataset targetDataset, Dictionary<string, Template> allTemplates )
     {
-        Logger.Debug( message: "Cloning template {0} to apply overrides in dataset {1}", argument1: targetDataset.Template!.Name, argument2: targetDataset.Path );
+        Logger.Trace( message: "Cloning template {0} to apply overrides in dataset {1}", argument1: targetDataset.Template!.Name, argument2: targetDataset.Path );
         Template clone = CreateChild( childConfigurationSection: overrides, allTemplates: allTemplates, childTemplateName: $"{targetDataset.Path}_{Name}_Local",isDatasetOverride:true );
         return clone;
     }
@@ -371,7 +371,7 @@ public class Template
 
         Template defaultTemplate = new( configurationSection: defaultTemplateSection );
 
-        Logger.Debug( message: "Default template created from configuration. Returning to {0}", argument: caller );
+        Logger.Trace( message: "Default template created from configuration. Returning to {0}", argument: caller );
 
         return defaultTemplate;
     }

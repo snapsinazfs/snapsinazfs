@@ -281,7 +281,7 @@ public class Configuration
         // If an entry exists in configuration, set its settings, following inheritance rules.
         foreach ( ( _, Dataset? ds ) in Datasets )
         {
-            _logger.Debug( "Processing dataset {0}", ds.VirtualPath );
+            _logger.Trace( "Processing dataset {0}", ds.VirtualPath );
             if ( ds.VirtualPath == "/" )
             {
                 //Skip the root dataset, as it is already configured for defaults.
@@ -310,7 +310,7 @@ public class Configuration
                 // Dataset is not explicitly configured. Inherit relevant properties from parent only.
                 ds.Enabled = ds.Parent!.Enabled;
                 ds.Template = ds.Parent.Template;
-                _logger.Debug( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
+                _logger.Trace( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
             }
 
             _logger.Debug( "Finished configuring dataset {0}", ds.Path );
