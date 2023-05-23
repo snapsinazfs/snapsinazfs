@@ -125,10 +125,15 @@ public class Dataset
     internal void TrimUnwantedChildren(SortedDictionary<string,Dataset> allDatasets )
     {
         Logger.Debug( "Pruning unwanted children of Dataset {0}", Path );
-        ReadOnlyDictionary<string, Dataset> readOnlyDictionary = Children.AsReadOnly();
-        foreach ( (string? childKey, Dataset? child) in readOnlyDictionary )
+        string[] dsNames = Children.Keys.ToArray( );
+        foreach ( string childKey in dsNames )
         {
-            child.TrimUnwantedChildren(allDatasets);
+            if ( !allDatasets.TryGetValue( childKey, out Dataset child ) )
+            {
+                continue;
+            }
+
+            child.TrimUnwantedChildren( allDatasets );
             if ( !child.Enabled )
             {
                 Logger.Debug( "Dataset {0} is not wanted. Attempting to remove from parent.", child.Path );
@@ -138,8 +143,10 @@ public class Dataset
                 {
                     Logger.Error( "Dataset {0} could not be removed from the global collection.", child.Path );
                 }
+
                 continue;
             }
+
             Logger.Debug( "Dataset {0} is still wanted.", child.Path );
         }
         Logger.Debug( "Finished pruning unwanted children of Dataset {0}", Path );

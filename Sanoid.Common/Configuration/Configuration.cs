@@ -468,10 +468,23 @@ public class Configuration
     public void TrimUnwantedDatasetsFromRunningConfiguration( )
     {
         _logger.Debug( "Pruning all unwanted Datasets from running configuration." );
-        foreach ( ( string? k, Dataset? ds ) in Datasets )
+        string[] allDatasets = Datasets.Where( ( kvp ) => kvp.Value.IsPool ).Select( kvp => kvp.Key ).ToArray( );
+        foreach ( string dsName in allDatasets )
         {
-            ds.TrimUnwantedChildren(Datasets);
+            if ( dsName == "/" )
+                continue;
+            Datasets.TryGetValue( dsName, out Dataset ds );
+            ds!.TrimUnwantedChildren( Datasets );
+            _logger.Debug( "Checking if {0} is enabled.", dsName );
+            if ( !Datasets[ dsName ].Enabled )
+            {
+                _logger.Debug( "Dataset {0} is not enabled. Removing.", dsName );
+                Datasets.Remove( dsName );
+            }
+
+            _logger.Debug( "Dataset {0} is enabled.", dsName );
         }
+
         _logger.Debug( "Finished pruning all unwanted Datasets from running configuration." );
     }
 }
