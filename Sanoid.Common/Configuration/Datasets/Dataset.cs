@@ -130,6 +130,8 @@ public class Dataset
 
     internal void TrimUnwantedChildren(SortedDictionary<string,Dataset> allDatasets )
     {
+        if ( Children.Count == 0 )
+            return;
         Logger.Debug( "Pruning unwanted children of Dataset {0}", Path );
         string[] dsNames = Children.Keys.ToArray( );
         foreach ( string childKey in dsNames )
