@@ -91,7 +91,11 @@ public class ZfsCommandRunner : IZfsCommandRunner
         ProcessStartInfo zfsSnapshotStartInfo = new( zfsCommand, arguments )
         {
             CreateNoWindow = true,
-            RedirectStandardOutput = true
+            RedirectStandardOutput = false
         };
+        using ( Process snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
+        {
+            snapshotProcess?.WaitForExit( );
+        }
     }
 }
