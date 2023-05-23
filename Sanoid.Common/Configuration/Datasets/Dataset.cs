@@ -119,6 +119,16 @@ public class Dataset
         return Root;
     }
 
+    /// <summary>
+    ///     Gets whether or not this Dataset is wanted for the given period, according to its Template.
+    /// </summary>
+    /// <param name="period">The period to check against.</param>
+    /// <returns>
+    ///     A boolean indicating that the dataset's template specifies a value greater than 0 for the given period.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If an unexpected value is passed for <paramref name="period" />
+    /// </exception>
     public bool IsWantedForPeriod( SnapshotPeriod period )
     {
         return Template != null && period switch
