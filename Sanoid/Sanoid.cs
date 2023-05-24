@@ -161,6 +161,7 @@ logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to 
 
 // Let's be tidy and clean up the default mutex ourselves
 Mutexes.ReleaseMutex( );
+Mutexes.DisposeMutexes( );
 
 // Be sure we clean up any mutexes we have acquired, and log warnings for those that this has to deal with.
 return (int)Errno.ENOSYS;
