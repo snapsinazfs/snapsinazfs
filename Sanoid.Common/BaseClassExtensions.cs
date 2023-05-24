@@ -6,6 +6,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Sanoid.Common.Configuration.Snapshots;
+using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Common;
 

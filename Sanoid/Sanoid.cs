@@ -11,14 +11,42 @@ using Sanoid.Common;
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Configuration.Snapshots;
 using Sanoid.Common.Zfs;
+using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
-
-Logging.ConfigureLogger( );
 
 // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
 // Desired logging parameters should be set in Sanoid.nlog.json
+Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
+using Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out bool _, out Exception? caughtFatalException );
+
+switch ( caughtFatalException )
+{
+    case IOException:
+        logger.Fatal( caughtFatalException, "Exiting due to IOException: {0}", caughtFatalException.Message );
+        return (int)Errno.EINVAL;
+    case AbandonedMutexException:
+        logger.Fatal( caughtFatalException, "A previous instance of Sanoid.net exited without properly releasing the mutex. Sanoid.net will now exit after releasing the abandoned mutex. Try running again." );
+        return (int)Errno.EAGAIN;
+    case WaitHandleCannotBeOpenedException whcboe:
+        logger.Fatal( whcboe, "Unable to acquire mutex. Sanoid.net will exit." );
+        return (int)Errno.EEXIST;
+}
+
+if ( sanoidMutex is null )
+{
+    logger.Fatal( "Unable to acquire mutex. Sanoid.net will exit." );
+    return (int)Errno.ENOLCK;
+}
+// If another process has the mutex, let's wait a few seconds before we give up.
+bool gotMutex = sanoidMutex.WaitOne( 5000 );
+
+if ( !gotMutex )
+{
+    logger.Fatal( "Another Sanoid.net process is running. This process will terminate." );
+    return (int)Errno.EBUSY;
+}
 
 // PowerArgs takes over execution to parse command-line arguments.
 // We're going to cheat and let it parse and then deal with the aftermath.
@@ -30,7 +58,8 @@ if ( argParseReults is null )
     logger.Debug( "Arg parse results object was null. Exiting." );
     return 0;
 }
-if(argParseReults.Args is null )
+
+if ( argParseReults.Args is null )
 {
     logger.Debug( "args object was null. Exiting." );
     return 0;
@@ -52,7 +81,6 @@ if ( argParseReults.Args.Version )
     logger.Trace( "Version method invoked by command-line argument. Exiting with status {0}.", Errno.ECANCELED );
     return (int)Errno.ECANCELED;
 }
-
 
 // Now, let's validate the configuration files against the configuration schema documents.
 // Any exception will be logged and the program will terminate with status 22 (EINVAL)
@@ -81,7 +109,6 @@ catch
 // 4. ./Sanoid.local.json                       #(Located in Sanoid.net's working directory)
 // 5. Environment variables prefixed with 'Sanoid.net:' and following standard .net configuration nomenclature from there
 // 6. Command-line arguments passed on invocation of Sanoid.net
-
 logger.Debug( "Building base configuration from files and environment variables." );
 IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #if WINDOWS
@@ -103,7 +130,7 @@ zfsCommandRunnerType = typeof( DummyZfsCommandRunner );
 #else
 zfsCommandRunnerType = typeof( ZfsCommandRunner );
 #endif
-logger.Debug( "Creating ZFS command runner of type {0}.", zfsCommandRunnerType);
+logger.Debug( "Creating ZFS command runner of type {0}.", zfsCommandRunnerType );
 
 if ( Activator.CreateInstance( zfsCommandRunnerType, rootConfiguration.GetRequiredSection( "PlatformUtilities" ) ) is not IZfsCommandRunner zfsCommandRunner )
 {
@@ -119,7 +146,7 @@ sanoidConfiguration.TrimUnwantedDatasetsFromRunningConfiguration( );
 if ( sanoidConfiguration.TakeSnapshots )
 {
     DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-    logger.Debug("TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}.",currentTimestamp);
+    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}.", currentTimestamp );
     SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
 }
 else
@@ -131,4 +158,7 @@ logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
 logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
 
+// This isn't explicitly necessary, because of the using statement, but I'm putting it here to force its scope to
+// exist all the way through the file without having to use a block using, so it doesn't disappear unexpectedly.
+sanoidMutex.ReleaseMutex( );
 return (int)Errno.ENOSYS;
