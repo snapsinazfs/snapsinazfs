@@ -8,8 +8,8 @@ namespace Sanoid.Common.Zfs;
 
 public static class ZfsListObjectTypesExtensions
 {
-    public static string ToStringNoWhitespace( this ZfsListObjectTypes value )
+    public static string ToStringForCommandLine( this ZfsListObjectTypes value )
     {
-        return value.ToString( ).Replace( " ", "" );
+        return value.ToString( ).Replace( " ", "" ).ToLower( );
     }
 }

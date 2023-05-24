@@ -31,54 +31,13 @@ public class ZfsCommandRunner : IZfsCommandRunner
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
     private readonly IConfigurationSection _platformUtilitiesConfigurationSection;
 
-    /// <inheritdoc />
-    public ImmutableSortedSet<string> ZfsListAll( )
-    {
-        ImmutableSortedSet<string>.Builder dataSets = ImmutableSortedSet<string>.Empty.ToBuilder( );
-        ProcessStartInfo zfsListStartInfo = new( _platformUtilitiesConfigurationSection[ "zfs" ]!, "list -o name -t filesystem,volume -Hr" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
-        {
-            _logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
-            try
-            {
-                zfsListProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                _logger.Fatal( "Error running zfs list operation. The error returned was {0}", ioex );
-                throw;
-            }
-
-            while ( !zfsListProcess.StandardOutput.EndOfStream )
-            {
-                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
-                _logger.Trace( "{0}", outputLine );
-                dataSets.Add( outputLine );
-            }
-
-            if ( !zfsListProcess.HasExited )
-            {
-                _logger.Trace( "Waiting for zfs list process to exit" );
-                zfsListProcess.WaitForExit( 3000 );
-            }
-
-            _logger.Debug( "zfs list process finished" );
-        }
-
-        return dataSets.ToImmutable( );
-    }
-
     /// <summary>
     ///     Calls zfs snapshot to create a snapshot of <paramref name="snapshotParent" />.
     /// </summary>
     /// <remarks>
     ///     The <see cref="IZfsObject" /> provided in <paramref name="snapshotParent" /> is expected to be fully configured,
-    ///     with all<br />
-    ///     associated <see cref="Template" />s applied and the full tree path of parents back to a <see cref="Zpool" />
+    ///     with all associated <see cref="Template" />s applied and the full tree path of parents back to a
+    ///     <see cref="Zpool" />
     ///     already built.
     /// </remarks>
     /// <param name="snapshotParent"></param>
@@ -105,8 +64,55 @@ public class ZfsCommandRunner : IZfsCommandRunner
         }
         catch ( Exception e )
         {
-            _logger.Error( "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments, e );
+            _logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Gets the output of `zfs list -o name -t ` with the types of objects set in <paramref name="types" /> appended
+    /// </summary>
+    /// <param name="types">A <see cref="ZfsListObjectTypes" /> with flags set for each desired object type.</param>
+    /// <returns>An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s containing the output of the command</returns>
+    public ImmutableSortedSet<string> ZfsListAll( ZfsListObjectTypes types = ZfsListObjectTypes.FileSystem | ZfsListObjectTypes.Volume )
+    {
+        ImmutableSortedSet<string>.Builder dataSets = ImmutableSortedSet<string>.Empty.ToBuilder( );
+        string typesToList = types.ToStringForCommandLine( );
+        _logger.Debug( "Requested listing of all zfs objects of the following types: {0}", typesToList );
+        ProcessStartInfo zfsListStartInfo = new( _platformUtilitiesConfigurationSection[ "zfs" ]!, $"list -o name -t {typesToList} -Hr" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
+        {
+            _logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
+            try
+            {
+                zfsListProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                _logger.Fatal( ioex, "Error running zfs list operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsListProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
+                _logger.Trace( "{0}", outputLine );
+                dataSets.Add( outputLine );
+            }
+
+            if ( !zfsListProcess.HasExited )
+            {
+                _logger.Trace( "Waiting for zfs list process to exit" );
+                zfsListProcess.WaitForExit( 3000 );
+            }
+
+            _logger.Debug( "zfs list process finished" );
+        }
+
+        return dataSets.ToImmutable( );
     }
 }
