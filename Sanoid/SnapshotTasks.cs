@@ -30,6 +30,8 @@ internal static class SnapshotTasks
                 Logger.Debug( "Successfully acquired mutex {0}", snapshotMutexName );
             }
                 break;
+            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
+            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
             case MutexAcquisitionErrno.InProgess:
             case MutexAcquisitionErrno.IoException:
             case MutexAcquisitionErrno.AbandonedMutex:
@@ -45,6 +47,27 @@ internal static class SnapshotTasks
                 throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
         }
 
+        ConcurrentQueue<Dataset> wantedRoots = BuildSnapshotQueue( config, period );
+
+        Logger.Trace( "SnapshotQueue: {0}", JsonSerializer.Serialize( wantedRoots.Select( wr => wr.VirtualPath ).ToArray( ) ) );
+
+        Logger.Debug( "Begin taking snapshots for all items in the queue." );
+        while ( wantedRoots.TryDequeue( out Dataset? ds ) )
+        {
+            TakeSnapshot( config, ds, period, timestamp );
+        }
+
+        Logger.Debug( "Finished taking snapshots for all items in the queue." );
+
+        // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        Mutexes.ReleaseMutex( snapshotMutexName );
+
+        return Errno.EOK;
+    }
+
+    private static ConcurrentQueue<Dataset> BuildSnapshotQueue( Configuration config, SnapshotPeriod period )
+    {
         ConcurrentQueue<Dataset> wantedRoots = new( );
         Logger.Debug( "Building Dataset queue for snapshots" );
         foreach ( ( string _, Dataset dataset ) in config.Datasets )
@@ -90,18 +113,7 @@ internal static class SnapshotTasks
         }
 
         Logger.Debug( "Finished building Dataset queue for snapshots" );
-        Logger.Trace( "SnapshotQueue: {0}", JsonSerializer.Serialize( wantedRoots.Select( wr => wr.VirtualPath ).ToArray( ) ) );
-
-        while ( wantedRoots.TryDequeue( out Dataset? ds ) )
-        {
-            TakeSnapshot( config, ds, period, timestamp );
-        }
-
-        // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( snapshotMutexName );
-
-        return Errno.EOK;
+        return wantedRoots;
     }
 
     internal static void TakeSnapshot( Configuration config, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
