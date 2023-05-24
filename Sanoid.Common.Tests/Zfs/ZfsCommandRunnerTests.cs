@@ -13,15 +13,18 @@ public class ZfsCommandRunnerTests
 {
     [Test( Description = "Tests all possible values of ZfsListObjectTypes and their expected string representations" )]
     [Category( "General" )]
-    [TestCase( (ZfsListObjectTypes)1, ExpectedResult = "filesystem" )]
-    [TestCase( (ZfsListObjectTypes)2, ExpectedResult = "snapshot" )]
-    [TestCase( (ZfsListObjectTypes)3, ExpectedResult = "filesystem,snapshot" )]
-    [TestCase( (ZfsListObjectTypes)4, ExpectedResult = "volume" )]
-    [TestCase( (ZfsListObjectTypes)5, ExpectedResult = "filesystem,volume" )]
-    [TestCase( (ZfsListObjectTypes)6, ExpectedResult = "snapshot,volume" )]
-    [TestCase( (ZfsListObjectTypes)7, ExpectedResult = "filesystem,snapshot,volume" )]
-    public string ListTypeEnumStringsAsExpected( ZfsListObjectTypes types )
+    [TestCase( (ZfsListObjectTypes)1, "filesystem" )]
+    [TestCase( (ZfsListObjectTypes)2, "snapshot" )]
+    [TestCase( (ZfsListObjectTypes)3, "filesystem,snapshot" )]
+    [TestCase( (ZfsListObjectTypes)4, "volume" )]
+    [TestCase( (ZfsListObjectTypes)5, "filesystem,volume" )]
+    [TestCase( (ZfsListObjectTypes)6, "snapshot,volume" )]
+    [TestCase( (ZfsListObjectTypes)7, "filesystem,snapshot,volume" )]
+    public void ListTypeEnumStringsAsExpected( ZfsListObjectTypes types, string expectedString )
     {
-        return types.ToStringForCommandLine( );
+        Console.Write( "Checking ToStringForCommandLine({0}) returns {1}: ", (int)types, expectedString );
+        string actualString = types.ToStringForCommandLine( );
+        Console.WriteLine( actualString == expectedString ? "yes" : "no" );
+        Assert.That( actualString, Is.EqualTo( expectedString ) );
     }
 }
