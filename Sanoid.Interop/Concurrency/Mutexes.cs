@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using NLog;
 
@@ -12,10 +13,11 @@ namespace Sanoid.Interop.Concurrency;
 public static class Mutexes
 {
     private static bool _disposed;
-    private static (string name, Mutex? mutex) _sanoidMutex = new( string.Empty, null );
+    private static readonly ConcurrentDictionary<string, Mutex?> _mutexes = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
+    ///     Gets the default mutex for Sanoid.net, named "Global\\Sanoid.net"
     /// </summary>
     /// <param name="caughtException">
     ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
@@ -37,13 +39,8 @@ public static class Mutexes
     }
 
     /// <summary>
+    ///     Gets a mutex named <paramref name="name" />
     /// </summary>
-    /// <param name="createdNew">
-    ///     When this method returns, contains a <see langword="bool" /> that is <see langword="true" /> if a local mutex was
-    ///     created (that is, if name is null or an empty string) or if the specified named system mutex was created;<br />
-    ///     <see langword="false" /> if the specified named system mutex already existed. Any initial value of this parameter
-    ///     is ignored and overwritten by the framework.
-    /// </param>
     /// <param name="caughtException">
     ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
     ///     to acquire the mutex.<br />
@@ -75,19 +72,21 @@ public static class Mutexes
     {
         Logger.Debug( "Mutex {0} requested.", name );
         caughtException = null;
-        if ( _sanoidMutex.mutex != null )
+        bool exists = _mutexes.TryGetValue( name, out Mutex? sanoidMutex );
+        if ( exists && sanoidMutex != null )
         {
             Logger.Debug( "Mutex {0} already exists. Returning it.", name );
-            return _sanoidMutex.mutex;
+            return sanoidMutex;
         }
-
-        _sanoidMutex.name = name;
 
         try
         {
             Logger.Debug( "Attempting to acquire new or existing mutex {0}.", name );
-            _sanoidMutex.mutex = new( true, name, out bool createdNew );
+            sanoidMutex = new( true, name, out bool createdNew );
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
+            // This exception is not possible. Setter creates the node.
+            // ReSharper disable once ExceptionNotDocumentedOptional
+            _mutexes[ name ] = sanoidMutex;
             _disposed = false;
         }
         catch ( IOException ioe )
@@ -106,13 +105,13 @@ public static class Mutexes
             caughtException = ame;
         }
 
-        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, _sanoidMutex.mutex is null ? "null" : "not-null" );
-        return _sanoidMutex.mutex;
+        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, sanoidMutex is null ? "null" : "not-null" );
+        return sanoidMutex;
     }
 
-    public static void ReleaseSanoidMutex( )
+    public static void ReleaseMutex( string name = "Global\\Sanoid.net" )
     {
-        Logger.Debug( "Requested to release mutex {0}", _sanoidMutex.name );
+        Logger.Debug( "Requested to release mutex {0}", name );
         if ( _disposed )
         {
             return;
@@ -120,7 +119,11 @@ public static class Mutexes
 
         try
         {
-            _sanoidMutex.mutex?.ReleaseMutex( );
+            if ( _mutexes.TryGetValue( name, out Mutex? mutex ) )
+            {
+                mutex?.ReleaseMutex( );
+                _mutexes.TryRemove( name, out _ );
+            }
         }
         catch ( ApplicationException ex )
         {
@@ -143,9 +146,13 @@ public static class Mutexes
 
         Logger.Debug( "Disposing all mutexes" );
 
-        ReleaseSanoidMutex( );
-        _sanoidMutex.mutex?.Dispose( );
-        _sanoidMutex.mutex = null;
+        ReleaseMutex( );
+        foreach ( ( string? _, Mutex? mutex ) in _mutexes )
+        {
+            mutex?.Dispose( );
+        }
+
+        _mutexes.Clear( );
         _disposed = true;
     }
 }
