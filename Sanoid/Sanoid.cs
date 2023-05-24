@@ -19,11 +19,8 @@ using Sanoid.Interop.Libc.Enums;
 Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
-// Let's register to receive the process exit event to at least attempt to let go of any mutexes we forgot to
-// release, and log them as warnings.
-AppDomain.CurrentDomain.ProcessExit += ( _, _ ) => Mutexes.DisposeMutexes( true );
-
-Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
+using Mutexes mutexes = Mutexes.Instance;
+Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
 
 switch ( caughtFatalException )
 {
@@ -38,11 +35,14 @@ switch ( caughtFatalException )
         return (int)Errno.EEXIST;
 }
 
+Mutex? sanoidMutex = mutexes[ "Global\\Sanoid.net" ];
+
 if ( sanoidMutex is null )
 {
     logger.Fatal( "Unable to acquire mutex. Sanoid.net will exit." );
     return (int)Errno.ENOLCK;
 }
+
 // If another process has the mutex, let's wait a few seconds before we give up.
 bool gotMutex = sanoidMutex.WaitOne( 5000 );
 
@@ -51,6 +51,8 @@ if ( !gotMutex )
     logger.Fatal( "Another Sanoid.net process is running. This process will terminate." );
     return (int)Errno.EBUSY;
 }
+
+logger.Debug( "Successfully acquired mutex Global\\Sanoid.net." );
 
 // PowerArgs takes over execution to parse command-line arguments.
 // We're going to cheat and let it parse and then deal with the aftermath.
@@ -162,6 +164,8 @@ logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
 logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
 
+// Let's be tidy and clean up the default mutex ourselves
+Mutexes.ReleaseMutex( );
+
 // Be sure we clean up any mutexes we have acquired, and log warnings for those that this has to deal with.
-Mutexes.DisposeMutexes(true);
 return (int)Errno.ENOSYS;

@@ -10,11 +10,45 @@ using NLog;
 
 namespace Sanoid.Interop.Concurrency;
 
-public static class Mutexes
+public sealed class Mutexes : IDisposable
 {
-    private static bool _disposed;
-    private static readonly ConcurrentDictionary<string, Mutex?> AllMutexes = new( );
+    static Mutexes( )
+    {
+    }
+
+    private Mutexes( )
+    {
+        Logger.Debug("Creating mutex manager.");
+    }
+
+    private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
+    private bool _disposed;
+
+    public static Mutexes Instance { get; } = new( );
+
+    public Mutex? this[ string name ]
+    {
+        get
+        {
+            Mutex? mutex = GetMutex( out Exception? caughtException, name );
+            if ( caughtException is not null )
+            {
+                Logger.Error( caughtException, "Error getting Mutex {0}", name );
+            }
+
+            return mutex;
+        }
+    }
+
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    /// <summary>
+    ///     Disposes all remaining held mutexes, and logs warnings for them
+    /// </summary>
+    public void Dispose( )
+    {
+        DisposeMutexes( true );
+    }
 
     /// <summary>
     ///     Gets the default mutex for Sanoid.net, named "Global\\Sanoid.net"
@@ -60,20 +94,14 @@ public static class Mutexes
     ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
     ///     Caller bears responsibility for handling results of this method call.
     /// </remarks>
-    /// <exception cref="UnauthorizedAccessException">
-    ///     Windows-only: The named mutex exists and has access control security, but
-    ///     the user does not have FullControl.
-    /// </exception>
-    /// <exception cref="ArgumentException">
-    ///     .NET Framework only: <paramref name="name" /> is longer than MAX_PATH (260
-    ///     characters).
-    /// </exception>
     /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumented", Justification = "The undocumented exceptions can't be thrown on Linux." )]
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
     public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\Sanoid.net" )
     {
         Logger.Debug( "Mutex {0} requested.", name );
         caughtException = null;
-        bool exists = AllMutexes.TryGetValue( name, out Mutex? sanoidMutex );
+        bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? sanoidMutex );
         if ( exists && sanoidMutex != null )
         {
             Logger.Debug( "Mutex {0} already exists. Returning it.", name );
@@ -87,8 +115,8 @@ public static class Mutexes
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             // This exception is not possible. Setter creates the node.
             // ReSharper disable once ExceptionNotDocumentedOptional
-            AllMutexes[ name ] = sanoidMutex;
-            _disposed = false;
+            Instance._allMutexes[ name ] = sanoidMutex;
+            Instance._disposed = false;
         }
         catch ( IOException ioe )
         {
@@ -123,17 +151,17 @@ public static class Mutexes
         }
 
         Logger.Debug( "Requested to release mutex {0}", name );
-        if ( _disposed )
+        if ( Instance._disposed )
         {
             return;
         }
 
         try
         {
-            if ( AllMutexes.TryGetValue( name, out Mutex? mutex ) )
+            if ( Instance._allMutexes.TryGetValue( name, out Mutex? mutex ) )
             {
                 mutex?.ReleaseMutex( );
-                AllMutexes.TryRemove( name, out _ );
+                Instance._allMutexes.TryRemove( name, out _ );
             }
 
             Logger.Debug( "Mutex {0} released", name );
@@ -153,14 +181,14 @@ public static class Mutexes
 
     public static void DisposeMutexes( bool warnOnStillHeld = false )
     {
-        if ( _disposed )
+        if ( Instance._disposed )
         {
             return;
         }
 
         Logger.Debug( "Disposing all mutexes" );
 
-        foreach ( ( string? name, Mutex? mutex ) in AllMutexes )
+        foreach ( ( string? name, Mutex? mutex ) in Instance._allMutexes )
         {
             if ( warnOnStillHeld )
             {
@@ -170,7 +198,7 @@ public static class Mutexes
             mutex?.Dispose( );
         }
 
-        AllMutexes.Clear( );
-        _disposed = true;
+        Instance._allMutexes.Clear( );
+        Instance._disposed = true;
     }
 }
