@@ -11,7 +11,7 @@ namespace Sanoid.Interop.Concurrency;
 public static class Mutexes
 {
     private static bool _disposed;
-    private static Mutex? _sanoidMutex;
+    private static (string name, Mutex? mutex) _sanoidMutex = new( string.Empty, null );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
@@ -54,16 +54,18 @@ public static class Mutexes
         Logger.Debug( "Mutex {0} requested.", name );
         caughtException = null;
         createdNew = false;
-        if ( _sanoidMutex != null )
+        if ( _sanoidMutex.mutex != null )
         {
             Logger.Debug( "Mutex {0} already exists. Returning it.", name );
-            return _sanoidMutex;
+            return _sanoidMutex.mutex;
         }
+
+        _sanoidMutex.name = name;
 
         try
         {
             Logger.Debug( "Attempting to acquire new or existing mutex {0}.", name );
-            _sanoidMutex = new( true, name, out createdNew );
+            _sanoidMutex.mutex = new( true, name, out createdNew );
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             _disposed = false;
         }
@@ -83,20 +85,20 @@ public static class Mutexes
             caughtException = ame;
         }
 
-        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, _sanoidMutex is null ? "null" : "not-null" );
-        return _sanoidMutex;
+        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, _sanoidMutex.mutex is null ? "null" : "not-null" );
+        return _sanoidMutex.mutex;
     }
 
-    public static void ReleaseSanoidMutex( )
+    public static void ReleaseSanoidMutex()
     {
+        Logger.Debug( "Requested to release mutex {0}", _sanoidMutex.name );
         if ( _disposed )
         {
             return;
         }
-
         try
         {
-            _sanoidMutex?.ReleaseMutex( );
+            _sanoidMutex.mutex?.ReleaseMutex( );
         }
         catch ( ApplicationException ex )
         {
@@ -120,8 +122,8 @@ public static class Mutexes
         Logger.Debug( "Disposing all mutexes" );
 
         ReleaseSanoidMutex( );
-        _sanoidMutex?.Dispose( );
-        _sanoidMutex = null;
+        _sanoidMutex.mutex?.Dispose( );
+        _sanoidMutex.mutex = null;
         _disposed = true;
     }
 }
