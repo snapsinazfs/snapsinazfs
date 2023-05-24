@@ -24,7 +24,7 @@ public class ZfsCommandRunnerTests
     {
         Console.Write( "Checking ToStringForCommandLine({0}) returns {1}: ", (int)types, expectedString );
         string actualString = types.ToStringForCommandLine( );
-        Console.WriteLine( actualString == expectedString ? "yes" : "no" );
+        Console.Write( actualString == expectedString ? "yes" : "no" );
         Assert.That( actualString, Is.EqualTo( expectedString ) );
     }
 }
