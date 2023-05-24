@@ -17,7 +17,7 @@ namespace Sanoid.Interop.Libc.Enums;
 public enum Errno
 {
     /// <summary>No error. Not actually defined in errno.h, but here for nice output in tests and such.</summary>
-    None = 0,
+    EOK = 0,
 
     /// <summary>Operation not permitted</summary>
     EPERM = 1,

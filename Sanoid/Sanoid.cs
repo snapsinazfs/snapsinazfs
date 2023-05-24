@@ -20,39 +20,34 @@ Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
 using Mutexes mutexes = Mutexes.Instance;
-Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
+using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex("Global\\Sanoid.net");
 
-switch ( caughtFatalException )
+switch ( mutexResult.ErrorCode )
 {
-    case IOException:
-        logger.Fatal( caughtFatalException, "Exiting due to IOException: {0}", caughtFatalException.Message );
-        return (int)Errno.EINVAL;
-    case AbandonedMutexException:
-        logger.Fatal( caughtFatalException, "A previous instance of Sanoid.net exited without properly releasing the mutex. Sanoid.net will now exit after releasing the abandoned mutex. Try running again." );
-        return (int)Errno.EAGAIN;
-    case WaitHandleCannotBeOpenedException whcboe:
-        logger.Fatal( whcboe, "Unable to acquire mutex. Sanoid.net will exit." );
-        return (int)Errno.EEXIST;
+    case MutexAcquisitionErrno.Success:
+        logger.Debug( "Succesfully acquired global mutex." );
+        break;
+    case MutexAcquisitionErrno.IoException:
+        logger.Fatal( mutexResult.Exception, "Exiting due to IOException: {0}", mutexResult.Exception.Message );
+        return (int)mutexResult.ErrorCode;
+    case MutexAcquisitionErrno.AbandonedMutex:
+        logger.Fatal( mutexResult.Exception, "A previous instance of Sanoid.net exited without properly releasing the mutex. Sanoid.net will now exit after releasing the abandoned mutex. Try running again." );
+        return (int)mutexResult.ErrorCode;
+    case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
+        logger.Fatal( mutexResult.Exception, "Unable to acquire mutex. Sanoid.net will exit." );
+        return (int)mutexResult.ErrorCode;
+    case MutexAcquisitionErrno.PossiblyNullMutex:
+        logger.Fatal( "Unable to acquire mutex. Sanoid.net will exit." );
+        return (int)mutexResult.ErrorCode;
+    case MutexAcquisitionErrno.AnotherProcessIsBusy:
+        logger.Fatal( "Another Sanoid.net process is running. This process will terminate." );
+        return (int)mutexResult.ErrorCode;
+    case MutexAcquisitionErrno.InvalidMutexNameRequested:
+        return (int)mutexResult.ErrorCode;
+    default:
+        logger.Fatal(mutexResult.Exception,"Failed to get mutex. Exiting.");
+        return (int)mutexResult.ErrorCode;
 }
-
-Mutex? sanoidMutex = mutexes[ "Global\\Sanoid.net" ];
-
-if ( sanoidMutex is null )
-{
-    logger.Fatal( "Unable to acquire mutex. Sanoid.net will exit." );
-    return (int)Errno.ENOLCK;
-}
-
-// If another process has the mutex, let's wait a few seconds before we give up.
-bool gotMutex = sanoidMutex.WaitOne( 5000 );
-
-if ( !gotMutex )
-{
-    logger.Fatal( "Another Sanoid.net process is running. This process will terminate." );
-    return (int)Errno.EBUSY;
-}
-
-logger.Debug( "Successfully acquired mutex Global\\Sanoid.net." );
 
 // PowerArgs takes over execution to parse command-line arguments.
 // We're going to cheat and let it parse and then deal with the aftermath.

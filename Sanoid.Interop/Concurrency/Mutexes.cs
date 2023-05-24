@@ -7,6 +7,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using NLog;
+using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Interop.Concurrency;
 
@@ -18,7 +19,7 @@ public sealed class Mutexes : IDisposable
 
     private Mutexes( )
     {
-        Logger.Debug("Creating mutex manager.");
+        Logger.Debug( "Creating mutex manager." );
     }
 
     private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
@@ -136,6 +137,71 @@ public sealed class Mutexes : IDisposable
 
         Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, sanoidMutex is null ? "null" : "not-null" );
         return sanoidMutex;
+    }
+
+    /// <summary>
+    ///     Attempts to acquire the named mutex, and returns a standard POSIX <see cref="Errno" /> based on the result.
+    /// </summary>
+    /// <param name="mutexName">The name of the mutex to attempt to acquire</param>
+    /// <param name="timeout">Number of milliseconds to wait for an in-use mutex, or 5000 if omitted</param>
+    /// <returns>
+    ///     A <see cref="MutexAcquisitionResult" /> containing the status of the operation as well as:<br />
+    ///     On success: The acquired Mutex<br />
+    ///     On failure: A <see cref="MutexAcquisitionException" /> describing the nature of the failure.
+    /// </returns>
+    public static MutexAcquisitionResult GetAndWaitMutex( string mutexName, int timeout = 5000 )
+    {
+        if ( string.IsNullOrWhiteSpace( mutexName ) )
+        {
+            const string errorMessage = "Requested mutex name cannot be null, empty string, or whitespace.";
+            return new( MutexAcquisitionErrno.InvalidMutexNameRequested, new( MutexAcquisitionErrno.InvalidMutexNameRequested, new ArgumentNullException( nameof( mutexName ), errorMessage ), errorMessage ) );
+        }
+
+        Mutex? possiblyNullMutex = GetMutex( out Exception? caughtException, mutexName );
+        switch ( caughtException )
+        {
+            case IOException ioe:
+            {
+                string errorMessage = $"Failed taking snapshots due to IOException: {ioe.Message}";
+                Logger.Error( ioe, errorMessage );
+                return new( MutexAcquisitionErrno.IoException, new( MutexAcquisitionErrno.IoException, ioe ) );
+            }
+            case AbandonedMutexException ame:
+            {
+                const string errorMessage = "Failed taking snapshots. A previous instance of Sanoid.net exited without properly releasing the snapshot mutex.";
+                Logger.Error( ame, errorMessage );
+                return new( MutexAcquisitionErrno.AbandonedMutex, new( MutexAcquisitionErrno.AbandonedMutex, ame ) );
+            }
+            case WaitHandleCannotBeOpenedException whcboe:
+            {
+                const string errorMessage = "Unable to acquire snapshot mutex. See InnerException for details.";
+                Logger.Error( whcboe, errorMessage );
+                return new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, whcboe ) );
+            }
+        }
+
+        if ( possiblyNullMutex is null )
+        {
+            const string errorMessage = "Unable to acquire snapshot mutex.";
+            Logger.Error( caughtException, errorMessage );
+            return new( MutexAcquisitionErrno.PossiblyNullMutex, new( MutexAcquisitionErrno.PossiblyNullMutex, new NullReferenceException( "A null mutex object was encountered" ), errorMessage ) );
+        }
+
+        // The exceptions this could throw will have already happened in the call to GetMutex above,
+        // so we can silence Resharper's warnings about them here.
+        // If one somehow happens at run-time, it will be addressed, but it should theoretically not be possible.
+        // ReSharper disable ExceptionNotDocumented
+        // ReSharper disable ExceptionNotDocumentedOptional
+        if ( possiblyNullMutex.WaitOne( timeout ) )
+        {
+            Logger.Debug( "Mutex {0} successfully acquired", mutexName );
+            return new( mutexName, possiblyNullMutex );
+        }
+        // ReSharper restore ExceptionNotDocumentedOptional
+        // ReSharper restore ExceptionNotDocumented
+
+        Logger.Error( "Timed out waiting for another process to release the mutex. This process will not take snapshots." );
+        return new( MutexAcquisitionErrno.AnotherProcessIsBusy, mutexName, possiblyNullMutex );
     }
 
     /// <summary>
