@@ -77,43 +77,48 @@ internal static class SnapshotTasks
                 continue;
             }
 
-            Logger.Debug( "Checking dataset {0} for inclusion", dataset.Path );
-            switch ( dataset )
-            {
-                case { Template.AutoSnapshot: true, Enabled: true }:
-                {
-                    Logger.Debug( "{0} is wanted for snapshots. Checking period", dataset.Path );
-                    if ( dataset.IsWantedForPeriod( period ) )
-                    {
-                        Logger.Debug( "{0} is wanted for period. Adding to queue", dataset.Path );
-                        wantedRoots.Enqueue( dataset );
-                        continue;
-                    }
-
-                    Logger.Trace( "{0} is not wanted for period", dataset.Path );
-                }
-                    break;
-                case { Enabled: false }:
-                {
-                    Logger.Trace( "{0} is not enabled for snapshots", dataset.Path );
-                }
-                    break;
-                case { Template: null }:
-                {
-                    Logger.Trace( "Dataset {0} has no Template. Skipping." );
-                }
-                    break;
-                default:
-                {
-                    Logger.Error( "Dataset {0} did not match any expected conditions. Exiting", dataset.Path );
-                    wantedRoots.Clear( );
-                    throw new InvalidOperationException( $"Dataset {dataset.Path} did not match any expected conditions. Exiting." );
-                }
-            }
+            CheckForDatasetInclusion( period, dataset, wantedRoots );
         }
 
         Logger.Debug( "Finished building Dataset queue for snapshots" );
         return wantedRoots;
+    }
+
+    private static void CheckForDatasetInclusion( SnapshotPeriod period, Dataset dataset, ConcurrentQueue<Dataset> wantedRoots )
+    {
+        Logger.Debug( "Checking dataset {0} for inclusion", dataset.Path );
+        switch ( dataset )
+        {
+            case { Template.AutoSnapshot: true, Enabled: true }:
+            {
+                Logger.Debug( "{0} is wanted for snapshots. Checking period", dataset.Path );
+                if ( dataset.IsWantedForPeriod( period ) )
+                {
+                    Logger.Debug( "{0} is wanted for period. Adding to queue", dataset.Path );
+                    wantedRoots.Enqueue( dataset );
+                    return;
+                }
+
+                Logger.Trace( "{0} is not wanted for period", dataset.Path );
+            }
+                break;
+            case { Enabled: false }:
+            {
+                Logger.Trace( "{0} is not enabled for snapshots", dataset.Path );
+            }
+                break;
+            case { Template: null }:
+            {
+                Logger.Trace( "Dataset {0} has no Template. Skipping." );
+            }
+                break;
+            default:
+            {
+                Logger.Error( "Dataset {0} did not match any expected conditions. Exiting", dataset.Path );
+                wantedRoots.Clear( );
+                throw new InvalidOperationException( $"Dataset {dataset.Path} did not match any expected conditions. Exiting." );
+            }
+        }
     }
 
     internal static void TakeSnapshot( Configuration config, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
