@@ -38,7 +38,7 @@ internal static class SnapshotTasks
             case MutexAcquisitionErrno.AnotherProcessIsBusy:
             case MutexAcquisitionErrno.InvalidMutexNameRequested:
             {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}.", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
+                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
                 return mutexAcquisitionResult;
             }
             default:
@@ -54,25 +54,25 @@ internal static class SnapshotTasks
                 continue;
             }
 
-            Logger.Debug( "Checking dataset {0} for inclusion.", dataset.Path );
+            Logger.Debug( "Checking dataset {0} for inclusion", dataset.Path );
             switch ( dataset )
             {
                 case { Template.AutoSnapshot: true, Enabled: true }:
                 {
-                    Logger.Debug( "{0} is wanted for snapshots. Checking period.", dataset.Path );
+                    Logger.Debug( "{0} is wanted for snapshots. Checking period", dataset.Path );
                     if ( dataset.IsWantedForPeriod( period ) )
                     {
-                        Logger.Debug( "{0} is wanted for period. Adding to queue.", dataset.Path );
+                        Logger.Debug( "{0} is wanted for period. Adding to queue", dataset.Path );
                         wantedRoots.Enqueue( dataset );
                         continue;
                     }
 
-                    Logger.Trace( "{0} is not wanted for period.", dataset.Path );
+                    Logger.Trace( "{0} is not wanted for period", dataset.Path );
                 }
                     break;
                 case { Enabled: false }:
                 {
-                    Logger.Trace( "{0} is not enabled for snapshots.", dataset.Path );
+                    Logger.Trace( "{0} is not enabled for snapshots", dataset.Path );
                 }
                     break;
                 case { Template: null }:
@@ -82,7 +82,7 @@ internal static class SnapshotTasks
                     break;
                 default:
                 {
-                    Logger.Error( "Dataset {0} did not match any expected conditions. Exiting.", dataset.Path );
+                    Logger.Error( "Dataset {0} did not match any expected conditions. Exiting", dataset.Path );
                     wantedRoots.Clear( );
                     throw new InvalidOperationException( $"Dataset {dataset.Path} did not match any expected conditions. Exiting." );
                 }
