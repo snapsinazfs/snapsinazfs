@@ -19,6 +19,10 @@ using Sanoid.Interop.Libc.Enums;
 Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
+// Let's register to receive the process exit event to at least attempt to let go of any mutexes we forgot to
+// release, and log them as warnings.
+AppDomain.CurrentDomain.ProcessExit += ( _, _ ) => Mutexes.DisposeMutexes( true );
+
 Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
 
 switch ( caughtFatalException )
