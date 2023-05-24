@@ -13,7 +13,7 @@ namespace Sanoid.Interop.Concurrency;
 public static class Mutexes
 {
     private static bool _disposed;
-    private static readonly ConcurrentDictionary<string, Mutex?> _mutexes = new( );
+    private static readonly ConcurrentDictionary<string, Mutex?> AllMutexes = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
@@ -72,7 +72,7 @@ public static class Mutexes
     {
         Logger.Debug( "Mutex {0} requested.", name );
         caughtException = null;
-        bool exists = _mutexes.TryGetValue( name, out Mutex? sanoidMutex );
+        bool exists = AllMutexes.TryGetValue( name, out Mutex? sanoidMutex );
         if ( exists && sanoidMutex != null )
         {
             Logger.Debug( "Mutex {0} already exists. Returning it.", name );
@@ -86,7 +86,7 @@ public static class Mutexes
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             // This exception is not possible. Setter creates the node.
             // ReSharper disable once ExceptionNotDocumentedOptional
-            _mutexes[ name ] = sanoidMutex;
+            AllMutexes[ name ] = sanoidMutex;
             _disposed = false;
         }
         catch ( IOException ioe )
@@ -109,8 +109,18 @@ public static class Mutexes
         return sanoidMutex;
     }
 
+    /// <summary>
+    ///     Attempts to release the specified mutex.
+    /// </summary>
+    /// <param name="name">The name of the mutex to release.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
     public static void ReleaseMutex( string name = "Global\\Sanoid.net" )
     {
+        if ( string.IsNullOrWhiteSpace( name ) )
+        {
+            throw new ArgumentNullException( nameof( name ), "Mutex name cannot be null or an empty string." );
+        }
+
         Logger.Debug( "Requested to release mutex {0}", name );
         if ( _disposed )
         {
@@ -119,11 +129,13 @@ public static class Mutexes
 
         try
         {
-            if ( _mutexes.TryGetValue( name, out Mutex? mutex ) )
+            if ( AllMutexes.TryGetValue( name, out Mutex? mutex ) )
             {
                 mutex?.ReleaseMutex( );
-                _mutexes.TryRemove( name, out _ );
+                AllMutexes.TryRemove( name, out _ );
             }
+
+            Logger.Debug( "Mutex {0} released", name );
         }
         catch ( ApplicationException ex )
         {
@@ -133,7 +145,8 @@ public static class Mutexes
         catch ( ObjectDisposedException ex )
         {
             // If the mutex has somehow already been disposed elsewhere, we can discard this and carry on.
-            Logger.Warn( ex, "Attempted to release mutex that has already been disposed." );
+            // Log as an error, though, because this needs to be handled in code.
+            Logger.Error( ex, "Attempted to release mutex that has already been disposed." );
         }
     }
 
@@ -147,12 +160,12 @@ public static class Mutexes
         Logger.Debug( "Disposing all mutexes" );
 
         ReleaseMutex( );
-        foreach ( ( string? _, Mutex? mutex ) in _mutexes )
+        foreach ( ( string? _, Mutex? mutex ) in AllMutexes )
         {
             mutex?.Dispose( );
         }
 
-        _mutexes.Clear( );
+        AllMutexes.Clear( );
         _disposed = true;
     }
 }
