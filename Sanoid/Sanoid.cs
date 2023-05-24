@@ -19,7 +19,7 @@ using Sanoid.Interop.Libc.Enums;
 Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
-using Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out bool _, out Exception? caughtFatalException );
+using Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
 
 switch ( caughtFatalException )
 {
