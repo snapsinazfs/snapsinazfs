@@ -97,18 +97,18 @@ public sealed class Mutexes : IDisposable
     [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
     public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\Sanoid.net" )
     {
-        Logger.Debug( "Mutex {0} requested.", name );
+        Logger.Debug( "Mutex {0} requested", name );
         caughtException = null;
         bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? sanoidMutex );
         if ( exists && sanoidMutex != null )
         {
-            Logger.Debug( "Mutex {0} already exists. Returning it.", name );
+            Logger.Debug( "Mutex {0} already exists. Returning it", name );
             return sanoidMutex;
         }
 
         try
         {
-            Logger.Debug( "Attempting to acquire new or existing mutex {0}.", name );
+            Logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
             sanoidMutex = new( true, name, out bool createdNew );
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             // This exception is not possible. Setter creates the node.
@@ -118,17 +118,17 @@ public sealed class Mutexes : IDisposable
         }
         catch ( IOException ioe )
         {
-            Logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired.", name );
+            Logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired", name );
             caughtException = ioe;
         }
         catch ( WaitHandleCannotBeOpenedException whcboe )
         {
-            Logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired.", name );
+            Logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired", name );
             caughtException = whcboe;
         }
         catch ( AbandonedMutexException ame )
         {
-            Logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid.", name );
+            Logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid", name );
             caughtException = ame;
         }
 
@@ -255,7 +255,7 @@ public sealed class Mutexes : IDisposable
         {
             if ( warnOnStillHeld )
             {
-                Logger.Warn( "Mutex {0} still held.", name );
+                Logger.Warn( "Mutex {0} still held", name );
             }
 
             mutex?.Dispose( );
