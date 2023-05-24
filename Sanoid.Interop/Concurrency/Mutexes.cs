@@ -4,9 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Security.AccessControl;
 using NLog;
-using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Interop.Concurrency;
 
@@ -43,20 +41,30 @@ public static class Mutexes
     ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
     ///     Caller bears responsibility for handling results of this method call.
     /// </remarks>
-    /// <exception cref="UnauthorizedAccessException">Windows-only: The named mutex exists and has access control security, but the user does not have <see cref="System.Security.AccessControl.MutexRights.FullControl" />.</exception>
-    /// <exception cref="ArgumentException">.NET Framework only: <paramref name="name" /> is longer than MAX_PATH (260 characters).</exception>
+    /// <exception cref="UnauthorizedAccessException">
+    ///     Windows-only: The named mutex exists and has access control security, but
+    ///     the user does not have FullControl.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    ///     .NET Framework only: <paramref name="name" /> is longer than MAX_PATH (260
+    ///     characters).
+    /// </exception>
     public static Mutex? GetSanoidMutex( out bool createdNew, out Exception? caughtException, string name = "Global\\Sanoid.net" )
     {
+        Logger.Debug( "Mutex {0} requested.", name );
         caughtException = null;
         createdNew = false;
         if ( _sanoidMutex != null )
         {
+            Logger.Debug( "Mutex {0} already exists. Returning it.", name );
             return _sanoidMutex;
         }
 
         try
         {
+            Logger.Debug( "Attempting to acquire new or existing mutex {0}.", name );
             _sanoidMutex = new( true, name, out createdNew );
+            Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             _disposed = false;
         }
         catch ( IOException ioe )
@@ -75,6 +83,7 @@ public static class Mutexes
             caughtException = ame;
         }
 
+        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, _sanoidMutex is null ? "null" : "not-null" );
         return _sanoidMutex;
     }
 
@@ -92,12 +101,12 @@ public static class Mutexes
         catch ( ApplicationException ex )
         {
             //This means we didn't own the mutex. We can discard this and carry on with life.
-            Logger.Warn( "Attempted to release mutex when we didn't own it.", ex );
+            Logger.Warn(ex, "Attempted to release mutex when we didn't own it." );
         }
         catch ( ObjectDisposedException ex )
         {
             // If the mutex has somehow already been disposed elsewhere, we can discard this and carry on.
-            Logger.Warn( "Attempted to release mutex that has already been disposed.", ex );
+            Logger.Warn( ex, "Attempted to release mutex that has already been disposed." );
         }
     }
 
