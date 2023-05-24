@@ -68,6 +68,7 @@ public static class Mutexes
     ///     .NET Framework only: <paramref name="name" /> is longer than MAX_PATH (260
     ///     characters).
     /// </exception>
+    /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
     public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\Sanoid.net" )
     {
         Logger.Debug( "Mutex {0} requested.", name );
@@ -150,7 +151,7 @@ public static class Mutexes
         }
     }
 
-    public static void Dispose( )
+    public static void DisposeMutexes( bool warnOnStillHeld = false )
     {
         if ( _disposed )
         {
@@ -159,9 +160,13 @@ public static class Mutexes
 
         Logger.Debug( "Disposing all mutexes" );
 
-        ReleaseMutex( );
-        foreach ( ( string? _, Mutex? mutex ) in AllMutexes )
+        foreach ( ( string? name, Mutex? mutex ) in AllMutexes )
         {
+            if ( warnOnStillHeld )
+            {
+                Logger.Warn( "Mutex {0} still held.", name );
+            }
+
             mutex?.Dispose( );
         }
 

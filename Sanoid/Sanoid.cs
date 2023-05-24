@@ -19,7 +19,7 @@ using Sanoid.Interop.Libc.Enums;
 Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
-using Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
+Mutex? sanoidMutex = Mutexes.GetSanoidMutex( out Exception? caughtFatalException );
 
 switch ( caughtFatalException )
 {
@@ -158,7 +158,6 @@ logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
 logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
 
-// This isn't explicitly necessary, because of the using statement, but I'm putting it here to force its scope to
-// exist all the way through the file without having to use a block using, so it doesn't disappear unexpectedly.
-sanoidMutex.ReleaseMutex( );
+// Be sure we clean up any mutexes we have acquired, and log warnings for those that this has to deal with.
+Mutexes.DisposeMutexes(true);
 return (int)Errno.ENOSYS;
