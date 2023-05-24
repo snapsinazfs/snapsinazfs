@@ -97,6 +97,7 @@ public class ZfsCommandRunner : IZfsCommandRunner
         {
             using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
             {
+                _logger.Debug( "Waiting for {0} {1} to finish", zfsCommand, arguments );
                 snapshotProcess?.WaitForExit( );
             }
 
@@ -104,7 +105,7 @@ public class ZfsCommandRunner : IZfsCommandRunner
         }
         catch ( Exception e )
         {
-            _logger.Error( "Error running {0} {1}. Snapshot may not exist.", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments, e );
+            _logger.Error( "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments, e );
             return false;
         }
     }

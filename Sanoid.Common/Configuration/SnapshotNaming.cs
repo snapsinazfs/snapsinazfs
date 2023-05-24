@@ -16,7 +16,7 @@ namespace Sanoid.Common.Configuration;
 public class SnapshotNaming
 {
     private readonly IConfigurationSection _snapshotNamingConfigurationSection;
-
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     /// Creates a new instance of a SnapshotNaming object, for control of Snapshot naming rules, from the specified configuration section
     /// </summary>
@@ -196,8 +196,9 @@ public class SnapshotNaming
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public string GetSnapshotName( SnapshotPeriod period,DateTimeOffset timestamp )
     {
+        Logger.Debug("Getting snapshot name.");
         string everythingButSuffix = $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}";
-        return period switch
+        string fullSnapshotName = period switch
         {
             SnapshotPeriod.Daily => $"{everythingButSuffix}{DailySuffix}",
             SnapshotPeriod.Monthly => $"{everythingButSuffix}{MonthlySuffix}",
@@ -209,5 +210,7 @@ public class SnapshotNaming
             SnapshotPeriod.Manual => $"{everythingButSuffix}{ManualSuffix}",
             _ => throw new ArgumentOutOfRangeException( nameof( period ), period, null )
         };
+        Logger.Debug( "Snapshot name is {0}", fullSnapshotName );
+        return fullSnapshotName;
     }
 }
