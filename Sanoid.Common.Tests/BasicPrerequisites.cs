@@ -6,7 +6,6 @@
 
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
 namespace Sanoid.Common.Tests;
 
@@ -20,6 +19,7 @@ public class BasicPrerequisiteTests
     [Order( 1 )]
     public void IsOperatingSystemSupported( )
     {
+        Console.Write( $"Checking if operating system is supported: {(Environment.OSVersion.Platform == PlatformID.Unix ? "yes" : $"no")}" );
         Warn.If( Environment.OSVersion.Platform, Is.Not.EqualTo( PlatformID.Unix ), ( ) => "Not on supported platform." );
     }
 
@@ -57,7 +57,7 @@ public class BasicPrerequisiteTests
         // So, we're going to slice up the output from `dotnet --info` and look for the .NET SDK section and
         // grab the version string from there to check if it's ok...
         Console.Write( "Checking dotnet --info..." );
-        Console.Out.Flush();
+        Console.Out.Flush( );
         ProcessStartInfo psi = new( "dotnet", "--info" )
         {
             CreateNoWindow = true,
@@ -130,7 +130,7 @@ public class BasicPrerequisiteTests
     [Category( ".NET" )]
     public void CheckDotnetRuntimeVersionIsSupported( )
     {
-        Console.Write("Checking that dotnet runtime version is supported (7.0 or higher): "  );
+        Console.Write( "Checking that dotnet runtime version is supported (7.0 or higher): " );
         Assert.That( _dotnetInfoOutput, Is.Not.Null );
         // This regular expression matches the entire ".NET runtimes installed:" section, and specifically
         // captures named groups that should capture as many lines as there are in the entire section
