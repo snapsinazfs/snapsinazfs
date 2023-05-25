@@ -11,6 +11,13 @@ using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Interop.Concurrency;
 
+/// <summary>
+///     A static class for access to common uses of system-level mutexes
+/// </summary>
+/// <remarks>
+///     By default, lock files used for <see cref="Mutex" />es are stored at /tmp/.dotnet/shm under .net7.0 on Linux<br />
+///     The name of a given named Mutex determines its path beneath that root.
+/// </remarks>
 public sealed class Mutexes : IDisposable
 {
     private Mutexes( )
