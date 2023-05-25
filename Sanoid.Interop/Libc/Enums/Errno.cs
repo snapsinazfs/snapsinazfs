@@ -4,19 +4,76 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+
 namespace Sanoid.Interop.Libc.Enums;
 
-// ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 /// <summary>
-///     An enum of POSIX-compliant status codes as defined in errno-base.h and errno.h of Linux kernel version 6.1.9
-///     headers.
+///     An <see langword="enum" /> of POSIX-compliant status codes, as defined in
+///     <see href="https://raw.githubusercontent.com/torvalds/linux/v6.1/include/uapi/asm-generic/errno-base.h">errno-base.h</see>
+///     and <see href="https://github.com/torvalds/linux/raw/v6.1/include/uapi/asm-generic/errno.h">errno.h</see> of the
+///     <see href="https://github.com/torvalds/linux/tree/830b3c68c1fb1e9176028d02ef86f3cf76aa2476/include">
+///         Linux kernel version 6.1 headers
+///     </see>
+///     , combined together, as well as extra values for -1 and 0, for better static analysis
 /// </summary>
+/// <remarks>
+///     <list type="table">
+///         <listheader>
+///             <description>
+///                 Note that the following values are not defined in errno-base.h or errno.h and may be unwise
+///                 for general use outside of the context of their use in the Sanoid.net project:
+///             </description>
+///         </listheader>
+///         <item>
+///             <term>
+///                 <see cref="GenericError" />
+///             </term>
+///             <description>
+///                 Defined here as -1 (0xFFFFFFFF). Often returned by applications as a generic error, while
+///                 also setting LastError
+///             </description>
+///         </item>
+///         <item>
+///             <term>
+///                 <see cref="EOK" />
+///             </term>
+///             <description>
+///                 Defined here as 0 (0x00000000). POSIX-compliant applications return 0 on success, though some
+///                 applications may also set LastError, anyway.
+///             </description>
+///         </item>
+///     </list>
+///     While this code is free for use by the terms of <see href="https://www.gnu.org/licenses/gpl-3.0.txt">GPLv3</see>, I
+///     certainly don't recommend using it elsewhere without due diligence in ensuring the values returned by an
+///     application are known and expected to correspond to these enumeration values, or you can expect
+///     <see cref="InvalidCastException" />s and other issues.
+/// </remarks>
+// General recommendation for types used with P/Invoke is to matain the native library's naming conventions, so
+// let's silence ReSharper against the various ways this type violates recommended C# naming conventions.
+// Also, a lot of values aren't used, but I'm leaving them here, so silencing the unused member warning, too.
+[SuppressMessage( "ReSharper", "InconsistentNaming", Justification = "Following recommendations for types used with P/Invoke" )]
 public enum Errno
 {
-    /// <summary>No error. Not actually defined in errno.h, but here for nice output in tests and such.</summary>
+    /// <summary>
+    ///     Unspecified status indicating error. Not actually defined in errno.h, but here for nice output and better
+    ///     static analysis.
+    /// </summary>
+    /// <remarks>
+    ///     Generally, a P/Invoke method that returns this has set an error code that should be retrieved by a call to
+    ///     <see cref="Marshal.GetLastPInvokeError" /> for further error handling.<br />
+    ///     It is entirely possible that some applications may use this status for specific error cases, but that's the
+    ///     caller's responsibility to deal with.
+    /// </remarks>
+    GenericError = -1,
+
+    /// <summary>No error. Not actually defined in errno.h, but here for nice output and better static analysis.</summary>
+    /// <remarks>
+    ///     Generally, a P/Invoke method that returns this is indicating it executed and exited without a critical error.<br />
+    ///     However, it is entirely possible that some applications may have also set LastError, but it is the caller's
+    ///     responsibility to deal with that.
+    /// </remarks>
     EOK = 0,
 
     /// <summary>Operation not permitted</summary>
@@ -129,7 +186,7 @@ public enum Errno
 
     /// <summary>
     ///     Function not implemented
-    ///</summary>
+    /// </summary>
     ENOSYS = 38,
 
     ///<summary>Directory not empty</summary>
@@ -444,4 +501,3 @@ public enum Errno
     ENOATTR = 1093,
     ENOPOLICY = 1103 // No such policy registered
 }
-// ReSharper enable InconsistentNaming
