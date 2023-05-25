@@ -18,6 +18,13 @@ public class BasicPrerequisiteTests
 {
     [Test]
     [Order( 1 )]
+    public void IsOperatingSystemSupported( )
+    {
+        Warn.If( Environment.OSVersion.Platform, Is.Not.EqualTo( PlatformID.Unix ), ( ) => "Not on supported platform." );
+    }
+
+    [Test]
+    [Order( 1 )]
     public void CheckPathEnvironmentVariableIsDefined( )
     {
         Console.Write( "Checking PATH environment variable not null: " );
