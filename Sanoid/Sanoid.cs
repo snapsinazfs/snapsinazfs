@@ -20,7 +20,7 @@ Logging.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
 using Mutexes mutexes = Mutexes.Instance;
-using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex("Global\\Sanoid.net");
+using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\Sanoid.net" );
 
 switch ( mutexResult.ErrorCode )
 {
@@ -45,7 +45,7 @@ switch ( mutexResult.ErrorCode )
     case MutexAcquisitionErrno.InvalidMutexNameRequested:
         return (int)mutexResult.ErrorCode;
     default:
-        logger.Fatal(mutexResult.Exception,"Failed to get mutex. Exiting.");
+        logger.Fatal( mutexResult.Exception, "Failed to get mutex. Exiting." );
         return (int)mutexResult.ErrorCode;
 }
 
@@ -139,7 +139,7 @@ sanoidConfiguration.TrimUnwantedDatasetsFromRunningConfiguration( );
 if ( sanoidConfiguration.TakeSnapshots )
 {
     DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}.", currentTimestamp );
+    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
     SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
 }
 else
