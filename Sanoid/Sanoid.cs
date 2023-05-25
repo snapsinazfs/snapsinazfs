@@ -125,19 +125,11 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #endif
                                        .Build( );
 
-Type zfsCommandRunnerType;
-#if WINDOWS
-zfsCommandRunnerType = typeof( DummyZfsCommandRunner );
-#else
-zfsCommandRunnerType = typeof( ZfsCommandRunner );
-#endif
-logger.Debug( "Creating ZFS command runner of type {0}.", zfsCommandRunnerType );
-
-if ( Activator.CreateInstance( zfsCommandRunnerType, rootConfiguration.GetRequiredSection( "PlatformUtilities" ) ) is not IZfsCommandRunner zfsCommandRunner )
+IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 {
-    logger.Error( "ZFS command runner of type {0} was unable to be created. Program will terminate." );
-    return (int)Errno.EINVAL;
-}
+    PlatformID.Unix => new ZfsCommandRunner( rootConfiguration.GetRequiredSection( "PlatformUtilities" ) ),
+    _ => new DummyZfsCommandRunner( )
+};
 
 Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
 sanoidConfiguration.LoadConfigurationFromIConfiguration( );
