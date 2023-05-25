@@ -9,6 +9,10 @@ using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid;
 
+/// <summary>
+///     A dummy implementation of <see cref="IZfsCommandRunner" /> for use in development or if run from an unsupported
+///     platform
+/// </summary>
 internal class DummyZfsCommandRunner : IZfsCommandRunner
 {
     /// <summary>
