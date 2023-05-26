@@ -4,9 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Configuration.Snapshots;
-using Sanoid.Interop.Libc.Enums;
 
 namespace Sanoid.Common;
 
@@ -153,5 +152,20 @@ public static class BaseClassExtensions
         }
 
         return configurationSection[ settingKey ].AsInt( fallbackValue );
+    }
+
+    /// <inheritdoc cref="Enum.HasFlag" />
+    /// <remarks>
+    ///     Valid for 32-bit enums ONLY. Will return unpredictable results or potentially memory access violations for shorter
+    ///     types.<br />
+    ///     Works by taking the pointer to your enum and the flag value, re-casting them as int pointers, and then bitwise
+    ///     AND-ing the two values.
+    /// </remarks>
+    [MethodImpl( MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization )]
+    public static unsafe bool BinaryHasFlags<T>( this T value, T flag ) where T : unmanaged, Enum
+    {
+        int* valuePointer = (int*)&value;
+        int* flagPointer = (int*)&flag;
+        return ( *valuePointer & *flagPointer ) == *valuePointer;
     }
 }
