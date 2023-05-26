@@ -4,12 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
+using System.Security;
 using System.Text.Json.Serialization;
-using NLog.Fluent;
+using Sanoid.Common.Configuration.Json;
 using Sanoid.Common.Configuration.Snapshots;
-using Sanoid.Common.Configuration.Templates;
+using Template = Sanoid.Common.Configuration.Templates.Template;
 
 namespace Sanoid.Common.Configuration.Datasets;
 
@@ -55,15 +54,76 @@ public class Dataset
     public bool Enabled { get; set; }
 
     /// <summary>
+    /// Scans all processes in /proc for any running calls to zfs send or receive that involve this Dataset
+    /// </summary>
+    /// <exception cref="SecurityException">The caller does not have the required permission.</exception>
+    /// <exception cref="PathTooLongException" />
+    /// <exception cref="ArgumentNullException" />
+    /// <exception cref="DirectoryNotFoundException">
+    ///     The path encapsulated in the <see cref="DirectoryInfo" /> object is
+    ///     invalid (for example, it is on an unmapped drive).
+    /// </exception>
+    /// <exception cref="ArgumentException" />
+    /// <exception cref="UnauthorizedAccessException" />
+    /// <exception cref="NotSupportedException" />
+    /// <exception cref="IOException" />
+    /// <exception cref="FileNotFoundException" />
+    /// <exception cref="OverflowException" />
+    /// 
+    public bool IsAlreadyInvolvedInSendOrReceive
+    {
+        get
+        {
+            DirectoryInfo procDir = new( "/proc" );
+            foreach ( DirectoryInfo p in procDir.EnumerateDirectories( ) )
+            {
+                // Process directories are purely numeric, so skip anything that isn't int parseable
+                if ( !int.TryParse( p.Name, out _ ) )
+                {
+                    continue;
+                }
+
+                // Look for the exe node in /proc/[id]/
+                FileInfo f = new( System.IO.Path.Combine( p.FullName, "exe" ) );
+
+                // Verify it is actually there, is a ReparsePoint, is a valid string value, and ends with "/zfs"
+                if ( f.Exists && f.Attributes.BinaryHasFlags( FileAttributes.ReparsePoint ) & !string.IsNullOrWhiteSpace(f.LinkTarget) && f.LinkTarget!.EndsWith( "/zfs" ) )
+                {
+                    continue;
+                }
+
+                // Get the cmdline special file, and check if it is long enough to care and is send or receive operation
+                string[] commandLine = File.ReadAllText( System.IO.Path.Combine( p.FullName, "cmdline" ) ).Split( '\0', (StringSplitOptions)3 );
+                if ( commandLine.Length < 3 || !new[] { "send", "receive", "recv" }.Contains( commandLine[ 1 ] ) )
+                {
+                    continue;
+                }
+
+                // Scan all arguments past the second one and check if any are explicitly our dataset (not children)
+                for ( int i = commandLine.Length-1; i>2;i--)
+                {
+                    if ( System.IO.Path.GetDirectoryName(commandLine[i]) == Path )
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets whether this dataset exists explicitly in the configuration
     /// </summary>
     public bool IsInConfiguration { get; set; }
 
     /// <summary>
-    /// Gets whether this Dataset is a zpool
+    ///     Gets whether this Dataset is a zpool
     /// </summary>
     /// <value>
-    ///     A <see langword="bool"/> computed from !<see cref="IsRoot"/> &amp;&amp; <see cref="_parent"/>!.<see cref="IsRoot"/>
+    ///     A <see langword="bool" /> computed from !<see cref="IsRoot" /> &amp;&amp; <see cref="_parent" />!.
+    ///     <see cref="IsRoot" />
     /// </value>
     public bool IsPool => !IsRoot && _parent!.IsRoot;
 
@@ -128,15 +188,18 @@ public class Dataset
         return Root;
     }
 
-    internal void TrimUnwantedChildren(SortedDictionary<string,Dataset> allDatasets )
+    internal void TrimUnwantedChildren( SortedDictionary<string, Dataset> allDatasets )
     {
         if ( Children.Count == 0 )
+        {
             return;
+        }
+
         Logger.Debug( "Pruning unwanted children of Dataset {0}", Path );
         string[] dsNames = Children.Keys.ToArray( );
         foreach ( string childKey in dsNames )
         {
-            if ( !allDatasets.TryGetValue( childKey, out _) )
+            if ( !allDatasets.TryGetValue( childKey, out _ ) )
             {
                 continue;
             }
@@ -158,6 +221,7 @@ public class Dataset
 
             Logger.Debug( "Dataset {0} is still wanted.", child.Path );
         }
+
         Logger.Debug( "Finished pruning unwanted children of Dataset {0}", Path );
     }
 
