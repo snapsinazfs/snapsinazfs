@@ -8,6 +8,8 @@
  another is a good way to learn a language.\
  I use sanoid on several systems, and it is not a huge project, so it seemed like a decent project to tackle.
 
+ That was how the project started. Now, I've learned what I wanted to learn and my goals are evolving as I continue with the project.
+
  ## Goals
 
  Ideally, the goal is to create a .net 7.0+ application having at least feature parity with the version/commit
@@ -15,20 +17,16 @@
  that is sanoid release 2.1.0 plus all sanoid master branch commits up to
  [jimsalterjrs/sanoid@55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0](https://github.com/jimsalterjrs/sanoid/commit/55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0)
 
- I have been making various minor enhancements along the way, so far, especially in the area of configuration,
- to help make things more versatile and help keep configurations more logically organized, in a hierarchical
- fashion, which at least makes sense to me, since file systems are naturally hierarchical, and PERL sanoid
- already builds a hierarchical configuration from its flat configuration files.
+ I have been making various minor enhancements along the way, so far, especially in the area of configuration, which is now going to depend on native facilities provided by ZFS, via user properties.\
+ This will keep all of the zfs-related configuration in ZFS itself, and will make the settings and how they are going to apply to each dataset much easier both for the user and also for me, in developing Sanoid.net.
+
+ I originally started off by using an entirely JSON configuration, which was nice in a lot of ways and made hierarchical configuration easier to achieve in code, but creating a robust and user-proof configuration system has rapidly become a larger time consumer than the rest of the application, with plenty of potential pitfalls, especially with inheritance of settings and in deciding where, in the hierarchy, and on which elements a setting should exist. If the settings are stored in ZFS itself, there are already well-defined rules around inheritance, and retrieval of those properties is quick and efficient and very easy to code for, as Sanoid.net won't have to parse a user-friendly configuration and then turn it into a meaningful runtime configuration.
 
  #### Long-Term Goals
 
- I intend to, at some point, implement some functionality that PERL sanoid/syncoid currently depends on external
- utilities for, such as sending snapshots to remote machines, as native calls within the application, using
- sockets, openssl, etc, as appropriate. Same goes for compression of send streams.
+ I intend to, at some point, implement some functionality that PERL sanoid/syncoid currently depends on external utilities for, such as sending snapshots to remote machines, as native calls within the application, using sockets, openssl, etc, as appropriate. Same goes for compression of send streams.
 
- I also want to build Sanoid.net to eventually support running as a daemon, which could have various advantages,
- such as more consistent and reliable timestamps (since it will not depend on systemd timers to run) and anything
- else that having a long-running resident process may provide.
+ I also want to build Sanoid.net to eventually support running as a daemon, which could have various advantages, such as more consistent and reliable timestamps (since it will not depend on systemd timers to run) and anything else that having a long-running resident process may provide.
 
  #### Long-Term Lofty Goals
 
@@ -41,58 +39,27 @@
  
  ## Compatibility With PERL-based sanoid
  
- Sanoid.net is intended to be at least mostly compatible with PERL-based sanoid. Invocations of Sanoid.net will
- accept the same arguments as PERL sanoid, and will behave largely the same, except for default timing settings 
- (explained below) and logging output, which is via nlog.
- 
- All settings are configurable by the end user, using json files, environment variables, command line switches,
- and ZFS cistom dataset properties (planned for future), and can be made to match PERL sanoid, if desired.
+ Sanoid.net is intended to have similar behavior to PERL-based sanoid. Invocations of Sanoid.net will accept most of the same arguments as PERL sanoid, and will behave largely the same.
  
  Sanoid.net will also have additional capabilities which are not guaranteed to be available in PERL sanoid.
- 
- Thus, sanoid => Sanoid.net portability should be fairly seemless, but Sanoid.net => sanoid portability is only
- guaranteed if no Sanoid.net enhancements are used.
 
  Sanoid.net is also planned to incorporate some functionality that PERL sanoid currently delegates to other
  utilities, where that functionality is either included in .net or where I get the motivation to do so.
 
  ## Project Organization
 
- I intend to organize the project differently than sanoid/syncoid/findoid, partially thanks to the benefit of
- hindsight, but also in an attempt to make it easier to maintain, modify, and extend.
+ I intend to organize the project differently than sanoid/syncoid/findoid, partially thanks to the benefit of hindsight, but also in an attempt to make it easier to maintain, modify, and extend.
 
- Most significantly, I intend to separate the code into one or more common library projects, to help avoid code
- duplication and aid in organization. Currently, Sanoid.Common contains most of the core functionality, including
- configuration and the zfs command runner.
+ Most significantly, I intend to separate the code into one or more common library projects, to help avoid code duplication and aid in organization. Currently, Sanoid.Common contains most of the core functionality, including configuration and the zfs command runner. Sanoid.Interop contains code such as native platform calls, Concurrency management, and other Interop layer code.
 
- Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked
- with identical commands and arguments as their PERL ancestors, plus anything new Sanoid.net provides.
+ Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked with the same or very similar commands and arguments as their PERL ancestors, plus anything new Sanoid.net provides.
 
- **Configuration** for the applications will be a hiearchy of json files, with formal schemas included, 
- that mimic and, where the motivation strikes, extend the existing configuration capabilities of PERL 
- sanoid/syncoid.\
- A command line argument will be provided that enables Sanoid.net to parse PERL sanoid's configuration files
- and convert them to Sanoid.net's json configuration format.\
- Sanoid.net will NOT take action using PERL sanoid's configuration files *except* to convert those files to
- Sanoid.net's json format. Invoking Sanoid.net with the command line switch to convert PERL sanoid configuration
- will not take snapshots or prune existing snapshots, and will behave as if --dry-run was specified.
-
- My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well
- as vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in
- Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and,
- therefore, sanoid currenly are a Linux-targeted toolset, the project will always be guaranteed to compile and
- run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what I have) with
- the project's required version of the dotnet runtime installed.
+ My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and, therefore, sanoid currenly are a Linux-targeted toolset, the project will always be guaranteed to compile and run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what I have) with the project's required version of the dotnet runtime installed.
 
  ## Dependencies
 
- My intention is for this project to have no external dependencies other than the required version of the
- dotnet runtime that have to be manually installed by the end user. This includes not being reliant on the
- PERL versions of the applications, either, or any of their core dependencies. All compile-time dependencies of
- these ports will either be included in published releases or included as project references in the dotnet 
- projects, so that they can be automatically restored by the dotnet runtime, from the public NuGet repository.\
- Runtime dependencies, such as mbuffer, ssh, and others that are invoked by sanoid are, of course, still
- required to be installed and available, if they are used by your configuration.
+ My intention is for this project to have no external dependencies other than the required version of the dotnet runtime that have to be manually installed by the end user. This includes not being reliant on the PERL versions of the applications, either, or any of their core. All compile-time dependencies of these ports will either be included in published releases or included as project references in the dotnet projects, so that they can be automatically restored by the dotnet SDK, from the public NuGet repository.\
+ Runtime dependencies, such as mbuffer, ssh, and others that are invoked by sanoid are, of course, still required to be installed and available, if they are used by your configuration, though I intend to implement some of that functionality in Sanoid.net itself, eventually.
  
  That said, here are the nuget package dependencies as of right now (automatically retrieved during build):
  
@@ -105,17 +72,11 @@
   - NLog
   - NLog.Extensions.Logging
   - NLog.Targets.Journald
+  - JetBrains.Annotations
 
-  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build
-  targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All
-  build targets in the Makefile are bash-compatible scripts that assume standard coreutils are installed.
+  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils are installed. I may also use autoconf, at a later time, though it hasn't been strictly necessary, so far.
 
-  Platform utilities should only be required for installation, and are mostly included in core-utils, so should
-  be available on pretty much every standard linux distro. Sanoid.net itself uses native platform calls from libc,
-  for the functionality that would otherwise be provided by those utilities, so the standard shared libraries
-  included in most basic distro installs are all Sanoid.net needs to run properly. The goal is for Sanoid.net
-  to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0
-  SDK, in addition, to build from source.
+  Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. Sanoid.net itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all Sanoid.net needs to run properly (binaries only - header files are not needed). The goal is for Sanoid.net to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
  ## Installing From Source
  
@@ -124,11 +85,7 @@
      cd sanoid/dotnet
      make install-release
 
- This will fetch all .net dependencies from NuGet, build Sanoid.net in the ./publish/Release-R2R/ folder as a
- combined "Ready-to-Run" (partially natively pre-compiled) executable file, install Sanoid.net to
- `/usr/local/bin/Sanoid` (also hard-linked to `/usr/local/bin/Sanoid.net`), install all base configuration files
- to `/usr/local/share/Sanoid.net/`, and install a local configuration file at `/etc/sanoid/Sanoid.local.json`,
- making backups of any replaced configuration files along the way.
+ This will fetch all .net dependencies from NuGet, build Sanoid.net in the ./publish/Release-R2R/ folder as a combined "Ready-to-Run" (partially natively pre-compiled) executable file, install Sanoid.net to usr/local/bin/Sanoid` (also hard-linked to `/usr/local/bin/Sanoid.net`), install all base configuration files to `/usr/local/share/Sanoid.net/`, and install a local configuration file at `/etc/sanoid/Sanoid.local.json`, making backups of any replaced configuration files along the way.
 
  ## Uninstalling From Source
 
@@ -156,33 +113,91 @@
  Sanoid.net is installed in a common binary path. If `/usr/local/bin` is not in your PATH, you should add it at
  least for the users intended to run it, or system-wide, if you so desire.
 
- ## Environment Variables
+ You can also invoke it directly from the project folder itself by running `dotnet run`.
  
- Sanoid.net will support configuration elements specified in environment variables.
+ ## Configuration
 
- However, at this time, this is not supported on Linux, as environment variable identifiers dot not support the
- syntax of .net configuration elements (due to the use of characters such as `:` that are illegal for variable
- names). I will have to look into ways to get around that. It is likely it will simply require that variables 
- either be explicitly named for specific options or that their values will have to contain JSON strings.
+ **NB: Sanoid.net is an early alpha project, and its configuration is not to be considered stable until Sanoid.net reaches beta, at which time significant changes to configuration method and schema will be avoided as much as possible.**
+
+ Configuration for Sanoid.net will be quite different from PERL sanoid.\
+ Most importantly, many/most settings that PERL sanoid currently keeps in text files will instead be stored directly in ZFS, using custom user properties.\
+ Settings not relevant to ZFS or Sanoid.net's interaction with it will be stored in JSON configuration files.
  
- ## Configuration Hierarchy
+ Continue reading below for specifics on where and how settings are stored.
+
+ ### Global Sanoid.net Settings
+
+ Various global settings will still be in text files, formatted as JSON, with a schema distributed along with Sanoid.net, which will be validated at runtime.
+
+ #### Settings currently defined as global:
+
+ This table lists all settings currently accepted in the global configuration and what they do.\
+ These settings are defined at the root level of the Sanoid.local.json file and must follow the schema in the
+ Sanoid.local.schema.json document, using standard JSON rules for data types as shown.
+
+ | Setting Key | Type      | Default | Description |
+ | :---------- | :-------- | :------ | :---------- |
+ | DryRun | boolean | false | If true, Sanoid.net will not make any changes to ZFS, and will attempt to output what it would have done if this setting were false[^dryrunnote1] |
+ | TakeSnapshots | boolean | false | If true, Sanoid.net will run its snapshot functionality, for taking new snapshots. |
+ | PruneSnapshots | boolean | false | If true, Sanoid.net will run its snapshot pruning functionality. |
+ | Templates | Template[^templatesnote1][^templatesnote3] | [^templatesnote2] | A dictionary of string names to template definitions, as defined in Sanoid.template.schema.json] |
+ | ZfsPropertyNamespace | string[^zfsprop1] | sanoid.net | The string Sanoid.net will use as the prefix for ZFS properties. |
+ | CacheDirectory | string[^cachedir1] | /var/cache/sanoid | The directory Sanoid.net will use to store cache data, as needed.[^cachedir2][^cachedir3] |
+ | SnapshotNaming | SnapshotNaming[^snapshotnaming1] | | Definitions for the various components of snapshot names.[^snapshotnaming2] |
+ | PlatformUtilities | PlatformUtilities[^platformutilities1] | | Any named external utility dependencies Sanoid.net has and a path to each. |
+
+ [^dryrunnote1]: Setting TakeSnapshots or PruneSnapshots to true will still control Sanoid.net's output, but no changes will be made to ZFS.
+
+ [^templatesnote1]: A JSON object. The defintion of a Template is in Sanoid.template.schema.json, and will also be published online.
+
+ [^templatesnote2]: A default template is defined in the core Sanoid.json file, which MUST exist. It is strongly recommended not to modify the default template. If you want to use other settings, define your own templates.
+
+ [^templatesnote3]: Must be valid as a user property identifier in ZFS. See the User Properties section of the zfsprops(7) man page for details. Default is `sanoid.net` and is not recommended to be changed
+
+ [^zfsprop1]: A colon character is assumed to exist between this string and the setting name, for zfs properties.
+
+ [^cachedir1]: Must be a valid path string.
+
+ [^cachedir2]: If the directory does not exist, it will be created.
+
+ [^cachedir3]: Any user that executes Sanoid.net must have read and write access to this directory.
+
+ [^snapshotnaming1]: The schema for this section can be found in Sanoid.schema.json.
+
+ [^snapshotnaming2]: When you run Sanoid.net with the --prepare-zfs-properties switch, Sanoid.net will set these values or the hard-coded defaults on all pool root datasets, if not already set.
+
+ [^platformutilities1]: This section is mandatory and the pre-defined keys MUST exist. Paths can be any executable file or symlink to each of them.
+
+ #### ZFS Properties
+
+ Settings that apply to zfs and Sanoid's interaction with it will be stored as custom user properties on the datasets themselves.
+
+ When Sanoid.net runs, it will run `zfs list -d 0 -Ht volume,filesystem -s name -o name,type,$settings`, where $settings is a comma-separated string of every setting Sanoid.net has internally defined.
+
+ ##### Missing Properties
+
+ If Sanoid.net does not find values for all expected settings on each pool root dataset, it will let you know and then exit without making any changes to the system.
+
+ If you want to find out which properties are missing, without making changes to the system, Sanoid.net can be run with the --check-zfs-properties command line parameter.\This will cause Sanoid.net to output a list of missing properties, by pool root dataset, and then exit without doing anything else.
+
+ If properties are not defined, Sanoid.net can be invoked with the `--prepare-zfs-properties`
+ command line switch.\
+ This option will cause Sanoid.net to check all pool root datasets for properties that are defined with the configued ZfsPropertyNamespace, and define all missing settings, using default values for each, on those pool roots.
+
+ ##### Removing Sanoid.net ZFS Properties
+
+ If you no longer wish to use Sanoid.net, you can clean up all of its settings from ZFS in either of two ways:
+
+ - By running Sanoid.net with the `--remove-zfs-properties` command line switch, which will clear all Sanoid.net settings on all datasets via a call to `zfs inherit $setting -r` on every pool root. Once a user property is no longer explicitly set to a value other than inherit, in ZFS, ZFS removes the property completely.
+ - By manually calling `zfs inherit -r  $setting` on each pool root, where $setting is the setting to remove from ZFS entirely. 
  
- Configuration is loaded in the following order, with each element in the list superceding the settings defined
- at the level above it:
+ Configuration is zpplied in the following order, with each element in the list superceding the settings defined at the level above it:
  
  - /usr/local/share/Sanoid.json (this is the base configuration and should never be modified by the user)
  - /etc/sanoid/Sanoid.local.json
  - $HOME/.config/Sanoid.net/Sanoid.user.json
- - Sanoid.local.json (in the same folder as the Sanoid.net executable assembly)
- - ~~Environment variables with prefix `Sanoid.net:`~~ (this isn't possible in most Linux shells)
  - Command line arguments
 
- ## But seriously... WHY???
-
- I'm not doing this to solve any "problem," fix any "deficiencies" in sanoid, or with the explicit purpose of
- improving it in any way. As I said, it is just a learning project for me, and I'm putting it in a public github
- repository in the hope that someone, somewhere, may either have use for it or learn something from it, as I hope
- to learn from it. However, the goals likely will evolve (and already have), as I go along.
 
  ## Contributing
 
