@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -22,6 +22,17 @@ public class Dataset : IZfsObject
     {
         Name = name;
         Kind = kind;
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="Dataset" /> with the specified name with <see cref="Kind" /> set to
+    ///     <see cref="DatasetKind.Unknown" />
+    /// </summary>
+    /// <param name="name">The name of the new <see cref="Dataset" /></param>
+    public Dataset( string name )
+    {
+        Name = name;
+        Kind = DatasetKind.Unknown;
     }
 
     /// <summary>

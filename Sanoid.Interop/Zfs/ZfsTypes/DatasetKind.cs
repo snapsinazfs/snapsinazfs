@@ -18,5 +18,8 @@ public enum DatasetKind
     FileSystem = ZfsObjectKind.FileSystem,
 
     /// <summary>A zfs zvol</summary>
-    Volume = ZfsObjectKind.Volume
+    Volume = ZfsObjectKind.Volume,
+
+    /// <inheritdoc cref="ZfsObjectKind.Unknown"/>
+    Unknown = ZfsObjectKind.Unknown,
 }
