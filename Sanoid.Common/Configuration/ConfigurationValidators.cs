@@ -101,7 +101,6 @@ public static class ConfigurationValidators
     #if WINDOWS
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.monitoring.schema.json" ) );
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.template.schema.json" ) );
-        SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.dataset.schema.json" ) );
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "Sanoid.local.schema.json" ) );
         configFilePaths.Add(("Sanoid.json",true)  );
         configFilePaths.Add(("Sanoid.local.json",false)  );
@@ -110,7 +109,6 @@ public static class ConfigurationValidators
     #else
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.monitoring.schema.json" ) );
         SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.template.schema.json" ) );
-        SchemaRegistry.Global.Register( JsonSchema.FromFile( "/usr/local/share/Sanoid.net/Sanoid.dataset.schema.json" ) );
         configFilePaths.Add( ( "/usr/local/share/Sanoid.net/Sanoid.json", true ) );
         configFilePaths.Add( ( "/etc/sanoid/Sanoid.local.json", false ) );
         configFilePaths.Add((Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ),false)  );
