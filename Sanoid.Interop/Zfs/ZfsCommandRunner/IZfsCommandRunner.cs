@@ -73,4 +73,15 @@ public interface IZfsCommandRunner
     /// <exception cref="InvalidOperationException">If the process execution threw this exception.</exception>
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsObjectName" /></exception>
     public Dictionary<string, ZfsProperty> GetZfsProperties(ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true);
+
+    /// <summary>
+    ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
+    /// </summary>
+    /// <param name="zfsPath">The fully-qualified path to operate on</param>
+    /// <param name="properties">A parameterized array of <see cref="ZfsProperty" /> objects to set</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating success or failure of the operation.
+    /// </returns>
+    public bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties );
+
 }

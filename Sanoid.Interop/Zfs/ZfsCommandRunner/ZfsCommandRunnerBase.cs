@@ -61,4 +61,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     /// <inheritdoc />
     public abstract Dictionary<string, ZfsProperty> GetZfsProperties(ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true);
+
+    /// <inheritdoc />
+    public abstract bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties );
 }

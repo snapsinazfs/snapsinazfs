@@ -5,7 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Immutable;
-using System.Data;
 using System.Diagnostics;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
@@ -90,7 +89,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         _logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o property,value,source -H {zfsObjectName}" )
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o properties,value,source -H {zfsObjectName}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -196,7 +195,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultProperties )
         {
             if ( result.ExistingProperties.ContainsKey( key ) )
+            {
                 continue;
+            }
+
             propertiesToAdd.Add( key, prop );
         }
 
@@ -205,7 +207,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return result;
     }
 
-    public bool SetZfsProperty( string zfsPath, params ZfsProperty[] property )
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
+    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -214,7 +218,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
 
-        string propertiesToSet = string.Join( ' ', property.Select( p => p.SetString ) );
+        string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         _logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
         {
@@ -243,6 +247,5 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             _logger.Debug( "zfs set process finished" );
             return true;
         }
-
     }
 }
