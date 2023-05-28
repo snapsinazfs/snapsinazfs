@@ -12,10 +12,11 @@ namespace Sanoid.Interop.Zfs;
 
 /// <summary>
 /// </summary>
-public class ZfsCommandRunner : IZfsCommandRunner
+public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 {
     /// <summary>
-    ///     Creates a new instance of the standard <see cref="ZfsCommandRunner" /> class, which uses calls zfs at the path provided in <paramref name="pathToZfs"/>
+    ///     Creates a new instance of the standard <see cref="ZfsCommandRunner" /> class, which uses calls zfs at the path
+    ///     provided in <paramref name="pathToZfs" />
     /// </summary>
     /// <param name="pathToZfs">
     ///     A fully-qualified path to the zfs executable
@@ -25,13 +26,21 @@ public class ZfsCommandRunner : IZfsCommandRunner
         ZfsPath = pathToZfs;
     }
 
-    private string ZfsPath { get; }
-
     private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
+
+    private string ZfsPath { get; }
 
     /// <inheritdoc />
     public bool ZfsSnapshot( string snapshotName )
     {
+        // This exception is guaranteed not to be thrown because we are passing a known good value for kind
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        if ( !ValidateName( ZfsObjectKind.Snapshot, snapshotName ) )
+        {
+            _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
+            return false;
+        }
+
         string arguments = $"snapshot {snapshotName}";
         _logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
