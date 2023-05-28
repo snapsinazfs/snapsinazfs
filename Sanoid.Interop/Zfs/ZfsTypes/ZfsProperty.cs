@@ -126,4 +126,9 @@ public class ZfsProperty
     }
 
     public string SetString => $"{Namespace}{Name}={Value}";
+
+    internal static ZfsProperty Parse( string[] tokens )
+    {
+        return new ( tokens );
+    }
 }
