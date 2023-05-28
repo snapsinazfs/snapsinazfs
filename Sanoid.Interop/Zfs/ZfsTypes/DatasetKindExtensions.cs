@@ -14,7 +14,7 @@ public static class DatasetKindExtensions
         {
             "filesystem" => DatasetKind.FileSystem,
             "volume" => DatasetKind.Volume,
-            _ => throw new NotSupportedException( $"String value {value} not supported for conversion to DatasetKind" );
+            _ => throw new NotSupportedException( $"String value {value} not supported for conversion to DatasetKind" )
         };
     }
 }
