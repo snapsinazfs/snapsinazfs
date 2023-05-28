@@ -126,15 +126,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return dataSets.ToImmutable( );
     }
 
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     If an invalid or uninitialized value is provided for paramref name="kind" />.
-    /// </exception>
-    /// <exception cref="ArgumentNullException">
-    ///     If <paramref name="zfsObjectName" /> is null, empty, or only whitespace
-    /// </exception>
-    /// <exception cref="InvalidOperationException">If the process execution threw this exception.</exception>
-    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsObjectName" /></exception>
-    public Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
+    /// <inheritdoc />
+    public override Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
     {
         if ( !ValidateName( kind, zfsObjectName ) )
         {
