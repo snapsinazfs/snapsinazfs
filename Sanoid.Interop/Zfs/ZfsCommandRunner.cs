@@ -125,4 +125,60 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         return dataSets.ToImmutable( );
     }
+
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If an invalid or uninitialized value is provided for paramref name="kind" />.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">
+    ///     If <paramref name="zfsObjectName" /> is null, empty, or only whitespace
+    /// </exception>
+    /// <exception cref="InvalidOperationException">If the process execution threw this exception.</exception>
+    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsObjectName" /></exception>
+    public Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
+    {
+        if ( !ValidateName( kind, zfsObjectName ) )
+        {
+            throw new ArgumentException( $"Unable to get properties for {zfsObjectName}. Name is invalid.", nameof( zfsObjectName ) );
+        }
+
+        _logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get -o property,value,source -H {zfsObjectName}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        Dictionary<string, ZfsProperty> properties = new( );
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            _logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                _logger.Fatal( ioex, "Error running zfs get operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
+                _logger.Trace( "{0}", outputLine );
+                if ( ZfsProperty.TryParse( outputLine, out ZfsProperty? property ) )
+                {
+                    properties.Add( property!.Name, property );
+                }
+            }
+
+            if ( !zfsGetProcess.HasExited )
+            {
+                _logger.Trace( "Waiting for zfs get process to exit" );
+                zfsGetProcess.WaitForExit( 3000 );
+            }
+
+            _logger.Debug( "zfs get process finished" );
+            return properties;
+        }
+    }
 }
