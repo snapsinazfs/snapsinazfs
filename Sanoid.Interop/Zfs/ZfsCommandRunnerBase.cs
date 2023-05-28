@@ -11,11 +11,21 @@ namespace Sanoid.Interop.Zfs;
 
 public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 {
-    protected static Logger Logger = LogManager.GetCurrentClassLogger( );
+    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="ArgumentOutOfRangeException">If an invalid or uninitialized value is provided for <paramref name="kind"/>.</exception>
     public static bool ValidateName( ZfsObjectKind kind, string name )
     {
+        if ( string.IsNullOrWhiteSpace( name ) )
+        {
+            return false;
+        }
+
+        if ( name.Length > 255 )
+        {
+            throw new ArgumentOutOfRangeException( nameof( name ), "name must be 255 characters or less" );
+        }
+
         Regex validatorRegex = kind switch
         {
             ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
@@ -23,10 +33,6 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified to ValidateName." )
         };
-        if ( string.IsNullOrWhiteSpace( name ) )
-        {
-            return false;
-        }
 
         // ReSharper disable once ExceptionNotDocumentedOptional
         MatchCollection matches = validatorRegex.Matches( name );
