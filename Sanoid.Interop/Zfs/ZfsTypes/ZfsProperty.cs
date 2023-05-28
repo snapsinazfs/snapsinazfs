@@ -22,6 +22,7 @@ public class ZfsProperty
     }
     private ZfsProperty(string[] components)
     {
+        Logger.Debug( "Creating new ZfsProperty from array [{0}]", string.Join( ',', components ) );
         string[] nameComponents = components[0].Split(':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         switch (nameComponents.Length)
         {
@@ -41,6 +42,8 @@ public class ZfsProperty
         {
             InheritedFrom = components[3][16..];
         }
+
+        Logger.Debug( "ZfsProperty created: {0}", this );
     }
 
     public string? InheritedFrom { get; set; }
@@ -60,8 +63,15 @@ public class ZfsProperty
     public string Namespace { get; set; }
     public string Value { get; set; }
 
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return $"{Namespace}{Name}: {Value}";
+    }
+
     public static bool TryParse(string value, out ZfsProperty? property)
     {
+        Logger.Debug("Trying to parse new ZfsProperty from {0}", value);
         property = null;
         try
         {
@@ -75,6 +85,8 @@ public class ZfsProperty
         {
             return false;
         }
+
+        Logger.Debug( "Successfully parsed ZfsProperty {0}", property );
 
         return true;
     }
@@ -95,6 +107,7 @@ public class ZfsProperty
             Logger.Error(errorString);
             throw new ArgumentNullException(nameof(value), errorString);
         }
+        Logger.Debug("Parsing ZfsProperty from {0}", value);
 
         string[] components = value.Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
         if (components.Length < 3)
