@@ -35,5 +35,5 @@ public class Dataset : IZfsObject
     public string Name { get; }
 
     /// <inheritdoc />
-    public ConcurrentDictionary<string, string> Properties { get; } = new();
+    public ConcurrentDictionary<string, ZfsProperty> Properties { get; } = new();
 }

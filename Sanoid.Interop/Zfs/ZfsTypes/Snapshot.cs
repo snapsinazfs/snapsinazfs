@@ -29,5 +29,5 @@ public class Snapshot : IZfsObject
     public ZfsObjectKind ZfsKind { get; }
 
     /// <inheritdoc />
-    public ConcurrentDictionary<string, string> Properties { get; private set; }
+    public ConcurrentDictionary<string, ZfsProperty> Properties { get; private set; }
 }

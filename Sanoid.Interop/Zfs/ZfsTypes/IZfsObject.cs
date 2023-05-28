@@ -24,5 +24,5 @@ public interface IZfsObject
     /// <summary>
     /// A dcitionary of property names and their values, as strings
     /// </summary>
-    ConcurrentDictionary<string, string> Properties { get; }
+    ConcurrentDictionary<string, ZfsProperty> Properties { get; }
 }
