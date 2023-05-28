@@ -299,4 +299,58 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return names;
         }
     }
+    public Dictionary<string,Dataset> GetZfsDatasetConfiguration( )
+    {
+        Dictionary<string,Dataset> datasets = new( );
+
+        _logger.Debug( "Getting all ZFS dataset configurations" );
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -o name,property,value,source" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            _logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                _logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
+                _logger.Trace( "{0}", outputLine );
+                string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+                if ( lineTokens.Length < 4 )
+                {
+                    _logger.Error( "Line {0} not understood", outputLine );
+                    throw new InvalidOperationException( $"Unable to parse dataset configuration. Expected 4 tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
+                }
+
+                if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
+                {
+                    _logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
+                    datasets.Add( lineTokens[ 0 ], new ( lineTokens[ 0 ], DatasetKind.Unknown ) );
+                }
+
+                _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+            }
+
+            if ( !zfsGetProcess.HasExited )
+            {
+                _logger.Trace( "Waiting for zfs list process to exit" );
+                zfsGetProcess.WaitForExit( 3000 );
+            }
+
+            _logger.Debug( "zfs list process finished" );
+            return datasets;
+        }
+    }
 }

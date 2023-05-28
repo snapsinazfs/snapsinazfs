@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -62,15 +62,15 @@ public class Dataset : IZfsObject
             throw new InvalidOperationException( $"String provided to Dataset.Parse must contain at least {ZfsProperty.DefaultProperties.Count} components" );
         }
 
-        return PrivateParse( components );
+        return PrivateParse( components, ZfsProperty.DefaultProperties.Keys.ToArray( ) );
     }
 
-    private static Dataset PrivateParse( string[] components )
+    private static Dataset PrivateParse( string[] components, string[] expectedProperties )
     {
         Dataset ds = new( components[ 0 ], components[ 1 ].ToDatasetKind( ) );
         for ( int i = 2; i < components.Length; i++ )
         {
-            ZfsProperty prop = ZfsProperty.Parse( components[ i ] );
+            ZfsProperty prop = new( "sanoid.net:", expectedProperties[ i - 2 ], components[ i ], "list" );
             ds.Properties[ prop.FullName ] = prop;
         }
 
