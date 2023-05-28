@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Immutable;
+using System.Data;
 using System.Diagnostics;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
@@ -201,10 +202,45 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         result.AddedProperties = propertiesToAdd;
         return result;
     }
-}
 
-public class UpdateZfsPropertySchemaResult
-{
-    public Dictionary<string, ZfsProperty> ExistingProperties { get; set; }
-    public Dictionary<string, ZfsProperty> AddedProperties { get; set; }
+    public bool SetZfsProperty( string zfsPath, params ZfsProperty[] property )
+    {
+        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        {
+            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
+        }
+
+        string propertiesToSet = string.Join( ' ', property.Select( p => p.SetString ) );
+        _logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
+        ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {zfsPath} {propertiesToSet}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        {
+            _logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
+            try
+            {
+                zfsSetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                _logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
+                return false;
+            }
+
+            if ( !zfsSetProcess.HasExited )
+            {
+                _logger.Trace( "Waiting for zfs set process to exit" );
+                zfsSetProcess.WaitForExit( 3000 );
+            }
+
+            _logger.Debug( "zfs set process finished" );
+            return true;
+        }
+
+    }
 }
