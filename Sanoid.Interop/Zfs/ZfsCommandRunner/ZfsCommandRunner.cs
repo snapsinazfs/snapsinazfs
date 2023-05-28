@@ -190,6 +190,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         result.ExistingProperties = GetZfsProperties( ZfsObjectKind.FileSystem, zfsPath );
 
+        Dictionary<string, ZfsProperty> propertiesToAdd = (Dictionary<string, ZfsProperty>)ZfsProperty.DefaultProperties.Except( result.ExistingProperties );
+        result.AddedProperties = propertiesToAdd;
         return result;
     }
 }
@@ -197,4 +199,5 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 public class UpdateZfsPropertySchemaResult
 {
     public Dictionary<string, ZfsProperty> ExistingProperties { get; set; }
+    public Dictionary<string, ZfsProperty> AddedProperties { get; set; }
 }
