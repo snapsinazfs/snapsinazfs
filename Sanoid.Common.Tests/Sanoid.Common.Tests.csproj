@@ -30,9 +30,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\Sanoid\Sanoid.dataset.schema.json" Link="Sanoid.dataset.schema.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\Sanoid\Sanoid.json" Link="Sanoid.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

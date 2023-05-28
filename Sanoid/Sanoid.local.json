@@ -14,24 +14,6 @@
       "Snapshots": false
     }
   },
-  "Datasets": {
-    "pool1/dataset1": {
-      "Template": "production",
-      "Enabled": false
-    },
-    "pool1/dataset2": {
-      "Enabled": false
-    },
-    "pool1/zvol1": {
-      "Template": "production_noHourly",
-      "Enabled": false,
-      "TemplateOverrides": {
-        "SnapshotRetention": {
-          "Yearly": 1
-        }
-      }
-    }
-  },
   "Templates": {
     "default": {
       "Templates": {
