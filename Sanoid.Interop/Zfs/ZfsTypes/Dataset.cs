@@ -47,33 +47,4 @@ public class Dataset : IZfsObject
 
     /// <inheritdoc />
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; } = new( );
-
-    public static Dataset Parse( string value )
-    {
-        if ( string.IsNullOrWhiteSpace( value ) )
-        {
-            throw new ArgumentNullException( nameof( value ), "Dataset string cannot be null, empty, or only whitespace." );
-        }
-
-        string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-        if ( components.Length < ZfsProperty.DefaultProperties.Count )
-        {
-            throw new InvalidOperationException( $"String provided to Dataset.Parse must contain at least {ZfsProperty.DefaultProperties.Count} components" );
-        }
-
-        return PrivateParse( components, ZfsProperty.DefaultProperties.Keys.ToArray( ) );
-    }
-
-    private static Dataset PrivateParse( string[] components, string[] expectedProperties )
-    {
-        Dataset ds = new( components[ 0 ], components[ 1 ].ToDatasetKind( ) );
-        for ( int i = 2; i < components.Length; i++ )
-        {
-            ZfsProperty prop = new( "sanoid.net:", expectedProperties[ i - 2 ], components[ i ], "list" );
-            ds.Properties[ prop.FullName ] = prop;
-        }
-
-        return ds;
-    }
 }
