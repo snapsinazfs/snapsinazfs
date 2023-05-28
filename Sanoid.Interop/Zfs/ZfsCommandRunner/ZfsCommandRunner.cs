@@ -186,9 +186,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
 
-        UpdateZfsPropertySchemaResult result = new( );
-
-        result.ExistingProperties = GetZfsProperties( ZfsObjectKind.FileSystem, zfsPath );
+        UpdateZfsPropertySchemaResult result = new( )
+        {
+            ExistingProperties = GetZfsProperties( ZfsObjectKind.FileSystem, zfsPath )
+        };
 
         Dictionary<string, ZfsProperty> propertiesToAdd = new( );
 
