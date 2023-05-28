@@ -17,8 +17,8 @@ public class Dataset : IZfsObject
     ///     Creates a new <see cref="Dataset" /> with the specified name and kind <see cref="IZfsObject" />
     /// </summary>
     /// <param name="name">The name of the new <see cref="Dataset" /></param>
-    /// <param name="kind">The <see cref="DatasetKind"/> of Dataset to create</param>
-    public Dataset(string name, DatasetKind kind)
+    /// <param name="kind">The <see cref="DatasetKind" /> of Dataset to create</param>
+    public Dataset( string name, DatasetKind kind )
     {
         Name = name;
         Kind = kind;
@@ -35,5 +35,34 @@ public class Dataset : IZfsObject
     public string Name { get; }
 
     /// <inheritdoc />
-    public ConcurrentDictionary<string, ZfsProperty> Properties { get; } = new();
+    public ConcurrentDictionary<string, ZfsProperty> Properties { get; } = new( );
+
+    public static Dataset Parse( string value )
+    {
+        if ( string.IsNullOrWhiteSpace( value ) )
+        {
+            throw new ArgumentNullException( nameof( value ), "Dataset string cannot be null, empty, or only whitespace." );
+        }
+
+        string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+
+        if ( components.Length < ZfsProperty.DefaultProperties.Count )
+        {
+            throw new InvalidOperationException( $"String provided to Dataset.Parse must contain at least {ZfsProperty.DefaultProperties.Count} components" );
+        }
+
+        return PrivateParse( components );
+    }
+
+    private static Dataset PrivateParse( string[] components )
+    {
+        Dataset ds = new( components[ 0 ], components[ 1 ].ToDatasetKind( ) );
+        for ( int i = 2; i < components.Length; i++ )
+        {
+            ZfsProperty prop = ZfsProperty.Parse( components[ i ] );
+            ds.Properties[ prop.FullName ] = prop;
+        }
+
+        return ds;
+    }
 }

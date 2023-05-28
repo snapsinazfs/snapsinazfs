@@ -60,6 +60,7 @@ public class ZfsProperty
         { "sanoid.net:recursive", new( "sanoid.net:", "recursive", "false", "sanoid" ) },
     } );
 
+    public string FullName => $"{Namespace}{Name}";
     public string Name { get; set; }
     public string Namespace { get; set; }
     public string Value { get; set; }
