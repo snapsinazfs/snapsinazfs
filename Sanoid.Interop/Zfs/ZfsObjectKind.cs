@@ -6,13 +6,13 @@
 
 using Sanoid.Interop.Zfs.Native.Enums;
 
-namespace Sanoid.Common.Zfs;
+namespace Sanoid.Interop.Zfs;
 
 /// <summary>
 ///     An enumeration used for calls to zfs list, which contains a subset of the values in <see cref="zfs_type_t" />
 /// </summary>
 [Flags]
-public enum ZfsListObjectTypes
+public enum ZfsObjectKind
 {
     /// <summary>A zfs file system (dataset)</summary>
     /// <value>Equivalent to <see cref="zfs_type_t.ZFS_TYPE_FILESYSTEM" /> (1)</value>

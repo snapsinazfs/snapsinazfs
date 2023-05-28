@@ -5,7 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Sanoid.Common.Zfs;
-using Sanoid.Interop.Zfs.Enums;
+using Sanoid.Interop.Zfs.Native.Enums;
 
 namespace Sanoid.Common.Tests.Zfs;
 
@@ -30,7 +30,7 @@ public class ZfsCommandRunnerTests
         Assert.That( Enum.GetValuesAsUnderlyingType<ZfsListObjectTypes>( ), Is.EquivalentTo( expectedValues ) );
     }
 
-    [Test( Description = "Tests all possible values of ZfsListObjectTypes and their expected string representations" )]
+    [Test( Description = "Tests all possible values of ZfsObjectKind and their expected string representations" )]
     [Category( "General" )]
     [Category( "TypeChecks" )]
     [TestCase( (ZfsListObjectTypes)1, "filesystem" )]

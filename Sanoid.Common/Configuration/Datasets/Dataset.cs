@@ -6,7 +6,6 @@
 
 using System.Security;
 using System.Text.Json.Serialization;
-using Sanoid.Common.Configuration.Json;
 using Sanoid.Common.Configuration.Snapshots;
 using Template = Sanoid.Common.Configuration.Templates.Template;
 

@@ -6,10 +6,10 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Sanoid.Interop.Zfs.Enums;
+namespace Sanoid.Interop.Zfs.Native.Enums;
 
 #pragma warning disable IDE1006 // Naming Styles
-[SuppressMessage( "ReSharper", "InconsistentNaming", Justification = "Keeping names as defined in libzfs, per recommendations for native types used with P/Invoke" )]
+[SuppressMessage("ReSharper", "InconsistentNaming", Justification = "Keeping names as defined in libzfs, per recommendations for native types used with P/Invoke")]
 [Flags]
 public enum zfs_type_t
 {
