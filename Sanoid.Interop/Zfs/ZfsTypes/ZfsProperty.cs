@@ -51,12 +51,12 @@ public class ZfsProperty
 
     public static Dictionary<string, ZfsProperty> DefaultProperties { get; } = new()
     {
-        { "sanoid.net:template", new( "sanoid.net","template", "default","sanoid" ) },
-        { "sanoid.net:enabled", new("sanoid.net", "enabled", "true","sanoid" ) },
-        { "sanoid.net:skipchildren", new("sanoid.net", "skipchildren", "true","sanoid" ) },
-        { "sanoid.net:autoprune", new("sanoid.net", "autoprune", "false","sanoid" ) },
-        { "sanoid.net:autosnapshot", new("sanoid.net", "autosnapshot", "false","sanoid" ) },
-        { "sanoid.net:recursive", new("sanoid.net", "recursive", "false","sanoid" ) },
+        { "sanoid.net:template", new( "sanoid.net:","template", "default","sanoid" ) },
+        { "sanoid.net:enabled", new("sanoid.net:", "enabled", "true","sanoid" ) },
+        { "sanoid.net:skipchildren", new("sanoid.net:", "skipchildren", "true","sanoid" ) },
+        { "sanoid.net:autoprune", new("sanoid.net:", "autoprune", "false","sanoid" ) },
+        { "sanoid.net:autosnapshot", new("sanoid.net:", "autosnapshot", "false","sanoid" ) },
+        { "sanoid.net:recursive", new("sanoid.net:", "recursive", "false","sanoid" ) },
     };
 
     public string Name { get; set; }
