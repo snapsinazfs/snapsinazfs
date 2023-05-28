@@ -129,6 +129,20 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
+    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    {
+        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        {
+            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
+        }
+
+        return PrivateSetZfsProperty( zfsPath, properties );
+    }
+
     /// <summary>
     ///     Gets the output of `zfs list -o name -t ` with the kind of objects set in <paramref name="kind" /> appended
     /// </summary>
@@ -208,7 +222,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return result;
     }
 
-    /// <inheritdoc cref="SetZfsProperty"/>
+    /// <inheritdoc cref="SetZfsProperty" />
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
@@ -245,18 +259,44 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    /// <inheritdoc />
-    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    public List<string> GetZfsRootNames( )
     {
-        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        List<string> names = new( );
+
+        _logger.Debug( "Getting all ZFS root datasets" );
+        ProcessStartInfo zfsListStartInfo = new( ZfsPath, "list -d 0 -H -o name" )
         {
-            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
+        {
+            _logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
+            try
+            {
+                zfsListProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                _logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsListProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
+                _logger.Trace( "{0}", outputLine );
+                names.Add( outputLine.Trim( ) );
+            }
+
+            if ( !zfsListProcess.HasExited )
+            {
+                _logger.Trace( "Waiting for zfs list process to exit" );
+                zfsListProcess.WaitForExit( 3000 );
+            }
+
+            _logger.Debug( "zfs list process finished" );
+            return names;
         }
-
-        return PrivateSetZfsProperty( zfsPath, properties );
-
     }
 }
