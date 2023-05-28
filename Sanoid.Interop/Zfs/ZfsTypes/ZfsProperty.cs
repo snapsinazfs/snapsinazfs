@@ -101,6 +101,9 @@ public class ZfsProperty
     ///     If the provided property string has less than 3 components separated by a
     ///     tab character.
     /// </exception>
+    /// <remarks>
+    ///     Expected format is `peropertyName,value,source[,inheritedFrom]`
+    /// </remarks>
     public static ZfsProperty Parse(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
