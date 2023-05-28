@@ -119,4 +119,6 @@ public class ZfsProperty
 
         return new(components);
     }
+
+    public string SetString => $"{Namespace}{Name}={Value}";
 }
