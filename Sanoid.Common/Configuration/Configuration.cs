@@ -106,8 +106,6 @@ public class Configuration
     /// </remarks>
     public SortedDictionary<string, Dataset> Datasets { get; } = new( );
 
-    private IConfigurationSection DatasetsConfigurationSection => RootConfiguration.GetRequiredSection( "Datasets" );
-
     /// <summary>
     ///     Gets or sets the default logging levels to be used by NLog
     /// </summary>
@@ -275,49 +273,7 @@ public class Configuration
 
     private void LoadDatasetConfigurations( )
     {
-        //TODO: This can probably be inlined when loading datasets
-        _logger.Debug( "Setting dataset options from configuration" );
-        // Scan the datasets collection
-        // If an entry exists in configuration, set its settings, following inheritance rules.
-        foreach ( ( _, Dataset? ds ) in Datasets )
-        {
-            _logger.Trace( "Processing dataset {0}", ds.VirtualPath );
-            if ( ds.VirtualPath == "/" )
-            {
-                //Skip the root dataset, as it is already configured for defaults.
-                continue;
-            }
-
-            IConfigurationSection section = DatasetsConfigurationSection.GetSection( ds.Path );
-            if ( section.Exists( ) )
-            {
-                _logger.Debug( "Dataset {0} is explicitly configured.", ds.Path );
-                // Dataset exists in configuration. Set configured settings and inherit everything else
-                ds.IsInConfiguration = true;
-                ds.Enabled = section.GetBoolean( "Enabled", true );
-                string? templateName = section[ "Template" ];
-                ds.Template = templateName is null ? ds.Parent!.Template : Templates[ templateName ];
-
-                IConfigurationSection overrides = section.GetSection( "TemplateOverrides" );
-                if ( overrides.Exists( ) )
-                {
-                    _logger.Debug( "Template overrides exist for Dataset {0}. Creating override Template with settings inherited from Template {1}.", section.Key, templateName );
-                    ds.Template = ds.Template!.CloneForDatasetWithOverrides( overrides, ds, Templates );
-                }
-            }
-            else
-            {
-                // Dataset is not explicitly configured. Inherit relevant properties from parent only.
-                ds.Enabled = ds.Parent!.Enabled;
-                ds.Template = ds.Parent.Template;
-                _logger.Trace( "Dataset {0} is not explicitly configured, and is {1}enabled due to inheritance.", ds.Path, ds.Enabled ? "" : "not " );
-            }
-
-            _logger.Debug( "Finished configuring dataset {0}", ds.Path );
-            _logger.Trace( "Final configuration of dataset {0}: {1}", ds.Path, JsonSerializer.Serialize( ds, new JsonSerializerOptions { ReferenceHandler = ReferenceHandler.Preserve, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
-        }
-
-        _logger.Debug( "Dataset options configured." );
+        //TODO: Get datasets from ZFS
     }
 
     private void BuildTemplateHierarchy( IConfigurationSection defaultTemplateConfigurationSection )
