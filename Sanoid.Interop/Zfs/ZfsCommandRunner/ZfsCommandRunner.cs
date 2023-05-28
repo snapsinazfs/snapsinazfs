@@ -216,7 +216,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         string propertiesToSet = string.Join( ' ', property.Select( p => p.SetString ) );
         _logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
-        ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {zfsPath} {propertiesToSet}" )
+        ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
