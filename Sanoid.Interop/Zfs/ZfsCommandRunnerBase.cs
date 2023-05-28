@@ -13,12 +13,16 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 {
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    /// <exception cref="ArgumentOutOfRangeException">If an invalid or uninitialized value is provided for <paramref name="kind"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If an invalid or uninitialized value is provided for
+    ///     <paramref name="kind" />.
+    /// </exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="name" /> is null, empty, or only whitespace</exception>
     public static bool ValidateName( ZfsObjectKind kind, string name )
     {
         if ( string.IsNullOrWhiteSpace( name ) )
         {
-            return false;
+            throw new ArgumentNullException( nameof( name ), "name must be a non-null, non-empty, non-whitespace string" );
         }
 
         if ( name.Length > 255 )

@@ -33,11 +33,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public bool ZfsSnapshot( string snapshotName )
     {
-        // This exception is guaranteed not to be thrown because we are passing a known good value for kind
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ValidateName( ZfsObjectKind.Snapshot, snapshotName ) )
+        try
         {
-            _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
+            // This exception is only thrown if kind is invalid. We're passing a known good value.
+            // ReSharper disable once ExceptionNotDocumentedOptional
+            if ( !ValidateName( ZfsObjectKind.Snapshot, snapshotName ) )
+            {
+                _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
+                return false;
+            }
+        }
+        catch ( ArgumentNullException ex )
+        {
+            _logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
             return false;
         }
 
