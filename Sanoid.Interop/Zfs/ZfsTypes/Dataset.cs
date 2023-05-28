@@ -6,7 +6,7 @@
 
 using System.Collections.Concurrent;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
 ///     A ZFS Dataset object. Can be a filesystem or volume.
@@ -18,7 +18,7 @@ public class Dataset : IZfsObject
     /// </summary>
     /// <param name="name">The name of the new <see cref="Dataset" /></param>
     /// <param name="kind">The <see cref="DatasetKind"/> of Dataset to create</param>
-    public Dataset( string name, DatasetKind kind )
+    public Dataset(string name, DatasetKind kind)
     {
         Name = name;
         Kind = kind;
@@ -35,5 +35,5 @@ public class Dataset : IZfsObject
     public string Name { get; }
 
     /// <inheritdoc />
-    public ConcurrentDictionary<string, string> Properties { get; } = new( );
+    public ConcurrentDictionary<string, string> Properties { get; } = new();
 }

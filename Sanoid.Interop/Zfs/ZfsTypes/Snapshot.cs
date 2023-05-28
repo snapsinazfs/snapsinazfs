@@ -6,7 +6,7 @@
 
 using System.Collections.Concurrent;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
 ///     A ZFS snapshot
@@ -17,7 +17,7 @@ public class Snapshot : IZfsObject
     ///     Creates a new <see cref="Snapshot" /> with the given name
     /// </summary>
     /// <param name="name">The final component of the name of the Snapshot</param>
-    public Snapshot( string name )
+    public Snapshot(string name)
     {
         Name = name;
     }

@@ -6,7 +6,7 @@
 
 using Sanoid.Interop.Zfs.Native.Enums;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
 ///     An enumeration used for calls to zfs list, which contains a subset of the values in <see cref="zfs_type_t" />

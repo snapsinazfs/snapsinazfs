@@ -6,7 +6,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
 ///     Extension methods to simplify common operations of the <see cref="ZfsObjectKind" /> <see langword="enum" />
@@ -21,10 +21,10 @@ public static class ZfsListObjectTypesExtensions
     ///     A string, on a single line, with comma-separated string representations of each specified flag,
     ///     in lower case, and with no whitespace
     /// </returns>
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "Inputs are incapable of causing these exceptions" )]
-    public static string ToStringForCommandLine( this ZfsObjectKind value )
+    [SuppressMessage("ReSharper", "ExceptionNotDocumentedOptional", Justification = "Inputs are incapable of causing these exceptions")]
+    public static string ToStringForCommandLine(this ZfsObjectKind value)
     {
-        return value.ToString( ).Replace( " ", "" ).ToLower( );
+        return value.ToString().Replace(" ", "").ToLower();
     }
 
     /// <summary>
@@ -34,8 +34,8 @@ public static class ZfsListObjectTypesExtensions
     /// <returns>
     ///     A string array, containing one value per specified flag, converted to lower-case using the invariant culture
     /// </returns>
-    public static string[] ToStringArray( this ZfsObjectKind value )
+    public static string[] ToStringArray(this ZfsObjectKind value)
     {
-        return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+        return value.ToString().ToLowerInvariant().Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 }

@@ -6,7 +6,7 @@
 
 using System.Collections.Concurrent;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
 /// An interface for objects implementing basic common properties for ZFS objects
@@ -24,5 +24,5 @@ public interface IZfsObject
     /// <summary>
     /// A dcitionary of property names and their values, as strings
     /// </summary>
-    ConcurrentDictionary<string,string> Properties { get; }
+    ConcurrentDictionary<string, string> Properties { get; }
 }
