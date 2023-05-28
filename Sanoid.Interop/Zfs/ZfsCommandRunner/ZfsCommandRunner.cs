@@ -202,22 +202,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             propertiesToAdd.Add( key, prop );
         }
 
-        SetZfsProperty( zfsPath, propertiesToAdd.Values.ToArray( ) );
+        PrivateSetZfsProperty( zfsPath, propertiesToAdd.Values.ToArray( ) );
         result.AddedProperties = propertiesToAdd;
         return result;
     }
 
-    /// <inheritdoc />
-    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    /// <inheritdoc cref="SetZfsProperty"/>
+    /// <remarks>
+    ///     Does not perform name validation
+    /// </remarks>
+    private bool PrivateSetZfsProperty( string zfsPath, params ZfsProperty[] properties )
     {
-        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
-        {
-            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
-        }
-
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         _logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
@@ -247,5 +242,20 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             _logger.Debug( "zfs set process finished" );
             return true;
         }
+    }
+
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
+    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    {
+        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        {
+            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
+        }
+
+        return PrivateSetZfsProperty( zfsPath, properties );
+
     }
 }
