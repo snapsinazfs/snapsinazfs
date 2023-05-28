@@ -190,7 +190,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         result.ExistingProperties = GetZfsProperties( ZfsObjectKind.FileSystem, zfsPath );
 
-        Dictionary<string, ZfsProperty> propertiesToAdd = (Dictionary<string, ZfsProperty>)ZfsProperty.DefaultProperties.Except( result.ExistingProperties );
+        Dictionary<string, ZfsProperty> propertiesToAdd = new( );
+
+        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultProperties )
+        {
+            if ( result.ExistingProperties.ContainsKey( key ) )
+                continue;
+            propertiesToAdd.Add( key, prop );
+        }
         result.AddedProperties = propertiesToAdd;
         return result;
     }
