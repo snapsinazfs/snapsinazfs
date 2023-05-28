@@ -11,9 +11,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class ZfsProperty
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
-    public ZfsProperty(string propertyNamespace, string propertyName, string propertyValue, string valueSource, string? inheritedFrom = null)
+    public ZfsProperty( string propertyNamespace, string propertyName, string propertyValue, string valueSource, string? inheritedFrom = null )
     {
         Namespace = propertyNamespace;
         Name = propertyName;
@@ -21,49 +19,53 @@ public class ZfsProperty
         Source = valueSource;
         InheritedFrom = inheritedFrom;
     }
-    private ZfsProperty(string[] components)
+
+    private ZfsProperty( string[] components )
     {
         Logger.Debug( "Creating new ZfsProperty from array [{0}]", string.Join( ',', components ) );
-        string[] nameComponents = components[0].Split(':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        switch (nameComponents.Length)
+        string[] nameComponents = components[ 0 ].Split( ':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+        switch ( nameComponents.Length )
         {
             case 2:
-                Namespace = nameComponents[0];
-                Name = nameComponents[1];
+                Namespace = nameComponents[ 0 ];
+                Name = nameComponents[ 1 ];
                 break;
             default:
                 Namespace = string.Empty;
-                Name = components[0];
+                Name = components[ 0 ];
                 break;
         }
 
-        Value = components[1];
-        Source = components[2];
-        if (components.Length > 3 && components[3].Length >= 16)
+        Value = components[ 1 ];
+        Source = components[ 2 ];
+        if ( components.Length > 3 && components[ 3 ].Length >= 16 )
         {
-            InheritedFrom = components[3][16..];
+            InheritedFrom = components[ 3 ][ 16.. ];
         }
 
         Logger.Debug( "ZfsProperty created: {0}", this );
     }
 
-    public string? InheritedFrom { get; set; }
-    public string Source { get; set; }
-
-    public static ImmutableDictionary<string, ZfsProperty> DefaultProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>( )
+    public static ImmutableDictionary<string, ZfsProperty> DefaultProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
         { "sanoid.net:template", new( "sanoid.net:", "template", "default", "sanoid" ) },
         { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "sanoid" ) },
         { "sanoid.net:skipchildren", new( "sanoid.net:", "skipchildren", "true", "sanoid" ) },
         { "sanoid.net:autoprune", new( "sanoid.net:", "autoprune", "false", "sanoid" ) },
         { "sanoid.net:autosnapshot", new( "sanoid.net:", "autosnapshot", "false", "sanoid" ) },
-        { "sanoid.net:recursive", new( "sanoid.net:", "recursive", "false", "sanoid" ) },
+        { "sanoid.net:recursive", new( "sanoid.net:", "recursive", "false", "sanoid" ) }
     } );
 
     public string FullName => $"{Namespace}{Name}";
+
+    public string? InheritedFrom { get; set; }
     public string Name { get; set; }
     public string Namespace { get; set; }
+
+    public string SetString => $"{Namespace}{Name}={Value}";
+    public string Source { get; set; }
     public string Value { get; set; }
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
     public override string ToString( )
@@ -71,19 +73,19 @@ public class ZfsProperty
         return $"{Namespace}{Name}: {Value}";
     }
 
-    public static bool TryParse(string value, out ZfsProperty? property)
+    public static bool TryParse( string value, out ZfsProperty? property )
     {
-        Logger.Debug("Trying to parse new ZfsProperty from {0}", value);
+        Logger.Debug( "Trying to parse new ZfsProperty from {0}", value );
         property = null;
         try
         {
-            property = Parse(value);
+            property = Parse( value );
         }
-        catch (ArgumentOutOfRangeException ex)
+        catch ( ArgumentOutOfRangeException ex )
         {
             return false;
         }
-        catch (ArgumentNullException ex)
+        catch ( ArgumentNullException ex )
         {
             return false;
         }
@@ -96,7 +98,10 @@ public class ZfsProperty
     /// <summary>
     ///     Gets a <see cref="ZfsProperty" /> parsed from the supplied string
     /// </summary>
-    /// <exception cref="ArgumentNullException">If <paramref propertyName="value" /> is a null, empty, or entirely whitespace string</exception>
+    /// <exception cref="ArgumentNullException">
+    ///     If <paramref propertyName="value" /> is a null, empty, or entirely whitespace
+    ///     string
+    /// </exception>
     /// <exception cref="ArgumentOutOfRangeException">
     ///     If the provided property string has less than 3 components separated by a
     ///     tab character.
@@ -104,31 +109,30 @@ public class ZfsProperty
     /// <remarks>
     ///     Expected format is `peropertyName,value,source[,inheritedFrom]`
     /// </remarks>
-    public static ZfsProperty Parse(string value)
+    public static ZfsProperty Parse( string value )
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if ( string.IsNullOrWhiteSpace( value ) )
         {
             const string errorString = "Unable to parse ZfsProperty. String must not be null, empty, or whitespace.";
-            Logger.Error(errorString);
-            throw new ArgumentNullException(nameof(value), errorString);
+            Logger.Error( errorString );
+            throw new ArgumentNullException( nameof( value ), errorString );
         }
-        Logger.Debug("Parsing ZfsProperty from {0}", value);
 
-        string[] components = value.Split('\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-        if (components.Length < 3)
+        Logger.Debug( "Parsing ZfsProperty from {0}", value );
+
+        string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+        if ( components.Length < 3 )
         {
             const string errorString = "ZfsProperty value string is invalid.";
-            Logger.Error(errorString);
-            throw new ArgumentOutOfRangeException(nameof(value), errorString);
+            Logger.Error( errorString );
+            throw new ArgumentOutOfRangeException( nameof( value ), errorString );
         }
 
-        return new(components);
+        return new( components );
     }
-
-    public string SetString => $"{Namespace}{Name}={Value}";
 
     internal static ZfsProperty Parse( string[] tokens )
     {
-        return new ( tokens );
+        return new( tokens );
     }
 }
