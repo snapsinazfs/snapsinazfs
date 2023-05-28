@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Immutable;
 using NLog;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
@@ -49,15 +50,15 @@ public class ZfsProperty
     public string? InheritedFrom { get; set; }
     public string Source { get; set; }
 
-    public static Dictionary<string, ZfsProperty> DefaultProperties { get; } = new()
+    public static ImmutableDictionary<string, ZfsProperty> DefaultProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>( )
     {
-        { "sanoid.net:template", new( "sanoid.net:","template", "default","sanoid" ) },
-        { "sanoid.net:enabled", new("sanoid.net:", "enabled", "false","sanoid" ) },
-        { "sanoid.net:skipchildren", new("sanoid.net:", "skipchildren", "true","sanoid" ) },
-        { "sanoid.net:autoprune", new("sanoid.net:", "autoprune", "false","sanoid" ) },
-        { "sanoid.net:autosnapshot", new("sanoid.net:", "autosnapshot", "false","sanoid" ) },
-        { "sanoid.net:recursive", new("sanoid.net:", "recursive", "false","sanoid" ) },
-    };
+        { "sanoid.net:template", new( "sanoid.net:", "template", "default", "sanoid" ) },
+        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "sanoid" ) },
+        { "sanoid.net:skipchildren", new( "sanoid.net:", "skipchildren", "true", "sanoid" ) },
+        { "sanoid.net:autoprune", new( "sanoid.net:", "autoprune", "false", "sanoid" ) },
+        { "sanoid.net:autosnapshot", new( "sanoid.net:", "autosnapshot", "false", "sanoid" ) },
+        { "sanoid.net:recursive", new( "sanoid.net:", "recursive", "false", "sanoid" ) },
+    } );
 
     public string Name { get; set; }
     public string Namespace { get; set; }
