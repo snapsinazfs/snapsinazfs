@@ -24,5 +24,12 @@ public enum ZfsObjectKind
 
     /// <summary>A zfs block volume (zvol)</summary>
     /// <value>Equivalent to <see cref="zfs_type_t.ZFS_TYPE_VOLUME" /> (4)</value>
-    Volume = zfs_type_t.ZFS_TYPE_VOLUME
+    Volume = zfs_type_t.ZFS_TYPE_VOLUME,
+
+    /// <summary>An unknown type</summary>
+    /// <value>
+    ///     Equivalent to <see cref="zfs_type_t.ZFS_TYPE_INVALID" /> (0)<br />
+    ///     Also used for when we don't care about the type
+    /// </value>
+    Unknown = zfs_type_t.ZFS_TYPE_INVALID
 }

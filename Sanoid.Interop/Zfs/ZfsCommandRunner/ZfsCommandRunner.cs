@@ -89,7 +89,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         _logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o properties,value,source -H {zfsObjectName}" )
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o property,value,source -H {zfsObjectName}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
