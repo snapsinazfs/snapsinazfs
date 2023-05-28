@@ -199,6 +199,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 continue;
             propertiesToAdd.Add( key, prop );
         }
+
+        SetZfsProperty( zfsPath, propertiesToAdd.Values.ToArray( ) );
         result.AddedProperties = propertiesToAdd;
         return result;
     }
