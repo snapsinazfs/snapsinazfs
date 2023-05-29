@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -12,40 +12,18 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// <summary>
 ///     A ZFS Dataset object. Can be a filesystem or volume.
 /// </summary>
-public class Dataset : IZfsObject
+public class Dataset : ZfsObjectBase
 {
     /// <summary>
-    ///     Creates a new <see cref="Dataset" /> with the specified name and kind <see cref="IZfsObject" />
+    ///     Creates a new <see cref="Dataset" /> with the specified name and kind, optionally performing name validation
     /// </summary>
     /// <param name="name">The name of the new <see cref="Dataset" /></param>
     /// <param name="kind">The <see cref="DatasetKind" /> of Dataset to create</param>
-    public Dataset( string name, DatasetKind kind )
+    /// <param name="validateName">Whether to validate the name of the new <see cref="Dataset"/> (<see langword="true"/>) or not (<see langword="false"/> - default)</param>
+    /// <param name="validatorRegex">The <see cref="Regex"/> to user for name validation</param>
+    public Dataset( string name, DatasetKind kind, bool validateName = false,Regex? validatorRegex = null )
+        : base( name, (ZfsObjectKind)kind, validatorRegex, validateName )
     {
-        Name = name;
-        Kind = kind;
+
     }
-
-    /// <summary>
-    ///     Creates a new <see cref="Dataset" /> with the specified name with <see cref="Kind" /> set to
-    ///     <see cref="DatasetKind.Unknown" />
-    /// </summary>
-    /// <param name="name">The name of the new <see cref="Dataset" /></param>
-    public Dataset( string name )
-    {
-        Name = name;
-        Kind = DatasetKind.Unknown;
-    }
-
-    /// <summary>
-    ///     Gets the <see cref="DatasetKind" /> represented by this <see cref="Dataset" />
-    /// </summary>
-    public DatasetKind Kind { get; }
-
-    public ZfsObjectKind ZfsKind => (ZfsObjectKind)Kind;
-
-    /// <inheritdoc />
-    public string Name { get; }
-
-    /// <inheritdoc />
-    public ConcurrentDictionary<string, ZfsProperty> Properties { get; } = new( );
 }
