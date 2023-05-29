@@ -27,7 +27,7 @@ public class ZfsProperty
         switch ( nameComponents.Length )
         {
             case 2:
-                Namespace = nameComponents[ 0 ];
+                Namespace = $"{nameComponents[ 0 ]}:";
                 Name = nameComponents[ 1 ];
                 break;
             default:
