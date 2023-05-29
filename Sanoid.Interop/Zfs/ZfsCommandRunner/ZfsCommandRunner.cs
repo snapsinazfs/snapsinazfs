@@ -34,12 +34,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override bool TakeSnapshot( string snapshotName )
     {
-        Snapshot snap = new ( snapshotName );
+        Snapshot snap = new( snapshotName );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
             // ReSharper disable once ExceptionNotDocumentedOptional
-            if ( !snap.ValidateName() )
+            if ( !snap.ValidateName( ) )
             {
                 _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
                 return false;
@@ -300,9 +300,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return names;
         }
     }
-    public Dictionary<string,Dataset> GetZfsDatasetConfiguration( )
+
+    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
     {
-        Dictionary<string,Dataset> datasets = new( );
+        Dictionary<string, Dataset> datasets = new( );
 
         _logger.Debug( "Getting all ZFS dataset configurations" );
         ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -o name,property,value,source" )
@@ -337,7 +338,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
                 {
                     _logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
-                    datasets.Add( lineTokens[ 0 ], new ( lineTokens[ 0 ], DatasetKind.Unknown ) );
+                    datasets.Add( lineTokens[ 0 ], new( lineTokens[ 0 ], DatasetKind.Unknown ) );
                 }
 
                 _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );

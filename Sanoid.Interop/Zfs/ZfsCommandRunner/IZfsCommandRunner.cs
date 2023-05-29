@@ -6,10 +6,8 @@
 
 using System.Collections.Immutable;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
-using ZfsIdentifierRegexes = Sanoid.Interop.Zfs.ZfsTypes.Validation.ZfsIdentifierRegexes;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -25,12 +23,13 @@ public interface IZfsCommandRunner
     ///     Gets a list of ZFS datasets (filesystems and volumes)
     /// </summary>
     /// <returns>
-    ///     An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s, each representing the ZFS path of a dataset on the system.
+    ///     An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s, each representing the ZFS path of a dataset
+    ///     on the system.
     /// </returns>
-    ImmutableSortedSet<string> ZfsListAll()
+    ImmutableSortedSet<string> ZfsListAll( )
     {
-        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union(new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" });
-        LogManager.GetCurrentClassLogger().Warn("Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize(dataSets));
+        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union( new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" } );
+        LogManager.GetCurrentClassLogger( ).Warn( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize( dataSets ) );
         return dataSets;
     }
 
@@ -43,7 +42,8 @@ public interface IZfsCommandRunner
     bool TakeSnapshot( string snapshotName );
 
     /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}"/> of &lt;<see langword="string"/>,<see cref="ZfsProperty"/>&gt; for <paramref name="zfsObjectName"/>
+    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of &lt;<see langword="string" />,<see cref="ZfsProperty" />&gt; for
+    ///     <paramref name="zfsObjectName" />
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
     ///     If an invalid or uninitialized value is provided for paramref name="kind" />.
@@ -53,7 +53,7 @@ public interface IZfsCommandRunner
     /// </exception>
     /// <exception cref="InvalidOperationException">If the process execution threw this exception.</exception>
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsObjectName" /></exception>
-    public Dictionary<string, ZfsProperty> GetZfsProperties(ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true);
+    public Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true );
 
     /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
@@ -64,5 +64,4 @@ public interface IZfsCommandRunner
     ///     A <see langword="bool" /> indicating success or failure of the operation.
     /// </returns>
     public bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties );
-
 }
