@@ -32,13 +32,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private string ZfsPath { get; }
 
     /// <inheritdoc />
-    public bool ZfsSnapshot( string snapshotName )
+    public override bool TakeSnapshot( string snapshotName )
     {
+        Snapshot snap = new ( snapshotName );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
             // ReSharper disable once ExceptionNotDocumentedOptional
-            if ( !ValidateName( ZfsObjectKind.Snapshot, snapshotName ) )
+            if ( !snap.ValidateName() )
             {
                 _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
                 return false;
@@ -83,7 +84,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
     {
-        if ( !ValidateName( kind, zfsObjectName ) )
+        if ( !ZfsObjectBase.ValidateName( kind, zfsObjectName ) )
         {
             throw new ArgumentException( $"Unable to get properties for {zfsObjectName}. PropertyName is invalid.", nameof( zfsObjectName ) );
         }
@@ -135,7 +136,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        if ( !ZfsObjectBase.ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
         {
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
@@ -195,7 +196,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        if ( !ZfsObjectBase.ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
         {
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
