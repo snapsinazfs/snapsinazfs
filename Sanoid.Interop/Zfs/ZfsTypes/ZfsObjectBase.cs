@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes.Validation;
@@ -50,6 +51,7 @@ public abstract class ZfsObjectBase : IZfsObject
         Properties = new( );
     }
 
+    [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
