@@ -55,7 +55,7 @@ public interface IZfsCommandRunner
 
         foreach (Match match in matches)
         {
-            Console.WriteLine(match.Value ?? "null");
+            Console.WriteLine(match.Value);
         }
 
         return true;
