@@ -346,6 +346,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                             "volume" => DatasetKind.Volume,
                             _ => throw new InvalidOperationException( "Type of object from zfs get was unrecognized" )
                         };
+                        _logger.Debug( "Dataset {0} will be a {1}", lineTokens[ 0 ], newDsKind );
 
                         Dataset dataset = new( lineTokens[ 0 ], newDsKind );
                         datasets.Add( lineTokens[ 0 ], dataset );
@@ -353,8 +354,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 else
                 {
-                    _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
-                    datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                    if ( ZfsProperty.DefaultProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
+                    {
+                        _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                        datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                    }
                 }
             }
 
