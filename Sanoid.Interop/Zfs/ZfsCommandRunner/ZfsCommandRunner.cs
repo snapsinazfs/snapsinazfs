@@ -337,12 +337,25 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                 if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
                 {
-                    _logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
-                    datasets.Add( lineTokens[ 0 ], new( lineTokens[ 0 ], DatasetKind.Unknown ) );
-                }
+                    if ( lineTokens[ 1 ] == "type" )
+                    {
+                        _logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
+                        DatasetKind newDsKind = lineTokens[ 2 ] switch
+                        {
+                            "filesystem" => DatasetKind.FileSystem,
+                            "volume" => DatasetKind.Volume,
+                            _ => throw new InvalidOperationException( "Type of object from zfs get was unrecognized" )
+                        };
 
-                _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
-                datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                        Dataset dataset = new( lineTokens[ 0 ], newDsKind );
+                        datasets.Add( lineTokens[ 0 ], dataset );
+                    }
+                }
+                else
+                {
+                    _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                    datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                }
             }
 
             if ( !zfsGetProcess.HasExited )
