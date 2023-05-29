@@ -9,20 +9,20 @@ using System.Collections.Concurrent;
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
-/// An interface for objects implementing basic common properties for ZFS objects
+///     An interface for objects implementing basic common properties for ZFS objects
 /// </summary>
 public interface IZfsObject
 {
     /// <summary>
-    /// Gets or sets the name of the <see cref="IZfsObject"/>
+    ///     Gets or sets the name of the <see cref="IZfsObject" />
     /// </summary>
-    /// <value>A <see langword="string"/> value, containing the final component of the name of the object</value>
+    /// <value>A <see langword="string" /> value, containing the final component of the name of the object</value>
     string Name { get; }
 
-    ZfsObjectKind ZfsKind { get; }
-
     /// <summary>
-    /// A dcitionary of property names and their values, as strings
+    ///     A dcitionary of property names and their values, as strings
     /// </summary>
     ConcurrentDictionary<string, ZfsProperty> Properties { get; }
+
+    ZfsObjectKind ZfsKind { get; }
 }
