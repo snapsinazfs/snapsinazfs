@@ -357,7 +357,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     if ( ZfsProperty.DefaultProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
                         _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
-                        datasets[ lineTokens[ 0 ] ].Properties[ lineTokens[ 1 ] ] = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                        datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
                     }
                 }
             }

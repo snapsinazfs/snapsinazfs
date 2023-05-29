@@ -120,5 +120,13 @@ public abstract class ZfsObjectBase : IZfsObject
         return true;
     }
 
-
+    /// <summary>
+    /// Adds the <see cref="ZfsProperty"/> <paramref name="prop"/> to this <see name="ZfsObjectBase"/>
+    /// </summary>
+    /// <param name="prop">The property to add</param>
+    public void AddProperty( ZfsProperty prop )
+    {
+        Logger.Debug( "Adding property {0} to {1}", prop, Name );
+        Properties[prop.Name] = prop;
+    }
 }
