@@ -22,24 +22,31 @@ public class ZfsProperty
 
     private ZfsProperty( string[] components )
     {
-        Logger.Debug( "Creating new ZfsProperty from array [{0}]", string.Join( ',', components ) );
+        Logger.Debug( "Creating new ZfsProperty from array" );
         string[] nameComponents = components[ 0 ].Split( ':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
         switch ( nameComponents.Length )
         {
             case 2:
-                Namespace = $"{nameComponents[ 0 ]}:";
+            {
+                string namespaceComponent = nameComponents[ 0 ];
+                Logger.Debug( "New property is in namespace {0}", namespaceComponent );
+                Namespace = $"{namespaceComponent}:";
                 Name = nameComponents[ 1 ];
                 break;
+            }
             default:
+            {
+                Logger.Debug( "New property has no namespace" );
                 Namespace = string.Empty;
                 Name = components[ 0 ];
                 break;
+            }
         }
 
         Value = components[ 1 ];
         Source = components[ 2 ];
 
-        Logger.Debug( "ZfsProperty created: {0}", this );
+        Logger.Debug( "ZfsProperty created: {0}({1})", FullName, Value );
     }
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
@@ -55,13 +62,16 @@ public class ZfsProperty
     public string FullName => $"{Namespace}{Name}";
 
     [JsonIgnore]
-    public string Name { get; set; }
+    public string Name { get; }
+
     [JsonIgnore]
-    public string Namespace { get; set; }
+    public string Namespace { get; }
+
     [JsonIgnore]
     public string SetString => $"{Namespace}{Name}={Value}";
+
     public string Source { get; set; }
-    public string Value { get; set; }
+    public string Value { get; }
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
@@ -80,10 +90,12 @@ public class ZfsProperty
         }
         catch ( ArgumentOutOfRangeException ex )
         {
+            Logger.Error( ex, "Error parsing new ZfsProperty from '{0}'", value );
             return false;
         }
         catch ( ArgumentNullException ex )
         {
+            Logger.Error( ex, "Error parsing new ZfsProperty from '{0}'", value );
             return false;
         }
 
@@ -130,6 +142,7 @@ public class ZfsProperty
 
     internal static ZfsProperty Parse( string[] tokens )
     {
+        Logger.Debug( "Parsing ZfsProperty from array [{0}]", string.Join( ',', tokens ) );
         return new( tokens );
     }
 }
