@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using ZfsIdentifierRegexes = Sanoid.Interop.Zfs.ZfsTypes.Validation.ZfsIdentifierRegexes;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -39,27 +40,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    bool ZfsSnapshot(string snapshotName)
-    {
-        if (string.IsNullOrWhiteSpace(snapshotName))
-        {
-            return false;
-        }
-
-        MatchCollection matches = ZfsIdentifierRegexes.SnapshotNameRegex().Matches(snapshotName);
-
-        if (matches.Count == 0)
-        {
-            return false;
-        }
-
-        foreach (Match match in matches)
-        {
-            Console.WriteLine(match.Value);
-        }
-
-        return true;
-    }
+    bool TakeSnapshot( string snapshotName );
 
     /// <summary>
     ///     Gets a <see cref="Dictionary{TKey,TValue}"/> of &lt;<see langword="string"/>,<see cref="ZfsProperty"/>&gt; for <paramref name="zfsObjectName"/>
