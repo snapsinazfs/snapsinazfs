@@ -4,8 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Interop.Zfs.ZfsTypes.Validation;
 
 namespace Sanoid.Interop.Tests.Zfs;
 
@@ -75,14 +78,13 @@ public class ZfsCommandRunnerBaseTests
     [TestCaseSource( nameof( GetIllegalSnapshotCases ), new object?[] { 8, 12, 5 } )]
     [Category( "General" )]
     [Category( "ZFS" )]
-    [Platform( "Unix" )]
+    [Platform( "Unix,Linux" )]
     public void CheckSnapshotNameValidation( NameValidationTestCase testCase )
     {
         if ( testCase.Name.Length >= 255 )
         {
             Assert.Ignore( "Total path depth requested would exceed valid ZFS identifier length (255)" );
         }
-
         string nameToTest = testCase.Name;
         bool snapshotValidationResult = ZfsObjectBase.ValidateName( ZfsObjectKind.Snapshot, nameToTest ) == testCase.Valid;
         Assert.That( snapshotValidationResult, Is.True );
