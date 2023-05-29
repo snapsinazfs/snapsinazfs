@@ -18,7 +18,6 @@ public class ZfsProperty
         Name = propertyName;
         Value = propertyValue;
         Source = valueSource;
-        InheritedFrom = inheritedFrom;
     }
 
     private ZfsProperty( string[] components )
@@ -39,10 +38,6 @@ public class ZfsProperty
 
         Value = components[ 1 ];
         Source = components[ 2 ];
-        if ( components.Length > 3 && components[ 3 ].Length >= 16 )
-        {
-            InheritedFrom = components[ 3 ][ 16.. ];
-        }
 
         Logger.Debug( "ZfsProperty created: {0}", this );
     }
@@ -59,7 +54,6 @@ public class ZfsProperty
 
     public string FullName => $"{Namespace}{Name}";
 
-    public string? InheritedFrom { get; set; }
     [JsonIgnore]
     public string Name { get; set; }
     [JsonIgnore]
