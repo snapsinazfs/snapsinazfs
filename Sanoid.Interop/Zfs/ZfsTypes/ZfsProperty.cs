@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Immutable;
+using System.Text.Json.Serialization;
 using NLog;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
@@ -59,9 +60,11 @@ public class ZfsProperty
     public string FullName => $"{Namespace}{Name}";
 
     public string? InheritedFrom { get; set; }
+    [JsonIgnore]
     public string Name { get; set; }
+    [JsonIgnore]
     public string Namespace { get; set; }
-
+    [JsonIgnore]
     public string SetString => $"{Namespace}{Name}={Value}";
     public string Source { get; set; }
     public string Value { get; set; }
