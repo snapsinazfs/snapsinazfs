@@ -6,7 +6,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace Sanoid.Interop.Zfs;
+namespace Sanoid.Interop.Zfs.ZfsTypes.Validation;
 
 /// <summary>
 ///     Pre-generated regular expressions which follow the naming rules outlined in the zfs(8) man page as defined in
