@@ -306,7 +306,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, Dataset> datasets = new( );
 
         _logger.Debug( "Getting all ZFS dataset configurations" );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -o name,property,value,source" )
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -p -o name,property,value,source" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
