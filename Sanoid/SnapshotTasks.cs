@@ -8,7 +8,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using Sanoid.Common.Configuration;
 using Sanoid.Common.Configuration.Datasets;
-using Sanoid.Common.Configuration.Snapshots;
+using Sanoid.Common.Settings;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 
@@ -123,9 +123,9 @@ internal static class SnapshotTasks
 
     internal static void TakeSnapshot( Configuration config, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
     {
-        Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Path, snapshotPeriod );
-        bool result = config.ZfsCommandRunner.ZfsSnapshot( ds, config.SnapshotNaming.GetSnapshotName( snapshotPeriod, timestamp ) );
-        Logger.Debug( "Result of TakeSnapshot for {0} with period {1} was {2}", ds.Path, snapshotPeriod, result );
+        //Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Path, snapshotPeriod );
+        //bool result = config.zfsCommandRunner.ZfsSnapshot( ds, config.SnapshotNaming.GetSnapshotName( snapshotPeriod, timestamp ) );
+        //Logger.Debug( "Result of TakeSnapshot for {0} with period {1} was {2}", ds.Path, snapshotPeriod, result );
 
     }
 }

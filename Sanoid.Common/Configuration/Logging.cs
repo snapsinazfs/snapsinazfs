@@ -21,8 +21,6 @@ public static class Logging
     {
 #pragma warning disable CA2000
         IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
-                                                .SetBasePath( Directory.GetCurrentDirectory( ) )
-                                                .AddEnvironmentVariables( "Sanoid.net:" )
                                             #if WINDOWS
                                                 .AddJsonFile( "Sanoid.nlog.json", true, false )
                                             #else

@@ -4,15 +4,15 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
-using Sanoid;
 using Sanoid.Common;
 using Sanoid.Common.Configuration;
-using Sanoid.Common.Configuration.Snapshots;
-using Sanoid.Common.Zfs;
+using Sanoid.Common.Settings;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
+using Sanoid.Interop.Zfs.ZfsCommandRunner;
 
 // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
 // Desired logging parameters should be set in Sanoid.nlog.json
@@ -71,7 +71,7 @@ if ( argParseReults.Args is null )
 // Either way, exit now.
 if ( argParseReults.Cancelled )
 {
-    logger.Trace( "Help method invoked by command-line argument. Exiting with status {0}.", Errno.ECANCELED );
+    logger.Trace( "Help method invoked by command-line argument. Exiting with status {0}", Errno.ECANCELED );
     return (int)Errno.ECANCELED;
 }
 
@@ -79,20 +79,8 @@ if ( argParseReults.Cancelled )
 // Can just exit now without doing anything else.
 if ( argParseReults.Args.Version )
 {
-    logger.Trace( "Version method invoked by command-line argument. Exiting with status {0}.", Errno.ECANCELED );
+    logger.Trace( "Version method invoked by command-line argument. Exiting with status {0}", Errno.ECANCELED );
     return (int)Errno.ECANCELED;
-}
-
-// Now, let's validate the configuration files against the configuration schema documents.
-// Any exception will be logged and the program will terminate with status 22 (EINVAL)
-try
-{
-    ConfigurationValidators.ValidateSanoidConfigurationSchema( );
-}
-catch
-{
-    logger.Trace( "Configuration validation threw exception. Exiting with status {0}.", Errno.EINVAL );
-    return (int)Errno.EINVAL;
 }
 
 // Configuration is built in the following order from various sources.
@@ -108,44 +96,44 @@ catch
 // 2. /etc/sanoid/Sanoid.local.json
 // 3. ~/.config/Sanoid.net/Sanoid.user.json     #(Located in executing user's home directory)
 // 4. ./Sanoid.local.json                       #(Located in Sanoid.net's working directory)
-// 5. Environment variables prefixed with 'Sanoid.net:' and following standard .net configuration nomenclature from there
 // 6. Command-line arguments passed on invocation of Sanoid.net
 logger.Debug( "Building base configuration from files and environment variables." );
 IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                    #if WINDOWS
                                        .AddJsonFile( "Sanoid.json", true, false )
                                        .AddJsonFile( "Sanoid.local.json", true, false )
-                                       .AddEnvironmentVariables( "Sanoid.net:" )
                                    #else
                                        .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
                                        .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
                                        .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
                                        .AddJsonFile( "Sanoid.local.json", true, false )
-                                       .AddEnvironmentVariables( "Sanoid.net:" )
                                    #endif
                                        .Build( );
-
+SanoidSettings settings = rootConfiguration.Get<SanoidSettings>( );
 IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 {
-    PlatformID.Unix => new ZfsCommandRunner( rootConfiguration.GetRequiredSection( "PlatformUtilities" ) ),
+    PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath ),
     _ => new DummyZfsCommandRunner( )
 };
 
-Configuration sanoidConfiguration = new( rootConfiguration, zfsCommandRunner );
-sanoidConfiguration.LoadConfigurationFromIConfiguration( );
-sanoidConfiguration.SetValuesFromArgs( argParseReults );
-sanoidConfiguration.TrimUnwantedDatasetsFromRunningConfiguration( );
+Console.WriteLine( JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true } ) );
 
-if ( sanoidConfiguration.TakeSnapshots )
-{
-    DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
-    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
-}
-else
-{
-    logger.Warn( "TakeSnapshots is false" );
-}
+Console.WriteLine( settings.Templates[ "default" ].RecursionMode );
+
+//if ( sanoidConfiguration.TakeSnapshots )
+//{
+//    DateTimeOffset currentTimestamp = DateTimeOffset.Now;
+//    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
+//    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
+//}
+//else
+//{
+//    logger.Warn( "TakeSnapshots is false" );
+//}
+
+//var datasets = r.GetZfsDatasetConfiguration( );
+
+//logger.Warn(JsonSerializer.Serialize(datasets  ));
 
 logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );

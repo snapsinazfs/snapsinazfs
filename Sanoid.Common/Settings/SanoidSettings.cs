@@ -107,5 +107,4 @@ public sealed class SanoidSettings
             Logger.Debug( "TakeSnapshots is now {0}", TakeSnapshots );
         }
     }
-
 }
