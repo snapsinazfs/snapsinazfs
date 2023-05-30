@@ -5,8 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
-using Sanoid.Common.Configuration;
-using Sanoid.Common.Zfs;
+using Sanoid.Interop.Zfs.ZfsCommandRunner;
+using Sanoid.Interop.Zfs.ZfsTypes;
 using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid.Common.Tests.Configuration;
@@ -98,6 +98,24 @@ public class ConfigurationTests
         public bool ZfsSnapshot( Dataset snapshotParent, string snapshotName )
         {
             return true;
+        }
+
+        /// <inheritdoc />
+        public bool TakeSnapshot( string snapshotName )
+        {
+            throw new NotImplementedException( );
+        }
+
+        /// <inheritdoc />
+        public Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
+        {
+            throw new NotImplementedException( );
+        }
+
+        /// <inheritdoc />
+        public bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+        {
+            throw new NotImplementedException( );
         }
     }
 
