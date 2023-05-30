@@ -59,7 +59,7 @@ internal static class SnapshotTasks
 
             // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
-            List<ZfsProperty?> propsToSet = new( );
+            List<ZfsProperty> propsToSet = new( );
             if ( ds is { TakeSnapshots: true, Enabled: true } )
             {
                 if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
@@ -68,8 +68,9 @@ internal static class SnapshotTasks
                     if ( frequentSnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) )
                     {
                         prop.Value = timestamp.ToString( "O" );
+                        prop.PropertySource = ZfsPropertySource.Local;
                         ds[ ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName ] = prop;
-                        propsToSet.Add(prop);
+                        propsToSet.Add( prop );
                     }
                 }
 
@@ -79,8 +80,9 @@ internal static class SnapshotTasks
                     if ( hourlySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
                     {
                         prop.Value = timestamp.ToString( "O" );
+                        prop.PropertySource = ZfsPropertySource.Local;
                         ds[ ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName ] = prop;
-                        propsToSet.Add(prop);
+                        propsToSet.Add( prop );
                     }
                 }
 
@@ -90,11 +92,13 @@ internal static class SnapshotTasks
                     if ( dailySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty prop ) )
                     {
                         prop.Value = timestamp.ToString( "O" );
+                        prop.PropertySource = ZfsPropertySource.Local;
                         ds[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = prop;
                         propsToSet.Add( prop );
                     }
                 }
 
+                commandRunner.SetZfsProperty( ds.Name, propsToSet.ToArray( ) );
             }
         }
 

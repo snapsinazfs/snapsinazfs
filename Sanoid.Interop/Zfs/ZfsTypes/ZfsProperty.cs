@@ -89,7 +89,11 @@ public class ZfsProperty
     public string Namespace { get; protected init; }
 
     [JsonIgnore]
-    public ZfsPropertySource PropertySource => Source;
+    public ZfsPropertySource PropertySource
+    {
+        get => Source;
+        set => Source = value;
+    }
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
