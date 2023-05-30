@@ -22,8 +22,8 @@ public sealed class Mutexes : IDisposable
 {
     private Mutexes( )
     {
-        Instance._logger = LogManager.GetCurrentClassLogger( );
-        Instance._logger.Debug( "Creating mutex manager." );
+        Logger = LogManager.GetCurrentClassLogger( );
+        Logger.Debug( "Creating mutex manager." );
     }
 
     private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
@@ -38,14 +38,14 @@ public sealed class Mutexes : IDisposable
             Mutex? mutex = GetMutex( out Exception? caughtException, name );
             if ( caughtException is not null )
             {
-                Instance._logger.Error( caughtException, "Error getting Mutex {0}", name );
+                Logger.Error( caughtException, "Error getting Mutex {0}", name );
             }
 
             return mutex;
         }
     }
 
-    private Logger _logger;
+    private static Logger Logger;
 
     /// <summary>
     ///     Disposes all remaining held mutexes, and logs warnings for them
@@ -104,20 +104,20 @@ public sealed class Mutexes : IDisposable
     [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
     public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\Sanoid.net" )
     {
-        Instance._logger.Debug( "Mutex {0} requested", name );
+        Logger.Debug( "Mutex {0} requested", name );
         caughtException = null;
         bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? sanoidMutex );
         if ( exists && sanoidMutex != null )
         {
-            Instance._logger.Debug( "Mutex {0} already exists. Returning it", name );
+            Logger.Debug( "Mutex {0} already exists. Returning it", name );
             return sanoidMutex;
         }
 
         try
         {
-            Instance._logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
+            Logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
             sanoidMutex = new( true, name, out bool createdNew );
-            Instance._logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
+            Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             // This exception is not possible. Setter creates the node.
             // ReSharper disable once ExceptionNotDocumentedOptional
             Instance._allMutexes[ name ] = sanoidMutex;
@@ -125,21 +125,21 @@ public sealed class Mutexes : IDisposable
         }
         catch ( IOException ioe )
         {
-            Instance._logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired", name );
+            Logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired", name );
             caughtException = ioe;
         }
         catch ( WaitHandleCannotBeOpenedException whcboe )
         {
-            Instance._logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired", name );
+            Logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired", name );
             caughtException = whcboe;
         }
         catch ( AbandonedMutexException ame )
         {
-            Instance._logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid", name );
+            Logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid", name );
             caughtException = ame;
         }
 
-        Instance._logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, sanoidMutex is null ? "null" : "not-null" );
+        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, sanoidMutex is null ? "null" : "not-null" );
         return sanoidMutex;
     }
 
@@ -167,19 +167,19 @@ public sealed class Mutexes : IDisposable
             case IOException ioe:
             {
                 string errorMessage = $"Failed taking snapshots due to IOException: {ioe.Message}";
-                Instance._logger.Error( ioe, errorMessage );
+                Logger.Error( ioe, errorMessage );
                 return new( MutexAcquisitionErrno.IoException, new( MutexAcquisitionErrno.IoException, ioe ) );
             }
             case AbandonedMutexException ame:
             {
                 const string errorMessage = "Failed taking snapshots. A previous instance of Sanoid.net exited without properly releasing the snapshot mutex.";
-                Instance._logger.Error( ame, errorMessage );
+                Logger.Error( ame, errorMessage );
                 return new( MutexAcquisitionErrno.AbandonedMutex, new( MutexAcquisitionErrno.AbandonedMutex, ame ) );
             }
             case WaitHandleCannotBeOpenedException whcboe:
             {
                 const string errorMessage = "Unable to acquire snapshot mutex. See InnerException for details.";
-                Instance._logger.Error( whcboe, errorMessage );
+                Logger.Error( whcboe, errorMessage );
                 return new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, whcboe ) );
             }
         }
@@ -187,7 +187,7 @@ public sealed class Mutexes : IDisposable
         if ( possiblyNullMutex is null )
         {
             const string errorMessage = "Unable to acquire snapshot mutex.";
-            Instance._logger.Error( caughtException, errorMessage );
+            Logger.Error( caughtException, errorMessage );
             return new( MutexAcquisitionErrno.PossiblyNullMutex, new( MutexAcquisitionErrno.PossiblyNullMutex, new NullReferenceException( "A null mutex object was encountered" ), errorMessage ) );
         }
 
@@ -198,13 +198,13 @@ public sealed class Mutexes : IDisposable
         // ReSharper disable ExceptionNotDocumentedOptional
         if ( possiblyNullMutex.WaitOne( timeout ) )
         {
-            Instance._logger.Debug( "Mutex {0} successfully acquired", mutexName );
+            Logger.Debug( "Mutex {0} successfully acquired", mutexName );
             return new( mutexName, possiblyNullMutex );
         }
         // ReSharper restore ExceptionNotDocumentedOptional
         // ReSharper restore ExceptionNotDocumented
 
-        Instance._logger.Error( "Timed out waiting for another process to release the mutex. This process will not take snapshots." );
+        Logger.Error( "Timed out waiting for another process to release the mutex. This process will not take snapshots." );
         return new( MutexAcquisitionErrno.AnotherProcessIsBusy, mutexName, possiblyNullMutex );
     }
 
@@ -220,7 +220,7 @@ public sealed class Mutexes : IDisposable
             throw new ArgumentNullException( nameof( name ), "Mutex name cannot be null or an empty string." );
         }
 
-        Instance._logger.Debug( "Requested to release mutex {0}", name );
+        Logger.Debug( "Requested to release mutex {0}", name );
         if ( Instance._disposed )
         {
             return;
@@ -234,18 +234,18 @@ public sealed class Mutexes : IDisposable
                 Instance._allMutexes.TryRemove( name, out _ );
             }
 
-            Instance._logger.Debug( "Mutex {0} released", name );
+            Logger.Debug( "Mutex {0} released", name );
         }
         catch ( ApplicationException ex )
         {
             //This means we didn't own the mutex. We can discard this and carry on with life.
-            Instance._logger.Warn( ex, "Attempted to release mutex when we didn't own it." );
+            Logger.Warn( ex, "Attempted to release mutex when we didn't own it." );
         }
         catch ( ObjectDisposedException ex )
         {
             // If the mutex has somehow already been disposed elsewhere, we can discard this and carry on.
             // Log as an error, though, because this needs to be handled in code.
-            Instance._logger.Error( ex, "Attempted to release mutex that has already been disposed." );
+            Logger.Error( ex, "Attempted to release mutex that has already been disposed." );
         }
     }
 
@@ -256,13 +256,13 @@ public sealed class Mutexes : IDisposable
             return;
         }
 
-        Instance._logger.Debug( "Disposing all mutexes" );
+        Logger.Debug( "Disposing all mutexes" );
 
         foreach ( ( string? name, Mutex? mutex ) in Instance._allMutexes )
         {
             if ( warnOnStillHeld )
             {
-                Instance._logger.Warn( "Mutex {0} still held", name );
+                Logger.Warn( "Mutex {0} still held", name );
             }
 
             mutex?.Dispose( );
