@@ -63,6 +63,12 @@ public class ZfsProperty
     public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
         "sanoid.net:enabled",
+        "sanoid.net:lastdailysnapshot",
+        "sanoid.net:lastfrequentsnapshot",
+        "sanoid.net:lasthourlysnapshot",
+        "sanoid.net:lastmonthlysnapshot",
+        "sanoid.net:lastweeklysnapshot",
+        "sanoid.net:lastyearlysnapshot",
         "sanoid.net:prunesnapshots",
         "sanoid.net:recursion",
         "sanoid.net:takesnapshots",
@@ -81,6 +87,12 @@ public class ZfsProperty
     public static ImmutableDictionary<string, ZfsProperty> SanoidDefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
         { "sanoid.net:template", new( "sanoid.net:", "template", "default", "local" ) },
+        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
+        { "sanoid.net:lastdailysnapshot", new( "sanoid.net:", "lastdailysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastfrequentsnapshot", new( "sanoid.net:", "lastfrequentsnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
+        { "sanoid.net:lasthourlysnapshot", new( "sanoid.net:", "lasthourlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastmonthlysnapshot", new( "sanoid.net:", "lastmonthlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastyearlysnapshot", new( "sanoid.net:", "lastyearlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
         { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
         { "sanoid.net:prunesnapshots", new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
         { "sanoid.net:takesnapshots", new( "sanoid.net:", "takesnapshots", "false", "local" ) },
