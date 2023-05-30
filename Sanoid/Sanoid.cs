@@ -125,6 +125,7 @@ logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
 bool missingPropertiesFound = false;
 logger.Debug( "Requested check of zfs properties schema" );
+Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
 foreach ( ( string poolName, Dataset? pool ) in poolRoots )
 {
     logger.Debug( "Checking properties for pool {0}", poolName );
@@ -144,6 +145,11 @@ foreach ( ( string poolName, Dataset? pool ) in poolRoots )
         missingPropertiesFound = true;
         pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
         missingProperties.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
+    }
+
+    if ( missingProperties.Count > 0 )
+    {
+        missingPoolPropertyCollections.Add( poolName, missingProperties );
     }
 
     logger.Debug( "Finished checking properties for pool {0}", poolName );
@@ -173,26 +179,9 @@ if ( !argParseReults.Args.CheckZfsProperties && !argParseReults.Args.PrepareZfsP
 if ( argParseReults.Args.PrepareZfsProperties )
 {
     logger.Debug( "Requested update of zfs properties schema" );
-    foreach ( ( string poolName, Dataset? pool ) in poolRoots )
+    foreach ( ( string poolName, Dictionary<string,ZfsProperty> propertiesToAdd ) in missingPoolPropertyCollections )
     {
         logger.Debug( "Updating properties for pool {0}", poolName );
-        Dictionary<string, ZfsProperty> propertiesToAdd = new( );
-
-        foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
-        {
-            logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
-            if ( pool.HasProperty( propertyName ) )
-            {
-                logger.Debug( "Pool {0} already has property {1}", poolName, propertyName );
-                continue;
-            }
-
-            logger.Debug( "Pool {0} does not have property {1}. Adding property", poolName, propertyName );
-            propertiesToAdd.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
-            pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
-            logger.Debug( "Added property {0} to pool {1}: {2}", propertyName, poolName, property );
-        }
-
         zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
 
         logger.Debug( "Finished updating properties for pool {0}", poolName );
