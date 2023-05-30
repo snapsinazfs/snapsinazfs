@@ -57,14 +57,11 @@ public class ZfsProperty
         Logger.Debug( "ZfsProperty created: {0}({1})", FullName, Value );
     }
 
-    public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
-    {
-        { "sanoid.net:template", new( "sanoid.net:", "template", "default", "sanoid" ) },
-        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "sanoid" ) },
-        { "sanoid.net:prunesnapshots", new( "sanoid.net:", "autoprune", "false", "sanoid" ) },
-        { "sanoid.net:takesnapshots", new( "sanoid.net:", "autosnapshot", "false", "sanoid" ) },
-        { "sanoid.net:recursion", new( "sanoid.net:", "recursion", "default", "sanoid" ) }
-    } );
+    public static ZfsProperty DefaultDatasetEnabledProperty { get; } = new( "sanoid.net:", "enabled", "false", "local" );
+    public static ZfsProperty DefaultDatasetPruneSnapshotsProperty { get; } = new( "sanoid.net:", "autoprune", "false", "local" );
+    public static ZfsProperty DefaultDatasetRecursionProperty { get; } = new( "sanoid.net:", "recursion", "default", "local" );
+    public static ZfsProperty DefaultDatasetTakeSnapshotsProperty { get; } = new( "sanoid.net:", "autosnapshot", "false", "local" );
+    public static ZfsProperty DefaultDatasetTemplateProperty { get; } = new( "sanoid.net:", "template", "default", "local" );
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
@@ -101,6 +98,15 @@ public class ZfsProperty
 
     [JsonIgnore]
     public ZfsPropertySource PropertySource => Source;
+
+    public static ImmutableDictionary<string, ZfsProperty> SanoidDefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
+    {
+        { "sanoid.net:template", DefaultDatasetTemplateProperty },
+        { "sanoid.net:enabled", DefaultDatasetEnabledProperty },
+        { "sanoid.net:prunesnapshots", DefaultDatasetPruneSnapshotsProperty },
+        { "sanoid.net:takesnapshots", DefaultDatasetTakeSnapshotsProperty },
+        { "sanoid.net:recursion", DefaultDatasetRecursionProperty }
+    } );
 
     [JsonIgnore]
     public string SetString => $"{Namespace}{Name}={Value}";
