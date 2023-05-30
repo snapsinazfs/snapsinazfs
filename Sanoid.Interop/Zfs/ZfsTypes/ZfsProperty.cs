@@ -57,12 +57,6 @@ public class ZfsProperty
         Logger.Debug( "ZfsProperty created: {0}({1})", FullName, Value );
     }
 
-    public static ZfsProperty DefaultDatasetEnabledProperty { get; } = new( "sanoid.net:", "enabled", "false", "local" );
-    public static ZfsProperty DefaultDatasetPruneSnapshotsProperty { get; } = new( "sanoid.net:", "prunesnapshots", "false", "local" );
-    public static ZfsProperty DefaultDatasetRecursionProperty { get; } = new( "sanoid.net:", "recursion", "default", "local" );
-    public static ZfsProperty DefaultDatasetTakeSnapshotsProperty { get; } = new( "sanoid.net:", "takesnapshots", "false", "local" );
-    public static ZfsProperty DefaultDatasetTemplateProperty { get; } = new( "sanoid.net:", "template", "default", "local" );
-
     public static ImmutableDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
         { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
@@ -101,11 +95,11 @@ public class ZfsProperty
 
     public static ImmutableDictionary<string, ZfsProperty> SanoidDefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { "sanoid.net:template", DefaultDatasetTemplateProperty },
-        { "sanoid.net:enabled", DefaultDatasetEnabledProperty },
-        { "sanoid.net:prunesnapshots", DefaultDatasetPruneSnapshotsProperty },
-        { "sanoid.net:takesnapshots", DefaultDatasetTakeSnapshotsProperty },
-        { "sanoid.net:recursion", DefaultDatasetRecursionProperty }
+        { "sanoid.net:template", (ZfsProperty)new( "sanoid.net:", "template", "default", "local" ) },
+        { "sanoid.net:enabled", (ZfsProperty)new( "sanoid.net:", "enabled", "false", "local" ) },
+        { "sanoid.net:prunesnapshots", (ZfsProperty)new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
+        { "sanoid.net:takesnapshots", (ZfsProperty)new( "sanoid.net:", "takesnapshots", "false", "local" ) },
+        { "sanoid.net:recursion", (ZfsProperty)new( "sanoid.net:", "recursion", "default", "local" ) }
     } );
 
     [JsonIgnore]
