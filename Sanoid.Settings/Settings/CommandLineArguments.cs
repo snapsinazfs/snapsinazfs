@@ -73,6 +73,10 @@ public class CommandLineArguments
     [ArgShortcut( "--monitor-snapshots-nagios" )]
     public bool? MonitorSnapshots { get; set; }
 
+    [ArgDescription( "Updates the property schema for sanoid.net in zfs, using default values. Will not overwrite values that are already set." )]
+    [ArgShortcut( "--prepare-zfs-properties" )]
+    public bool PrepareZfsProperties { get; set; }
+
     [ArgDescription( "Prunes expired snapshots, except for snapshots of datasets currently involved in a send or receive operation." )]
     [ArgShortcut( "--prune-snapshots" )]
     public bool? PruneSnapshots { get; set; }
@@ -144,17 +148,17 @@ public class CommandLineArguments
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Info, LogLevel.Fatal ) );
         }
 
-        if ( ( Debug ?? false ) )
+        if ( Debug ?? false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Debug, LogLevel.Fatal ) );
         }
 
-        if ( Trace??false )
+        if ( Trace ?? false )
         {
             LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Trace, LogLevel.Fatal ) );
         }
 
-        if ( (ReallyQuiet??false) || (Quiet??false) || (Verbose??false) || (Debug??false) || (Trace??false) )
+        if ( ( ReallyQuiet ?? false ) || ( Quiet ?? false ) || ( Verbose ?? false ) || ( Debug ?? false ) || ( Trace ?? false ) )
         {
             LogManager.ReconfigExistingLoggers( );
         }
