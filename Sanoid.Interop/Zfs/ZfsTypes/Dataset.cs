@@ -43,31 +43,6 @@ public class Dataset : ZfsObjectBase
         }
     }
 
-    public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
-    {
-        int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
-        double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshot ).TotalMinutes;
-        int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshot );
-        bool lastFrequentSnapshotInCurrentPeriod = minutesSinceLastFrequentSnapshot <= template.SnapshotTiming.FrequentPeriod && ( lastFrequentSnapshotPeriodOfHour == currentFrequentPeriodOfHour );
-        return !lastFrequentSnapshotInCurrentPeriod && template.SnapshotRetention.IsFrequentWanted;
-    }
-
-    public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
-    {
-        TimeSpan timeSinceLastHourlySnapshot = ( timestamp - LastHourlySnapshot );
-        bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
-        bool lastHourlySnapshotOutsudeCurrentHour = (atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.Hour != timestamp.Hour);
-        return lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
-    }
-    
-    public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
-    {
-        TimeSpan timeSinceLastDailySnapshot = ( timestamp - LastHourlySnapshot );
-        bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
-        bool lastHourlySnapshotOutsudeCurrentHour = (atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.Hour != timestamp.Hour);
-        return lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
-    }
-
     [JsonIgnore]
     public DateTimeOffset LastDailySnapshot => Properties.TryGetValue( "sanoid.net:lastdailysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
@@ -122,6 +97,43 @@ public class Dataset : ZfsObjectBase
     public string Template => Properties.TryGetValue( "sanoid.net:template", out ZfsProperty? prop ) ? prop.Value : "default";
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    {
+        Logger.Debug( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
+        int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshot );
+        double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshot ).TotalMinutes;
+        // Check if more than FrequentPeriod ago or if the period of the hour is different.
+        bool lastFrequentSnapshotOutsideCurrentPeriod = minutesSinceLastFrequentSnapshot >= template.SnapshotTiming.FrequentPeriod || lastFrequentSnapshotPeriodOfHour != currentFrequentPeriodOfHour;
+        bool frequentSnapshotNeeded = lastFrequentSnapshotOutsideCurrentPeriod && template.SnapshotRetention.IsFrequentWanted;
+        Logger.Debug( "Frequent snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, frequentSnapshotNeeded ? "" : "not " );
+        return frequentSnapshotNeeded;
+    }
+
+    public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    {
+        Logger.Debug( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshot;
+        bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
+        // Check if more than an hour ago or if hour is different
+        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.ToUniversalTime( ).Hour != timestamp.ToUniversalTime( ).Hour;
+        bool hourlySnapshotNeeded = lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
+        Logger.Debug( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? "" : "not " );
+        return hourlySnapshotNeeded;
+    }
+
+    public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    {
+        Logger.Debug( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshot;
+        bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
+        // Check if more than a day ago or if a different day of the year
+        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot || LastDailySnapshot.ToUniversalTime( ).DayOfYear != timestamp.ToUniversalTime( ).DayOfYear;
+        bool dailySnapshotNeeded = lastDailySnapshotOutsideCurrentDay && retention.IsDailyWanted;
+        Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
+        return dailySnapshotNeeded;
+    }
 
     /// <inheritdoc />
     public override string ToString( )

@@ -63,49 +63,20 @@ internal static class SnapshotTasks
             Snapshot? latestFrequentSnapshot = null;
             NullableDateTimeOffsetComparer nullableDateTimeOffsetComparer = new ();
 
-            if ( template.SnapshotRetention.Frequent > 0 && ds is { TakeSnapshots: true, Enabled: true } )
+            if ( ds is { TakeSnapshots: true, Enabled: true } )
             {
-                Logger.Debug("Getting latest frequent snapshot for {0}",ds.Name);
-                latestFrequentSnapshot = ds.Snapshots.Where( s => s.Value.Period == SnapshotPeriod.Frequent ).OrderByDescending( s => s.Value.Timestamp, nullableDateTimeOffsetComparer ).Select( p => p.Value ).FirstOrDefault( p => true, null );;
-            }
-
-            Snapshot? latestHourlySnapshot = null;
-            if ( template.SnapshotRetention.Hourly > 0 && ds is { TakeSnapshots: true, Enabled: true } )
-            {
-                Logger.Debug("Getting latest hourly snapshot for {0}",ds.Name);
-                Snapshot[] hourlies = ds.Snapshots.Where( s => s.Value.HasProperty(SnapshotProperty.PeriodPropertyName) && s.Value.Period == SnapshotPeriod.Hourly ).Select( p=>p.Value).ToArray();
-                if ( hourlies.Any( ) )
+                if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
                 {
-                    latestHourlySnapshot = hourlies.OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( p => true, null );
+                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
                 }
-            }
-
-            Snapshot? latestDailySnapshot = null;
-            if ( template.SnapshotRetention.Daily > 0 && ds is { TakeSnapshots: true, Enabled: true } )
-            {
-                Logger.Debug("Getting latest daily snapshot for {0}",ds.Name);
-                Snapshot[] dailies = ds.Snapshots.Where( s => s.Value.HasProperty(SnapshotProperty.PeriodPropertyName) && s.Value.Period == SnapshotPeriod.Daily ).Select( p=>p.Value).ToArray();
-                if ( dailies.Any( ) )
+                if ( ds.IsHourlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
-                    latestDailySnapshot = dailies.OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( p => true, null );
+                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
                 }
-            }
-            //Snapshot? latestWeeklySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Weekly ).MaxBy( s => s.Timestamp );
-            //Snapshot? latestMonthlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Monthly ).MaxBy( s => s.Timestamp );
-            //Snapshot? latestYearlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Yearly ).MaxBy( s => s.Timestamp );
-            // ReSharper restore SimplifyLinqExpressionUseMinByAndMaxBy
-
-            if ( template.SnapshotRetention.Frequent > 0 && ((latestFrequentSnapshot is null) || (timestamp.Subtract( latestFrequentSnapshot.Timestamp ?? DateTimeOffset.UnixEpoch).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )))
-            {
-                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
-            }
-            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp?? DateTimeOffset.UnixEpoch ).TotalHours >= 1d )))
-            {
-                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
-            }
-            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp?? DateTimeOffset.UnixEpoch ).TotalDays >= 1d) ))
-            {
-                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
+                if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
+                {
+                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp );
+                }
             }
         }
 
