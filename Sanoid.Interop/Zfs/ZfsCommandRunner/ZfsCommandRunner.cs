@@ -277,7 +277,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
                 Logger.Debug( "Read line {0} from zfs get", outputLine );
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-                if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count + 1 )
+                if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count )
                 {
                     Logger.Error( "Line {0} not understood", outputLine );
                     throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {SnapshotProperty.KnownSnapshotProperties.Count } tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
