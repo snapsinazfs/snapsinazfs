@@ -60,22 +60,12 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public bool Recursive
+    public SnapshotRecursionMode Recursion
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:recursive", out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
-        }
-    }
-
-    [JsonIgnore]
-    public bool SkipChildren
-    {
-        get
-        {
-            string valueString = Properties.TryGetValue( "sanoid.net:skipchildren", out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
+            string valueString = Properties.TryGetValue( "sanoid.net:recursion", out ZfsProperty? prop ) ? prop.Value : "false";
+            return valueString;
         }
     }
 
