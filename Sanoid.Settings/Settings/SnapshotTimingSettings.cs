@@ -21,6 +21,11 @@ public sealed class SnapshotTimingSettings
     /// </remarks>
     public required int FrequentPeriod { get; init; }
 
+    public int GetPeriodOfHour( DateTimeOffset timestamp )
+    {
+        return timestamp.Minute / FrequentPeriod;
+    }
+
     /// <summary>
     ///     Gets or sets the time of day that daily snapshots are taken
     /// </summary>

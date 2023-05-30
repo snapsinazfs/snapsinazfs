@@ -4,6 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json.Serialization;
+
 namespace Sanoid.Settings.Settings;
 
 /// <summary>
@@ -15,6 +17,19 @@ public sealed class SnapshotRetentionSettings
     ///     Gets or sets how many daily snapshots will be retained
     /// </summary>
     public required int Daily { get; init; }
+
+    [JsonIgnore]
+    public bool IsFrequentWanted => Frequent > 0;
+    [JsonIgnore]
+    public bool IsHourlyWanted => Hourly > 0;
+    [JsonIgnore]
+    public bool IsDailyWanted => Daily > 0;
+    [JsonIgnore]
+    public bool IsWeeklyWanted => Weekly > 0;
+    [JsonIgnore]
+    public bool IsMonthlyWanted => Monthly > 0;
+    [JsonIgnore]
+    public bool IsYearlyWanted => Yearly > 0;
 
     /// <summary>
     ///     Gets or sets how many frequent snapshots will be retained

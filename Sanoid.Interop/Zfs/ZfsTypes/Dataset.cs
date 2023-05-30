@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -41,6 +41,31 @@ public class Dataset : ZfsObjectBase
             string valueString = Properties.TryGetValue( "sanoid.net:enabled", out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
+    }
+
+    public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    {
+        int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
+        double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshot ).TotalMinutes;
+        int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshot );
+        bool lastFrequentSnapshotInCurrentPeriod = minutesSinceLastFrequentSnapshot <= template.SnapshotTiming.FrequentPeriod && ( lastFrequentSnapshotPeriodOfHour == currentFrequentPeriodOfHour );
+        return !lastFrequentSnapshotInCurrentPeriod && template.SnapshotRetention.IsFrequentWanted;
+    }
+
+    public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    {
+        TimeSpan timeSinceLastHourlySnapshot = ( timestamp - LastHourlySnapshot );
+        bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
+        bool lastHourlySnapshotOutsudeCurrentHour = (atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.Hour != timestamp.Hour);
+        return lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
+    }
+    
+    public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    {
+        TimeSpan timeSinceLastDailySnapshot = ( timestamp - LastHourlySnapshot );
+        bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
+        bool lastHourlySnapshotOutsudeCurrentHour = (atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.Hour != timestamp.Hour);
+        return lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
     }
 
     [JsonIgnore]
