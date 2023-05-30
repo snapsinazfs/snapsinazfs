@@ -23,6 +23,7 @@ public sealed class ZfsPropertySource
     public static ZfsPropertySource Inherited { get; } = new( ZfsPropertySourceKind.Inherited );
     public static ZfsPropertySource Local { get; } = new( ZfsPropertySourceKind.Local );
     public static ZfsPropertySource Native { get; } = new( ZfsPropertySourceKind.Native );
+    public static ZfsPropertySource Sanoid { get; } = new( ZfsPropertySourceKind.Sanoid );
 
     public static implicit operator string( ZfsPropertySource obj )
     {
@@ -42,6 +43,7 @@ public sealed class ZfsPropertySource
         {
             "local" => Local,
             "default" => Default,
+            "sanoid" => Sanoid,
             "-" => Native,
             _ => Inherited
         };
@@ -55,7 +57,8 @@ public sealed class ZfsPropertySource
             ZfsPropertySourceKind.Default => "default",
             ZfsPropertySourceKind.Local => "local",
             ZfsPropertySourceKind.Native => "native",
-            ZfsPropertySourceKind.Inherited => "inherited"
+            ZfsPropertySourceKind.Inherited => "inherited",
+            ZfsPropertySourceKind.Sanoid => "sanoid"
         };
     }
 }

@@ -5,5 +5,6 @@ internal enum ZfsPropertySourceKind
     Default,
     Local,
     Native,
-    Inherited
+    Inherited,
+    Sanoid
 }
