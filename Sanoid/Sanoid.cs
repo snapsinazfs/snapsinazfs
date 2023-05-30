@@ -130,6 +130,8 @@ if ( argParseReults.Args.PrepareZfsProperties )
     foreach ( ( string poolName, Dataset? pool ) in poolRoots )
     {
         logger.Debug( "Updating properties for pool {0}", poolName );
+        Dictionary<string, ZfsProperty> propertiesToAdd = new( );
+
         foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
         {
             logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
@@ -140,7 +142,9 @@ if ( argParseReults.Args.PrepareZfsProperties )
             }
 
             logger.Debug( "Pool {0} does not have property {1}. Adding property", poolName, propertyName );
+            propertiesToAdd.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
             pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
+            zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
             logger.Debug( "Added property {0} to pool {1}: {2}", propertyName, poolName, property );
         }
 
