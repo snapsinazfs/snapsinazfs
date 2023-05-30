@@ -80,6 +80,12 @@ public abstract class ZfsObjectBase : IZfsObject
     public ZfsObjectKind ZfsKind { get; }
 
     /// <inheritdoc />
+    public bool HasProperty( string propertyName )
+    {
+        return Properties.ContainsKey( propertyName );
+    }
+
+    /// <inheritdoc />
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
 
     protected internal bool ValidateName( string name )

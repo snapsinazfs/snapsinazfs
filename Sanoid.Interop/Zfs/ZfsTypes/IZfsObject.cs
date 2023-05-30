@@ -25,4 +25,6 @@ public interface IZfsObject
     ConcurrentDictionary<string, ZfsProperty> Properties { get; }
 
     ZfsObjectKind ZfsKind { get; }
+
+    public bool HasProperty( string propertyName );
 }

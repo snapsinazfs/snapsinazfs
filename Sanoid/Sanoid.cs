@@ -123,6 +123,34 @@ IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 
 logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
+if ( argParseReults.Args.PrepareZfsProperties )
+{
+    logger.Debug( "Requested update of zfs properties schema" );
+    Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
+    foreach ( ( string poolName, Dataset? pool ) in poolRoots )
+    {
+        logger.Debug( "Updating properties for pool {0}", poolName );
+        foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
+        {
+            logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
+            if ( pool.HasProperty( propertyName ) )
+            {
+                logger.Debug( "Pool {0} already has property {1}", poolName, propertyName );
+                continue;
+            }
+
+            logger.Debug( "Pool {0} does not have property {1}. Adding property", poolName, propertyName );
+            pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
+            logger.Debug( "Added property {0} to pool {1}: {2}", propertyName, poolName, property );
+        }
+
+        logger.Debug( "Finished updating properties for pool {0}", poolName );
+    }
+
+    logger.Debug( "Finished updating zfs properties schema for all pool roots" );
+    return (int)Errno.EOK;
+}
+
 Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
 if ( settings is { TakeSnapshots: true } )
