@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -30,21 +30,21 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public bool AutoPrune
+    public bool PruneSnapshots
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:autoprune", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( "sanoid.net:prunesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
 
     [JsonIgnore]
-    public bool AutoSnapshot
+    public bool TakeSnapshots
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:autosnapshot", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( "sanoid.net:takesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
