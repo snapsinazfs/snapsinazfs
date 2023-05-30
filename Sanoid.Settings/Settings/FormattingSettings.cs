@@ -17,4 +17,25 @@ public sealed class FormattingSettings
     public required string TimestampFormatString { get; set; }
     public required string WeeklySuffix { get; set; }
     public required string YearlySuffix { get; set; }
+
+    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriod period, DateTimeOffset timestamp )
+    {
+        return $"{datasetName}@{GenerateShortSnapshotName( period, timestamp )}";
+    }
+
+    public string GenerateShortSnapshotName( SnapshotPeriod period, DateTimeOffset timestamp )
+    {
+        return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{period switch
+        {
+            SnapshotPeriod.Temporary => "temporary",
+            SnapshotPeriod.Frequent => FrequentSuffix,
+            SnapshotPeriod.Hourly => HourlySuffix,
+            SnapshotPeriod.Daily => DailySuffix,
+            SnapshotPeriod.Weekly => WeeklySuffix,
+            SnapshotPeriod.Monthly => MonthlySuffix,
+            SnapshotPeriod.Yearly => YearlySuffix,
+            SnapshotPeriod.Manual => "manual",
+            _ => throw new ArgumentOutOfRangeException( nameof( period ), period, null )
+        }}";
+    }
 }
