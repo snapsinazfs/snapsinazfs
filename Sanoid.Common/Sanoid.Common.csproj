@@ -58,4 +58,8 @@
 		<Using Include="JetBrains.Annotations" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Settings\" />
+	</ItemGroup>
+
 </Project>

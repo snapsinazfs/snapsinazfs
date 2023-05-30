@@ -41,8 +41,9 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         return new( );
     }
 
+    /// <param name="datasets"></param>
     /// <inheritdoc />
-    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( )
+    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets )
     {
         return new( );
     }

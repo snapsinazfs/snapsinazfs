@@ -5,7 +5,13 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
+using PowerArgs;
+using Sanoid.Interop.Libc;
+using Sanoid.Interop.Libc.Enums;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Common;
 
@@ -14,6 +20,8 @@ namespace Sanoid.Common;
 /// </summary>
 public static class BaseClassExtensions
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <summary>
     ///     Attempts to convert the current string to a <see cref="bool" /> value.<br />
     /// </summary>
@@ -167,5 +175,56 @@ public static class BaseClassExtensions
         int* valuePointer = (int*)&value;
         int* flagPointer = (int*)&flag;
         return ( *valuePointer & *flagPointer ) == *valuePointer;
+    }
+
+    /// <summary>
+    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+    ///     the CLI
+    /// </summary>
+    /// <param name="settings">The <see cref="SanoidSettings" /> object to get <see cref="TemplateSettings" /> from</param>
+    /// <param name="argParseReults"></param>
+    public static void SetValuesFromArgs( this SanoidSettings settings, ArgAction<CommandLineArguments> argParseReults )
+    {
+        Logger.Debug( "Overriding settings using arguments from command line." );
+        Logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+        // Let's go through all args in an order that makes sense
+        CommandLineArguments args = argParseReults.Args;
+        if ( !string.IsNullOrEmpty( args.CacheDir ) )
+        {
+            Logger.Debug( "CacheDir argument specified. Value: {0}", args.CacheDir );
+            string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
+            Logger.Debug( "CacheDir canonical path: {0}", canonicalCacheDirPath );
+            if ( !Directory.Exists( canonicalCacheDirPath ) )
+            {
+                string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
+                Logger.Error( badDirectoryMessage );
+                throw new DirectoryNotFoundException( badDirectoryMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Read ) != 0 )
+            {
+                string cantReadDirMessage = $"CacheDir {canonicalCacheDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
+                Logger.Error( cantReadDirMessage );
+                throw new UnauthorizedAccessException( cantReadDirMessage );
+            }
+
+            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Write ) != 0 )
+            {
+                string cantWriteDirMessage = $"CacheDir {canonicalCacheDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
+                Logger.Error( cantWriteDirMessage );
+                throw new UnauthorizedAccessException( cantWriteDirMessage );
+            }
+
+            settings.CacheDirectory = args.CacheDir;
+            Logger.Debug( "CacheDirectory is now {0}", canonicalCacheDirPath );
+        }
+
+        if ( args.TakeSnapshots is not null )
+        {
+            Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
+
+            settings.TakeSnapshots = args.TakeSnapshots!.Value;
+            Logger.Debug( "TakeSnapshots is now {0}", settings.TakeSnapshots );
+        }
     }
 }

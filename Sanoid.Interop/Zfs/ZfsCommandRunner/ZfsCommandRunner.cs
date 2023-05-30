@@ -241,8 +241,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return poolRoots;
     }
 
+    /// <param name="datasets"></param>
     /// <inheritdoc />
-    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( )
+    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets )
     {
         Dictionary<string, Snapshot> snapshots = new( );
 
@@ -261,7 +262,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}" );
+                Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
                 throw;
             }
 
@@ -290,6 +291,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 Snapshot snap = Snapshot.FromListSnapshots( lineTokens );
                 snapshots.TryAdd( snap.Name, snap );
+                datasets[ snap.DatasetName ].AddSnapshot( snap );
 
                 Logger.Debug( "Finished with line {0} from zfs list", outputLine );
             }

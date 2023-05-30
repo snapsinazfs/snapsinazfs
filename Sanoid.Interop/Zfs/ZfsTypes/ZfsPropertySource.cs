@@ -58,7 +58,8 @@ public sealed class ZfsPropertySource
             ZfsPropertySourceKind.Local => "local",
             ZfsPropertySourceKind.Native => "native",
             ZfsPropertySourceKind.Inherited => "inherited",
-            ZfsPropertySourceKind.Sanoid => "sanoid"
+            ZfsPropertySourceKind.Sanoid => "sanoid",
+            _ => "-"
         };
     }
 }

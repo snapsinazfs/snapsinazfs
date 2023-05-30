@@ -14,6 +14,14 @@ namespace Sanoid.Settings.Settings;
 public sealed class SnapshotTimingSettings
 {
     /// <summary>
+    ///     Gets or sets the interval, in minutes, between frequent snapshots
+    /// </summary>
+    /// <remarks>
+    ///     Should be a whole number factor of 60, such as 5, 10, 15, 20, or 30
+    /// </remarks>
+    public required int FrequentPeriod { get; init; }
+
+    /// <summary>
     ///     Gets or sets the time of day that daily snapshots are taken
     /// </summary>
     public required TimeOnly DailyTime { get; init; }

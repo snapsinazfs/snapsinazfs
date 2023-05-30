@@ -8,6 +8,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
 using Sanoid;
+using Sanoid.Common;
 using Sanoid.Common.Logging;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
@@ -112,7 +113,12 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                        .Build( );
 
 logger.Debug( "Building settings objects from IConfiguration" );
-SanoidSettings settings = rootConfiguration.Get<SanoidSettings>( );
+SanoidSettings? settings = rootConfiguration.Get<SanoidSettings>( );
+if ( settings is null )
+{
+    logger.Fatal( "Unable to parse settings from JSON" );
+    return (int)Errno.EFTYPE;
+}
 
 logger.Debug( "Getting ZFS command runner for the current environment" );
 IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
@@ -191,25 +197,24 @@ if ( argParseReults.Args.PrepareZfsProperties )
     return (int)Errno.EOK;
 }
 
-logger.Debug( "Checking for command-line overrides" );
-argParseReults.Args.UpdateSettingsFromArgs( settings );
+settings.SetValuesFromArgs( argParseReults );
 
 Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
+
+logger.Debug( "Getting sanoid snapshots" );
+Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( ref datasets );
+logger.Debug( "Finished getting sanoid snapshots" );
 
 if ( settings is { TakeSnapshots: true } )
 {
     DateTimeOffset currentTimestamp = DateTimeOffset.Now;
     logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
-    SnapshotTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, datasets, settings, SnapshotPeriod.Daily, currentTimestamp );
+    SnapshotTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, SnapshotPeriod.Daily, currentTimestamp, ref datasets );
 }
 else
 {
     logger.Warn( "TakeSnapshots is false" );
 }
-
-logger.Debug("Getting sanoid snapshots");
-Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( );
-logger.Debug("Finished getting sanoid snapshots");
 
 logger.Warn( "Snapshots: {0}", JsonSerializer.Serialize( snapshots ) );
 

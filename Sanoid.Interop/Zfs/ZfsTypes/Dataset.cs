@@ -4,9 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
@@ -15,6 +17,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Dataset : ZfsObjectBase
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Creates a new <see cref="Dataset" /> with the specified name and kind, optionally performing name validation
     /// </summary>
@@ -29,6 +32,8 @@ public class Dataset : ZfsObjectBase
         : base( name, (ZfsObjectKind)kind, validatorRegex, validateName )
     {
     }
+
+    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
 
     [JsonIgnore]
     public bool Enabled
@@ -77,5 +82,11 @@ public class Dataset : ZfsObjectBase
     public override string ToString( )
     {
         return JsonSerializer.Serialize( this );
+    }
+
+    public void AddSnapshot( Snapshot snap )
+    {
+        Logger.Debug( "Adding snapshot {0} to dataset {1}", snap.Name, Name );
+        Snapshots[ snap.Name ] = snap;
     }
 }

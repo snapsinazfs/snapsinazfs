@@ -22,7 +22,6 @@ public sealed class Mutexes : IDisposable
 {
     private Mutexes( )
     {
-        Logger = LogManager.GetCurrentClassLogger( );
         Logger.Debug( "Creating mutex manager." );
     }
 
@@ -45,7 +44,7 @@ public sealed class Mutexes : IDisposable
         }
     }
 
-    private static Logger Logger;
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
     ///     Disposes all remaining held mutexes, and logs warnings for them

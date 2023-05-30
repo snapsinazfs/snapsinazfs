@@ -28,11 +28,6 @@ public class ZfsProperty
         Source = source;
     }
 
-    protected internal ZfsProperty( )
-    {
-
-    }
-
     private ZfsProperty( string[] components )
     {
         Logger.Debug( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
@@ -85,11 +80,11 @@ public class ZfsProperty
 
     public static ImmutableDictionary<string, ZfsProperty> SanoidDefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { "sanoid.net:template", (ZfsProperty)new( "sanoid.net:", "template", "default", "local" ) },
-        { "sanoid.net:enabled", (ZfsProperty)new( "sanoid.net:", "enabled", "false", "local" ) },
-        { "sanoid.net:prunesnapshots", (ZfsProperty)new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
-        { "sanoid.net:takesnapshots", (ZfsProperty)new( "sanoid.net:", "takesnapshots", "false", "local" ) },
-        { "sanoid.net:recursion", (ZfsProperty)new( "sanoid.net:", "recursion", "default", "local" ) }
+        { "sanoid.net:template", new( "sanoid.net:", "template", "default", "local" ) },
+        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
+        { "sanoid.net:prunesnapshots", new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
+        { "sanoid.net:takesnapshots", new( "sanoid.net:", "takesnapshots", "false", "local" ) },
+        { "sanoid.net:recursion", new( "sanoid.net:", "recursion", "default", "local" ) }
     } );
 
     [JsonIgnore]

@@ -22,14 +22,6 @@ public sealed class SnapshotRetentionSettings
     public required int Frequent { get; init; }
 
     /// <summary>
-    ///     Gets or sets the interval, in minutes, between frequent snapshots
-    /// </summary>
-    /// <remarks>
-    ///     Should be a whole number factor of 60, such as 5, 10, 15, 20, or 30
-    /// </remarks>
-    public required int FrequentPeriod { get; init; }
-
-    /// <summary>
     ///     Gets or sets how many hourly snapshots will be retained
     /// </summary>
     public required int Hourly { get; init; }

@@ -18,7 +18,7 @@ internal static class SnapshotTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, Dictionary<string, Dataset> datasets, SanoidSettings settings, SnapshotPeriod period, DateTimeOffset timestamp )
+    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, SnapshotPeriod period, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
     {
         const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
@@ -50,7 +50,32 @@ internal static class SnapshotTasks
 
         foreach ( ( string _, Dataset ds ) in datasets )
         {
-            TakeSnapshot( commandRunner, settings, ds, period, timestamp );
+            if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
+            {
+                string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
+                Logger.Error( errorMessage );
+                continue;
+            }
+
+            Snapshot? latestFrequentSnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Frequent ).MaxBy( s => s.Timestamp );
+            Snapshot? latestHourlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Hourly ).MaxBy( s => s.Timestamp );
+            Snapshot? latestDailySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Daily ).MaxBy( s => s.Timestamp );
+            Snapshot? latestWeeklySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Weekly ).MaxBy( s => s.Timestamp );
+            Snapshot? latestMonthlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Monthly ).MaxBy( s => s.Timestamp );
+            Snapshot? latestYearlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Yearly ).MaxBy( s => s.Timestamp );
+
+            if ( template.SnapshotRetention.Frequent > 0 && (latestFrequentSnapshot is null) || timestamp.Subtract( latestFrequentSnapshot.Timestamp ).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )
+            {
+                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
+            }
+            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp ).TotalHours >= 1d )))
+            {
+                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
+            }
+            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp ).TotalDays >= 1d) ))
+            {
+                TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
+            }
         }
 
         Logger.Debug( "Finished taking {0} snapshots", period );
@@ -149,6 +174,7 @@ internal static class SnapshotTasks
 
         if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out Snapshot snapshot ) )
         {
+            ds.Snapshots[snapshot.Name] = snapshot;
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );
         }
         else

@@ -5,9 +5,11 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Immutable;
+using JetBrains.Annotations;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
+[UsedImplicitly]
 public class SnapshotProperty : ZfsProperty
 {
     /// <inheritdoc />
@@ -16,14 +18,22 @@ public class SnapshotProperty : ZfsProperty
     {
     }
 
-    /// <summary>
-    /// Creates a new SnapshotProperty from the provided string array
-    /// </summary>
-    /// <param name="lineTokens"></param>
-    internal SnapshotProperty( string[] lineTokens )
+    public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
+        { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
+        { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
+        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.MinValue.ToString( ), ZfsPropertySource.Sanoid ) }
+    } );
 
-    }
+    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
+    {
+        "sanoid.net:prunesnapshots",
+        "sanoid.net:recursion",
+        "sanoid.net:snapshotname",
+        "sanoid.net:snapshotperiod",
+        "sanoid.net:snapshottimestamp",
+        "sanoid.net:template"
+    } );
 
     public const string NamePropertyName = "sanoid.net:snapshotname";
     public const string NamePropertyShortName = "snapshotname";
@@ -48,7 +58,7 @@ public class SnapshotProperty : ZfsProperty
         Timestamp
     }
 
-    public static ZfsProperty GetNewSnapshotProperty( SnapshotPropertyKind kind, string value, ZfsPropertySource source )
+    public static SnapshotProperty GetNewSnapshotProperty( SnapshotPropertyKind kind, string value, ZfsPropertySource source )
     {
         return kind switch
         {
@@ -61,21 +71,4 @@ public class SnapshotProperty : ZfsProperty
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), kind, "Invalid snapshot property kind provided" )
         };
     }
-
-    public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
-    {
-        { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.MinValue.ToString( ), ZfsPropertySource.Sanoid ) }
-    } );
-
-    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
-    {
-        "sanoid.net:prunesnapshots",
-        "sanoid.net:recursion",
-        "sanoid.net:snapshotname",
-        "sanoid.net:snapshotperiod",
-        "sanoid.net:snapshottimestamp",
-        "sanoid.net:template"
-    } );
 }

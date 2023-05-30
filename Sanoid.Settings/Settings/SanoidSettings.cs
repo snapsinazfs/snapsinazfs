@@ -14,7 +14,6 @@ namespace Sanoid.Settings.Settings;
 /// </summary>
 public sealed class SanoidSettings
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Gets or sets sanoid.net's directory for temporary files
     /// </summary>
@@ -49,5 +48,4 @@ public sealed class SanoidSettings
     ///     Gets or sets the path to the zfs utility
     /// </summary>
     public required string ZfsPath { get; set; }
-
 }

@@ -74,7 +74,7 @@ public abstract class ZfsObjectBase : IZfsObject
             if ( value is null )
             {
                 Logger.Debug( "Removing property {0} from {1} {2}", key, ZfsKind, Name );
-                Properties.TryRemove( key, out ZfsProperty? prop );
+                Properties.TryRemove( key, out ZfsProperty? _ );
                 return;
             }
 
@@ -148,8 +148,9 @@ public abstract class ZfsObjectBase : IZfsObject
 
         Logger.Debug( "Checking regex matches for {0}", name );
         // No matter which kind was specified, the pool group should exist and be a match
-        foreach ( Match match in matches )
+        for ( int matchIndex = 0; matchIndex < matches.Count; matchIndex++ )
         {
+            Match match = matches[ matchIndex ];
             Logger.Debug( "Inspecting match {0}", match.Value );
         }
 

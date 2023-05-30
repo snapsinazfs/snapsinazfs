@@ -8,7 +8,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class SnapshotRecursionMode
 {
-    private SnapshotRecursionKind _kind;
+    private readonly SnapshotRecursionKind _kind;
 
     public static SnapshotRecursionMode Default { get; } = new ( SnapshotRecursionKind.Default );
     public static SnapshotRecursionMode Zfs { get; } = new ( SnapshotRecursionKind.Zfs );
@@ -45,6 +45,7 @@ public class SnapshotRecursionMode
         {
             SnapshotRecursionKind.Default => "default",
             SnapshotRecursionKind.Zfs => "zfs",
+            _ => "default"
         };
     }
 }

@@ -37,6 +37,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             SnapshotPeriodKind.Monthly => "monthly",
             SnapshotPeriodKind.Yearly => "yearly",
             SnapshotPeriodKind.Manual => "manual",
+            _=> "-"
         };
     }
 

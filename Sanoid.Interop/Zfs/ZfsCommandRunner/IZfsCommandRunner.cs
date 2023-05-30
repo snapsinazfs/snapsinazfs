@@ -88,9 +88,10 @@ public interface IZfsCommandRunner
     /// <summary>
     ///     Gets all snapshots from zfs
     /// </summary>
+    /// <param name="datasets"></param>
     /// <returns>
     ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Snapshot" /> of all snapshots
     ///     in all pools that were taken by Sanoid.net
     /// </returns>
-    public Dictionary<string, Snapshot> GetZfsSanoidSnapshots( );
+    public Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
 }

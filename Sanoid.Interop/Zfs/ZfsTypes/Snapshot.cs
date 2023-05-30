@@ -4,7 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Reflection.Metadata.Ecma335;
 using NLog;
 using Sanoid.Settings.Settings;
 
@@ -15,11 +14,6 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Snapshot : ZfsObjectBase
 {
-    private Snapshot( string name, SnapshotPeriod periodKind )
-        : base( name, ZfsObjectKind.Snapshot )
-    {
-    }
-
     private Snapshot( string name )
         : base( name, ZfsObjectKind.Snapshot )
     {
@@ -35,7 +29,33 @@ public class Snapshot : ZfsObjectBase
             }
 
             int sliceEnd = prop.Value.IndexOf( '@' );
-            return prop.Value[..sliceEnd] ?? throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
+            return prop.Value[ ..sliceEnd ] ?? throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
+        }
+    }
+
+    public SnapshotPeriod Period
+    {
+        get
+        {
+            if ( !Properties.TryGetValue( SnapshotProperty.PeriodPropertyName, out ZfsProperty? prop ) )
+            {
+                throw new InvalidOperationException( "snapshotperiod property not defined on Snapshot" );
+            }
+
+            return (SnapshotPeriod)prop.Value;
+        }
+    }
+
+    public DateTimeOffset Timestamp
+    {
+        get
+        {
+            if ( !Properties.TryGetValue( SnapshotProperty.TimestampPropertyName, out ZfsProperty? prop ) )
+            {
+                throw new InvalidOperationException( "snapshottimestamp property not defined on Snapshot" );
+            }
+
+            return DateTimeOffset.Parse( prop.Value );
         }
     }
 
@@ -45,6 +65,7 @@ public class Snapshot : ZfsObjectBase
     {
         return $"-o {string.Join( " -o ", Properties.Select( pair => pair.Value.SetString ) )}";
     }
+
     public string GetPropertiesAsOutputListString( )
     {
         return $"-o {string.Join( ",", Properties.Select( pair => pair.Key ) )}";
@@ -53,7 +74,7 @@ public class Snapshot : ZfsObjectBase
     public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
-        Snapshot newSnapshot = new( snapshotName, period );
+        Snapshot newSnapshot = new ( snapshotName );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Name, snapshotName, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Period, period, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Timestamp, timestamp.ToString( "O" ), ZfsPropertySource.Local ) );
