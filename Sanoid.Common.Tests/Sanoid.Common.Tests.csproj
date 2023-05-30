@@ -69,4 +69,8 @@
     <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Zfs\" />
+  </ItemGroup>
+
 </Project>
