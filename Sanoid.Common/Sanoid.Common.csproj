@@ -45,10 +45,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Logging\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 

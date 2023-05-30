@@ -8,15 +8,16 @@ using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
 using Sanoid.Common;
-using Sanoid.Common.Configuration;
+using Sanoid.Common.Logging;
 using Sanoid.Common.Settings;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
+using Sanoid.Interop.Zfs.ZfsTypes;
 
 // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
 // Desired logging parameters should be set in Sanoid.nlog.json
-Logging.ConfigureLogger( );
+LoggingSettings.ConfigureLogger( );
 Logger logger = LogManager.GetCurrentClassLogger( );
 
 using Mutexes mutexes = Mutexes.Instance;
