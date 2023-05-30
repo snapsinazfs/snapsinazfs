@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -53,7 +53,6 @@ public class ZfsProperty
     {
         { "sanoid.net:template", new( "sanoid.net:", "template", "default", "sanoid" ) },
         { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "sanoid" ) },
-        { "sanoid.net:skipchildren", new( "sanoid.net:", "skipchildren", "true", "sanoid" ) },
         { "sanoid.net:autoprune", new( "sanoid.net:", "autoprune", "false", "sanoid" ) },
         { "sanoid.net:autosnapshot", new( "sanoid.net:", "autosnapshot", "false", "sanoid" ) },
         { "sanoid.net:recursive", new( "sanoid.net:", "recursive", "false", "sanoid" ) }
