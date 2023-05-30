@@ -36,14 +36,14 @@ public class Configuration
     /// <param name="zfsCommandRunner">The <see cref="IZfsCommandRunner" /> that will call ZFS native commands</param>
     public Configuration( IConfigurationRoot rootConfiguration, IZfsCommandRunner zfsCommandRunner )
     {
-        RootConfiguration = rootConfiguration;
-        ZfsCommandRunner = zfsCommandRunner;
+        _rootConfiguration = rootConfiguration;
+        _zfsCommandRunner = zfsCommandRunner;
         //Instance = this;
     }
 #pragma warning restore CS8618
 
-    internal readonly IConfigurationRoot RootConfiguration;
-    internal readonly IZfsCommandRunner ZfsCommandRunner;
+    private readonly IConfigurationRoot _rootConfiguration;
+    private readonly IZfsCommandRunner _zfsCommandRunner;
 
     private bool _cron;
 
@@ -304,7 +304,7 @@ public class Configuration
     }
 
     /// <summary>
-    ///     Loads Sanoid.net's configuration from the various sources combined in <see cref="RootConfiguration" />
+    ///     Loads Sanoid.net's configuration from the various sources combined in <see cref="_rootConfiguration" />
     /// </summary>
     public void LoadConfigurationFromIConfiguration( )
     {
@@ -331,12 +331,12 @@ public class Configuration
     private void GetBaseConfiguration( )
     {
         _logger.Debug( "Initializing root-level configuration from Sanoid.Json#/" );
-        CacheDirectory = RootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
-        ConfigurationPathBase = RootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
-        RunDirectory = RootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
-        TakeSnapshots = RootConfiguration.GetBoolean( "TakeSnapshots" );
-        PruneSnapshots = RootConfiguration.GetBoolean( "PruneSnapshots" );
-        SnapshotNaming = new( RootConfiguration.GetRequiredSection( "Formatting" ).GetRequiredSection( "SnapshotNaming" ) );
+        CacheDirectory = _rootConfiguration[ "SanoidConfigurationCacheDirectory" ] ?? "/var/cache/sanoid";
+        ConfigurationPathBase = _rootConfiguration[ "SanoidConfigurationPathBase" ] ?? "/etc/sanoid";
+        RunDirectory = _rootConfiguration[ "SanoidConfigurationRunDirectory" ] ?? "/var/run/sanoid";
+        TakeSnapshots = _rootConfiguration.GetBoolean( "TakeSnapshots" );
+        PruneSnapshots = _rootConfiguration.GetBoolean( "PruneSnapshots" );
+        SnapshotNaming = new( _rootConfiguration.GetRequiredSection( "Formatting" ).GetRequiredSection( "SnapshotNaming" ) );
         _logger.Debug( "Root level configuration initialized." );
     }
 
