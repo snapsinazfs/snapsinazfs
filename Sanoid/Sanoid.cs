@@ -122,11 +122,55 @@ IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 };
 
 logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
+    Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
+bool missingPropertiesFound = false;
+    logger.Debug( "Requested check of zfs properties schema" );
+    foreach ( ( string poolName, Dataset? pool ) in poolRoots )
+    {
+        logger.Debug( "Updating properties for pool {0}", poolName );
+        Dictionary<string, ZfsProperty> missingProperties = new( );
+
+        foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
+        {
+            logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
+            if ( pool.HasProperty( propertyName ) )
+            {
+                logger.Debug( "Pool {0} already has property {1}", poolName, propertyName );
+                continue;
+            }
+
+            logger.Debug( "Pool {0} does not have property {1}", poolName, propertyName );
+            missingPropertiesFound = true;
+            missingProperties.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
+        }
+
+        logger.Debug( "Finished checking properties for pool {0}", poolName );
+
+        if ( argParseReults.Args.CheckZfsProperties )
+        {
+            logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+        }
+        else if ( !argParseReults.Args.PrepareZfsProperties )
+        {
+            logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+        }
+    }
+    logger.Debug( "Finished checking zfs properties schema for all pool roots" );
+if ( argParseReults.Args.CheckZfsProperties )
+{
+    return (int)Errno.EOK;
+}
+
+if ( !argParseReults.Args.CheckZfsProperties && !argParseReults.Args.PrepareZfsProperties && missingPropertiesFound )
+{
+    logger.Fatal("Missing properties were found in zfs. Cannot continue. Exiting");
+    return (int)Errno.ENOATTR;
+}
+
 
 if ( argParseReults.Args.PrepareZfsProperties )
 {
     logger.Debug( "Requested update of zfs properties schema" );
-    Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
     foreach ( ( string poolName, Dataset? pool ) in poolRoots )
     {
         logger.Debug( "Updating properties for pool {0}", poolName );
@@ -153,37 +197,6 @@ if ( argParseReults.Args.PrepareZfsProperties )
     }
 
     logger.Debug( "Finished updating zfs properties schema for all pool roots" );
-    return (int)Errno.EOK;
-}
-
-if ( argParseReults.Args.CheckZfsProperties )
-{
-    logger.Debug( "Requested check of zfs properties schema" );
-    Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
-    foreach ( ( string poolName, Dataset? pool ) in poolRoots )
-    {
-        logger.Debug( "Updating properties for pool {0}", poolName );
-        Dictionary<string, ZfsProperty> missingProperties = new( );
-
-        foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
-        {
-            logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
-            if ( pool.HasProperty( propertyName ) )
-            {
-                logger.Debug( "Pool {0} already has property {1}", poolName, propertyName );
-                continue;
-            }
-
-            logger.Debug( "Pool {0} does not have property {1}", poolName, propertyName );
-            missingProperties.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
-        }
-
-        logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
-
-        logger.Debug( "Finished checking properties for pool {0}", poolName );
-    }
-
-    logger.Debug( "Finished checking zfs properties schema for all pool roots" );
     return (int)Errno.EOK;
 }
 
