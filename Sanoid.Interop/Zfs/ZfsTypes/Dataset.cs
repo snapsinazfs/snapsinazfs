@@ -17,7 +17,6 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Dataset : ZfsObjectBase
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Creates a new <see cref="Dataset" /> with the specified name and kind, optionally performing name validation
     /// </summary>
@@ -33,8 +32,6 @@ public class Dataset : ZfsObjectBase
     {
     }
 
-    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
-
     [JsonIgnore]
     public bool Enabled
     {
@@ -44,6 +41,24 @@ public class Dataset : ZfsObjectBase
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
+
+    [JsonIgnore]
+    public DateTimeOffset LastDailySnapshot => Properties.TryGetValue( "sanoid.net:lastdailysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+
+    [JsonIgnore]
+    public DateTimeOffset LastFrequentSnapshot => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+
+    [JsonIgnore]
+    public DateTimeOffset LastHourlySnapshot => Properties.TryGetValue( "sanoid.net:lasthourlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+
+    [JsonIgnore]
+    public DateTimeOffset LastMonthlySnapshot => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+
+    [JsonIgnore]
+    public DateTimeOffset LastWeeklySnapshot => Properties.TryGetValue( "sanoid.net:lastweeklysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+
+    [JsonIgnore]
+    public DateTimeOffset LastYearlySnapshot => Properties.TryGetValue( "sanoid.net:lastyearlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
 
     [JsonIgnore]
     public bool PruneSnapshots
@@ -65,6 +80,8 @@ public class Dataset : ZfsObjectBase
         }
     }
 
+    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+
     [JsonIgnore]
     public bool TakeSnapshots
     {
@@ -77,6 +94,8 @@ public class Dataset : ZfsObjectBase
 
     [JsonIgnore]
     public string Template => Properties.TryGetValue( "sanoid.net:template", out ZfsProperty? prop ) ? prop.Value : "default";
+
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
     public override string ToString( )
