@@ -120,6 +120,10 @@ public class CommandLineArguments
     [ArgEnforceCase]
     public bool Version { get; set; }
 
+    [ArgDescription( "Checks the property schema for sanoid.net in zfs and reports any missing properties for pool roots." )]
+    [ArgShortcut( "--check-zfs-properties" )]
+    public bool CheckZfsProperties { get; set; }
+
     /// <summary>
     ///     Called by main thread to set logging settings early, before we load the rest of the configuration.
     /// </summary>
