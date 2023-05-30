@@ -58,9 +58,9 @@ public class ZfsProperty
     }
 
     public static ZfsProperty DefaultDatasetEnabledProperty { get; } = new( "sanoid.net:", "enabled", "false", "local" );
-    public static ZfsProperty DefaultDatasetPruneSnapshotsProperty { get; } = new( "sanoid.net:", "autoprune", "false", "local" );
+    public static ZfsProperty DefaultDatasetPruneSnapshotsProperty { get; } = new( "sanoid.net:", "prunesnapshots", "false", "local" );
     public static ZfsProperty DefaultDatasetRecursionProperty { get; } = new( "sanoid.net:", "recursion", "default", "local" );
-    public static ZfsProperty DefaultDatasetTakeSnapshotsProperty { get; } = new( "sanoid.net:", "autosnapshot", "false", "local" );
+    public static ZfsProperty DefaultDatasetTakeSnapshotsProperty { get; } = new( "sanoid.net:", "takesnapshots", "false", "local" );
     public static ZfsProperty DefaultDatasetTemplateProperty { get; } = new( "sanoid.net:", "template", "default", "local" );
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
