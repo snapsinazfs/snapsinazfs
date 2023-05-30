@@ -53,7 +53,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string arguments = $"snapshot {string.Join( " -o ", snapshot.Properties.Values.Select( p => p.SetString ) )} {snapshot.Name}";
+        string arguments = $"snapshot {string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
         Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
         {
