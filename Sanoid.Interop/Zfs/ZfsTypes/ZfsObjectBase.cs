@@ -20,10 +20,11 @@ public abstract class ZfsObjectBase : IZfsObject
     /// <param name="name">The name of the new <see cref="ZfsObjectBase" /></param>
     /// <param name="kind">The <see cref="ZfsObjectKind" /> of object to create</param>
     /// <param name="validateName">
-    /// If true, the constructor will perform name validation for the type of object being created.
+    ///     If true, the constructor will perform name validation for the type of object being created.
     /// </param>
     /// <param name="nameValidatorRegex">
-    ///     An optional <see cref="Regex" />. If left null, uses a Regex from <see cref="ZfsIdentifierRegexes" /> based on <paramref name="kind"/>
+    ///     An optional <see cref="Regex" />. If left null, uses a Regex from <see cref="ZfsIdentifierRegexes" /> based on
+    ///     <paramref name="kind" />
     /// </param>
     protected internal ZfsObjectBase( string name, ZfsObjectKind kind, Regex? nameValidatorRegex = null, bool validateName = false )
     {
@@ -31,14 +32,15 @@ public abstract class ZfsObjectBase : IZfsObject
         ZfsKind = kind;
         if ( validateName )
         {
-            Logger.Debug("Name validation requested for new ZfsObjectBase");
+            Logger.Debug( "Name validation requested for new ZfsObjectBase" );
             if ( !ValidateName( name ) )
             {
                 string? errorMessage = $"Invalid name specified for a new {ZfsKind} with validateName=true";
-                Logger.Error(errorMessage);
+                Logger.Error( errorMessage );
                 throw new ArgumentOutOfRangeException( nameof( name ), errorMessage );
             }
         }
+
         NameValidatorRegex = nameValidatorRegex ?? kind switch
         {
             ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
@@ -49,6 +51,21 @@ public abstract class ZfsObjectBase : IZfsObject
 
         Name = name;
         Properties = new( );
+    }
+
+    public ZfsProperty? this[ string key ]
+    {
+        get => Properties.TryGetValue( key, out ZfsProperty prop ) ? prop : null;
+        set
+        {
+            if ( value is null )
+            {
+                Properties.TryRemove( key, out ZfsProperty? prop );
+                return;
+            }
+
+            Properties[ key ] = value;
+        }
     }
 
     [JsonIgnore]
@@ -80,53 +97,53 @@ public abstract class ZfsObjectBase : IZfsObject
     ///     <paramref name="kind" />.
     /// </exception>
     /// <exception cref="ArgumentNullException">If <paramref name="name" /> is null, empty, or only whitespace</exception>
-    public static bool ValidateName(ZfsObjectKind kind, string name, Regex? validatorRegex = null)
+    public static bool ValidateName( ZfsObjectKind kind, string name, Regex? validatorRegex = null )
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if ( string.IsNullOrWhiteSpace( name ) )
         {
-            throw new ArgumentNullException(nameof(name), "name must be a non-null, non-empty, non-whitespace string");
+            throw new ArgumentNullException( nameof( name ), "name must be a non-null, non-empty, non-whitespace string" );
         }
 
-        if (name.Length > 255)
+        if ( name.Length > 255 )
         {
-            throw new ArgumentOutOfRangeException(nameof(name), "name must be 255 characters or less");
+            throw new ArgumentOutOfRangeException( nameof( name ), "name must be 255 characters or less" );
         }
 
         validatorRegex ??= kind switch
         {
-            ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex(),
-            ZfsObjectKind.Volume => ZfsIdentifierRegexes.DatasetNameRegex(),
-            ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex(),
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), "Unknown type of object specified to ValidateName.")
+            ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            ZfsObjectKind.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
+            _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified to ValidateName." )
         };
 
         // ReSharper disable once ExceptionNotDocumentedOptional
-        MatchCollection matches = validatorRegex.Matches(name);
+        MatchCollection matches = validatorRegex.Matches( name );
 
-        if (matches.Count == 0)
+        if ( matches.Count == 0 )
         {
             return false;
         }
 
-        Logger.Debug("Checking regex matches for {0}", name);
+        Logger.Debug( "Checking regex matches for {0}", name );
         // No matter which kind was specified, the pool group should exist and be a match
-        foreach (Match match in matches)
+        foreach ( Match match in matches )
         {
-            Logger.Debug("Inspecting match {0}", match.Value);
+            Logger.Debug( "Inspecting match {0}", match.Value );
         }
 
-        Logger.Debug("PropertyName of {0} {1} is valid", kind, name);
+        Logger.Debug( "PropertyName of {0} {1} is valid", kind, name );
 
         return true;
     }
 
     /// <summary>
-    /// Adds the <see cref="ZfsProperty"/> <paramref name="prop"/> to this <see name="ZfsObjectBase"/>
+    ///     Adds the <see cref="ZfsProperty" /> <paramref name="prop" /> to this <see name="ZfsObjectBase" />
     /// </summary>
     /// <param name="prop">The property to add</param>
     public void AddProperty( ZfsProperty prop )
     {
         Logger.Debug( "Adding property {0} to {1}", prop, Name );
-        Properties[prop.Name] = prop;
+        Properties[ prop.Name ] = prop;
     }
 }

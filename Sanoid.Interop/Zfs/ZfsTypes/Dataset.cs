@@ -78,22 +78,4 @@ public class Dataset : ZfsObjectBase
     {
         return JsonSerializer.Serialize( this );
     }
-
-    public ZfsProperty? this[ string key ]
-    {
-        get
-        {
-            return Properties.TryGetValue( key, out ZfsProperty prop ) ? prop : null;
-        }
-        set
-        {
-            if ( value is null )
-            {
-                Properties.TryRemove( key, out ZfsProperty? prop );
-                return;
-            }
-
-            Properties[ key ] = value;
-        }
-    }
 }
