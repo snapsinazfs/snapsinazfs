@@ -92,8 +92,8 @@ public class ZfsProperty
         { "sanoid.net:lastfrequentsnapshot", new( "sanoid.net:", "lastfrequentsnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
         { "sanoid.net:lasthourlysnapshot", new( "sanoid.net:", "lasthourlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
         { "sanoid.net:lastmonthlysnapshot", new( "sanoid.net:", "lastmonthlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastweeklysnapshot", new( "sanoid.net:", "lastweeklysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
         { "sanoid.net:lastyearlysnapshot", new( "sanoid.net:", "lastyearlysnapshot", DateTimeOffset.MinValue.ToString( "O" ), "local" ) },
-        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
         { "sanoid.net:prunesnapshots", new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
         { "sanoid.net:takesnapshots", new( "sanoid.net:", "takesnapshots", "false", "local" ) },
         { "sanoid.net:recursion", new( "sanoid.net:", "recursion", "default", "local" ) }
