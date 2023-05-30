@@ -56,9 +56,11 @@ public class Snapshot : ZfsObjectBase
             }
 
             if ( !DateTimeOffset.TryParse( prop.Value, out DateTimeOffset result ) )
+            {
                 return null;
-            return result;
+            }
 
+            return result;
         }
     }
 
@@ -77,7 +79,7 @@ public class Snapshot : ZfsObjectBase
     public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
-        Snapshot newSnapshot = new ( snapshotName );
+        Snapshot newSnapshot = new( snapshotName );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Name, snapshotName, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Period, period, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Timestamp, timestamp.ToString( "O" ), ZfsPropertySource.Local ) );
