@@ -71,4 +71,10 @@ public class Dataset : ZfsObjectBase
 
     [JsonIgnore]
     public string Template => Properties.TryGetValue( "sanoid.net:template", out ZfsProperty? prop ) ? prop.Value : "default";
+
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return JsonSerializer.Serialize( this );
+    }
 }
