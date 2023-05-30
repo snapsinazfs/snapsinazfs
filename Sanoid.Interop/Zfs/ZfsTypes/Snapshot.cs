@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Reflection.Metadata.Ecma335;
 using NLog;
 using Sanoid.Settings.Settings;
 
@@ -33,7 +34,8 @@ public class Snapshot : ZfsObjectBase
                 throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
             }
 
-            return Path.GetDirectoryName( prop.Value ) ?? throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
+            int sliceEnd = prop.Value.IndexOf( '@' );
+            return prop.Value[..sliceEnd] ?? throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
         }
     }
 
