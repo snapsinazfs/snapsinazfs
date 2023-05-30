@@ -179,7 +179,7 @@ if ( !argParseReults.Args.CheckZfsProperties && !argParseReults.Args.PrepareZfsP
 if ( argParseReults.Args.PrepareZfsProperties )
 {
     logger.Debug( "Requested update of zfs properties schema" );
-    foreach ( ( string poolName, Dictionary<string,ZfsProperty> propertiesToAdd ) in missingPoolPropertyCollections )
+    foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in missingPoolPropertyCollections )
     {
         logger.Debug( "Updating properties for pool {0}", poolName );
         zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
@@ -190,6 +190,9 @@ if ( argParseReults.Args.PrepareZfsProperties )
     logger.Debug( "Finished updating zfs properties schema for all pool roots" );
     return (int)Errno.EOK;
 }
+
+logger.Debug( "Checking for command-line overrides" );
+argParseReults.Args.UpdateSettingsFromArgs( settings );
 
 Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
