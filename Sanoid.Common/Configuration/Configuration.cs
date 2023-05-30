@@ -12,9 +12,9 @@ using Microsoft.Extensions.Configuration;
 using NLog.Config;
 using PowerArgs;
 using Sanoid.Common.Configuration.Templates;
-using Sanoid.Common.Zfs;
 using Sanoid.Interop.Libc;
 using Sanoid.Interop.Libc.Enums;
+using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Dataset = Sanoid.Common.Configuration.Datasets.Dataset;
 
 namespace Sanoid.Common.Configuration;
@@ -132,7 +132,7 @@ public class Configuration
         set
         {
             _logger.Warn( "Log levels should be changed in Sanoid.nlog.json for normal usage." );
-            _logger.Debug( "Setting minimum log severity to {0} for ALL rules.", value.Name );
+            _logger.Debug( "Setting minimum log severity to {0} for ALL rules", value.Name );
             for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration!.LoggingRules.Count; ruleIndex++ )
             {
                 LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
@@ -247,13 +247,13 @@ public class Configuration
         // First, add the virtual root dataset, with the provided template
         Datasets.Add( "/", Dataset.GetRoot( defaultTemplateForRoot ) );
 
-        ImmutableSortedSet<string> zfsListResults = ZfsCommandRunner.ZfsListAll( );
+        ImmutableSortedSet<string> zfsListResults = _zfsCommandRunner.ZfsListAll( );
         // List is returned in the form of a path tree already, so we can just scan the list linearly
         // Pool nodes will be added as children of the dummy root node, and so on down the chain until all datasets exist in the
         // Datasets dictionary
         foreach ( string dsName in zfsListResults )
         {
-            _logger.Trace( "Processing dataset {0} from zfs list.", dsName );
+            _logger.Trace( "Processing dataset {0} from zfs list", dsName );
         #if WINDOWS
             // Gotta love how Windows changes the forward slashes to backslashes silently, but only on paths more than 1 deep...
             string parentDsName = $"/{Path.GetDirectoryName( dsName )}".Replace( "\\", "/" );
@@ -267,7 +267,7 @@ public class Configuration
                 Pools.TryAdd( newDs.VirtualPath, newDs );
             }
 
-            _logger.Debug( "Dataset {0} added to dictionary.", dsName );
+            _logger.Debug( "Dataset {0} added to dictionary", dsName );
         }
     }
 
@@ -314,7 +314,7 @@ public class Configuration
         // Template configuration initialization
         _logger.Debug( "Initializing template configuration from Sanoid.json#/Templates" );
         // First, find the default template
-        RootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
+        _rootConfiguration.CheckTemplateSectionExists( "default", out IConfigurationSection defaultTemplateSection );
         defaultTemplateSection.CheckTemplateSnapshotRetentionSectionExists( out IConfigurationSection _ );
         defaultTemplateSection.CheckDefaultTemplateSnapshotTimingSectionExists( out IConfigurationSection _ );
 
@@ -354,9 +354,9 @@ public class Configuration
         CommandLineArguments args = argParseReults.Args;
         if ( !string.IsNullOrEmpty( args.CacheDir ) )
         {
-            _logger.Debug( "CacheDir argument specified. Value: {0}.", args.CacheDir );
+            _logger.Debug( "CacheDir argument specified. Value: {0}", args.CacheDir );
             string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
-            _logger.Debug( "CacheDir canonical path: {0}.", canonicalCacheDirPath );
+            _logger.Debug( "CacheDir canonical path: {0}", canonicalCacheDirPath );
             if ( !Directory.Exists( canonicalCacheDirPath ) )
             {
                 string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
@@ -384,9 +384,9 @@ public class Configuration
 
         if ( !string.IsNullOrEmpty( args.RunDir ) )
         {
-            _logger.Debug( "RunDir argument specified. Value: {0}.", args.RunDir );
+            _logger.Debug( "RunDir argument specified. Value: {0}", args.RunDir );
             string canonicalRunDirPath = NativeMethods.CanonicalizeFileName( args.RunDir );
-            _logger.Debug( "RunDir canonical path: {0}.", canonicalRunDirPath );
+            _logger.Debug( "RunDir canonical path: {0}", canonicalRunDirPath );
             if ( !Directory.Exists( canonicalRunDirPath ) )
             {
                 string badDirectoryMessage = $"RunDir argument value {canonicalRunDirPath} is a non-existent directory. Program will terminate.";
@@ -437,14 +437,14 @@ public class Configuration
 
             Datasets.TryGetValue( dsName, out _ );
             Datasets[ dsName ].TrimUnwantedChildren( Datasets );
-            _logger.Debug( "Checking if {0} is enabled.", dsName );
+            _logger.Debug( "Checking if {0} is enabled", dsName );
             if ( !Datasets[ dsName ].Enabled )
             {
-                _logger.Debug( "Dataset {0} is not enabled. Removing.", dsName );
+                _logger.Debug( "Dataset {0} is not enabled. Removing", dsName );
                 Datasets.Remove( dsName );
             }
 
-            _logger.Debug( "Dataset {0} is enabled.", dsName );
+            _logger.Debug( "Dataset {0} is enabled", dsName );
         }
 
         _logger.Debug( "Finished pruning all unwanted Datasets from running configuration." );
