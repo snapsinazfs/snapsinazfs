@@ -65,21 +65,29 @@ internal static class SnapshotTasks
             if ( template.SnapshotRetention.Frequent > 0 && ds is { TakeSnapshots: true, Enabled: true } )
             {
                 Logger.Debug("Getting latest frequent snapshot for {0}",ds.Name);
-                latestFrequentSnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Frequent ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( );
+                latestFrequentSnapshot = ds.Snapshots.Where( s => s.Value.Period == SnapshotPeriod.Frequent ).OrderByDescending( s => s.Value.Timestamp, nullableDateTimeOffsetComparer ).Select( p => p.Value ).FirstOrDefault( p => true, null );;
             }
 
             Snapshot? latestHourlySnapshot = null;
             if ( template.SnapshotRetention.Hourly > 0 && ds is { TakeSnapshots: true, Enabled: true } )
             {
-                Logger.Debug("Getting hourly frequent snapshot for {0}",ds.Name);
-                latestHourlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Hourly ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( );
+                Logger.Debug("Getting latest hourly snapshot for {0}",ds.Name);
+                Snapshot[] hourlies = ds.Snapshots.Where( s => s.Value.HasProperty(SnapshotProperty.PeriodPropertyName) && s.Value.Period == SnapshotPeriod.Hourly ).Select( p=>p.Value).ToArray();
+                if ( hourlies.Any( ) )
+                {
+                    latestHourlySnapshot = hourlies.OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( p => true, null );
+                }
             }
 
             Snapshot? latestDailySnapshot = null;
             if ( template.SnapshotRetention.Daily > 0 && ds is { TakeSnapshots: true, Enabled: true } )
             {
                 Logger.Debug("Getting latest daily snapshot for {0}",ds.Name);
-                latestDailySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Daily ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer).FirstOrDefault( );
+                Snapshot[] dailies = ds.Snapshots.Where( s => s.Value.HasProperty(SnapshotProperty.PeriodPropertyName) && s.Value.Period == SnapshotPeriod.Daily ).Select( p=>p.Value).ToArray();
+                if ( dailies.Any( ) )
+                {
+                    latestDailySnapshot = dailies.OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( p => true, null );
+                }
             }
             //Snapshot? latestWeeklySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Weekly ).MaxBy( s => s.Timestamp );
             //Snapshot? latestMonthlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Monthly ).MaxBy( s => s.Timestamp );
