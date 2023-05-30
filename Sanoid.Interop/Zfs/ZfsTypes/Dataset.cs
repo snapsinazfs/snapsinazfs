@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using NLog;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
@@ -43,22 +44,22 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public DateTimeOffset LastDailySnapshot => Properties.TryGetValue( "sanoid.net:lastdailysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastDailySnapshot => Properties.TryGetValue( "sanoid.net:lastdailysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastFrequentSnapshot => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastFrequentSnapshot => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastHourlySnapshot => Properties.TryGetValue( "sanoid.net:lasthourlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastHourlySnapshot => Properties.TryGetValue( "sanoid.net:lasthourlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastMonthlySnapshot => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastMonthlySnapshot => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastWeeklySnapshot => Properties.TryGetValue( "sanoid.net:lastweeklysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastWeeklySnapshot => Properties.TryGetValue( "sanoid.net:lastweeklysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastYearlySnapshot => Properties.TryGetValue( "sanoid.net:lastyearlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.MinValue;
+    public DateTimeOffset LastYearlySnapshot => Properties.TryGetValue( "sanoid.net:lastyearlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
     public bool PruneSnapshots

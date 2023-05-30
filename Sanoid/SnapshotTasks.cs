@@ -62,6 +62,7 @@ internal static class SnapshotTasks
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
             Snapshot? latestFrequentSnapshot = null;
             NullableDateTimeOffsetComparer nullableDateTimeOffsetComparer = new ();
+
             if ( template.SnapshotRetention.Frequent > 0 && ds is { TakeSnapshots: true, Enabled: true } )
             {
                 Logger.Debug("Getting latest frequent snapshot for {0}",ds.Name);
@@ -94,15 +95,15 @@ internal static class SnapshotTasks
             //Snapshot? latestYearlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Yearly ).MaxBy( s => s.Timestamp );
             // ReSharper restore SimplifyLinqExpressionUseMinByAndMaxBy
 
-            if ( template.SnapshotRetention.Frequent > 0 && ((latestFrequentSnapshot is null) || (timestamp.Subtract( latestFrequentSnapshot.Timestamp ?? DateTimeOffset.MinValue).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )))
+            if ( template.SnapshotRetention.Frequent > 0 && ((latestFrequentSnapshot is null) || (timestamp.Subtract( latestFrequentSnapshot.Timestamp ?? DateTimeOffset.UnixEpoch).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
             }
-            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp?? DateTimeOffset.MinValue ).TotalHours >= 1d )))
+            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp?? DateTimeOffset.UnixEpoch ).TotalHours >= 1d )))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
             }
-            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp?? DateTimeOffset.MinValue ).TotalDays >= 1d) ))
+            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp?? DateTimeOffset.UnixEpoch ).TotalDays >= 1d) ))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
             }

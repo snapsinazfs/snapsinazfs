@@ -22,7 +22,7 @@ public class SnapshotProperty : ZfsProperty
     {
         { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
         { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.MinValue.ToString( ), ZfsPropertySource.Sanoid ) }
+        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySource.Sanoid ) }
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
