@@ -7,47 +7,21 @@
         "$id": {
             "type": "string",
             "description": "The name of the config file. Sanoid expects to see 'Sanoid.json'.",
-            "default": "Sanoid.json",
-            "format": "uri-reference"
+            "default": "Sanoid.json"
         },
         "$comments": {
             "type": "string",
             "description": "Comments about this document."
         },
-        "UseSanoidConfiguration": {
-            "type": "boolean",
-            "description": "Should Sanoid.net use the standard ini-formatted configuration files?",
-            "default": true
-        },
-        "SanoidConfigurationPathBase": {
-            "type": "string",
-            "description": "The base directory where the ini-formatted sanoid configuration files are located, without trailing slash.",
-            "default": "/etc/sanoid",
-            "format": "uri-reference"
-        },
-        "SanoidConfigurationDefaultsFile": {
-            "type": "string",
-            "description": "The name of the file containing configuration defaults for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-            "default": "sanoid.defaults.config",
-            "format": "uri-reference"
-        },
-        "SanoidConfigurationLocalFile": {
-            "type": "string",
-            "description": "The name of the local configuration file for the perl version of sanoid. File must be located in the directory specified in #properties/SanoidConfigurationPathBase",
-            "default": "sanoid.config",
-            "format": "uri-reference"
-        },
-        "SanoidConfigurationCacheDirectory": {
+        "CacheDirectory": {
             "type": "string",
             "description": "The cache directory sanoid will use",
-            "default": "/var/cache/sanoid",
-            "format": "uri-reference"
+            "default": "/var/cache/sanoid"
         },
-        "SanoidConfigurationRunDirectory": {
+        "ZfsPath": {
             "type": "string",
-            "description": "The run directory sanoid will use",
-            "default": "/var/run/sanoid",
-            "format": "uri-reference"
+            "description": "The path to the zfs utility",
+            "default": "/usr/local/sbin/zfs"
         },
         "DryRun": {
             "type": "boolean",
@@ -64,99 +38,109 @@
             "description": "If running Sanoid.net will prune expired snapshots by default",
             "default": false
         },
-        "ForcePruneSnapshots": {
-            "type": "boolean",
-            "description": "If running Sanoid.net will prune expired snapshots by default, even if their parent datasets are currently involved in a send or receive operation",
-            "default": false
+        "Formatting": {
+            "$ref": "#/$defs/Formatting",
+            "additionalProperties": false
+        },
+        "Monitoring": {
+            "$ref": "#/$defs/Monitoring",
+            "additionalProperties": false
+        },
+        "Templates": {
+            "$ref": "#/$defs/Templates",
+            "additionalProperties": false
         }
     },
-    "required": [],
+    "additionalProperties": false,
+    "required": [
+        "CacheDirectory",
+        "ZfsPath",
+        "Formatting",
+        "Monitoring",
+        "TakeSnapshots",
+        "PruneSnapshots"
+    ],
     "$defs": {
         "Templates": {
             "type": "object",
             "description": "Templates to apply to dataset nodes",
             "properties": {
                 "default": {
-                    "$ref": "Sanoid.template.schema.json",
-                    "type": "object"
+                    "$ref": "Sanoid.template.schema.json"
                 }
             },
-            "additionalProperties": {
-                "$ref": "Sanoid.template.schema.json"
-            }
+            "additionalProperties": false
         },
         "Formatting": {
             "type": "object",
             "description": "Configuration section for configurable formatting options for output, naming, etc.",
             "properties": {
-                "SnapshotNaming": {
-                    "type": "object",
-                    "description": "Formatting configuration section for composing snapshot names.",
-                    "properties": {
-                        "ComponentSeparator": {
-                            "type": "string",
-                            "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name. Can be an empty string.",
-                            "default": "_",
-                            "pattern": "^[a-zA-Z0-9_-]{0,2}$"
-                        },
-                        "Prefix": {
-                            "type": "string",
-                            "description": "The prefix component of all snapshot names.",
-                            "default": "autosnap",
-                            "pattern": "^[a-zA-Z0-9_-]+$"
-                        },
-                        "TimestampFormatString": {
-                            "type": "string",
-                            "description": ".net-style DateTimeOffset format string for the timestamp component of snapshot names.",
-                            "default": "yyyy-MM-dd_HH\\:mm\\:ss"
-                        },
-                        "FrequentSuffix": {
-                            "type": "string",
-                            "description": "The suffix component of frequent snapshot names.",
-                            "default": "frequently"
-                        },
-                        "HourlySuffix": {
-                            "type": "string",
-                            "description": "The suffix component of hourly snapshot names.",
-                            "default": "hourly"
-                        },
-                        "DailySuffix": {
-                            "type": "string",
-                            "description": "The suffix component of daily snapshot names.",
-                            "default": "daily"
-                        },
-                        "WeeklySuffix": {
-                            "type": "string",
-                            "description": "The suffix component of weekly snapshot names.",
-                            "default": "weekly"
-                        },
-                        "MonthlySuffix": {
-                            "type": "string",
-                            "description": "The suffix component of monthly snapshot names.",
-                            "default": "monthly"
-                        },
-                        "YearlySuffix": {
-                            "type": "string",
-                            "description": "The suffix component of yearly snapshot names.",
-                            "default": "yearly"
-                        }
-                    },
-                    "required": [
-                        "ComponentSeparator",
-                        "Prefix",
-                        "TimestampFormatString",
-                        "FrequentSuffix",
-                        "HourlySuffix",
-                        "DailySuffix",
-                        "WeeklySuffix",
-                        "MonthlySuffix",
-                        "YearlySuffix"
-                    ]
+                "ComponentSeparator": {
+                    "type": "string",
+                    "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name. Can be an empty string.",
+                    "default": "_",
+                    "pattern": "^[a-zA-Z0-9:._-]{0,2}$"
+                },
+                "Prefix": {
+                    "type": "string",
+                    "description": "The prefix component of all snapshot names.",
+                    "default": "autosnap",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "TimestampFormatString": {
+                    "type": "string",
+                    "description": ".net-style DateTimeOffset format string for the timestamp component of snapshot names.",
+                    "default": "yyyy-MM-dd_HH\\:mm\\:ss",
+                    "$comment": "See the Microsoft documentation for DateTimeOffset.ToString() format strings. Note that backslash must be escaped for JSON and that the resulting string must be properly escaped for the ToString function."
+                },
+                "FrequentSuffix": {
+                    "type": "string",
+                    "description": "The suffix component of frequent snapshot names.",
+                    "default": "frequently",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "HourlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of hourly snapshot names.",
+                    "default": "hourly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "DailySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of daily snapshot names.",
+                    "default": "daily",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "WeeklySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of weekly snapshot names.",
+                    "default": "weekly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "MonthlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of monthly snapshot names.",
+                    "default": "monthly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "YearlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of yearly snapshot names.",
+                    "default": "yearly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
                 }
             },
             "additionalProperties": false,
             "required": [
-                "SnapshotNaming"
+                "ComponentSeparator",
+                "Prefix",
+                "TimestampFormatString",
+                "FrequentSuffix",
+                "HourlySuffix",
+                "DailySuffix",
+                "WeeklySuffix",
+                "MonthlySuffix",
+                "YearlySuffix"
             ]
         },
         "Monitoring": {
@@ -165,30 +149,6 @@
             "additionalProperties": {
                 "$ref": "Sanoid.monitoring.schema.json",
                 "type": "object"
-            }
-        },
-        "PlatformUtilities": {
-            "type": "object",
-            "description": "Paths to platform utilities, either absolute or relative to the $PATH environment variable Sanoid.net is invoked with.",
-            "properties": {
-                "ps": {
-                    "type": "string",
-                    "description": "The path to the standard 'ps' command or another utility with identical output",
-                    "default": "/usr/bin/ps"
-                },
-                "zfs": {
-                    "type": "string",
-                    "description": "The path to the 'zfs' command",
-                    "default": "/usr/local/sbin/zfs"
-                },
-                "zpool": {
-                    "type": "string",
-                    "description": "The path to the 'zpool' command",
-                    "default": "/usr/local/sbin/zpool"
-                }
-            },
-            "additionalProperties": {
-                "type": "string"
             }
         }
     }

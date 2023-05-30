@@ -1,34 +1,39 @@
-{
-  "$schema": "https://json-schema.org/draft/2019-09/schema",
-  "$id": "Sanoid.monitoring.schema.json",
-  "type": "object",
-  "description": "Configuration schema for Sanoid.net's monitoring capabilities",
-  "required": [ "MonitorType" ],
-  "properties": {
-    "$comments": {
-      "type": "string",
-      "description": "Comments about this document. Not used in configuration validation."
+﻿{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "Sanoid.monitoring.schema.json",
+    "type": "object",
+    "description": "Configuration schema for Sanoid.net's monitoring capabilities",
+    "properties": {
+        "$comments": {
+            "type": "string",
+            "description": "Comments about this document. Not used in configuration validation."
+        },
+        "Health": {
+            "type": "boolean",
+            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on. It only monitors filesystems that are configured in sanoid.net. Corresponds to the --monitor-health command line argument.",
+            "default": false
+        },
+        "Capacity": {
+            "type": "boolean",
+            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in sanoid.net. Corresponds to the --monitor-capacity command line argument.",
+            "default": false
+        },
+        "Snapshots": {
+            "type": "boolean",
+            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of your snapshots. Corresponds to the --monitor-snapshots command line argument.",
+            "default": false
+        },
+        "MonitorType": {
+            "type": "string",
+            "description": "The type of the monitor",
+            "enum": [
+                "Nagios"
+            ],
+            "$comment": "If a module is written to extend to another monitoring system, add a type specifier for it to the MonitorType enum in this schema, for configuration validation."
+        }
     },
-    "Health": {
-      "type": "boolean",
-      "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on. It only monitors filesystems that are configured in sanoid.net. Corresponds to the --monitor-health command line argument.",
-      "default": false
-    },
-    "Capacity": {
-      "type": "boolean",
-      "description": "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in sanoid.net. Corresponds to the --monitor-capacity command line argument.",
-      "default": false
-    },
-    "Snapshots": {
-      "type": "boolean",
-      "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of your snapshots. Corresponds to the --monitor-snapshots command line argument.",
-      "default": false
-    },
-    "MonitorType": {
-      "type": "string",
-      "description": "The type of the monitor",
-      "$comment": "If a module is written to extend to another monitoring system, add a type specifier for it to the enum below, for configuration validation.",
-      "enum": [ "Nagios" ]
-    }
-  }
+    "additionalProperties": false,
+    "required": [
+        "MonitorType"
+    ]
 }

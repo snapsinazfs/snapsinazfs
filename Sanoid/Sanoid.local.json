@@ -2,6 +2,8 @@
   "$schema": "Sanoid.local.schema.json",
   "$id": "Sanoid.local.json",
   "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
+  "CacheDirectory": "var/cache/sanoid",
+  "ZfsPath": "/usr/local/sbin/zfs", 
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
@@ -14,34 +16,43 @@
       "Snapshots": false
     }
   },
+  "Formatting": {
+    "ComponentSeparator": "_",
+    "Prefix": "autosnap",
+    "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+    "FrequentSuffix": "frequently",
+    "HourlySuffix": "hourly",
+    "DailySuffix": "daily",
+    "WeeklySuffix": "weekly",
+    "MonthlySuffix": "monthly",
+    "YearlySuffix": "yearly"
+  },
   "Templates": {
-    "default": {
-      "Templates": {
-        "production": {
-          "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template.",
-          "AutoPrune": true,
-          "AutoSnapshot": true,
-          "SnapshotRetention": {
-            "Frequent": 0,
-            "Hourly": 36,
-            "Daily": 30,
-            "Weekly": 0,
-            "Monthly": 3,
-            "Yearly": 0
-          },
-          "SkipChildren": false,
-          "Recursive": false,
-          "Templates": {
-            "production_noHourly": {
-              "$comments": "Sample template. Inherits all settings from the 'production' template (and its parent, 'default'), but overrides how many hourly snapshots are retained.",
-              "UseTemplate": "production",
-              "SnapshotRetention": {
-                "Hourly": 0
-              }
-            }
-
-          }
-        }
+    "production": {
+      "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template.",
+      "TakeSnapshots": true,
+      "PruneSnapshots": true,
+      "Recursion": "default",
+      "SnapshotTiming": {
+        "FrequentPeriod": 15,
+        "UseLocalTime": true,
+        "HourlyMinute": 59,
+        "DailyTime": "00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00",
+        "MonthlyDay": 31,
+        "MonthlyTime": "00:00",
+        "YearlyMonth": 12,
+        "YearlyDay": 31,
+        "YearlyTime": "00:00"
+      },
+      "SnapshotRetention": {
+        "Frequent": 0,
+        "Hourly": 36,
+        "Daily": 30,
+        "Weekly": 0,
+        "Monthly": 3,
+        "Yearly": 0
       }
     }
   }
