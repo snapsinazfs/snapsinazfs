@@ -248,17 +248,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, Snapshot> snapshots = new( );
 
         Logger.Debug( "Getting ZFS snapshot configurations" );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"list -r -t snapshot -H -p -o {string.Join( ',', SnapshotProperty.KnownSnapshotProperties )}" )
+        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -r -t snapshot -H -p -o {string.Join( ',', SnapshotProperty.KnownSnapshotProperties )}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
         {
-            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
             try
             {
-                zfsGetProcess.Start( );
+                zfsListProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
@@ -266,17 +266,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 throw;
             }
 
-            if ( zfsGetProcess.HasExited && zfsGetProcess.ExitCode == 2 )
+            if ( zfsListProcess.HasExited && zfsListProcess.ExitCode == 2 )
             {
                 string errorMessage = "Missing snapshot properties. Cannot get snapshots from ZFS";
                 Logger.Error( errorMessage );
                 throw new InvalidOperationException( errorMessage );
             }
 
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            while ( !zfsListProcess.StandardOutput.EndOfStream )
             {
-                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                Logger.Debug( "Read line {0} from zfs get", outputLine );
+                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
+                Logger.Trace( "Read line {0} from zfs list", outputLine );
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
                 if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count )
                 {
@@ -286,20 +286,20 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                 if ( lineTokens[ 2 ] == "-" )
                 {
-                    Logger.Debug("Output line is not a sanoid.net snapshot - skipping");
+                    Logger.Trace("Output line is not a sanoid.net snapshot - skipping");
                     continue;
                 }
                 Snapshot snap = Snapshot.FromListSnapshots( lineTokens );
                 snapshots.TryAdd( snap.Name, snap );
                 datasets[ snap.DatasetName ].AddSnapshot( snap );
 
-                Logger.Debug( "Finished with line {0} from zfs list", outputLine );
+                Logger.Trace( "Finished with line {0} from zfs list", outputLine );
             }
 
-            if ( !zfsGetProcess.HasExited )
+            if ( !zfsListProcess.HasExited )
             {
                 Logger.Trace( "Waiting for zfs list process to exit" );
-                zfsGetProcess.WaitForExit( 3000 );
+                zfsListProcess.WaitForExit( 3000 );
             }
 
             Logger.Debug( "zfs list process finished" );
