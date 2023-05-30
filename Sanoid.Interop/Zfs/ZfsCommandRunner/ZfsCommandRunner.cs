@@ -53,7 +53,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string arguments = $"snapshot {snapshot.GetPropertiesSetStringForCommandLine( )} {snapshot.Name}";
+        string arguments = $"snapshot {string.Join( " -o ", snapshot.Properties.Values.Select( p => p.SetString ) )} {snapshot.Name}";
         Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
         {
@@ -217,6 +217,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                         Logger.Debug( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
                     }
                 }
+
                 Logger.Debug( "Finished with line {0} from zfs get", outputLine );
             }
 

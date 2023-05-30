@@ -153,7 +153,7 @@ public abstract class ZfsObjectBase : IZfsObject
             Logger.Debug( "Inspecting match {0}", match.Value );
         }
 
-        Logger.Debug( "PropertyName of {0} {1} is valid", kind, name );
+        Logger.Debug( "Name of {0} {1} is valid", kind, name );
 
         return true;
     }
