@@ -15,9 +15,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     public SnapshotPeriodKind Kind { get; set; }
 
     public static SnapshotPeriod Temporary { get; } = new ( SnapshotPeriodKind.Temporary );
-
     public static SnapshotPeriod Frequent { get; } = new( SnapshotPeriodKind.Frequent );
-
     public static SnapshotPeriod Hourly { get; } = new ( SnapshotPeriodKind.Hourly);
     public static SnapshotPeriod Daily { get; } = new( SnapshotPeriodKind.Daily);
     public static SnapshotPeriod Weekly { get; } = new( SnapshotPeriodKind.Weekly);
@@ -43,8 +41,12 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
 
     public static explicit operator SnapshotPeriod( string value )
     {
+        if ( value == "-" )
+        {
+            return Temporary;
+        }
         if ( !Enum.TryParse( value, out SnapshotPeriodKind kind ) )
-            throw new InvalidCastException( "Invalid SnapshotPeriod string" );
+            throw new InvalidCastException( $"Invalid SnapshotPeriod string ({value})" );
         return new( kind );
     }
 
