@@ -23,11 +23,7 @@ public class SnapshotRecursionMode
 
     public static implicit operator string( SnapshotRecursionMode obj )
     {
-        return obj._kind switch
-        {
-            SnapshotRecursionKind.Default => "default",
-            SnapshotRecursionKind.Zfs => "zfs"
-        };
+        return obj.ToString( );
     }
     public static implicit operator SnapshotRecursionMode( string value )
     {
@@ -39,6 +35,16 @@ public class SnapshotRecursionMode
             "Zfs"=> Zfs,
             "ZFS"=> Zfs,
             _=> Default
+        };
+    }
+
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return _kind switch
+        {
+            SnapshotRecursionKind.Default => "default",
+            SnapshotRecursionKind.Zfs => "zfs",
         };
     }
 }

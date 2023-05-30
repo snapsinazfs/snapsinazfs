@@ -1,0 +1,75 @@
+﻿// LICENSE:
+// 
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
+// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
+// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+
+namespace Sanoid.Common.Settings;
+
+/// <summary>
+///     Snapshot timing policies for use in <see cref="TemplateSettings" />
+/// </summary>
+public sealed class SnapshotTimingSettings
+{
+    /// <summary>
+    ///     Gets or sets the time of day that daily snapshots are taken
+    /// </summary>
+    public required TimeOnly DailyTime { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the minute of the hour that hourly snapshots are taken
+    /// </summary>
+    [ValueRange(0,59)]
+    public required int HourlyMinute { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the day of the month that monthly snapshots are taken
+    /// </summary>
+    /// <remarks>
+    ///     If the current month has fewer days than the specified value, monthly snapshots will be taken on the last day of
+    ///     the month
+    /// </remarks>
+    [ValueRange(1,31)]
+    public required int MonthlyDay { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the time of day that monthly snapshots are taken
+    /// </summary>
+    public required TimeOnly MonthlyTime { get; init; }
+
+    /// <summary>
+    ///     Gets or sets whether local time is used for snapshot naming and processing.
+    /// </summary>
+    public required bool UseLocalTime { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the day of the week on which weekly snapshots are taken
+    /// </summary>
+    public required DayOfWeek WeeklyDay { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the time of day that weekly snapshots are taken
+    /// </summary>
+    public required TimeOnly WeeklyTime { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the day of the <see cref="YearlyMonth" /> that yearly snapshots are taken
+    /// </summary>
+    /// <remarks>
+    ///     If the current month has fewer days than the specified value, yearly snapshots will be taken on the last day of
+    ///     <see cref="YearlyMonth" />
+    /// </remarks>
+    [ValueRange(1,31)]
+    public required int YearlyDay { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the month of the year in which yearly snapshots will be taken
+    /// </summary>
+    [ValueRange(1,12)]
+    public required int YearlyMonth { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the time of day that yearly snapshots are taken
+    /// </summary>
+    public required TimeOnly YearlyTime { get; init; }
+}
