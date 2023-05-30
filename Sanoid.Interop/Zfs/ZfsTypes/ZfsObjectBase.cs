@@ -165,6 +165,6 @@ public abstract class ZfsObjectBase : IZfsObject
     public void AddProperty( ZfsProperty prop )
     {
         Logger.Debug( "Adding property {0} to {1}", prop, Name );
-        Properties[ prop.Name ] = prop;
+        Properties[ prop.FullName ] = prop;
     }
 }

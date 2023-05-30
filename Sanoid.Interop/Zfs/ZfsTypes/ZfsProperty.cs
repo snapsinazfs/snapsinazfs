@@ -112,7 +112,7 @@ public class ZfsProperty
     /// <inheritdoc />
     public override string ToString( )
     {
-        return $"{Namespace}{Name}: {Value}";
+        return $"{FullName}: {Value}";
     }
 
     public static bool TryParse( string value, out ZfsProperty? property )

@@ -117,7 +117,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Trace( "{0}", outputLine );
                 if ( ZfsProperty.TryParse( outputLine, out ZfsProperty? property ) )
                 {
-                    properties.Add( property!.Name, property );
+                    properties.Add( property!.FullName, property );
                 }
             }
 
