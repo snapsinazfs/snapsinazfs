@@ -20,14 +20,6 @@ public sealed class TemplateSettings
     public required bool PruneSnapshots { get; set; }
 
     /// <summary>
-    ///     Gets or sets the recursion mode for the template
-    /// </summary>
-    public required string Recursion { get; set; }
-
-    [JsonIgnore]
-    public SnapshotRecursionMode RecursionMode => Recursion;
-
-    /// <summary>
     ///     Gets or sets the snapshot retention settings sub-section
     /// </summary>
     public required SnapshotRetentionSettings SnapshotRetention { get; set; }
