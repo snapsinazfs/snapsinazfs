@@ -26,7 +26,7 @@ internal static class SnapshotTasks
         {
             case MutexAcquisitionErrno.Success:
             {
-                Logger.Debug( "Successfully acquired mutex {0}", snapshotMutexName );
+                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
             }
                 break;
             // All of the error cases can just fall through, here, because we really don't care WHY it failed,
@@ -46,7 +46,7 @@ internal static class SnapshotTasks
                 throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
         }
 
-        Logger.Debug( "Begin taking snapshots for all configured datasets" );
+        Logger.Info( "Begin taking snapshots for all configured datasets" );
 
         foreach ( ( string _, Dataset ds ) in datasets )
         {
@@ -59,25 +59,29 @@ internal static class SnapshotTasks
 
             // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
-
+            bool frequentSnapshotTaken;
+            bool hourlySnapshotTaken;
+            bool dailySnapshotTaken;
             if ( ds is { TakeSnapshots: true, Enabled: true } )
             {
                 if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
                 {
-                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
+                    frequentSnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
                 }
+
                 if ( ds.IsHourlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
-                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
+                    hourlySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
                 }
+
                 if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
-                    TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp );
+                    dailySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp );
                 }
             }
         }
 
-        Logger.Debug( "Finished taking {0} snapshots", period );
+        Logger.Debug( "Finished taking snapshots" );
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -86,33 +90,32 @@ internal static class SnapshotTasks
         return Errno.EOK;
     }
 
-    internal static void TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
+    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
     {
         Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
 
-        Logger.Debug( "Checking dataset {0} settings: {1}", ds.Name, ds );
         if ( !ds.Enabled )
         {
-            Logger.Debug( "Dataset {0} is not enabled. Skipping", ds.Name );
-            return;
+            Logger.Trace( "Dataset {0} is not enabled. Skipping", ds.Name );
+            return false;
         }
 
         if ( !ds.TakeSnapshots )
         {
-            Logger.Debug( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
-            return;
+            Logger.Trace( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
+            return false;
         }
 
         if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ "sanoid.net:recursion" ]?.PropertySource != ZfsPropertySource.Local )
         {
-            Logger.Debug( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
-            return;
+            Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
+            return false;
         }
 
         if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
         {
             Logger.Error( "Template {0} for dataset {1} not found in configuration. Skipping", ds.Template, ds.Name );
-            return;
+            return false;
         }
 
         switch ( snapshotPeriod.Kind )
@@ -120,48 +123,48 @@ internal static class SnapshotTasks
             case SnapshotPeriodKind.Frequent:
                 if ( template.SnapshotRetention.Frequent == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Hourly:
                 if ( template.SnapshotRetention.Hourly == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Daily:
                 if ( template.SnapshotRetention.Daily == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Weekly:
                 if ( template.SnapshotRetention.Weekly == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Monthly:
                 if ( template.SnapshotRetention.Monthly == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Yearly:
                 if ( template.SnapshotRetention.Yearly == 0 )
                 {
-                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
-                    return;
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return false;
                 }
 
                 break;
@@ -173,12 +176,12 @@ internal static class SnapshotTasks
 
         if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out Snapshot snapshot ) )
         {
-            ds.Snapshots[snapshot.Name] = snapshot;
+            ds.Snapshots[ snapshot.Name ] = snapshot;
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );
+            return true;
         }
-        else
-        {
-            Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
-        }
+
+        Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
+        return false;
     }
 }

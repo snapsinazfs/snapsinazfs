@@ -191,9 +191,9 @@ public static class BaseClassExtensions
         CommandLineArguments args = argParseReults.Args;
         if ( !string.IsNullOrEmpty( args.CacheDir ) )
         {
-            Logger.Debug( "CacheDir argument specified. Value: {0}", args.CacheDir );
+            Logger.Trace( "CacheDir argument specified. Value: {0}", args.CacheDir );
             string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
-            Logger.Debug( "CacheDir canonical path: {0}", canonicalCacheDirPath );
+            Logger.Trace( "CacheDir canonical path: {0}", canonicalCacheDirPath );
             if ( !Directory.Exists( canonicalCacheDirPath ) )
             {
                 string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
@@ -216,15 +216,15 @@ public static class BaseClassExtensions
             }
 
             settings.CacheDirectory = args.CacheDir;
-            Logger.Debug( "CacheDirectory is now {0}", canonicalCacheDirPath );
+            Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
         if ( args.TakeSnapshots is not null )
         {
-            Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
+            Logger.Trace( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
 
             settings.TakeSnapshots = args.TakeSnapshots!.Value;
-            Logger.Debug( "TakeSnapshots is now {0}", settings.TakeSnapshots );
+            Logger.Trace( "TakeSnapshots is now {0}", settings.TakeSnapshots );
         }
     }
 }

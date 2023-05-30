@@ -179,7 +179,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
                 string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                Logger.Debug( "Read line {0} from zfs get", outputLine );
+                Logger.Trace( "Read line {0} from zfs get", outputLine );
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
                 if ( lineTokens.Length < 4 )
                 {
@@ -206,7 +206,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 else
                 {
-                    Logger.Debug( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
+                    Logger.Trace( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
                     if ( ZfsProperty.KnownDatasetProperties.Contains( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
                         Logger.Debug( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
@@ -214,11 +214,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     }
                     else
                     {
-                        Logger.Debug( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
+                        Logger.Trace( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
                     }
                 }
 
-                Logger.Debug( "Finished with line {0} from zfs get", outputLine );
+                Logger.Trace( "Finished with line {0} from zfs get", outputLine );
             }
 
             if ( !zfsGetProcess.HasExited )
@@ -393,7 +393,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private bool PrivateSetZfsProperty( string zfsPath, params ZfsProperty[] properties )
     {
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
-        Logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
+        Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
         {
             CreateNoWindow = true,
@@ -418,7 +418,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 zfsSetProcess.WaitForExit( 3000 );
             }
 
-            Logger.Debug( "zfs set process finished" );
+            Logger.Trace( "zfs set process finished" );
             return true;
         }
     }

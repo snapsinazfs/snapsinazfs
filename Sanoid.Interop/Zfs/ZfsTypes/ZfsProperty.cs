@@ -30,21 +30,21 @@ public class ZfsProperty
 
     private ZfsProperty( string[] components )
     {
-        Logger.Debug( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
+        Logger.Trace( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
         string[] nameComponents = components[ 0 ].Split( ':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
         switch ( nameComponents.Length )
         {
             case 2:
             {
                 string namespaceComponent = nameComponents[ 0 ];
-                Logger.Debug( "New property is in namespace {0}", namespaceComponent );
+                Logger.Trace( "New property is in namespace {0}", namespaceComponent );
                 Namespace = $"{namespaceComponent}:";
                 Name = nameComponents[ 1 ];
                 break;
             }
             default:
             {
-                Logger.Debug( "New property has no namespace" );
+                Logger.Trace( "New property has no namespace" );
                 Namespace = string.Empty;
                 Name = components[ 0 ];
                 break;
@@ -54,7 +54,7 @@ public class ZfsProperty
         Value = components[ 1 ];
         Source = components[ 2 ];
 
-        Logger.Debug( "ZfsProperty created: {0}({1})", FullName, Value );
+        Logger.Trace( "ZfsProperty created: {0}({1})", FullName, Value );
     }
 
 
@@ -114,7 +114,7 @@ public class ZfsProperty
 
     public static bool TryParse( string value, out ZfsProperty? property )
     {
-        Logger.Debug( "Trying to parse new ZfsProperty from {0}", value );
+        Logger.Trace( "Trying to parse new ZfsProperty from {0}", value );
         property = null;
         try
         {
@@ -159,7 +159,7 @@ public class ZfsProperty
             throw new ArgumentNullException( nameof( value ), errorString );
         }
 
-        Logger.Debug( "Parsing ZfsProperty from {0}", value );
+        Logger.Trace( "Parsing ZfsProperty from {0}", value );
 
         string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
         if ( components.Length < 3 )
@@ -174,7 +174,7 @@ public class ZfsProperty
 
     internal static ZfsProperty Parse( string[] tokens )
     {
-        Logger.Debug( "Parsing ZfsProperty from array [{0}]", string.Join( ',', tokens ) );
+        Logger.Trace( "Parsing ZfsProperty from array [{0}]", string.Join( ',', tokens ) );
         return new( tokens );
     }
 }

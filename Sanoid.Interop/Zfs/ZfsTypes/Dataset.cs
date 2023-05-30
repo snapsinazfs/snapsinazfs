@@ -100,7 +100,7 @@ public class Dataset : ZfsObjectBase
 
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
         int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshotTimestamp );
         double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshotTimestamp ).TotalMinutes;
@@ -113,7 +113,7 @@ public class Dataset : ZfsObjectBase
 
     public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        Logger.Trace( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
@@ -125,7 +125,7 @@ public class Dataset : ZfsObjectBase
 
     public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
@@ -143,7 +143,7 @@ public class Dataset : ZfsObjectBase
 
     public void AddSnapshot( Snapshot snap )
     {
-        Logger.Debug( "Adding snapshot {0} to dataset {1}", snap.Name, Name );
+        Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
         Snapshots[ snap.Name ] = snap;
     }
 }
