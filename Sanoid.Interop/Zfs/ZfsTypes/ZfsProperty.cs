@@ -88,12 +88,12 @@ public class ZfsProperty
     {
         { "sanoid.net:template", new( "sanoid.net:", "template", "default", "local" ) },
         { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
-        { "sanoid.net:lastdailysnapshottimestamp", new( "sanoid.net:", "lastdailysnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:lastfrequentsnapshottimestamp", new( "sanoid.net:", "lastfrequentsnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:lasthourlysnapshottimestamp", new( "sanoid.net:", "lasthourlysnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:lastmonthlysnapshottimestamp", new( "sanoid.net:", "lastmonthlysnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:lastweeklysnapshottimestamp", new( "sanoid.net:", "lastweeklysnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:lastyearlysnapshottimestamp", new( "sanoid.net:", "lastyearlysnapshot", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastdailysnapshottimestamp", new( "sanoid.net:", "lastdailysnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastfrequentsnapshottimestamp", new( "sanoid.net:", "lastfrequentsnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lasthourlysnapshottimestamp", new( "sanoid.net:", "lasthourlysnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastmonthlysnapshottimestamp", new( "sanoid.net:", "lastmonthlysnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastweeklysnapshottimestamp", new( "sanoid.net:", "lastweeklysnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { "sanoid.net:lastyearlysnapshottimestamp", new( "sanoid.net:", "lastyearlysnapshottimestamp", DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { "sanoid.net:prunesnapshots", new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
         { "sanoid.net:takesnapshots", new( "sanoid.net:", "takesnapshots", "false", "local" ) },
         { "sanoid.net:recursion", new( "sanoid.net:", "recursion", "default", "local" ) }
