@@ -27,4 +27,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         return true;
     }
+
+    /// <inheritdoc />
+    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
+    {
+        return new( );
+    }
 }

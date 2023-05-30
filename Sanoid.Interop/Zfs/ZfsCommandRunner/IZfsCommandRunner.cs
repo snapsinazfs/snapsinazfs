@@ -64,4 +64,13 @@ public interface IZfsCommandRunner
     ///     A <see langword="bool" /> indicating success or failure of the operation.
     /// </returns>
     public bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties );
+
+    /// <summary>
+    ///     Gets all dataset configuration from zfs
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of all datasets in
+    ///     zfs, with sanoid.net properties populated
+    /// </returns>
+    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( );
 }

@@ -301,7 +301,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
+    /// A <see cref="Dictionary{TKey,TValue}"/> of <see langword="string"/> to <see cref="Dataset"/> of all datasets in zfs, with sanoid.net properties populated
+    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
     {
         Dictionary<string, Dataset> datasets = new( );
 
