@@ -241,6 +241,70 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return poolRoots;
     }
 
+    /// <inheritdoc />
+    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( )
+    {
+        Dictionary<string, Snapshot> snapshots = new( );
+
+        Logger.Debug( "Getting ZFS snapshot configurations" );
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"list -r -t snapshot -H -p -o {string.Join( ',', SnapshotProperty.KnownSnapshotProperties )}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}" );
+                throw;
+            }
+
+            if ( zfsGetProcess.HasExited && zfsGetProcess.ExitCode == 2 )
+            {
+                string errorMessage = "Missing snapshot properties. Cannot get snapshots from ZFS";
+                Logger.Error( errorMessage );
+                throw new InvalidOperationException( errorMessage );
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
+                Logger.Debug( "Read line {0} from zfs get", outputLine );
+                string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+                if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count + 1 )
+                {
+                    Logger.Error( "Line {0} not understood", outputLine );
+                    throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {SnapshotProperty.KnownSnapshotProperties.Count } tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
+                }
+
+                if ( lineTokens[ 2 ] == "-" )
+                {
+                    Logger.Debug("Output line is not a sanoid.net snapshot - skipping");
+                    continue;
+                }
+                Snapshot snap = Snapshot.FromListSnapshots( lineTokens );
+                snapshots.TryAdd( snap.Name, snap );
+
+                Logger.Debug( "Finished with line {0} from zfs list", outputLine );
+            }
+
+            if ( !zfsGetProcess.HasExited )
+            {
+                Logger.Trace( "Waiting for zfs list process to exit" );
+                zfsGetProcess.WaitForExit( 3000 );
+            }
+
+            Logger.Debug( "zfs list process finished" );
+            return snapshots;
+        }
+    }
+
     /// <summary>
     ///     Gets the output of `zfs list -o name -t ` with the kind of objects set in <paramref name="kind" /> appended
     /// </summary>

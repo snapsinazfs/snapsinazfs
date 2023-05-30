@@ -207,6 +207,12 @@ else
     logger.Warn( "TakeSnapshots is false" );
 }
 
+logger.Debug("Getting sanoid snapshots");
+Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( );
+logger.Debug("Finished getting sanoid snapshots");
+
+logger.Warn( "Snapshots: {0}", JsonSerializer.Serialize( snapshots ) );
+
 logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
 logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );

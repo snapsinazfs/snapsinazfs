@@ -28,6 +28,11 @@ public class ZfsProperty
         Source = source;
     }
 
+    protected internal ZfsProperty( )
+    {
+
+    }
+
     private ZfsProperty( string[] components )
     {
         Logger.Debug( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
@@ -57,31 +62,16 @@ public class ZfsProperty
         Logger.Debug( "ZfsProperty created: {0}({1})", FullName, Value );
     }
 
-    public static ImmutableDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
-    {
-        { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.MinValue.ToString( ), ZfsPropertySource.Sanoid ) }
-    } );
 
     public string FullName => $"{Namespace}{Name}";
 
-    public static ImmutableHashSet<string> KnownDatasetProperties { get; } = ImmutableHashSet<string>.Empty.Union( new[]
+    public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
-        "sanoid.net:template",
         "sanoid.net:enabled",
         "sanoid.net:prunesnapshots",
+        "sanoid.net:recursion",
         "sanoid.net:takesnapshots",
-        "sanoid.net:recursion"
-    } );
-
-    public static ImmutableHashSet<string> KnownSnapshotProperties { get; } = ImmutableHashSet<string>.Empty.Union( new[]
-    {
-        "sanoid.net:prunesnapshots",
-        "sanoid.net:snapshotname",
-        "sanoid.net:snapshotperiod",
-        "sanoid.net:snapshotrecursion",
-        "sanoid.net:snapshottimestamp"
+        "sanoid.net:template"
     } );
 
     [JsonIgnore]

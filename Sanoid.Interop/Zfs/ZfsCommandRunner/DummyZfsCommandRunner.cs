@@ -40,4 +40,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         return new( );
     }
+
+    /// <inheritdoc />
+    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( )
+    {
+        return new( );
+    }
 }

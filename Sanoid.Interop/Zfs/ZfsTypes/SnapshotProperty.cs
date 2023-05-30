@@ -4,6 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Immutable;
+
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class SnapshotProperty : ZfsProperty
@@ -14,14 +16,25 @@ public class SnapshotProperty : ZfsProperty
     {
     }
 
+    /// <summary>
+    /// Creates a new SnapshotProperty from the provided string array
+    /// </summary>
+    /// <param name="lineTokens"></param>
+    internal SnapshotProperty( string[] lineTokens )
+    {
+
+    }
+
     public const string NamePropertyName = "sanoid.net:snapshotname";
     public const string NamePropertyShortName = "snapshotname";
     public const string PeriodPropertyName = "sanoid.net:snapshotperiod";
     public const string PeriodPropertyShortName = "snapshotperiod";
     public const string PrunePropertyName = "sanoid.net:prunesnapshots";
     public const string PrunePropertyShortName = "prunesnapshots";
-    public const string RecursionPropertyName = "sanoid.net:snapshotrecursion";
-    public const string RecursionPropertyShortName = "snapshotrecursion";
+    public const string RecursionPropertyName = "sanoid.net:recursion";
+    public const string RecursionPropertyShortName = "recursion";
+    public const string TemplatePropertyName = "sanoid.net:template";
+    public const string TemplatePropertyShortName = "template";
     public const string TimestampPropertyName = "sanoid.net:snapshottimestamp";
     public const string TimestampPropertyShortName = "snapshottimestamp";
 
@@ -31,6 +44,7 @@ public class SnapshotProperty : ZfsProperty
         Period,
         Prune,
         Recursion,
+        Template,
         Timestamp
     }
 
@@ -42,8 +56,26 @@ public class SnapshotProperty : ZfsProperty
             SnapshotPropertyKind.Period => new( PeriodPropertyShortName, value, source ),
             SnapshotPropertyKind.Prune => new( PrunePropertyShortName, value, source ),
             SnapshotPropertyKind.Recursion => new( RecursionPropertyShortName, value, source ),
+            SnapshotPropertyKind.Template => new( TemplatePropertyShortName, value, source ),
             SnapshotPropertyKind.Timestamp => new( TimestampPropertyShortName, value, source ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), kind, "Invalid snapshot property kind provided" )
         };
     }
+
+    public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
+    {
+        { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
+        { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
+        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.MinValue.ToString( ), ZfsPropertySource.Sanoid ) }
+    } );
+
+    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
+    {
+        "sanoid.net:prunesnapshots",
+        "sanoid.net:recursion",
+        "sanoid.net:snapshotname",
+        "sanoid.net:snapshotperiod",
+        "sanoid.net:snapshottimestamp",
+        "sanoid.net:template"
+    } );
 }

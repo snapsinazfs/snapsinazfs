@@ -28,4 +28,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     /// <inheritdoc />
     public abstract Dictionary<string, Dataset> GetZfsPoolRoots( );
+
+    /// <inheritdoc />
+    public abstract Dictionary<string, Snapshot> GetZfsSanoidSnapshots( );
 }

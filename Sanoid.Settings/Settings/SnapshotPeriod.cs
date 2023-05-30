@@ -6,7 +6,7 @@
 
 namespace Sanoid.Settings.Settings;
 
-public class SnapshotPeriod
+public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<SnapshotPeriod>
 {
     private SnapshotPeriod( SnapshotPeriodKind kind)
     {
@@ -45,5 +45,19 @@ public class SnapshotPeriod
         if ( !Enum.TryParse( value, out SnapshotPeriodKind kind ) )
             throw new InvalidCastException( "Invalid SnapshotPeriod string" );
         return new( kind );
+    }
+
+    /// <inheritdoc />
+    public int CompareTo( SnapshotPeriodKind other )
+    {
+        return Kind.CompareTo( other );
+    }
+
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException"><paramref name="other" /> and this instance are not the same type.</exception>
+    /// <exception cref="InvalidOperationException">This instance is not type <see cref="SByte" />, <see cref="Int16" />, <see cref="Int32" />, <see cref="Int64" />, <see cref="Byte" />, <see cref="UInt16" />, <see cref="UInt32" />, or <see cref="UInt64" />.</exception>
+    public int CompareTo( SnapshotPeriod? other )
+    {
+        return other is null ? -1 : Kind.CompareTo( other.Kind );
     }
 }
