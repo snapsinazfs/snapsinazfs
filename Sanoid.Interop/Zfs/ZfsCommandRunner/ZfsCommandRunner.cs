@@ -179,7 +179,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
                 string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                Logger.Trace( "{0}", outputLine );
+                Logger.Debug( "Read line {0} from zfs get", outputLine );
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
                 if ( lineTokens.Length < 4 )
                 {
@@ -206,12 +206,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 else
                 {
+                    Logger.Debug( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
                     if ( ZfsProperty.SanoidDefaultDatasetProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
                         Logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
                         datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
                     }
                 }
+                Logger.Debug( "Finished with line {0} from zfs get", outputLine );
             }
 
             if ( !zfsGetProcess.HasExited )
