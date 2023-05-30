@@ -44,22 +44,22 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public DateTimeOffset LastDailySnapshot => Properties.TryGetValue( "sanoid.net:lastdailysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastdailysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastFrequentSnapshot => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastHourlySnapshot => Properties.TryGetValue( "sanoid.net:lasthourlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastHourlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lasthourlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastMonthlySnapshot => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastMonthlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastWeeklySnapshot => Properties.TryGetValue( "sanoid.net:lastweeklysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastWeeklySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastweeklysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastYearlySnapshot => Properties.TryGetValue( "sanoid.net:lastyearlysnapshot", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastyearlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
     public bool PruneSnapshots
@@ -102,8 +102,8 @@ public class Dataset : ZfsObjectBase
     {
         Logger.Debug( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
-        int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshot );
-        double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshot ).TotalMinutes;
+        int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshotTimestamp );
+        double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshotTimestamp ).TotalMinutes;
         // Check if more than FrequentPeriod ago or if the period of the hour is different.
         bool lastFrequentSnapshotOutsideCurrentPeriod = minutesSinceLastFrequentSnapshot >= template.SnapshotTiming.FrequentPeriod || lastFrequentSnapshotPeriodOfHour != currentFrequentPeriodOfHour;
         bool frequentSnapshotNeeded = lastFrequentSnapshotOutsideCurrentPeriod && template.SnapshotRetention.IsFrequentWanted;
@@ -114,10 +114,10 @@ public class Dataset : ZfsObjectBase
     public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
         Logger.Debug( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
-        TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshot;
+        TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
-        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshot.ToUniversalTime( ).Hour != timestamp.ToUniversalTime( ).Hour;
+        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshotTimestamp.ToUniversalTime( ).Hour != timestamp.ToUniversalTime( ).Hour;
         bool hourlySnapshotNeeded = lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
         Logger.Debug( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? "" : "not " );
         return hourlySnapshotNeeded;
@@ -126,10 +126,10 @@ public class Dataset : ZfsObjectBase
     public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
         Logger.Debug( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
-        TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshot;
+        TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
-        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot || LastDailySnapshot.ToUniversalTime( ).DayOfYear != timestamp.ToUniversalTime( ).DayOfYear;
+        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot || LastDailySnapshotTimestamp.ToUniversalTime( ).DayOfYear != timestamp.ToUniversalTime( ).DayOfYear;
         bool dailySnapshotNeeded = lastDailySnapshotOutsideCurrentDay && retention.IsDailyWanted;
         Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
         return dailySnapshotNeeded;

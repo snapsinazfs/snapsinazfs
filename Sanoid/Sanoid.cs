@@ -176,7 +176,7 @@ if ( argParseReults.Args.CheckZfsProperties )
     return (int)Errno.EOK;
 }
 
-if ( !argParseReults.Args.CheckZfsProperties && !argParseReults.Args.PrepareZfsProperties && missingPropertiesFound )
+if ( argParseReults.Args is { CheckZfsProperties: false, PrepareZfsProperties: false } && missingPropertiesFound )
 {
     logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
     return (int)Errno.ENOATTR;
