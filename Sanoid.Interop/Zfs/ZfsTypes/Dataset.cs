@@ -1,9 +1,10 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -76,5 +77,23 @@ public class Dataset : ZfsObjectBase
     public override string ToString( )
     {
         return JsonSerializer.Serialize( this );
+    }
+
+    public ZfsProperty? this[ string key ]
+    {
+        get
+        {
+            return Properties.TryGetValue( key, out ZfsProperty prop ) ? prop : null;
+        }
+        set
+        {
+            if ( value is null )
+            {
+                Properties.TryRemove( key, out ZfsProperty? prop );
+                return;
+            }
+
+            Properties[ key ] = value;
+        }
     }
 }
