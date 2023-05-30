@@ -153,11 +153,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// to
     /// <see cref="Dataset" />
     /// of all datasets in zfs, with sanoid.net properties populated
-    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
+    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
     {
         Dictionary<string, Dataset> datasets = new( );
 
-        Logger.Debug( "Getting all ZFS dataset configurations" );
+        Logger.Debug( "Getting ZFS dataset configurations" );
         ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -p -o name,property,value,source" )
         {
             CreateNoWindow = true,
@@ -206,7 +206,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 else
                 {
-                    if ( ZfsProperty.DefaultDatasetProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
+                    if ( ZfsProperty.SanoidDefaultDatasetProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
                         Logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
                         datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
@@ -223,6 +223,15 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Debug( "zfs list process finished" );
             return datasets;
         }
+    }
+
+    /// <inheritdoc />
+    public override Dictionary<string, Dataset> GetZfsPoolRoots( )
+    {
+        Logger.Debug( "Requested pool root configuration" );
+        Dictionary<string, Dataset> poolRoots = GetZfsDatasetConfiguration( " -d 0" );
+        Logger.Debug( "Pool root configuration retrieved" );
+        return poolRoots;
     }
 
     /// <summary>
@@ -289,7 +298,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         Dictionary<string, ZfsProperty> propertiesToAdd = new( );
 
-        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultDatasetProperties )
+        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.SanoidDefaultDatasetProperties )
         {
             if ( result.ExistingProperties.ContainsKey( key ) )
             {

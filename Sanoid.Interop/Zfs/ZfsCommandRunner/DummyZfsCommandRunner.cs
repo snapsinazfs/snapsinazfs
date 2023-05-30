@@ -34,4 +34,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         return new( );
     }
+
+    /// <inheritdoc />
+    public override Dictionary<string, Dataset> GetZfsPoolRoots( )
+    {
+        return new( );
+    }
 }

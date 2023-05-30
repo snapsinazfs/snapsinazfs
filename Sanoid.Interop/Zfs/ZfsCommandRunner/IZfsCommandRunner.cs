@@ -73,5 +73,14 @@ public interface IZfsCommandRunner
     ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of all datasets in
     ///     zfs, with sanoid.net properties populated
     /// </returns>
-    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( );
+    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
+
+    /// <summary>
+    ///     Gets configuration defined at all pool roots
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of pool root datasets in
+    ///     zfs, with sanoid.net properties populated
+    /// </returns>
+    public Dictionary<string, Dataset> GetZfsPoolRoots( );
 }
