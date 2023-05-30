@@ -50,6 +50,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
+	  <ProjectReference Include="..\Sanoid.Settings\Sanoid.Settings.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

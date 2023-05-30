@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F0DF7CB3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid.Interop.Tests", "Sanoid.Interop.Tests\Sanoid.Interop.Tests.csproj", "{36551E6E-DCA5-4C33-B772-B8337F7057F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanoid.Settings", "Sanoid.Settings\Sanoid.Settings.csproj", "{B0F0E26A-7492-4DB8-977D-686DB83D52EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,14 @@ Global
 		{36551E6E-DCA5-4C33-B772-B8337F7057F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36551E6E-DCA5-4C33-B772-B8337F7057F0}.Release-R2R|Any CPU.ActiveCfg = Release|Any CPU
 		{36551E6E-DCA5-4C33-B772-B8337F7057F0}.Release-R2R|Any CPU.Build.0 = Release|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Debug-Windows|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Debug-Windows|Any CPU.Build.0 = Debug|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release-R2R|Any CPU.ActiveCfg = Release|Any CPU
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release-R2R|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

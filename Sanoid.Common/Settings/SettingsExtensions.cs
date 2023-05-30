@@ -4,66 +4,25 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Text.Json.Serialization;
-
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
-
+using System.Text.Json.Serialization;
 using PowerArgs;
-
-using Sanoid.Interop.Libc.Enums;
-
 using Sanoid.Interop.Libc;
+using Sanoid.Interop.Libc.Enums;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Common.Settings;
 
-/// <summary>
-///     Settings class for use with the .net <see cref="IConfiguration" /> binder
-/// </summary>
-public sealed class SanoidSettings
+public static class SettingsExtensions
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    /// <summary>
-    ///     Gets or sets sanoid.net's directory for temporary files
-    /// </summary>
-    public required string CacheDirectory { get; set; }
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
-    ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS
-    /// </summary>
-    public required bool DryRun { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the global formatting settings sanoid.net will use
-    /// </summary>
-    public required FormattingSettings Formatting { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the global PruneSnapshots setting
-    /// </summary>
-    public required bool PruneSnapshots { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the global TakeSnapshots setting
-    /// </summary>
-    public required bool TakeSnapshots { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the templates sub-section
-    /// </summary>
-    public required Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
-
-    /// <summary>
-    ///     Gets or sets the path to the zfs utility
-    /// </summary>
-    public required string ZfsPath { get; set; }
-
-        /// <summary>
     ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
     ///     the CLI
     /// </summary>
     /// <param name="argParseReults"></param>
-    public void SetValuesFromArgs( ArgAction<CommandLineArguments> argParseReults )
+    public static void SetValuesFromArgs( this SanoidSettings settings, ArgAction<CommandLineArguments> argParseReults )
     {
         Logger.Debug( "Overriding settings using arguments from command line." );
         Logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
@@ -95,7 +54,7 @@ public sealed class SanoidSettings
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
 
-            CacheDirectory = args.CacheDir;
+            settings.CacheDirectory = args.CacheDir;
             Logger.Debug( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
@@ -103,8 +62,8 @@ public sealed class SanoidSettings
         {
             Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
 
-            TakeSnapshots = args.TakeSnapshots!.Value;
-            Logger.Debug( "TakeSnapshots is now {0}", TakeSnapshots );
+            settings.TakeSnapshots = args.TakeSnapshots!.Value;
+            Logger.Debug( "TakeSnapshots is now {0}", settings.TakeSnapshots );
         }
     }
 }
