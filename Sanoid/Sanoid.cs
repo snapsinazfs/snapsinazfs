@@ -144,9 +144,10 @@ if ( argParseReults.Args.PrepareZfsProperties )
             logger.Debug( "Pool {0} does not have property {1}. Adding property", poolName, propertyName );
             propertiesToAdd.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
             pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
-            zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
             logger.Debug( "Added property {0} to pool {1}: {2}", propertyName, poolName, property );
         }
+
+        zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
 
         logger.Debug( "Finished updating properties for pool {0}", poolName );
     }
