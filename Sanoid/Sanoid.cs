@@ -128,6 +128,7 @@ bool missingPropertiesFound = false;
     foreach ( ( string poolName, Dataset? pool ) in poolRoots )
     {
         logger.Debug( "Updating properties for pool {0}", poolName );
+        logger.Debug( "Pool {0} current properties: {1}", poolName, JsonSerializer.Serialize( pool.Properties.Values ) );
         Dictionary<string, ZfsProperty> missingProperties = new( );
 
         foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.SanoidDefaultDatasetProperties )
@@ -141,6 +142,7 @@ bool missingPropertiesFound = false;
 
             logger.Debug( "Pool {0} does not have property {1}", poolName, propertyName );
             missingPropertiesFound = true;
+            pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
             missingProperties.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
         }
 
