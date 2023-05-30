@@ -91,10 +91,6 @@ public class CommandLineArguments
     [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
     public bool? ReallyQuiet { get; set; }
 
-    [ArgDescription( "Runtime directory for sanoid" )]
-    [ArgShortcut( "--run-dir" )]
-    public string? RunDir { get; set; }
-
     [ArgDescription( "Will make sanoid take snapshots, but will not prune unless --prune-snapshots is also specified." )]
     [ArgShortcut( "--take-snapshots" )]
     public bool? TakeSnapshots { get; set; }
