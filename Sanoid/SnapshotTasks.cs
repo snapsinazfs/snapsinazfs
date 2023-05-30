@@ -4,7 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
@@ -60,8 +59,6 @@ internal static class SnapshotTasks
 
             // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
-            Snapshot? latestFrequentSnapshot = null;
-            NullableDateTimeOffsetComparer nullableDateTimeOffsetComparer = new ();
 
             if ( ds is { TakeSnapshots: true, Enabled: true } )
             {
@@ -183,28 +180,5 @@ internal static class SnapshotTasks
         {
             Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
         }
-    }
-}
-
-public class NullableDateTimeOffsetComparer : IComparer<DateTimeOffset?>
-{
-    /// <inheritdoc />
-    public int Compare( DateTimeOffset? x, DateTimeOffset? y )
-    {
-        switch ( x )
-        {
-            case null when y is null:
-                return 0;
-            case null:
-                return 1;
-        }
-
-        if ( y is null )
-        {
-            return -1;
-        }
-
-        return DateTimeOffset.Compare( x.Value, y.Value );
-
     }
 }
