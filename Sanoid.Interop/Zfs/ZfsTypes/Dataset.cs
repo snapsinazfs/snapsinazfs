@@ -31,31 +31,21 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public bool PruneSnapshots
-    {
-        get
-        {
-            string valueString = Properties.TryGetValue( "sanoid.net:prunesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
-        }
-    }
-
-    [JsonIgnore]
-    public bool TakeSnapshots
-    {
-        get
-        {
-            string valueString = Properties.TryGetValue( "sanoid.net:takesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
-        }
-    }
-
-    [JsonIgnore]
     public bool Enabled
     {
         get
         {
             string valueString = Properties.TryGetValue( "sanoid.net:enabled", out ZfsProperty? prop ) ? prop.Value : "false";
+            return bool.TryParse( valueString, out bool result ) && result;
+        }
+    }
+
+    [JsonIgnore]
+    public bool PruneSnapshots
+    {
+        get
+        {
+            string valueString = Properties.TryGetValue( "sanoid.net:prunesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
@@ -67,6 +57,16 @@ public class Dataset : ZfsObjectBase
         {
             string valueString = Properties.TryGetValue( "sanoid.net:recursion", out ZfsProperty? prop ) ? prop.Value : "false";
             return valueString;
+        }
+    }
+
+    [JsonIgnore]
+    public bool TakeSnapshots
+    {
+        get
+        {
+            string valueString = Properties.TryGetValue( "sanoid.net:takesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
+            return bool.TryParse( valueString, out bool result ) && result;
         }
     }
 

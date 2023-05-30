@@ -4,13 +4,12 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Collections.Concurrent;
 using System.Text.Json;
-using Sanoid.Common.Configuration;
-using Sanoid.Common.Configuration.Datasets;
-using Sanoid.Common.Settings;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
+using Sanoid.Interop.Zfs.ZfsCommandRunner;
+using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid;
 
@@ -19,7 +18,7 @@ internal static class SnapshotTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static Errno TakeAllConfiguredSnapshots( Configuration config, SnapshotPeriod period, DateTimeOffset timestamp )
+    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, Dictionary<string, Dataset> datasets, SanoidSettings settings, SnapshotPeriod period, DateTimeOffset timestamp )
     {
         const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
@@ -47,17 +46,14 @@ internal static class SnapshotTasks
                 throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
         }
 
-        ConcurrentQueue<Dataset> wantedRoots = BuildSnapshotQueue( config, period );
+        Logger.Debug( "Begin taking {0} snapshots", period );
 
-        Logger.Trace( "SnapshotQueue: {0}", JsonSerializer.Serialize( wantedRoots.Select( wr => wr.VirtualPath ).ToArray( ) ) );
-
-        Logger.Debug( "Begin taking snapshots for all items in the queue." );
-        while ( wantedRoots.TryDequeue( out Dataset? ds ) )
+        foreach ( ( string _, Dataset ds ) in datasets )
         {
-            TakeSnapshot( config, ds, period, timestamp );
+            TakeSnapshot( commandRunner, settings, ds, period, timestamp );
         }
 
-        Logger.Debug( "Finished taking snapshots for all items in the queue." );
+        Logger.Debug( "Finished taking {0} snapshots", period );
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -66,66 +62,98 @@ internal static class SnapshotTasks
         return Errno.EOK;
     }
 
-    private static ConcurrentQueue<Dataset> BuildSnapshotQueue( Configuration config, SnapshotPeriod period )
+    internal static void TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
     {
-        ConcurrentQueue<Dataset> wantedRoots = new( );
-        Logger.Debug( "Building Dataset queue for snapshots" );
-        foreach ( ( string _, Dataset dataset ) in config.Datasets )
-        {
-            if ( dataset.Path == "/" )
-            {
-                continue;
-            }
+        Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
 
-            CheckForDatasetInclusion( period, dataset, wantedRoots );
+        Logger.Debug( "Checking dataset {0} settings: {1}", ds.Name, ds );
+        if ( !ds.Enabled )
+        {
+            Logger.Debug( "Dataset {0} is not enabled. Skipping", ds.Name );
+            return;
         }
 
-        Logger.Debug( "Finished building Dataset queue for snapshots" );
-        return wantedRoots;
-    }
-
-    private static void CheckForDatasetInclusion( SnapshotPeriod period, Dataset dataset, ConcurrentQueue<Dataset> wantedRoots )
-    {
-        Logger.Debug( "Checking dataset {0} for inclusion", dataset.Path );
-        switch ( dataset )
+        if ( !ds.TakeSnapshots )
         {
-            case { Template.AutoSnapshot: true, Enabled: true }:
-            {
-                Logger.Debug( "{0} is wanted for snapshots. Checking period", dataset.Path );
-                if ( dataset.IsWantedForPeriod( period ) )
+            Logger.Debug( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
+            return;
+        }
+
+        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ "sanoid.net:recursion" ]?.PropertySource != ZfsPropertySource.Local )
+        {
+            Logger.Debug( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
+            return;
+        }
+
+        if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
+        {
+            Logger.Error( "Template {0} for dataset {1} not found in configuration. Skipping", ds.Template, ds.Name );
+            return;
+        }
+
+        switch ( snapshotPeriod.Kind )
+        {
+            case SnapshotPeriodKind.Frequent:
+                if ( template.SnapshotRetention.Frequent == 0 )
                 {
-                    Logger.Debug( "{0} is wanted for period. Adding to queue", dataset.Path );
-                    wantedRoots.Enqueue( dataset );
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return;
                 }
 
-                Logger.Trace( "{0} is not wanted for period", dataset.Path );
-            }
                 break;
-            case { Enabled: false }:
-            {
-                Logger.Trace( "{0} is not enabled for snapshots", dataset.Path );
-            }
+            case SnapshotPeriodKind.Hourly:
+                if ( template.SnapshotRetention.Hourly == 0 )
+                {
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return;
+                }
+
                 break;
-            case { Template: null }:
-            {
-                Logger.Trace( "Dataset {0} has no Template. Skipping." );
-            }
+            case SnapshotPeriodKind.Daily:
+                if ( template.SnapshotRetention.Daily == 0 )
+                {
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return;
+                }
+
+                break;
+            case SnapshotPeriodKind.Weekly:
+                if ( template.SnapshotRetention.Weekly == 0 )
+                {
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return;
+                }
+
+                break;
+            case SnapshotPeriodKind.Monthly:
+                if ( template.SnapshotRetention.Monthly == 0 )
+                {
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return;
+                }
+
+                break;
+            case SnapshotPeriodKind.Yearly:
+                if ( template.SnapshotRetention.Yearly == 0 )
+                {
+                    Logger.Debug( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    return;
+                }
+
                 break;
             default:
-            {
-                Logger.Error( "Dataset {0} did not match any expected conditions. Exiting", dataset.Path );
-                wantedRoots.Clear( );
-                throw new InvalidOperationException( $"Dataset {dataset.Path} did not match any expected conditions. Exiting." );
-            }
+                throw new ArgumentOutOfRangeException( nameof( snapshotPeriod ), snapshotPeriod, $"Unexpected value received for snapshotPeriod for dataset {ds.Name}. Snapshot not taken." );
         }
-    }
 
-    internal static void TakeSnapshot( Configuration config, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
-    {
-        //Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Path, snapshotPeriod );
-        //bool result = config.zfsCommandRunner.ZfsSnapshot( ds, config.SnapshotNaming.GetSnapshotName( snapshotPeriod, timestamp ) );
-        //Logger.Debug( "Result of TakeSnapshot for {0} with period {1} was {2}", ds.Path, snapshotPeriod, result );
+        Logger.Debug( "Dataset {0} will have a snapshot taken with these settings: {1}", ds.Name, JsonSerializer.Serialize( new { ds, template } ) );
 
+        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out Snapshot snapshot ) )
+        {
+            Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );
+        }
+        else
+        {
+            Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
+        }
     }
 }

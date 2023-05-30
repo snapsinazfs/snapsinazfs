@@ -69,4 +69,8 @@
     <PackageReference Include="NLog" Version="5.1.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Sanoid.Settings\Sanoid.Settings.csproj" />
+  </ItemGroup>
+
 </Project>

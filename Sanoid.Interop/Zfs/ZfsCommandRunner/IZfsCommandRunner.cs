@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using System.Text.Json;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -39,7 +40,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    bool TakeSnapshot( string snapshotName );
+    public bool TakeSnapshot( Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
 
     /// <summary>
     ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of &lt;<see langword="string" />,<see cref="ZfsProperty" />&gt; for

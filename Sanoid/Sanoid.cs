@@ -7,13 +7,14 @@
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
-using Sanoid.Common;
+using Sanoid;
 using Sanoid.Common.Logging;
-using Sanoid.Common.Settings;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
+using CommandLineArguments = Sanoid.Common.CommandLineArguments;
 
 // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
 // Desired logging parameters should be set in Sanoid.nlog.json
@@ -90,7 +91,7 @@ if ( argParseReults.Args.Version )
 // override earlier values.
 // Note that nlog-specific configuration is separate, in Sanoid.nlog.json, and is not affected by the configuration specified below,
 // and is loaded/parsed FIRST, before any configuration specified below.
-// See the Sanoid.Common.Configuration.Logging class for nlog configuration details.
+// See the Sanoid.Common.Logging.LoggingSettings class for nlog configuration details.
 // See documentation for a more detailed explanation with examples.
 // Configuration order:
 // 1. /usr/local/share/Sanoid.net/Sanoid.json   #(Required - Base configuration - Should not be modified by the user)
@@ -110,31 +111,31 @@ IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                        .AddJsonFile( "Sanoid.local.json", true, false )
                                    #endif
                                        .Build( );
+
+logger.Debug( "Building settings objects from IConfiguration" );
 SanoidSettings settings = rootConfiguration.Get<SanoidSettings>( );
+
+logger.Debug( "Getting ZFS command runner for the current environment" );
 IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 {
     PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath ),
     _ => new DummyZfsCommandRunner( )
 };
 
-Console.WriteLine( JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true } ) );
+logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
-Console.WriteLine( settings.Templates[ "default" ].RecursionMode );
+Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
-//if ( sanoidConfiguration.TakeSnapshots )
-//{
-//    DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-//    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
-//    SnapshotTasks.TakeAllConfiguredSnapshots( sanoidConfiguration, SnapshotPeriod.Daily, currentTimestamp );
-//}
-//else
-//{
-//    logger.Warn( "TakeSnapshots is false" );
-//}
-
-//var datasets = r.GetZfsDatasetConfiguration( );
-
-//logger.Warn(JsonSerializer.Serialize(datasets  ));
+if ( settings is { TakeSnapshots: true } )
+{
+    DateTimeOffset currentTimestamp = DateTimeOffset.Now;
+    logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
+    SnapshotTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, datasets, settings, SnapshotPeriod.Daily, currentTimestamp );
+}
+else
+{
+    logger.Warn( "TakeSnapshots is false" );
+}
 
 logger.Fatal( "Not yet implemented." );
 logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );

@@ -5,15 +5,16 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
 internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
-    public override bool TakeSnapshot( string snapshotName )
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
     {
-        return true;
+        throw new NotImplementedException( );
     }
 
     /// <inheritdoc />

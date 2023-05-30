@@ -8,6 +8,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -27,32 +28,33 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         ZfsPath = pathToZfs;
     }
 
-    private readonly Logger _logger = LogManager.GetCurrentClassLogger( );
-
     private string ZfsPath { get; }
 
+    private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <inheritdoc />
-    public override bool TakeSnapshot( string snapshotName )
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
     {
-        Snapshot snap = new( snapshotName );
+        Logger.Debug( "Snapshot requested for dataset {0}", ds.Name );
+        snapshot = Snapshot.GetSnapshotForCommandRunner( ds, period, timestamp, settings );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
             // ReSharper disable once ExceptionNotDocumentedOptional
-            if ( !snap.ValidateName( ) )
+            if ( !snapshot.ValidateName( ) )
             {
-                _logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
+                Logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
                 return false;
             }
         }
         catch ( ArgumentNullException ex )
         {
-            _logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not taken", snapshotName );
+            Logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
             return false;
         }
 
-        string arguments = $"snapshot {snapshotName}";
-        _logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
+        string arguments = $"snapshot {snapshot.GetPropertiesSetStringForCommandLine( )} {snapshot.Name}";
+        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
         {
             CreateNoWindow = true,
@@ -62,21 +64,21 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         {
             using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
             {
-                _logger.Debug( "Waiting for {0} {1} to finish", ZfsPath, arguments );
+                Logger.Debug( "Waiting for {0} {1} to finish", ZfsPath, arguments );
                 snapshotProcess?.WaitForExit( );
                 if ( snapshotProcess?.ExitCode == 0 )
                 {
                     return true;
                 }
 
-                _logger.Error( "Snapshot creation failed for {0}", snapshotName );
+                Logger.Error( "Snapshot creation failed for {0}", snapshot.Name );
             }
 
             return true;
         }
         catch ( Exception e )
         {
-            _logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
+            Logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
             return false;
         }
     }
@@ -89,7 +91,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentException( $"Unable to get properties for {zfsObjectName}. PropertyName is invalid.", nameof( zfsObjectName ) );
         }
 
-        _logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
+        Logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
         ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o property,value,source -H {zfsObjectName}" )
         {
             CreateNoWindow = true,
@@ -98,21 +100,21 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, ZfsProperty> properties = new( );
         using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
         {
-            _logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
             try
             {
                 zfsGetProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
-                _logger.Fatal( ioex, "Error running zfs get operation. The error returned was {0}" );
+                Logger.Fatal( ioex, "Error running zfs get operation. The error returned was {0}" );
                 throw;
             }
 
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
                 string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                _logger.Trace( "{0}", outputLine );
+                Logger.Trace( "{0}", outputLine );
                 if ( ZfsProperty.TryParse( outputLine, out ZfsProperty? property ) )
                 {
                     properties.Add( property!.Name, property );
@@ -121,11 +123,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             if ( !zfsGetProcess.HasExited )
             {
-                _logger.Trace( "Waiting for zfs get process to exit" );
+                Logger.Trace( "Waiting for zfs get process to exit" );
                 zfsGetProcess.WaitForExit( 3000 );
             }
 
-            _logger.Debug( "zfs get process finished" );
+            Logger.Debug( "zfs get process finished" );
             return properties;
         }
     }
@@ -144,6 +146,85 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return PrivateSetZfsProperty( zfsPath, properties );
     }
 
+    /// A
+    /// <see cref="Dictionary{TKey,TValue}" />
+    /// of
+    /// <see langword="string" />
+    /// to
+    /// <see cref="Dataset" />
+    /// of all datasets in zfs, with sanoid.net properties populated
+    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
+    {
+        Dictionary<string, Dataset> datasets = new( );
+
+        Logger.Debug( "Getting all ZFS dataset configurations" );
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -p -o name,property,value,source" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
+                Logger.Trace( "{0}", outputLine );
+                string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+                if ( lineTokens.Length < 4 )
+                {
+                    Logger.Error( "Line {0} not understood", outputLine );
+                    throw new InvalidOperationException( $"Unable to parse dataset configuration. Expected 4 tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
+                }
+
+                if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
+                {
+                    if ( lineTokens[ 1 ] == "type" )
+                    {
+                        Logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
+                        DatasetKind newDsKind = lineTokens[ 2 ] switch
+                        {
+                            "filesystem" => DatasetKind.FileSystem,
+                            "volume" => DatasetKind.Volume,
+                            _ => throw new InvalidOperationException( "Type of object from zfs get was unrecognized" )
+                        };
+                        Logger.Debug( "Dataset {0} will be a {1}", lineTokens[ 0 ], newDsKind );
+
+                        Dataset dataset = new( lineTokens[ 0 ], newDsKind );
+                        datasets.Add( lineTokens[ 0 ], dataset );
+                    }
+                }
+                else
+                {
+                    if ( ZfsProperty.DefaultDatasetProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
+                    {
+                        Logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                        datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
+                    }
+                }
+            }
+
+            if ( !zfsGetProcess.HasExited )
+            {
+                Logger.Trace( "Waiting for zfs list process to exit" );
+                zfsGetProcess.WaitForExit( 3000 );
+            }
+
+            Logger.Debug( "zfs list process finished" );
+            return datasets;
+        }
+    }
+
     /// <summary>
     ///     Gets the output of `zfs list -o name -t ` with the kind of objects set in <paramref name="kind" /> appended
     /// </summary>
@@ -153,7 +234,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         ImmutableSortedSet<string>.Builder dataSets = ImmutableSortedSet<string>.Empty.ToBuilder( );
         string typesToList = kind.ToStringForCommandLine( );
-        _logger.Debug( "Requested listing of all zfs objects of the following kind: {0}", typesToList );
+        Logger.Debug( "Requested listing of all zfs objects of the following kind: {0}", typesToList );
         ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -o name -t {typesToList} -Hr" )
         {
             CreateNoWindow = true,
@@ -161,31 +242,31 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         };
         using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
         {
-            _logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
             try
             {
                 zfsListProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
-                _logger.Fatal( ioex, "Error running zfs list operation. The error returned was {0}" );
+                Logger.Fatal( ioex, "Error running zfs list operation. The error returned was {0}" );
                 throw;
             }
 
             while ( !zfsListProcess.StandardOutput.EndOfStream )
             {
                 string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
-                _logger.Trace( "{0}", outputLine );
+                Logger.Trace( "{0}", outputLine );
                 dataSets.Add( outputLine );
             }
 
             if ( !zfsListProcess.HasExited )
             {
-                _logger.Trace( "Waiting for zfs list process to exit" );
+                Logger.Trace( "Waiting for zfs list process to exit" );
                 zfsListProcess.WaitForExit( 3000 );
             }
 
-            _logger.Debug( "zfs list process finished" );
+            Logger.Debug( "zfs list process finished" );
         }
 
         return dataSets.ToImmutable( );
@@ -208,7 +289,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         Dictionary<string, ZfsProperty> propertiesToAdd = new( );
 
-        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultProperties )
+        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultDatasetProperties )
         {
             if ( result.ExistingProperties.ContainsKey( key ) )
             {
@@ -230,7 +311,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private bool PrivateSetZfsProperty( string zfsPath, params ZfsProperty[] properties )
     {
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
-        _logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
+        Logger.Debug( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
         {
             CreateNoWindow = true,
@@ -238,24 +319,24 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         };
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
         {
-            _logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
             try
             {
                 zfsSetProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
-                _logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
+                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
                 return false;
             }
 
             if ( !zfsSetProcess.HasExited )
             {
-                _logger.Trace( "Waiting for zfs set process to exit" );
+                Logger.Trace( "Waiting for zfs set process to exit" );
                 zfsSetProcess.WaitForExit( 3000 );
             }
 
-            _logger.Debug( "zfs set process finished" );
+            Logger.Debug( "zfs set process finished" );
             return true;
         }
     }
@@ -264,7 +345,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         List<string> names = new( );
 
-        _logger.Debug( "Getting all ZFS root datasets" );
+        Logger.Debug( "Getting all ZFS root datasets" );
         ProcessStartInfo zfsListStartInfo = new( ZfsPath, "list -d 0 -H -o name" )
         {
             CreateNoWindow = true,
@@ -272,105 +353,32 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         };
         using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
         {
-            _logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
             try
             {
                 zfsListProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
-                _logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
+                Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
                 throw;
             }
 
             while ( !zfsListProcess.StandardOutput.EndOfStream )
             {
                 string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
-                _logger.Trace( "{0}", outputLine );
+                Logger.Trace( "{0}", outputLine );
                 names.Add( outputLine.Trim( ) );
             }
 
             if ( !zfsListProcess.HasExited )
             {
-                _logger.Trace( "Waiting for zfs list process to exit" );
+                Logger.Trace( "Waiting for zfs list process to exit" );
                 zfsListProcess.WaitForExit( 3000 );
             }
 
-            _logger.Debug( "zfs list process finished" );
+            Logger.Debug( "zfs list process finished" );
             return names;
-        }
-    }
-
-    /// A <see cref="Dictionary{TKey,TValue}"/> of <see langword="string"/> to <see cref="Dataset"/> of all datasets in zfs, with sanoid.net properties populated
-    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
-    {
-        Dictionary<string, Dataset> datasets = new( );
-
-        _logger.Debug( "Getting all ZFS dataset configurations" );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, "get all -r -t filesystem,volume -H -p -o name,property,value,source" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
-        {
-            _logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
-            try
-            {
-                zfsGetProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                _logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
-                throw;
-            }
-
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
-            {
-                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                _logger.Trace( "{0}", outputLine );
-                string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-                if ( lineTokens.Length < 4 )
-                {
-                    _logger.Error( "Line {0} not understood", outputLine );
-                    throw new InvalidOperationException( $"Unable to parse dataset configuration. Expected 4 tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
-                }
-
-                if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
-                {
-                    if ( lineTokens[ 1 ] == "type" )
-                    {
-                        _logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
-                        DatasetKind newDsKind = lineTokens[ 2 ] switch
-                        {
-                            "filesystem" => DatasetKind.FileSystem,
-                            "volume" => DatasetKind.Volume,
-                            _ => throw new InvalidOperationException( "Type of object from zfs get was unrecognized" )
-                        };
-                        _logger.Debug( "Dataset {0} will be a {1}", lineTokens[ 0 ], newDsKind );
-
-                        Dataset dataset = new( lineTokens[ 0 ], newDsKind );
-                        datasets.Add( lineTokens[ 0 ], dataset );
-                    }
-                }
-                else
-                {
-                    if ( ZfsProperty.DefaultProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
-                    {
-                        _logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
-                        datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
-                    }
-                }
-            }
-
-            if ( !zfsGetProcess.HasExited )
-            {
-                _logger.Trace( "Waiting for zfs list process to exit" );
-                zfsGetProcess.WaitForExit( 3000 );
-            }
-
-            _logger.Debug( "zfs list process finished" );
-            return datasets;
         }
     }
 }

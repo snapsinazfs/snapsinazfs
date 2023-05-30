@@ -6,6 +6,7 @@
 
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -14,7 +15,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract bool TakeSnapshot( string snapshotName );
+    public abstract bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
 
     /// <inheritdoc />
     public abstract Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true );

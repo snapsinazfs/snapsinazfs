@@ -6,57 +6,44 @@
 
 namespace Sanoid.Settings.Settings;
 
-/// <summary>
-///     An enumeration of possible <see cref="Snapshot" /> periods
-/// </summary>
-public enum SnapshotPeriod
+public class SnapshotPeriod
 {
-    /// <summary>
-    ///     Temporary snapshots taken by sanoid/syncoid themselves.
-    /// </summary>
-    /// <remarks>Not intended to be used by an end-user.</remarks>
-    /// <value>0</value>
-    Temporary,
+    private SnapshotPeriod( SnapshotPeriodKind kind)
+    {
+        Kind = kind;
+    }
+    public SnapshotPeriodKind Kind { get; set; }
 
-    /// <summary>
-    ///     Snapshots that are taken according to the "frequently" setting in sanoid.conf.
-    /// </summary>
-    /// <value>1</value>
-    Frequent,
+    public static SnapshotPeriod Temporary { get; } = new ( SnapshotPeriodKind.Temporary );
 
-    /// <summary>
-    ///     Snapshots that are taken according to the "hourly" setting in sanoid.conf.
-    /// </summary>
-    /// <value>2</value>
-    Hourly,
+    public static SnapshotPeriod Frequent { get; } = new( SnapshotPeriodKind.Frequent );
 
-    /// <summary>
-    ///     Snapshots that are taken according to the "daily" setting in sanoid.conf.
-    /// </summary>
-    /// <value>3</value>
-    Daily,
+    public static SnapshotPeriod Hourly { get; } = new ( SnapshotPeriodKind.Hourly);
+    public static SnapshotPeriod Daily { get; } = new( SnapshotPeriodKind.Daily);
+    public static SnapshotPeriod Weekly { get; } = new( SnapshotPeriodKind.Weekly);
+    public static SnapshotPeriod Monthly { get; } = new( SnapshotPeriodKind.Monthly);
+    public static SnapshotPeriod Yearly { get; } = new( SnapshotPeriodKind.Yearly);
+    public static SnapshotPeriod Manual { get; } = new( SnapshotPeriodKind.Manual);
 
-    /// <summary>
-    ///     Snapshots that are taken according to the "weekly" setting in sanoid.conf.
-    /// </summary>
-    /// <value>4</value>
-    Weekly,
+    public static implicit operator string( SnapshotPeriod self )
+    {
+        return self.Kind switch
+        {
+            SnapshotPeriodKind.Temporary => "temporary",
+            SnapshotPeriodKind.Frequent => "frequently",
+            SnapshotPeriodKind.Hourly => "hourly",
+            SnapshotPeriodKind.Daily => "daily",
+            SnapshotPeriodKind.Weekly => "weekly",
+            SnapshotPeriodKind.Monthly => "monthly",
+            SnapshotPeriodKind.Yearly => "yearly",
+            SnapshotPeriodKind.Manual => "manual",
+        };
+    }
 
-    /// <summary>
-    ///     Snapshots that are taken according to the "monthly" setting in sanoid.conf.
-    /// </summary>
-    /// <value>5</value>
-    Monthly,
-
-    /// <summary>
-    ///     Snapshots that are taken according to the "yearly" setting in sanoid.conf.
-    /// </summary>
-    /// <value>6</value>
-    Yearly,
-
-    /// <summary>
-    ///     Snapshots that are taken manually by the user.
-    /// </summary>
-    /// <value>100</value>
-    Manual = 100
+    public static explicit operator SnapshotPeriod( string value )
+    {
+        if ( !Enum.TryParse( value, out SnapshotPeriodKind kind ) )
+            throw new InvalidCastException( "Invalid SnapshotPeriod string" );
+        return new( kind );
+    }
 }

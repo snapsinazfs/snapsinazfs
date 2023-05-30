@@ -49,7 +49,6 @@ public abstract class ZfsObjectBase : IZfsObject
             }
         }
 
-
         Name = name;
         Properties = new( );
     }

@@ -18,24 +18,24 @@ public sealed class FormattingSettings
     public required string WeeklySuffix { get; set; }
     public required string YearlySuffix { get; set; }
 
-    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriod period, DateTimeOffset timestamp )
+    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
     {
-        return $"{datasetName}@{GenerateShortSnapshotName( period, timestamp )}";
+        return $"{datasetName}@{GenerateShortSnapshotName( periodKind, timestamp )}";
     }
 
-    public string GenerateShortSnapshotName( SnapshotPeriod period, DateTimeOffset timestamp )
+    public string GenerateShortSnapshotName( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
     {
-        return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{period switch
+        return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{periodKind switch
         {
-            SnapshotPeriod.Temporary => "temporary",
-            SnapshotPeriod.Frequent => FrequentSuffix,
-            SnapshotPeriod.Hourly => HourlySuffix,
-            SnapshotPeriod.Daily => DailySuffix,
-            SnapshotPeriod.Weekly => WeeklySuffix,
-            SnapshotPeriod.Monthly => MonthlySuffix,
-            SnapshotPeriod.Yearly => YearlySuffix,
-            SnapshotPeriod.Manual => "manual",
-            _ => throw new ArgumentOutOfRangeException( nameof( period ), period, null )
+            SnapshotPeriodKind.Temporary => "temporary",
+            SnapshotPeriodKind.Frequent => FrequentSuffix,
+            SnapshotPeriodKind.Hourly => HourlySuffix,
+            SnapshotPeriodKind.Daily => DailySuffix,
+            SnapshotPeriodKind.Weekly => WeeklySuffix,
+            SnapshotPeriodKind.Monthly => MonthlySuffix,
+            SnapshotPeriodKind.Yearly => YearlySuffix,
+            SnapshotPeriodKind.Manual => "manual",
+            _ => throw new ArgumentOutOfRangeException( nameof( periodKind ), periodKind, null )
         }}";
     }
 }

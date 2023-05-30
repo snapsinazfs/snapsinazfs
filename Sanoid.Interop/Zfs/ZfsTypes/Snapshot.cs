@@ -4,6 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using Sanoid.Settings.Settings;
+
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 /// <summary>
@@ -11,38 +13,24 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Snapshot : ZfsObjectBase
 {
-    /// <summary>
-    ///     Creates a new <see cref="Snapshot" /> with the given name and an empty <see cref="ZfsObjectBase.Properties" />
-    ///     collection
-    /// </summary>
-    /// <param name="name">The final component of the name of the Snapshot</param>
-    public Snapshot( string name )
+    private Snapshot( string name, SnapshotPeriodKind periodKind )
         : base( name, ZfsObjectKind.Snapshot )
     {
     }
 
-    private Snapshot( string parentPath, string name )
-        : base( name, ZfsObjectKind.Snapshot )
+    public string GetPropertiesSetStringForCommandLine( )
     {
-        ParentPath = parentPath;
+        return $"-o {string.Join( ", -o ", Properties.Select( pair => pair.Value.SetString ) )}";
     }
 
-    public static Snapshot Invalid => new( "@@INVALID@@" )
+    public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
-        Properties =
-        {
-            [ "sanoid.net:invalid" ] = new( "sanoid.net:", "invalid", "true", "sanoid" )
-        }
-    };
-
-    /// <summary>
-    ///     Gets or sets the path of the parent object, without trailing '/'
-    /// </summary>
-    /// <remarks>
-    ///     Is not validated
-    /// </remarks>
-    /// <value>
-    ///     <see langword="null" /> or a string representing the path of the <see cref="Dataset" /> the snapshot belongs to
-    /// </value>
-    public string? ParentPath { get; set; }
+        string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
+        Snapshot newSnapshot = new( snapshotName, period.Kind );
+        newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Name, snapshotName, ZfsPropertySource.Local ) );
+        newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Period, period, ZfsPropertySource.Local ) );
+        newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Timestamp, timestamp.ToString( "O" ), ZfsPropertySource.Local ) );
+        newSnapshot.AddProperty( SnapshotProperty.GetNewSnapshotProperty( SnapshotProperty.SnapshotPropertyKind.Recursion, ds.Recursion, ZfsPropertySource.Local ) );
+        return newSnapshot;
+    }
 }

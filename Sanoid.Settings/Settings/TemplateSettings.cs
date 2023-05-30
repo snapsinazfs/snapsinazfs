@@ -45,9 +45,9 @@ public sealed class TemplateSettings
         return Formatting ?? fallbackSettings;
     }
 
-    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriod period, DateTimeOffset timestamp, FormattingSettings fallbackSettings )
+    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriodKind periodKind, DateTimeOffset timestamp, FormattingSettings fallbackSettings )
     {
         Formatting ??= fallbackSettings;
-        return Formatting.GenerateFullSnapshotName( datasetName, period, timestamp );
+        return Formatting.GenerateFullSnapshotName( datasetName, periodKind, timestamp );
     }
 }

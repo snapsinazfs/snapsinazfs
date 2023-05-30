@@ -5,7 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Diagnostics.CodeAnalysis;
-using Sanoid.Interop.Zfs.ZfsTypes;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
