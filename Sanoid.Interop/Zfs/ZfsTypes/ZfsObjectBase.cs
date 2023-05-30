@@ -55,15 +55,30 @@ public abstract class ZfsObjectBase : IZfsObject
 
     public ZfsProperty? this[ string key ]
     {
-        get => Properties.TryGetValue( key, out ZfsProperty prop ) ? prop : null;
+        get
+        {
+            Logger.Debug("Trying to get property {0} from {1} {2}",key, ZfsKind, Name);
+            bool gotValue = Properties.TryGetValue( key, out ZfsProperty? prop );
+            if ( gotValue )
+            {
+                Logger.Debug( "Got property {0}({3}) from {1} {2}", key, ZfsKind, Name, prop!.Value );
+            }
+            else
+            {
+                Logger.Debug( "Property {0} not found in {1} {2}", key, ZfsKind, Name );
+            }
+            return prop;
+        }
         set
         {
             if ( value is null )
             {
+                Logger.Debug( "Removing property {0} from {1} {2}", key, ZfsKind, Name );
                 Properties.TryRemove( key, out ZfsProperty? prop );
                 return;
             }
 
+            Logger.Debug( "Setting property {0}({3}) from {1} {2}", key, ZfsKind, Name, value.Value );
             Properties[ key ] = value;
         }
     }

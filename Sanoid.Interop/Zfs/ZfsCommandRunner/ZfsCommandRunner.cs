@@ -209,8 +209,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     Logger.Debug( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
                     if ( ZfsProperty.SanoidDefaultDatasetProperties.ContainsKey( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
-                        Logger.Debug( "Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                        Logger.Debug( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
                         datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
+                    }
+                    else
+                    {
+                        Logger.Debug( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
                     }
                 }
                 Logger.Debug( "Finished with line {0} from zfs get", outputLine );

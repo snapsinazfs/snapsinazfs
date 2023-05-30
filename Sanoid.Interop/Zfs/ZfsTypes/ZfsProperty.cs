@@ -30,7 +30,7 @@ public class ZfsProperty
 
     private ZfsProperty( string[] components )
     {
-        Logger.Debug( "Creating new ZfsProperty from array" );
+        Logger.Debug( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
         string[] nameComponents = components[ 0 ].Split( ':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
         switch ( nameComponents.Length )
         {
@@ -103,7 +103,7 @@ public class ZfsProperty
     } );
 
     [JsonIgnore]
-    public string SetString => $"{Namespace}{Name}={Value}";
+    public string SetString => $"{FullName}={Value}";
 
     public string Source { get; set; }
     public string Value { get; protected init; }
