@@ -19,12 +19,17 @@ namespace Sanoid.Settings.Settings;
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
 public class CommandLineArguments
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Gets or sets the cache directory to use, overriding the same setting from all other levels
     /// </summary>
     [ArgDescription( "Cache directory for sanoid" )]
     [ArgShortcut( "--cache-dir" )]
     public string? CacheDir { get; set; }
+
+    [ArgDescription( "Checks the property schema for sanoid.net in zfs and reports any missing properties for pool roots." )]
+    [ArgShortcut( "--check-zfs-properties" )]
+    public bool CheckZfsProperties { get; set; }
 
     /// <summary>
     ///     Gets or sets the configuration directory to use, overriding the same setting from all other levels
@@ -120,10 +125,6 @@ public class CommandLineArguments
     [ArgEnforceCase]
     public bool Version { get; set; }
 
-    [ArgDescription( "Checks the property schema for sanoid.net in zfs and reports any missing properties for pool roots." )]
-    [ArgShortcut( "--check-zfs-properties" )]
-    public bool CheckZfsProperties { get; set; }
-
     /// <summary>
     ///     Called by main thread to set logging settings early, before we load the rest of the configuration.
     /// </summary>
@@ -165,6 +166,15 @@ public class CommandLineArguments
         if ( ( ReallyQuiet ?? false ) || ( Quiet ?? false ) || ( Verbose ?? false ) || ( Debug ?? false ) || ( Trace ?? false ) )
         {
             LogManager.ReconfigExistingLoggers( );
+        }
+    }
+
+    public void UpdateSettingsFromArgs( SanoidSettings settings )
+    {
+        if ( TakeSnapshots.HasValue )
+        {
+            Logger.Debug( "TakeSnapshots set to {0} on command line. Overriding", TakeSnapshots.Value );
+            settings.TakeSnapshots = true;
         }
     }
 }
