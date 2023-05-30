@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
@@ -46,7 +47,7 @@ internal static class SnapshotTasks
                 throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
         }
 
-        Logger.Debug( "Begin taking {0} snapshots", period );
+        Logger.Debug( "Begin taking snapshots for all configured datasets" );
 
         foreach ( ( string _, Dataset ds ) in datasets )
         {
@@ -57,22 +58,43 @@ internal static class SnapshotTasks
                 continue;
             }
 
-            Snapshot? latestFrequentSnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Frequent ).MaxBy( s => s.Timestamp );
-            Snapshot? latestHourlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Hourly ).MaxBy( s => s.Timestamp );
-            Snapshot? latestDailySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Daily ).MaxBy( s => s.Timestamp );
-            Snapshot? latestWeeklySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Weekly ).MaxBy( s => s.Timestamp );
-            Snapshot? latestMonthlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Monthly ).MaxBy( s => s.Timestamp );
-            Snapshot? latestYearlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Yearly ).MaxBy( s => s.Timestamp );
+            // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
+            // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
+            Snapshot? latestFrequentSnapshot = null;
+            NullableDateTimeOffsetComparer nullableDateTimeOffsetComparer = new ();
+            if ( template.SnapshotRetention.Frequent > 0 && ds is { TakeSnapshots: true, Enabled: true } )
+            {
+                Logger.Debug("Getting latest frequent snapshot for {0}",ds.Name);
+                latestFrequentSnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Frequent ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( );
+            }
 
-            if ( template.SnapshotRetention.Frequent > 0 && (latestFrequentSnapshot is null) || timestamp.Subtract( latestFrequentSnapshot.Timestamp ).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )
+            Snapshot? latestHourlySnapshot = null;
+            if ( template.SnapshotRetention.Hourly > 0 && ds is { TakeSnapshots: true, Enabled: true } )
+            {
+                Logger.Debug("Getting hourly frequent snapshot for {0}",ds.Name);
+                latestHourlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Hourly ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer ).FirstOrDefault( );
+            }
+
+            Snapshot? latestDailySnapshot = null;
+            if ( template.SnapshotRetention.Daily > 0 && ds is { TakeSnapshots: true, Enabled: true } )
+            {
+                Logger.Debug("Getting latest daily snapshot for {0}",ds.Name);
+                latestDailySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Daily ).OrderByDescending( s => s.Timestamp, nullableDateTimeOffsetComparer).FirstOrDefault( );
+            }
+            //Snapshot? latestWeeklySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Weekly ).MaxBy( s => s.Timestamp );
+            //Snapshot? latestMonthlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Monthly ).MaxBy( s => s.Timestamp );
+            //Snapshot? latestYearlySnapshot = ds.Snapshots.Values.Where( s => s.Period == SnapshotPeriod.Yearly ).MaxBy( s => s.Timestamp );
+            // ReSharper restore SimplifyLinqExpressionUseMinByAndMaxBy
+
+            if ( template.SnapshotRetention.Frequent > 0 && ((latestFrequentSnapshot is null) || (timestamp.Subtract( latestFrequentSnapshot.Timestamp ?? DateTimeOffset.MinValue).TotalMinutes >= template.SnapshotTiming.FrequentPeriod )))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
             }
-            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp ).TotalHours >= 1d )))
+            if ( template.SnapshotRetention.Hourly > 0 && ((latestHourlySnapshot is null) || (timestamp.Subtract( latestHourlySnapshot.Timestamp?? DateTimeOffset.MinValue ).TotalHours >= 1d )))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
             }
-            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp ).TotalDays >= 1d) ))
+            if ( template.SnapshotRetention.Daily > 0 && ((latestDailySnapshot is null) || (timestamp.Subtract( latestDailySnapshot.Timestamp?? DateTimeOffset.MinValue ).TotalDays >= 1d) ))
             {
                 TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
             }
@@ -181,5 +203,28 @@ internal static class SnapshotTasks
         {
             Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
         }
+    }
+}
+
+public class NullableDateTimeOffsetComparer : IComparer<DateTimeOffset?>
+{
+    /// <inheritdoc />
+    public int Compare( DateTimeOffset? x, DateTimeOffset? y )
+    {
+        switch ( x )
+        {
+            case null when y is null:
+                return 0;
+            case null:
+                return 1;
+        }
+
+        if ( y is null )
+        {
+            return -1;
+        }
+
+        return DateTimeOffset.Compare( x.Value, y.Value );
+
     }
 }

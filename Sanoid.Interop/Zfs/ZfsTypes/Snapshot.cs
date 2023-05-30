@@ -46,7 +46,7 @@ public class Snapshot : ZfsObjectBase
         }
     }
 
-    public DateTimeOffset Timestamp
+    public DateTimeOffset? Timestamp
     {
         get
         {
@@ -55,7 +55,10 @@ public class Snapshot : ZfsObjectBase
                 throw new InvalidOperationException( "snapshottimestamp property not defined on Snapshot" );
             }
 
-            return DateTimeOffset.Parse( prop.Value );
+            if ( !DateTimeOffset.TryParse( prop.Value, out DateTimeOffset result ) )
+                return null;
+            return result;
+
         }
     }
 
