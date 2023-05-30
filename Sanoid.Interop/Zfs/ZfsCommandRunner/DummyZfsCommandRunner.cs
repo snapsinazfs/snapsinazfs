@@ -30,7 +30,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( )
+    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
     {
         return new( );
     }
