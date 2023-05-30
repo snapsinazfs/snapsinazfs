@@ -371,7 +371,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         Dictionary<string, ZfsProperty> propertiesToAdd = new( );
 
-        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.SanoidDefaultDatasetProperties )
+        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultDatasetProperties )
         {
             if ( result.ExistingProperties.ContainsKey( key ) )
             {

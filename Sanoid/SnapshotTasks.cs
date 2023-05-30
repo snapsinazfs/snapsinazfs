@@ -59,25 +59,42 @@ internal static class SnapshotTasks
 
             // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
-            bool frequentSnapshotTaken;
-            bool hourlySnapshotTaken;
-            bool dailySnapshotTaken;
+            List<ZfsProperty?> propsToSet = new( );
             if ( ds is { TakeSnapshots: true, Enabled: true } )
             {
                 if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
                 {
-                    frequentSnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp );
+                    bool frequentSnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Frequent, timestamp, out Snapshot? snapshot );
+                    if ( frequentSnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) )
+                    {
+                        prop.Value = timestamp.ToString( "O" );
+                        ds[ ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName ] = prop;
+                        propsToSet.Add(prop);
+                    }
                 }
 
                 if ( ds.IsHourlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
-                    hourlySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp );
+                    bool hourlySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Hourly, timestamp, out Snapshot? snapshot );
+                    if ( hourlySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
+                    {
+                        prop.Value = timestamp.ToString( "O" );
+                        ds[ ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName ] = prop;
+                        propsToSet.Add(prop);
+                    }
                 }
 
                 if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
-                    dailySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp );
+                    bool dailySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp, out Snapshot? snapshot );
+                    if ( dailySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty prop ) )
+                    {
+                        prop.Value = timestamp.ToString( "O" );
+                        ds[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = prop;
+                        propsToSet.Add( prop );
+                    }
                 }
+
             }
         }
 
@@ -90,10 +107,10 @@ internal static class SnapshotTasks
         return Errno.EOK;
     }
 
-    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp )
+    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
         Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
-
+        snapshot = null;
         if ( !ds.Enabled )
         {
             Logger.Trace( "Dataset {0} is not enabled. Skipping", ds.Name );
@@ -172,9 +189,9 @@ internal static class SnapshotTasks
                 throw new ArgumentOutOfRangeException( nameof( snapshotPeriod ), snapshotPeriod, $"Unexpected value received for snapshotPeriod for dataset {ds.Name}. Snapshot not taken." );
         }
 
-        Logger.Debug( "Dataset {0} will have a snapshot taken with these settings: {1}", ds.Name, JsonSerializer.Serialize( new { ds, template } ) );
+        Logger.Trace( "Dataset {0} will have a snapshot taken with these settings: {1}", ds.Name, JsonSerializer.Serialize( new { ds, template } ) );
 
-        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out Snapshot snapshot ) )
+        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out snapshot ) )
         {
             ds.Snapshots[ snapshot.Name ] = snapshot;
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );

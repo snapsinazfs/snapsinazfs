@@ -44,22 +44,30 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastdailysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastDailySnapshotTimestamp
+    {
+        get => Properties.TryGetValue(ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    }
+
+    public ZfsProperty SetLastDailySnapshotTimestamp( DateTimeOffset timestamp, ZfsPropertySource source )
+    {
+        return this[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = new ( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, timestamp.ToString( "O" ), source );
+    }
 
     [JsonIgnore]
-    public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastfrequentsnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastHourlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lasthourlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastHourlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastMonthlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastmonthlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastMonthlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastWeeklySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastweeklysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastWeeklySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( "sanoid.net:lastyearlysnapshottimestamp", out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
     public bool PruneSnapshots

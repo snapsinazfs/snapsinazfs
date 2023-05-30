@@ -57,7 +57,7 @@ public abstract class ZfsObjectBase : IZfsObject
     {
         get
         {
-            Logger.Debug("Trying to get property {0} from {1} {2}",key, ZfsKind, Name);
+            Logger.Trace("Trying to get property {0} from {1} {2}",key, ZfsKind, Name);
             bool gotValue = Properties.TryGetValue( key, out ZfsProperty? prop );
             if ( gotValue )
             {
@@ -65,7 +65,7 @@ public abstract class ZfsObjectBase : IZfsObject
             }
             else
             {
-                Logger.Debug( "Property {0} not found in {1} {2}", key, ZfsKind, Name );
+                Logger.Trace( "Property {0} not found in {1} {2}", key, ZfsKind, Name );
             }
             return prop;
         }
