@@ -147,7 +147,7 @@ foreach ( ( string poolName, Dataset? pool ) in poolRoots )
             continue;
         }
 
-        logger.Debug( "Pool {0} does not have property {1}", poolName, propertyName );
+        logger.Info( "Pool {0} does not have property {1}", poolName, propertyName );
         missingPropertiesFound = true;
         pool.AddProperty( ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
         missingProperties.Add( propertyName, ZfsProperty.SanoidDefaultDatasetProperties[ propertyName ] );
@@ -187,10 +187,9 @@ if ( argParseReults.Args.PrepareZfsProperties )
     logger.Debug( "Requested update of zfs properties schema" );
     foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in missingPoolPropertyCollections )
     {
-        logger.Debug( "Updating properties for pool {0}", poolName );
+        logger.Info( "Updating properties for pool {0}", poolName );
         zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
-
-        logger.Debug( "Finished updating properties for pool {0}", poolName );
+        logger.Info( "Finished updating properties for pool {0}", poolName );
     }
 
     logger.Debug( "Finished updating zfs properties schema for all pool roots" );
