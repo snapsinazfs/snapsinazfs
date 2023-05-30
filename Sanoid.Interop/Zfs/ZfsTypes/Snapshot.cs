@@ -108,14 +108,14 @@ public class Snapshot : ZfsObjectBase
             throw new ArgumentException( errorMessage, nameof( lineTokens ) );
         }
 
-        if ( !ValidateName( ZfsObjectKind.Snapshot, lineTokens[ 0 ] ) )
+        if ( !ValidateName( ZfsObjectKind.Snapshot, lineTokens[ 2 ] ) )
         {
-            string errorMessage = $"Snapshot name {lineTokens[ 0 ]} is invalid";
+            string errorMessage = $"Snapshot name {lineTokens[ 2 ]} is invalid";
             Logger.Error( errorMessage );
             throw new ArgumentException( errorMessage, nameof( lineTokens ) );
         }
 
-        Snapshot snap = new( lineTokens[ 0 ] )
+        Snapshot snap = new( lineTokens[ 2 ] )
         {
             [ SnapshotProperty.PrunePropertyName ] = new( SnapshotProperty.PrunePropertyName, lineTokens[ 0 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.RecursionPropertyName ] = new( SnapshotProperty.RecursionPropertyName, lineTokens[ 1 ], ZfsPropertySource.Local ),
