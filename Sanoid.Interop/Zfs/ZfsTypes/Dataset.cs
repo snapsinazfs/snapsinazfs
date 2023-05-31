@@ -67,7 +67,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:prunesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsProperty.PruneSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
@@ -98,11 +98,6 @@ public class Dataset : ZfsObjectBase
     public string Template => Properties.TryGetValue( "sanoid.net:template", out ZfsProperty? prop ) ? prop.Value : "default";
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
-    public ZfsProperty SetLastDailySnapshotTimestamp( DateTimeOffset timestamp, ZfsPropertySource source )
-    {
-        return this[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, timestamp.ToString( "O" ), source );
-    }
 
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {

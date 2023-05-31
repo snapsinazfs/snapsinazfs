@@ -66,16 +66,6 @@ public class Snapshot : ZfsObjectBase
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public string GetPropertiesAsOptionsString( )
-    {
-        return $"-o {string.Join( " -o ", Properties.Select( pair => pair.Value.SetString ) )}";
-    }
-
-    public string GetPropertiesAsOutputListString( )
-    {
-        return $"-o {string.Join( ",", Properties.Select( pair => pair.Key ) )}";
-    }
-
     public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );

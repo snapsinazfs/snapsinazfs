@@ -8,10 +8,6 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public sealed class ZfsPropertySource
 {
-    private ZfsPropertySource( )
-    {
-    }
-
     private ZfsPropertySource( ZfsPropertySourceKind kind )
     {
         _kind = kind;

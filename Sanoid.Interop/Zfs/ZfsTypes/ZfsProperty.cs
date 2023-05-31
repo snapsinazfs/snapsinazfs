@@ -18,6 +18,7 @@ public class ZfsProperty
     public const string DatasetLastMonthlySnapshotTimestampPropertyName = "sanoid.net:lastmonthlysnapshottimestamp";
     public const string DatasetLastWeeklySnapshotTimestampPropertyName = "sanoid.net:lastweeklysnapshottimestamp";
     public const string DatasetLastYearlySnapshotTimestampPropertyName = "sanoid.net:lastyearlysnapshottimestamp";
+    public const string PruneSnapshotsPropertyName =  "sanoid.net:prunesnapshots";
 
     public ZfsProperty( string propertyNamespace, string propertyName, string propertyValue, string valueSource )
     {
@@ -76,17 +77,17 @@ public class ZfsProperty
         DatasetLastMonthlySnapshotTimestampPropertyName,
         DatasetLastWeeklySnapshotTimestampPropertyName,
         DatasetLastYearlySnapshotTimestampPropertyName,
-        "sanoid.net:prunesnapshots",
+        PruneSnapshotsPropertyName,
         "sanoid.net:recursion",
         "sanoid.net:takesnapshots",
         "sanoid.net:template"
     } );
 
     [JsonIgnore]
-    public string Name { get; protected init; }
+    public string Name { get; }
 
     [JsonIgnore]
-    public string Namespace { get; protected init; }
+    public string Namespace { get; }
 
     [JsonIgnore]
     public ZfsPropertySource PropertySource
@@ -97,17 +98,17 @@ public class ZfsProperty
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { "sanoid.net:template", new( "sanoid.net:", "template", "default", "local" ) },
-        { "sanoid.net:enabled", new( "sanoid.net:", "enabled", "false", "local" ) },
+        { "sanoid.net:template", new( "sanoid.net:template", "default", "local" ) },
+        { "sanoid.net:enabled", new( "sanoid.net:enabled", "false", "local" ) },
         { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { "sanoid.net:prunesnapshots", new( "sanoid.net:", "prunesnapshots", "false", "local" ) },
-        { "sanoid.net:takesnapshots", new( "sanoid.net:", "takesnapshots", "false", "local" ) },
-        { "sanoid.net:recursion", new( "sanoid.net:", "recursion", "default", "local" ) }
+        { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", "local" ) },
+        { "sanoid.net:takesnapshots", new( "sanoid.net:takesnapshots", "false", "local" ) },
+        { "sanoid.net:recursion", new( "sanoid.net:recursion", "default", "local" ) }
     } );
 
     [JsonIgnore]

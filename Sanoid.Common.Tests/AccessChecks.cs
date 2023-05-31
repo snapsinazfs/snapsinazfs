@@ -23,7 +23,7 @@ public class AccessChecks
     [OneTimeSetUp]
     public void OneTimeSetup( )
     {
-        string[] programNames = { "cp", "install", "ln", "mkdir", "mv", "rm", "zfs", "zpool" };
+        string[] programNames = { "cp", "install", "ln", "mkdir", "mv", "rm", "zfs" };
         foreach ( string programName in programNames )
         {
             ProcessStartInfo whichStartInfo = new( "which", programName )

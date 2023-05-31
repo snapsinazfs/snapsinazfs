@@ -6,16 +6,13 @@
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public class SnapshotRecursionMode
+public sealed class SnapshotRecursionMode
 {
     private readonly SnapshotRecursionKind _kind;
 
     public static SnapshotRecursionMode Default { get; } = new ( SnapshotRecursionKind.Default );
     public static SnapshotRecursionMode Zfs { get; } = new ( SnapshotRecursionKind.Zfs );
 
-    private SnapshotRecursionMode( )
-    {
-    }
     private SnapshotRecursionMode( SnapshotRecursionKind kind )
     {
         _kind = kind;

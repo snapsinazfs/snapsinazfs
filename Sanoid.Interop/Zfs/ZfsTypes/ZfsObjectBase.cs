@@ -61,7 +61,7 @@ public abstract class ZfsObjectBase : IZfsObject
             bool gotValue = Properties.TryGetValue( key, out ZfsProperty? prop );
             if ( gotValue )
             {
-                Logger.Trace( "Got property {0}({3}) from {1} {2}", key, ZfsKind, Name, prop!.Value );
+                Logger.Trace( "Got property {0} from {1}", prop, Name);
             }
             else
             {
@@ -78,7 +78,7 @@ public abstract class ZfsObjectBase : IZfsObject
                 return;
             }
 
-            Logger.Trace( "Setting property {0}({3}) for {1} {2}", key, ZfsKind, Name, value.Value );
+            Logger.Trace( "Setting property {0} for {1} {2}", value, ZfsKind, Name);
             Properties[ key ] = value;
         }
     }
@@ -88,7 +88,10 @@ public abstract class ZfsObjectBase : IZfsObject
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets or sets the name of the <see cref="IZfsObject" />
+    /// </summary>
+    /// <value>A <see langword="string" /> containing the name of the object</value>
     public string Name { get; }
 
     /// <inheritdoc />
@@ -100,7 +103,9 @@ public abstract class ZfsObjectBase : IZfsObject
         return Properties.ContainsKey( propertyName );
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     A dcitionary of property names and their values, as strings
+    /// </summary>
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
 
     protected internal bool ValidateName( string name )
