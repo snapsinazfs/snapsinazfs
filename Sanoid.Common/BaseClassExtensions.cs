@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
-using PowerArgs;
 using Sanoid.Interop.Libc;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Settings.Settings;
@@ -182,13 +181,12 @@ public static class BaseClassExtensions
     ///     the CLI
     /// </summary>
     /// <param name="settings">The <see cref="SanoidSettings" /> object to get <see cref="TemplateSettings" /> from</param>
-    /// <param name="argParseReults"></param>
-    public static void SetValuesFromArgs( this SanoidSettings settings, ArgAction<CommandLineArguments> argParseReults )
+    /// <param name="args"></param>
+    public static void SetValuesFromArgs( this SanoidSettings settings, CommandLineArguments args )
     {
         Logger.Debug( "Overriding settings using arguments from command line." );
-        Logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( argParseReults.Args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+        Logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
         // Let's go through all args in an order that makes sense
-        CommandLineArguments args = argParseReults.Args;
         if ( !string.IsNullOrEmpty( args.CacheDir ) )
         {
             Logger.Trace( "CacheDir argument specified. Value: {0}", args.CacheDir );
@@ -219,7 +217,7 @@ public static class BaseClassExtensions
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
-        if ( args is { TakeSnapshots: not null } )
+        if ( args.TakeSnapshots.HasValue )
         {
             Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots.Value );
 
@@ -227,7 +225,8 @@ public static class BaseClassExtensions
 
             Logger.Debug( "TakeSnapshots is now {0}", settings.TakeSnapshots );
         }
-        if (args is { DryRun: not null } )
+
+        if ( args.DryRun.HasValue )
         {
             Logger.Debug( "DryRun set to {0} on command line. Overriding", args.DryRun.Value );
 
