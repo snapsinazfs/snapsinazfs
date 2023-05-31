@@ -169,19 +169,4 @@ public class CommandLineArguments
             LogManager.ReconfigExistingLoggers( );
         }
     }
-
-    public void UpdateSettingsFromArgs( SanoidSettings settings )
-    {
-        if ( TakeSnapshots.HasValue )
-        {
-            Logger.Debug( "TakeSnapshots set to {0} on command line. Overriding", TakeSnapshots.Value );
-            settings.TakeSnapshots = TakeSnapshots.Value;
-        }
-
-        if ( DryRun.HasValue )
-        {
-            Logger.Debug( "DryRun set to {0} on command line. Overriding", DryRun.Value );
-            settings.DryRun = DryRun.Value;
-        }
-    }
 }

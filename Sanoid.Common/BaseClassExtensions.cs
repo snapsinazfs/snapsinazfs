@@ -219,12 +219,21 @@ public static class BaseClassExtensions
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
-        if ( args.TakeSnapshots is not null )
+        if ( args is { TakeSnapshots: not null } )
         {
-            Logger.Trace( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots );
+            Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots.Value );
 
-            settings.TakeSnapshots = args.TakeSnapshots!.Value;
-            Logger.Trace( "TakeSnapshots is now {0}", settings.TakeSnapshots );
+            settings.TakeSnapshots = args.TakeSnapshots ?? false;
+
+            Logger.Debug( "TakeSnapshots is now {0}", settings.TakeSnapshots );
+        }
+        if (args is { DryRun: not null } )
+        {
+            Logger.Debug( "DryRun set to {0} on command line. Overriding", args.DryRun.Value );
+
+            settings.DryRun = args.DryRun ?? false;
+
+            Logger.Debug( "DryRun is now {0}", settings.DryRun );
         }
     }
 }
