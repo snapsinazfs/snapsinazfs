@@ -4,9 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Globalization;
 using System.Text.Json;
-using NLog.Fluent;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
@@ -95,7 +93,7 @@ internal static class SnapshotTasks
                 if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
                 {
                     bool dailySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp, out Snapshot? snapshot );
-                    if ( dailySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty prop ) )
+                    if ( dailySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
                     {
                         Logger.Trace( "Daily snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
                         prop.Value = timestamp.ToString( "O" );
@@ -108,12 +106,12 @@ internal static class SnapshotTasks
                 if ( ds.IsWeeklySnapshotNeeded( template, timestamp ) )
                 {
                     bool weeklySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Weekly, timestamp, out Snapshot? snapshot );
-                    if ( weeklySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty prop ) )
+                    if ( weeklySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
                     {
-                        Logger.Trace( "Daily snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
+                        Logger.Trace( "Weekly snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
                         prop.Value = timestamp.ToString( "O" );
                         prop.PropertySource = ZfsPropertySource.Local;
-                        ds[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = prop;
+                        ds[ ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName ] = prop;
                         propsToSet.Add( prop );
                     }
                 }
@@ -226,7 +224,7 @@ internal static class SnapshotTasks
         return false;
     }
 
-    internal static void UpdateZfsDatasetSchema( ref Dictionary<string, Dictionary<string, ZfsProperty>> poolPropertyCollections, IZfsCommandRunner zfsCommandRunner)
+    internal static void UpdateZfsDatasetSchema( ref Dictionary<string, Dictionary<string, ZfsProperty>> poolPropertyCollections, IZfsCommandRunner zfsCommandRunner )
     {
         Logger.Debug( "Requested update of zfs properties schema" );
         foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in poolPropertyCollections )
@@ -237,10 +235,10 @@ internal static class SnapshotTasks
             {
                 Logger.Error( "Failed updating properties for pool {0}. Unset properties: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
             }
+
             Logger.Info( "Finished updating properties for pool {0}", poolName );
         }
 
         Logger.Debug( "Finished updating zfs properties schema for all pool roots" );
     }
-
 }
