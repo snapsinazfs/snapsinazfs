@@ -185,11 +185,12 @@ public static class BaseClassExtensions
     public static void SetValuesFromArgs( this SanoidSettings settings, CommandLineArguments args )
     {
         Logger.Debug( "Overriding settings using arguments from command line." );
-        Logger.Trace( "Arguments object: {0}", JsonSerializer.Serialize( args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+        Logger.Error( "Arguments object: {0}", JsonSerializer.Serialize( args, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+        Logger.Error( "Command line from runtime: {0}", Environment.CommandLine );
         // Let's go through all args in an order that makes sense
         if ( !string.IsNullOrEmpty( args.CacheDir ) )
         {
-            Logger.Trace( "CacheDir argument specified. Value: {0}", args.CacheDir );
+            Logger.Debug( "CacheDir argument specified. Value: {0}", args.CacheDir );
             string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
             Logger.Trace( "CacheDir canonical path: {0}", canonicalCacheDirPath );
             if ( !Directory.Exists( canonicalCacheDirPath ) )
@@ -219,7 +220,7 @@ public static class BaseClassExtensions
 
         if ( args.TakeSnapshots.HasValue )
         {
-            Logger.Debug( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots.Value );
+            Logger.Error( "TakeSnapshots argument specified. Value: {0}", args.TakeSnapshots.Value );
 
             settings.TakeSnapshots = args.TakeSnapshots ?? false;
 
@@ -228,7 +229,7 @@ public static class BaseClassExtensions
 
         if ( args.DryRun.HasValue )
         {
-            Logger.Debug( "DryRun set to {0} on command line. Overriding", args.DryRun.Value );
+            Logger.Error( "DryRun set to {0} on command line. Overriding", args.DryRun.Value );
 
             settings.DryRun = args.DryRun ?? false;
 
