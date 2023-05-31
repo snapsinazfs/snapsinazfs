@@ -201,7 +201,7 @@ switch ( argParseReults.Args )
     }
     case { PrepareZfsProperties: true }:
     {
-        SnapshotTasks.UpdateZfsDatasetSchema( ref missingPoolPropertyCollections, zfsCommandRunner );
+        SnapshotTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner );
         return (int)Errno.EOK;
     }
 }

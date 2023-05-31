@@ -54,12 +54,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         string arguments = $"snapshot {string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
-        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
+        if ( settings.DryRun )
+        {
+            Logger.Info("DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
+            return true;
+        }
+        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         try
         {
             using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
@@ -91,7 +96,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentException( $"Unable to get properties for {zfsObjectName}. PropertyName is invalid.", nameof( zfsObjectName ) );
         }
 
-        Logger.Debug( "Getting all zfs properties for: {0}", zfsObjectName );
         ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o property,value,source -H {zfsObjectName}" )
         {
             CreateNoWindow = true,
@@ -134,7 +138,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperties( string zfsPath, params ZfsProperty[] properties )
+    public override bool SetZfsProperties(bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -143,7 +147,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
 
-        return PrivateSetZfsProperty( zfsPath, properties );
+        return PrivateSetZfsProperty( dryRun, zfsPath, properties );
     }
 
     /// A
@@ -355,7 +359,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <exception cref="ArgumentNullException">If <paramref name="zfsPath" /> is null, empty, or only whitespace</exception>
-    public UpdateZfsPropertySchemaResult UpdateZfsPropertySchema( string zfsPath )
+    public UpdateZfsPropertySchemaResult UpdateZfsPropertySchema( string zfsPath, bool dryRun )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -381,7 +385,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             propertiesToAdd.Add( key, prop );
         }
 
-        PrivateSetZfsProperty( zfsPath, propertiesToAdd.Values.ToArray( ) );
+        PrivateSetZfsProperty( dryRun, zfsPath, propertiesToAdd.Values.ToArray( ) );
         result.AddedProperties = propertiesToAdd;
         return result;
     }
@@ -390,7 +394,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
-    private bool PrivateSetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    private bool PrivateSetZfsProperty(bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
@@ -401,6 +405,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         };
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
         {
+            if ( dryRun )
+            {
+                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsPath, zfsSetStartInfo.Arguments );
+                return true;
+            }
             Logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
             try
             {

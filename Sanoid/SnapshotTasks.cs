@@ -116,7 +116,7 @@ internal static class SnapshotTasks
                     }
                 }
 
-                commandRunner.SetZfsProperties( ds.Name, propsToSet.ToArray( ) );
+                commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) );
             }
         }
 
@@ -224,14 +224,14 @@ internal static class SnapshotTasks
         return false;
     }
 
-    internal static void UpdateZfsDatasetSchema( ref Dictionary<string, Dictionary<string, ZfsProperty>> poolPropertyCollections, IZfsCommandRunner zfsCommandRunner )
+    internal static void UpdateZfsDatasetSchema( bool dryRun, ref Dictionary<string, Dictionary<string, ZfsProperty>> poolPropertyCollections, IZfsCommandRunner zfsCommandRunner )
     {
         Logger.Debug( "Requested update of zfs properties schema" );
         foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in poolPropertyCollections )
         {
             Logger.Info( "Updating properties for pool {0}", poolName );
             ZfsProperty[] propertyArray = propertiesToAdd.Values.ToArray( );
-            if ( !zfsCommandRunner.SetZfsProperties( poolName, propertyArray ) )
+            if ( !zfsCommandRunner.SetZfsProperties( dryRun, poolName, propertyArray ) )
             {
                 Logger.Error( "Failed updating properties for pool {0}. Unset properties: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
             }

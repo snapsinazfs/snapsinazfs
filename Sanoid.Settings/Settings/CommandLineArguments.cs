@@ -87,7 +87,7 @@ public class CommandLineArguments
 
     [ArgDescription( "Suppress non-error output. WILL WARN BEFORE SETTING IS APPLIED. Configure in Sanoid.nlog.json for normal usage." )]
     [ArgShortcut( "--quiet" )]
-    [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
+    [ArgCantBeCombinedWith( "Debug|Verbose|DryRun" )]
     public bool? Quiet { get; set; }
 
     [ArgDescription( "Skip creation/deletion of snapshots (Simulate)." )]
@@ -95,11 +95,11 @@ public class CommandLineArguments
     [ArgShortcut( "--read-only" )]
     [ArgShortcut( "--dryrun" )]
     [ArgShortcut( "--dry-run" )]
-    public bool? ReadOnly { get; set; }
+    public bool? DryRun { get; set; }
 
     [ArgDescription( "No output logging. Change log level to Off in Sanoid.nlog.json to set for normal usage. Will not warn when used." )]
     [ArgShortcut( "--really-quiet" )]
-    [ArgCantBeCombinedWith( "Debug|Verbose|ReadOnly" )]
+    [ArgCantBeCombinedWith( "Debug|Verbose|DryRun" )]
     public bool? ReallyQuiet { get; set; }
 
     [ArgDescription( "Will make sanoid take snapshots, but will not prune unless --prune-snapshots is also specified." )]
@@ -175,7 +175,13 @@ public class CommandLineArguments
         if ( TakeSnapshots.HasValue )
         {
             Logger.Debug( "TakeSnapshots set to {0} on command line. Overriding", TakeSnapshots.Value );
-            settings.TakeSnapshots = true;
+            settings.TakeSnapshots = TakeSnapshots.Value;
+        }
+
+        if ( DryRun.HasValue )
+        {
+            Logger.Debug( "DryRun set to {0} on command line. Overriding", DryRun.Value );
+            settings.DryRun = DryRun.Value;
         }
     }
 }

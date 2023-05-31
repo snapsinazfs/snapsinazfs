@@ -41,6 +41,7 @@ public sealed class SanoidSettings
     /// <summary>
     ///     Gets or sets the templates sub-section
     /// </summary>
+    // ReSharper disable once CollectionNeverUpdated.Global
     public required Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>
