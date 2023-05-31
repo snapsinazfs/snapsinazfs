@@ -20,6 +20,6 @@ public enum DatasetKind
     /// <summary>A zfs zvol</summary>
     Volume = ZfsObjectKind.Volume,
 
-    /// <inheritdoc cref="ZfsObjectKind.Unknown"/>
-    Unknown = ZfsObjectKind.Unknown,
+    /// <inheritdoc cref="ZfsObjectKind.Unknown" />
+    Unknown = ZfsObjectKind.Unknown
 }

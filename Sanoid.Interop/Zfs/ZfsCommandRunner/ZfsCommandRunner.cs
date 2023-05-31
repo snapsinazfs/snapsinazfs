@@ -266,9 +266,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 throw;
             }
 
-            if ( zfsListProcess.HasExited && zfsListProcess.ExitCode == 2 )
+            if ( zfsListProcess is { HasExited: true, ExitCode: 2 } )
             {
-                string errorMessage = "Missing snapshot properties. Cannot get snapshots from ZFS";
+                const string errorMessage = "Missing snapshot properties. Cannot get snapshots from ZFS";
                 Logger.Error( errorMessage );
                 throw new InvalidOperationException( errorMessage );
             }

@@ -10,6 +10,6 @@ namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
 public class UpdateZfsPropertySchemaResult
 {
-    public Dictionary<string, ZfsProperty> AddedProperties { get; set; }
-    public Dictionary<string, ZfsProperty> ExistingProperties { get; set; }
+    public Dictionary<string, ZfsProperty>? AddedProperties { get; set; }
+    public Dictionary<string, ZfsProperty>? ExistingProperties { get; set; }
 }

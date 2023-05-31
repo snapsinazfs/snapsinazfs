@@ -35,6 +35,7 @@ public abstract class ZfsObjectBase : IZfsObject
             ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
             ZfsObjectKind.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
             ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
+            ZfsObjectKind.Unknown => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified for ZfsIdentifierValidator." ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified for ZfsIdentifierValidator." )
         };
 
@@ -43,7 +44,7 @@ public abstract class ZfsObjectBase : IZfsObject
             Logger.Debug( "Name validation requested for new ZfsObjectBase" );
             if ( !ValidateName( name ) )
             {
-                string? errorMessage = $"Invalid name specified for a new {ZfsKind} with validateName=true";
+                string errorMessage = $"Invalid name specified for a new {ZfsKind} with validateName=true";
                 Logger.Error( errorMessage );
                 throw new ArgumentOutOfRangeException( nameof( name ), errorMessage );
             }

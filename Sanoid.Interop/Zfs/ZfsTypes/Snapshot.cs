@@ -131,7 +131,7 @@ public class Snapshot : ZfsObjectBase
     {
         if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count )
         {
-            string errorMessage = "Not enough elements in array";
+            const string errorMessage = "Not enough elements in array";
             Logger.Error( errorMessage );
             throw new ArgumentException( errorMessage, nameof( lineTokens ) );
         }

@@ -26,6 +26,11 @@ public sealed class Mutexes : IDisposable
         Logger.Debug( "Creating mutex manager." );
     }
 
+    static Mutexes()
+    {
+        Logger = LogManager.GetCurrentClassLogger( );
+    }
+
     private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
     private bool _disposed;
 

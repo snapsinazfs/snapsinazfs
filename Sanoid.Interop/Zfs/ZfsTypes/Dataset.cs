@@ -45,15 +45,7 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public DateTimeOffset LastDailySnapshotTimestamp
-    {
-        get => Properties.TryGetValue(ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
-    }
-
-    public ZfsProperty SetLastDailySnapshotTimestamp( DateTimeOffset timestamp, ZfsPropertySource source )
-    {
-        return this[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = new ( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, timestamp.ToString( "O" ), source );
-    }
+    public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
     public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
@@ -107,6 +99,11 @@ public class Dataset : ZfsObjectBase
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
+    public ZfsProperty SetLastDailySnapshotTimestamp( DateTimeOffset timestamp, ZfsPropertySource source )
+    {
+        return this[ ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName ] = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, timestamp.ToString( "O" ), source );
+    }
+
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -154,7 +151,7 @@ public class Dataset : ZfsObjectBase
         // Check if more than a week ago or if the week number is different by local rules, using the chosen day as the first day of the week
         int lastWeeklySnapshotWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( LastWeeklySnapshotTimestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
         int currentWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( timestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
-        bool lastWeeklySnapshotOutsideCurrentWeek = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber!= lastWeeklySnapshotWeekNumber;
+        bool lastWeeklySnapshotOutsideCurrentWeek = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber != lastWeeklySnapshotWeekNumber;
         bool weeklySnapshotNeeded = lastWeeklySnapshotOutsideCurrentWeek && template.SnapshotRetention.IsWeeklyWanted;
         Logger.Debug( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? "" : "not " );
         return weeklySnapshotNeeded;

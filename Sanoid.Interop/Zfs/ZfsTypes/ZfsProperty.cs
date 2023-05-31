@@ -173,14 +173,17 @@ public class ZfsProperty
         Logger.Trace( "Parsing ZfsProperty from {0}", value );
 
         string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-        if ( components.Length < 3 )
+        switch ( components.Length )
         {
-            const string errorString = "ZfsProperty value string is invalid.";
-            Logger.Error( errorString );
-            throw new ArgumentOutOfRangeException( nameof( value ), errorString );
+            case < 3:
+            {
+                const string errorString = "ZfsProperty value string is invalid.";
+                Logger.Error( errorString );
+                throw new ArgumentOutOfRangeException( nameof( value ), errorString );
+            }
+            default:
+                return new( components );
         }
-
-        return new( components );
     }
 
     internal static ZfsProperty Parse( string[] tokens )
