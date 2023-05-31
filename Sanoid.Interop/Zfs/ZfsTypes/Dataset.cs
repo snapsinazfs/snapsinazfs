@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -125,7 +126,8 @@ public class Dataset : ZfsObjectBase
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
-        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot || LastHourlySnapshotTimestamp.ToUniversalTime( ).Hour != timestamp.ToUniversalTime( ).Hour;
+        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot
+                                                    || LastHourlySnapshotTimestamp.LocalDateTime.Hour != timestamp.LocalDateTime.Hour;
         bool hourlySnapshotNeeded = lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
         Logger.Debug( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? "" : "not " );
         return hourlySnapshotNeeded;
@@ -137,10 +139,25 @@ public class Dataset : ZfsObjectBase
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
-        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot || LastDailySnapshotTimestamp.ToUniversalTime( ).DayOfYear != timestamp.ToUniversalTime( ).DayOfYear;
+        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot
+                                                  || LastDailySnapshotTimestamp.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
         bool dailySnapshotNeeded = lastDailySnapshotOutsideCurrentDay && retention.IsDailyWanted;
         Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
         return dailySnapshotNeeded;
+    }
+
+    public bool IsWeeklySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    {
+        Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        TimeSpan timeSinceLastWeeklySnapshot = timestamp - LastWeeklySnapshotTimestamp;
+        bool atLeastOneWeekSinceLastWeeklySnapshot = timeSinceLastWeeklySnapshot.TotalDays >= 7d;
+        // Check if more than a week ago or if the week number is different by local rules, using the chosen day as the first day of the week
+        int lastWeeklySnapshotWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( LastWeeklySnapshotTimestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
+        int currentWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( timestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
+        bool lastWeeklySnapshotOutsideCurrentWeek = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber!= lastWeeklySnapshotWeekNumber;
+        bool weeklySnapshotNeeded = lastWeeklySnapshotOutsideCurrentWeek && template.SnapshotRetention.IsWeeklyWanted;
+        Logger.Debug( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? "" : "not " );
+        return weeklySnapshotNeeded;
     }
 
     /// <inheritdoc />

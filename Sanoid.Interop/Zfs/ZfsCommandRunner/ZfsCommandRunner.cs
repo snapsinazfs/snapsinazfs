@@ -134,7 +134,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties )
+    public override bool SetZfsProperties( string zfsPath, params ZfsProperty[] properties )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -386,7 +386,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return result;
     }
 
-    /// <inheritdoc cref="SetZfsProperty" />
+    /// <inheritdoc cref="SetZfsProperties" />
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>

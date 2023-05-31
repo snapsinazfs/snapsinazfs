@@ -129,26 +129,25 @@ IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 
 logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
-bool missingPropertiesFound = false;
 logger.Debug( "Requested check of zfs properties schema" );
 Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
+bool missingPropertiesFound = false;
 foreach ( ( string poolName, Dataset? pool ) in poolRoots )
 {
-    logger.Debug( "Checking properties for pool {0}", poolName );
-    logger.Debug( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
+    logger.Info( "Checking properties for pool {0}", poolName );
+    logger.Trace( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
     Dictionary<string, ZfsProperty> missingProperties = new( );
 
     foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.DefaultDatasetProperties )
     {
-        logger.Debug( "Checking pool {0} for property {1}", poolName, propertyName );
+        logger.Trace( "Checking pool {0} for property {1}", poolName, propertyName );
         if ( pool.HasProperty( propertyName ) )
         {
-            logger.Debug( "Pool {0} already has property {1}", poolName, propertyName );
+            logger.Trace( "Pool {0} already has property {1}", poolName, propertyName );
             continue;
         }
 
-        logger.Info( "Pool {0} does not have property {1}", poolName, propertyName );
-        missingPropertiesFound = true;
+        logger.Debug( "Pool {0} does not have property {1}", poolName, property );
         pool.AddProperty( ZfsProperty.DefaultDatasetProperties[ propertyName ] );
         missingProperties.Add( propertyName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
     }
@@ -160,40 +159,51 @@ foreach ( ( string poolName, Dataset? pool ) in poolRoots )
 
     logger.Debug( "Finished checking properties for pool {0}", poolName );
 
-    if ( argParseReults.Args.CheckZfsProperties )
+    missingPropertiesFound = missingPoolPropertyCollections.Any();
+    bool missingPropertiesFoundForPool = missingProperties.Any( );
+    switch ( argParseReults.Args )
     {
-        logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
-    }
-    else if ( !argParseReults.Args.PrepareZfsProperties )
-    {
-        logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+        case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
+            logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+            break;
+        case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
+            logger.Info( "No missing properties in pool {0}",poolName );
+            break;
+        case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
+            logger.Info( "Pool {0} is missing the following properties: {1}",poolName,string.Join( ", ", missingProperties.Keys ) );
+            break;
+        case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
+            logger.Info( "No missing properties in pool {0}",poolName );
+            break;
+        case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
+            logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+            break;
+        case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
+            logger.Debug( "No missing properties in pool {0}", poolName);
+            break;
     }
 }
 
-logger.Debug( "Finished checking zfs properties schema for all pool roots" );
-if ( argParseReults.Args.CheckZfsProperties )
+switch ( argParseReults.Args )
 {
-    return (int)Errno.EOK;
-}
-
-if ( argParseReults.Args is { CheckZfsProperties: false, PrepareZfsProperties: false } && missingPropertiesFound )
-{
-    logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
-    return (int)Errno.ENOATTR;
-}
-
-if ( argParseReults.Args.PrepareZfsProperties )
-{
-    logger.Debug( "Requested update of zfs properties schema" );
-    foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in missingPoolPropertyCollections )
+    case { CheckZfsProperties: true } when !missingPropertiesFound:
     {
-        logger.Info( "Updating properties for pool {0}", poolName );
-        zfsCommandRunner.SetZfsProperty( poolName, propertiesToAdd.Values.ToArray( ) );
-        logger.Info( "Finished updating properties for pool {0}", poolName );
+        return (int)Errno.EOK;
     }
-
-    logger.Debug( "Finished updating zfs properties schema for all pool roots" );
-    return (int)Errno.EOK;
+    case { CheckZfsProperties: true } when missingPropertiesFound:
+    {
+        return (int)Errno.ENOATTR;
+    }
+    case { CheckZfsProperties: false, PrepareZfsProperties: false } when missingPropertiesFound:
+    {
+        logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
+        return (int)Errno.ENOATTR;
+    }
+    case { PrepareZfsProperties: true }:
+    {
+        SnapshotTasks.UpdateZfsDatasetSchema( ref missingPoolPropertyCollections, zfsCommandRunner );
+        return (int)Errno.EOK;
+    }
 }
 
 settings.SetValuesFromArgs( argParseReults );

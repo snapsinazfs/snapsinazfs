@@ -52,7 +52,6 @@ public abstract class ZfsObjectBase : IZfsObject
         Name = name;
         Properties = new( );
     }
-
     public ZfsProperty? this[ string key ]
     {
         get
@@ -61,7 +60,7 @@ public abstract class ZfsObjectBase : IZfsObject
             bool gotValue = Properties.TryGetValue( key, out ZfsProperty? prop );
             if ( gotValue )
             {
-                Logger.Debug( "Got property {0}({3}) from {1} {2}", key, ZfsKind, Name, prop!.Value );
+                Logger.Trace( "Got property {0}({3}) from {1} {2}", key, ZfsKind, Name, prop!.Value );
             }
             else
             {
@@ -73,12 +72,12 @@ public abstract class ZfsObjectBase : IZfsObject
         {
             if ( value is null )
             {
-                Logger.Debug( "Removing property {0} from {1} {2}", key, ZfsKind, Name );
+                Logger.Trace( "Removing property {0} from {1} {2}", key, ZfsKind, Name );
                 Properties.TryRemove( key, out ZfsProperty? _ );
                 return;
             }
 
-            Logger.Debug( "Setting property {0}({3}) from {1} {2}", key, ZfsKind, Name, value.Value );
+            Logger.Trace( "Setting property {0}({3}) for {1} {2}", key, ZfsKind, Name, value.Value );
             Properties[ key ] = value;
         }
     }
@@ -165,7 +164,7 @@ public abstract class ZfsObjectBase : IZfsObject
     /// <param name="prop">The property to add</param>
     public void AddProperty( ZfsProperty prop )
     {
-        Logger.Debug( "Adding property {0} to {1}", prop, Name );
+        Logger.Trace( "Adding property {0} to Properties collection of {1}", prop, Name );
         Properties[ prop.FullName ] = prop;
     }
 }

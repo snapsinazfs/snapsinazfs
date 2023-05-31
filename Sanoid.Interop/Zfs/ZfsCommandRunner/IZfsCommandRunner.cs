@@ -64,7 +64,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A <see langword="bool" /> indicating success or failure of the operation.
     /// </returns>
-    public bool SetZfsProperty( string zfsPath, params ZfsProperty[] properties );
+    public bool SetZfsProperties( string zfsPath, params ZfsProperty[] properties );
 
     /// <summary>
     ///     Gets all dataset configuration from zfs
