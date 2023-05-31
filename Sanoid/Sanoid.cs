@@ -120,6 +120,14 @@ if ( settings is null )
     return (int)Errno.EFTYPE;
 }
 
+logger.Debug( "Argument parse results: {0}", JsonSerializer.Serialize( argParseReults.Args ) );
+
+settings.SetValuesFromArgs( argParseReults.Args );
+
+logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
+
+
+
 logger.Debug( "Getting ZFS command runner for the current environment" );
 IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
 {
@@ -205,13 +213,6 @@ switch ( argParseReults.Args )
         return (int)Errno.EOK;
     }
 }
-
-
-logger.Debug( "Argument parse results: {0}", JsonSerializer.Serialize( argParseReults.Args ) );
-
-settings.SetValuesFromArgs( argParseReults.Args );
-
-logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
 Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
