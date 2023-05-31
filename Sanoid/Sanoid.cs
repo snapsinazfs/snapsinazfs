@@ -208,6 +208,9 @@ switch ( argParseReults.Args )
 
 settings.SetValuesFromArgs( argParseReults );
 
+logger.Debug( "Argument parse results: {0}", JsonSerializer.Serialize( argParseReults.Args ) );
+logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
+
 Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
 logger.Debug( "Getting sanoid snapshots" );
