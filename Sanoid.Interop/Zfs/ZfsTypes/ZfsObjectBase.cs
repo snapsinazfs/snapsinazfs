@@ -12,7 +12,7 @@ using Sanoid.Interop.Zfs.ZfsTypes.Validation;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public abstract class ZfsObjectBase : IZfsObject
+public abstract class ZfsObjectBase
 {
     /// <summary>
     ///     Creates a new <see cref="ZfsObjectBase" /> with the specified name and kind
@@ -53,20 +53,22 @@ public abstract class ZfsObjectBase : IZfsObject
         Name = name;
         Properties = new( );
     }
+
     public ZfsProperty? this[ string key ]
     {
         get
         {
-            Logger.Trace("Trying to get property {0} from {1} {2}",key, ZfsKind, Name);
+            Logger.Trace( "Trying to get property {0} from {1} {2}", key, ZfsKind, Name );
             bool gotValue = Properties.TryGetValue( key, out ZfsProperty? prop );
             if ( gotValue )
             {
-                Logger.Trace( "Got property {0} from {1}", prop, Name);
+                Logger.Trace( "Got property {0} from {1}", prop, Name );
             }
             else
             {
                 Logger.Trace( "Property {0} not found in {1} {2}", key, ZfsKind, Name );
             }
+
             return prop;
         }
         set
@@ -78,35 +80,33 @@ public abstract class ZfsObjectBase : IZfsObject
                 return;
             }
 
-            Logger.Trace( "Setting property {0} for {1} {2}", value, ZfsKind, Name);
+            Logger.Trace( "Setting property {0} for {1} {2}", value, ZfsKind, Name );
             Properties[ key ] = value;
         }
     }
 
-    [JsonIgnore]
-    internal Regex NameValidatorRegex { get; }
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
     /// <summary>
-    ///     Gets or sets the name of the <see cref="IZfsObject" />
+    ///     Gets or sets the name of the <see cref="ZfsObjectBase" />
     /// </summary>
     /// <value>A <see langword="string" /> containing the name of the object</value>
     public string Name { get; }
 
-    /// <inheritdoc />
-    public ZfsObjectKind ZfsKind { get; }
-
-    /// <inheritdoc />
-    public bool HasProperty( string propertyName )
-    {
-        return Properties.ContainsKey( propertyName );
-    }
+    [JsonIgnore]
+    internal Regex NameValidatorRegex { get; }
 
     /// <summary>
     ///     A dcitionary of property names and their values, as strings
     /// </summary>
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
+
+    public ZfsObjectKind ZfsKind { get; }
+
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    public bool HasProperty( string propertyName )
+    {
+        return Properties.ContainsKey( propertyName );
+    }
 
     protected internal bool ValidateName( string name )
     {

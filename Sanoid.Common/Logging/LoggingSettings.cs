@@ -17,20 +17,20 @@ public static class LoggingSettings
     /// <summary>
     ///     Configures NLog using Sanoid.nlog.json
     /// </summary>
-    public static void ConfigureLogger()
+    public static void ConfigureLogger( )
     {
 #pragma warning disable CA2000
-        IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager()
-#if WINDOWS
-                                                .AddJsonFile("Sanoid.nlog.json", true, false)
-#else
+        IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
+                                            #if WINDOWS
+                                                .AddJsonFile( "Sanoid.nlog.json", true, false )
+                                            #else
                                                 .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.nlog.json", false, false )
                                                 .AddJsonFile( "/etc/sanoid/Sanoid.nlog.json", true, false )
                                                 .AddJsonFile( "Sanoid.nlog.json", true, false )
                                                 .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.nlog.json" ), true, false )
-#endif
-                                                .Build();
+                                            #endif
+                                                .Build( );
 #pragma warning restore CA2000
-        LogManager.Configuration = new NLogLoggingConfiguration(nlogJsonConfigRoot.GetSection("NLog"));
+        LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
     }
 }

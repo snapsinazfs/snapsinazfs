@@ -19,7 +19,6 @@ namespace Sanoid.Settings.Settings;
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
 public class CommandLineArguments
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Gets or sets the cache directory to use, overriding the same setting from all other levels
     /// </summary>
@@ -124,6 +123,8 @@ public class CommandLineArguments
     [ArgShortcut( "--version" )]
     [ArgEnforceCase]
     public bool Version { get; set; }
+
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
     ///     Called by main thread to set logging settings early, before we load the rest of the configuration.

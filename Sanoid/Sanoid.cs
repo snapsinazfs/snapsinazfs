@@ -159,7 +159,7 @@ foreach ( ( string poolName, Dataset? pool ) in poolRoots )
 
     logger.Debug( "Finished checking properties for pool {0}", poolName );
 
-    missingPropertiesFound = missingPoolPropertyCollections.Any();
+    missingPropertiesFound = missingPoolPropertyCollections.Any( );
     bool missingPropertiesFoundForPool = missingProperties.Any( );
     switch ( argParseReults.Args )
     {
@@ -167,19 +167,19 @@ foreach ( ( string poolName, Dataset? pool ) in poolRoots )
             logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
             break;
         case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
-            logger.Info( "No missing properties in pool {0}",poolName );
+            logger.Info( "No missing properties in pool {0}", poolName );
             break;
         case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
-            logger.Info( "Pool {0} is missing the following properties: {1}",poolName,string.Join( ", ", missingProperties.Keys ) );
+            logger.Info( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
             break;
         case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
-            logger.Info( "No missing properties in pool {0}",poolName );
+            logger.Info( "No missing properties in pool {0}", poolName );
             break;
         case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
             logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
             break;
         case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
-            logger.Debug( "No missing properties in pool {0}", poolName);
+            logger.Debug( "No missing properties in pool {0}", poolName );
             break;
     }
 }

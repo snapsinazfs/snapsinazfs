@@ -14,6 +14,11 @@ namespace Sanoid.Settings.Settings;
 public sealed class SnapshotTimingSettings
 {
     /// <summary>
+    ///     Gets or sets the time of day that daily snapshots are taken
+    /// </summary>
+    public required TimeOnly DailyTime { get; init; }
+
+    /// <summary>
     ///     Gets or sets the interval, in minutes, between frequent snapshots
     /// </summary>
     /// <remarks>
@@ -21,20 +26,10 @@ public sealed class SnapshotTimingSettings
     /// </remarks>
     public required int FrequentPeriod { get; init; }
 
-    public int GetPeriodOfHour( DateTimeOffset timestamp )
-    {
-        return timestamp.Minute / FrequentPeriod;
-    }
-
-    /// <summary>
-    ///     Gets or sets the time of day that daily snapshots are taken
-    /// </summary>
-    public required TimeOnly DailyTime { get; init; }
-
     /// <summary>
     ///     Gets or sets the minute of the hour that hourly snapshots are taken
     /// </summary>
-    [ValueRange(0,59)]
+    [ValueRange( 0, 59 )]
     public required int HourlyMinute { get; init; }
 
     /// <summary>
@@ -44,7 +39,7 @@ public sealed class SnapshotTimingSettings
     ///     If the current month has fewer days than the specified value, monthly snapshots will be taken on the last day of
     ///     the month
     /// </remarks>
-    [ValueRange(1,31)]
+    [ValueRange( 1, 31 )]
     public required int MonthlyDay { get; init; }
 
     /// <summary>
@@ -74,17 +69,22 @@ public sealed class SnapshotTimingSettings
     ///     If the current month has fewer days than the specified value, yearly snapshots will be taken on the last day of
     ///     <see cref="YearlyMonth" />
     /// </remarks>
-    [ValueRange(1,31)]
+    [ValueRange( 1, 31 )]
     public required int YearlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the month of the year in which yearly snapshots will be taken
     /// </summary>
-    [ValueRange(1,12)]
+    [ValueRange( 1, 12 )]
     public required int YearlyMonth { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that yearly snapshots are taken
     /// </summary>
     public required TimeOnly YearlyTime { get; init; }
+
+    public int GetPeriodOfHour( DateTimeOffset timestamp )
+    {
+        return timestamp.Minute / FrequentPeriod;
+    }
 }

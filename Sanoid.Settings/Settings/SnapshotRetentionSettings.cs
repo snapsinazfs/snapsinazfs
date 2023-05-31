@@ -18,19 +18,6 @@ public sealed class SnapshotRetentionSettings
     /// </summary>
     public required int Daily { get; init; }
 
-    [JsonIgnore]
-    public bool IsFrequentWanted => Frequent > 0;
-    [JsonIgnore]
-    public bool IsHourlyWanted => Hourly > 0;
-    [JsonIgnore]
-    public bool IsDailyWanted => Daily > 0;
-    [JsonIgnore]
-    public bool IsWeeklyWanted => Weekly > 0;
-    [JsonIgnore]
-    public bool IsMonthlyWanted => Monthly > 0;
-    [JsonIgnore]
-    public bool IsYearlyWanted => Yearly > 0;
-
     /// <summary>
     ///     Gets or sets how many frequent snapshots will be retained
     /// </summary>
@@ -40,6 +27,24 @@ public sealed class SnapshotRetentionSettings
     ///     Gets or sets how many hourly snapshots will be retained
     /// </summary>
     public required int Hourly { get; init; }
+
+    [JsonIgnore]
+    public bool IsDailyWanted => Daily > 0;
+
+    [JsonIgnore]
+    public bool IsFrequentWanted => Frequent > 0;
+
+    [JsonIgnore]
+    public bool IsHourlyWanted => Hourly > 0;
+
+    [JsonIgnore]
+    public bool IsMonthlyWanted => Monthly > 0;
+
+    [JsonIgnore]
+    public bool IsWeeklyWanted => Weekly > 0;
+
+    [JsonIgnore]
+    public bool IsYearlyWanted => Yearly > 0;
 
     /// <summary>
     ///     Gets or sets how many monthly snapshots will be retained
