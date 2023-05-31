@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Globalization;
 using System.Text.Json;
 using NLog.Fluent;
 using Sanoid.Interop.Concurrency;
@@ -106,8 +107,8 @@ internal static class SnapshotTasks
 
                 if ( ds.IsWeeklySnapshotNeeded( template, timestamp ) )
                 {
-                    bool dailySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Daily, timestamp, out Snapshot? snapshot );
-                    if ( dailySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty prop ) )
+                    bool weeklySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Weekly, timestamp, out Snapshot? snapshot );
+                    if ( weeklySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty prop ) )
                     {
                         Logger.Trace( "Daily snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
                         prop.Value = timestamp.ToString( "O" );
