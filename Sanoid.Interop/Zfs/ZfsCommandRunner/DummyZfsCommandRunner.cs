@@ -14,7 +14,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
     {
-        throw new NotImplementedException( );
+        return true;
     }
 
     /// <inheritdoc />

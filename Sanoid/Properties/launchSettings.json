@@ -3,37 +3,13 @@
     "Sanoid": {
       "commandName": "Project"
     },
-    "Verbose Logging": {
+    "DryRun": {
       "commandName": "Project",
-      "commandLineArgs": "--verbose"
+      "commandLineArgs": "--dry-run"
     },
-    "Trace Logging": {
+    "DryRun TakeSnapshots": {
       "commandName": "Project",
-      "commandLineArgs": "--trace"
-    },
-    "VerboseAndQuiet": {
-      "commandName": "Project",
-      "commandLineArgs": "--verbose --quiet"
-    },
-    "Help": {
-      "commandName": "Project",
-      "commandLineArgs": "-h"
-    },
-    "ConfigDirOverride": {
-      "commandName": "Project",
-      "commandLineArgs": "--config-dir=/config/somewhere_else"
-    },
-    "CacheDirOverride": {
-      "commandName": "Project",
-      "commandLineArgs": "--cache-dir=/cache/somewhere_else"
-    },
-    "RunDirOverride": {
-      "commandName": "Project",
-      "commandLineArgs": "--run-dir=/run/somewhere_else"
-    },
-    "Version": {
-      "commandName": "Project",
-      "commandLineArgs": "--version"
+      "commandLineArgs": "--dry-run --take-snapshots"
     }
   }
 }

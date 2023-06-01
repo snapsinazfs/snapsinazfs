@@ -23,7 +23,7 @@ public sealed class Mutexes : IDisposable
     private Mutexes( )
     {
         Logger = LogManager.GetCurrentClassLogger( );
-        Logger.Debug( "Creating mutex manager." );
+        Logger.Trace( "Creating mutex manager" );
     }
 
     static Mutexes()
@@ -114,7 +114,7 @@ public sealed class Mutexes : IDisposable
         bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? sanoidMutex );
         if ( exists && sanoidMutex != null )
         {
-            Logger.Debug( "Mutex {0} already exists. Returning it", name );
+            Logger.Trace( "Mutex {0} already exists. Returning it", name );
             return sanoidMutex;
         }
 
@@ -158,6 +158,7 @@ public sealed class Mutexes : IDisposable
     ///     On success: The acquired Mutex<br />
     ///     On failure: A <see cref="MutexAcquisitionException" /> describing the nature of the failure.
     /// </returns>
+    /// <exception cref="MutexAcquisitionException"></exception>
     public static MutexAcquisitionResult GetAndWaitMutex( string mutexName, int timeout = 5000 )
     {
         if ( string.IsNullOrWhiteSpace( mutexName ) )
@@ -187,6 +188,10 @@ public sealed class Mutexes : IDisposable
                 Logger.Error( whcboe, errorMessage );
                 return new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, new( MutexAcquisitionErrno.WaitHandleCannotBeOpened, whcboe ) );
             }
+            case null:
+                break;
+            default:
+                throw new MutexAcquisitionException( MutexAcquisitionErrno.PossiblyNullMutex, caughtException );
         }
 
         if ( possiblyNullMutex is null )

@@ -14,7 +14,7 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
     <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    <StartupObject>Program</StartupObject>
+    <StartupObject>Sanoid.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">
@@ -50,7 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
@@ -66,6 +65,7 @@
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.0" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
+    <PackageReference Include="PowerArgs" Version="4.0.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 
