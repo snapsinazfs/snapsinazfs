@@ -4,8 +4,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid.Common", "Sanoid.Common\Sanoid.Common.csproj", "{0E846AE0-1933-4523-A868-F73EDC007C3C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid", "Sanoid\Sanoid.csproj", "{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8213F454-E94F-4F84-B21F-E2B3121FDAB5}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -21,7 +19,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F0DF7CB3
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid.Interop.Tests", "Sanoid.Interop.Tests\Sanoid.Interop.Tests.csproj", "{36551E6E-DCA5-4C33-B772-B8337F7057F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanoid.Settings", "Sanoid.Settings\Sanoid.Settings.csproj", "{B0F0E26A-7492-4DB8-977D-686DB83D52EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid.Settings", "Sanoid.Settings\Sanoid.Settings.csproj", "{B0F0E26A-7492-4DB8-977D-686DB83D52EC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{BF90F296-1208-445D-A45D-E11D7F00EB95}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{4D503858-739F-4BCE-92DA-10163F9EFA39}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid", "Sanoid\Sanoid.csproj", "{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +43,6 @@ Global
 		{0E846AE0-1933-4523-A868-F73EDC007C3C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0E846AE0-1933-4523-A868-F73EDC007C3C}.Release-R2R|Any CPU.ActiveCfg = Release-R2R|Any CPU
 		{0E846AE0-1933-4523-A868-F73EDC007C3C}.Release-R2R|Any CPU.Build.0 = Release-R2R|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Debug-Windows|Any CPU.ActiveCfg = Debug-Windows|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Debug-Windows|Any CPU.Build.0 = Debug-Windows|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Release-R2R|Any CPU.ActiveCfg = Release-R2R|Any CPU
-		{5C974F94-3FB9-43C4-BCBB-247F57BB1B7E}.Release-R2R|Any CPU.Build.0 = Release-R2R|Any CPU
 		{23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6}.Debug-Windows|Any CPU.ActiveCfg = Debug-Windows|Any CPU
@@ -79,13 +75,25 @@ Global
 		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release-R2R|Any CPU.ActiveCfg = Release|Any CPU
 		{B0F0E26A-7492-4DB8-977D-686DB83D52EC}.Release-R2R|Any CPU.Build.0 = Release|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Debug-Windows|Any CPU.ActiveCfg = Debug-Windows|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Debug-Windows|Any CPU.Build.0 = Debug-Windows|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Release-R2R|Any CPU.ActiveCfg = Release-R2R|Any CPU
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}.Release-R2R|Any CPU.Build.0 = Release-R2R|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{0E846AE0-1933-4523-A868-F73EDC007C3C} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 		{23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6} = {F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}
+		{C9EFABAF-D518-4FF6-8213-4FDC4D4A4AE7} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 		{36551E6E-DCA5-4C33-B772-B8337F7057F0} = {F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}
+		{B0F0E26A-7492-4DB8-977D-686DB83D52EC} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
+		{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345} = {4D503858-739F-4BCE-92DA-10163F9EFA39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C48CFF09-F3F8-4708-B33C-C996B0B4C693}
