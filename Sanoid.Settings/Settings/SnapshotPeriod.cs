@@ -4,6 +4,8 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Reflection.Metadata.Ecma335;
+
 namespace Sanoid.Settings.Settings;
 
 public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<SnapshotPeriod>
@@ -40,6 +42,12 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     public int CompareTo( SnapshotPeriodKind other )
     {
         return Kind.CompareTo( other );
+    }
+
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return this;
     }
 
     public static implicit operator string( SnapshotPeriod self )
