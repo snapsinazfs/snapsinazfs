@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -142,6 +142,70 @@ internal static class ZfsTasks
                 propsToSet.Add( fakeProp );
             }
         }
+    }
+
+    internal static Errno PruneAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
+    {
+        const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
+        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
+        switch ( mutexAcquisitionResult.ErrorCode )
+        {
+            case MutexAcquisitionErrno.Success:
+            {
+                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
+            }
+                break;
+            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
+            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
+            case MutexAcquisitionErrno.InProgess:
+            case MutexAcquisitionErrno.IoException:
+            case MutexAcquisitionErrno.AbandonedMutex:
+            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
+            case MutexAcquisitionErrno.PossiblyNullMutex:
+            case MutexAcquisitionErrno.AnotherProcessIsBusy:
+            case MutexAcquisitionErrno.InvalidMutexNameRequested:
+            {
+                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
+                return mutexAcquisitionResult;
+            }
+            default:
+                throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
+        }
+
+        Logger.Info( "Begin pruning snapshots for all configured datasets" );
+        List<Snapshot> allSnapshotsToPrune = new( );
+        foreach ( ( string _, Dataset ds ) in datasets )
+        {
+            if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
+            {
+                string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
+                Logger.Error( errorMessage );
+                continue;
+            }
+
+            if ( ds is not { PruneSnapshots: true } )
+            {
+                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
+                continue;
+            }
+
+            if ( ds is not { Enabled: true } )
+            {
+                Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
+                continue;
+            }
+
+            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template, timestamp );
+            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
+            allSnapshotsToPrune.AddRange( snapshotsToPruneForDataset );
+        }
+        Logger.Debug( "Need to prune the following snapshots globally:{0}", string.Join( ',', allSnapshotsToPrune.Select( s => s.Name ) ) );
+
+        // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        Mutexes.ReleaseMutex( snapshotMutexName );
+
+        return Errno.EOK;
     }
 
     internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
