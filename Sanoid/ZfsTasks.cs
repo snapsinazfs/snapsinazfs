@@ -116,6 +116,32 @@ internal static class ZfsTasks
                     }
                 }
 
+                if ( ds.IsMonthlySnapshotNeeded( template, timestamp ) )
+                {
+                    bool monthlySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Monthly, timestamp, out Snapshot? snapshot );
+                    if ( monthlySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
+                    {
+                        Logger.Trace( "Monthly snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
+                        prop.Value = timestamp.ToString( "O" );
+                        prop.PropertySource = ZfsPropertySource.Local;
+                        ds[ ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName ] = prop;
+                        propsToSet.Add( prop );
+                    }
+                }
+
+                if ( ds.IsYearlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
+                {
+                    bool yearlySnapshotTaken = TakeSnapshot( commandRunner, settings, ds, SnapshotPeriod.Yearly, timestamp, out Snapshot? snapshot );
+                    if ( yearlySnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) )
+                    {
+                        Logger.Trace( "Yearly snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
+                        prop.Value = timestamp.ToString( "O" );
+                        prop.PropertySource = ZfsPropertySource.Local;
+                        ds[ ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName ] = prop;
+                        propsToSet.Add( prop );
+                    }
+                }
+
                 commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) );
             }
         }
