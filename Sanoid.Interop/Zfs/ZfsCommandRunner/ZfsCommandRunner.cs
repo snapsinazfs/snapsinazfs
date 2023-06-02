@@ -498,6 +498,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// </remarks>
     private bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
+        if ( properties.Length == 0 )
+        {
+            Logger.Trace("No properties to set"  );
+            return false;
+        }
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
