@@ -23,7 +23,7 @@ public class Snapshot : ZfsObjectBase
     {
         get
         {
-            if ( !Properties.TryGetValue( SnapshotProperty.NamePropertyName, out ZfsProperty? prop ) )
+            if ( !Properties.TryGetValue( SnapshotProperty.SnapshotNamePropertyName, out ZfsProperty? prop ) )
             {
                 throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
             }
@@ -137,7 +137,7 @@ public class Snapshot : ZfsObjectBase
         {
             [ ZfsProperty.PruneSnapshotsPropertyName ] = new( ZfsProperty.PruneSnapshotsPropertyName, lineTokens[ 0 ], ZfsPropertySource.Local ),
             [ ZfsProperty.RecursionPropertyName ] = new( ZfsProperty.RecursionPropertyName, lineTokens[ 1 ], ZfsPropertySource.Local ),
-            [ SnapshotProperty.NamePropertyName ] = new( SnapshotProperty.NamePropertyName, lineTokens[ 2 ], ZfsPropertySource.Local ),
+            [ SnapshotProperty.SnapshotNamePropertyName ] = new( SnapshotProperty.SnapshotNamePropertyName, lineTokens[ 2 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.PeriodPropertyName ] = new( SnapshotProperty.PeriodPropertyName, lineTokens[ 3 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.TimestampPropertyName ] = new( SnapshotProperty.TimestampPropertyName, lineTokens[ 4 ], ZfsPropertySource.Local ),
             [ ZfsProperty.TemplatePropertyName ] = new( ZfsProperty.TemplatePropertyName, lineTokens[ 5 ], ZfsPropertySource.Local )
