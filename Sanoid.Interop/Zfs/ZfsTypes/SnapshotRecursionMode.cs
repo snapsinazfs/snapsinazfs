@@ -6,44 +6,8 @@
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public sealed class SnapshotRecursionMode
+public static class SnapshotRecursionMode
 {
-    private SnapshotRecursionMode( SnapshotRecursionKind kind )
-    {
-        _kind = kind;
-    }
-
-    private readonly SnapshotRecursionKind _kind;
-
-    public static SnapshotRecursionMode Default { get; } = new( SnapshotRecursionKind.Default );
-    public static SnapshotRecursionMode Zfs { get; } = new( SnapshotRecursionKind.Zfs );
-
-    public static implicit operator string( SnapshotRecursionMode obj )
-    {
-        return obj.ToString( );
-    }
-
-    public static implicit operator SnapshotRecursionMode( string value )
-    {
-        return value switch
-        {
-            "sanoid" => Default,
-            "Sanoid" => Default,
-            "zfs" => Zfs,
-            "Zfs" => Zfs,
-            "ZFS" => Zfs,
-            _ => Default
-        };
-    }
-
-    /// <inheritdoc />
-    public override string ToString( )
-    {
-        return _kind switch
-        {
-            SnapshotRecursionKind.Default => "default",
-            SnapshotRecursionKind.Zfs => "zfs",
-            _ => "default"
-        };
-    }
+    public const string Sanoid = "sanoid";
+    public const string Zfs = "zfs";
 }

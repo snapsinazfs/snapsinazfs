@@ -131,13 +131,13 @@ internal static class ZfsTasks
             {
                 Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
                 prop.Value = timestamp.ToString( "O" );
-                prop.PropertySource = ZfsPropertySource.Local;
+                prop.Source = "local";
                 ds[ datasetSnapshotTimestampPropertyName ] = prop;
                 propsToSet.Add( prop );
             }
             else if ( !snapshotTaken && settings.DryRun )
             {
-                ZfsProperty fakeProp = prop ?? new ZfsProperty( datasetSnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySource.Local );
+                ZfsProperty fakeProp = prop ?? new ZfsProperty( datasetSnapshotTimestampPropertyName, timestamp.ToString( "O" ), "local" );
                 ds[ datasetSnapshotTimestampPropertyName ] = fakeProp;
                 propsToSet.Add( fakeProp );
             }
@@ -268,7 +268,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsProperty.RecursionPropertyName ]?.PropertySource != ZfsPropertySource.Local )
+        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsProperty.RecursionPropertyName ]?.Source != "local" )
         {
             Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
             return false;
@@ -410,7 +410,7 @@ internal static class ZfsTasks
             Logger.Trace( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
             Dictionary<string, ZfsProperty> missingProperties = new( );
 
-            foreach ( ( string? propertyName, ZfsProperty? property ) in ZfsProperty.DefaultDatasetProperties )
+            foreach ( ( string propertyName, ZfsProperty? property ) in ZfsProperty.DefaultDatasetProperties )
             {
                 Logger.Trace( "Checking pool {0} for property {1}", poolName, propertyName );
                 if ( pool.HasProperty( propertyName ) )

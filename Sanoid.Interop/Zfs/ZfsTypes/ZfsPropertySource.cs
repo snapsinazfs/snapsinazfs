@@ -17,15 +17,9 @@ public sealed class ZfsPropertySource
 
     public static ZfsPropertySource Default { get; } = new( ZfsPropertySourceKind.Default );
     public static ZfsPropertySource Inherited { get; } = new( ZfsPropertySourceKind.Inherited );
-    public static ZfsPropertySource Local { get; } = new( ZfsPropertySourceKind.Local );
-    public static ZfsPropertySource Native { get; } = new( ZfsPropertySourceKind.Native );
+    public const string Local = "local";
     public static ZfsPropertySource Unknown { get; } = new( ZfsPropertySourceKind.Unknown );
-    public static ZfsPropertySource Sanoid { get; } = new( ZfsPropertySourceKind.Sanoid );
-
-    public static implicit operator string( ZfsPropertySource obj )
-    {
-        return obj.ToString( );
-    }
+    public const string Sanoid = "sanoid";
 
     /// <summary>
     ///     Implicit conversion from string to <see cref="ZfsPropertySource" />

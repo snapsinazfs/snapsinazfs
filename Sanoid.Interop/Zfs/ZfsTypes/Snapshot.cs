@@ -158,12 +158,12 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
         Snapshot newSnapshot = new( snapshotName );
-        newSnapshot.AddProperty( new( ZfsProperty.SnapshotNamePropertyName, snapshotName, ZfsPropertySource.Local ));
+        newSnapshot.AddProperty( new ( ZfsProperty.SnapshotNamePropertyName, snapshotName, ZfsPropertySource.Local ));
         newSnapshot.AddProperty( new( ZfsProperty.SnapshotPeriodPropertyName, period, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( new( ZfsProperty.SnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySource.Local ) );
-        newSnapshot.AddProperty( new( ZfsProperty.RecursionPropertyName, (string)ds.Recursion, ZfsPropertySource.Local ) );
+        newSnapshot.AddProperty( new( ZfsProperty.RecursionPropertyName, ds.Recursion, ZfsPropertySource.Local ) );
         newSnapshot.AddProperty( new( ZfsProperty.TemplatePropertyName, ds.Template, ZfsPropertySource.Local ) );
-        newSnapshot.AddProperty( new( ZfsProperty.PruneSnapshotsPropertyName, ds.PruneSnapshots.ToString( ), ZfsPropertySource.Local ) );
+        newSnapshot.AddProperty( new( ZfsProperty.PruneSnapshotsPropertyName, ds.PruneSnapshots.ToString( ).ToLowerInvariant(), ZfsPropertySource.Local ) );
         return newSnapshot;
     }
 

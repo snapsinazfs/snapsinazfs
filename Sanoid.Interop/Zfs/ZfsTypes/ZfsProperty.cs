@@ -15,6 +15,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class ZfsProperty
 {
+    const string ZfsUndefinedPropertyValueString = "-";
     public ZfsProperty( string propertyName, string propertyValue, string valueSource )
     {
         Name = propertyName;
@@ -23,16 +24,13 @@ public class ZfsProperty
         IsSanoidProperty = propertyName.StartsWith( "sanoid.net:" );
     }
 
-    protected internal ZfsProperty( string propertyName, string propertyValue, ZfsPropertySource valueSource )
-    {
-        Name = propertyName;
-        Value = propertyValue;
-        Source = valueSource;
-        IsSanoidProperty = propertyName.StartsWith( "sanoid.net:" );
-    }
+    [JsonIgnore]
+    public bool IsUndefined => IsSanoidProperty
+                               && (Value == ZfsUndefinedPropertyValueString || Source == ZfsUndefinedPropertyValueString);
 
     public bool IsSanoidProperty { get; }
 
+    [JsonIgnore]
     public bool HasValidValue
     {
         get
@@ -57,7 +55,7 @@ public class ZfsProperty
                     };
                 }
                 case TemplatePropertyName:
-                    return !string.IsNullOrWhiteSpace( Value ) && Value != "-";
+                    return !string.IsNullOrWhiteSpace( Value ) && Value != ZfsUndefinedPropertyValueString;
                 case EnabledPropertyName:
                 case PruneSnapshotsPropertyName:
                 case TakeSnapshotsPropertyName:
@@ -72,7 +70,7 @@ public class ZfsProperty
             }
             if ( IsSanoidProperty )
             {
-                return Value != "-";
+                return Value != ZfsUndefinedPropertyValueString;
             }
             return true;
         }
@@ -80,6 +78,7 @@ public class ZfsProperty
 
     public static (bool success, ZfsProperty? prop, string? parent) FromZfsGetLine( string zfsGetLine )
     {
+        Logger.Trace( "Using regex to parse new ZfsProperty from {0}", zfsGetLine );
         Regex parseRegex = ZfsPropertyParseRegexes.ZfsPropertyParseRegex( );
         MatchCollection matches = parseRegex.Matches( zfsGetLine );
         Match firstMatch = matches[ 0 ];
@@ -92,6 +91,7 @@ public class ZfsProperty
              && groups[ "Value" ].Success
              && groups[ "Source" ].Success )
         {
+            Logger.Trace( "Match succeeded. Returning new ZfsProperty" );
             return new( true, new ( groups[ "Property" ].Value, groups[ "Value" ].Value, groups[ "Source" ].Value ), groups["Name"].Value );
         }
 
@@ -140,15 +140,7 @@ public class ZfsProperty
         SnapshotRetentionYearlyPropertyName,
     } );
 
-    [JsonIgnore]
     public string Name { get; }
-
-    [JsonIgnore]
-    public ZfsPropertySource PropertySource
-    {
-        get => Source;
-        set => Source = value;
-    }
 
     [JsonIgnore]
     public string SetString => $"{Name}={Value}";
@@ -160,9 +152,9 @@ public class ZfsProperty
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, "@@INVALID@@", (string)ZfsPropertySource.Sanoid ) },
-        { SnapshotPeriodPropertyName, new(SnapshotPeriodPropertyName, "temporary", (string)ZfsPropertySource.Sanoid ) },
-        { SnapshotTimestampPropertyName, new(SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), (string)ZfsPropertySource.Sanoid ) }
+        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, "@@INVALID@@", ZfsPropertySource.Sanoid ) },
+        { SnapshotPeriodPropertyName, new(SnapshotPeriodPropertyName, "temporary", ZfsPropertySource.Sanoid ) },
+        { SnapshotTimestampPropertyName, new(SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySource.Sanoid ) }
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]

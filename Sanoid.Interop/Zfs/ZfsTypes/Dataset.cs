@@ -77,11 +77,11 @@ public class Dataset : ZfsObjectBase
     }
 
     [JsonIgnore]
-    public SnapshotRecursionMode Recursion
+    public string Recursion
     {
         get
         {
-            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : SnapshotRecursionMode.Sanoid;
             return valueString;
         }
     }
