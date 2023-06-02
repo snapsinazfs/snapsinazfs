@@ -22,8 +22,18 @@ public class ZfsProperty
 
     protected internal ZfsProperty( string name, string value, ZfsPropertySource source )
     {
-        Namespace = "sanoid.net:";
-        Name = name;
+        if ( name.Contains( ':' ) )
+        {
+            string[] parts = name.Split( ':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            Namespace = $"{parts[ 0 ]}:";
+            Name = parts[ 1 ];
+        }
+        else
+        {
+            Namespace = string.Empty;
+            Name = name;
+        }
+
         Value = value;
         Source = source;
     }
