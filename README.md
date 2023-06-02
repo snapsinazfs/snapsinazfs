@@ -4,16 +4,23 @@
 
  ## Status
 
- As of today (2023-06-02), Sanoid.net is capable of taking (but not pruning) snapshots, using configuration
- stored in ZFS itself, via user properties. Snapshot pruning is the next work item.
+ As of today (2023-06-02), Sanoid.net is capable of taking and pruning snapshots, using configuration
+ stored in ZFS itself, via user properties.
 
- Once taking and pruning snapshots work as intended, I may make an alpha release tag and possibly provide a
- pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an
- alpha-stage project and you should not trust important systems with it.
+ I may make an alpha release tag soon and possibly provide a pre-built release, here on github. This comes with
+ what should be the obvious disclaimer that this is an alpha-stage project and you should not trust important
+ systems with it.
 
- I estimate taking all snapshot levels and pruning them as well should be finished within the next few days, if
- I'm able to put enough time into it. With the configuration in ZFS, just about every operation is now so much
- easier to handle, both on the dev side and the user side.
+ Since implementing pruning went so quickly, I would like to make another alteration to the project.\
+ Configuration stored in ZFS has been a major boon for the application. I am now strongly considering moving ALL
+ settings that still remain in settings into zfs. This will completely prevent the case of someone deleting a
+ template that was configured for use in part of your ZFS hierarchy, causing subsequent runs of Sanoid.net to
+ fail, due to the missing template.
+
+ To make configuration even easier, I'm thinking I may introduce a command-line configuration grammar to
+ Sanoid.net or else maybe provide an admin tool that provides a text-mode UI to configure Sanoid.net in ZFS.\
+ If I do go that route, I'll make a configuration library with an API that can be used by any other tools anyone
+ may want to write (for example, a web-based config tool or other graphical UI).
 
  
  ## Goals
@@ -43,11 +50,19 @@
  
  ## Compatibility With PERL-based sanoid
  
- Sanoid.net is intended to have *similar* behavior to PERL-based sanoid. Invocations of Sanoid.net will accept
- most of the same arguments as PERL sanoid, and will behave largely the same, except that it ***requires***
- configuration to be set in zfs. Sanoid.net can both check and update the required property schema for you.
+ Sanoid.net is intended to have *similar* behavior to PERL-based sanoid, though it is definitely not a 1:1
+ drop-in replacement for PERL sanoid, as it will require configuration migration.\
+ However, the configuration is intended to be as simple as possible, and I may provide a migration tool with at
+ least basic capability to migrate simple configurations to the way Sanoid.net works.
+
+ Invocations of Sanoid.net will accept *most* of the same arguments as PERL sanoid, and will behave largely the
+ same, except that it ***requires*** configuration to be set in zfs. Sanoid.net can both check and update the
+ required property schema for you, already, in its current state.
  
- Sanoid.net will also have additional capabilities which are not guaranteed to be available in PERL sanoid.
+ Sanoid.net also has additional capabilities and command-line arguments which are not guaranteed to be available
+ in PERL sanoid. My intention is to mostly follow standard getopt-style option naming, with flags that enable a
+ setting being named positively (such as --take-snapshots) and flags that disable a setting being the "no-"
+ version of the same argument (such as --no-take-snapshots), per standard conventions.
 
  Sanoid.net is also planned to incorporate some functionality that PERL sanoid currently delegates to other
  utilities, where that functionality is either included in .net or where I get the motivation to do so.
@@ -105,7 +120,6 @@
   - Microsoft.Extensions.Configuration.Json
   - Microsoft.Extensions.Configuration.Ini
   - Microsoft.Extensions.Configuration.EnvironmentVariables
-  - Microsoft.Extensions.Configuration.CommandLine
   - NLog
   - NLog.Extensions.Logging
   - NLog.Targets.Journald
@@ -116,6 +130,8 @@
   Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. Sanoid.net itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all Sanoid.net needs to run properly (binaries only - header files are not needed). The goal is for Sanoid.net to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
  ## Installing From Source
+
+ ### Likely broken at the moment - I will revisit this when I've finished my current tasks
  
  After cloning this repository, execute the following commands to build and install Sanoid.net using make:
 
@@ -217,8 +233,9 @@
  If properties are not defined, Sanoid.net can be invoked with the `--prepare-zfs-properties`
  command line switch.\
  This option will cause Sanoid.net to check all pool root datasets for properties that the current version of Sanoid.net understands, and define all missing settings, using default values for each, on those pool roots.\
- Default settings are safe, and will result in no snapshots being taken or pruned.\
- Settings you have already defined will not be overwritten, and obsolete properties will not be removed.
+ Default settings are safe, and will result in no snapshots being taken or pruned, unless you have changed
+ something yourself.\
+ Settings you have already defined will not be overwritten, and **obsolete properties will not be removed**.
 
  ##### Removing Sanoid.net ZFS Properties
 
