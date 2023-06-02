@@ -69,6 +69,13 @@ public class Dataset : ZfsObjectBase
     public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     public List<Snapshot> MonthlySnapshots { get; } = new( );
+
+    public (bool MissingAny, List<string>? MissingPropertyNames) GetMissingMandatoryProperties( )
+    {
+        List<string> missing = ZfsProperty.DefaultDatasetProperties.Keys.Except( Properties.Keys ).ToList( );
+        return missing.Any( ) ? new( false, missing ) : new( true, null );
+    }
+
     [JsonIgnore]
     public SnapshotRecursionMode Recursion
     {
