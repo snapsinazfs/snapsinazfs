@@ -175,6 +175,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     ///         </item>
     ///     </list>
     /// </exception>
+    /// <exception cref="ArgumentNullException">If a <see langword="null" /> string is somehow provided to ContainsKey when looking for existing entries in the dictionary to return.</exception>
+    /// <exception cref="OutOfMemoryException">There is insufficient memory to allocate a buffer when parsing zfs output.</exception>
+    /// <exception cref="IOException">An I/O error occurs.</exception>
+    /// <exception cref="ArgumentException">An element with the same key already exists in the <see cref="Dictionary`2" />.</exception>
     public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
     {
         Dictionary<string, Dataset> datasets = new( );
