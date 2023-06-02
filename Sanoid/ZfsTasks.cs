@@ -199,7 +199,14 @@ internal static class ZfsTasks
             Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
             allSnapshotsToPrune.AddRange( snapshotsToPruneForDataset );
         }
+
         Logger.Debug( "Need to prune the following snapshots globally:{0}", string.Join( ',', allSnapshotsToPrune.Select( s => s.Name ) ) );
+
+        // Now actually call destroy on everything we decided to wreck
+        foreach ( Snapshot snapshot in allSnapshotsToPrune )
+        {
+            commandRunner.DestroySnapshot( datasets[ snapshot.DatasetName ], snapshot, settings );
+        }
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
