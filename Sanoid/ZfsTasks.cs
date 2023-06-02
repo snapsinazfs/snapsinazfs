@@ -13,7 +13,7 @@ using Sanoid.Settings.Settings;
 
 namespace Sanoid;
 
-internal static class SnapshotTasks
+internal static class ZfsTasks
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

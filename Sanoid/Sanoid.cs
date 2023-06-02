@@ -127,8 +127,10 @@ internal class Program
         };
 
         Logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
+
         Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
-        Logger.Debug( "Requested check of zfs properties schema" );
+
+        Logger.Debug( "Checking zfs properties schema" );
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
         foreach ( ( string poolName, Dataset? pool ) in poolRoots )
@@ -200,7 +202,7 @@ internal class Program
             }
             case { PrepareZfsProperties: true }:
             {
-                SnapshotTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner );
+                ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner );
                 return (int)Errno.EOK;
             }
         }
@@ -215,7 +217,7 @@ internal class Program
         {
             DateTimeOffset currentTimestamp = DateTimeOffset.Now;
             Logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
-            SnapshotTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, SnapshotPeriod.Daily, currentTimestamp, ref datasets );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, SnapshotPeriod.Daily, currentTimestamp, ref datasets );
         }
         else
         {
