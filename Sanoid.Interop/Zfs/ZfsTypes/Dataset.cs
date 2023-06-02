@@ -83,6 +83,12 @@ public class Dataset : ZfsObjectBase
     }
 
     public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
+    public List<Snapshot> FrequentSnapshots { get; } = new( );
+    public List<Snapshot> HourlySnapshots { get; } = new( );
+    public List<Snapshot> DailySnapshots { get; } = new( );
+    public List<Snapshot> WeeklySnapshots { get; } = new( );
+    public List<Snapshot> MonthlySnapshots { get; } = new( );
+    public List<Snapshot> YearlySnapshots { get; } = new( );
 
     [JsonIgnore]
     public bool TakeSnapshots
@@ -370,5 +376,28 @@ public class Dataset : ZfsObjectBase
     {
         Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
         AllSnapshots[ snap.Name ] = snap;
+        switch ( snap.Period.Kind )
+        {
+            case SnapshotPeriodKind.Frequent:
+                FrequentSnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Hourly:
+                HourlySnapshots.Add(snap );
+                break;
+            case SnapshotPeriodKind.Daily:
+                DailySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Weekly:
+                WeeklySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Monthly:
+                MonthlySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Yearly:
+                YearlySnapshots.Add( snap );
+                break;
+            default:
+                break;
+        }
     }
 }
