@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -18,7 +18,7 @@ internal static class ZfsTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, SnapshotPeriod period, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
+    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
     {
         const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
@@ -68,7 +68,6 @@ internal static class ZfsTasks
                     if ( frequentSnapshotTaken && ds.Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) )
                     {
                         Logger.Trace( "Frequent snapshot {0} taken successfully", snapshot?.Name ?? $"of {ds.Name}" );
-
                         prop.Value = timestamp.ToString( "O" );
                         prop.PropertySource = ZfsPropertySource.Local;
                         ds[ ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName ] = prop;

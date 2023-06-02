@@ -177,8 +177,8 @@ internal class Program
         // Handle taking new snapshots, if requested
         if ( settings is { TakeSnapshots: true } )
         {
-            Logger.Debug( "TakeSnapshots is true. Taking daily snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, SnapshotPeriod.Daily, currentTimestamp, ref datasets );
+            Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, ref datasets );
         }
         else
         {
