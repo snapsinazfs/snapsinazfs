@@ -158,7 +158,7 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref schemaCheckResult.missingPoolPropertyCollections, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, schemaCheckResult.missingPoolPropertyCollections, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }

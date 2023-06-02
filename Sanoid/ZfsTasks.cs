@@ -354,7 +354,7 @@ internal static class ZfsTasks
         return false;
     }
 
-    internal static bool UpdateZfsDatasetSchema( bool dryRun, ref Dictionary<string, Dictionary<string, ZfsProperty>> missingPropertiesByPool, IZfsCommandRunner zfsCommandRunner )
+    internal static bool UpdateZfsDatasetSchema( bool dryRun, Dictionary<string, Dictionary<string, ZfsProperty>> missingPropertiesByPool, IZfsCommandRunner zfsCommandRunner )
     {
         bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
