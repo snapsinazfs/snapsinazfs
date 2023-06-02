@@ -205,7 +205,45 @@ internal static class ZfsTasks
         // Now actually call destroy on everything we decided to wreck
         foreach ( Snapshot snapshot in allSnapshotsToPrune )
         {
-            commandRunner.DestroySnapshot( datasets[ snapshot.DatasetName ], snapshot, settings );
+            Dataset ds = datasets[ snapshot.DatasetName ];
+            bool destroySuccessful = commandRunner.DestroySnapshot( ds, snapshot, settings );
+            if ( destroySuccessful || settings.DryRun )
+            {
+                if ( settings.DryRun )
+                {
+                    Logger.Info("DRY RUN: Snapshot not destroyed, but pretending it was for simulation"  );
+                }
+                else
+                {
+                    Logger.Info("Destroyed snapshot {0}", snapshot.Name);
+                }
+                switch ( snapshot.Period.Kind )
+                {
+                    case SnapshotPeriodKind.Frequent:
+                        ds.FrequentSnapshots.Remove( snapshot );
+                        goto default;
+                    case SnapshotPeriodKind.Hourly:
+                        ds.HourlySnapshots.Remove( snapshot );
+                        goto default;
+                    case SnapshotPeriodKind.Daily:
+                        ds.DailySnapshots.Remove( snapshot );
+                        goto default;
+                    case SnapshotPeriodKind.Weekly:
+                        ds.WeeklySnapshots.Remove( snapshot );
+                        goto default;
+                    case SnapshotPeriodKind.Monthly:
+                        ds.MonthlySnapshots.Remove( snapshot );
+                        goto default;
+                    case SnapshotPeriodKind.Yearly:
+                        ds.YearlySnapshots.Remove( snapshot );
+                        goto default;
+                    default:
+                        ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
+                        continue;
+                }
+            }
+
+            Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
         }
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
