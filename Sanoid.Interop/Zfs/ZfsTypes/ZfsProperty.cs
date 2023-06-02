@@ -7,7 +7,9 @@
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using NLog;
+using Sanoid.Interop.Zfs.ZfsTypes.Properties;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
@@ -18,6 +20,7 @@ public class ZfsProperty
         Name = propertyName;
         Value = propertyValue;
         Source = valueSource;
+        IsSanoidProperty = propertyName.StartsWith( "sanoid.net:" );
     }
 
     protected internal ZfsProperty( string propertyName, string propertyValue, ZfsPropertySource valueSource )
@@ -25,17 +28,77 @@ public class ZfsProperty
         Name = propertyName;
         Value = propertyValue;
         Source = valueSource;
+        IsSanoidProperty = propertyName.StartsWith( "sanoid.net:" );
     }
 
-    private ZfsProperty( string[] components )
-    {
-        Logger.Trace( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
-        
-        Name = components[ 0 ];
-        Value = components[ 1 ];
-        Source = components[ 2 ];
+    public bool IsSanoidProperty { get; }
 
-        Logger.Trace( "ZfsProperty created: {0}({1})", Name, Value );
+    public bool HasValidValue
+    {
+        get
+        {
+            switch ( Name )
+            {
+                case DatasetLastFrequentSnapshotTimestampPropertyName:
+                case DatasetLastHourlySnapshotTimestampPropertyName:
+                case DatasetLastDailySnapshotTimestampPropertyName:
+                case DatasetLastWeeklySnapshotTimestampPropertyName:
+                case DatasetLastMonthlySnapshotTimestampPropertyName:
+                case DatasetLastYearlySnapshotTimestampPropertyName:
+                {
+                    return DateTimeOffset.TryParse( Value, out _ );
+                }
+                    break;
+                case RecursionPropertyName:
+                {
+                    return Value switch
+                    {
+                        "default" => true,
+                        "sanoid" => true,
+                        "zfs" => true,
+                        _ => false
+                    };
+                }
+                case TemplatePropertyName:
+                    return !string.IsNullOrWhiteSpace( Value ) && Value != "-";
+                case EnabledPropertyName:
+                case PruneSnapshotsPropertyName:
+                case TakeSnapshotsPropertyName:
+                    return Value == bool.FalseString || Value == bool.TrueString;
+                case SnapshotRetentionFrequentPropertyName:
+                    case SnapshotRetentionHourlyPropertyName:
+                    case SnapshotRetentionDailyPropertyName:
+                    case SnapshotRetentionWeeklyPropertyName:
+                    case SnapshotRetentionMonthlyPropertyName:
+                    case SnapshotRetentionYearlyPropertyName:
+                    return int.TryParse( Value, out _ );
+            }
+            if ( IsSanoidProperty )
+            {
+                return Value != "-";
+            }
+            return true;
+        }
+    }
+
+    public static (bool success, ZfsProperty? prop, string? parent) FromZfsGetLine( string zfsGetLine )
+    {
+        Regex parseRegex = ZfsPropertyParseRegexes.ZfsPropertyParseRegex( );
+        MatchCollection matches = parseRegex.Matches( zfsGetLine );
+        Match firstMatch = matches[ 0 ];
+        GroupCollection groups = firstMatch.Groups;
+
+        // If the regex matched exactly once, and got all 4 of the expected capture groups, this is a good parse.
+        if ( firstMatch.Success
+             && groups[ "Name" ].Success
+             && groups[ "Property" ].Success
+             && groups[ "Value" ].Success
+             && groups[ "Source" ].Success )
+        {
+            return new( true, new ( groups[ "Property" ].Value, groups[ "Value" ].Value, groups[ "Source" ].Value ), groups["Name"].Value );
+        }
+
+        return ( false, null, null );
     }
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
@@ -98,6 +161,29 @@ public class ZfsProperty
     [MaxLength(8192)]
     public string Value { get; set; }
 
+    public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
+    {
+        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, "@@INVALID@@", (string)ZfsPropertySource.Sanoid ) },
+        { SnapshotPeriodPropertyName, new(SnapshotPeriodPropertyName, "temporary", (string)ZfsPropertySource.Sanoid ) },
+        { SnapshotTimestampPropertyName, new(SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), (string)ZfsPropertySource.Sanoid ) }
+    } );
+
+    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
+    {
+        PruneSnapshotsPropertyName,
+        RecursionPropertyName,
+        SnapshotNamePropertyName,
+        SnapshotPeriodPropertyName,
+        SnapshotTimestampPropertyName,
+        TemplatePropertyName,
+        SnapshotRetentionDailyPropertyName,
+        SnapshotRetentionFrequentPropertyName,
+        SnapshotRetentionHourlyPropertyName,
+        SnapshotRetentionMonthlyPropertyName,
+        SnapshotRetentionWeeklyPropertyName,
+        SnapshotRetentionYearlyPropertyName
+    } );
+
     public const string DatasetLastDailySnapshotTimestampPropertyName = "sanoid.net:lastdailysnapshottimestamp";
     public const string DatasetLastFrequentSnapshotTimestampPropertyName = "sanoid.net:lastfrequentsnapshottimestamp";
     public const string DatasetLastHourlySnapshotTimestampPropertyName = "sanoid.net:lasthourlysnapshottimestamp";
@@ -115,80 +201,14 @@ public class ZfsProperty
     public const string RecursionPropertyName = "sanoid.net:recursion";
     public const string TemplatePropertyName = "sanoid.net:template";
     public const string EnabledPropertyName = "sanoid.net:enabled";
+    public const string SnapshotNamePropertyName = "sanoid.net:snapshotname";
+    public const string SnapshotPeriodPropertyName = "sanoid.net:snapshotperiod";
+    public const string SnapshotTimestampPropertyName = "sanoid.net:snapshottimestamp";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
     public override string ToString( )
     {
         return $"{Name}: {Value}";
-    }
-
-    public static bool TryParse( string value, out ZfsProperty? property )
-    {
-        Logger.Trace( "Trying to parse new ZfsProperty from {0}", value );
-        property = null;
-        try
-        {
-            property = Parse( value );
-        }
-        catch ( ArgumentOutOfRangeException ex )
-        {
-            Logger.Error( ex, "Error parsing new ZfsProperty from '{0}'", value );
-            return false;
-        }
-        catch ( ArgumentNullException ex )
-        {
-            Logger.Error( ex, "Error parsing new ZfsProperty from '{0}'", value );
-            return false;
-        }
-
-        Logger.Debug( "Successfully parsed ZfsProperty {0}", property );
-
-        return true;
-    }
-
-    /// <summary>
-    ///     Gets a <see cref="ZfsProperty" /> parsed from the supplied string
-    /// </summary>
-    /// <exception cref="ArgumentNullException">
-    ///     If <paramref propertyName="value" /> is a null, empty, or entirely whitespace
-    ///     string
-    /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     If the provided property string has less than 3 components separated by a
-    ///     tab character.
-    /// </exception>
-    /// <remarks>
-    ///     Expected format is `peropertyName,value,source[,inheritedFrom]`
-    /// </remarks>
-    public static ZfsProperty Parse( string value )
-    {
-        if ( string.IsNullOrWhiteSpace( value ) )
-        {
-            const string errorString = "Unable to parse ZfsProperty. String must not be null, empty, or whitespace.";
-            Logger.Error( errorString );
-            throw new ArgumentNullException( nameof( value ), errorString );
-        }
-
-        Logger.Trace( "Parsing ZfsProperty from {0}", value );
-
-        string[] components = value.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-        switch ( components.Length )
-        {
-            case < 3:
-            {
-                const string errorString = "ZfsProperty value string is invalid.";
-                Logger.Error( errorString );
-                throw new ArgumentOutOfRangeException( nameof( value ), errorString );
-            }
-            default:
-                return new( components );
-        }
-    }
-
-    internal static ZfsProperty Parse( string[] tokens )
-    {
-        Logger.Trace( "Parsing ZfsProperty from array [{0}]", string.Join( ',', tokens ) );
-        return new( tokens );
     }
 }

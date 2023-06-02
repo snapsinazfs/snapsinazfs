@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -34,6 +34,9 @@ public class Dataset : ZfsObjectBase
     {
     }
 
+    public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
+    public List<Snapshot> DailySnapshots { get; } = new( );
+
     [JsonIgnore]
     public bool Enabled
     {
@@ -43,6 +46,9 @@ public class Dataset : ZfsObjectBase
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
+
+    public List<Snapshot> FrequentSnapshots { get; } = new( );
+    public List<Snapshot> HourlySnapshots { get; } = new( );
 
     [JsonIgnore]
     public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
@@ -61,6 +67,35 @@ public class Dataset : ZfsObjectBase
 
     [JsonIgnore]
     public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+
+    public List<Snapshot> MonthlySnapshots { get; } = new( );
+    [JsonIgnore]
+    public SnapshotRecursionMode Recursion
+    {
+        get
+        {
+            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
+            return valueString;
+        }
+    }
+
+    [JsonIgnore]
+    public bool TakeSnapshots
+    {
+        get
+        {
+            string valueString = Properties.TryGetValue( ZfsProperty.TakeSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
+            return bool.TryParse( valueString, out bool result ) && result;
+        }
+    }
+
+    [JsonIgnore]
+    public string Template => Properties.TryGetValue( ZfsProperty.TemplatePropertyName, out ZfsProperty? prop ) ? prop.Value : "default";
+
+    public List<Snapshot> WeeklySnapshots { get; } = new( );
+    public List<Snapshot> YearlySnapshots { get; } = new( );
+
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template )
     {
@@ -147,39 +182,6 @@ public class Dataset : ZfsObjectBase
 
         return snapshotsToPrune;
     }
-
-    [JsonIgnore]
-    public SnapshotRecursionMode Recursion
-    {
-        get
-        {
-            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
-            return valueString;
-        }
-    }
-
-    public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
-    public List<Snapshot> FrequentSnapshots { get; } = new( );
-    public List<Snapshot> HourlySnapshots { get; } = new( );
-    public List<Snapshot> DailySnapshots { get; } = new( );
-    public List<Snapshot> WeeklySnapshots { get; } = new( );
-    public List<Snapshot> MonthlySnapshots { get; } = new( );
-    public List<Snapshot> YearlySnapshots { get; } = new( );
-
-    [JsonIgnore]
-    public bool TakeSnapshots
-    {
-        get
-        {
-            string valueString = Properties.TryGetValue( ZfsProperty.TakeSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
-        }
-    }
-
-    [JsonIgnore]
-    public string Template => Properties.TryGetValue( ZfsProperty.TemplatePropertyName, out ZfsProperty? prop ) ? prop.Value : "default";
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
     ///     Gets whether a frequent snapshot is needed, according to the provided <see cref="TemplateSettings" /> and

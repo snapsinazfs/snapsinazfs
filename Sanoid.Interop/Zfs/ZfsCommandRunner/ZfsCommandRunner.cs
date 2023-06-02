@@ -305,7 +305,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, Snapshot> snapshots = new( );
 
         Logger.Debug( "Getting ZFS snapshot configurations" );
-        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -r -t snapshot -H -p -o {string.Join( ',', SnapshotProperty.KnownSnapshotProperties )}" )
+        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -r -t snapshot -H -p -o {string.Join( ',', ZfsProperty.KnownSnapshotProperties )}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -335,10 +335,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
                 Logger.Trace( "Read line {0} from zfs list", outputLine );
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-                if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count )
+                if ( lineTokens.Length < ZfsProperty.KnownSnapshotProperties.Count )
                 {
                     Logger.Error( "Line {0} not understood", outputLine );
-                    throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {SnapshotProperty.KnownSnapshotProperties.Count} tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
+                    throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {ZfsProperty.KnownSnapshotProperties.Count} tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
                 }
 
                 if ( lineTokens[ 2 ] == "-" )
