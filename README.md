@@ -1,6 +1,21 @@
  # Sanoid.net
 
  A .net 7.0+/C#11+ re-implementation (not a port) of sanoid
+
+ ## Status
+
+ As of today (2023-06-01), Sanoid.net is capable of taking (but not pruning) frequent, hourly, daily, and weekly
+ snapshots, using configuration stored in ZFS itself, via user properties. I will be adding monthly and yearly
+ snapshot functionality shortly, and then will move on to pruning.
+
+ Once taking and pruning snapshots work as intended, I may make an alpha release tag and possibly provide a
+ pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an
+ alpha-stage project and you should not trust important systems with it.
+
+ I estimate taking all snapshot levels and pruning them as well should be finished within the next few days, if
+ I'm able to put enough time into it. With the configuration in ZFS, just about every operation is now so much
+ easier to handle, both on the dev side and the user side.
+
  
  ## Goals
 
@@ -20,15 +35,18 @@
 
  #### Long-Term Lofty Goals
 
- I would love to, once Sanoid.net is stable, attempt to implement interaction with zfs
- via native calls through libzfs. This may or may not be easily achievable without *significant* additional work, to marshall all the various C++ constructs in zfs into the .net world.
+ I would love to, once Sanoid.net is stable, attempt to implement interaction with zfs via native calls through
+ libzfs. This may or may not be easily achievable without *significant* additional work, to marshall all the
+ various C++ constructs in zfs (some of which are quite cumbersome) into the .net world.
 
  I've already written a few basic P/Invoke methods to make calls directly to libc functions, to avoid spawning
  processes for equivalent commands, but zfs is a completely different beast.
  
  ## Compatibility With PERL-based sanoid
  
- Sanoid.net is intended to have similar behavior to PERL-based sanoid. Invocations of Sanoid.net will accept most of the same arguments as PERL sanoid, and will behave largely the same, except that it ***requires*** configuration to be set in zfs. Sanoid.net can do that for you, to avoid making typos.
+ Sanoid.net is intended to have *similar* behavior to PERL-based sanoid. Invocations of Sanoid.net will accept
+ most of the same arguments as PERL sanoid, and will behave largely the same, except that it ***requires***
+ configuration to be set in zfs. Sanoid.net can both check and update the required property schema for you.
  
  Sanoid.net will also have additional capabilities which are not guaranteed to be available in PERL sanoid.
 
@@ -39,16 +57,46 @@
 
  I intend to organize the project differently than sanoid/syncoid/findoid, partially thanks to the benefit of hindsight, but also in an attempt to make it easier to maintain, modify, and extend.
 
- Most significantly, I intend to separate the code into one or more common library projects, to help avoid code duplication and aid in organization. Currently, Sanoid.Common contains mostly configuration, at this time. Sanoid.Interop contains code such as native platform calls, Concurrency management, and other Interop layer code, as well as types necessary for calling the zfs utility.
+ Most significantly, I intend to separate the code into one or more common library projects, to help avoid code
+ duplication and aid in organization.
+ 
+ Currently, the solution is laid out as follows:
+ 
+  - Sanoid: The main Sanoid.net executable. This project should only contain code relevant specifically to Sanoid.net
+  - Sanoid.Interop: Code such as native platform calls, Concurrency management, and other Interop layer code, as
+  well as types used to interact with and define structures relevant to ZFS, such as snapshots and datasets.
+  - Sanoid.Settings: Contains formal definitions of settings in code. The .net configuration binder is used to
+  populate an instance of this class, in Sanoid.net, and command line arguments are used to override individual
+  values, as appropriate.
+  - Sanoid.Common: Intended to be a common library that Sanoid.net, Syncoid.net, and Findoid.net use, with types
+  relevant to all, but which don't belong in Sanoid.Interop
+  - Test projects: Each class library project will have a test project defined, for unit tests. I'm not doing this
+  by TDD, so these are likely to not be well-defined until later in the project development cycle, when things
+  stabilize a bit.
+  - Syncoid: Doesn't exist yet, but will be the Syncoid.net utility
+  - Findoid: Doesn't exist yet, but will be the Findoid.net utility
 
- Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked with the same or very similar commands and arguments as their PERL ancestors, plus anything new Sanoid.net provides.
+ Sanoid.net, Syncoid.net, and Findoid.net will, themselves, remain individual applications that can be invoked
+ with the same or very similar commands and arguments as their PERL ancestors, plus anything new Sanoid.net provides.
 
- My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and, therefore, sanoid currenly are a Linux-targeted toolset, the project will always be guaranteed to compile and run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what I have) with the project's required version of the dotnet runtime installed.
+ My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as
+ vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in
+ Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and,
+ therefore, sanoid currenly are a Linux-targeted toolset, release tags of the project will always be guaranteed
+ to compile and run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what
+ I have) with the project's required version of the dotnet runtime installed.
 
  ## Dependencies
 
- My intention is for this project to have no external dependencies other than the required version of the dotnet runtime that have to be manually installed by the end user. This includes not being reliant on the PERL versions of the applications, either, or any of their core. All compile-time dependencies of these ports will either be included in published releases or included as project references in the dotnet projects, so that they can be automatically restored by the dotnet SDK, from the public NuGet repository.\
- Runtime dependencies, such as mbuffer, ssh, and others that are invoked by sanoid are, of course, still required to be installed and available, if they are used by your configuration, though I intend to implement some of that functionality in Sanoid.net itself, eventually.
+ My intention is for this project to have no external dependencies other than the required version of the dotnet
+ runtime that have to be manually installed by the end user. This includes not being reliant on the PERL versions
+ of the applications, either, or any of their configuration files or required perl packages. All compile-time
+ dependencies of these applications will either be included in published releases or included as project
+ references in the dotnet projects, so that they can be automatically restored by the dotnet SDK, from the public
+ NuGet repository.\
+ Runtime dependencies, such as mbuffer, ssh, and others that are invoked by sanoid are, of course, still required
+ to be installed and available, if they are used by your configuration, though I intend to implement some of that
+ functionality in these applications, themselves, eventually.
  
  That said, here are the nuget package dependencies as of right now (automatically retrieved during build):
  
