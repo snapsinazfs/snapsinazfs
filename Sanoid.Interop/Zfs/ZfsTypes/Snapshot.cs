@@ -135,12 +135,12 @@ public class Snapshot : ZfsObjectBase
 
         Snapshot snap = new( lineTokens[ 2 ] )
         {
-            [ SnapshotProperty.PrunePropertyName ] = new( SnapshotProperty.PrunePropertyName, lineTokens[ 0 ], ZfsPropertySource.Local ),
-            [ SnapshotProperty.RecursionPropertyName ] = new( SnapshotProperty.RecursionPropertyName, lineTokens[ 1 ], ZfsPropertySource.Local ),
+            [ ZfsProperty.PruneSnapshotsPropertyName ] = new( ZfsProperty.PruneSnapshotsPropertyName, lineTokens[ 0 ], ZfsPropertySource.Local ),
+            [ ZfsProperty.RecursionPropertyName ] = new( ZfsProperty.RecursionPropertyName, lineTokens[ 1 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.NamePropertyName ] = new( SnapshotProperty.NamePropertyName, lineTokens[ 2 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.PeriodPropertyName ] = new( SnapshotProperty.PeriodPropertyName, lineTokens[ 3 ], ZfsPropertySource.Local ),
             [ SnapshotProperty.TimestampPropertyName ] = new( SnapshotProperty.TimestampPropertyName, lineTokens[ 4 ], ZfsPropertySource.Local ),
-            [ SnapshotProperty.TemplatePropertyName ] = new( SnapshotProperty.TemplatePropertyName, lineTokens[ 5 ], ZfsPropertySource.Local )
+            [ ZfsProperty.TemplatePropertyName ] = new( ZfsProperty.TemplatePropertyName, lineTokens[ 5 ], ZfsPropertySource.Local )
         };
         return snap;
     }

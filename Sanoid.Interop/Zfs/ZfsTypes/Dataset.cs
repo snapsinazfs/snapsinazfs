@@ -39,7 +39,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:enabled", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsProperty.EnabledPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
@@ -77,7 +77,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:recursion", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return valueString;
         }
     }
@@ -89,13 +89,13 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( "sanoid.net:takesnapshots", out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsProperty.TakeSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
 
     [JsonIgnore]
-    public string Template => Properties.TryGetValue( "sanoid.net:template", out ZfsProperty? prop ) ? prop.Value : "default";
+    public string Template => Properties.TryGetValue( ZfsProperty.TemplatePropertyName, out ZfsProperty? prop ) ? prop.Value : "default";
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

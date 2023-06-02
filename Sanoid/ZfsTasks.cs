@@ -160,7 +160,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ "sanoid.net:recursion" ]?.PropertySource != ZfsPropertySource.Local )
+        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsProperty.RecursionPropertyName ]?.PropertySource != ZfsPropertySource.Local )
         {
             Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
             return false;
