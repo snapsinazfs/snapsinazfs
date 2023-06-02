@@ -454,7 +454,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( dryRun )
             {
                 Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsPath, zfsSetStartInfo.Arguments );
-                return true;
+                return false;
             }
 
             Logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );

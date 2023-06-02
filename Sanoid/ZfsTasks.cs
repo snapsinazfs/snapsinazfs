@@ -237,7 +237,7 @@ internal static class ZfsTasks
 
         if ( settings.DryRun )
         {
-            Logger.Info( "Snapshot for dataset {0} not taken", ds.Name );
+            Logger.Info( "DRY RUN: Snapshot for dataset {0} not taken", ds.Name );
             return false;
         }
 
@@ -259,14 +259,21 @@ internal static class ZfsTasks
 
             // Attempt to set the missing properties for the pool.
             // Log an error if unsuccessful
-            if ( !zfsCommandRunner.SetZfsProperties( dryRun, poolName, propertyArray ) )
+            if ( zfsCommandRunner.SetZfsProperties( dryRun, poolName, propertyArray ) )
             {
-                errorsEncountered = true;
-                Logger.Error( "Failed updating properties for pool {0}. Unset properties: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
+                Logger.Info( "Finished updating properties for pool {0}", poolName );
             }
             else
             {
-                Logger.Info( "Finished updating properties for pool {0}", poolName );
+                if ( dryRun )
+                {
+                    Logger.Info( "DRY RUN: Properties intentionally not set for {0}: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
+                }
+                else
+                {
+                    errorsEncountered = true;
+                    Logger.Error( "Failed updating properties for pool {0}. Unset properties: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
+                }
             }
         }
 
