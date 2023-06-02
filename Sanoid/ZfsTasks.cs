@@ -16,17 +16,17 @@ namespace Sanoid;
 internal static class ZfsTasks
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    const string SnapshotMutexName = "Global\\Sanoid.net_Snapshots";
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
     internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
     {
-        const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
-        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
+        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
         {
             case MutexAcquisitionErrno.Success:
             {
-                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
+                Logger.Trace( "Successfully acquired mutex {0}", SnapshotMutexName );
             }
                 break;
             // All of the error cases can just fall through, here, because we really don't care WHY it failed,
@@ -39,7 +39,7 @@ internal static class ZfsTasks
             case MutexAcquisitionErrno.AnotherProcessIsBusy:
             case MutexAcquisitionErrno.InvalidMutexNameRequested:
             {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
+                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", SnapshotMutexName, mutexAcquisitionResult.ErrorCode );
                 return mutexAcquisitionResult;
             }
             default:
@@ -109,7 +109,7 @@ internal static class ZfsTasks
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( snapshotMutexName );
+        Mutexes.ReleaseMutex( SnapshotMutexName );
 
         return Errno.EOK;
 
@@ -146,13 +146,12 @@ internal static class ZfsTasks
 
     internal static Errno PruneAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
     {
-        const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
-        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
+        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
         {
             case MutexAcquisitionErrno.Success:
             {
-                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
+                Logger.Trace( "Successfully acquired mutex {0}", SnapshotMutexName );
             }
                 break;
             // All of the error cases can just fall through, here, because we really don't care WHY it failed,
@@ -165,7 +164,7 @@ internal static class ZfsTasks
             case MutexAcquisitionErrno.AnotherProcessIsBusy:
             case MutexAcquisitionErrno.InvalidMutexNameRequested:
             {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
+                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", SnapshotMutexName, mutexAcquisitionResult.ErrorCode );
                 return mutexAcquisitionResult;
             }
             default:
@@ -248,7 +247,7 @@ internal static class ZfsTasks
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( snapshotMutexName );
+        Mutexes.ReleaseMutex( SnapshotMutexName );
 
         return Errno.EOK;
     }
