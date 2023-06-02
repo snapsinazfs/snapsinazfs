@@ -113,8 +113,7 @@ public class Dataset : ZfsObjectBase
         int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshotTimestamp );
         double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshotTimestamp ).TotalMinutes;
         // Check if more than FrequentPeriod ago or if the period of the hour is different.
-        bool lastFrequentSnapshotOutsideCurrentPeriod = minutesSinceLastFrequentSnapshot >= template.SnapshotTiming.FrequentPeriod || lastFrequentSnapshotPeriodOfHour != currentFrequentPeriodOfHour;
-        bool frequentSnapshotNeeded = lastFrequentSnapshotOutsideCurrentPeriod && template.SnapshotRetention.IsFrequentWanted;
+        bool frequentSnapshotNeeded = minutesSinceLastFrequentSnapshot >= template.SnapshotTiming.FrequentPeriod || lastFrequentSnapshotPeriodOfHour != currentFrequentPeriodOfHour;
         Logger.Debug( "Frequent snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, frequentSnapshotNeeded ? "" : "not " );
         return frequentSnapshotNeeded;
     }
@@ -132,9 +131,8 @@ public class Dataset : ZfsObjectBase
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
-        bool lastHourlySnapshotOutsudeCurrentHour = atLeastOneHourSinceLastHourlySnapshot
-                                                    || LastHourlySnapshotTimestamp.LocalDateTime.Hour != timestamp.LocalDateTime.Hour;
-        bool hourlySnapshotNeeded = lastHourlySnapshotOutsudeCurrentHour && retention.IsHourlyWanted;
+        bool hourlySnapshotNeeded = atLeastOneHourSinceLastHourlySnapshot
+                                    || LastHourlySnapshotTimestamp.LocalDateTime.Hour != timestamp.LocalDateTime.Hour;
         Logger.Debug( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? "" : "not " );
         return hourlySnapshotNeeded;
     }
@@ -152,9 +150,8 @@ public class Dataset : ZfsObjectBase
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
-        bool lastDailySnapshotOutsideCurrentDay = atLeastOneDaySinceLastDailySnapshot
-                                                  || LastDailySnapshotTimestamp.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
-        bool dailySnapshotNeeded = lastDailySnapshotOutsideCurrentDay && retention.IsDailyWanted;
+        bool lastDailyOnDifferentDayOfYear = LastDailySnapshotTimestamp.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
+        bool dailySnapshotNeeded = atLeastOneDaySinceLastDailySnapshot || lastDailyOnDifferentDayOfYear;
         Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
         return dailySnapshotNeeded;
     }
@@ -174,8 +171,7 @@ public class Dataset : ZfsObjectBase
         // Check if more than a week ago or if the week number is different by local rules, using the chosen day as the first day of the week
         int lastWeeklySnapshotWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( LastWeeklySnapshotTimestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
         int currentWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear( timestamp.LocalDateTime, CalendarWeekRule.FirstDay, template.SnapshotTiming.WeeklyDay );
-        bool lastWeeklySnapshotOutsideCurrentWeek = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber != lastWeeklySnapshotWeekNumber;
-        bool weeklySnapshotNeeded = lastWeeklySnapshotOutsideCurrentWeek && template.SnapshotRetention.IsWeeklyWanted;
+        bool weeklySnapshotNeeded = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber != lastWeeklySnapshotWeekNumber;
         Logger.Debug( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? "" : "not " );
         return weeklySnapshotNeeded;
     }
