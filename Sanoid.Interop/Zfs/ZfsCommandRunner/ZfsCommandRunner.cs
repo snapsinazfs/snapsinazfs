@@ -35,7 +35,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
     {
-        Logger.Debug( "Snapshot requested for dataset {0}", ds.Name );
+        Logger.Debug( "{0:G} snapshot requested for dataset {1}", period.Kind, ds.Name );
         snapshot = Snapshot.GetSnapshotForCommandRunner( ds, period, timestamp, settings );
         try
         {
