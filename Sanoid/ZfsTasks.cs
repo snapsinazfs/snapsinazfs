@@ -301,7 +301,7 @@ internal static class ZfsTasks
 
         if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out snapshot ) )
         {
-            ds.AllSnapshots[ snapshot.Name ] = snapshot;
+            ds.AddSnapshot( snapshot );
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );
             return true;
         }
