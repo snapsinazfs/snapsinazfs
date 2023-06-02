@@ -48,6 +48,12 @@ public class ZfsProperty
         { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", "local" ) },
+        { SnapshotRetentionFrequentPropertyName, new( SnapshotRetentionFrequentPropertyName, "0", "local" ) },
+        { SnapshotRetentionHourlyPropertyName, new( SnapshotRetentionHourlyPropertyName, "48", "local" ) },
+        { SnapshotRetentionMonthlyPropertyName, new( SnapshotRetentionMonthlyPropertyName, "6", "local" ) },
+        { SnapshotRetentionWeeklyPropertyName, new( SnapshotRetentionWeeklyPropertyName, "0", "local" ) },
+        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", "local" ) },
         { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", "local" ) },
         { TakeSnapshotsPropertyName, new( TakeSnapshotsPropertyName, "false", "local" ) },
         { RecursionPropertyName, new( RecursionPropertyName, "default", "local" ) }
@@ -62,6 +68,12 @@ public class ZfsProperty
         DatasetLastMonthlySnapshotTimestampPropertyName,
         DatasetLastWeeklySnapshotTimestampPropertyName,
         DatasetLastYearlySnapshotTimestampPropertyName,
+        SnapshotRetentionDailyPropertyName,
+        SnapshotRetentionFrequentPropertyName,
+        SnapshotRetentionHourlyPropertyName,
+        SnapshotRetentionMonthlyPropertyName,
+        SnapshotRetentionWeeklyPropertyName,
+        SnapshotRetentionYearlyPropertyName,
         PruneSnapshotsPropertyName,
         RecursionPropertyName,
         TakeSnapshotsPropertyName,
@@ -92,6 +104,12 @@ public class ZfsProperty
     public const string DatasetLastMonthlySnapshotTimestampPropertyName = "sanoid.net:lastmonthlysnapshottimestamp";
     public const string DatasetLastWeeklySnapshotTimestampPropertyName = "sanoid.net:lastweeklysnapshottimestamp";
     public const string DatasetLastYearlySnapshotTimestampPropertyName = "sanoid.net:lastyearlysnapshottimestamp";
+    public const string SnapshotRetentionDailyPropertyName = "sanoid.net:retention:daily";
+    public const string SnapshotRetentionFrequentPropertyName = "sanoid.net:retention:frequent";
+    public const string SnapshotRetentionHourlyPropertyName = "sanoid.net:retention:hourly";
+    public const string SnapshotRetentionMonthlyPropertyName = "sanoid.net:retention:monthly";
+    public const string SnapshotRetentionWeeklyPropertyName = "sanoid.net:retention:weekly";
+    public const string SnapshotRetentionYearlyPropertyName = "sanoid.net:retention:yearly";
     public const string PruneSnapshotsPropertyName = "sanoid.net:prunesnapshots";
     public const string TakeSnapshotsPropertyName = "sanoid.net:takesnapshots";
     public const string RecursionPropertyName = "sanoid.net:recursion";

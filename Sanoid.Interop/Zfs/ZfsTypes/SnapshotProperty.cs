@@ -32,7 +32,14 @@ public class SnapshotProperty : ZfsProperty
         SnapshotNamePropertyName,
         PeriodPropertyName,
         TimestampPropertyName,
-        TemplatePropertyName
+        TemplatePropertyName,
+        SnapshotRetentionDailyPropertyName,
+        SnapshotRetentionFrequentPropertyName,
+        SnapshotRetentionHourlyPropertyName,
+        SnapshotRetentionMonthlyPropertyName,
+        SnapshotRetentionWeeklyPropertyName,
+        SnapshotRetentionYearlyPropertyName
+
     } );
 
     public const string SnapshotNamePropertyName = "sanoid.net:snapshotname";
