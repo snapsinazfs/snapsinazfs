@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -82,7 +82,7 @@ public class Dataset : ZfsObjectBase
         }
     }
 
-    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+    public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
 
     [JsonIgnore]
     public bool TakeSnapshots
@@ -369,6 +369,6 @@ public class Dataset : ZfsObjectBase
     public void AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
-        Snapshots[ snap.Name ] = snap;
+        AllSnapshots[ snap.Name ] = snap;
     }
 }

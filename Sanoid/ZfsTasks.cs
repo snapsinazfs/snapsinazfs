@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -230,7 +230,7 @@ internal static class ZfsTasks
 
         if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out snapshot ) )
         {
-            ds.Snapshots[ snapshot.Name ] = snapshot;
+            ds.AllSnapshots[ snapshot.Name ] = snapshot;
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );
             return true;
         }
