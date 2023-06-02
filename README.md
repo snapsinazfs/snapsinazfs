@@ -4,9 +4,8 @@
 
  ## Status
 
- As of today (2023-06-01), Sanoid.net is capable of taking (but not pruning) frequent, hourly, daily, and weekly
- snapshots, using configuration stored in ZFS itself, via user properties. I will be adding monthly and yearly
- snapshot functionality shortly, and then will move on to pruning.
+ As of today (2023-06-02), Sanoid.net is capable of taking (but not pruning) snapshots, using configuration
+ stored in ZFS itself, via user properties. Snapshot pruning is the next work item.
 
  Once taking and pruning snapshots work as intended, I may make an alpha release tag and possibly provide a
  pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an
