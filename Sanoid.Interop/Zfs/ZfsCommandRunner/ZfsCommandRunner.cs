@@ -62,7 +62,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( settings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
-            return true;
+            return false;
         }
 
         Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
