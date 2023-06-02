@@ -185,6 +185,17 @@ internal class Program
             Logger.Info( "Not taking snapshots" );
         }
 
+        // Handle pruning old snapshots, if requested
+        if ( settings is { PruneSnapshots: true } )
+        {
+            Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
+            ZfsTasks.PruneAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, ref datasets );
+        }
+        else
+        {
+            Logger.Info( "Not pruning snapshots" );
+        }
+
         Logger.Fatal( "Not yet implemented." );
         Logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
         Logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
