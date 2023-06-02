@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -101,6 +101,8 @@ public class Dataset : ZfsObjectBase
 
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         int currentFrequentPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( timestamp );
         int lastFrequentSnapshotPeriodOfHour = template.SnapshotTiming.GetPeriodOfHour( LastFrequentSnapshotTimestamp );
@@ -114,6 +116,8 @@ public class Dataset : ZfsObjectBase
 
     public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
         Logger.Trace( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
@@ -127,6 +131,8 @@ public class Dataset : ZfsObjectBase
 
     public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
         Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
@@ -140,6 +146,8 @@ public class Dataset : ZfsObjectBase
 
     public bool IsWeeklySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
         Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         TimeSpan timeSinceLastWeeklySnapshot = timestamp - LastWeeklySnapshotTimestamp;
         bool atLeastOneWeekSinceLastWeeklySnapshot = timeSinceLastWeeklySnapshot.TotalDays >= 7d;
