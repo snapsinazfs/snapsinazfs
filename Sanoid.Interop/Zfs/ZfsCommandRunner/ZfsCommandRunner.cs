@@ -460,38 +460,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return dataSets.ToImmutable( );
     }
 
-    /// <exception cref="ArgumentNullException">If <paramref name="zfsPath" /> is null, empty, or only whitespace</exception>
-    public UpdateZfsPropertySchemaResult UpdateZfsPropertySchema( string zfsPath, bool dryRun )
-    {
-        // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ZfsObjectBase.ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
-        {
-            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
-        }
-
-        UpdateZfsPropertySchemaResult result = new( )
-        {
-            ExistingProperties = GetZfsProperties( ZfsObjectKind.FileSystem, zfsPath )
-        };
-
-        Dictionary<string, ZfsProperty> propertiesToAdd = new( );
-
-        foreach ( ( string key, ZfsProperty prop ) in ZfsProperty.DefaultDatasetProperties )
-        {
-            if ( result.ExistingProperties.ContainsKey( key ) )
-            {
-                continue;
-            }
-
-            propertiesToAdd.Add( key, prop );
-        }
-
-        PrivateSetZfsProperty( dryRun, zfsPath, propertiesToAdd.Values.ToArray( ) );
-        result.AddedProperties = propertiesToAdd;
-        return result;
-    }
-
     /// <inheritdoc cref="SetZfsProperties" />
     /// <remarks>
     ///     Does not perform name validation
