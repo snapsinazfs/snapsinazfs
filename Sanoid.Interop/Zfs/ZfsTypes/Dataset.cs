@@ -93,6 +93,58 @@ public class Dataset : ZfsObjectBase
             }
         }
 
+        if ( DailySnapshots.Count > template.SnapshotRetention.Daily )
+        {
+            int numberToPrune = DailySnapshots.Count - template.SnapshotRetention.Daily;
+            Logger.Debug( "Need to prune oldest {0} daily snapshots from dataset {1}", numberToPrune, Name );
+            DailySnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot dailySnapshot = DailySnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", dailySnapshot.Name );
+                snapshotsToPrune.Add( dailySnapshot );
+            }
+        }
+
+        if ( WeeklySnapshots.Count > template.SnapshotRetention.Weekly )
+        {
+            int numberToPrune = WeeklySnapshots.Count - template.SnapshotRetention.Weekly;
+            Logger.Debug( "Need to prune oldest {0} weekly snapshots from dataset {1}", numberToPrune, Name );
+            WeeklySnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot weeklySnapshot = WeeklySnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", weeklySnapshot.Name );
+                snapshotsToPrune.Add( weeklySnapshot );
+            }
+        }
+
+        if ( MonthlySnapshots.Count > template.SnapshotRetention.Monthly )
+        {
+            int numberToPrune = MonthlySnapshots.Count - template.SnapshotRetention.Monthly;
+            Logger.Debug( "Need to prune oldest {0} monthly snapshots from dataset {1}", numberToPrune, Name );
+            MonthlySnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot monthlySnapshot = MonthlySnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", monthlySnapshot.Name );
+                snapshotsToPrune.Add( monthlySnapshot );
+            }
+        }
+
+        if ( YearlySnapshots.Count > template.SnapshotRetention.Yearly )
+        {
+            int numberToPrune = YearlySnapshots.Count - template.SnapshotRetention.Yearly;
+            Logger.Debug( "Need to prune oldest {0} yearly snapshots from dataset {1}", numberToPrune, Name );
+            YearlySnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot yearlySnapshot = YearlySnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", yearlySnapshot.Name );
+                snapshotsToPrune.Add( yearlySnapshot );
+            }
+        }
+
         return snapshotsToPrune;
     }
 
