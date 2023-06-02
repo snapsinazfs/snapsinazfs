@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using NLog;
 
@@ -81,7 +82,10 @@ public class ZfsProperty
     public string SetString => $"{Name}={Value}";
 
     public string Source { get; set; }
+
+    [MaxLength(8192)]
     public string Value { get; set; }
+
     public const string DatasetLastDailySnapshotTimestampPropertyName = "sanoid.net:lastdailysnapshottimestamp";
     public const string DatasetLastFrequentSnapshotTimestampPropertyName = "sanoid.net:lastfrequentsnapshottimestamp";
     public const string DatasetLastHourlySnapshotTimestampPropertyName = "sanoid.net:lasthourlysnapshottimestamp";
