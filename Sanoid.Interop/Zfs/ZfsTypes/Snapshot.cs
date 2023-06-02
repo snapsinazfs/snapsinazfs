@@ -12,7 +12,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// <summary>
 ///     A ZFS snapshot
 /// </summary>
-public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
+public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapshot>
 {
     private Snapshot( string name )
         : base( name, ZfsObjectKind.Snapshot )
@@ -255,5 +255,20 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
 
             return 0 - x!.CompareTo( y );
         }
+    }
+
+    /// <inheritdoc />
+    public bool Equals( Snapshot? other )
+    {
+        // First, check for reference equality
+        if(ReferenceEquals(this,other))
+            return true;
+
+        // If the other is null, obviously we're not equal
+        if( other == null )
+            return false;
+
+        // If our names are the same, we're the same snapshot
+        return Name == other.Name;
     }
 }
