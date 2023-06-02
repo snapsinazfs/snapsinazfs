@@ -12,59 +12,29 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class ZfsProperty
 {
-    public ZfsProperty( string propertyNamespace, string propertyName, string propertyValue, string valueSource )
+    public ZfsProperty( string propertyName, string propertyValue, string valueSource )
     {
-        Namespace = propertyNamespace;
         Name = propertyName;
         Value = propertyValue;
         Source = valueSource;
     }
 
-    protected internal ZfsProperty( string name, string value, ZfsPropertySource source )
+    protected internal ZfsProperty( string propertyName, string propertyValue, ZfsPropertySource valueSource )
     {
-        if ( name.Contains( ':' ) )
-        {
-            string[] parts = name.Split( ':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            Namespace = $"{parts[ 0 ]}:";
-            Name = parts[ 1 ];
-        }
-        else
-        {
-            Namespace = string.Empty;
-            Name = name;
-        }
-
-        Value = value;
-        Source = source;
+        Name = propertyName;
+        Value = propertyValue;
+        Source = valueSource;
     }
 
     private ZfsProperty( string[] components )
     {
         Logger.Trace( "Creating new ZfsProperty from array: [{0}]", string.Join( ",", components ) );
-        string[] nameComponents = components[ 0 ].Split( ':', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-        switch ( nameComponents.Length )
-        {
-            case 2:
-            {
-                string namespaceComponent = nameComponents[ 0 ];
-                Logger.Trace( "New property is in namespace {0}", namespaceComponent );
-                Namespace = $"{namespaceComponent}:";
-                Name = nameComponents[ 1 ];
-                break;
-            }
-            default:
-            {
-                Logger.Trace( "New property has no namespace" );
-                Namespace = string.Empty;
-                Name = components[ 0 ];
-                break;
-            }
-        }
-
+        
+        Name = components[ 0 ];
         Value = components[ 1 ];
         Source = components[ 2 ];
 
-        Logger.Trace( "ZfsProperty created: {0}({1})", FullName, Value );
+        Logger.Trace( "ZfsProperty created: {0}({1})", Name, Value );
     }
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
@@ -81,8 +51,6 @@ public class ZfsProperty
         { "sanoid.net:takesnapshots", new( "sanoid.net:takesnapshots", "false", "local" ) },
         { "sanoid.net:recursion", new( "sanoid.net:recursion", "default", "local" ) }
     } );
-
-    public string FullName => $"{Namespace}{Name}";
 
     public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
@@ -103,9 +71,6 @@ public class ZfsProperty
     public string Name { get; }
 
     [JsonIgnore]
-    public string Namespace { get; }
-
-    [JsonIgnore]
     public ZfsPropertySource PropertySource
     {
         get => Source;
@@ -113,7 +78,7 @@ public class ZfsProperty
     }
 
     [JsonIgnore]
-    public string SetString => $"{FullName}={Value}";
+    public string SetString => $"{Name}={Value}";
 
     public string Source { get; set; }
     public string Value { get; set; }
@@ -129,7 +94,7 @@ public class ZfsProperty
     /// <inheritdoc />
     public override string ToString( )
     {
-        return $"{FullName}: {Value}";
+        return $"{Name}: {Value}";
     }
 
     public static bool TryParse( string value, out ZfsProperty? property )

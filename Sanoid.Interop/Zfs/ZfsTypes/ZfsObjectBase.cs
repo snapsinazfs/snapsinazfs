@@ -171,6 +171,6 @@ public abstract class ZfsObjectBase
     public void AddProperty( ZfsProperty prop )
     {
         Logger.Trace( "Adding property {0} to Properties collection of {1}", prop, Name );
-        Properties[ prop.FullName ] = prop;
+        Properties[ prop.Name ] = prop;
     }
 }

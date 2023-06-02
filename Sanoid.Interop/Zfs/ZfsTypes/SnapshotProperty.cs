@@ -20,33 +20,27 @@ public class SnapshotProperty : ZfsProperty
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { "sanoid.net:snapshotname", new( "sanoid.net:", "snapshotname", "@@INVALID@@", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshotperiod", new( "sanoid.net:", "snapshotperiod", "temporary", ZfsPropertySource.Sanoid ) },
-        { "sanoid.net:snapshottimestamp", new( "sanoid.net:", "snapshottimestamp", DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySource.Sanoid ) }
+        { NamePropertyName, new( NamePropertyName, "@@INVALID@@", (string)ZfsPropertySource.Sanoid ) },
+        { PeriodPropertyName, new(PeriodPropertyName, "temporary", (string)ZfsPropertySource.Sanoid ) },
+        { TimestampPropertyName, new(TimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), (string)ZfsPropertySource.Sanoid ) }
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
-        "sanoid.net:prunesnapshots",
-        "sanoid.net:recursion",
-        "sanoid.net:snapshotname",
-        "sanoid.net:snapshotperiod",
-        "sanoid.net:snapshottimestamp",
-        "sanoid.net:template"
+        PrunePropertyName,
+        RecursionPropertyName,
+        NamePropertyName,
+        PeriodPropertyName,
+        TimestampPropertyName,
+        TemplatePropertyName
     } );
 
     public const string NamePropertyName = "sanoid.net:snapshotname";
-    public const string NamePropertyShortName = "snapshotname";
     public const string PeriodPropertyName = "sanoid.net:snapshotperiod";
-    public const string PeriodPropertyShortName = "snapshotperiod";
     public const string PrunePropertyName = "sanoid.net:prunesnapshots";
-    public const string PrunePropertyShortName = "prunesnapshots";
     public const string RecursionPropertyName = "sanoid.net:recursion";
-    public const string RecursionPropertyShortName = "recursion";
     public const string TemplatePropertyName = "sanoid.net:template";
-    public const string TemplatePropertyShortName = "template";
     public const string TimestampPropertyName = "sanoid.net:snapshottimestamp";
-    public const string TimestampPropertyShortName = "snapshottimestamp";
 
     public enum SnapshotPropertyKind
     {
@@ -62,12 +56,12 @@ public class SnapshotProperty : ZfsProperty
     {
         return kind switch
         {
-            SnapshotPropertyKind.Name => new( NamePropertyShortName, value, source ),
-            SnapshotPropertyKind.Period => new( PeriodPropertyShortName, value, source ),
-            SnapshotPropertyKind.Prune => new( PrunePropertyShortName, value, source ),
-            SnapshotPropertyKind.Recursion => new( RecursionPropertyShortName, value, source ),
-            SnapshotPropertyKind.Template => new( TemplatePropertyShortName, value, source ),
-            SnapshotPropertyKind.Timestamp => new( TimestampPropertyShortName, value, source ),
+            SnapshotPropertyKind.Name => new( NamePropertyName, value, source ),
+            SnapshotPropertyKind.Period => new( PeriodPropertyName, value, source ),
+            SnapshotPropertyKind.Prune => new( PrunePropertyName, value, source ),
+            SnapshotPropertyKind.Recursion => new( RecursionPropertyName, value, source ),
+            SnapshotPropertyKind.Template => new( TemplatePropertyName, value, source ),
+            SnapshotPropertyKind.Timestamp => new( TimestampPropertyName, value, source ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), kind, "Invalid snapshot property kind provided" )
         };
     }
