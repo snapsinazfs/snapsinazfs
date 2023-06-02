@@ -61,9 +61,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         };
         if ( settings.DryRun )
         {
-            Logger.Info("DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
             return true;
         }
+
         Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
         try
         {
@@ -138,7 +139,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperties(bool dryRun, string zfsPath, params ZfsProperty[] properties )
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -150,13 +151,30 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return PrivateSetZfsProperty( dryRun, zfsPath, properties );
     }
 
-    /// A
-    /// <see cref="Dictionary{TKey,TValue}" />
-    /// of
-    /// <see langword="string" />
-    /// to
-    /// <see cref="Dataset" />
-    /// of all datasets in zfs, with sanoid.net properties populated
+    /// <summary>Gets properties for datasets, either recursively (default) or using supplied arguments</summary>
+    /// <returns>
+    ///     A  <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" />
+    ///     of all datasets in zfs, with sanoid.net properties populated
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    ///     <list type="bullet">
+    ///         <listheader>
+    ///             <description>
+    ///                 Thrown for the following reasons:
+    ///             </description>
+    ///         </listheader>
+    ///         <item>
+    ///             <description>
+    ///                 If an exception is thrown when executing the zfs process
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 If a parse error occurs
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </exception>
     public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
     {
         Dictionary<string, Dataset> datasets = new( );
@@ -285,14 +303,15 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( lineTokens.Length < SnapshotProperty.KnownSnapshotProperties.Count )
                 {
                     Logger.Error( "Line {0} not understood", outputLine );
-                    throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {SnapshotProperty.KnownSnapshotProperties.Count } tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
+                    throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {SnapshotProperty.KnownSnapshotProperties.Count} tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
                 }
 
                 if ( lineTokens[ 2 ] == "-" )
                 {
-                    Logger.Trace("Output line is not a sanoid.net snapshot - skipping");
+                    Logger.Trace( "Output line is not a sanoid.net snapshot - skipping" );
                     continue;
                 }
+
                 Snapshot snap = Snapshot.FromListSnapshots( lineTokens );
                 snapshots.TryAdd( snap.Name, snap );
                 datasets[ snap.DatasetName ].AddSnapshot( snap );
@@ -394,7 +413,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
-    private bool PrivateSetZfsProperty(bool dryRun, string zfsPath, params ZfsProperty[] properties )
+    private bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
@@ -410,6 +429,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsPath, zfsSetStartInfo.Arguments );
                 return true;
             }
+
             Logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
             try
             {
