@@ -224,34 +224,52 @@ internal static class ZfsTasks
         return false;
     }
 
-    internal static void UpdateZfsDatasetSchema( bool dryRun, ref Dictionary<string, Dictionary<string, ZfsProperty>> poolPropertyCollections, IZfsCommandRunner zfsCommandRunner )
+    internal static bool UpdateZfsDatasetSchema( bool dryRun, ref Dictionary<string, Dictionary<string, ZfsProperty>> missingPropertiesByPool, IZfsCommandRunner zfsCommandRunner )
     {
+        bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
-        foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in poolPropertyCollections )
+        foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in missingPropertiesByPool )
         {
             Logger.Info( "Updating properties for pool {0}", poolName );
+
+            // It's not a nullable type...
+            // ReSharper disable once ExceptionNotDocumentedOptional
             ZfsProperty[] propertyArray = propertiesToAdd.Values.ToArray( );
+
+            // Attempt to set the missing properties for the pool.
+            // Log an error if unsuccessful
             if ( !zfsCommandRunner.SetZfsProperties( dryRun, poolName, propertyArray ) )
             {
+                errorsEncountered = true;
                 Logger.Error( "Failed updating properties for pool {0}. Unset properties: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
             }
-
-            Logger.Info( "Finished updating properties for pool {0}", poolName );
+            else
+            {
+                Logger.Info( "Finished updating properties for pool {0}", poolName );
+            }
         }
 
         Logger.Debug( "Finished updating zfs properties schema for all pool roots" );
+        if ( errorsEncountered )
+        {
+            Logger.Error( "Some operations failed. See previous log output." );
+        }
+
+        return !errorsEncountered;
     }
 
     public static (Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound) CheckZfsPropertiesSchema( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
+        Logger.Debug( "Checking zfs properties schema" );
+
         Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
 
-        Logger.Debug( "Checking zfs properties schema" );
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
+
         foreach ( ( string poolName, Dataset? pool ) in poolRoots )
         {
-            Logger.Info( "Checking properties for pool {0}", poolName );
+            Logger.Debug( "Checking properties for pool {0}", poolName );
             Logger.Trace( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
             Dictionary<string, ZfsProperty> missingProperties = new( );
 
@@ -276,8 +294,13 @@ internal static class ZfsTasks
 
             Logger.Debug( "Finished checking properties for pool {0}", poolName );
 
+            // Can't be null because we literally constructed it above...
+            // ReSharper disable ExceptionNotDocumentedOptional
             missingPropertiesFound = missingPoolPropertyCollections.Any( );
             bool missingPropertiesFoundForPool = missingProperties.Any( );
+            // ReSharper restore ExceptionNotDocumentedOptional
+
+            // Now let's act on what we found for this pool, based on command-line arguments
             switch ( args )
             {
                 case { CheckZfsProperties: true } when missingPropertiesFoundForPool:

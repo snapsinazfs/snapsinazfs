@@ -27,6 +27,8 @@ internal class Program
     {
         LoggingSettings.ConfigureLogger( );
 
+        DateTimeOffset currentTimestamp = DateTimeOffset.Now;
+
         Logger.Trace( "Parsing command-line arguments" );
         CommandLineArguments? args = Args.Parse<CommandLineArguments>( argv );
 
@@ -129,43 +131,58 @@ internal class Program
 
         ( Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound ) = ZfsTasks.CheckZfsPropertiesSchema( zfsCommandRunner, args );
 
+        // Check
         switch ( args )
         {
             case { CheckZfsProperties: true } when !missingPropertiesFound:
             {
+                // Requested check and no properties were missing.
+                // Return 0
                 return (int)Errno.EOK;
             }
             case { CheckZfsProperties: true } when missingPropertiesFound:
             {
+                // Requested check and some properties were missing.
+                // Return ENOATTR (1093)
                 return (int)Errno.ENOATTR;
             }
             case { CheckZfsProperties: false, PrepareZfsProperties: false } when missingPropertiesFound:
             {
+                // Did not request check or update (normal run) but properties were missing.
+                // Cannot safely do anything useful
+                // Log a fatal error and exit with ENOATTR
                 Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
                 return (int)Errno.ENOATTR;
             }
             case { PrepareZfsProperties: true }:
             {
-                ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner );
-                return (int)Errno.EOK;
+                // Requested schema update
+                // Run the update and return EOK or ENOATTR based on success of the updates
+                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner ) 
+                    ? (int)Errno.EOK
+                    : (int)Errno.ENOATTR;
             }
         }
 
+        // TODO: Make this a single pass
+        // This is pretty redundant.
+        // Since we are guaranteed a good schema from this point, we can just use list operations and
+        // just ask for filesystem,volume,snapshot, and process accordingly
         Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
-//Logger.Debug( "Getting sanoid snapshots" );
-//Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( ref datasets );
-//Logger.Debug( "Finished getting sanoid snapshots" );
+        Logger.Trace( "Getting sanoid snapshots" );
+        Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( ref datasets );
+        Logger.Trace( "Finished getting sanoid snapshots" );
 
+        // Handle taking new snapshots, if requested
         if ( settings is { TakeSnapshots: true } )
         {
-            DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-            Logger.Debug( "TakeSnapshots is true. Taking daily snapshots for testing purposes using timestamp {0:O}", currentTimestamp );
+            Logger.Debug( "TakeSnapshots is true. Taking daily snapshots using timestamp {0:O}", currentTimestamp );
             ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, SnapshotPeriod.Daily, currentTimestamp, ref datasets );
         }
         else
         {
-            Logger.Warn( "TakeSnapshots is false" );
+            Logger.Info( "Not taking snapshots" );
         }
 
         Logger.Fatal( "Not yet implemented." );
