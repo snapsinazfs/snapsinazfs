@@ -6,51 +6,12 @@
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public sealed class ZfsPropertySource
+public static class ZfsPropertySource
 {
-    private ZfsPropertySource( ZfsPropertySourceKind kind )
-    {
-        _kind = kind;
-    }
-
-    private readonly ZfsPropertySourceKind _kind;
-
-    public static ZfsPropertySource Default { get; } = new( ZfsPropertySourceKind.Default );
-    public static ZfsPropertySource Inherited { get; } = new( ZfsPropertySourceKind.Inherited );
+    public const string Default = "default";
+    public const string Inherited = "inherited";
     public const string Local = "local";
-    public static ZfsPropertySource Unknown { get; } = new( ZfsPropertySourceKind.Unknown );
+    public const string None = "-";
+    public const string Received = "received";
     public const string Sanoid = "sanoid";
-
-    /// <summary>
-    ///     Implicit conversion from string to <see cref="ZfsPropertySource" />
-    /// </summary>
-    /// <param name="value">The string to convert to a <see cref="ZfsPropertySource" /></param>
-    /// <remarks>
-    ///     Assumes that any string that isn't explicitly defined indicates the property is inherited.
-    /// </remarks>
-    public static implicit operator ZfsPropertySource( string value )
-    {
-        return value.ToLowerInvariant( ) switch
-        {
-            "local" => Local,
-            "default" => Default,
-            "sanoid" => Sanoid,
-            "-" => Unknown,
-            _ => Inherited
-        };
-    }
-
-    /// <inheritdoc />
-    public override string ToString( )
-    {
-        return _kind switch
-        {
-            ZfsPropertySourceKind.Default => "default",
-            ZfsPropertySourceKind.Local => "local",
-            ZfsPropertySourceKind.Native => "native",
-            ZfsPropertySourceKind.Inherited => "inherited",
-            ZfsPropertySourceKind.Sanoid => "sanoid",
-            _ => "-"
-        };
-    }
 }
