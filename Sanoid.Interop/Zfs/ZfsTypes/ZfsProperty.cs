@@ -200,9 +200,3 @@ public class ZfsProperty
         return $"{Name}: {Value}";
     }
 }
-
-public static partial class ZfsPropertyParseRegexes
-{
-    [GeneratedRegex( "^(?<Name>(?<Dataset>[A-Za-z][A-Za-z0-9_.: -]*?[A-Za-z0-9_.:-](?:/[A-Za-z0-9_.:-][A-Za-z0-9_.: -]*?[A-Za-z0-9_.:-]*?)*)(?<Snapshot>@[A-Za-z0-9][A-Za-z0-9_.: -]*?[A-Za-z0-9_.:-]*?)?)\t(?<Property>type|sanoid\\.net:[a-z0-9:_.-]+)\t(?<Value>[a-zA-Z0-9@:. _+-]+)\t(?<Source>(?<UndefinedSource>-)|(?<DefaultSource>default)|(?<LocalSource>local)|inherited from (?<InheritedSource>[A-Za-z0-9_.: @/-]+))" )]
-    public static partial Regex ZfsPropertyParseRegex( );
-}
