@@ -125,6 +125,7 @@ public abstract class ZfsObjectBase
     /// <exception cref="ArgumentNullException">If <paramref name="name" /> is null, empty, or only whitespace</exception>
     public static bool ValidateName( ZfsObjectKind kind, string name, Regex? validatorRegex = null )
     {
+        Logger.Debug( "Validating {0} name \"{1}\"", kind.ToString( ), name );
         if ( string.IsNullOrWhiteSpace( name ) )
         {
             throw new ArgumentNullException( nameof( name ), "name must be a non-null, non-empty, non-whitespace string" );
@@ -143,7 +144,6 @@ public abstract class ZfsObjectBase
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified to ValidateName." )
         };
 
-        // ReSharper disable once ExceptionNotDocumentedOptional
         MatchCollection matches = validatorRegex.Matches( name );
 
         if ( matches.Count == 0 )
@@ -151,12 +151,19 @@ public abstract class ZfsObjectBase
             return false;
         }
 
-        Logger.Debug( "Checking regex matches for {0}", name );
+        Logger.Trace( "Checking regex matches for {0}", name );
         // No matter which kind was specified, the pool group should exist and be a match
         for ( int matchIndex = 0; matchIndex < matches.Count; matchIndex++ )
         {
             Match match = matches[ matchIndex ];
-            Logger.Debug( "Inspecting match {0}", match.Value );
+            Logger.Trace( "Inspecting match {0}", match.Value );
+            if ( match.Success )
+            {
+                continue;
+            }
+
+            Logger.Error( "Name of {0} {1} is invalid", kind.ToString( ), name );
+            return false;
         }
 
         Logger.Debug( "Name of {0} {1} is valid", kind, name );
