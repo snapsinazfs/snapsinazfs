@@ -12,7 +12,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// <summary>
 ///     A ZFS snapshot
 /// </summary>
-public class Snapshot : ZfsObjectBase
+public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
 {
     private Snapshot( string name )
         : base( name, ZfsObjectKind.Snapshot )
@@ -65,6 +65,91 @@ public class Snapshot : ZfsObjectBase
     }
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    /// <summary>
+    ///     Compares the current instance with another <see cref="Snapshot" /> and returns an integer that indicates
+    ///     whether the current instance precedes, follows, or occurs in the same position in the sort order as the other
+    ///     <see cref="Snapshot" />.
+    /// </summary>
+    /// <param name="other">Another <see cref="Snapshot" /> to compare with this instance.</param>
+    /// <returns>
+    ///     A value that indicates the relative order of the <see cref="Snapshot" />s being compared. The return value has
+    ///     these meanings:
+    ///     <list type="table">
+    ///         <listheader>
+    ///             <term> Value</term><description> Meaning</description>
+    ///         </listheader>
+    ///         <item>
+    ///             <term> Less than zero</term>
+    ///             <description> This instance precedes <paramref name="other" /> in the sort order.</description>
+    ///         </item>
+    ///         <item>
+    ///             <term> Zero</term>
+    ///             <description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description>
+    ///         </item>
+    ///         <item>
+    ///             <term> Greater than zero</term>
+    ///             <description> This instance follows <paramref name="other" /> in the sort order.</description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
+    /// <remarks>
+    /// Sort order is as follows:
+    ///     <list type="number">
+    ///         <listheader>
+    ///             <term>Condition</term><description>Result</description>
+    ///         </listheader>
+    ///         <item>
+    ///             <term>Other <see cref="Snapshot?"/> is null or has a null <see cref="Timestamp"/></term>
+    ///             <description>This <see cref="Snapshot"/> precedes <paramref name="other" /> in the sort order.</description>
+    ///         </item>
+    ///         <item>
+    ///             <term><see cref="Timestamp"/> of this <see cref="Snapshot"/> is null</term>
+    ///             <description>This <see cref="Snapshot"/> follows <paramref name="other" /> in the sort order.</description>
+    ///         </item>
+    ///         <item>
+    ///             <term><see cref="Timestamp"/> of each <see cref="Snapshot"/> is different</term>
+    ///             <description>Sort by <see cref="Timestamp"/>, using system rules for the <see cref="DateTimeOffset"/> type</description>
+    ///         </item>
+    ///         <item>
+    ///             <term><see cref="Period"/> of each <see cref="Snapshot"/> is different</term>
+    ///             <description>Delegate sort order to <see cref="SnapshotPeriod"/>, using <see cref="Period"/> of each</description>
+    ///         </item>
+    ///         <item>
+    ///             <term><see cref="Period"/>s of both <see cref="Snapshot"/>s are equal</term>
+    ///             <description>Sort by <see cref="ZfsObjectBase.Name"/></description>
+    ///         </item>
+    ///     </list>
+    /// </remarks>
+    public int CompareTo( Snapshot? other )
+    {
+        // If the other snapshot is null or has a null timestamp, consider this snapshot earlier rank
+        if ( other?.Timestamp is null )
+        {
+            return -1;
+        }
+
+        // If our timestamp is null, and the other isn't, consider this snapshot later rank
+        if ( Timestamp is null )
+        {
+            return 1;
+        }
+
+        // If timestamps are different, sort on timestamps
+        if ( other.Timestamp != Timestamp )
+        {
+            return Timestamp.Value.CompareTo( other.Timestamp.Value );
+        }
+        
+        // If timestamps are different, sort on period
+        if ( Period != other.Period )
+        {
+            return Period.CompareTo( other.Period );
+        }
+
+        // If periods are the same, sort by name
+        return Name.CompareTo( other.Name );
+    }
 
     public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
