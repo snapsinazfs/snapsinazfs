@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -94,30 +94,33 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
     ///     </list>
     /// </returns>
     /// <remarks>
-    /// Sort order is as follows:
+    ///     Sort order is as follows:
     ///     <list type="number">
     ///         <listheader>
     ///             <term>Condition</term><description>Result</description>
     ///         </listheader>
     ///         <item>
-    ///             <term>Other <see cref="Snapshot?"/> is null or has a null <see cref="Timestamp"/></term>
-    ///             <description>This <see cref="Snapshot"/> precedes <paramref name="other" /> in the sort order.</description>
+    ///             <term>Other <see cref="Snapshot?" /> is null or has a null <see cref="Timestamp" /></term>
+    ///             <description>This <see cref="Snapshot" /> precedes <paramref name="other" /> in the sort order.</description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Timestamp"/> of this <see cref="Snapshot"/> is null</term>
-    ///             <description>This <see cref="Snapshot"/> follows <paramref name="other" /> in the sort order.</description>
+    ///             <term><see cref="Timestamp" /> of this <see cref="Snapshot" /> is null</term>
+    ///             <description>This <see cref="Snapshot" /> follows <paramref name="other" /> in the sort order.</description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Timestamp"/> of each <see cref="Snapshot"/> is different</term>
-    ///             <description>Sort by <see cref="Timestamp"/>, using system rules for the <see cref="DateTimeOffset"/> type</description>
+    ///             <term><see cref="Timestamp" /> of each <see cref="Snapshot" /> is different</term>
+    ///             <description>
+    ///                 Sort by <see cref="Timestamp" />, using system rules for the <see cref="DateTimeOffset" />
+    ///                 type
+    ///             </description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Period"/> of each <see cref="Snapshot"/> is different</term>
-    ///             <description>Delegate sort order to <see cref="SnapshotPeriod"/>, using <see cref="Period"/> of each</description>
+    ///             <term><see cref="Period" /> of each <see cref="Snapshot" /> is different</term>
+    ///             <description>Delegate sort order to <see cref="SnapshotPeriod" />, using <see cref="Period" /> of each</description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Period"/>s of both <see cref="Snapshot"/>s are equal</term>
-    ///             <description>Sort by <see cref="ZfsObjectBase.Name"/></description>
+    ///             <term><see cref="Period" />s of both <see cref="Snapshot" />s are equal</term>
+    ///             <description>Sort by <see cref="ZfsObjectBase.Name" /></description>
     ///         </item>
     ///     </list>
     /// </remarks>
