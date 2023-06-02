@@ -45,10 +45,7 @@ public class ZfsProperty
                 case DatasetLastWeeklySnapshotTimestampPropertyName:
                 case DatasetLastMonthlySnapshotTimestampPropertyName:
                 case DatasetLastYearlySnapshotTimestampPropertyName:
-                {
                     return DateTimeOffset.TryParse( Value, out _ );
-                }
-                    break;
                 case RecursionPropertyName:
                 {
                     return Value switch
@@ -103,44 +100,44 @@ public class ZfsProperty
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { TemplatePropertyName, new( TemplatePropertyName, "default", "local" ) },
         { EnabledPropertyName, new( EnabledPropertyName, "false", "local" ) },
-        { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { TakeSnapshotsPropertyName, new( TakeSnapshotsPropertyName, "false", "local" ) },
+        { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", "local" ) },
+        { RecursionPropertyName, new( RecursionPropertyName, "default", "local" ) },
+        { TemplatePropertyName, new( TemplatePropertyName, "default", "local" ) },
         { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
+        { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
         { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), "local" ) },
-        { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", "local" ) },
         { SnapshotRetentionFrequentPropertyName, new( SnapshotRetentionFrequentPropertyName, "0", "local" ) },
         { SnapshotRetentionHourlyPropertyName, new( SnapshotRetentionHourlyPropertyName, "48", "local" ) },
-        { SnapshotRetentionMonthlyPropertyName, new( SnapshotRetentionMonthlyPropertyName, "6", "local" ) },
+        { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", "local" ) },
         { SnapshotRetentionWeeklyPropertyName, new( SnapshotRetentionWeeklyPropertyName, "0", "local" ) },
-        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", "local" ) },
-        { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", "local" ) },
-        { TakeSnapshotsPropertyName, new( TakeSnapshotsPropertyName, "false", "local" ) },
-        { RecursionPropertyName, new( RecursionPropertyName, "default", "local" ) }
+        { SnapshotRetentionMonthlyPropertyName, new( SnapshotRetentionMonthlyPropertyName, "6", "local" ) },
+        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", "local" ) }
     } );
 
     public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
         EnabledPropertyName,
-        DatasetLastDailySnapshotTimestampPropertyName,
-        DatasetLastFrequentSnapshotTimestampPropertyName,
-        DatasetLastHourlySnapshotTimestampPropertyName,
-        DatasetLastMonthlySnapshotTimestampPropertyName,
-        DatasetLastWeeklySnapshotTimestampPropertyName,
-        DatasetLastYearlySnapshotTimestampPropertyName,
-        SnapshotRetentionDailyPropertyName,
-        SnapshotRetentionFrequentPropertyName,
-        SnapshotRetentionHourlyPropertyName,
-        SnapshotRetentionMonthlyPropertyName,
-        SnapshotRetentionWeeklyPropertyName,
-        SnapshotRetentionYearlyPropertyName,
+        TakeSnapshotsPropertyName,
         PruneSnapshotsPropertyName,
         RecursionPropertyName,
-        TakeSnapshotsPropertyName,
-        TemplatePropertyName
+        TemplatePropertyName,
+        DatasetLastFrequentSnapshotTimestampPropertyName,
+        DatasetLastHourlySnapshotTimestampPropertyName,
+        DatasetLastDailySnapshotTimestampPropertyName,
+        DatasetLastWeeklySnapshotTimestampPropertyName,
+        DatasetLastMonthlySnapshotTimestampPropertyName,
+        DatasetLastYearlySnapshotTimestampPropertyName,
+        SnapshotRetentionFrequentPropertyName,
+        SnapshotRetentionHourlyPropertyName,
+        SnapshotRetentionDailyPropertyName,
+        SnapshotRetentionWeeklyPropertyName,
+        SnapshotRetentionMonthlyPropertyName,
+        SnapshotRetentionYearlyPropertyName,
     } );
 
     [JsonIgnore]
