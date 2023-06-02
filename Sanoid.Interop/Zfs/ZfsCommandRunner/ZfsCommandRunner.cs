@@ -146,54 +146,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
-    {
-        if ( !ZfsObjectBase.ValidateName( kind, zfsObjectName ) )
-        {
-            throw new ArgumentException( $"Unable to get properties for {zfsObjectName}. PropertyName is invalid.", nameof( zfsObjectName ) );
-        }
-
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all -o property,value,source -H {zfsObjectName}" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        Dictionary<string, ZfsProperty> properties = new( );
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
-        {
-            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
-            try
-            {
-                zfsGetProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                Logger.Fatal( ioex, "Error running zfs get operation. The error returned was {0}" );
-                throw;
-            }
-
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
-            {
-                string outputLine = zfsGetProcess.StandardOutput.ReadLine( )!;
-                Logger.Trace( "{0}", outputLine );
-                if ( ZfsProperty.TryParse( outputLine, out ZfsProperty? property ) )
-                {
-                    properties.Add( property!.Name, property );
-                }
-            }
-
-            if ( !zfsGetProcess.HasExited )
-            {
-                Logger.Trace( "Waiting for zfs get process to exit" );
-                zfsGetProcess.WaitForExit( 3000 );
-            }
-
-            Logger.Debug( "zfs get process finished" );
-            return properties;
-        }
-    }
-
-    /// <inheritdoc />
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
     public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {

@@ -21,9 +21,6 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings );
 
     /// <inheritdoc />
-    public abstract Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true );
-
-    /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
 
     /// <inheritdoc />

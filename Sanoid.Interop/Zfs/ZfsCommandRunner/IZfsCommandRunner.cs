@@ -51,20 +51,6 @@ public interface IZfsCommandRunner
     public bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
-    ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of &lt;<see langword="string" />,<see cref="ZfsProperty" />&gt; for
-    ///     <paramref name="zfsObjectName" />
-    /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     If an invalid or uninitialized value is provided for paramref name="kind" />.
-    /// </exception>
-    /// <exception cref="ArgumentNullException">
-    ///     If <paramref name="zfsObjectName" /> is null, empty, or only whitespace
-    /// </exception>
-    /// <exception cref="InvalidOperationException">If the process execution threw this exception.</exception>
-    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsObjectName" /></exception>
-    public Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true );
-
-    /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
     /// </summary>
     /// <param name="zfsPath">The fully-qualified path to operate on</param>

@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -21,12 +21,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings )
     {
         return false;
-    }
-
-    /// <inheritdoc />
-    public override Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
-    {
-        return new( );
     }
 
     /// <inheritdoc />
