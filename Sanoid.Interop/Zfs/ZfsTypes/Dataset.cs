@@ -101,6 +101,11 @@ public class Dataset : ZfsObjectBase
 
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
+        //Exit early if retention settings say no frequent
+        if ( !template.SnapshotRetention.IsFrequentWanted )
+        {
+            return false;
+        }
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -116,6 +121,11 @@ public class Dataset : ZfsObjectBase
 
     public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
+        //Exit early if retention settings say no hourlies
+        if ( !retention.IsHourlyWanted )
+        {
+            return false;
+        }
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -131,6 +141,11 @@ public class Dataset : ZfsObjectBase
 
     public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
+        //Exit early if retention settings say no dailies
+        if ( !retention.IsDailyWanted )
+        {
+            return false;
+        }
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -146,6 +161,11 @@ public class Dataset : ZfsObjectBase
 
     public bool IsWeeklySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
+        //Exit early if retention settings say no weeklies
+        if ( !template.SnapshotRetention.IsWeeklyWanted )
+        {
+            return false;
+        }
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
