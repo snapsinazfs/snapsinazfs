@@ -198,6 +198,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
+                // Log this, but re-throw, because this is likely fatal, depending on call site
                 Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
                 throw;
             }
@@ -209,10 +210,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string[] lineTokens = outputLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
                 if ( lineTokens.Length < 4 )
                 {
+                    // If there aren't the expected number of tokens, something is badly wrong.
+                    // Log the error and throw to caller.
                     Logger.Error( "Line {0} not understood", outputLine );
                     throw new InvalidOperationException( $"Unable to parse dataset configuration. Expected 4 tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
                 }
 
+                // If datasets doesn't already contain this token, it's a new dataset. Add it.
                 if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
                 {
                     if ( lineTokens[ 1 ] == "type" )
@@ -227,19 +231,33 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                         Logger.Debug( "Dataset {0} will be a {1}", lineTokens[ 0 ], newDsKind );
 
                         Dataset dataset = new( lineTokens[ 0 ], newDsKind );
-                        datasets.Add( lineTokens[ 0 ], dataset );
+                        if ( !datasets.TryAdd( lineTokens[ 0 ], dataset ) )
+                        {
+                            // Log if we somehow try to add a duplicate, but continue processing
+                            // Likely not fatal, but needs to be reported if it does happen
+                            Logger.Error( "Attempted to add a duplicate dataset ({0}) to the collection", lineTokens[ 0 ] );
+                        }
                     }
                 }
                 else
                 {
+                    // Dataset is already in the collection
+                    // This line is a property line
+                    // Parse it and add it to the dataset, if it is one of the wanted keys
                     Logger.Trace( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
                     if ( ZfsProperty.KnownDatasetProperties.Contains( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
                     {
                         Logger.Trace( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
-                        datasets[ lineTokens[ 0 ] ].AddProperty( ZfsProperty.Parse( lineTokens[ 1.. ] ) );
+
+                        // Parse the array starting from the second element (first was dataset name)
+                        // The slice does allocate a new array, but it's trivial
+                        ZfsProperty propertyToAdd = ZfsProperty.Parse( lineTokens[ 1.. ] );
+
+                        datasets[ lineTokens[ 0 ] ].AddProperty( propertyToAdd );
                     }
                     else
                     {
+                        // Property name wasn't a key in the set of wanted keys, so we can just ignore it and move on
                         Logger.Trace( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
                     }
                 }
@@ -249,11 +267,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             if ( !zfsGetProcess.HasExited )
             {
-                Logger.Trace( "Waiting for zfs list process to exit" );
-                zfsGetProcess.WaitForExit( 3000 );
+                // If the process hasn't exited, log it at debug level,
+                // wait 3 more seconds, and abandon if if the wait times out.
+                // It has nothing else useful to say to us
+                Logger.Debug( "Waiting for zfs list process to exit" );
+                if ( !zfsGetProcess.WaitForExit( 3000 ) )
+                {
+                    Logger.Warn( "zfs get process abandoned after 3 seconds. Please report this warning if you receive it often." );
+                }
             }
 
-            Logger.Debug( "zfs list process finished" );
+            Logger.Debug( "Finished getting datasets" );
             return datasets;
         }
     }
