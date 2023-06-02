@@ -99,6 +99,35 @@ public abstract class ZfsObjectBase
     /// </summary>
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
 
+    public bool PruneSnapshots
+    {
+        get
+        {
+            Logger.Trace( "Trying to get prunesnapshots property for {0}", Name );
+            bool gotValue = Properties.TryGetValue( ZfsProperty.PruneSnapshotsPropertyName, out ZfsProperty? prop );
+            if ( gotValue )
+            {
+                Logger.Trace( "Got property {0} from {1}", prop, Name );
+            }
+            else
+            {
+                Logger.Trace( "prunesnapshots property not found in {0}", Name );
+            }
+
+            if ( prop is null )
+            {
+                return false;
+            }
+
+            if ( string.IsNullOrWhiteSpace( prop.Value ) )
+            {
+                return false;
+            }
+
+            return bool.TryParse( prop.Value, out bool result ) && result;
+        }
+    }
+
     public ZfsObjectKind ZfsKind { get; }
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
