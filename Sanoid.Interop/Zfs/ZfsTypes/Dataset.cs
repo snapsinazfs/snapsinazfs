@@ -99,6 +99,30 @@ public class Dataset : ZfsObjectBase
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
+    /// <summary>
+    ///     Gets whether a frequent snapshot is needed, according to the provided <see cref="TemplateSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="template">
+    ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
+    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
+    ///     defined.
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Template snapshot retention settings define frequent greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either more than FrequentPeriod minutes ahead of the last frequent
+    ///                 snapshot OR the last frequent snapshot is not in the same period of the hour
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no frequent
@@ -106,6 +130,7 @@ public class Dataset : ZfsObjectBase
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -118,6 +143,28 @@ public class Dataset : ZfsObjectBase
         return frequentSnapshotNeeded;
     }
 
+    /// <summary>
+    ///     Gets whether an hourly snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="retention">
+    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against.
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Snapshot retention settings define hourly greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either more than one hour ahead of the last hourly
+    ///                 snapshot OR the last hourly snapshot is not in the same hour
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
     public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no hourlies
@@ -125,6 +172,7 @@ public class Dataset : ZfsObjectBase
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -137,6 +185,28 @@ public class Dataset : ZfsObjectBase
         return hourlySnapshotNeeded;
     }
 
+    /// <summary>
+    ///     Gets whether a daily snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="retention">
+    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against.
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Snapshot retention settings define daily greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either more than one day ahead of the last daily
+    ///                 snapshot OR the last daily snapshot is not in the same day of the year
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
     public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no dailies
@@ -144,6 +214,7 @@ public class Dataset : ZfsObjectBase
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -156,6 +227,34 @@ public class Dataset : ZfsObjectBase
         return dailySnapshotNeeded;
     }
 
+    /// <summary>
+    ///     Gets whether a weekly snapshot is needed, according to the provided <see cref="TemplateSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="template">
+    ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
+    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
+    ///     defined.
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Snapshot retention settings define weekly greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either more than 7 days ahead of the last weekly
+    ///                 snapshot OR the last weekly snapshot is not in the same week of the year
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
+    /// <remarks>
+    ///     Uses culture-aware definitions of week numbers, using the executing user's culture, and treating the day of the
+    ///     week specified in settings for weekly snapshots as the "first" day of the week, for week numbering purposes
+    /// </remarks>
     public bool IsWeeklySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no weeklies
@@ -163,6 +262,7 @@ public class Dataset : ZfsObjectBase
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -176,6 +276,33 @@ public class Dataset : ZfsObjectBase
         return weeklySnapshotNeeded;
     }
 
+    /// <summary>
+    ///     Gets whether a monthly snapshot is needed, according to the provided <see cref="TemplateSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="template">
+    ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
+    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
+    ///     defined.
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Snapshot retention settings define monthly greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either in a different month than the last monthly snapshot OR the last
+    ///                 monthly snapshot is in a different year
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
+    /// <remarks>
+    ///     Uses culture-aware definitions of months, using the executing user's culture.
+    /// </remarks>
     public bool IsMonthlySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
@@ -183,6 +310,7 @@ public class Dataset : ZfsObjectBase
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if monthly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
@@ -198,13 +326,29 @@ public class Dataset : ZfsObjectBase
         return monthlySnapshotNeeded;
     }
 
-    public bool IsYearlySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    /// <summary>
+    ///     Gets whether a yearly snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="retention">
+    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against
+    /// </param>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether the last yearly snapshot is in the same year as
+    ///     <paramref name="timestamp" />
+    /// </returns>
+    /// <remarks>
+    ///     Uses culture-aware definitions of years, using the executing user's culture.
+    /// </remarks>
+    public bool IsYearlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !template.SnapshotRetention.IsYearlyWanted )
+        if ( !retention.IsYearlyWanted )
         {
             return false;
         }
+
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if yearly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
