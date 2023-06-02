@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -62,14 +62,38 @@ public class Dataset : ZfsObjectBase
     [JsonIgnore]
     public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
-    [JsonIgnore]
-    public bool PruneSnapshots
+    public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template, DateTimeOffset timestamp )
     {
-        get
+        Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
+        List<Snapshot> snapshotsToPrune = new ( );
+
+        if ( FrequentSnapshots.Count > template.SnapshotRetention.Frequent )
         {
-            string valueString = Properties.TryGetValue( ZfsProperty.PruneSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
-            return bool.TryParse( valueString, out bool result ) && result;
+            int numberToPrune = FrequentSnapshots.Count - template.SnapshotRetention.Frequent;
+            Logger.Debug( "Need to prune oldest {0} frequent snapshots from dataset {1}", numberToPrune, Name );
+            FrequentSnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot frequentSnapshot = FrequentSnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", frequentSnapshot.Name );
+                snapshotsToPrune.Add( frequentSnapshot );
+            }
         }
+
+        if ( HourlySnapshots.Count > template.SnapshotRetention.Hourly )
+        {
+            int numberToPrune = HourlySnapshots.Count - template.SnapshotRetention.Hourly;
+            Logger.Debug( "Need to prune oldest {0} hourly snapshots from dataset {1}", numberToPrune, Name );
+            HourlySnapshots.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot hourlySnapshot = HourlySnapshots[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", hourlySnapshot.Name );
+                snapshotsToPrune.Add( hourlySnapshot );
+            }
+        }
+
+        return snapshotsToPrune;
     }
 
     [JsonIgnore]
