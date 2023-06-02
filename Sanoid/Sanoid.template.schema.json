@@ -11,11 +11,6 @@
         "SnapshotRetention": {
             "type": "object",
             "properties": {
-                "FrequentPeriod": {
-                    "type": "integer",
-                    "description": "The time, in minutes, between 'frequent' snapshots. Should be a whole number factor of 60.",
-                    "default": 15
-                },
                 "Frequent": {
                     "type": "integer",
                     "description": "How many frequent snapshots to keep for this template.",
@@ -76,6 +71,11 @@
             "type": "object",
             "description": "The times at which the corresponding snapshot periods will be taken.",
             "properties": {
+                "FrequentPeriod": {
+                    "type": "integer",
+                    "description": "The time, in minutes, between 'frequent' snapshots. Should be a whole number factor of 60.",
+                    "default": 15
+                },
                 "UseLocalTime": {
                     "type": "boolean",
                     "description": "Whether snapshot timing uses local time (true - default) or UTC (false).",
