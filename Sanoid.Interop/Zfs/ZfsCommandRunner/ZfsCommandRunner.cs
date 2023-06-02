@@ -252,7 +252,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     // This line is a property line
                     // Parse it and add it to the dataset, if it is one of the wanted keys
                     Logger.Trace( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
-                    if ( ZfsProperty.KnownDatasetProperties.Contains( lineTokens[ 1 ] ) || lineTokens[ 1 ] == "snapshot_limit" || lineTokens[ 1 ] == "snapshot_count" )
+                    if ( ZfsProperty.KnownDatasetProperties.Contains( lineTokens[ 1 ] ) )
                     {
                         Logger.Trace( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
 
