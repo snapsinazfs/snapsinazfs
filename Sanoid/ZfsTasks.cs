@@ -195,7 +195,7 @@ internal static class ZfsTasks
                 continue;
             }
 
-            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template, timestamp );
+            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template );
             Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
             allSnapshotsToPrune.AddRange( snapshotsToPruneForDataset );
         }

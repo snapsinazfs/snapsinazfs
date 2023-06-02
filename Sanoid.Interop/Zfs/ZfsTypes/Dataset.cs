@@ -62,7 +62,7 @@ public class Dataset : ZfsObjectBase
     [JsonIgnore]
     public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
-    public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template, DateTimeOffset timestamp )
+    public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         List<Snapshot> snapshotsToPrune = new ( );
