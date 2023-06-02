@@ -129,24 +129,24 @@ internal class Program
 
         Logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
-        ( Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound ) = ZfsTasks.CheckZfsPropertiesSchema( zfsCommandRunner, args );
+        ZfsTasks.CheckZfsPropertiesSchemaResult? schemaCheckResult = ZfsTasks.CheckZfsPropertiesSchema( zfsCommandRunner, args );
 
         // Check
         switch ( args )
         {
-            case { CheckZfsProperties: true } when !missingPropertiesFound:
+            case { CheckZfsProperties: true } when !schemaCheckResult.missingPropertiesFound:
             {
                 // Requested check and no properties were missing.
                 // Return 0
                 return (int)Errno.EOK;
             }
-            case { CheckZfsProperties: true } when missingPropertiesFound:
+            case { CheckZfsProperties: true } when schemaCheckResult.missingPropertiesFound:
             {
                 // Requested check and some properties were missing.
                 // Return ENOATTR (1093)
                 return (int)Errno.ENOATTR;
             }
-            case { CheckZfsProperties: false, PrepareZfsProperties: false } when missingPropertiesFound:
+            case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.missingPropertiesFound:
             {
                 // Did not request check or update (normal run) but properties were missing.
                 // Cannot safely do anything useful
@@ -158,16 +158,16 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref missingPoolPropertyCollections, zfsCommandRunner ) 
+                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, ref schemaCheckResult.missingPoolPropertyCollections, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
         }
 
+        (Errno status, Dictionary<string, Dataset>? dictionary) = zfsCommandRunner.GetFullDatasetConfiguration( settings );
+
         // TODO: Make this a single pass
         // This is pretty redundant.
-        // Since we are guaranteed a good schema from this point, we can just use list operations and
-        // just ask for filesystem,volume,snapshot, and process accordingly
         Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
 
         Logger.Trace( "Getting sanoid snapshots" );
