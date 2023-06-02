@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -174,6 +174,46 @@ public class Dataset : ZfsObjectBase
         bool weeklySnapshotNeeded = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber != lastWeeklySnapshotWeekNumber;
         Logger.Debug( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? "" : "not " );
         return weeklySnapshotNeeded;
+    }
+
+    public bool IsMonthlySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    {
+        //Exit early if retention settings say no monthlies
+        if ( !template.SnapshotRetention.IsMonthlyWanted )
+        {
+            return false;
+        }
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
+        Logger.Trace( "Checking if monthly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        int lastMonthlySnapshotMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( LastMonthlySnapshotTimestamp.LocalDateTime );
+        int currentMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( timestamp.LocalDateTime );
+        int lastMonthlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastMonthlySnapshotTimestamp.LocalDateTime );
+        int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
+        // Check if the last monthly snapshot was in a different month or if same month but different year
+        bool lastMonthlySnapshotInDifferentMonth = lastMonthlySnapshotMonth != currentMonth;
+        bool lastMonthlySnapshotInDifferentYear = currentYear != lastMonthlySnapshotYear;
+        bool monthlySnapshotNeeded = lastMonthlySnapshotInDifferentMonth || lastMonthlySnapshotInDifferentYear;
+        Logger.Debug( "Monthly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, monthlySnapshotNeeded ? "" : "not " );
+        return monthlySnapshotNeeded;
+    }
+
+    public bool IsYearlySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    {
+        //Exit early if retention settings say no monthlies
+        if ( !template.SnapshotRetention.IsYearlyWanted )
+        {
+            return false;
+        }
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
+        Logger.Trace( "Checking if yearly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        int lastYearlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastYearlySnapshotTimestamp.LocalDateTime );
+        int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
+        // Check if the last yearly snapshot was in a different year
+        bool yearlySnapshotNeeded = lastYearlySnapshotYear != currentYear;
+        Logger.Debug( "Yearly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, yearlySnapshotNeeded ? "" : "not " );
+        return yearlySnapshotNeeded;
     }
 
     /// <inheritdoc />
