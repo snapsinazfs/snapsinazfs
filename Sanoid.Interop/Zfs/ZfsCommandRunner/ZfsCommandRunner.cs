@@ -80,11 +80,67 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Error( "Snapshot creation failed for {0}", snapshot.Name );
             }
 
-            return true;
+            return false;
         }
         catch ( Exception e )
         {
             Logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
+            return false;
+        }
+    }
+
+    /// <inheritdoc />
+    public override bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings )
+    {
+        Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
+        try
+        {
+            // This exception is only thrown if kind is invalid. We're passing a known good value.
+            // ReSharper disable once ExceptionNotDocumentedOptional
+            if ( !snapshot.ValidateName( ) )
+            {
+                Logger.Error( "Snapshot name {0} is invalid. Snapshot not destroyed", snapshot.Name );
+                return false;
+            }
+        }
+        catch ( ArgumentNullException ex )
+        {
+            Logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not destroyed", snapshot.Name );
+            return false;
+        }
+
+        string arguments = $"destroy {snapshot.Name}";
+        ProcessStartInfo zfsDestroyStartInfo = new( ZfsPath, arguments )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = false
+        };
+        if ( settings.DryRun )
+        {
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsDestroyStartInfo.Arguments );
+            return false;
+        }
+
+        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
+        try
+        {
+            using ( Process? zfsDestroyProcess = Process.Start( zfsDestroyStartInfo ) )
+            {
+                Logger.Debug( "Waiting for {0} {1} to finish", ZfsPath, arguments );
+                zfsDestroyProcess?.WaitForExit( );
+                if ( zfsDestroyProcess?.ExitCode == 0 )
+                {
+                    return true;
+                }
+
+                Logger.Error( "Destroy snapshot failed for {0}", snapshot.Name );
+            }
+
+            return false;
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error running {0} {1}. Snapshot may still exist", zfsDestroyStartInfo.FileName, zfsDestroyStartInfo.Arguments );
             return false;
         }
     }

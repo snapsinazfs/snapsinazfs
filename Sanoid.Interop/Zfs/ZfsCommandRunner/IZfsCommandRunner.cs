@@ -41,6 +41,14 @@ public interface IZfsCommandRunner
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
     public bool TakeSnapshot( Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
+    
+    /// <summary>
+    ///     Destroys a zfs snapshot
+    /// </summary>
+    /// <returns>
+    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
+    /// </returns>
+    public bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
     ///     Gets a <see cref="Dictionary{TKey,TValue}" /> of &lt;<see langword="string" />,<see cref="ZfsProperty" />&gt; for

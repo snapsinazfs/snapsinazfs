@@ -18,6 +18,12 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
+    public override bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings )
+    {
+        return false;
+    }
+
+    /// <inheritdoc />
     public override Dictionary<string, ZfsProperty> GetZfsProperties( ZfsObjectKind kind, string zfsObjectName, bool sanoidOnly = true )
     {
         return new( );
