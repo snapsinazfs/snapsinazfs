@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -143,7 +143,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
         {
             return Timestamp.Value.CompareTo( other.Timestamp.Value );
         }
-        
+
         // If timestamps are different, sort on period
         if ( Period != other.Period )
         {
@@ -231,5 +231,29 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>
             [ ZfsProperty.TemplatePropertyName ] = new( ZfsProperty.TemplatePropertyName, lineTokens[ 5 ], ZfsPropertySource.Local )
         };
         return snap;
+    }
+
+    public class SnapshotReverseComparer : IComparer<Snapshot>
+    {
+        /// <inheritdoc />
+        public int Compare( Snapshot? x, Snapshot? y )
+        {
+            if ( x == null && y == null )
+            {
+                return 0;
+            }
+
+            if ( x != null && y == null )
+            {
+                return 1;
+            }
+
+            if ( x == null && y != null )
+            {
+                return -1;
+            }
+
+            return 0 - x!.CompareTo( y );
+        }
     }
 }
