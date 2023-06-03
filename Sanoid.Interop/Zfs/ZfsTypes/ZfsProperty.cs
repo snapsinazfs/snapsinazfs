@@ -28,56 +28,10 @@ public class ZfsProperty
 
     public bool IsSanoidProperty { get; }
 
-    [JsonIgnore]
-    public bool HasValidValue
-    {
-        get
-        {
-            switch ( Name )
-            {
-                case DatasetLastFrequentSnapshotTimestampPropertyName:
-                case DatasetLastHourlySnapshotTimestampPropertyName:
-                case DatasetLastDailySnapshotTimestampPropertyName:
-                case DatasetLastWeeklySnapshotTimestampPropertyName:
-                case DatasetLastMonthlySnapshotTimestampPropertyName:
-                case DatasetLastYearlySnapshotTimestampPropertyName:
-                    return DateTimeOffset.TryParse( Value, out _ );
-                case RecursionPropertyName:
-                {
-                    return Value switch
-                    {
-                        "default" => true,
-                        "sanoid" => true,
-                        "zfs" => true,
-                        _ => false
-                    };
-                }
-                case TemplatePropertyName:
-                    return !string.IsNullOrWhiteSpace( Value ) && Value != ZfsUndefinedPropertyValueString;
-                case EnabledPropertyName:
-                case PruneSnapshotsPropertyName:
-                case TakeSnapshotsPropertyName:
-                    return Value == bool.FalseString || Value == bool.TrueString;
-                case SnapshotRetentionFrequentPropertyName:
-                    case SnapshotRetentionHourlyPropertyName:
-                    case SnapshotRetentionDailyPropertyName:
-                    case SnapshotRetentionWeeklyPropertyName:
-                    case SnapshotRetentionMonthlyPropertyName:
-                    case SnapshotRetentionYearlyPropertyName:
-                    return int.TryParse( Value, out _ );
-            }
-            if ( IsSanoidProperty )
-            {
-                return Value != ZfsUndefinedPropertyValueString;
-            }
-            return true;
-        }
-    }
-
     public static (bool success, ZfsProperty? prop, string? parent) FromZfsGetLine( string zfsGetLine )
     {
         Logger.Trace( "Using regex to parse new ZfsProperty from {0}", zfsGetLine );
-        Regex parseRegex = ZfsPropertyParseRegexes.ZfsPropertyParseRegex( );
+        Regex parseRegex = ZfsPropertyParseRegexes.FullFeatured( );
         MatchCollection matches = parseRegex.Matches( zfsGetLine );
         Match firstMatch = matches[ 0 ];
         GroupCollection groups = firstMatch.Groups;
