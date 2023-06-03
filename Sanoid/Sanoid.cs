@@ -132,6 +132,8 @@ internal class Program
 
         ZfsTasks.CheckZfsPropertiesSchemaResult? schemaCheckResult = ZfsTasks.CheckZfsPoolRootPropertiesSchema( zfsCommandRunner, args );
 
+        Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult.missingPropertiesFound ) );
+
         // Check
         switch ( args )
         {

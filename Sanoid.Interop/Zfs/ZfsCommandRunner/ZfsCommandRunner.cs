@@ -375,7 +375,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 result[ dsName ] = new( dsName, DatasetKind.FileSystem );
             }
 
-            Logger.Debug( "Adding property {0} to {1}", propertyName, dsName );
+            Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
             result[ dsName ].AddProperty( propertyName, propertyValue, propertyValueSource );
         }
         Logger.Debug( "Pool root configuration retrieved" );
