@@ -5,7 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using NLog;
 using Sanoid.Interop.Libc.Enums;
@@ -467,53 +466,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 yield return zfsGetProcess.StandardOutput.ReadLine( )!;
             }
         }
-    }
-
-    /// <summary>
-    ///     Gets the output of `zfs list -o name -t ` with the kind of objects set in <paramref name="kind" /> appended
-    /// </summary>
-    /// <param name="kind">A <see cref="ZfsObjectKind" /> with flags set for each desired object type.</param>
-    /// <returns>An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s containing the output of the command</returns>
-    public ImmutableSortedSet<string> ZfsListAll( ZfsObjectKind kind = ZfsObjectKind.FileSystem | ZfsObjectKind.Volume )
-    {
-        ImmutableSortedSet<string>.Builder dataSets = ImmutableSortedSet<string>.Empty.ToBuilder( );
-        string typesToList = kind.ToStringForCommandLine( );
-        Logger.Debug( "Requested listing of all zfs objects of the following kind: {0}", typesToList );
-        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -o name -t {typesToList} -Hr" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
-        {
-            Logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
-            try
-            {
-                zfsListProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                Logger.Fatal( ioex, "Error running zfs list operation. The error returned was {0}" );
-                throw;
-            }
-
-            while ( !zfsListProcess.StandardOutput.EndOfStream )
-            {
-                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
-                Logger.Trace( "{0}", outputLine );
-                dataSets.Add( outputLine );
-            }
-
-            if ( !zfsListProcess.HasExited )
-            {
-                Logger.Trace( "Waiting for zfs list process to exit" );
-                zfsListProcess.WaitForExit( 3000 );
-            }
-
-            Logger.Debug( "zfs list process finished" );
-        }
-
-        return dataSets.ToImmutable( );
     }
 
     /// <inheritdoc cref="SetZfsProperties" />
