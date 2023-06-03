@@ -209,4 +209,10 @@ public abstract class ZfsObjectBase
         Logger.Trace( "Adding property {0} to Properties collection of {1}", prop, Name );
         Properties[ prop.Name ] = prop;
     }
+
+    public void AddProperty( string propertyName, string propertyValue, string propertyValueSource )
+    {
+        ZfsProperty prop = new ZfsProperty(propertyName,propertyValue, propertyValueSource);
+        AddProperty( prop );
+    }
 }

@@ -4,9 +4,12 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using NLog;
+using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -191,7 +194,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, Dataset> datasets = new( );
 
         Logger.Debug( "Getting ZFS dataset configurations" );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all{args} -t filesystem,volume -H -p -o name,property,value,source" )
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all{args} -t filesystem,volume,snapshot -H -p -o name,property,value,source" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -206,7 +209,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             catch ( InvalidOperationException ioex )
             {
                 // Log this, but re-throw, because this is likely fatal, depending on call site
-                Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
+                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}" );
                 throw;
             }
 
@@ -289,13 +292,84 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    /// <inheritdoc />
-    public override Dictionary<string, Dataset> GetZfsPoolRoots( )
+    /// <summary>
+    /// Raw call to ZFS get with any supplied parameters that yields a string enumerator, which provides a line-by-line enumeration of the output of the command.
+    /// </summary>
+    /// <param name="verb"></param>
+    /// <param name="args"></param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see langword="string"/>s, iterating over the output of the zfs get operation</returns>
+    private IEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"{verb} {args}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        Logger.Debug( "Preparing to execute `{0} get {1}` and yield an enumerator for output", ZfsPath, args );
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                // Log this, but re-throw, because this is likely fatal, depending on call site
+                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}" );
+                throw;
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                yield return zfsGetProcess.StandardOutput.ReadLine( )!;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public override ConcurrentDictionary<string, Dataset> GetPoolRootsWithAllRequiredSanoidProperties( )
+    {
+        ConcurrentDictionary<string, Dataset> result = new( );
         Logger.Debug( "Requested pool root configuration" );
-        Dictionary<string, Dataset> poolRoots = GetZfsDatasetConfiguration( " -d 0" );
+        // ZFS is interesting here... If a property doesn't exist, it'll return it in the output anyway, but just
+        // show its value and source as none, denoted by "-"
+        // We can just use that behavior to tell us which properties are defined and which aren't, by whether
+        // they have a source of "local" or not.
+        // Format of line output from zfs get, without -o argument, is:
+        // {datasetName}\t{propertyName}\t{propertyValue}\t{propertySource}\n
+        // The line feed is swallowed by the ReadLine method in the iterator, so we don't need to worry about it.
+        // Pool roots are the schema root, and must have all required properties defined locally.
+        // ZFS User Properties are always inherited, so this guarantees the minimum required schema will be there
+        // for Sanoid.net to depend on.
+        // The user can, of course, break things, if they want to, but that's their own fault.
+        // That's why Sanoid.net will do at least this check on every startup.
+        // The run-time cost is minimal, so it's better to be safe, even if a cached configuration is likely to
+        // be correct the majority of the time.
+        // Comments, corrections, rude commentary, etc. are welcome (but not too rude - this is a labor of love😅).
+        foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"{string.Join( ',', ZfsProperty.DefaultDatasetProperties.Keys )} -t filesystem -s local,default,none -Hpd 0" ) )
+        {
+            string[] elements = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            if ( elements.Length != 4 )
+            {
+                Logger.Error( "Expected exactly 4 elements from zfs get command. Got {0}. Line from ZFS: {1}", elements.Length, zfsGetLine );
+                continue;
+            }
+            // Root datasets are always filesystems, so we can just charge right on ahead
+            // Also, just grabbing these strings with names for readability.
+            // The compiler will optimize this away, in release builds, so it's nothing to worry about
+            string dsName = elements[ 0 ];
+            string propertyName = elements[ 1 ];
+            string propertyValue = elements[ 2 ];
+            string propertyValueSource = elements[ 3 ];
+
+            // Get or add the dataset. If it's already in the dictionary, the existing Dataset will we returned.
+            // IF it isn't the new one will be constructed.
+            Dataset ds = result.GetOrAdd( dsName,  new Dataset( dsName, DatasetKind.FileSystem ) );
+            ds.AddProperty( propertyName, propertyValue, propertyValueSource );
+        }
         Logger.Debug( "Pool root configuration retrieved" );
-        return poolRoots;
+        return result;
     }
 
     /// <param name="datasets"></param>
@@ -363,6 +437,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Debug( "zfs list process finished" );
             return snapshots;
         }
+    }
+
+    /// <inheritdoc />
+    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings )
+    {
+        Logger.Debug( "Getting configuration from ZFS" );
+        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"get -rt filesystem,volume -H -p type,{string.Join(',',ZfsProperty.KnownDatasetProperties)}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        Logger.Debug( "About to run {0} {1}", settings.ZfsPath, zfsListStartInfo.Arguments );
+        return ( Errno.EOK, new ( ) );
     }
 
     /// <summary>

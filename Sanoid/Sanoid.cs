@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
@@ -129,7 +130,7 @@ internal class Program
 
         Logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
-        ZfsTasks.CheckZfsPropertiesSchemaResult? schemaCheckResult = ZfsTasks.CheckZfsPropertiesSchema( zfsCommandRunner, args );
+        ZfsTasks.CheckZfsPropertiesSchemaResult? schemaCheckResult = ZfsTasks.CheckZfsPoolRootPropertiesSchema( zfsCommandRunner, args );
 
         // Check
         switch ( args )
@@ -164,7 +165,7 @@ internal class Program
             }
         }
 
-        (Errno status, Dictionary<string, Dataset>? dictionary) = zfsCommandRunner.GetFullDatasetConfiguration( settings );
+        (Errno status, ConcurrentDictionary<string, Dataset> dictionary) = zfsCommandRunner.GetFullDatasetConfiguration( settings );
 
         // TODO: Make this a single pass
         // This is pretty redundant.

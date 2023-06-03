@@ -4,9 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
 using NLog;
+using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -77,7 +79,7 @@ public interface IZfsCommandRunner
     ///     datasets in
     ///     zfs, with sanoid.net properties populated
     /// </returns>
-    public Dictionary<string, Dataset> GetZfsPoolRoots( );
+    public ConcurrentDictionary<string, Dataset> GetPoolRootsWithAllRequiredSanoidProperties( );
 
     /// <summary>
     ///     Gets all snapshots from zfs
@@ -88,4 +90,11 @@ public interface IZfsCommandRunner
     ///     in all pools that were taken by Sanoid.net
     /// </returns>
     public Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
+
+    /// <summary>
+    /// Gets everything Sanoid.net cares about from ZFS, via a call to zfs list with all known properties
+    /// </summary>
+    /// <param name="settings"></param>
+    /// <returns>A tuple containing an exit status and a dictionary of all datasets found, along with their properties and dependent snapshots that Sanoid.net created</returns>
+    public (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings );
 }

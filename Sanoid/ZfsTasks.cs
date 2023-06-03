@@ -1,9 +1,10 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
@@ -395,11 +396,11 @@ internal static class ZfsTasks
     }
     public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound );
 
-    public static CheckZfsPropertiesSchemaResult CheckZfsPropertiesSchema( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
+    public static CheckZfsPropertiesSchemaResult CheckZfsPoolRootPropertiesSchema( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        Dictionary<string, Dataset> poolRoots = zfsCommandRunner.GetZfsPoolRoots( );
+       ConcurrentDictionary<string, Dataset> poolRoots = zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidProperties( );
 
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
@@ -463,4 +464,41 @@ internal static class ZfsTasks
 
         return new ( missingPoolPropertyCollections, missingPropertiesFound );
     }
+
+    public static (Errno status, Dictionary<string, Dataset>? datasets) GetEverythingFromZfs( IZfsCommandRunner commandRunner, SanoidSettings settings )
+    {
+        // Acquire the mutex so we can be sure snapshots are at least not being changed by Sanoid.net concurrently.
+        const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
+        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
+        switch ( mutexAcquisitionResult.ErrorCode )
+        {
+            case MutexAcquisitionErrno.Success:
+            {
+                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
+            }
+                break;
+            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
+            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
+            case MutexAcquisitionErrno.InProgess:
+            case MutexAcquisitionErrno.IoException:
+            case MutexAcquisitionErrno.AbandonedMutex:
+            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
+            case MutexAcquisitionErrno.PossiblyNullMutex:
+            case MutexAcquisitionErrno.AnotherProcessIsBusy:
+            case MutexAcquisitionErrno.InvalidMutexNameRequested:
+            {
+                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
+                return ( mutexAcquisitionResult, null );
+            }
+            default:
+                throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
+        }
+
+        Logger.Trace( "Begin getting full configuration from ZFS" );
+
+        Dictionary<string, Dataset> datasets = new ();
+
+        return ( Errno.EOK, datasets );
+    }
 }
+
