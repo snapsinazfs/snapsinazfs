@@ -36,5 +36,5 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
 
     /// <inheritdoc />
-    public abstract (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings );
+    public abstract Task<Errno> GetDatasetsAndSnapshotsFromZfs( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, SanoidSettings settings );
 }

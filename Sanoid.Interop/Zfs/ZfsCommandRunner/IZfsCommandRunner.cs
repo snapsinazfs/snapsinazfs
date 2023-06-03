@@ -8,7 +8,6 @@ using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
 using NLog;
-using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -43,7 +42,7 @@ public interface IZfsCommandRunner
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
     public bool TakeSnapshot( Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
-    
+
     /// <summary>
     ///     Destroys a zfs snapshot
     /// </summary>
@@ -55,6 +54,10 @@ public interface IZfsCommandRunner
     /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
     /// </summary>
+    /// <param name="dryRun">
+    ///     If true, instructs the method not to actually call the ZFS utility, but instead just report what
+    ///     it <em>would</em> have done.
+    /// </param>
     /// <param name="zfsPath">The fully-qualified path to operate on</param>
     /// <param name="properties">A parameterized array of <see cref="ZfsProperty" /> objects to set</param>
     /// <returns>
@@ -92,9 +95,10 @@ public interface IZfsCommandRunner
     public Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
 
     /// <summary>
-    /// Gets everything Sanoid.net cares about from ZFS, via a call to zfs list with all known properties
+    ///     Gets everything Sanoid.net cares about from ZFS, via separate processes executing in parallel using the thread pool
     /// </summary>
+    /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
     /// <param name="settings"></param>
-    /// <returns>A tuple containing an exit status and a dictionary of all datasets found, along with their properties and dependent snapshots that Sanoid.net created</returns>
-    public (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetDatasetsAndSnapshotsFromZfs( SanoidSettings settings );
+    /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
+    public GetDatasetsAndSnapshotsFromZfsResult GetDatasetsAndSnapshotsFromZfs( ConcurrentDictionary<string, Dataset> datasets, SanoidSettings settings );
 }

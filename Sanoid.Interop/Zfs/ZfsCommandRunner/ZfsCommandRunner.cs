@@ -417,16 +417,33 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetDatasetsAndSnapshotsFromZfs( SanoidSettings settings )
+    public override async Task<Errno> GetDatasetsAndSnapshotsFromZfs(ConcurrentDictionary<string,Dataset> datasets, ConcurrentDictionary<string,Snapshot> snapshots, SanoidSettings settings )
     {
-        Logger.Debug( "Getting configuration from ZFS" );
-        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"get -rt filesystem,volume -H -p type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )}" )
+        using SemaphoreSlim threadLimiter = new ( 4, 4 );
+        string[] poolRootNames = datasets.Keys.ToArray();
+        List<Task> zfsListTaskts = new( );
+        foreach ( string poolName in poolRootNames )
         {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        Logger.Debug( "About to run {0} {1}", settings.ZfsPath, zfsListStartInfo.Arguments );
-        return ( Errno.EOK, new( ) );
+            zfsListTaskts.Add( Task.Run( ( ) => { GetDatasetsFromZfsTask( poolName ); } ) );
+        }
+        Logger.Debug( "Getting configuration from ZFS" );
+        throw new NotImplementedException();
+
+        void GetDatasetsFromZfsTask( string dsName )
+        {
+            ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -rt filesystem,volume -Hp name,type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} {dsName}" )
+            {
+                CreateNoWindow = true,
+                RedirectStandardOutput = true
+            };
+            Logger.Debug( "About to run {0} {1}", settings.ZfsPath, zfsListStartInfo.Arguments );
+        }
+    }
+
+
+    private void zfsListCallback( object? state )
+    {
+        throw new NotImplementedException( );
     }
 
     /// <summary>
