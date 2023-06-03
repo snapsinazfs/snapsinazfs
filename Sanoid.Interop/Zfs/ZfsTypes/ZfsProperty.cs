@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -14,7 +14,6 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public class ZfsProperty
 {
-    const string ZfsUndefinedPropertyValueString = "-";
     public ZfsProperty( string propertyName, string propertyValue, string valueSource )
     {
         Name = propertyName;
@@ -25,7 +24,7 @@ public class ZfsProperty
 
     [JsonIgnore]
     public bool IsUndefined => IsSanoidProperty
-                               && (Value == ZfsUndefinedPropertyValueString || Source == ZfsUndefinedPropertyValueString);
+                               && ( Value == ZfsPropertyValueConstants.None || Source == ZfsPropertySourceConstants.None );
 
     public bool IsSanoidProperty { get; }
 
@@ -151,9 +150,9 @@ public class ZfsProperty
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, "@@INVALID@@", ZfsPropertySource.Sanoid ) },
-        { SnapshotPeriodPropertyName, new(SnapshotPeriodPropertyName, "temporary", ZfsPropertySource.Sanoid ) },
-        { SnapshotTimestampPropertyName, new(SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySource.Sanoid ) }
+        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, "@@INVALID@@", ZfsPropertySourceConstants.Sanoid ) },
+        { SnapshotPeriodPropertyName, new(SnapshotPeriodPropertyName, "temporary", ZfsPropertySourceConstants.Sanoid ) },
+        { SnapshotTimestampPropertyName, new(SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySourceConstants.Sanoid ) }
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]

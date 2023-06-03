@@ -341,7 +341,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     throw new InvalidOperationException( $"Unable to parse snapshot output. Expected {ZfsProperty.KnownSnapshotProperties.Count} tokens in output. Got {lineTokens.Length}: [{outputLine}]" );
                 }
 
-                if ( lineTokens[ 2 ] == "-" )
+                if ( lineTokens[ 2 ] == ZfsPropertyValueConstants.None )
                 {
                     Logger.Trace( "Output line is not a sanoid.net snapshot - skipping" );
                     continue;

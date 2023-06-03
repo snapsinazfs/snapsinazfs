@@ -6,7 +6,7 @@
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public static class ZfsPropertySource
+public static class ZfsPropertySourceConstants
 {
     public const string Default = "default";
     public const string Inherited = "inherited";
