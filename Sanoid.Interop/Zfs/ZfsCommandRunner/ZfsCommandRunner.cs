@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -261,9 +261,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                         // Parse the array starting from the second element (first was dataset name)
                         // The slice does allocate a new array, but it's trivial
-                        ZfsProperty propertyToAdd = ZfsProperty.Parse( lineTokens[ 1.. ] );
+                        (bool success, ZfsProperty? prop, string? parent) parseResult = ZfsProperty.FromZfsGetLine( outputLine );
 
-                        datasets[ lineTokens[ 0 ] ].AddProperty( propertyToAdd );
+                        if ( parseResult is { success: true, prop: not null, parent: not null } )
+                        {
+                            datasets[ parseResult.parent ].AddProperty( parseResult.prop );
+                        }
                     }
                     else
                     {
