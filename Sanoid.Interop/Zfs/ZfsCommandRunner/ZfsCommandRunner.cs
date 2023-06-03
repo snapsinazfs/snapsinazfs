@@ -7,6 +7,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using NLog;
 using Sanoid.Interop.Libc.Enums;
@@ -308,10 +309,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        Logger.Debug( "Preparing to execute `{0} get {1}` and yield an enumerator for output", ZfsPath, args );
+        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZfsPath, verb, args );
         using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
         {
-            Logger.Debug( "Calling {0} {1}", (object)zfsGetStartInfo.FileName, (object)zfsGetStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
             try
             {
                 zfsGetProcess.Start( );
@@ -319,7 +320,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             catch ( InvalidOperationException ioex )
             {
                 // Log this, but re-throw, because this is likely fatal, depending on call site
-                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}" );
+                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}", ioex.Message );
                 throw;
             }
 
