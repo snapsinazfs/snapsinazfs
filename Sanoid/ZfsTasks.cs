@@ -411,17 +411,16 @@ internal static class ZfsTasks
             Logger.Trace( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
             Dictionary<string, ZfsProperty> missingProperties = new( );
 
-            foreach ( ( string propertyName, ZfsProperty? property ) in ZfsProperty.DefaultDatasetProperties )
+            foreach ( ( string propertyName, ZfsProperty property ) in pool.Properties )
             {
                 Logger.Trace( "Checking pool {0} for property {1}", poolName, propertyName );
-                if ( pool.HasProperty( propertyName ) )
+                if ( pool.HasProperty( propertyName ) && property.Value != ZfsPropertyValueConstants.None && property.Source == ZfsPropertySourceConstants.Local)
                 {
                     Logger.Trace( "Pool {0} already has property {1}", poolName, propertyName );
                     continue;
                 }
 
-                Logger.Debug( "Pool {0} does not have property {1}", poolName, property );
-                pool.AddProperty( ZfsProperty.DefaultDatasetProperties[ propertyName ] );
+                Logger.Debug( "Pool {0} does not have property {1}", poolName, ZfsProperty.DefaultDatasetProperties[ propertyName ]  );
                 missingProperties.Add( propertyName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
             }
 
