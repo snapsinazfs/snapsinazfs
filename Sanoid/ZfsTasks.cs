@@ -16,8 +16,8 @@ namespace Sanoid;
 
 internal static class ZfsTasks
 {
+    private const string SnapshotMutexName = "Global\\Sanoid.net_Snapshots";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    const string SnapshotMutexName = "Global\\Sanoid.net_Snapshots";
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
     internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
@@ -211,12 +211,13 @@ internal static class ZfsTasks
             {
                 if ( settings.DryRun )
                 {
-                    Logger.Info("DRY RUN: Snapshot not destroyed, but pretending it was for simulation"  );
+                    Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
                 }
                 else
                 {
-                    Logger.Info("Destroyed snapshot {0}", snapshot.Name);
+                    Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
                 }
+
                 switch ( snapshot.Period.Kind )
                 {
                     case SnapshotPeriodKind.Frequent:
@@ -394,13 +395,14 @@ internal static class ZfsTasks
 
         return !errorsEncountered;
     }
+
     public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound );
 
     public static CheckZfsPropertiesSchemaResult CheckZfsPoolRootPropertiesSchema( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-       ConcurrentDictionary<string, Dataset> poolRoots = zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidProperties( );
+        ConcurrentDictionary<string, Dataset> poolRoots = zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidProperties( );
 
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
@@ -414,13 +416,13 @@ internal static class ZfsTasks
             foreach ( ( string propertyName, ZfsProperty property ) in pool.Properties )
             {
                 Logger.Trace( "Checking pool {0} for property {1}", poolName, propertyName );
-                if ( pool.HasProperty( propertyName ) && property.Value != ZfsPropertyValueConstants.None && property.Source == ZfsPropertySourceConstants.Local)
+                if ( pool.HasProperty( propertyName ) && property.Value != ZfsPropertyValueConstants.None && property.Source == ZfsPropertySourceConstants.Local )
                 {
                     Logger.Trace( "Pool {0} already has property {1}", poolName, propertyName );
                     continue;
                 }
 
-                Logger.Debug( "Pool {0} does not have property {1}", poolName, ZfsProperty.DefaultDatasetProperties[ propertyName ]  );
+                Logger.Debug( "Pool {0} does not have property {1}", poolName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
                 missingProperties.Add( propertyName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
             }
 
@@ -461,7 +463,7 @@ internal static class ZfsTasks
             }
         }
 
-        return new ( missingPoolPropertyCollections, missingPropertiesFound );
+        return new( missingPoolPropertyCollections, missingPropertiesFound );
     }
 
     public static (Errno status, Dictionary<string, Dataset>? datasets) GetEverythingFromZfs( IZfsCommandRunner commandRunner, SanoidSettings settings )
@@ -495,9 +497,8 @@ internal static class ZfsTasks
 
         Logger.Trace( "Begin getting full configuration from ZFS" );
 
-        Dictionary<string, Dataset> datasets = new ();
+        Dictionary<string, Dataset> datasets = new( );
 
         return ( Errno.EOK, datasets );
     }
 }
-
