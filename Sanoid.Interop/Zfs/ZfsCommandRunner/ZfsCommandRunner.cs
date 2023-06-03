@@ -417,7 +417,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings )
+    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetDatasetsAndSnapshotsFromZfs( SanoidSettings settings )
     {
         Logger.Debug( "Getting configuration from ZFS" );
         ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"get -rt filesystem,volume -H -p type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )}" )

@@ -167,7 +167,7 @@ internal class Program
             }
         }
 
-        (Errno status, ConcurrentDictionary<string, Dataset> dictionary) = zfsCommandRunner.GetFullDatasetConfiguration( settings );
+        (Errno status, ConcurrentDictionary<string, Dataset> dictionary) = zfsCommandRunner.GetDatasetsAndSnapshotsFromZfs( settings );
 
         // TODO: Make this a single pass
         // This is pretty redundant.

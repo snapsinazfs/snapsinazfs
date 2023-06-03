@@ -96,5 +96,5 @@ public interface IZfsCommandRunner
     /// </summary>
     /// <param name="settings"></param>
     /// <returns>A tuple containing an exit status and a dictionary of all datasets found, along with their properties and dependent snapshots that Sanoid.net created</returns>
-    public (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings );
+    public (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetDatasetsAndSnapshotsFromZfs( SanoidSettings settings );
 }

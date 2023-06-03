@@ -55,7 +55,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings )
+    public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetDatasetsAndSnapshotsFromZfs( SanoidSettings settings )
     {
         ConcurrentDictionary<string, Dataset> datasets = new( );
         GetMockZfsOutputFromTextFile( datasets, "datasets.txt" );
