@@ -7,8 +7,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using NLog;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
@@ -187,7 +185,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     ///         </item>
     ///     </list>
     /// </exception>
-    /// <exception cref="ArgumentNullException">If a <see langword="null" /> string is somehow provided to ContainsKey when looking for existing entries in the dictionary to return.</exception>
+    /// <exception cref="ArgumentNullException">
+    ///     If a <see langword="null" /> string is somehow provided to ContainsKey when
+    ///     looking for existing entries in the dictionary to return.
+    /// </exception>
     /// <exception cref="OutOfMemoryException">There is insufficient memory to allocate a buffer when parsing zfs output.</exception>
     /// <exception cref="IOException">An I/O error occurs.</exception>
     public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
@@ -296,41 +297,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    /// <summary>
-    /// Raw call to ZFS get with any supplied parameters that yields a string enumerator, which provides a line-by-line enumeration of the output of the command.
-    /// </summary>
-    /// <param name="verb"></param>
-    /// <param name="args"></param>
-    /// <returns>An <see cref="IEnumerable{T}"/> of <see langword="string"/>s, iterating over the output of the zfs get operation</returns>
-    private IEnumerable<string> ZfsExecEnumerator( string verb, string args )
-    {
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"{verb} {args}" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZfsPath, verb, args );
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
-        {
-            Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
-            try
-            {
-                zfsGetProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                // Log this, but re-throw, because this is likely fatal, depending on call site
-                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}", ioex.Message );
-                throw;
-            }
-
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
-            {
-                yield return zfsGetProcess.StandardOutput.ReadLine( )!;
-            }
-        }
-    }
-
     /// <inheritdoc />
     public override ConcurrentDictionary<string, Dataset> GetPoolRootsWithAllRequiredSanoidProperties( )
     {
@@ -359,6 +325,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Error( "Expected exactly 4 elements from zfs get command. Got {0}. Line from ZFS: {1}", elements.Length, zfsGetLine );
                 continue;
             }
+
             // Root datasets are always filesystems, so we can just charge right on ahead
             // Also, just grabbing these strings with names for readability.
             // The compiler will optimize this away, in release builds, so it's nothing to worry about
@@ -378,6 +345,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
             result[ dsName ].AddProperty( propertyName, propertyValue, propertyValueSource );
         }
+
         Logger.Debug( "Pool root configuration retrieved" );
         return result;
     }
@@ -453,13 +421,52 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override (Errno status, ConcurrentDictionary<string, Dataset> datasets) GetFullDatasetConfiguration( SanoidSettings settings )
     {
         Logger.Debug( "Getting configuration from ZFS" );
-        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"get -rt filesystem,volume -H -p type,{string.Join(',',ZfsProperty.KnownDatasetProperties)}" )
+        ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"get -rt filesystem,volume -H -p type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
         Logger.Debug( "About to run {0} {1}", settings.ZfsPath, zfsListStartInfo.Arguments );
-        return ( Errno.EOK, new ( ) );
+        return ( Errno.EOK, new( ) );
+    }
+
+    /// <summary>
+    ///     Raw call to ZFS get with any supplied parameters that yields a string enumerator, which provides a line-by-line
+    ///     enumeration of the output of the command.
+    /// </summary>
+    /// <param name="verb"></param>
+    /// <param name="args"></param>
+    /// <returns>
+    ///     An <see cref="IEnumerable{T}" /> of <see langword="string" />s, iterating over the output of the zfs get
+    ///     operation
+    /// </returns>
+    private IEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    {
+        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"{verb} {args}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZfsPath, verb, args );
+        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
+            try
+            {
+                zfsGetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                // Log this, but re-throw, because this is likely fatal, depending on call site
+                Logger.Error( ioex, "Error running zfs get operation. The error returned was {0}", ioex.Message );
+                throw;
+            }
+
+            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            {
+                yield return zfsGetProcess.StandardOutput.ReadLine( )!;
+            }
+        }
     }
 
     /// <summary>
@@ -517,9 +524,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         if ( properties.Length == 0 )
         {
-            Logger.Trace("No properties to set"  );
+            Logger.Trace( "No properties to set" );
             return false;
         }
+
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
