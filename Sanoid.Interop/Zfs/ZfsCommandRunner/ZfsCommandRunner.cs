@@ -564,45 +564,4 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return true;
         }
     }
-
-    public List<string> GetZfsRootNames( )
-    {
-        List<string> names = new( );
-
-        Logger.Debug( "Getting all ZFS root datasets" );
-        ProcessStartInfo zfsListStartInfo = new( ZfsPath, "list -d 0 -H -o name" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        using ( Process zfsListProcess = new( ) { StartInfo = zfsListStartInfo } )
-        {
-            Logger.Debug( "Calling {0} {1}", (object)zfsListStartInfo.FileName, (object)zfsListStartInfo.Arguments );
-            try
-            {
-                zfsListProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                Logger.Error( ioex, "Error running zfs list operation. The error returned was {0}" );
-                throw;
-            }
-
-            while ( !zfsListProcess.StandardOutput.EndOfStream )
-            {
-                string outputLine = zfsListProcess.StandardOutput.ReadLine( )!;
-                Logger.Trace( "{0}", outputLine );
-                names.Add( outputLine.Trim( ) );
-            }
-
-            if ( !zfsListProcess.HasExited )
-            {
-                Logger.Trace( "Waiting for zfs list process to exit" );
-                zfsListProcess.WaitForExit( 3000 );
-            }
-
-            Logger.Debug( "zfs list process finished" );
-            return names;
-        }
-    }
 }
