@@ -142,9 +142,9 @@ public class ZfsProperty
     public const string RecursionPropertyName = "sanoid.net:recursion";
     public const string TemplatePropertyName = "sanoid.net:template";
     public const string EnabledPropertyName = "sanoid.net:enabled";
-    public const string SnapshotNamePropertyName = "sanoid.net:snapshotname";
-    public const string SnapshotPeriodPropertyName = "sanoid.net:snapshotperiod";
-    public const string SnapshotTimestampPropertyName = "sanoid.net:snapshottimestamp";
+    public const string SnapshotNamePropertyName = "sanoid.net:snapshot:name";
+    public const string SnapshotPeriodPropertyName = "sanoid.net:snapshot:period";
+    public const string SnapshotTimestampPropertyName = "sanoid.net:snapshot:timestamp";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
