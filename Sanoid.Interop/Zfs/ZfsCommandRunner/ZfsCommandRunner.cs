@@ -369,8 +369,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             // Get or add the dataset. If it's already in the dictionary, the existing Dataset will we returned.
             // IF it isn't the new one will be constructed.
-            Dataset ds = result.GetOrAdd( dsName,  new Dataset( dsName, DatasetKind.FileSystem ) );
-            ds.AddProperty( propertyName, propertyValue, propertyValueSource );
+            if ( !result.ContainsKey( dsName ) )
+            {
+                Logger.Debug( "Key not in result. Creating new dataset {0}", dsName );
+                result[ dsName ] = new( dsName, DatasetKind.FileSystem );
+            }
+
+            Logger.Debug( "Adding property {0} to {1}", propertyName, dsName );
+            result[ dsName ].AddProperty( propertyName, propertyValue, propertyValueSource );
         }
         Logger.Debug( "Pool root configuration retrieved" );
         return result;
