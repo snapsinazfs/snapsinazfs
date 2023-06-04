@@ -6,6 +6,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable MissingXmlDoc
+// ReSharper disable IdentifierTypo
 #pragma warning disable CS1591
 
 

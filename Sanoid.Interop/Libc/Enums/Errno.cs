@@ -194,7 +194,7 @@ public enum Errno
 
     ///<summary>Too many symbolic links encountered</summary>
     ELOOP = 40,
-    EWOULDBLOCK = EAGAIN, // Operation would block 
+    EWOULDBLOCK = EAGAIN, // Operation would block
 
     ///<summary>No message of desired type</summary>
     ENOMSG = 42,

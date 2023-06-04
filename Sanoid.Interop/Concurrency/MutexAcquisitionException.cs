@@ -12,7 +12,7 @@ namespace Sanoid.Interop.Concurrency;
 ///     An exception type for errors acquiring mutexes
 /// </summary>
 /// <remarks>
-///     Inherits from <see cref="InvalidOperationException" /> and includes a mandator POSIX <see cref="Errno" /> for
+///     Inherits from <see cref="InvalidOperationException" /> and includes a mandatory POSIX <see cref="Errno" /> for
 ///     use in exception handling.
 /// </remarks>
 /// <seealso cref="InvalidOperationException" />
