@@ -40,7 +40,8 @@ public class ZfsProperty
         { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", ZfsPropertySourceConstants.Local ) },
         { SnapshotRetentionWeeklyPropertyName, new( SnapshotRetentionWeeklyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
         { SnapshotRetentionMonthlyPropertyName, new( SnapshotRetentionMonthlyPropertyName, "6", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", ZfsPropertySourceConstants.Local ) }
+        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
+        { SnapshotRetentionPruneDeferralPropertyName, new( SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local ) }
     } );
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
@@ -118,6 +119,7 @@ public class ZfsProperty
     public const string SnapshotRetentionFrequentPropertyName = "sanoid.net:retention:frequent";
     public const string SnapshotRetentionHourlyPropertyName = "sanoid.net:retention:hourly";
     public const string SnapshotRetentionMonthlyPropertyName = "sanoid.net:retention:monthly";
+    public const string SnapshotRetentionPruneDeferralPropertyName = "sanoid.net:retention:prunedeferral";
     public const string SnapshotRetentionWeeklyPropertyName = "sanoid.net:retention:weekly";
     public const string SnapshotRetentionYearlyPropertyName = "sanoid.net:retention:yearly";
     public const string SnapshotTimestampPropertyName = "sanoid.net:snapshot:timestamp";
