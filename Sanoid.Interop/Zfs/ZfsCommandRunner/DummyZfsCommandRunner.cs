@@ -42,7 +42,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( )
     {
         ConcurrentDictionary<string, Dataset> poolRoots = new( );
-        await GetMockZfsOutputFromTextFileAsync( poolRoots, "poolroots-good.txt" ).ConfigureAwait( false );
+        await GetMockZfsOutputFromTextFileAsync( poolRoots, "poolroots-good.txt" ).ConfigureAwait( true );
         return poolRoots;
     }
 
@@ -56,7 +56,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        await GetMockZfsOutputFromTextFileAsync( datasets, "datasets.txt" ).ConfigureAwait( false );
+        await GetMockZfsOutputFromTextFileAsync( datasets, "datasets.txt" ).ConfigureAwait( true );
         Logger.Info( "Final dictionary is: {0}", JsonSerializer.Serialize( datasets, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
     }
 

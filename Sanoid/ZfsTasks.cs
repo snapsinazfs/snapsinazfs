@@ -246,7 +246,7 @@ internal static class ZfsTasks
             } ) );
         }
 
-        await Task.WhenAll( pruneTasks ).ConfigureAwait( false );
+        await Task.WhenAll( pruneTasks ).ConfigureAwait( true );
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -403,7 +403,7 @@ internal static class ZfsTasks
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( false );
+        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
 
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;

@@ -429,14 +429,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
 
         Logger.Debug( "Waiting for all zfs get processes to finish." );
-        await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( false );
+        await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
 
         Logger.Debug("Getting all snapshots");
         Task[] zfsGetSnapshotTasks =
             ( from poolName
                   in poolRootNames
                   select Task.Run( ( ) => GetSnapshots( poolName ) ) ).ToArray( );
-        await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( false );
+        await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
 
         // Local function to get datasets starting from the specified path
         void GetDatasets( string dsName )
