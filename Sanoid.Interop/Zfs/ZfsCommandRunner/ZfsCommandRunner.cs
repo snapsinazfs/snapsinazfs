@@ -7,7 +7,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using NLog;
-using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -266,7 +265,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                         if ( parseResult is { success: true, prop: not null, parent: not null } )
                         {
-                            datasets[ parseResult.parent ].AddProperty( parseResult.prop );
+                            datasets[ parseResult.parent ].AddOrUpdateProperty( parseResult.prop );
                         }
                     }
                     else
@@ -297,7 +296,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override ConcurrentDictionary<string, Dataset> GetPoolRootsWithAllRequiredSanoidProperties( )
+    public override Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( )
     {
         ConcurrentDictionary<string, Dataset> result = new( );
         Logger.Debug( "Requested pool root configuration" );
@@ -342,11 +341,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
 
             Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
-            result[ dsName ].AddProperty( propertyName, propertyValue, propertyValueSource );
+            result[ dsName ].AddOrUpdateProperty( propertyName, propertyValue, propertyValueSource );
         }
 
         Logger.Debug( "Pool root configuration retrieved" );
-        return result;
+        return Task.FromResult( result );
     }
 
     /// <param name="datasets"></param>
@@ -417,33 +416,94 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<Errno> GetDatasetsAndSnapshotsFromZfs(ConcurrentDictionary<string,Dataset> datasets, ConcurrentDictionary<string,Snapshot> snapshots, SanoidSettings settings )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        using SemaphoreSlim threadLimiter = new ( 4, 4 );
-        string[] poolRootNames = datasets.Keys.ToArray();
-        List<Task> zfsListTaskts = new( );
-        foreach ( string poolName in poolRootNames )
-        {
-            zfsListTaskts.Add( Task.Run( ( ) => { GetDatasetsFromZfsTask( poolName ); } ) );
-        }
-        Logger.Debug( "Getting configuration from ZFS" );
-        throw new NotImplementedException();
+        string[] poolRootNames = datasets.Keys.ToArray( );
+        string datasetPropertiesString = string.Join( ',', ZfsProperty.KnownDatasetProperties );
+        string snapshotPropertiesString = $"{datasetPropertiesString},{string.Join( ',', ZfsProperty.DefaultSnapshotProperties.Keys )}";
+        Logger.Debug( "Getting remaining dataset configuration from ZFS" );
+        Task[] zfsGetDatasetTasks =
+            ( from poolName
+                  in poolRootNames
+                  select Task.Run( ( ) => { GetDatasets( poolName ); } ) ).ToArray( );
 
-        void GetDatasetsFromZfsTask( string dsName )
+
+        Logger.Debug( "Waiting for all zfs get processes to finish." );
+        await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( false );
+
+        Logger.Debug("Getting all snapshots");
+        Task[] zfsGetSnapshotTasks =
+            ( from poolName
+                  in poolRootNames
+                  select Task.Run( ( ) => GetSnapshots( poolName ) ) ).ToArray( );
+        await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( false );
+
+        // Local function to get datasets starting from the specified path
+        void GetDatasets( string dsName )
         {
-            ProcessStartInfo zfsListStartInfo = new( ZfsPath, $"list -rt filesystem,volume -Hp name,type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} {dsName}" )
+            Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", dsName );
+            foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {dsName}" ) )
             {
-                CreateNoWindow = true,
-                RedirectStandardOutput = true
-            };
-            Logger.Debug( "About to run {0} {1}", settings.ZfsPath, zfsListStartInfo.Arguments );
+                string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+                if ( zfsListTokens.Length != 4 )
+                {
+                    Logger.Error( "Line not understood. Expected 4 tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine );
+                    continue;
+                }
+
+                if ( !datasets.ContainsKey( dsName ) )
+                {
+                    if ( datasets.TryAdd( dsName, new( zfsListTokens[ 0 ], zfsListTokens[1].ToDatasetKind()) ) )
+                    {
+                        Logger.Debug( "Added Dataset {0} to collection", dsName );
+                        continue;
+                    }
+
+                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset may not be performed." );
+                    continue;
+                }
+
+                // We can ignore and continue if this is the type property
+                // This case happens for the pool roots, since they've already been created and the first
+                // encountered property will always be type
+                if ( zfsListTokens[ 1 ] == "type" )
+                    continue;
+
+                Logger.Debug( "Adding property {0} to dataset {1}", zfsListTokens[ 1 ], dsName );
+                datasets[ dsName ].AddOrUpdateProperty( zfsListTokens[ 1 ], zfsListTokens[ 2 ], zfsListTokens[ 3 ] );
+            }
+            Logger.Debug( "Finished adding filesystem children of {0}", dsName );
         }
-    }
+        // Local function to get snapshots, starting from the specified path
+        void GetSnapshots( string dsName )
+        {
+            Logger.Debug( "Getting and parsing snapshot descendents of {0}", dsName );
+            foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"{snapshotPropertiesString} -H -p -r -t snapshot {dsName}" ) )
+            {
+                string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+                if ( zfsListTokens.Length != 4 )
+                {
+                    Logger.Error( "Line not understood. Expected 4 tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine );
+                    continue;
+                }
 
+                if ( !datasets.ContainsKey( dsName ) )
+                {
+                    if ( datasets.TryAdd( dsName, new( zfsListTokens[ 0 ], zfsListTokens[1].ToDatasetKind()) ) )
+                    {
+                        Logger.Debug( "Added Dataset {0} to collection", dsName );
+                        continue;
+                    }
 
-    private void zfsListCallback( object? state )
-    {
-        throw new NotImplementedException( );
+                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset may not be performed." );
+                    continue;
+                }
+
+                Logger.Debug( "Adding property {0} to dataset {1}", zfsListTokens[ 1 ], dsName );
+                datasets[ dsName ].AddOrUpdateProperty( zfsListTokens[ 1 ], zfsListTokens[ 2 ], zfsListTokens[ 3 ] );
+            }
+            Logger.Debug( "Finished adding filesystem children of {0}", dsName );
+        }
     }
 
     /// <summary>

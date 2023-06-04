@@ -6,7 +6,6 @@
 
 using System.Collections.Concurrent;
 using NLog;
-using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -29,12 +28,12 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
 
     /// <inheritdoc />
-    public abstract ConcurrentDictionary<string, Dataset> GetPoolRootsWithAllRequiredSanoidProperties( );
+    public abstract Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( );
 
     /// <param name="datasets"></param>
     /// <inheritdoc />
     public abstract Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
 
     /// <inheritdoc />
-    public abstract Task<Errno> GetDatasetsAndSnapshotsFromZfs( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, SanoidSettings settings );
+    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 }

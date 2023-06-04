@@ -24,7 +24,7 @@ internal class Program
     // Desired logging parameters should be set in Sanoid.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public static int Main( string[] argv )
+    public static async Task<int> Main( string[] argv )
     {
         LoggingSettings.ConfigureLogger( );
 
@@ -130,26 +130,26 @@ internal class Program
 
         Logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
 
-        ZfsTasks.CheckZfsPropertiesSchemaResult? schemaCheckResult = ZfsTasks.CheckZfsPoolRootPropertiesSchema( zfsCommandRunner, args );
+        ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
 
         Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
 
         // Check
         switch ( args )
         {
-            case { CheckZfsProperties: true } when !schemaCheckResult.missingPropertiesFound:
+            case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
             {
                 // Requested check and no properties were missing.
                 // Return 0
                 return (int)Errno.EOK;
             }
-            case { CheckZfsProperties: true } when schemaCheckResult.missingPropertiesFound:
+            case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
             {
                 // Requested check and some properties were missing.
                 // Return ENOATTR (1093)
                 return (int)Errno.ENOATTR;
             }
-            case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.missingPropertiesFound:
+            case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
             {
                 // Did not request check or update (normal run) but properties were missing.
                 // Cannot safely do anything useful
@@ -161,27 +161,21 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, schemaCheckResult.missingPoolPropertyCollections, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, schemaCheckResult.MissingPoolPropertyCollections, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
         }
 
-        (Errno status, ConcurrentDictionary<string, Dataset> dictionary) = zfsCommandRunner.GetDatasetsAndSnapshotsFromZfs( settings );
-
-        // TODO: Make this a single pass
-        // This is pretty redundant.
-        Dictionary<string, Dataset> datasets = zfsCommandRunner.GetZfsDatasetConfiguration( );
-
-        Logger.Trace( "Getting sanoid snapshots" );
-        Dictionary<string, Snapshot> snapshots = zfsCommandRunner.GetZfsSanoidSnapshots( ref datasets );
-        Logger.Trace( "Finished getting sanoid snapshots" );
+        ConcurrentDictionary<string, Dataset> datasets = new( );
+        ConcurrentDictionary<string, Snapshot> snapshots = new( );
+        ZfsTasks.GetDatasetsAndSnapshotsFromZfs( zfsCommandRunner, settings, datasets, snapshots );
 
         // Handle taking new snapshots, if requested
         if ( settings is { TakeSnapshots: true } )
         {
             Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, ref datasets );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, datasets );
         }
         else
         {
@@ -192,7 +186,7 @@ internal class Program
         if ( settings is { PruneSnapshots: true } )
         {
             Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
-            ZfsTasks.PruneAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, ref datasets );
+            await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, settings, datasets ).ConfigureAwait( true );
         }
         else
         {

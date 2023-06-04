@@ -204,15 +204,36 @@ public abstract class ZfsObjectBase
     ///     Adds the <see cref="ZfsProperty" /> <paramref name="prop" /> to this <see name="ZfsObjectBase" />
     /// </summary>
     /// <param name="prop">The property to add</param>
-    public void AddProperty( ZfsProperty prop )
+    public ZfsProperty AddOrUpdateProperty( ZfsProperty prop )
     {
-        Logger.Trace( "Adding property {0} to Properties collection of {1}", prop, Name );
-        Properties[ prop.Name ] = prop;
+        lock ( _propertiesDictionaryLock )
+        {
+            return Properties[ prop.Name ] = prop;
+        }
     }
 
-    public void AddProperty( string propertyName, string propertyValue, string propertyValueSource )
+    /// <exception cref="ArgumentNullException"><paramref name="key" /> is <see langword="null" />.</exception>
+    /// <exception cref="KeyNotFoundException">The property is retrieved and <paramref name="key" /> does not exist in the collection.</exception>
+    public ZfsProperty AddOrUpdateProperty( string propertyName, string propertyValue, string propertyValueSource )
     {
-        ZfsProperty prop = new ZfsProperty(propertyName,propertyValue, propertyValueSource);
-        AddProperty( prop );
+        // Unfortunately, the AddOrUpdate method isn't atomic, so we need to enforce a lock ourselves
+        // There's no built-in atomic way to perform a check for the key, update if it exists, and insert if not.
+        // It can only atomically test and perform one operation
+        lock ( _propertiesDictionaryLock )
+        {
+            return Properties.AddOrUpdate( propertyName, AddValueFactory, UpdateValueFactory );
+
+            ZfsProperty UpdateValueFactory( string key, ZfsProperty oldProperty )
+            {
+                oldProperty.Value = propertyValue;
+                oldProperty.Source = propertyValueSource;
+                return oldProperty;
+            }
+
+            ZfsProperty AddValueFactory( string arg ) => new ( propertyName, propertyValue, propertyValueSource );
+        }
     }
+
+    private readonly object _propertiesDictionaryLock = new( );
+
 }

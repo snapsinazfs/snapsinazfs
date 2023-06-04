@@ -33,9 +33,9 @@ public class AccessChecks
             };
             using ( Process? whichProcess = Process.Start( whichStartInfo ) )
             {
-                string? programPath = whichProcess?.StandardOutput?.ReadToEnd( );
+                string? programPath = whichProcess?.StandardOutput.ReadToEnd( );
                 whichProcess?.WaitForExit( 1000 );
-                ProgramPathDictionary.TryAdd( programName, programPath.Trim( ) );
+                ProgramPathDictionary.TryAdd( programName, programPath!.Trim( ) );
             }
         }
     }

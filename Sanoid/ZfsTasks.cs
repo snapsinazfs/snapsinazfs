@@ -20,7 +20,7 @@ internal static class ZfsTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static Errno TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
+    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, Dataset> datasets )
     {
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
@@ -41,7 +41,7 @@ internal static class ZfsTasks
             case MutexAcquisitionErrno.InvalidMutexNameRequested:
             {
                 Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", SnapshotMutexName, mutexAcquisitionResult.ErrorCode );
-                return mutexAcquisitionResult;
+                return;
             }
             default:
                 throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
@@ -112,7 +112,7 @@ internal static class ZfsTasks
         // ReSharper disable once ExceptionNotDocumentedOptional
         Mutexes.ReleaseMutex( SnapshotMutexName );
 
-        return Errno.EOK;
+        return;
 
         void TakeSnapshotKind( Dataset ds, SnapshotPeriod period, List<ZfsProperty> propsToSet )
         {
@@ -125,7 +125,7 @@ internal static class ZfsTasks
                 SnapshotPeriodKind.Weekly => ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName,
                 SnapshotPeriodKind.Monthly => ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName,
                 SnapshotPeriodKind.Yearly => ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName,
-                _ => throw new ArgumentOutOfRangeException( )
+                _ => throw new ArgumentOutOfRangeException( nameof( period ) )
             };
             bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out Snapshot? snapshot );
             if ( snapshotTaken && ds.Properties.TryGetValue( datasetSnapshotTimestampPropertyName, out prop ) )
@@ -145,7 +145,7 @@ internal static class ZfsTasks
         }
     }
 
-    internal static Errno PruneAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SanoidSettings settings, DateTimeOffset timestamp, ref Dictionary<string, Dataset> datasets )
+    internal static async Task<Errno> PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets )
     {
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
@@ -173,7 +173,7 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        List<Snapshot> allSnapshotsToPrune = new( );
+        List<Task> pruneTasks = new( );
         foreach ( ( string _, Dataset ds ) in datasets )
         {
             if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
@@ -196,56 +196,57 @@ internal static class ZfsTasks
             }
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template );
+
             Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
-            allSnapshotsToPrune.AddRange( snapshotsToPruneForDataset );
-        }
 
-        Logger.Debug( "Need to prune the following snapshots globally:{0}", string.Join( ',', allSnapshotsToPrune.Select( s => s.Name ) ) );
-
-        // Now actually call destroy on everything we decided to wreck
-        foreach ( Snapshot snapshot in allSnapshotsToPrune )
-        {
-            Dataset ds = datasets[ snapshot.DatasetName ];
-            bool destroySuccessful = commandRunner.DestroySnapshot( ds, snapshot, settings );
-            if ( destroySuccessful || settings.DryRun )
+            pruneTasks.Add( Task.Run( ( ) =>
             {
-                if ( settings.DryRun )
+                foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
                 {
-                    Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
-                }
-                else
-                {
-                    Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
-                }
+                    bool destroySuccessful = commandRunner.DestroySnapshot( ds, snapshot, settings );
+                    if ( destroySuccessful || settings.DryRun )
+                    {
+                        if ( settings.DryRun )
+                        {
+                            Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
+                        }
+                        else
+                        {
+                            Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
+                        }
 
-                switch ( snapshot.Period.Kind )
-                {
-                    case SnapshotPeriodKind.Frequent:
-                        ds.FrequentSnapshots.Remove( snapshot );
-                        goto default;
-                    case SnapshotPeriodKind.Hourly:
-                        ds.HourlySnapshots.Remove( snapshot );
-                        goto default;
-                    case SnapshotPeriodKind.Daily:
-                        ds.DailySnapshots.Remove( snapshot );
-                        goto default;
-                    case SnapshotPeriodKind.Weekly:
-                        ds.WeeklySnapshots.Remove( snapshot );
-                        goto default;
-                    case SnapshotPeriodKind.Monthly:
-                        ds.MonthlySnapshots.Remove( snapshot );
-                        goto default;
-                    case SnapshotPeriodKind.Yearly:
-                        ds.YearlySnapshots.Remove( snapshot );
-                        goto default;
-                    default:
-                        ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
-                        continue;
-                }
-            }
+                        switch ( snapshot.Period.Kind )
+                        {
+                            case SnapshotPeriodKind.Frequent:
+                                ds.FrequentSnapshots.Remove( snapshot );
+                                goto default;
+                            case SnapshotPeriodKind.Hourly:
+                                ds.HourlySnapshots.Remove( snapshot );
+                                goto default;
+                            case SnapshotPeriodKind.Daily:
+                                ds.DailySnapshots.Remove( snapshot );
+                                goto default;
+                            case SnapshotPeriodKind.Weekly:
+                                ds.WeeklySnapshots.Remove( snapshot );
+                                goto default;
+                            case SnapshotPeriodKind.Monthly:
+                                ds.MonthlySnapshots.Remove( snapshot );
+                                goto default;
+                            case SnapshotPeriodKind.Yearly:
+                                ds.YearlySnapshots.Remove( snapshot );
+                                goto default;
+                            default:
+                                ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
+                                break;
+                        }
+                    }
 
-            Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
+                    Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
+                }
+            } ) );
         }
+
+        await Task.WhenAll( pruneTasks ).ConfigureAwait( false );
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -396,13 +397,13 @@ internal static class ZfsTasks
         return !errorsEncountered;
     }
 
-    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections, bool missingPropertiesFound );
+    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound );
 
-    public static CheckZfsPropertiesSchemaResult CheckZfsPoolRootPropertiesSchema( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
+    public static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, Dataset> poolRoots = zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidProperties( );
+        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( false );
 
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
@@ -466,39 +467,8 @@ internal static class ZfsTasks
         return new( missingPoolPropertyCollections, missingPropertiesFound );
     }
 
-    public static (Errno status, Dictionary<string, Dataset>? datasets) GetEverythingFromZfs( IZfsCommandRunner commandRunner, SanoidSettings settings )
+    public static void GetDatasetsAndSnapshotsFromZfs( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        // Acquire the mutex so we can be sure snapshots are at least not being changed by Sanoid.net concurrently.
-        const string snapshotMutexName = "Global\\Sanoid.net_Snapshots";
-        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( snapshotMutexName );
-        switch ( mutexAcquisitionResult.ErrorCode )
-        {
-            case MutexAcquisitionErrno.Success:
-            {
-                Logger.Trace( "Successfully acquired mutex {0}", snapshotMutexName );
-            }
-                break;
-            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
-            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
-            case MutexAcquisitionErrno.InProgess:
-            case MutexAcquisitionErrno.IoException:
-            case MutexAcquisitionErrno.AbandonedMutex:
-            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
-            case MutexAcquisitionErrno.PossiblyNullMutex:
-            case MutexAcquisitionErrno.AnotherProcessIsBusy:
-            case MutexAcquisitionErrno.InvalidMutexNameRequested:
-            {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", snapshotMutexName, mutexAcquisitionResult.ErrorCode );
-                return ( mutexAcquisitionResult, null );
-            }
-            default:
-                throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
-        }
-
-        Logger.Trace( "Begin getting full configuration from ZFS" );
-
-        Dictionary<string, Dataset> datasets = new( );
-
-        return ( Errno.EOK, datasets );
+        zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 }
