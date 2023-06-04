@@ -70,12 +70,6 @@ public class Dataset : ZfsObjectBase
 
     public List<Snapshot> MonthlySnapshots { get; } = new( );
 
-    public (bool MissingAny, List<string>? MissingPropertyNames) GetMissingMandatoryProperties( )
-    {
-        List<string> missing = ZfsProperty.DefaultDatasetProperties.Keys.Except( Properties.Keys ).ToList( );
-        return missing.Any( ) ? new( false, missing ) : new( true, null );
-    }
-
     [JsonIgnore]
     public string Recursion
     {
@@ -104,6 +98,12 @@ public class Dataset : ZfsObjectBase
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
+    public (bool MissingAny, List<string>? MissingPropertyNames) GetMissingMandatoryProperties( )
+    {
+        List<string> missing = ZfsProperty.DefaultDatasetProperties.Keys.Except( Properties.Keys ).ToList( );
+        return missing.Any( ) ? new( false, missing ) : new( true, null );
+    }
+
     public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
@@ -121,7 +121,8 @@ public class Dataset : ZfsObjectBase
                 snapshotsToPrune.Add( frequentSnapshot );
             }
         }
-        snapshotsSetForPruning.Clear();
+
+        snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = HourlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Hourly )
         {
@@ -136,7 +137,7 @@ public class Dataset : ZfsObjectBase
             }
         }
 
-        snapshotsSetForPruning.Clear();
+        snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = DailySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Daily )
         {
@@ -151,7 +152,7 @@ public class Dataset : ZfsObjectBase
             }
         }
 
-        snapshotsSetForPruning.Clear();
+        snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = WeeklySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Weekly )
         {
@@ -166,7 +167,7 @@ public class Dataset : ZfsObjectBase
             }
         }
 
-        snapshotsSetForPruning.Clear();
+        snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = MonthlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Monthly )
         {
@@ -181,7 +182,7 @@ public class Dataset : ZfsObjectBase
             }
         }
 
-        snapshotsSetForPruning.Clear();
+        snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = YearlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Yearly )
         {

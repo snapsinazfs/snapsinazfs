@@ -54,6 +54,8 @@ public abstract class ZfsObjectBase
         Properties = new( );
     }
 
+    private readonly object _propertiesDictionaryLock = new( );
+
     public ZfsProperty? this[ string key ]
     {
         get
@@ -212,8 +214,7 @@ public abstract class ZfsObjectBase
         }
     }
 
-    /// <exception cref="ArgumentNullException"><paramref name="key" /> is <see langword="null" />.</exception>
-    /// <exception cref="KeyNotFoundException">The property is retrieved and <paramref name="key" /> does not exist in the collection.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null" />.</exception>
     public ZfsProperty AddOrUpdateProperty( string propertyName, string propertyValue, string propertyValueSource )
     {
         // Unfortunately, the AddOrUpdate method isn't atomic, so we need to enforce a lock ourselves
@@ -230,10 +231,10 @@ public abstract class ZfsObjectBase
                 return oldProperty;
             }
 
-            ZfsProperty AddValueFactory( string arg ) => new ( propertyName, propertyValue, propertyValueSource );
+            ZfsProperty AddValueFactory( string arg )
+            {
+                return new( propertyName, propertyValue, propertyValueSource );
+            }
         }
     }
-
-    private readonly object _propertiesDictionaryLock = new( );
-
 }
