@@ -85,16 +85,6 @@ public interface IZfsCommandRunner
     public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( );
 
     /// <summary>
-    ///     Gets all snapshots from zfs
-    /// </summary>
-    /// <param name="datasets"></param>
-    /// <returns>
-    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Snapshot" /> of all snapshots
-    ///     in all pools that were taken by Sanoid.net
-    /// </returns>
-    public Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
-
-    /// <summary>
     ///     Gets everything Sanoid.net cares about from ZFS, via separate processes executing in parallel using the thread pool
     /// </summary>
     /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
