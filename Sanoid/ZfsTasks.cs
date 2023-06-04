@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
@@ -467,8 +468,9 @@ internal static class ZfsTasks
         return new( missingPoolPropertyCollections, missingPropertiesFound );
     }
 
-    public static void GetDatasetsAndSnapshotsFromZfs( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly")]
+    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots );
+        await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots ).ConfigureAwait( true );
     }
 }

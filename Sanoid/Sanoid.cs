@@ -169,7 +169,7 @@ internal class Program
 
         ConcurrentDictionary<string, Dataset> datasets = new( );
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
-        ZfsTasks.GetDatasetsAndSnapshotsFromZfs( zfsCommandRunner, settings, datasets, snapshots );
+        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( zfsCommandRunner, settings, datasets, snapshots ).ConfigureAwait( true );
 
         // Handle taking new snapshots, if requested
         if ( settings is { TakeSnapshots: true } )
@@ -198,7 +198,6 @@ internal class Program
         Logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
 
 // Let's be tidy and clean up the default mutex ourselves
-        Mutexes.ReleaseMutex( );
         Mutexes.DisposeMutexes( );
 
 // Be sure we clean up any mutexes we have acquired, and log warnings for those that this has to deal with.

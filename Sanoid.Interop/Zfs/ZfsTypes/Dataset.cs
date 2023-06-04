@@ -470,7 +470,7 @@ public class Dataset : ZfsObjectBase
         return JsonSerializer.Serialize( this );
     }
 
-    public void AddSnapshot( Snapshot snap )
+    public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
         AllSnapshots[ snap.Name ] = snap;
@@ -495,5 +495,7 @@ public class Dataset : ZfsObjectBase
                 YearlySnapshots.Add( snap );
                 break;
         }
+
+        return snap;
     }
 }

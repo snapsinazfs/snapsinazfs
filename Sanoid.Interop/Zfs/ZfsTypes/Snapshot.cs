@@ -235,29 +235,19 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     /// </remarks>
     public static Snapshot FromListSnapshots( string[] lineTokens )
     {
-        if ( lineTokens.Length < ZfsProperty.KnownSnapshotProperties.Count )
+        if ( lineTokens.Length < ZfsProperty.KnownSnapshotProperties.Count + 1 )
         {
             const string errorMessage = "Not enough elements in array";
             Logger.Error( errorMessage );
             throw new ArgumentException( errorMessage, nameof( lineTokens ) );
         }
 
-        if ( !ValidateName( ZfsObjectKind.Snapshot, lineTokens[ 2 ] ) )
-        {
-            string errorMessage = $"Snapshot name {lineTokens[ 2 ]} is invalid";
-            Logger.Error( errorMessage );
-            throw new ArgumentException( errorMessage, nameof( lineTokens ) );
-        }
+        Snapshot snap = new( lineTokens[ 0 ] );
 
-        Snapshot snap = new( lineTokens[ 2 ] )
+        for ( int i = 1; i < lineTokens.Length; i++ )
         {
-            [ ZfsProperty.PruneSnapshotsPropertyName ] = new( ZfsProperty.PruneSnapshotsPropertyName, lineTokens[ 0 ], ZfsPropertySourceConstants.Local ),
-            [ ZfsProperty.RecursionPropertyName ] = new( ZfsProperty.RecursionPropertyName, lineTokens[ 1 ], ZfsPropertySourceConstants.Local ),
-            [ ZfsProperty.SnapshotNamePropertyName ] = new( ZfsProperty.SnapshotNamePropertyName, lineTokens[ 2 ], ZfsPropertySourceConstants.Local ),
-            [ ZfsProperty.SnapshotPeriodPropertyName ] = new( ZfsProperty.SnapshotPeriodPropertyName, lineTokens[ 3 ], ZfsPropertySourceConstants.Local ),
-            [ ZfsProperty.SnapshotTimestampPropertyName ] = new( ZfsProperty.SnapshotTimestampPropertyName, lineTokens[ 4 ], ZfsPropertySourceConstants.Local ),
-            [ ZfsProperty.TemplatePropertyName ] = new( ZfsProperty.TemplatePropertyName, lineTokens[ 5 ], ZfsPropertySourceConstants.Local )
-        };
+            snap.AddOrUpdateProperty( ZfsProperty.KnownSnapshotProperties[ i - 1 ], lineTokens[ i ], "local" );
+        }
         return snap;
     }
 }

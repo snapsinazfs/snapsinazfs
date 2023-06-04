@@ -80,18 +80,10 @@ public class ZfsProperty
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
-        PruneSnapshotsPropertyName,
-        RecursionPropertyName,
         SnapshotNamePropertyName,
         SnapshotPeriodPropertyName,
         SnapshotTimestampPropertyName,
-        TemplatePropertyName,
-        SnapshotRetentionDailyPropertyName,
-        SnapshotRetentionFrequentPropertyName,
-        SnapshotRetentionHourlyPropertyName,
-        SnapshotRetentionMonthlyPropertyName,
-        SnapshotRetentionWeeklyPropertyName,
-        SnapshotRetentionYearlyPropertyName
+        PruneSnapshotsPropertyName
     } );
 
     public string Name { get; }

@@ -17,7 +17,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
     {
-        throw new NotImplementedException( );
+        snapshot = Snapshot.GetSnapshotForCommandRunner( ds, period, timestamp, settings );
+        return true;
     }
 
     /// <inheritdoc />
@@ -42,38 +43,32 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( )
     {
         ConcurrentDictionary<string, Dataset> poolRoots = new( );
-        await GetMockZfsOutputFromTextFileAsync( poolRoots, "poolroots-good.txt" ).ConfigureAwait( true );
+        await GetMockZfsDatasetsFromTextFileAsync( poolRoots, "poolroots-good.txt" ).ConfigureAwait( true );
         return poolRoots;
-    }
-
-    /// <param name="datasets"></param>
-    /// <inheritdoc />
-    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets )
-    {
-        return new( );
     }
 
     /// <inheritdoc />
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        await GetMockZfsOutputFromTextFileAsync( datasets, "datasets.txt" ).ConfigureAwait( true );
-        Logger.Info( "Final dictionary is: {0}", JsonSerializer.Serialize( datasets, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
+        await GetMockZfsDatasetsFromTextFileAsync( datasets, "datasets.txt" ).ConfigureAwait( true );
+        await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "snapshots-list.txt" ).ConfigureAwait( true );
+        Logger.Info( "Final Dataset dictionary is: {0}", JsonSerializer.Serialize( datasets, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
     }
 
-    private static async Task GetMockZfsOutputFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
+    private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
     {
         using StreamReader rdr = File.OpenText( filePath );
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
+            string? stringToParse = await rdr.ReadLineAsync().ConfigureAwait( true );
             if ( string.IsNullOrWhiteSpace( stringToParse ) )
             {
                 Logger.Error( "Error reading output from zfs. Null or empty line." );
                 continue;
             }
 
-            Logger.Info( "Parsing line {0}", stringToParse );
+            Logger.Info( $"Parsing line {stringToParse}" );
             (bool success, ZfsProperty? prop, string? parent) parseResult = ZfsProperty.FromZfsGetLine( stringToParse );
             if ( parseResult is not { success: true, prop: not null, parent: not null } )
             {
@@ -101,6 +96,40 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 Logger.Info( "Line is a property of an existing object" );
                 ds.AddOrUpdateProperty( parseResult.prop );
             }
+        }
+    }
+    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets,ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
+    {
+        Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} pool1" );
+        using StreamReader rdr = File.OpenText( filePath );
+
+        while ( !rdr.EndOfStream )
+        {
+            string? stringToParse = await rdr.ReadLineAsync().ConfigureAwait( true );
+            string[] zfsListTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
+            if ( zfsListTokens.Length != propertyCount )
+            {
+                Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, stringToParse, propertyCount );
+                continue;
+            }
+
+            if ( zfsListTokens[ 2 ] == "-" )
+            {
+                Logger.Debug( "Line was not a sanoid.net snapshot. Skipping" );
+                continue;
+            }
+
+            Snapshot snap = Snapshot.FromListSnapshots( zfsListTokens );
+            string snapDatasetName = snap.DatasetName;
+            if ( !datasets.ContainsKey( snapDatasetName ) )
+            {
+                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snap.Name );
+                continue;
+            }
+            snapshots[ zfsListTokens[ 0 ] ] = datasets[ snapDatasetName ].AddSnapshot( snap );
+
+            Logger.Debug( "Added snapshot {0} to dataset {1}", zfsListTokens[ 0 ], snapDatasetName );
         }
     }
 }
