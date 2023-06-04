@@ -29,12 +29,12 @@ public class ZfsProperty
         { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
         { RecursionPropertyName, new( RecursionPropertyName, "default", ZfsPropertySourceConstants.Local ) },
         { TemplatePropertyName, new( TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) },
-        { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
-        { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
-        { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
-        { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
-        { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
-        { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( "O" ), ZfsPropertySourceConstants.Local ) },
+        { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
         { SnapshotRetentionFrequentPropertyName, new( SnapshotRetentionFrequentPropertyName, "0", ZfsPropertySourceConstants.Local ) },
         { SnapshotRetentionHourlyPropertyName, new( SnapshotRetentionHourlyPropertyName, "48", ZfsPropertySourceConstants.Local ) },
         { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", ZfsPropertySourceConstants.Local ) },
@@ -47,7 +47,7 @@ public class ZfsProperty
     {
         { SnapshotNamePropertyName, new( SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
         { SnapshotPeriodPropertyName, new( SnapshotPeriodPropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
-        { SnapshotTimestampPropertyName, new( SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch.ToString( ), ZfsPropertySourceConstants.Sanoid ) }
+        { SnapshotTimestampPropertyName, new( SnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Sanoid ) }
     } );
 
     public bool IsSanoidProperty { get; }
@@ -123,6 +123,8 @@ public class ZfsProperty
     public const string SnapshotTimestampPropertyName = "sanoid.net:snapshot:timestamp";
     public const string TakeSnapshotsPropertyName = "sanoid.net:takesnapshots";
     public const string TemplatePropertyName = "sanoid.net:template";
+
+    private const string UnixEpoch = "1970-01-01T00:00:00.0000000+00:00";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     public static (bool success, ZfsProperty? prop, string? parent) FromZfsGetLine( string zfsGetLine )
