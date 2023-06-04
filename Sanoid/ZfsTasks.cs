@@ -203,7 +203,7 @@ internal static class ZfsTasks
             {
                 foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
                 {
-                    bool destroySuccessful = commandRunner.DestroySnapshot( ds, snapshot, settings );
+                    bool destroySuccessful = commandRunner.DestroySnapshot( snapshot, settings );
                     if ( destroySuccessful || settings.DryRun )
                     {
                         if ( settings.DryRun )
@@ -469,6 +469,6 @@ internal static class ZfsTasks
 
     public static void GetDatasetsAndSnapshotsFromZfs( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
+        zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots );
     }
 }

@@ -49,7 +49,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings );
+    public bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
@@ -97,9 +97,8 @@ public interface IZfsCommandRunner
     /// <summary>
     ///     Gets everything Sanoid.net cares about from ZFS, via separate processes executing in parallel using the thread pool
     /// </summary>
-    /// <param name="settings"></param>
     /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
     /// <param name="snapshots">A collection of snapshots for this method to populate</param>
     /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
-    public Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+    public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 }

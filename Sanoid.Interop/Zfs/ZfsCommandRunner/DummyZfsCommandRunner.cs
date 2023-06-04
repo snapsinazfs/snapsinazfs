@@ -21,7 +21,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings )
+    public override bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings )
     {
         return false;
     }
@@ -54,7 +54,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         await GetMockZfsOutputFromTextFileAsync( datasets, "datasets.txt" ).ConfigureAwait( true );
         Logger.Info( "Final dictionary is: {0}", JsonSerializer.Serialize( datasets, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );

@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -90,7 +90,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings )
+    public override bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings )
     {
         Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
         try
@@ -348,9 +348,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return Task.FromResult( result );
     }
 
-    /// <param name="datasets"></param>
     /// <inheritdoc />
-    public override Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         Dictionary<string, Snapshot> snapshots = new( );
 
@@ -416,7 +415,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         string[] poolRootNames = datasets.Keys.ToArray( );
         string datasetPropertiesString = string.Join( ',', ZfsProperty.KnownDatasetProperties );

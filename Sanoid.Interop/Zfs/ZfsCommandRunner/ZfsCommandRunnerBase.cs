@@ -19,7 +19,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
 
     /// <inheritdoc />
-    public abstract bool DestroySnapshot( Dataset ds, Snapshot snapshot, SanoidSettings settings );
+    public abstract bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings );
 
     /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
@@ -30,10 +30,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     /// <inheritdoc />
     public abstract Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( );
 
-    /// <param name="datasets"></param>
     /// <inheritdoc />
-    public abstract Dictionary<string, Snapshot> GetZfsSanoidSnapshots( ref Dictionary<string, Dataset> datasets );
+    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
-    /// <inheritdoc />
-    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 }
