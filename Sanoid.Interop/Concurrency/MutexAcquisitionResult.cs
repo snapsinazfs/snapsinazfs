@@ -60,11 +60,13 @@ public sealed class MutexAcquisitionResult : IDisposable
     [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The ArgumentNullException is prevented by the string validation before the call to ReleaseMutex" )]
     public void Dispose( )
     {
-        if ( IsSuccessResult && !string.IsNullOrWhiteSpace( MutexName ) & !_disposed )
+        if ( !IsSuccessResult || _disposed || string.IsNullOrWhiteSpace( MutexName ) )
         {
-            Mutexes.ReleaseMutex( MutexName );
-            _disposed = true;
+            return;
         }
+
+        Mutexes.ReleaseMutex( MutexName );
+        _disposed = true;
     }
 
     public static implicit operator Errno( MutexAcquisitionResult errno )
