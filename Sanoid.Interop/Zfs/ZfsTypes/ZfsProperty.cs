@@ -27,7 +27,7 @@ public class ZfsProperty
         { EnabledPropertyName, new( EnabledPropertyName, "false", ZfsPropertySourceConstants.Local ) },
         { TakeSnapshotsPropertyName, new( TakeSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
         { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
-        { RecursionPropertyName, new( RecursionPropertyName, "default", ZfsPropertySourceConstants.Local ) },
+        { RecursionPropertyName, new( RecursionPropertyName, "sanoid", ZfsPropertySourceConstants.Local ) },
         { TemplatePropertyName, new( TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) },
         { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
         { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
