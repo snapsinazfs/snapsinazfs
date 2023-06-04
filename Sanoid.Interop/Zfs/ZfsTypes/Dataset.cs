@@ -109,7 +109,7 @@ public class Dataset : ZfsObjectBase
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         List<Snapshot> snapshotsToPrune = new( );
         List<Snapshot> snapshotsSetForPruning = FrequentSnapshots.Where( s => s.PruneSnapshots ).ToList( );
-        int numberToPrune = 0;
+        int numberToPrune;
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Frequent )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Frequent;
@@ -185,6 +185,8 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = YearlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        // Don't do this, so these all look the same
+        // ReSharper disable once InvertIf
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Yearly )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Yearly;

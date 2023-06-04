@@ -145,13 +145,9 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         }
 
         // If timestamps are different, sort on period
-        if ( Period != other.Period )
-        {
-            return Period.CompareTo( other.Period );
-        }
-
-        // If periods are the same, sort by name
-        return Name.CompareTo( other.Name );
+        return Period != other.Period ? Period.CompareTo( other.Period ) :
+            // If periods are the same, sort by name
+            Name.CompareTo( other.Name );
     }
 
     /// <inheritdoc />

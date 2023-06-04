@@ -167,6 +167,8 @@ public abstract class ZfsObjectBase
             throw new ArgumentOutOfRangeException( nameof( name ), "name must be 255 characters or less" );
         }
 
+        // Sure they are... They're handled by the default case.
+        // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         validatorRegex ??= kind switch
         {
             ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
