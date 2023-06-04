@@ -109,9 +109,10 @@ public class Dataset : ZfsObjectBase
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         List<Snapshot> snapshotsToPrune = new( );
         List<Snapshot> snapshotsSetForPruning = FrequentSnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        int numberToPrune = 0;
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Frequent )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Frequent;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Frequent;
             Logger.Debug( "Need to prune oldest {0} frequent snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -126,7 +127,7 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning = HourlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Hourly )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Hourly;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Hourly;
             Logger.Debug( "Need to prune oldest {0} hourly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -141,7 +142,7 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning = DailySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Daily )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Daily;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Daily;
             Logger.Debug( "Need to prune oldest {0} daily snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -156,7 +157,7 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning = WeeklySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Weekly )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Weekly;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Weekly;
             Logger.Debug( "Need to prune oldest {0} weekly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -171,7 +172,7 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning = MonthlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Monthly )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Monthly;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Monthly;
             Logger.Debug( "Need to prune oldest {0} monthly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -186,7 +187,7 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning = YearlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Yearly )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Yearly;
+            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Yearly;
             Logger.Debug( "Need to prune oldest {0} yearly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
