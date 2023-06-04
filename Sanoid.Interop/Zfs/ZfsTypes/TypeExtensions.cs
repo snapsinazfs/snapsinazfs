@@ -11,7 +11,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// <summary>
 ///     Extension methods to simplify common operations of the <see cref="ZfsObjectKind" /> <see langword="enum" />
 /// </summary>
-public static class ZfsListObjectTypesExtensions
+public static class TypeExtensions
 {
     /// <summary>
     ///     Gets a string, suitable for use at the command line, of all flags specified
@@ -37,5 +37,27 @@ public static class ZfsListObjectTypesExtensions
     public static string[] ToStringArray( this ZfsObjectKind value )
     {
         return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+    }
+
+    /// <summary>
+    ///     Gets an equivalent <see cref="DatasetKind" /> from this <see langword="string" /> value.
+    /// </summary>
+    /// <param name="value">The input string to convert to <see cref="DatasetKind" /></param>
+    /// <returns>
+    ///     A <see cref="DatasetKind" /> for the given <see langword="string" /> value, or throws a
+    ///     <see cref="NotSupportedException" /> if an unsupported value is provided
+    /// </returns>
+    /// <exception cref="NotSupportedException">
+    ///     The <paramref name="value" /> does not correspond to a supported conversion to
+    ///     <see cref="DatasetKind" />
+    /// </exception>
+    public static DatasetKind ToDatasetKind( this string value )
+    {
+        return value switch
+        {
+            "volume" => DatasetKind.Volume,
+            "filesystem" => DatasetKind.FileSystem,
+            _ => throw new NotSupportedException( $"Conversion from {value} to a DatasetKind is not supported." )
+        };
     }
 }
