@@ -74,37 +74,58 @@ internal static class ZfsTasks
                 continue;
             }
 
+            Logger.Debug( "Checking for and taking needed snapshots for dataset {0}", ds.Name );
+
             if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
             {
+                Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
             }
 
             if ( ds.IsHourlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
             {
+                Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
             }
 
             if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
             {
+                Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
             }
 
             if ( ds.IsWeeklySnapshotNeeded( template, timestamp ) )
             {
+                Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
             }
 
             if ( ds.IsMonthlySnapshotNeeded( template, timestamp ) )
             {
+                Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
             }
 
             if ( ds.IsYearlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
             {
+                Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
             }
 
-            commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) );
+            if ( propsToSet.Any( ) )
+            {
+                Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, string.Join( ',', propsToSet.Select( p => $"{p.Name}: {p.Value}" ) ) );
+                if ( commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) ) && !settings.DryRun )
+                {
+                    Logger.Debug("Property set successful");
+                    continue;
+                }
+
+                Logger.Error( "Error setting properties for dataset {0}", ds.Name );
+                continue;
+            }
+
+            Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );
         }
 
         Logger.Debug( "Finished taking snapshots" );
