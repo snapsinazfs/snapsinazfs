@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -25,10 +25,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// </param>
     public ZfsCommandRunner( string pathToZfs )
     {
-        ZfsPath = pathToZfs;
+        PathToZfsUtility = pathToZfs;
     }
 
-    private string ZfsPath { get; }
+    private string PathToZfsUtility { get; }
 
     private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -54,23 +54,23 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         string arguments = $"snapshot {string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
-        ProcessStartInfo zfsSnapshotStartInfo = new( ZfsPath, arguments )
+        ProcessStartInfo zfsSnapshotStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
         if ( settings.DryRun )
         {
-            Logger.Info( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
             return false;
         }
 
-        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
+        Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, arguments );
         try
         {
             using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
             {
-                Logger.Debug( "Waiting for {0} {1} to finish", ZfsPath, arguments );
+                Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
                 snapshotProcess?.WaitForExit( );
                 if ( snapshotProcess?.ExitCode == 0 )
                 {
@@ -110,23 +110,23 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         string arguments = $"destroy {snapshot.Name}";
-        ProcessStartInfo zfsDestroyStartInfo = new( ZfsPath, arguments )
+        ProcessStartInfo zfsDestroyStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
         if ( settings.DryRun )
         {
-            Logger.Info( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsDestroyStartInfo.Arguments );
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsDestroyStartInfo.Arguments );
             return false;
         }
 
-        Logger.Debug( "Calling `{0} {1}`", ZfsPath, arguments );
+        Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, arguments );
         try
         {
             using ( Process? zfsDestroyProcess = Process.Start( zfsDestroyStartInfo ) )
             {
-                Logger.Debug( "Waiting for {0} {1} to finish", ZfsPath, arguments );
+                Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
                 zfsDestroyProcess?.WaitForExit( );
                 if ( zfsDestroyProcess?.ExitCode == 0 )
                 {
@@ -194,7 +194,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Dictionary<string, Dataset> datasets = new( );
 
         Logger.Debug( "Getting ZFS dataset configurations" );
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"get all{args} -t filesystem,volume,snapshot -H -p -o name,property,value,source" )
+        ProcessStartInfo zfsGetStartInfo = new( PathToZfsUtility, $"get all{args} -t filesystem,volume,snapshot -H -p -o name,property,value,source" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -467,12 +467,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// </returns>
     private async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
-        ProcessStartInfo zfsGetStartInfo = new( ZfsPath, $"{verb} {args}" )
+        ProcessStartInfo zfsGetStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZfsPath, verb, args );
+        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
         using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
         {
             Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
@@ -489,7 +489,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
-                yield return ( await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( false ) )!;
+                yield return ( await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) )!;
             }
         }
     }
@@ -508,7 +508,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
-        ProcessStartInfo zfsSetStartInfo = new( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
+        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesToSet} {zfsPath}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
@@ -517,11 +517,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         {
             if ( dryRun )
             {
-                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsPath, zfsSetStartInfo.Arguments );
+                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
                 return false;
             }
 
-            Logger.Debug( "Calling {0} {1}", (object)zfsSetStartInfo.FileName, (object)zfsSetStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             try
             {
                 zfsSetProcess.Start( );
