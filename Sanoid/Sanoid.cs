@@ -169,7 +169,12 @@ internal class Program
 
         ConcurrentDictionary<string, Dataset> datasets = new( );
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
+
+        Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
+
         await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( zfsCommandRunner, settings, datasets, snapshots ).ConfigureAwait( true );
+
+        Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
 
         // Handle taking new snapshots, if requested
         if ( settings is { TakeSnapshots: true } )
