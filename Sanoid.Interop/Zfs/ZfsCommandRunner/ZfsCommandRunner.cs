@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -391,7 +391,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( !datasets.ContainsKey( dsName ) )
                 {
                     Logger.Debug( "Dataset {0} not in collection. Attempting to add using Name: {0}, Kind: {1}", dsName, propertyValue );
-                    if ( datasets.TryAdd( poolRootName, new( dsName, propertyValue.ToDatasetKind( ) ) ) )
+                    if ( datasets.TryAdd( dsName, new( dsName, propertyValue.ToDatasetKind( ) ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;
