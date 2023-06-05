@@ -109,6 +109,7 @@ public class Dataset : ZfsObjectBase
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         List<Snapshot> snapshotsToPrune = new( );
         List<Snapshot> snapshotsSetForPruning = FrequentSnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Frequent )
         {
@@ -125,6 +126,7 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = HourlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Hourly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Hourly )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Hourly;
@@ -140,6 +142,7 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = DailySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Daily snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Daily )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Daily;
@@ -155,6 +158,7 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = WeeklySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Weekly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Weekly )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Weekly;
@@ -170,6 +174,7 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = MonthlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Monthly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Monthly )
         {
             numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Monthly;
@@ -185,6 +190,7 @@ public class Dataset : ZfsObjectBase
 
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = YearlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
+        Logger.Debug( "Yearly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         // Don't do this, so these all look the same
         // ReSharper disable once InvertIf
         if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Yearly )
