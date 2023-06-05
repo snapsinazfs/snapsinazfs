@@ -370,21 +370,24 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
 
         // Local function to get datasets starting from the specified path
-        async Task GetDatasets( string dsName )
+        async Task GetDatasets( string poolRootName )
         {
-            Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", dsName );
-            await foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {dsName}" ) )
+            Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", poolRootName );
+            await foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ) )
             {
                 string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+                // zfs get operations without an -o argument return 4 values per line
                 if ( zfsListTokens.Length != 4 )
                 {
                     Logger.Error( "Line not understood. Expected 4 tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine );
                     continue;
                 }
 
+                string dsName = zfsListTokens[ 0 ];
+                string propertyName = zfsListTokens[ 1 ];
                 if ( !datasets.ContainsKey( dsName ) )
                 {
-                    if ( datasets.TryAdd( dsName, new( zfsListTokens[ 0 ], zfsListTokens[ 1 ].ToDatasetKind( ) ) ) )
+                    if ( datasets.TryAdd( poolRootName, new( dsName, propertyName.ToDatasetKind( ) ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;
@@ -397,24 +400,24 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 // We can ignore and continue if this is the type property
                 // This case happens for the pool roots, since they've already been created and the first
                 // encountered property will always be type
-                if ( zfsListTokens[ 1 ] == "type" )
+                if ( propertyName == "type" )
                 {
                     continue;
                 }
 
-                Logger.Debug( "Adding property {0} to dataset {1}", zfsListTokens[ 1 ], dsName );
-                datasets[ dsName ].AddOrUpdateProperty( zfsListTokens[ 1 ], zfsListTokens[ 2 ], zfsListTokens[ 3 ] );
+                Logger.Debug( "Adding property {0} to dataset {1}", propertyName, dsName );
+                datasets[ dsName ].AddOrUpdateProperty( propertyName, zfsListTokens[ 2 ], zfsListTokens[ 3 ] );
             }
 
-            Logger.Debug( "Finished adding dataset children of {0}", dsName );
+            Logger.Debug( "Finished adding dataset children of {0}", poolRootName );
         }
 
         // Local function to get snapshots, starting from the specified path
-        async Task GetSnapshots( string rootDsName )
+        async Task GetSnapshots( string poolRootName )
         {
-            Logger.Debug( "Getting and parsing snapshot descendents of {0}", rootDsName );
+            Logger.Debug( "Getting and parsing snapshot descendents of {0}", poolRootName );
             // This one can use a list operation, because we don't care about inheritance source for snapshots - just the values
-            await foreach ( string zfsGetLine in ZfsExecEnumerator( "list", $"-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} {rootDsName}" ) )
+            await foreach ( string zfsGetLine in ZfsExecEnumerator( "list", $"-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} {poolRootName}" ) )
             {
                 string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
                 int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
@@ -444,7 +447,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Debug( "Added snapshot {0} to dataset {1}", snapName, snapDatasetName );
             }
 
-            Logger.Debug( "Finished adding snapshot children of {0}", rootDsName );
+            Logger.Debug( "Finished adding snapshot children of {0}", poolRootName );
         }
     }
 
