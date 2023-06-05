@@ -121,6 +121,11 @@ internal static class ZfsTasks
                     continue;
                 }
 
+                if ( settings.DryRun )
+                {
+                    Logger.Info( "DRY RUN: No properties were set on actual datasets" );
+                    continue;
+                }
                 Logger.Error( "Error setting properties for dataset {0}", ds.Name );
                 continue;
             }
