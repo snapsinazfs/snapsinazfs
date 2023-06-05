@@ -419,7 +419,7 @@ internal static class ZfsTasks
         return !errorsEncountered;
     }
 
-    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound );
+    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound, ConcurrentDictionary<string,Dataset> Datasets  );
 
     public static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
@@ -486,7 +486,7 @@ internal static class ZfsTasks
             }
         }
 
-        return new( missingPoolPropertyCollections, missingPropertiesFound );
+        return new( missingPoolPropertyCollections, missingPropertiesFound, poolRoots );
     }
 
     [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly")]

@@ -167,7 +167,7 @@ internal class Program
             }
         }
 
-        ConcurrentDictionary<string, Dataset> datasets = new( );
+        ConcurrentDictionary<string, Dataset> datasets = schemaCheckResult.Datasets;
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
