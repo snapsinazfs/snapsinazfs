@@ -385,9 +385,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                 string dsName = zfsListTokens[ 0 ];
                 string propertyName = zfsListTokens[ 1 ];
+                string propertyValue = zfsListTokens[ 2 ];
                 if ( !datasets.ContainsKey( dsName ) )
                 {
-                    if ( datasets.TryAdd( poolRootName, new( dsName, propertyName.ToDatasetKind( ) ) ) )
+                    if ( datasets.TryAdd( poolRootName, new( dsName, propertyValue.ToDatasetKind( ) ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;
@@ -406,7 +407,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
 
                 Logger.Debug( "Adding property {0} to dataset {1}", propertyName, dsName );
-                datasets[ dsName ].AddOrUpdateProperty( propertyName, zfsListTokens[ 2 ], zfsListTokens[ 3 ] );
+                datasets[ dsName ].AddOrUpdateProperty( propertyName, propertyValue, zfsListTokens[ 3 ] );
             }
 
             Logger.Debug( "Finished adding dataset children of {0}", poolRootName );
