@@ -375,6 +375,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", poolRootName );
             await foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ) )
             {
+                Logger.Debug( "Attempting to parse line {0} from zfs", zfsGetLine );
                 string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
                 // zfs get operations without an -o argument return 4 values per line
                 if ( zfsListTokens.Length != 4 )
@@ -386,15 +387,17 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string dsName = zfsListTokens[ 0 ];
                 string propertyName = zfsListTokens[ 1 ];
                 string propertyValue = zfsListTokens[ 2 ];
+                Logger.Debug("Checking for existence of dataset {0} in collection", dsName);
                 if ( !datasets.ContainsKey( dsName ) )
                 {
+                    Logger.Debug( "Dataset {0} not in collection. Attempting to add using Name: {0}, Kind: {1}", dsName, propertyValue );
                     if ( datasets.TryAdd( poolRootName, new( dsName, propertyValue.ToDatasetKind( ) ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;
                     }
 
-                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset may not be performed." );
+                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset may not be performed", dsName );
                     continue;
                 }
 
