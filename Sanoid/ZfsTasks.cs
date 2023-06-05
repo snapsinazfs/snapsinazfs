@@ -266,6 +266,8 @@ internal static class ZfsTasks
                                 ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
                                 break;
                         }
+
+                        continue;
                     }
 
                     Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
