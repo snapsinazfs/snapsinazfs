@@ -13,48 +13,20 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public sealed class SnapshotRetentionSettings
 {
-    public SnapshotRetentionSettings( )
-    {
-    }
-
     /// <summary>
     ///     Gets or sets how many daily snapshots will be retained
     /// </summary>
     public int Daily { get; set; }
-    //{
-    //    get
-    //    {
-    //        if ( !_owner.HasProperty( ZfsProperty.SnapshotRetentionDailyPropertyName ) )
-    //            throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionDailyPropertyName} not defined for {_owner.Name}" );
-    //        return int.Parse( _owner[ ZfsProperty.SnapshotRetentionDailyPropertyName ]?.Value ?? throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionDailyPropertyName} value invalid for {_owner.Name}" ) );
-    //    }
-    //}
 
     /// <summary>
     ///     Gets or sets how many frequent snapshots will be retained
     /// </summary>
     public int Frequent { get; set; }
-    //{
-    //    get
-    //    {
-    //        if ( !_owner.HasProperty( ZfsProperty.SnapshotRetentionFrequentPropertyName ) )
-    //            throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionFrequentPropertyName} not defined for {_owner.Name}" );
-    //        return int.Parse( _owner[ ZfsProperty.SnapshotRetentionFrequentPropertyName ]?.Value ?? throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionFrequentPropertyName} value invalid for {_owner.Name}" ) );
-    //    }
-    //}
 
     /// <summary>
     ///     Gets or sets how many hourly snapshots will be retained
     /// </summary>
     public int Hourly { get; set; }
-    //{
-    //    get
-    //    {
-    //        if ( !_owner.HasProperty( ZfsProperty.SnapshotRetentionHourlyPropertyName ) )
-    //            throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionHourlyPropertyName} not defined for {_owner.Name}" );
-    //        return int.Parse( _owner[ ZfsProperty.SnapshotRetentionHourlyPropertyName ]?.Value ?? throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionHourlyPropertyName} value invalid for {_owner.Name}" ) );
-    //    }
-    //}
 
     [JsonIgnore]
     public bool IsDailyWanted => Daily > 0;
@@ -78,14 +50,6 @@ public sealed class SnapshotRetentionSettings
     ///     Gets or sets how many monthly snapshots will be retained
     /// </summary>
     public int Monthly { get; set; }
-    //{
-    //    get
-    //    {
-    //        if ( !_owner.HasProperty( ZfsProperty.SnapshotRetentionMonthlyPropertyName ) )
-    //            throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionMonthlyPropertyName} not defined for {_owner.Name}" );
-    //        return int.Parse( _owner[ ZfsProperty.SnapshotRetentionMonthlyPropertyName ]?.Value ?? throw new InvalidOperationException( $"{ZfsProperty.SnapshotRetentionMonthlyPropertyName} value invalid for {_owner.Name}" ) );
-    //    }
-    //}
 
 
     /// <summary>

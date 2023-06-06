@@ -164,7 +164,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( zfsDestroyProcess is not null )
                 {
                     await zfsDestroyProcess.WaitForExitAsync( ).ConfigureAwait( true );
-                    if ( zfsDestroyProcess?.ExitCode == 0 )
+                    if ( zfsDestroyProcess.ExitCode == 0 )
                     {
                         return true;
                     }
@@ -187,7 +187,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         Logger.Debug( "Requested pool root capacities" );
         bool errorsEncountered = false;
-        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", $"-Hpo name,capacity {string.Join( ' ', datasets.Keys )}" ) )
+        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", $"-Hpo name,{ZpoolProperty.ZfsPoolCapacityPropertyName} {string.Join( ' ', datasets.Keys )}" ) )
         {
             string[] lineTokens = zpoolListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             string poolName = lineTokens[ 0 ];

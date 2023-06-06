@@ -22,7 +22,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings )
     {
-        return await Task.FromResult( true );
+        return true;
     }
 
     /// <inheritdoc />
@@ -161,7 +161,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         while ( !rdr.EndOfStream )
         {
             string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
-            string[] zfsListTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            string[] zfsListTokens = stringToParse!.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
             if ( zfsListTokens.Length != propertyCount )
             {

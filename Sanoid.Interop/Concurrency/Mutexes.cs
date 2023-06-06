@@ -50,6 +50,7 @@ public sealed class Mutexes : IDisposable
         }
     }
 
+    // ReSharper disable once InconsistentNaming
     private static Logger Logger;
 
     /// <summary>
