@@ -114,6 +114,12 @@ public class Dataset : ZfsObjectBase
     public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
+        if ( !Enabled )
+        {
+            Logger.Debug( "Dataset {0} is disabled. Skipping pruning", Name );
+            return new( );
+        }
+
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
         if ( PruneDeferral != 0 && PoolUsedCapacity < PruneDeferral )
         {
