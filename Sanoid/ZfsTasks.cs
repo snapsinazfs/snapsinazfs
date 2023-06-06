@@ -218,15 +218,15 @@ internal static class ZfsTasks
                 return;
             }
 
-            if ( ds is not { PruneSnapshots: true } )
-            {
-                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
-                return;
-            }
-
             if ( ds is not { Enabled: true } )
             {
                 Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
+                return;
+            }
+
+            if ( ds is not { PruneSnapshots: true } )
+            {
+                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
                 return;
             }
 
