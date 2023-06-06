@@ -142,39 +142,6 @@ public abstract class ZfsObjectBase
     ///     A dictionary of property names and their values, as strings
     /// </summary>
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
-
-    /// <summary>
-    ///     Gets the sanoid.net:retention:prunedeferral property, or 0, if not defined
-    /// </summary>
-    public int PruneDeferral
-    {
-        get
-        {
-            Logger.Trace( "Trying to get {0} property for {1}", ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, Name );
-            bool gotValue = Properties.TryGetValue( ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, out ZfsProperty? prop );
-            if ( gotValue )
-            {
-                Logger.Trace( "Got property {0} from {1}", prop, Name );
-            }
-            else
-            {
-                Logger.Trace( "{0} property not found in {1}", ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, Name );
-            }
-
-            if ( prop is null )
-            {
-                return 0;
-            }
-
-            if ( string.IsNullOrWhiteSpace( prop.Value ) )
-            {
-                return 0;
-            }
-
-            return int.TryParse( prop.Value, out int result ) ? result : 0;
-        }
-    }
-
     public bool PruneSnapshots
     {
         get
@@ -343,6 +310,9 @@ public abstract class ZfsObjectBase
                 break;
             case ZfsProperty.SnapshotRetentionYearlyPropertyName:
                 RetentionSettings.Yearly = int.Parse( propertyValue );
+                break;
+            case ZfsProperty.SnapshotRetentionPruneDeferralPropertyName:
+                RetentionSettings.PruneDeferral = int.Parse( propertyValue );
                 break;
         }
     }

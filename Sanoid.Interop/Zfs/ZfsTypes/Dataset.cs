@@ -121,13 +121,13 @@ public class Dataset : ZfsObjectBase
         }
 
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
-        if ( PruneDeferral != 0 && PoolUsedCapacity < PruneDeferral )
+        if ( RetentionSettings.PruneDeferral != 0 && PoolUsedCapacity < RetentionSettings.PruneDeferral )
         {
-            Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, PruneDeferral );
+            Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, RetentionSettings.PruneDeferral );
             return new( );
         }
 
-        if ( PruneDeferral == 0 )
+        if ( RetentionSettings.PruneDeferral == 0 )
         {
             Logger.Debug( "Prune deferral not enabled for {0}", Name );
         }
