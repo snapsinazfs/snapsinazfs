@@ -26,8 +26,36 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <param name="pathToZpool">
     ///     A fully-qualified path to the zpool executable
     /// </param>
+    /// <exception cref="ArgumentNullException">
+    ///     If either <paramref name="pathToZfs" /> or <paramref name="pathToZpool" /> is
+    ///     null, empty or whitespace
+    /// </exception>
+    /// <exception cref="FileNotFoundException">
+    ///     If either <paramref name="pathToZfs" /> or <paramref name="pathToZpool" /> do
+    ///     not refer to a valid existing file path
+    /// </exception>
     public ZfsCommandRunner( string pathToZfs, string pathToZpool )
     {
+        if ( string.IsNullOrWhiteSpace( pathToZfs ) )
+        {
+            throw new ArgumentNullException( nameof( pathToZfs ), "Path to zfs utility cannot be null" );
+        }
+
+        if ( !File.Exists( pathToZfs ) )
+        {
+            throw new FileNotFoundException( "Path to zfs utility must be a valid and accessible path." );
+        }
+
+        if ( string.IsNullOrWhiteSpace( pathToZpool ) )
+        {
+            throw new ArgumentNullException( nameof( pathToZpool ), "Path to zpool utility cannot be null" );
+        }
+
+        if ( !File.Exists( pathToZpool ) )
+        {
+            throw new FileNotFoundException( "Path to zpool utility must be a valid and accessible path." );
+        }
+
         PathToZfsUtility = pathToZfs;
         PathToZpoolUtility = pathToZpool;
     }
