@@ -1,0 +1,608 @@
+testpool	type	filesystem	-
+testpool	sanoid.net:enabled	true	local
+testpool	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool	sanoid.net:prunesnapshots	true	local
+testpool	sanoid.net:recursion	sanoid	local
+testpool	sanoid.net:retention:daily	6	local
+testpool	sanoid.net:retention:frequent	2	local
+testpool	sanoid.net:retention:hourly	2	local
+testpool	sanoid.net:retention:monthly	2	local
+testpool	sanoid.net:retention:weekly	5	local
+testpool	sanoid.net:retention:yearly	1	local
+testpool	sanoid.net:takesnapshots	true	local
+testpool	sanoid.net:template	default	local
+testpool	sanoid.net:retention:prunedeferral	0	local
+testpool/fs1	type	filesystem	-
+testpool/fs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1	sanoid.net:template	default	inherited from testpool
+testpool/fs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs1/childfs1	type	filesystem	-
+testpool/fs1/childfs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:template	default	inherited from testpool
+testpool/fs1/childfs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs1/childfs2	type	filesystem	-
+testpool/fs1/childfs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:template	default	inherited from testpool
+testpool/fs1/childfs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs1/childfs3	type	filesystem	-
+testpool/fs1/childfs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:template	default	inherited from testpool
+testpool/fs1/childfs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs1/childfs4	type	filesystem	-
+testpool/fs1/childfs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:template	default	inherited from testpool
+testpool/fs1/childfs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs1/childfs5	type	filesystem	-
+testpool/fs1/childfs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs1/childfs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:template	default	inherited from testpool
+testpool/fs1/childfs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2	type	filesystem	-
+testpool/fs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2	sanoid.net:template	default	inherited from testpool
+testpool/fs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2/childfs1	type	filesystem	-
+testpool/fs2/childfs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:template	default	inherited from testpool
+testpool/fs2/childfs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2/childfs2	type	filesystem	-
+testpool/fs2/childfs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:template	default	inherited from testpool
+testpool/fs2/childfs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2/childfs3	type	filesystem	-
+testpool/fs2/childfs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:template	default	inherited from testpool
+testpool/fs2/childfs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2/childfs4	type	filesystem	-
+testpool/fs2/childfs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:template	default	inherited from testpool
+testpool/fs2/childfs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs2/childfs5	type	filesystem	-
+testpool/fs2/childfs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs2/childfs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:template	default	inherited from testpool
+testpool/fs2/childfs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3	type	filesystem	-
+testpool/fs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3	sanoid.net:template	default	inherited from testpool
+testpool/fs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3/childfs1	type	filesystem	-
+testpool/fs3/childfs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:template	default	inherited from testpool
+testpool/fs3/childfs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3/childfs2	type	filesystem	-
+testpool/fs3/childfs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:template	default	inherited from testpool
+testpool/fs3/childfs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3/childfs3	type	filesystem	-
+testpool/fs3/childfs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:template	default	inherited from testpool
+testpool/fs3/childfs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3/childfs4	type	filesystem	-
+testpool/fs3/childfs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:template	default	inherited from testpool
+testpool/fs3/childfs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs3/childfs5	type	filesystem	-
+testpool/fs3/childfs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs3/childfs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:template	default	inherited from testpool
+testpool/fs3/childfs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4	type	filesystem	-
+testpool/fs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4	sanoid.net:template	default	inherited from testpool
+testpool/fs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4/childfs1	type	filesystem	-
+testpool/fs4/childfs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:template	default	inherited from testpool
+testpool/fs4/childfs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4/childfs2	type	filesystem	-
+testpool/fs4/childfs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:template	default	inherited from testpool
+testpool/fs4/childfs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4/childfs3	type	filesystem	-
+testpool/fs4/childfs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:template	default	inherited from testpool
+testpool/fs4/childfs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4/childfs4	type	filesystem	-
+testpool/fs4/childfs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:template	default	inherited from testpool
+testpool/fs4/childfs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs4/childfs5	type	filesystem	-
+testpool/fs4/childfs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs4/childfs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:template	default	inherited from testpool
+testpool/fs4/childfs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5	type	filesystem	-
+testpool/fs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5	sanoid.net:template	default	inherited from testpool
+testpool/fs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5/childfs1	type	filesystem	-
+testpool/fs5/childfs1	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:template	default	inherited from testpool
+testpool/fs5/childfs1	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5/childfs2	type	filesystem	-
+testpool/fs5/childfs2	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs2	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:template	default	inherited from testpool
+testpool/fs5/childfs2	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5/childfs3	type	filesystem	-
+testpool/fs5/childfs3	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs3	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:template	default	inherited from testpool
+testpool/fs5/childfs3	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5/childfs4	type	filesystem	-
+testpool/fs5/childfs4	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs4	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:template	default	inherited from testpool
+testpool/fs5/childfs4	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/fs5/childfs5	type	filesystem	-
+testpool/fs5/childfs5	sanoid.net:enabled	true	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/fs5/childfs5	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:daily	6	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:template	default	inherited from testpool
+testpool/fs5/childfs5	sanoid.net:retention:prunedeferral	0	inherited from testpool
+testpool/vol1	type	volume	-
+testpool/vol1	sanoid.net:enabled	true	inherited from testpool
+testpool/vol1	sanoid.net:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:lastfrequentsnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:lasthourlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:lastmonthlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:lastweeklysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
+testpool/vol1	sanoid.net:prunesnapshots	true	inherited from testpool
+testpool/vol1	sanoid.net:recursion	sanoid	inherited from testpool
+testpool/vol1	sanoid.net:retention:daily	6	inherited from testpool
+testpool/vol1	sanoid.net:retention:frequent	2	inherited from testpool
+testpool/vol1	sanoid.net:retention:hourly	2	inherited from testpool
+testpool/vol1	sanoid.net:retention:monthly	2	inherited from testpool
+testpool/vol1	sanoid.net:retention:weekly	5	inherited from testpool
+testpool/vol1	sanoid.net:retention:yearly	1	inherited from testpool
+testpool/vol1	sanoid.net:takesnapshots	true	inherited from testpool
+testpool/vol1	sanoid.net:template	default	inherited from testpool
+testpool/vol1	sanoid.net:retention:prunedeferral	0	inherited from testpool

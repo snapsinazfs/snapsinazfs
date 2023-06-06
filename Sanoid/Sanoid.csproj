@@ -74,7 +74,16 @@
     <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+    <None Update="alldatasets-withproperties.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="allsnapshots-withproperties.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="poolroots-withproperties.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Sanoid.template.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
