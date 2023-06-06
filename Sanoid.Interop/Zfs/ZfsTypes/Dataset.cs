@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -40,6 +40,7 @@ public class Dataset : ZfsObjectBase
         : base( name, (ZfsObjectKind)kind, poolRoot, isKnownPoolRoot, validateName, validatorRegex )
     {
     }
+
     public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
     public List<Snapshot> DailySnapshots { get; } = new( );
 
@@ -113,12 +114,23 @@ public class Dataset : ZfsObjectBase
     public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
+        Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
+        if ( PruneDeferral != 0 && PoolUsedCapacity < PruneDeferral )
+        {
+            Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, PruneDeferral );
+            return new( );
+        }
+
+        if ( PruneDeferral == 0 )
+        {
+            Logger.Debug( "Prune deferral not enabled for {0}", Name );
+        }
+
         List<Snapshot> snapshotsToPrune = new( );
         List<Snapshot> snapshotsSetForPruning = FrequentSnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
-        int numberToKeep;
-        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionFrequentPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionFrequentPropertyName ].Value, out int numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
             numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} frequent snapshots from dataset {1}", numberToPrune, Name );
