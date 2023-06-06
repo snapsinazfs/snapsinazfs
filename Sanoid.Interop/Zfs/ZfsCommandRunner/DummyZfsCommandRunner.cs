@@ -1,12 +1,10 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
@@ -60,7 +58,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync().ConfigureAwait( true );
+            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
             if ( string.IsNullOrWhiteSpace( stringToParse ) )
             {
                 Logger.Error( "Error reading output from zfs. Null or empty line." );
@@ -97,14 +95,15 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
         }
     }
-    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets,ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
+
+    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
     {
         Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} pool1" );
         using StreamReader rdr = File.OpenText( filePath );
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync().ConfigureAwait( true );
+            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
             string[] zfsListTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
             if ( zfsListTokens.Length != propertyCount )
@@ -126,6 +125,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snap.Name );
                 continue;
             }
+
             snapshots[ zfsListTokens[ 0 ] ] = datasets[ snapDatasetName ].AddSnapshot( snap );
 
             Logger.Debug( "Added snapshot {0} to dataset {1}", zfsListTokens[ 0 ], snapDatasetName );
