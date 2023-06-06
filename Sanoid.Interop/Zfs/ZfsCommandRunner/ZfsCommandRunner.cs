@@ -126,7 +126,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings )
     {
-        //todo: make this async too
         Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
         try
         {
