@@ -182,7 +182,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         return Name.GetHashCode( );
     }
 
-    public static Snapshot GetSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
+    public static Snapshot GetNewSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
         Snapshot newSnapshot = new( snapshotName );
