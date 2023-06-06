@@ -124,7 +124,7 @@ internal class Program
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
         {
-            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath ),
+            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
             _ => new DummyZfsCommandRunner( )
         };
 

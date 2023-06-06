@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -23,12 +23,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <param name="pathToZfs">
     ///     A fully-qualified path to the zfs executable
     /// </param>
-    public ZfsCommandRunner( string pathToZfs )
+    /// <param name="pathToZpool">
+    ///     A fully-qualified path to the zpool executable
+    /// </param>
+    public ZfsCommandRunner( string pathToZfs, string pathToZpool )
     {
         PathToZfsUtility = pathToZfs;
+        PathToZpoolUtility = pathToZpool;
     }
 
     private string PathToZfsUtility { get; }
+
+    private string PathToZpoolUtility { get; }
 
     private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
