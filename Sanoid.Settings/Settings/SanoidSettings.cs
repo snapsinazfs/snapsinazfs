@@ -48,4 +48,9 @@ public sealed class SanoidSettings
     ///     Gets or sets the path to the zfs utility
     /// </summary>
     public required string ZfsPath { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the path to the zpool utility
+    /// </summary>
+    public required string ZpoolPath { get; set; }
 }

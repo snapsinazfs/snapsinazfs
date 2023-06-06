@@ -6,6 +6,7 @@
   "PruneSnapshots": false,
   "CacheDirectory": "/var/cache/sanoid",
   "ZfsPath":  "/usr/local/sbin/zfs", 
+  "ZpoolPath":  "/usr/local/sbin/zpool", 
   "DryRun": false,
   "Formatting": {
     "ComponentSeparator": "_",

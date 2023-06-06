@@ -23,6 +23,11 @@
             "description": "The path to the zfs utility",
             "default": "/usr/local/sbin/zfs"
         },
+        "ZpoolPath": {
+            "type": "string",
+            "description": "The path to the zpool utility",
+            "default": "/usr/local/sbin/zpool"
+        },
         "DryRun": {
             "type": "boolean",
             "description": "If Sanoid.net will perform a dry run and make no changes to ZFS.",
@@ -55,6 +60,7 @@
     "required": [
         "CacheDirectory",
         "ZfsPath",
+        "ZpoolPath",
         "Formatting",
         "Monitoring",
         "TakeSnapshots",

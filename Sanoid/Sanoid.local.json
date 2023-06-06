@@ -4,6 +4,7 @@
   "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
   "CacheDirectory": "var/cache/sanoid",
   "ZfsPath": "/usr/local/sbin/zfs", 
+  "ZpoolPath": "/usr/local/sbin/zpool", 
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
