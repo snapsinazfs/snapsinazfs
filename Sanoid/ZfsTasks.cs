@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -7,6 +7,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Xml.Linq;
+
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
@@ -200,30 +202,38 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        foreach ( ( string dsName, Dataset ds ) in datasets )
+        Parallel.ForEach( datasets.Values, new ParallelOptions{ MaxDegreeOfParallelism = 4, TaskScheduler = null }, async ds => await PruneSnapshotsForDatasetAsync(ds) );
+
+        // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
+        // ReSharper disable once ExceptionNotDocumentedOptional
+        Mutexes.ReleaseMutex( SnapshotMutexName );
+
+        return Errno.EOK;
+
+        async Task PruneSnapshotsForDatasetAsync( Dataset ds )
         {
             if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
             {
-                string errorMessage = $"Template {ds.Template} specified for {dsName} not found in configuration - skipping";
+                string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
                 Logger.Error( errorMessage );
-                continue;
+                return;
             }
 
             if ( ds is not { PruneSnapshots: true } )
             {
-                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", dsName );
-                continue;
+                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
+                return;
             }
 
             if ( ds is not { Enabled: true } )
             {
-                Logger.Debug( "Dataset {0} is disabled - skipping prune", dsName );
-                continue;
+                Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
+                return;
             }
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
-            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", dsName, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
+            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
 
             foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
@@ -270,13 +280,8 @@ internal static class ZfsTasks
                 Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
             }
         }
-
-        // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( SnapshotMutexName );
-
-        return Errno.EOK;
     }
+
 
     internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
