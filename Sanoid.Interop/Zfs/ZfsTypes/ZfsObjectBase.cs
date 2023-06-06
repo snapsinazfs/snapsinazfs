@@ -200,6 +200,8 @@ public abstract class ZfsObjectBase
         }
     }
 
+    public SnapshotRetentionSettings RetentionSettings { get; } = new( );
+
     public string RootName => Name.GetZfsPathRoot( );
 
     public ZfsObjectKind ZfsKind { get; }
@@ -284,6 +286,28 @@ public abstract class ZfsObjectBase
     {
         lock ( _propertiesDictionaryLock )
         {
+            switch ( prop.Name )
+            {
+                case ZfsProperty.SnapshotRetentionFrequentPropertyName:
+                    RetentionSettings.Frequent = int.Parse( prop.Value );
+                    break;
+                case ZfsProperty.SnapshotRetentionHourlyPropertyName:
+                    RetentionSettings.Hourly = int.Parse( prop.Value );
+                    break;
+                case ZfsProperty.SnapshotRetentionDailyPropertyName:
+                    RetentionSettings.Daily = int.Parse( prop.Value );
+                    break;
+                case ZfsProperty.SnapshotRetentionWeeklyPropertyName:
+                    RetentionSettings.Weekly = int.Parse( prop.Value );
+                    break;
+                case ZfsProperty.SnapshotRetentionMonthlyPropertyName:
+                    RetentionSettings.Monthly = int.Parse( prop.Value );
+                    break;
+                case ZfsProperty.SnapshotRetentionYearlyPropertyName:
+                    RetentionSettings.Yearly = int.Parse( prop.Value );
+                    break;
+            }
+
             return Properties[ prop.Name ] = prop;
         }
     }
@@ -296,6 +320,28 @@ public abstract class ZfsObjectBase
         // It can only atomically test and perform one operation
         lock ( _propertiesDictionaryLock )
         {
+            switch ( propertyName )
+            {
+                case ZfsProperty.SnapshotRetentionFrequentPropertyName:
+                    RetentionSettings.Frequent = int.Parse( propertyValue );
+                    break;
+                case ZfsProperty.SnapshotRetentionHourlyPropertyName:
+                    RetentionSettings.Hourly = int.Parse( propertyValue );
+                    break;
+                case ZfsProperty.SnapshotRetentionDailyPropertyName:
+                    RetentionSettings.Daily = int.Parse( propertyValue );
+                    break;
+                case ZfsProperty.SnapshotRetentionWeeklyPropertyName:
+                    RetentionSettings.Weekly = int.Parse( propertyValue );
+                    break;
+                case ZfsProperty.SnapshotRetentionMonthlyPropertyName:
+                    RetentionSettings.Monthly = int.Parse( propertyValue );
+                    break;
+                case ZfsProperty.SnapshotRetentionYearlyPropertyName:
+                    RetentionSettings.Yearly = int.Parse( propertyValue );
+                    break;
+            }
+
             return Properties.AddOrUpdate( propertyName, AddValueFactory, UpdateValueFactory );
 
             ZfsProperty UpdateValueFactory( string key, ZfsProperty oldProperty )

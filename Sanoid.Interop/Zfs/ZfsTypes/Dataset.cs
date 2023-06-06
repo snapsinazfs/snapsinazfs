@@ -240,8 +240,7 @@ public class Dataset : ZfsObjectBase
     /// </summary>
     /// <param name="template">
     ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
-    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
-    ///     defined.
+    ///     <see cref="TemplateSettings.SnapshotTiming" /> property defined.
     /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
@@ -261,7 +260,7 @@ public class Dataset : ZfsObjectBase
     public bool IsFrequentSnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no frequent
-        if ( !template.SnapshotRetention.IsFrequentWanted )
+        if ( !RetentionSettings.IsFrequentWanted )
         {
             return false;
         }
@@ -279,12 +278,8 @@ public class Dataset : ZfsObjectBase
     }
 
     /// <summary>
-    ///     Gets whether an hourly snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
-    ///     <paramref name="timestamp" />
+    ///     Gets whether an hourly snapshot is needed, according to the provided <paramref name="timestamp" />
     /// </summary>
-    /// <param name="retention">
-    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against.
-    /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
@@ -300,10 +295,10 @@ public class Dataset : ZfsObjectBase
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsHourlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    public bool IsHourlySnapshotNeeded( DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no hourlies
-        if ( !retention.IsHourlyWanted )
+        if ( !RetentionSettings.IsHourlyWanted )
         {
             return false;
         }
@@ -324,9 +319,6 @@ public class Dataset : ZfsObjectBase
     ///     Gets whether a daily snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
     ///     <paramref name="timestamp" />
     /// </summary>
-    /// <param name="retention">
-    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against.
-    /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
@@ -342,10 +334,10 @@ public class Dataset : ZfsObjectBase
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsDailySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no dailies
-        if ( !retention.IsDailyWanted )
+        if ( !RetentionSettings.IsDailyWanted )
         {
             return false;
         }
@@ -368,8 +360,7 @@ public class Dataset : ZfsObjectBase
     /// </summary>
     /// <param name="template">
     ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
-    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
-    ///     defined.
+    ///     <see cref="TemplateSettings.SnapshotTiming" /> property defined.
     /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
@@ -393,7 +384,7 @@ public class Dataset : ZfsObjectBase
     public bool IsWeeklySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no weeklies
-        if ( !template.SnapshotRetention.IsWeeklyWanted )
+        if ( !RetentionSettings.IsWeeklyWanted )
         {
             return false;
         }
@@ -415,11 +406,6 @@ public class Dataset : ZfsObjectBase
     ///     Gets whether a monthly snapshot is needed, according to the provided <see cref="TemplateSettings" /> and
     ///     <paramref name="timestamp" />
     /// </summary>
-    /// <param name="template">
-    ///     The <see cref="TemplateSettings" /> object to check status against. Must have the
-    ///     <see cref="TemplateSettings.SnapshotRetention" /> and <see cref="TemplateSettings.SnapshotTiming" /> properties
-    ///     defined.
-    /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
@@ -438,10 +424,10 @@ public class Dataset : ZfsObjectBase
     /// <remarks>
     ///     Uses culture-aware definitions of months, using the executing user's culture.
     /// </remarks>
-    public bool IsMonthlySnapshotNeeded( TemplateSettings template, DateTimeOffset timestamp )
+    public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !template.SnapshotRetention.IsMonthlyWanted )
+        if ( !RetentionSettings.IsMonthlyWanted )
         {
             return false;
         }
@@ -465,9 +451,6 @@ public class Dataset : ZfsObjectBase
     ///     Gets whether a yearly snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
     ///     <paramref name="timestamp" />
     /// </summary>
-    /// <param name="retention">
-    ///     The <see cref="SnapshotRetentionSettings" /> object to check status against
-    /// </param>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether the last yearly snapshot is in the same year as
@@ -476,10 +459,10 @@ public class Dataset : ZfsObjectBase
     /// <remarks>
     ///     Uses culture-aware definitions of years, using the executing user's culture.
     /// </remarks>
-    public bool IsYearlySnapshotNeeded( SnapshotRetentionSettings retention, DateTimeOffset timestamp )
+    public bool IsYearlySnapshotNeeded( DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !retention.IsYearlyWanted )
+        if ( !RetentionSettings.IsYearlyWanted )
         {
             return false;
         }

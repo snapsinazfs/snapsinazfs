@@ -82,13 +82,13 @@ internal static class ZfsTasks
                 TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
             }
 
-            if ( ds.IsHourlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
+            if ( ds.IsHourlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
             }
 
-            if ( ds.IsDailySnapshotNeeded( template.SnapshotRetention, timestamp ) )
+            if ( ds.IsDailySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
@@ -100,13 +100,13 @@ internal static class ZfsTasks
                 TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
             }
 
-            if ( ds.IsMonthlySnapshotNeeded( template, timestamp ) )
+            if ( ds.IsMonthlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
             }
 
-            if ( ds.IsYearlySnapshotNeeded( template.SnapshotRetention, timestamp ) )
+            if ( ds.IsYearlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
@@ -211,13 +211,6 @@ internal static class ZfsTasks
 
         async Task PruneSnapshotsForDatasetAsync( Dataset ds )
         {
-            if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
-            {
-                string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
-                Logger.Error( errorMessage );
-                return;
-            }
-
             if ( ds is not { Enabled: true } )
             {
                 Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
@@ -313,7 +306,7 @@ internal static class ZfsTasks
         switch ( snapshotPeriod.Kind )
         {
             case SnapshotPeriodKind.Frequent:
-                if ( template.SnapshotRetention.Frequent == 0 )
+                if ( ds.RetentionSettings.Frequent == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -321,7 +314,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Hourly:
-                if ( template.SnapshotRetention.Hourly == 0 )
+                if ( ds.RetentionSettings.Hourly == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -329,7 +322,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Daily:
-                if ( template.SnapshotRetention.Daily == 0 )
+                if ( ds.RetentionSettings.Daily == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -337,7 +330,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Weekly:
-                if ( template.SnapshotRetention.Weekly == 0 )
+                if ( ds.RetentionSettings.Weekly == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -345,7 +338,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Monthly:
-                if ( template.SnapshotRetention.Monthly == 0 )
+                if ( ds.RetentionSettings.Monthly == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -353,7 +346,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Yearly:
-                if ( template.SnapshotRetention.Yearly == 0 )
+                if ( ds.RetentionSettings.Yearly == 0 )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;

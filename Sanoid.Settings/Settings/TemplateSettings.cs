@@ -22,11 +22,6 @@ public sealed class TemplateSettings
     public required bool PruneSnapshots { get; set; }
 
     /// <summary>
-    ///     Gets or sets the snapshot retention settings sub-section
-    /// </summary>
-    public required SnapshotRetentionSettings SnapshotRetention { get; set; }
-
-    /// <summary>
     ///     Gets or sets the snapshot timing settings sub-section
     /// </summary>
     public required SnapshotTimingSettings SnapshotTiming { get; set; }
