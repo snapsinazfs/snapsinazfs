@@ -504,10 +504,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// </returns>
     public override async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
-        if ( string.IsNullOrWhiteSpace( verb ) )
-        {
-            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
-        }
+        ValidateCommonExecArguments( verb, args );
 
         if ( verb is not "get" and not "list" )
         {
@@ -553,10 +550,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// </returns>
     public override async IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
     {
-        if ( string.IsNullOrWhiteSpace( verb ) )
-        {
-            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
-        }
+        ValidateCommonExecArguments( verb, args );
 
         if ( verb is not "get" and not "list" )
         {
@@ -587,6 +581,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             {
                 yield return ( await zpoolExecProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) )!;
             }
+        }
+    }
+
+    private static void ValidateCommonExecArguments( string verb, string args )
+    {
+        if ( string.IsNullOrWhiteSpace( verb ) )
+        {
+            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
+        }
+
+        if ( string.IsNullOrWhiteSpace( args ) )
+        {
+            throw new ArgumentNullException( nameof( args ), "Arguments are required for zfs/zpool exec operations" );
         }
     }
 
