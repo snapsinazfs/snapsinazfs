@@ -82,7 +82,7 @@ public interface IZfsCommandRunner
     ///     datasets in
     ///     zfs, with sanoid.net properties populated
     /// </returns>
-    public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithAllRequiredSanoidPropertiesAsync( );
+    public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( );
 
     /// <summary>
     ///     Gets everything Sanoid.net cares about from ZFS, via separate processes executing in parallel using the thread pool

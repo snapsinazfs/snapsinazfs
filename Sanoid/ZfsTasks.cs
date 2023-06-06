@@ -431,7 +431,7 @@ internal static class ZfsTasks
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
+        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
 
         Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
         bool missingPropertiesFound = false;
