@@ -45,15 +45,6 @@
         "YearlyMonth": 12,
         "YearlyDay": 31,
         "YearlyTime": "23:59"
-      },
-      "SnapshotRetention": {
-        "Frequent": 0,
-        "Hourly": 48,
-        "Daily": 90,
-        "Weekly": 0,
-        "Monthly": 6,
-        "Yearly": 0,
-        "PruneDeferral": 0
       }
     }
   }
