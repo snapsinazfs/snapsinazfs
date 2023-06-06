@@ -49,7 +49,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings );
+    public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />

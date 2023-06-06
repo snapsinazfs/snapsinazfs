@@ -90,8 +90,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings )
+    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings )
     {
+        //todo: make this async too
         Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
         try
         {
@@ -109,7 +110,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string arguments = $"destroy {snapshot.Name}";
+        string arguments = $"destroy -d {snapshot.Name}";
         ProcessStartInfo zfsDestroyStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
@@ -127,10 +128,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             using ( Process? zfsDestroyProcess = Process.Start( zfsDestroyStartInfo ) )
             {
                 Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
-                zfsDestroyProcess?.WaitForExit( );
-                if ( zfsDestroyProcess?.ExitCode == 0 )
+                if ( zfsDestroyProcess is not null )
                 {
-                    return true;
+                    await zfsDestroyProcess.WaitForExitAsync( ).ConfigureAwait( true );
+                    if ( zfsDestroyProcess?.ExitCode == 0 )
+                    {
+                        return true;
+                    }
                 }
 
                 Logger.Error( "Destroy snapshot failed for {0}", snapshot.Name );

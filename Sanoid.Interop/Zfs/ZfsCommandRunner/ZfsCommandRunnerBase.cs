@@ -19,7 +19,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot );
 
     /// <inheritdoc />
-    public abstract bool DestroySnapshot( Snapshot snapshot, SanoidSettings settings );
+    public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings );
 
     /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );

@@ -200,82 +200,76 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        List<Task> pruneTasks = new( );
-        foreach ( ( string _, Dataset ds ) in datasets )
+        foreach ( ( string dsName, Dataset ds ) in datasets )
         {
             if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
             {
-                string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
+                string errorMessage = $"Template {ds.Template} specified for {dsName} not found in configuration - skipping";
                 Logger.Error( errorMessage );
                 continue;
             }
 
             if ( ds is not { PruneSnapshots: true } )
             {
-                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
+                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", dsName );
                 continue;
             }
 
             if ( ds is not { Enabled: true } )
             {
-                Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
+                Logger.Debug( "Dataset {0} is disabled - skipping prune", dsName );
                 continue;
             }
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template );
 
-            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
+            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", dsName, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
 
-            pruneTasks.Add( Task.Run( ( ) =>
+            foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
-                foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
+                bool destroySuccessful = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( true );
+                if ( destroySuccessful || settings.DryRun )
                 {
-                    bool destroySuccessful = commandRunner.DestroySnapshot( snapshot, settings );
-                    if ( destroySuccessful || settings.DryRun )
+                    if ( settings.DryRun )
                     {
-                        if ( settings.DryRun )
-                        {
-                            Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
-                        }
-                        else
-                        {
-                            Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
-                        }
-
-                        switch ( snapshot.Period.Kind )
-                        {
-                            case SnapshotPeriodKind.Frequent:
-                                ds.FrequentSnapshots.Remove( snapshot );
-                                goto default;
-                            case SnapshotPeriodKind.Hourly:
-                                ds.HourlySnapshots.Remove( snapshot );
-                                goto default;
-                            case SnapshotPeriodKind.Daily:
-                                ds.DailySnapshots.Remove( snapshot );
-                                goto default;
-                            case SnapshotPeriodKind.Weekly:
-                                ds.WeeklySnapshots.Remove( snapshot );
-                                goto default;
-                            case SnapshotPeriodKind.Monthly:
-                                ds.MonthlySnapshots.Remove( snapshot );
-                                goto default;
-                            case SnapshotPeriodKind.Yearly:
-                                ds.YearlySnapshots.Remove( snapshot );
-                                goto default;
-                            default:
-                                ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
-                                break;
-                        }
-
-                        continue;
+                        Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
+                    }
+                    else
+                    {
+                        Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
                     }
 
-                    Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
-                }
-            } ) );
-        }
+                    switch ( snapshot.Period.Kind )
+                    {
+                        case SnapshotPeriodKind.Frequent:
+                            ds.FrequentSnapshots.Remove( snapshot );
+                            goto default;
+                        case SnapshotPeriodKind.Hourly:
+                            ds.HourlySnapshots.Remove( snapshot );
+                            goto default;
+                        case SnapshotPeriodKind.Daily:
+                            ds.DailySnapshots.Remove( snapshot );
+                            goto default;
+                        case SnapshotPeriodKind.Weekly:
+                            ds.WeeklySnapshots.Remove( snapshot );
+                            goto default;
+                        case SnapshotPeriodKind.Monthly:
+                            ds.MonthlySnapshots.Remove( snapshot );
+                            goto default;
+                        case SnapshotPeriodKind.Yearly:
+                            ds.YearlySnapshots.Remove( snapshot );
+                            goto default;
+                        default:
+                            ds.AllSnapshots.TryRemove( snapshot.Name, out _ );
+                            break;
+                    }
 
-        await Task.WhenAll( pruneTasks ).ConfigureAwait( true );
+                    continue;
+                }
+
+                Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
+            }
+        }
 
         // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
