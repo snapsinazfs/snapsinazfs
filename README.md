@@ -4,18 +4,13 @@
 
  ## Status
 
- As of today (2023-06-02), Sanoid.net is capable of taking and pruning snapshots, using configuration
- stored in ZFS itself, via user properties.
+ As of today (2023-06-06), Sanoid.net is capable of taking and pruning snapshots, using configuration
+ stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
+ in configuration files.
 
  I may make an alpha release tag soon and possibly provide a pre-built release, here on github. This comes with
  what should be the obvious disclaimer that this is an alpha-stage project and you should not trust important
  systems with it.
-
- Since implementing pruning went so quickly, I would like to make another alteration to the project.\
- Configuration stored in ZFS has been a major boon for the application. I am now strongly considering moving ALL
- settings that still remain in settings into zfs. This will completely prevent the case of someone deleting a
- template that was configured for use in part of your ZFS hierarchy, causing subsequent runs of Sanoid.net to
- fail, due to the missing template.
 
  To make configuration even easier, I'm thinking I may introduce a command-line configuration grammar to
  Sanoid.net or else maybe provide an admin tool that provides a text-mode UI to configure Sanoid.net in ZFS.\
