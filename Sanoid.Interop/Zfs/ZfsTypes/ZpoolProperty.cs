@@ -6,7 +6,7 @@
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public class ZpoolProperty
+public static class ZpoolProperty
 {
     public const string ZfsPoolCapacityPropertyName = "capacity";
 }
