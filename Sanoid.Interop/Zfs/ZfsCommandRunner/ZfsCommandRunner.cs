@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -180,6 +180,40 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Error( e, "Error running {0} {1}. Snapshot may still exist", zfsDestroyStartInfo.FileName, zfsDestroyStartInfo.Arguments );
             return false;
         }
+    }
+
+    /// <inheritdoc />
+    public override async Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets )
+    {
+        Logger.Debug( "Requested pool root capacities" );
+        bool errorsEncountered = false;
+        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", $"-Hpo name,capacity {string.Join( ' ', datasets.Keys )}" ) )
+        {
+            string[] lineTokens = zpoolListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            string poolName = lineTokens[ 0 ];
+            string poolCapacityString = lineTokens[ 1 ];
+            Logger.Debug( "Pool {0} capacity is {1}", poolName, poolCapacityString );
+            if ( datasets.TryGetValue( poolName, out Dataset? poolRoot ) && poolRoot is { IsPoolRoot: true } )
+            {
+                if ( int.TryParse( poolCapacityString, out int usedCapacity ) )
+                {
+                    Logger.Debug( "Setting dataset object {0} pool used capacity to {1}", poolName, usedCapacity );
+                    poolRoot.PoolUsedCapacity = usedCapacity;
+                }
+                else
+                {
+                    Logger.Error( "Failed to parse capacity for pool {0}. Prune deferral setting may be incorrect", poolName );
+                    errorsEncountered = true;
+                }
+            }
+            else if ( !datasets.ContainsKey( poolName ) )
+            {
+                Logger.Error( "Pool root {0} does not exist in current program state. Prune deferral setting may be incorrect", poolName );
+                errorsEncountered = true;
+            }
+        }
+
+        return errorsEncountered;
     }
 
     /// <inheritdoc />
@@ -374,7 +408,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !result.ContainsKey( dsName ) )
             {
                 Logger.Debug( "Key not in result. Creating new dataset {0}", dsName );
-                result[ dsName ] = new( dsName, DatasetKind.FileSystem );
+                result[ dsName ] = new( dsName, DatasetKind.FileSystem, null, true );
             }
 
             Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
@@ -424,11 +458,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string dsName = zfsListTokens[ 0 ];
                 string propertyName = zfsListTokens[ 1 ];
                 string propertyValue = zfsListTokens[ 2 ];
-                Logger.Debug("Checking for existence of dataset {0} in collection", dsName);
+                Logger.Debug( "Checking for existence of dataset {0} in collection", dsName );
                 if ( !datasets.ContainsKey( dsName ) )
                 {
                     Logger.Debug( "Dataset {0} not in collection. Attempting to add using Name: {0}, Kind: {1}", dsName, propertyValue );
-                    if ( datasets.TryAdd( dsName, new( dsName, propertyValue.ToDatasetKind( ) ) ) )
+                    if ( datasets.TryAdd( dsName, new( dsName, propertyValue.ToDatasetKind( ), datasets[ poolRootName ] ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;
@@ -474,7 +508,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     continue;
                 }
 
-                Snapshot snap = Snapshot.FromListSnapshots( zfsListTokens );
+                Snapshot snap = Snapshot.FromListSnapshots( zfsListTokens, datasets );
                 string snapDatasetName = snap.DatasetName;
                 if ( !datasets.ContainsKey( snapDatasetName ) )
                 {

@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -24,16 +24,22 @@ public class Dataset : ZfsObjectBase
     /// </summary>
     /// <param name="name">The name of the new <see cref="Dataset" /></param>
     /// <param name="kind">The <see cref="DatasetKind" /> of Dataset to create</param>
+    /// <param name="poolRoot">
+    ///     The root dataset for this dataset. Null for roots.
+    /// </param>
+    /// <param name="isKnownPoolRoot">
+    ///     Short-circuit if this dataset is known to be a pool root at instantiation, to avoid
+    ///     string lookup
+    /// </param>
     /// <param name="validateName">
     ///     Whether to validate the name of the new <see cref="Dataset" /> (<see langword="true" />) or
     ///     not (<see langword="false" /> - default)
     /// </param>
     /// <param name="validatorRegex">The <see cref="Regex" /> to user for name validation</param>
-    public Dataset( string name, DatasetKind kind, bool validateName = false, Regex? validatorRegex = null )
-        : base( name, (ZfsObjectKind)kind, validatorRegex, validateName )
+    public Dataset( string name, DatasetKind kind, Dataset? poolRoot = null, bool isKnownPoolRoot = false, bool validateName = false, Regex? validatorRegex = null )
+        : base( name, (ZfsObjectKind)kind, poolRoot, isKnownPoolRoot, validateName, validatorRegex )
     {
     }
-
     public ConcurrentDictionary<string, Snapshot> AllSnapshots { get; } = new( );
     public List<Snapshot> DailySnapshots { get; } = new( );
 

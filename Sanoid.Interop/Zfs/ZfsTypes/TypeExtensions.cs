@@ -60,4 +60,21 @@ public static class TypeExtensions
             _ => throw new NotSupportedException( $"Conversion from {value} to a DatasetKind is not supported." )
         };
     }
+
+    public static string GetZfsPathRoot( this string value )
+    {
+        int endIndex = value.IndexOf( '/' );
+        if ( endIndex == -1 )
+        {
+            endIndex = value.IndexOf( '@' );
+        }
+
+        if ( endIndex == -1 )
+        {
+            return value;
+        }
+
+        string rootPath = value[ ..endIndex ];
+        return rootPath;
+    }
 }

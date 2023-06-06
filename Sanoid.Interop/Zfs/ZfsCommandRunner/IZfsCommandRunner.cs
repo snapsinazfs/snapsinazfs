@@ -52,6 +52,13 @@ public interface IZfsCommandRunner
     public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
+    /// Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
+    /// </summary>
+    /// <param name="datasets"></param>
+    /// <returns>A boolean indicating success or failure of the operation</returns>
+    public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets );
+
+    /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
     /// </summary>
     /// <param name="dryRun">

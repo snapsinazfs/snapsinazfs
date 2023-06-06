@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using NLog;
 using Sanoid.Settings.Settings;
 
@@ -14,8 +15,8 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapshot>
 {
-    private Snapshot( string name )
-        : base( name, ZfsObjectKind.Snapshot )
+    private Snapshot( string name, ZfsObjectBase poolRoot )
+        : base( name, ZfsObjectKind.Snapshot, poolRoot )
     {
     }
 
@@ -185,7 +186,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     public static Snapshot GetNewSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
-        Snapshot newSnapshot = new( snapshotName );
+        Snapshot newSnapshot = new( snapshotName, ds.PoolRoot );
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ) );
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ) );
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySourceConstants.Local ) );
@@ -231,7 +232,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     ///         </item>
     ///     </list>
     /// </remarks>
-    public static Snapshot FromListSnapshots( string[] lineTokens )
+    public static Snapshot FromListSnapshots( string[] lineTokens, ConcurrentDictionary<string,Dataset> datasets )
     {
         if ( lineTokens.Length < ZfsProperty.KnownSnapshotProperties.Count + 1 )
         {
@@ -240,7 +241,8 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
             throw new ArgumentException( errorMessage, nameof( lineTokens ) );
         }
 
-        Snapshot snap = new( lineTokens[ 0 ] );
+        string snapshotName = lineTokens[ 0 ];
+        Snapshot snap = new( snapshotName, datasets[ snapshotName.GetZfsPathRoot( ) ] );
 
         for ( int i = 1; i < lineTokens.Length; i++ )
         {

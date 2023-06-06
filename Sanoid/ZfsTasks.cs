@@ -7,8 +7,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using System.Xml.Linq;
-
 using Sanoid.Interop.Concurrency;
 using Sanoid.Interop.Libc.Enums;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
@@ -119,7 +117,7 @@ internal static class ZfsTasks
                 Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, string.Join( ',', propsToSet.Select( p => $"{p.Name}: {p.Value}" ) ) );
                 if ( commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) ) && !settings.DryRun )
                 {
-                    Logger.Debug("Property set successful");
+                    Logger.Debug( "Property set successful" );
                     continue;
                 }
 
@@ -128,6 +126,7 @@ internal static class ZfsTasks
                     Logger.Info( "DRY RUN: No properties were set on actual datasets" );
                     continue;
                 }
+
                 Logger.Error( "Error setting properties for dataset {0}", ds.Name );
                 continue;
             }
@@ -202,7 +201,7 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        Parallel.ForEach( datasets.Values, new ParallelOptions{ MaxDegreeOfParallelism = 4, TaskScheduler = null }, async ds => await PruneSnapshotsForDatasetAsync(ds) );
+        Parallel.ForEach( datasets.Values, new( ) { MaxDegreeOfParallelism = 4, TaskScheduler = null }, async ds => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( true ) );
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -230,6 +229,7 @@ internal static class ZfsTasks
                 Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
                 return;
             }
+
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
@@ -281,7 +281,6 @@ internal static class ZfsTasks
             }
         }
     }
-
 
     internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SanoidSettings settings, Dataset ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
@@ -425,7 +424,7 @@ internal static class ZfsTasks
         return !errorsEncountered;
     }
 
-    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound, ConcurrentDictionary<string,Dataset> Datasets  );
+    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound, ConcurrentDictionary<string, Dataset> Datasets );
 
     public static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
@@ -492,10 +491,15 @@ internal static class ZfsTasks
             }
         }
 
+        if ( poolRoots.Any( ) )
+        {
+            await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( true );
+        }
+
         return new( missingPoolPropertyCollections, missingPropertiesFound, poolRoots );
     }
 
-    [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly")]
+    [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
     public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots ).ConfigureAwait( true );
