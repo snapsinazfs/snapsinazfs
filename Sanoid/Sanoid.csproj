@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -66,6 +66,8 @@
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
     <PackageReference Include="PowerArgs" Version="4.0.2" />
+    <PackageReference Include="Sharpie-Curses" Version="1.7.0" />
+    <PackageReference Include="Sharpie-Libs-NCurses" Version="1.0.4" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 
