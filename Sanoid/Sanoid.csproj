@@ -93,4 +93,10 @@
     <Using Include="NLog" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="allsnapshots-withproperties-needspruning.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
