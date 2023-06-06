@@ -128,6 +128,11 @@ public class CommandLineArguments
     [ArgEnforceCase]
     public bool Version { get; set; }
 
+    [ArgDescription("Launches Sanoid.net's built-in interactive configuration console")]
+    [ArgShortcut( "--configconsole" )]
+    [ArgShortcut( "--config-console" )]
+    public bool ConfigConsole { get; set; }
+
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
