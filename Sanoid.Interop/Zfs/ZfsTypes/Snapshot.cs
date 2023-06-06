@@ -186,7 +186,10 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     public static Snapshot GetNewSnapshotForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings )
     {
         string snapshotName = settings.Templates[ ds.Template ].GenerateFullSnapshotName( ds.Name, period.Kind, timestamp, settings.Formatting );
-        Snapshot newSnapshot = new( snapshotName, ds.PoolRoot );
+        Snapshot newSnapshot = new( snapshotName, ds.PoolRoot )
+        {
+            RetentionSettings = ds.RetentionSettings
+        };
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ) );
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ) );
         newSnapshot.AddOrUpdateProperty( new( ZfsProperty.SnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySourceConstants.Local ) );
@@ -200,6 +203,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     /// <param name="lineTokens">
     ///     A string array that must be in the order of the <see cref="ZfsProperty.KnownSnapshotProperties" /> collection
     /// </param>
+    /// <param name="datasets"></param>
     /// <returns>
     ///     A new <see cref="Snapshot" /> from the input array
     /// </returns>
@@ -242,7 +246,12 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         }
 
         string snapshotName = lineTokens[ 0 ];
-        Snapshot snap = new( snapshotName, datasets[ snapshotName.GetZfsPathRoot( ) ] );
+        string parentName = snapshotName[ ..snapshotName.LastIndexOfAny( new[] { '/', '@' } ) ];
+        Dataset poolRoot = datasets[ snapshotName.GetZfsPathRoot( ) ];
+        Snapshot snap = new( snapshotName, poolRoot )
+        {
+            RetentionSettings = datasets[parentName].RetentionSettings
+        };
 
         for ( int i = 1; i < lineTokens.Length; i++ )
         {
