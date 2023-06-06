@@ -493,17 +493,27 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <summary>
-    ///     Raw call to ZFS get with any supplied parameters that yields a string enumerator, which provides a line-by-line
+    ///     Raw call to the zfs utility with any supplied verb and parameters that yields a string enumerator, which provides a
+    ///     line-by-line
     ///     enumeration of the output of the command.
     /// </summary>
     /// <param name="verb"></param>
     /// <param name="args"></param>
     /// <returns>
-    ///     An <see cref="IEnumerable{T}" /> of <see langword="string" />s, iterating over the output of the zfs get
-    ///     operation
+    ///     An <see cref="IEnumerable{T}" /> of <see langword="string" />s, iterating over the output of the zfs operation
     /// </returns>
-    private async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    public override async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
+        if ( string.IsNullOrWhiteSpace( verb ) )
+        {
+            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
+        }
+
+        if ( verb is not "get" and not "list" )
+        {
+            throw new ArgumentOutOfRangeException( nameof( verb ), "Only get and list verbs are permitted for zfs enumerator operations" );
+        }
+
         ProcessStartInfo zfsGetStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
         {
             CreateNoWindow = true,
@@ -527,6 +537,55 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
                 yield return ( await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) )!;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Raw call to the zpool utility with any supplied <paramref name="verb" /> and <paramref name="args" /> that yields a
+    ///     string enumerator, which provides a line-by-line
+    ///     enumeration of the output of the command.
+    /// </summary>
+    /// <param name="verb">The verb (list or get) to use</param>
+    /// <param name="args">The arguments to supply after the verb</param>
+    /// <returns>
+    ///     An <see cref="IEnumerable{T}" /> of <see langword="string" />s, iterating over the output of the zpool operation
+    /// </returns>
+    public override async IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
+    {
+        if ( string.IsNullOrWhiteSpace( verb ) )
+        {
+            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
+        }
+
+        if ( verb is not "get" and not "list" )
+        {
+            throw new ArgumentOutOfRangeException( nameof( verb ), "Only get and list verbs are permitted for zpool enumerator operations" );
+        }
+
+        ProcessStartInfo zpoolExecStartInfo = new( PathToZpoolUtility, $"{verb} {args}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZpoolUtility, verb, args );
+        using ( Process zpoolExecProcess = new( ) { StartInfo = zpoolExecStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1} {2}", zpoolExecStartInfo.FileName, verb, args );
+            try
+            {
+                zpoolExecProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                // Log this, but re-throw, because this is likely fatal, depending on call site
+                Logger.Error( ioex, "Error running zpool {0} operation. The error returned was {1}", verb, ioex.Message );
+                throw;
+            }
+
+            while ( !zpoolExecProcess.StandardOutput.EndOfStream )
+            {
+                yield return ( await zpoolExecProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) )!;
             }
         }
     }

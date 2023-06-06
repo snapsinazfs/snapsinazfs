@@ -32,4 +32,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     /// <inheritdoc />
     public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+
+    public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
+    public abstract IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args );
 }

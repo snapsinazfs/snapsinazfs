@@ -91,4 +91,7 @@ public interface IZfsCommandRunner
     /// <param name="snapshots">A collection of snapshots for this method to populate</param>
     /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
     public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+
+    public IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
+    public IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args );
 }

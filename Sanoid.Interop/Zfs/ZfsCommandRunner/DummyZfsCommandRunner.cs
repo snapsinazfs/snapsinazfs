@@ -52,6 +52,18 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
     }
 
+    /// <inheritdoc />
+    public override IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
+    {
+        throw new NotImplementedException( );
+    }
+
+    /// <inheritdoc />
+    public override IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    {
+        throw new NotImplementedException( );
+    }
+
     private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
     {
         using StreamReader rdr = File.OpenText( filePath );
