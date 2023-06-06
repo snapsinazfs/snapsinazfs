@@ -104,16 +104,17 @@ public class Dataset : ZfsObjectBase
         return missing.Any( ) ? new( false, missing ) : new( true, null );
     }
 
-    public List<Snapshot> GetSnapshotsToPrune( TemplateSettings template )
+    public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         List<Snapshot> snapshotsToPrune = new( );
         List<Snapshot> snapshotsSetForPruning = FrequentSnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Frequent )
+        int numberToKeep;
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionFrequentPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Frequent;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} frequent snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -127,9 +128,9 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = HourlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Hourly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Hourly )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionHourlyPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Hourly;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} hourly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -143,9 +144,9 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = DailySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Daily snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Daily )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionDailyPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Daily;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} daily snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -159,9 +160,9 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = WeeklySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Weekly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Weekly )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionWeeklyPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Weekly;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} weekly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -175,9 +176,9 @@ public class Dataset : ZfsObjectBase
         snapshotsSetForPruning.Clear( );
         snapshotsSetForPruning = MonthlySnapshots.Where( s => s.PruneSnapshots ).ToList( );
         Logger.Debug( "Monthly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Monthly )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionMonthlyPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Monthly;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} monthly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
@@ -193,9 +194,9 @@ public class Dataset : ZfsObjectBase
         Logger.Debug( "Yearly snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         // Don't do this, so these all look the same
         // ReSharper disable once InvertIf
-        if ( snapshotsSetForPruning.Count > template.SnapshotRetention.Yearly )
+        if ( int.TryParse( Properties[ ZfsProperty.SnapshotRetentionYearlyPropertyName ].Value, out numberToKeep ) && snapshotsSetForPruning.Count > numberToKeep )
         {
-            numberToPrune = snapshotsSetForPruning.Count - template.SnapshotRetention.Yearly;
+            numberToPrune = snapshotsSetForPruning.Count - numberToKeep;
             Logger.Debug( "Need to prune oldest {0} yearly snapshots from dataset {1}", numberToPrune, Name );
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )

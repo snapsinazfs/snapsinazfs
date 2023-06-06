@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -221,7 +221,7 @@ internal static class ZfsTasks
                 continue;
             }
 
-            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( template );
+            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
             Logger.Debug( "Need to prune the following snapshots from {0}: {1}", dsName, string.Join( ',', snapshotsToPruneForDataset.Select( s => s.Name ) ) );
 
