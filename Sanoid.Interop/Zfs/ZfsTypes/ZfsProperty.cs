@@ -149,3 +149,44 @@ public class ZfsProperty
         return $"{Name}: {Value}";
     }
 }
+
+public class ZfsProperty<T> where T : notnull
+{
+    public ZfsProperty( string name, T value, string source )
+    {
+        Name = name;
+        Value = value;
+        Source = source;
+        IsSanoidProperty = name.StartsWith( "sanoid.net:" );
+    }
+
+    public bool IsInherited => Source.StartsWith( "inherited" );
+
+    public bool IsLocal => Source == "local";
+
+    /// <summary>
+    ///     Gets whether this is a sanoid property or not
+    /// </summary>
+    /// <remarks>Set by constructor, if property name begins with "sanoid.net:"</remarks>
+    public bool IsSanoidProperty { get; }
+
+    /// <summary>
+    ///     Gets a boolean indicating if this property is a sanoid property, is a string, and is equal to "-"
+    /// </summary>
+    public bool IsUndefinedOrDefault => IsSanoidProperty && Value is "-";
+
+    /// <summary>
+    ///     Gets or sets the name of the property
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the source of the property, as a string
+    /// </summary>
+    public string Source { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the value of the property, of type <see cref="T" />
+    /// </summary>
+    public T Value { get; set; }
+}
