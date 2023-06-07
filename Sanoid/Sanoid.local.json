@@ -31,8 +31,6 @@
   "Templates": {
     "production": {
       "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template.",
-      "TakeSnapshots": true,
-      "PruneSnapshots": true,
       "SnapshotTiming": {
         "FrequentPeriod": 15,
         "UseLocalTime": true,

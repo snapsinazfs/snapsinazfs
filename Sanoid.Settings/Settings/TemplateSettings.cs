@@ -17,19 +17,9 @@ public sealed class TemplateSettings
     public FormattingSettings? Formatting { get; set; }
 
     /// <summary>
-    ///     Gets or sets the global PruneSnapshots setting
-    /// </summary>
-    public required bool PruneSnapshots { get; set; }
-
-    /// <summary>
     ///     Gets or sets the snapshot timing settings sub-section
     /// </summary>
     public required SnapshotTimingSettings SnapshotTiming { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the global TakeSnapshots setting
-    /// </summary>
-    public required bool TakeSnapshots { get; set; }
 
     /// <summary>
     ///     Gets formatting settings for this template, or the fallback settings provided
