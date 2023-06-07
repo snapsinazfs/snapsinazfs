@@ -13,91 +13,93 @@
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using NStack;
 using Sanoid.Settings.Settings;
-using Terminal.Gui;
 
-namespace Sanoid.ConfigConsole;
-
-public partial class SanoidConfigConsole
+namespace Sanoid.ConfigConsole
 {
-    public SanoidConfigConsole( )
-    {
-        InitializeComponent( );
+    using System;
+    using Terminal.Gui;
 
-        resetGlobalConfigButton.Clicked += SetGlobalSettingsFieldsFromSettingsObject;
-        saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
-        SetGlobalSettingsFieldsFromSettingsObject( );
-    }
-
-    private void ShowSaveGlobalConfigDialog( )
+    public partial class SanoidConfigConsole
     {
-        if ( ValidateGlobalConfigValues( ) )
+        public SanoidConfigConsole( )
         {
-            using ( SaveDialog globalConfigSaveDialog = new( "Save GLobal Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+            InitializeComponent( );
+
+            resetGlobalConfigButton.Clicked += SetGlobalSettingsFieldsFromSettingsObject;
+            saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
+            SetGlobalSettingsFieldsFromSettingsObject( );
+        }
+
+        private void ShowSaveGlobalConfigDialog( )
+        {
+            if ( ValidateGlobalConfigValues( ) )
             {
-                globalConfigSaveDialog.AllowsOtherFileTypes = true;
-                globalConfigSaveDialog.CanCreateDirectories = true;
-                globalConfigSaveDialog.Modal = true;
-                Application.Run( globalConfigSaveDialog );
-                if ( globalConfigSaveDialog.Canceled )
+                using ( SaveDialog globalConfigSaveDialog = new( "Save GLobal Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
                 {
-                    return;
+                    globalConfigSaveDialog.AllowsOtherFileTypes = true;
+                    globalConfigSaveDialog.CanCreateDirectories = true;
+                    globalConfigSaveDialog.Modal = true;
+                    Application.Run( globalConfigSaveDialog );
+                    if ( globalConfigSaveDialog.Canceled )
+                    {
+                        return;
+                    }
+
+                    if ( globalConfigSaveDialog.FileName.IsEmpty )
+                    {
+                        return;
+                    }
+
+                    SanoidSettings settings = ConfigConsole.Settings;
+                    settings.DryRun = dryRunRadioGroup.SelectedItem == 0;
+                    settings.TakeSnapshots = takeSnapshotsRadioGroup.SelectedItem == 0;
+                    settings.PruneSnapshots = pruneSnapshotsRadioGroup.SelectedItem == 0;
+                    settings.ZfsPath = pathToZfsTextField.Text.ToString( );
+                    settings.ZpoolPath = pathToZpoolTextField.Text.ToString( );
+                    settings.Formatting.ComponentSeparator = snapshotNameComponentSeparatorValidatorField.Text.ToString( );
+                    settings.Formatting.Prefix = snapshotNamePrefixTextField.Text.ToString( );
+                    settings.Formatting.TimestampFormatString = snapshotNameTimestampFormatTextField.Text.ToString( );
+                    settings.Formatting.FrequentSuffix = snapshotNameFrequentSuffixTextField.Text.ToString( );
+                    settings.Formatting.HourlySuffix = snapshotNameHourlySuffixTextField.Text.ToString( );
+                    settings.Formatting.DailySuffix = snapshotNameDailySuffixTextField.Text.ToString( );
+                    settings.Formatting.WeeklySuffix = snapshotNameWeeklySuffixTextField.Text.ToString( );
+                    settings.Formatting.MonthlySuffix = snapshotNameMonthlySuffixTextField.Text.ToString( );
+                    settings.Formatting.YearlySuffix = snapshotNameYearlySuffixTextField.Text.ToString( ) ?? throw new InvalidOperationException( );
+
+
+                    File.WriteAllText( globalConfigSaveDialog.FileName.ToString( ), JsonSerializer.Serialize( ConfigConsole.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
                 }
-
-                if ( globalConfigSaveDialog.FileName.IsEmpty )
-                {
-                    return;
-                }
-
-                SanoidSettings settings = ConfigConsole.Settings;
-                settings.DryRun = dryRunRadioGroup.SelectedItem == 0;
-                settings.TakeSnapshots = takeSnapshotsRadioGroup.SelectedItem == 0;
-                settings.PruneSnapshots = pruneSnapshotsRadioGroup.SelectedItem == 0;
-                settings.ZfsPath = pathToZfsTextField.Text.ToString( );
-                settings.ZpoolPath = pathToZpoolTextField.Text.ToString( );
-                settings.Formatting.ComponentSeparator = snapshotNameComponentSeparatorValidatorField.Text.ToString( );
-                settings.Formatting.Prefix = snapshotNamePrefixTextField.Text.ToString( );
-                settings.Formatting.TimestampFormatString = snapshotNameTimestampFormatTextField.Text.ToString( );
-                settings.Formatting.FrequentSuffix = snapshotNameFrequentSuffixTextField.Text.ToString( );
-                settings.Formatting.HourlySuffix = snapshotNameHourlySuffixTextField.Text.ToString( );
-                settings.Formatting.DailySuffix = snapshotNameDailySuffixTextField.Text.ToString( );
-                settings.Formatting.WeeklySuffix = snapshotNameWeeklySuffixTextField.Text.ToString( );
-                settings.Formatting.MonthlySuffix = snapshotNameMonthlySuffixTextField.Text.ToString( );
-                settings.Formatting.YearlySuffix = snapshotNameYearlySuffixTextField.Text.ToString( );
-
-
-                File.WriteAllText( globalConfigSaveDialog.FileName.ToString( ), JsonSerializer.Serialize( ConfigConsole.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
             }
         }
-    }
 
-    private bool ValidateGlobalConfigValues( )
-    {
-        if ( pathToZfsTextField.Text.IsEmpty )
+        private bool ValidateGlobalConfigValues( )
         {
-            return false;
+            if ( pathToZfsTextField.Text.IsEmpty )
+            {
+                return false;
+            }
+
+            return true;
         }
 
-        return true;
-    }
+        private void SetGlobalSettingsFieldsFromSettingsObject( )
+        {
+            dryRunRadioGroup.SelectedItem = ConfigConsole.Settings.DryRun ? 0 : 1;
+            takeSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.TakeSnapshots ? 0 : 1;
+            pruneSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.PruneSnapshots ? 0 : 1;
+            pathToZfsTextField.Text = ConfigConsole.Settings.ZfsPath;
+            pathToZpoolTextField.Text = ConfigConsole.Settings.ZpoolPath;
 
-    private void SetGlobalSettingsFieldsFromSettingsObject( )
-    {
-        dryRunRadioGroup.SelectedItem = ConfigConsole.Settings.DryRun ? 0 : 1;
-        takeSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.TakeSnapshots ? 0 : 1;
-        pruneSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.PruneSnapshots ? 0 : 1;
-        pathToZfsTextField.Text = ConfigConsole.Settings.ZfsPath;
-        pathToZpoolTextField.Text = ConfigConsole.Settings.ZpoolPath;
-
-        snapshotNameComponentSeparatorValidatorField.Text = ConfigConsole.Settings.Formatting.ComponentSeparator;
-        snapshotNamePrefixTextField.Text = ConfigConsole.Settings.Formatting.Prefix;
-        snapshotNameTimestampFormatTextField.Text = ConfigConsole.Settings.Formatting.TimestampFormatString;
-        snapshotNameFrequentSuffixTextField.Text = ConfigConsole.Settings.Formatting.FrequentSuffix;
-        snapshotNameHourlySuffixTextField.Text = ConfigConsole.Settings.Formatting.HourlySuffix;
-        snapshotNameDailySuffixTextField.Text = ConfigConsole.Settings.Formatting.DailySuffix;
-        snapshotNameWeeklySuffixTextField.Text = ConfigConsole.Settings.Formatting.WeeklySuffix;
-        snapshotNameMonthlySuffixTextField.Text = ConfigConsole.Settings.Formatting.MonthlySuffix;
-        snapshotNameYearlySuffixTextField.Text = ConfigConsole.Settings.Formatting.YearlySuffix;
+            snapshotNameComponentSeparatorValidatorField.Text = ConfigConsole.Settings.Formatting.ComponentSeparator;
+            snapshotNamePrefixTextField.Text = ConfigConsole.Settings.Formatting.Prefix;
+            snapshotNameTimestampFormatTextField.Text = ConfigConsole.Settings.Formatting.TimestampFormatString;
+            snapshotNameFrequentSuffixTextField.Text = ConfigConsole.Settings.Formatting.FrequentSuffix;
+            snapshotNameHourlySuffixTextField.Text = ConfigConsole.Settings.Formatting.HourlySuffix;
+            snapshotNameDailySuffixTextField.Text = ConfigConsole.Settings.Formatting.DailySuffix;
+            snapshotNameWeeklySuffixTextField.Text = ConfigConsole.Settings.Formatting.WeeklySuffix;
+            snapshotNameMonthlySuffixTextField.Text = ConfigConsole.Settings.Formatting.MonthlySuffix;
+            snapshotNameYearlySuffixTextField.Text = ConfigConsole.Settings.Formatting.YearlySuffix;
+        }
     }
 }

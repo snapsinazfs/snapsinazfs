@@ -17,6 +17,10 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.ColorScheme greyOnBlack;
         
+        private Terminal.Gui.ColorScheme redOnBlack;
+        
+        private Terminal.Gui.ColorScheme whiteOnRed;
+        
         private Terminal.Gui.TabView configCategoryTabView;
         
         private Terminal.Gui.Window globalConfigWindow;
@@ -85,10 +89,19 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Button resetGlobalConfigButton;
         
+        private Terminal.Gui.Window window;
+        
+        private Terminal.Gui.Label label;
+        
+        private Terminal.Gui.Window zfsConfigurationWindow;
+        
         private Terminal.Gui.TreeView zfsConfigurationTreeView;
         
         private void InitializeComponent() {
             this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
+            this.zfsConfigurationWindow = new Terminal.Gui.Window();
+            this.label = new Terminal.Gui.Label();
+            this.window = new Terminal.Gui.Window();
             this.resetGlobalConfigButton = new Terminal.Gui.Button();
             this.saveGlobalConfigButton = new Terminal.Gui.Button();
             this.snapshotNameYearlySuffixTextField = new Terminal.Gui.TextValidateField();
@@ -129,6 +142,18 @@ namespace Sanoid.ConfigConsole {
             this.greyOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.greyOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.greyOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
+            this.redOnBlack = new Terminal.Gui.ColorScheme();
+            this.redOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Red, Terminal.Gui.Color.Black);
+            this.redOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightRed, Terminal.Gui.Color.Black);
+            this.redOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Red, Terminal.Gui.Color.Brown);
+            this.redOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightRed, Terminal.Gui.Color.Brown);
+            this.redOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Black);
+            this.whiteOnRed = new Terminal.Gui.ColorScheme();
+            this.whiteOnRed.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
+            this.whiteOnRed.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
+            this.whiteOnRed.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
+            this.whiteOnRed.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
+            this.whiteOnRed.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
@@ -463,23 +488,67 @@ namespace Sanoid.ConfigConsole {
             this.resetGlobalConfigButton.IsDefault = false;
             this.globalConfigWindow.Add(this.resetGlobalConfigButton);
             configCategoryTabView.AddTab(configCategoryTabViewglobalConfiguration, false);
+            Terminal.Gui.TabView.Tab configCategoryTabViewtemplates;
+            configCategoryTabViewtemplates = new Terminal.Gui.TabView.Tab("Templates", new View());
+            configCategoryTabViewtemplates.View.Width = Dim.Fill();
+            configCategoryTabViewtemplates.View.Height = Dim.Fill();
+            this.window.Width = 60;
+            this.window.Height = 9;
+            this.window.X = Pos.Center();
+            this.window.Y = Pos.Center();
+            this.window.ColorScheme = this.redOnBlack;
+            this.window.Modal = true;
+            this.window.Data = "window";
+            this.window.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.window.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.window.Border.Effect3D = false;
+            this.window.Border.Effect3DBrush = null;
+            this.window.Border.DrawMarginFrame = true;
+            this.window.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.window.Title = "";
+            configCategoryTabViewtemplates.View.Add(this.window);
+            this.label.Width = 4;
+            this.label.Height = 1;
+            this.label.X = Pos.Center();
+            this.label.Y = Pos.Center();
+            this.label.ColorScheme = this.whiteOnRed;
+            this.label.Data = "label";
+            this.label.Text = "Template Editing Not Yet Implemented";
+            this.label.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.window.Add(this.label);
+            configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());
             configCategoryTabViewzFSConfiguration.View.Width = Dim.Fill();
             configCategoryTabViewzFSConfiguration.View.Height = Dim.Fill();
-            this.zfsConfigurationTreeView.Width = Dim.Fill(0);
-            this.zfsConfigurationTreeView.Height = Dim.Fill(0);
-            this.zfsConfigurationTreeView.X = 0;
-            this.zfsConfigurationTreeView.Y = 0;
+            this.zfsConfigurationWindow.Width = Dim.Fill(8);
+            this.zfsConfigurationWindow.Height = Dim.Fill(8);
+            this.zfsConfigurationWindow.X = Pos.Center();
+            this.zfsConfigurationWindow.Y = Pos.Center();
+            this.zfsConfigurationWindow.Modal = false;
+            this.zfsConfigurationWindow.Data = "zfsConfigurationWindow";
+            this.zfsConfigurationWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsConfigurationWindow.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationWindow.Border.Effect3D = false;
+            this.zfsConfigurationWindow.Border.Effect3DBrush = null;
+            this.zfsConfigurationWindow.Border.DrawMarginFrame = true;
+            this.zfsConfigurationWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationWindow.Title = "";
+            configCategoryTabViewzFSConfiguration.View.Add(this.zfsConfigurationWindow);
+            this.zfsConfigurationTreeView.Width = Dim.Fill(16);
+            this.zfsConfigurationTreeView.Height = Dim.Fill(8);
+            this.zfsConfigurationTreeView.X = Pos.Center();
+            this.zfsConfigurationTreeView.Y = Pos.Center();
+            this.zfsConfigurationTreeView.ColorScheme = this.greyOnBlack;
             this.zfsConfigurationTreeView.Data = "zfsConfigurationTreeView";
-            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.zfsConfigurationTreeView.Style.CollapseableSymbol = '-';
             this.zfsConfigurationTreeView.Style.ColorExpandSymbol = false;
             this.zfsConfigurationTreeView.Style.ExpandableSymbol = '+';
             this.zfsConfigurationTreeView.Style.InvertExpandSymbolColors = false;
             this.zfsConfigurationTreeView.Style.LeaveLastRow = false;
             this.zfsConfigurationTreeView.Style.ShowBranchLines = true;
-            configCategoryTabViewzFSConfiguration.View.Add(this.zfsConfigurationTreeView);
+            this.zfsConfigurationWindow.Add(this.zfsConfigurationTreeView);
             configCategoryTabView.AddTab(configCategoryTabViewzFSConfiguration, false);
             this.configCategoryTabView.ApplyStyleChanges();
             this.Add(this.configCategoryTabView);
