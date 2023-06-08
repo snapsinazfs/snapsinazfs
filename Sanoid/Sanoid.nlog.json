@@ -44,7 +44,7 @@
             },
             {
               "name": "message",
-              "layout": "${message:raw=true}"
+              "layout": "${message}"
             },
             {
               "name": "properties",
