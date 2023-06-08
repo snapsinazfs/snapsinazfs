@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
+using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -38,4 +39,5 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
     public abstract IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args );
+    public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets );
 }

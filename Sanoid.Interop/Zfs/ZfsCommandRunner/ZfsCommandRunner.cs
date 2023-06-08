@@ -9,6 +9,7 @@ using System.Diagnostics;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
+using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -680,5 +681,49 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Trace( "zfs set process finished" );
             return true;
         }
+    }
+
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
+    {
+        List<ITreeNode> nodes = new( );
+        await foreach ( string zfsLine in ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            {
+                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ] );
+                nodes.Add( newRootDs );
+                return newRootDs;
+            }, ( k, ds ) =>
+            {
+                ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                return ds;
+            } );
+        }
+
+        await foreach ( string zfsLine in ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ' ', datasets.Keys )}" ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            {
+                int lastSlashIndex = k.LastIndexOf( '/' );
+                string parentName = k[ ..lastSlashIndex ];
+                SanoidZfsDataset parentDs = datasets[ parentName ];
+                SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], parentDs );
+                parentDs.Children.Add( newDs );
+                return newDs;
+            }, ( k, ds ) =>
+            {
+                if ( ds.IsPoolRoot )
+                {
+                    return ds;
+                }
+
+                ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                return ds;
+            } );
+        }
+
+        return nodes;
     }
 }

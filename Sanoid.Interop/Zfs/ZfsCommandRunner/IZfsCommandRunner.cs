@@ -10,6 +10,7 @@ using System.Text.Json;
 using NLog;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
+using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -52,7 +53,7 @@ public interface IZfsCommandRunner
     public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings );
 
     /// <summary>
-    /// Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
+    ///     Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
     /// </summary>
     /// <param name="datasets"></param>
     /// <returns>A boolean indicating success or failure of the operation</returns>
@@ -101,4 +102,5 @@ public interface IZfsCommandRunner
 
     public IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
     public IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args );
+    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets );
 }

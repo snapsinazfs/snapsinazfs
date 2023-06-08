@@ -7,6 +7,7 @@
 using System.Collections.Concurrent;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
+using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 
@@ -102,9 +103,70 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    public override async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
-        throw new NotImplementedException( );
+        if ( verb == "get" )
+        {
+            using StreamReader rdr = File.OpenText( args );
+            while ( !rdr.EndOfStream )
+            {
+                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true );
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
+    {
+        List<ITreeNode> nodes = new( );
+        ConcurrentDictionary<string, SanoidZfsDataset> poolRoots = new( );
+        await foreach ( string zfsLine in ZfsExecEnumerator( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            {
+                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ] );
+                Logger.Debug( "Adding new pool root object {0} to collections", newRootDs.Name );
+                nodes.Add( newRootDs );
+                return newRootDs;
+            }, ( k, ds ) =>
+            {
+                ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                Logger.Debug( "Updating property {0} for {1} to {2}", lineTokens[ 1 ], lineTokens[ 0 ], lineTokens[ 2 ] );
+                return ds;
+            } );
+        }
+
+        await foreach ( string zfsLine in ZfsExecEnumerator( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            {
+                int lastSlashIndex = k.LastIndexOf( '/' );
+                string parentName = k[ ..lastSlashIndex ];
+                SanoidZfsDataset parentDs = datasets[ parentName ];
+                SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], parentDs );
+                Logger.Debug( "Adding new {0} {1} to {2}", newDs.Kind, newDs.Name, parentDs.Name );
+                parentDs.Children.Add( newDs );
+                return newDs;
+            }, ( k, ds ) =>
+            {
+                if ( ds.IsPoolRoot )
+                {
+                    return ds;
+                }
+
+                string propertyName = lineTokens[ 1 ];
+                string propertyValue = lineTokens[ 2 ];
+                string propertySource = lineTokens[ 3 ];
+                Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
+                ds.UpdateProperty( propertyName, propertyValue, propertySource );
+                return ds;
+            } );
+        }
+
+        return nodes;
+
     }
 
     private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
@@ -113,6 +175,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         while ( !rdr.EndOfStream )
         {
+
             string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
             if ( string.IsNullOrWhiteSpace( stringToParse ) )
             {
@@ -145,7 +208,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
         }
     }
-
     private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
     {
         Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} pool1" );
