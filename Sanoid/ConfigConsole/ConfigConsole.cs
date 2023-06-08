@@ -26,6 +26,7 @@ internal static class ConfigConsole
     public static void RunConsoleInterface( SanoidSettings settings, IZfsCommandRunner commandRunner )
     {
         Logger.Info( "Config Console requested. \"Console\" logging rule will be suspended until exit" );
+
         LogManager.Flush( 250 );
 
         LogLevel? minConsoleLogLevel = null;
@@ -35,6 +36,7 @@ internal static class ConfigConsole
         {
             minConsoleLogLevel = consoleRule.FinalMinLevel;
             consoleRule.DisableLoggingForLevels( LogLevel.Trace, LogLevel.Off );
+            LogManager.ReconfigExistingLoggers();
         }
 
         Settings = settings;
@@ -43,7 +45,11 @@ internal static class ConfigConsole
         Application.Run<SanoidConfigConsole>( );
         Application.Shutdown( );
 
-        consoleRule?.EnableLoggingForLevels( minConsoleLogLevel, LogLevel.Fatal );
+        if ( consoleRule != null )
+        {
+            consoleRule.EnableLoggingForLevels( minConsoleLogLevel, LogLevel.Fatal );
+            LogManager.ReconfigExistingLoggers( );
+        }
 
         Logger.Info( "Exited Config Console. Resuming logging" );
     }
