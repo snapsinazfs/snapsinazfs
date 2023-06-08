@@ -14,6 +14,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Sanoid.Settings.Settings;
+using Terminal.Gui.Trees;
 
 namespace Sanoid.ConfigConsole
 {
@@ -31,6 +32,31 @@ namespace Sanoid.ConfigConsole
             quitMenuItem.Action = ( ) => Application.RequestStop( );
             SetGlobalSettingsFieldsFromSettingsObject( );
             zfsConfigurationRefreshButton.Clicked += RefreshZfsConfigurationTreeViewFromZfs;
+            zfsConfigurationTreeView.SelectionChanged += ZfsConfigurationTreeViewOnSelectionChanged;
+        }
+
+        private void ZfsConfigurationTreeViewOnSelectionChanged( object sender, SelectionChangedEventArgs<ITreeNode> e )
+        {
+            ClearAllZfsPropertyFields( );
+
+            if ( e.NewValue is SanoidZfsDataset ds )
+            {
+                SetZfsCommonPropertyFields( ds );
+            }
+
+        }
+
+        private void ClearAllZfsPropertyFields( )
+        {
+            zfsConfigurationPropertiesNameTextField.Clear();
+            zfsConfigurationPropertiesTypeTextField.Clear();
+        }
+        private void SetZfsCommonPropertyFields( [NotNull] SanoidZfsDataset ds)
+        {
+            ArgumentNullException.ThrowIfNull( ds, nameof( ds ) );
+
+            zfsConfigurationPropertiesNameTextField.Text = ds.Name;
+            zfsConfigurationPropertiesTypeTextField.Text = ds.Kind;
         }
 
         private async void RefreshZfsConfigurationTreeViewFromZfs( )

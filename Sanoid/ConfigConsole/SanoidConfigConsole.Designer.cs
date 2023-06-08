@@ -101,6 +101,18 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView zfsConfigurationPropertiesFrame;
         
+        private Terminal.Gui.FrameView zfsConfigurationCommonPropertiesFrame;
+        
+        private Terminal.Gui.Label zfsConfigurationPropertiesNameLabel;
+        
+        private Terminal.Gui.TextField zfsConfigurationPropertiesNameTextField;
+        
+        private Terminal.Gui.Label zfsConfigurationPropertiesTypeLabel;
+        
+        private Terminal.Gui.TextField zfsConfigurationPropertiesTypeTextField;
+        
+        private Terminal.Gui.FrameView zfsConfigurationSnapshotPropertiesFrame;
+        
         private Terminal.Gui.Button zfsConfigurationSaveAllButton;
         
         private Terminal.Gui.Button zfsConfigurationRefreshButton;
@@ -115,6 +127,12 @@ namespace Sanoid.ConfigConsole {
             this.topMenuBar = new Terminal.Gui.MenuBar();
             this.zfsConfigurationRefreshButton = new Terminal.Gui.Button();
             this.zfsConfigurationSaveAllButton = new Terminal.Gui.Button();
+            this.zfsConfigurationSnapshotPropertiesFrame = new Terminal.Gui.FrameView();
+            this.zfsConfigurationPropertiesTypeTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesTypeLabel = new Terminal.Gui.Label();
+            this.zfsConfigurationPropertiesNameTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesNameLabel = new Terminal.Gui.Label();
+            this.zfsConfigurationCommonPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
             this.zfsPathTreeFrame = new Terminal.Gui.FrameView();
@@ -593,6 +611,66 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationPropertiesFrame.Title = "Properties";
             this.zfsConfigurationWindow.Add(this.zfsConfigurationPropertiesFrame);
+            this.zfsConfigurationCommonPropertiesFrame.Width = Dim.Fill(0);
+            this.zfsConfigurationCommonPropertiesFrame.Height = 19;
+            this.zfsConfigurationCommonPropertiesFrame.X = 0;
+            this.zfsConfigurationCommonPropertiesFrame.Y = 0;
+            this.zfsConfigurationCommonPropertiesFrame.Data = "zfsConfigurationCommonPropertiesFrame";
+            this.zfsConfigurationCommonPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsConfigurationCommonPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationCommonPropertiesFrame.Border.Effect3D = false;
+            this.zfsConfigurationCommonPropertiesFrame.Border.Effect3DBrush = null;
+            this.zfsConfigurationCommonPropertiesFrame.Border.DrawMarginFrame = true;
+            this.zfsConfigurationCommonPropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationCommonPropertiesFrame.Title = "Common Properties";
+            this.zfsConfigurationPropertiesFrame.Add(this.zfsConfigurationCommonPropertiesFrame);
+            this.zfsConfigurationPropertiesNameLabel.Width = 4;
+            this.zfsConfigurationPropertiesNameLabel.Height = 1;
+            this.zfsConfigurationPropertiesNameLabel.X = 1;
+            this.zfsConfigurationPropertiesNameLabel.Y = 0;
+            this.zfsConfigurationPropertiesNameLabel.Data = "zfsConfigurationPropertiesNameLabel";
+            this.zfsConfigurationPropertiesNameLabel.Text = "Name";
+            this.zfsConfigurationPropertiesNameLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationCommonPropertiesFrame.Add(this.zfsConfigurationPropertiesNameLabel);
+            this.zfsConfigurationPropertiesNameTextField.Width = Dim.Fill(1);
+            this.zfsConfigurationPropertiesNameTextField.Height = 1;
+            this.zfsConfigurationPropertiesNameTextField.X = 26;
+            this.zfsConfigurationPropertiesNameTextField.Y = 0;
+            this.zfsConfigurationPropertiesNameTextField.Secret = false;
+            this.zfsConfigurationPropertiesNameTextField.Data = "zfsConfigurationPropertiesNameTextField";
+            this.zfsConfigurationPropertiesNameTextField.Text = "";
+            this.zfsConfigurationPropertiesNameTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationCommonPropertiesFrame.Add(this.zfsConfigurationPropertiesNameTextField);
+            this.zfsConfigurationPropertiesTypeLabel.Width = 4;
+            this.zfsConfigurationPropertiesTypeLabel.Height = 1;
+            this.zfsConfigurationPropertiesTypeLabel.X = 1;
+            this.zfsConfigurationPropertiesTypeLabel.Y = 1;
+            this.zfsConfigurationPropertiesTypeLabel.Data = "zfsConfigurationPropertiesTypeLabel";
+            this.zfsConfigurationPropertiesTypeLabel.Text = "Type";
+            this.zfsConfigurationPropertiesTypeLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationCommonPropertiesFrame.Add(this.zfsConfigurationPropertiesTypeLabel);
+            this.zfsConfigurationPropertiesTypeTextField.Width = Dim.Fill(1);
+            this.zfsConfigurationPropertiesTypeTextField.Height = 1;
+            this.zfsConfigurationPropertiesTypeTextField.X = 26;
+            this.zfsConfigurationPropertiesTypeTextField.Y = 1;
+            this.zfsConfigurationPropertiesTypeTextField.Secret = false;
+            this.zfsConfigurationPropertiesTypeTextField.Data = "zfsConfigurationPropertiesTypeTextField";
+            this.zfsConfigurationPropertiesTypeTextField.Text = "";
+            this.zfsConfigurationPropertiesTypeTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationCommonPropertiesFrame.Add(this.zfsConfigurationPropertiesTypeTextField);
+            this.zfsConfigurationSnapshotPropertiesFrame.Width = Dim.Fill(0);
+            this.zfsConfigurationSnapshotPropertiesFrame.Height = Dim.Fill(0);
+            this.zfsConfigurationSnapshotPropertiesFrame.X = 0;
+            this.zfsConfigurationSnapshotPropertiesFrame.Y = 19;
+            this.zfsConfigurationSnapshotPropertiesFrame.Data = "zfsConfigurationSnapshotPropertiesFrame";
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.Effect3D = false;
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.Effect3DBrush = null;
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.DrawMarginFrame = true;
+            this.zfsConfigurationSnapshotPropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationSnapshotPropertiesFrame.Title = "Snapshot Properties";
+            this.zfsConfigurationPropertiesFrame.Add(this.zfsConfigurationSnapshotPropertiesFrame);
             this.zfsConfigurationSaveAllButton.Width = 12;
             this.zfsConfigurationSaveAllButton.Height = 1;
             this.zfsConfigurationSaveAllButton.X = Pos.Center() - 8;
