@@ -36,7 +36,7 @@ internal class SanoidZfsDataset : TreeNode, ITreeNode
 
     internal ZfsProperty<bool> Enabled { get; } = new( ZfsProperty.EnabledPropertyName, false, "local" );
     internal bool IsPoolRoot { get; }
-    internal string Kind { get; }
+    internal string Kind { get; private set; }
     internal ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
     internal ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
     internal ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
@@ -72,6 +72,9 @@ internal class SanoidZfsDataset : TreeNode, ITreeNode
     {
         switch ( propertyName )
         {
+            case "type":
+                Kind = propertyValue;
+                return;
             case ZfsProperty.EnabledPropertyName:
                 Enabled.Value = bool.Parse( propertyValue );
                 Enabled.Source = propertySource;
