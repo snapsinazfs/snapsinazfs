@@ -28,7 +28,15 @@ namespace Sanoid.ConfigConsole
 
             resetGlobalConfigButton.Clicked += SetGlobalSettingsFieldsFromSettingsObject;
             saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
+            quitMenuItem.Action = ( ) => Application.RequestStop( );
             SetGlobalSettingsFieldsFromSettingsObject( );
+            zfsConfigurationRefreshButton.Clicked += RefreshZfsConfigurationTreeViewFromZfs;
+        }
+
+        private async void RefreshZfsConfigurationTreeViewFromZfs( )
+        {
+            zfsConfigurationTreeView.ClearObjects();
+            zfsConfigurationTreeView.AddObjects( await ZfsTasks.GetFullZfsConfigurationTreeAsync( ConfigConsole.Datasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner ).ConfigureAwait( true ) );
         }
 
         private void ShowSaveGlobalConfigDialog( )

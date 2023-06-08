@@ -91,16 +91,38 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Window window;
         
-        private Terminal.Gui.Label label;
+        private Terminal.Gui.Label templateEditingNotImplementedLabel;
         
         private Terminal.Gui.Window zfsConfigurationWindow;
         
+        private Terminal.Gui.FrameView zfsPathTreeFrame;
+        
+        private Terminal.Gui.ScrollView zfsConfigTreeScroller;
+        
         private Terminal.Gui.TreeView zfsConfigurationTreeView;
         
+        private Terminal.Gui.FrameView zfsConfigurationPropertiesFrame;
+        
+        private Terminal.Gui.Button zfsConfigurationSaveAllButton;
+        
+        private Terminal.Gui.Button zfsConfigurationRefreshButton;
+        
+        private Terminal.Gui.MenuBar topMenuBar;
+        
+        private Terminal.Gui.MenuBarItem fileMenu;
+        
+        private Terminal.Gui.MenuItem quitMenuItem;
+        
         private void InitializeComponent() {
+            this.topMenuBar = new Terminal.Gui.MenuBar();
+            this.zfsConfigurationRefreshButton = new Terminal.Gui.Button();
+            this.zfsConfigurationSaveAllButton = new Terminal.Gui.Button();
+            this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
+            this.zfsConfigTreeScroller = new Terminal.Gui.ScrollView();
+            this.zfsPathTreeFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
-            this.label = new Terminal.Gui.Label();
+            this.templateEditingNotImplementedLabel = new Terminal.Gui.Label();
             this.window = new Terminal.Gui.Window();
             this.resetGlobalConfigButton = new Terminal.Gui.Button();
             this.saveGlobalConfigButton = new Terminal.Gui.Button();
@@ -168,9 +190,9 @@ namespace Sanoid.ConfigConsole {
             this.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.Title = "Sanoid.net Configuration Console";
             this.configCategoryTabView.Width = Dim.Fill(0);
-            this.configCategoryTabView.Height = Dim.Fill(1);
+            this.configCategoryTabView.Height = Dim.Fill(8);
             this.configCategoryTabView.X = 0;
-            this.configCategoryTabView.Y = 0;
+            this.configCategoryTabView.Y = Pos.Center();
             this.configCategoryTabView.ColorScheme = this.greyOnBlack;
             this.configCategoryTabView.Data = "configCategoryTabView";
             this.configCategoryTabView.TextAlignment = Terminal.Gui.TextAlignment.Centered;
@@ -507,15 +529,15 @@ namespace Sanoid.ConfigConsole {
             this.window.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.window.Title = "";
             configCategoryTabViewtemplates.View.Add(this.window);
-            this.label.Width = 4;
-            this.label.Height = 1;
-            this.label.X = Pos.Center();
-            this.label.Y = Pos.Center();
-            this.label.ColorScheme = this.whiteOnRed;
-            this.label.Data = "label";
-            this.label.Text = "Template Editing Not Yet Implemented";
-            this.label.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.window.Add(this.label);
+            this.templateEditingNotImplementedLabel.Width = 4;
+            this.templateEditingNotImplementedLabel.Height = 1;
+            this.templateEditingNotImplementedLabel.X = Pos.Center();
+            this.templateEditingNotImplementedLabel.Y = Pos.Center();
+            this.templateEditingNotImplementedLabel.ColorScheme = this.whiteOnRed;
+            this.templateEditingNotImplementedLabel.Data = "templateEditingNotImplementedLabel";
+            this.templateEditingNotImplementedLabel.Text = "Template Editing Not Yet Implemented";
+            this.templateEditingNotImplementedLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.window.Add(this.templateEditingNotImplementedLabel);
             configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());
@@ -535,23 +557,90 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationWindow.Title = "";
             configCategoryTabViewzFSConfiguration.View.Add(this.zfsConfigurationWindow);
-            this.zfsConfigurationTreeView.Width = Dim.Fill(16);
-            this.zfsConfigurationTreeView.Height = Dim.Fill(8);
-            this.zfsConfigurationTreeView.X = Pos.Center();
-            this.zfsConfigurationTreeView.Y = Pos.Center();
-            this.zfsConfigurationTreeView.ColorScheme = this.greyOnBlack;
+            this.zfsPathTreeFrame.Width = 140;
+            this.zfsPathTreeFrame.Height = Dim.Fill(5);
+            this.zfsPathTreeFrame.X = 1;
+            this.zfsPathTreeFrame.Y = 0;
+            this.zfsPathTreeFrame.Data = "zfsPathTreeFrame";
+            this.zfsPathTreeFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsPathTreeFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsPathTreeFrame.Border.Effect3D = false;
+            this.zfsPathTreeFrame.Border.Effect3DBrush = null;
+            this.zfsPathTreeFrame.Border.DrawMarginFrame = true;
+            this.zfsPathTreeFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsPathTreeFrame.Title = "ZFS Objects";
+            this.zfsConfigurationWindow.Add(this.zfsPathTreeFrame);
+            this.zfsConfigTreeScroller.Width = Dim.Fill(0);
+            this.zfsConfigTreeScroller.Height = Dim.Fill(0);
+            this.zfsConfigTreeScroller.X = 0;
+            this.zfsConfigTreeScroller.Y = 0;
+            this.zfsConfigTreeScroller.ContentSize = new Size(20,10);
+            this.zfsConfigTreeScroller.Data = "zfsConfigTreeScroller";
+            this.zfsConfigTreeScroller.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsPathTreeFrame.Add(this.zfsConfigTreeScroller);
+            this.zfsConfigurationTreeView.Width = 16;
+            this.zfsConfigurationTreeView.Height = 5;
+            this.zfsConfigurationTreeView.X = -2;
+            this.zfsConfigurationTreeView.Y = 0;
             this.zfsConfigurationTreeView.Data = "zfsConfigurationTreeView";
-            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationTreeView.Style.CollapseableSymbol = '-';
             this.zfsConfigurationTreeView.Style.ColorExpandSymbol = false;
             this.zfsConfigurationTreeView.Style.ExpandableSymbol = '+';
             this.zfsConfigurationTreeView.Style.InvertExpandSymbolColors = false;
             this.zfsConfigurationTreeView.Style.LeaveLastRow = false;
             this.zfsConfigurationTreeView.Style.ShowBranchLines = true;
-            this.zfsConfigurationWindow.Add(this.zfsConfigurationTreeView);
+            this.zfsConfigTreeScroller.Add(this.zfsConfigurationTreeView);
+            this.zfsConfigurationPropertiesFrame.Width = Dim.Fill(1);
+            this.zfsConfigurationPropertiesFrame.Height = Dim.Fill(5);
+            this.zfsConfigurationPropertiesFrame.X = Pos.Right(zfsPathTreeFrame) + 2;
+            this.zfsConfigurationPropertiesFrame.Y = 0;
+            this.zfsConfigurationPropertiesFrame.Data = "zfsConfigurationPropertiesFrame";
+            this.zfsConfigurationPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsConfigurationPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesFrame.Border.Effect3D = false;
+            this.zfsConfigurationPropertiesFrame.Border.Effect3DBrush = null;
+            this.zfsConfigurationPropertiesFrame.Border.DrawMarginFrame = true;
+            this.zfsConfigurationPropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationPropertiesFrame.Title = "Properties";
+            this.zfsConfigurationWindow.Add(this.zfsConfigurationPropertiesFrame);
+            this.zfsConfigurationSaveAllButton.Width = 12;
+            this.zfsConfigurationSaveAllButton.Height = 1;
+            this.zfsConfigurationSaveAllButton.X = Pos.Center() - 8;
+            this.zfsConfigurationSaveAllButton.Y = Pos.AnchorEnd(2);
+            this.zfsConfigurationSaveAllButton.Data = "zfsConfigurationSaveAllButton";
+            this.zfsConfigurationSaveAllButton.Text = "Save All";
+            this.zfsConfigurationSaveAllButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.zfsConfigurationSaveAllButton.IsDefault = false;
+            this.zfsConfigurationWindow.Add(this.zfsConfigurationSaveAllButton);
+            this.zfsConfigurationRefreshButton.Width = 11;
+            this.zfsConfigurationRefreshButton.Height = 1;
+            this.zfsConfigurationRefreshButton.X = Pos.Center() + 6;
+            this.zfsConfigurationRefreshButton.Y = Pos.AnchorEnd(2);
+            this.zfsConfigurationRefreshButton.Data = "zfsConfigurationRefreshButton";
+            this.zfsConfigurationRefreshButton.Text = "Refresh";
+            this.zfsConfigurationRefreshButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.zfsConfigurationRefreshButton.IsDefault = false;
+            this.zfsConfigurationWindow.Add(this.zfsConfigurationRefreshButton);
             configCategoryTabView.AddTab(configCategoryTabViewzFSConfiguration, false);
             this.configCategoryTabView.ApplyStyleChanges();
             this.Add(this.configCategoryTabView);
+            this.topMenuBar.Width = Dim.Fill(0);
+            this.topMenuBar.Height = 1;
+            this.topMenuBar.X = 0;
+            this.topMenuBar.Y = 0;
+            this.topMenuBar.Data = "topMenuBar";
+            this.topMenuBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.fileMenu = new Terminal.Gui.MenuBarItem();
+            this.fileMenu.Title = "_File";
+            this.quitMenuItem = new Terminal.Gui.MenuItem();
+            this.quitMenuItem.Title = "Quit";
+            this.quitMenuItem.Data = "quitMenuItem";
+            this.fileMenu.Children = new Terminal.Gui.MenuItem[] {
+                    this.quitMenuItem};
+            this.topMenuBar.Menus = new Terminal.Gui.MenuBarItem[] {
+                    this.fileMenu};
+            this.Add(this.topMenuBar);
         }
     }
 }
