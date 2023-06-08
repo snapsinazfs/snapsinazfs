@@ -4,12 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using Sanoid.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 
-namespace Sanoid.ConfigConsole;
+namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-internal class SanoidZfsDataset : TreeNode, ITreeNode
+public class SanoidZfsDataset : TreeNode, ITreeNode
 {
     /// <exception cref="InvalidOperationException">Cannot create a non-root dataset without a parent</exception>
     internal SanoidZfsDataset( string name, string kind, SanoidZfsDataset? parent = null )
@@ -34,32 +33,32 @@ internal class SanoidZfsDataset : TreeNode, ITreeNode
         }
     }
 
-    internal ZfsProperty<bool> Enabled { get; } = new( ZfsProperty.EnabledPropertyName, false, "local" );
-    internal bool IsPoolRoot { get; }
-    internal string Kind { get; private set; }
-    internal ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    internal string Name { get; private set; }
+    public ZfsProperty<bool> Enabled { get; } = new( ZfsProperty.EnabledPropertyName, false, "local" );
+    public bool IsPoolRoot { get; }
+    public string Kind { get; private set; }
+    public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public string Name { get; private set; }
     private readonly SanoidZfsDataset _parent;
-    internal SanoidZfsDataset Parent => IsPoolRoot ? this : _parent;
-    internal int PathDepth => IsPoolRoot ? 0 : 1 + _parent.PathDepth;
-    internal ZfsProperty<bool> PruneSnapshots { get; } = new( ZfsProperty.PruneSnapshotsPropertyName, false, "local" );
-    internal ZfsProperty<string> Recursion { get; } = new( ZfsProperty.RecursionPropertyName, "sanoid", "local" );
+    public SanoidZfsDataset Parent => IsPoolRoot ? this : _parent;
+    public int PathDepth => IsPoolRoot ? 0 : 1 + _parent.PathDepth;
+    public ZfsProperty<bool> PruneSnapshots { get; } = new( ZfsProperty.PruneSnapshotsPropertyName, false, "local" );
+    public ZfsProperty<string> Recursion { get; } = new( ZfsProperty.RecursionPropertyName, "sanoid", "local" );
     private readonly SanoidZfsDataset _root;
-    internal SanoidZfsDataset Root => IsPoolRoot ? this : _root;
-    internal ZfsProperty<int> SnapshotRetentionDaily { get; } = new( ZfsProperty.SnapshotRetentionDailyPropertyName, -1, "local" );
-    internal ZfsProperty<int> SnapshotRetentionFrequent { get; } = new( ZfsProperty.SnapshotRetentionFrequentPropertyName, -1, "local" );
-    internal ZfsProperty<int> SnapshotRetentionHourly { get; } = new( ZfsProperty.SnapshotRetentionHourlyPropertyName, -1, "local" );
-    internal ZfsProperty<int> SnapshotRetentionMonthly { get; } = new( ZfsProperty.SnapshotRetentionMonthlyPropertyName, -1, "local" );
-    internal ZfsProperty<int> SnapshotRetentionPruneDeferral { get; } = new( ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, 0, "local" );
-    internal ZfsProperty<int> SnapshotRetentionWeekly { get; } = new( ZfsProperty.SnapshotRetentionWeeklyPropertyName, -1, "local" );
-    internal ZfsProperty<int> SnapshotRetentionYearly { get; } = new( ZfsProperty.SnapshotRetentionYearlyPropertyName, -1, "local" );
-    internal ZfsProperty<bool> TakeSnapshots { get; } = new( ZfsProperty.TakeSnapshotsPropertyName, false, "local" );
-    internal ZfsProperty<string> Template { get; } = new( ZfsProperty.TemplatePropertyName, "default", "local" );
+    public SanoidZfsDataset Root => IsPoolRoot ? this : _root;
+    public ZfsProperty<int> SnapshotRetentionDaily { get; } = new( ZfsProperty.SnapshotRetentionDailyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionFrequent { get; } = new( ZfsProperty.SnapshotRetentionFrequentPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionHourly { get; } = new( ZfsProperty.SnapshotRetentionHourlyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionMonthly { get; } = new( ZfsProperty.SnapshotRetentionMonthlyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionPruneDeferral { get; } = new( ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, 0, "local" );
+    public ZfsProperty<int> SnapshotRetentionWeekly { get; } = new( ZfsProperty.SnapshotRetentionWeeklyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionYearly { get; } = new( ZfsProperty.SnapshotRetentionYearlyPropertyName, -1, "local" );
+    public ZfsProperty<bool> TakeSnapshots { get; } = new( ZfsProperty.TakeSnapshotsPropertyName, false, "local" );
+    public ZfsProperty<string> Template { get; } = new( ZfsProperty.TemplatePropertyName, "default", "local" );
 
     /// <inheritdoc />
     public new string Text
@@ -242,4 +241,5 @@ internal class SanoidZfsDataset : TreeNode, ITreeNode
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" );
         }
     }
+
 }
