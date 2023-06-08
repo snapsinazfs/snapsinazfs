@@ -5,7 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using System.Drawing;
+using NLog.Config;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
@@ -15,22 +15,36 @@ using Terminal.Gui;
 
 namespace Sanoid.ConfigConsole;
 
-internal class ConfigConsole
+internal static class ConfigConsole
 {
-    internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; set; } = new( );
-    internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; set; } = new( );
-    internal static IZfsCommandRunner CommandRunner { get; set; }
-    internal static SanoidSettings Settings { get; set; }
+    internal static IZfsCommandRunner? CommandRunner { get; private set; }
+    internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; } = new( );
+    internal static SanoidSettings? Settings { get; private set; }
+    internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     public static void RunConsoleInterface( SanoidSettings settings, IZfsCommandRunner commandRunner )
     {
-        using ( LogManager.SuspendLogging( ) )
-        {
-            Settings = settings;
-            CommandRunner = commandRunner;
+        Logger.Info( "Config Console requested. \"Console\" logging rule will be suspended until exit" );
+        LogManager.Flush( 250 );
 
-            Application.Run<SanoidConfigConsole>( );
-            Application.Shutdown();
+        LogLevel? minConsoleLogLevel = null;
+        LoggingRule? consoleRule = LogManager.Configuration?.FindRuleByName( "Console" );
+
+        if ( consoleRule != null )
+        {
+            minConsoleLogLevel = consoleRule.FinalMinLevel;
+            consoleRule.DisableLoggingForLevels( LogLevel.Trace, LogLevel.Off );
         }
+
+        Settings = settings;
+        CommandRunner = commandRunner;
+
+        Application.Run<SanoidConfigConsole>( );
+        Application.Shutdown( );
+
+        consoleRule?.EnableLoggingForLevels( minConsoleLogLevel, LogLevel.Fatal );
+
+        Logger.Info( "Exited Config Console. Resuming logging" );
     }
 }
