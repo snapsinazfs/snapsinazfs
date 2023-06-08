@@ -16,7 +16,7 @@ internal static class ZfsTasks
     internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
     {
         List<ITreeNode> nodes = new( );
-        await foreach ( string zfsLine in commandRunner.ZfsExecEnumerator( "get", $"-Hpt filesystem -d 0 type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )}" ).ConfigureAwait( true ) )
+        await foreach ( string zfsLine in commandRunner.ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k => new( k, lineTokens[ 2 ] ), ( k, ds ) =>
@@ -26,7 +26,7 @@ internal static class ZfsTasks
             } );
         }
 
-        await foreach ( string zfsLine in commandRunner.ZfsExecEnumerator( "get", $"-Hprt filesystem,volume type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} {string.Join( ',', datasets.Keys )}" ).ConfigureAwait( true ) )
+        await foreach ( string zfsLine in commandRunner.ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ',', datasets.Keys )}" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
