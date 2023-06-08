@@ -578,8 +578,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigTreeScroller.Data = "zfsConfigTreeScroller";
             this.zfsConfigTreeScroller.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsPathTreeFrame.Add(this.zfsConfigTreeScroller);
-            this.zfsConfigurationTreeView.Width = 16;
-            this.zfsConfigurationTreeView.Height = 5;
+            this.zfsConfigurationTreeView.Width = Dim.Fill(1);
+            this.zfsConfigurationTreeView.Height = Dim.Fill(1);
             this.zfsConfigurationTreeView.X = -2;
             this.zfsConfigurationTreeView.Y = 0;
             this.zfsConfigurationTreeView.Data = "zfsConfigurationTreeView";
