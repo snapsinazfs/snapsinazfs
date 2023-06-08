@@ -167,15 +167,15 @@ internal class Program
             }
         }
 
-
-        ConcurrentDictionary<string, Dataset> datasets = schemaCheckResult.Datasets;
-        ConcurrentDictionary<string, Snapshot> snapshots = new( );
-
         if ( args.ConfigConsole )
         {
             ConfigConsole.ConfigConsole.RunConsoleInterface( settings, zfsCommandRunner );
             return (int)Errno.EOK;
         }
+
+        ConcurrentDictionary<string, Dataset> datasets = schemaCheckResult.Datasets;
+        ConcurrentDictionary<string, Snapshot> snapshots = new( );
+
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 
         await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( zfsCommandRunner, settings, datasets, snapshots ).ConfigureAwait( true );
