@@ -21,9 +21,13 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.ColorScheme whiteOnRed;
         
-        private Terminal.Gui.ColorScheme inheritedPropertyTextFieldScheme;
-
-        private Terminal.Gui.ColorScheme localPropertyTextFieldScheme;
+        private Terminal.Gui.ColorScheme localPropertyTextFieldColorScheme;
+        
+        private Terminal.Gui.ColorScheme inheritedPropertyTextFieldColorScheme;
+        
+        private Terminal.Gui.ColorScheme localPropertyRadioGroupColorScheme;
+        
+        private Terminal.Gui.ColorScheme inheritedPropertyRadioGroupColorScheme;
         
         private Terminal.Gui.TabView configCategoryTabView;
         
@@ -324,18 +328,30 @@ namespace Sanoid.ConfigConsole {
             this.whiteOnRed.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.whiteOnRed.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.whiteOnRed.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.inheritedPropertyTextFieldScheme = new Terminal.Gui.ColorScheme();
-            this.inheritedPropertyTextFieldScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyTextFieldScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray );
-            this.inheritedPropertyTextFieldScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyTextFieldScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray );
-            this.inheritedPropertyTextFieldScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.localPropertyTextFieldScheme = new Terminal.Gui.ColorScheme();
-            this.localPropertyTextFieldScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
+            this.localPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.localPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.localPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
+            this.inheritedPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
+            this.inheritedPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
+            this.inheritedPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
+            this.localPropertyRadioGroupColorScheme = new Terminal.Gui.ColorScheme();
+            this.localPropertyRadioGroupColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.localPropertyRadioGroupColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
+            this.localPropertyRadioGroupColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.localPropertyRadioGroupColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.localPropertyRadioGroupColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.inheritedPropertyRadioGroupColorScheme = new Terminal.Gui.ColorScheme();
+            this.inheritedPropertyRadioGroupColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyRadioGroupColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyRadioGroupColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyRadioGroupColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyRadioGroupColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
@@ -828,6 +844,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesEnabledRadioGroup.Height = 1;
             this.zfsConfigurationPropertiesEnabledRadioGroup.X = 22;
             this.zfsConfigurationPropertiesEnabledRadioGroup.Y = 3;
+            this.zfsConfigurationPropertiesEnabledRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.zfsConfigurationPropertiesEnabledRadioGroup.Data = "zfsConfigurationPropertiesEnabledRadioGroup";
             this.zfsConfigurationPropertiesEnabledRadioGroup.Text = "";
             this.zfsConfigurationPropertiesEnabledRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -865,6 +882,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Height = 1;
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.X = 22;
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Y = 4;
+            this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Data = "zfsConfigurationPropertiesTakeSnapshotsRadioGroup";
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Text = "";
             this.zfsConfigurationPropertiesTakeSnapshotsRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -902,6 +920,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Height = 1;
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.X = 22;
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Y = 5;
+            this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Data = "zfsConfigurationPropertiesPruneSnapshotsRadioGroup";
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Text = "";
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -939,6 +958,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecursionRadioGroup.Height = 1;
             this.zfsConfigurationPropertiesRecursionRadioGroup.X = 22;
             this.zfsConfigurationPropertiesRecursionRadioGroup.Y = 6;
+            this.zfsConfigurationPropertiesRecursionRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.zfsConfigurationPropertiesRecursionRadioGroup.Data = "zfsConfigurationPropertiesRecursionRadioGroup";
             this.zfsConfigurationPropertiesRecursionRadioGroup.Text = "";
             this.zfsConfigurationPropertiesRecursionRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1004,7 +1024,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionFrame.Y = 10;
             this.zfsConfigurationPropertiesRetentionFrame.Data = "zfsConfigurationPropertiesRetentionFrame";
             this.zfsConfigurationPropertiesRetentionFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.BrightGreen;
+            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.White;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesRetentionFrame.Border.DrawMarginFrame = true;
@@ -1023,7 +1043,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionFrequentTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Y = 0;
-            this.zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Data = "zfsConfigurationPropertiesRetentionFrequentTextField";
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Text = "";
@@ -1041,7 +1061,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionHourlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Y = 1;
-            this.zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Data = "zfsConfigurationPropertiesRetentionHourlyTextField";
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Text = "";
@@ -1059,7 +1079,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionDailyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionDailyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionDailyTextField.Y = 2;
-            this.zfsConfigurationPropertiesRetentionDailyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionDailyTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionDailyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionDailyTextField.Data = "zfsConfigurationPropertiesRetentionDailyTextField";
             this.zfsConfigurationPropertiesRetentionDailyTextField.Text = "";
@@ -1077,7 +1097,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Y = 3;
-            this.zfsConfigurationPropertiesRetentionWeeklyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionWeeklyTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Data = "zfsConfigurationPropertiesRetentionWeeklyTextField";
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Text = "";
@@ -1095,7 +1115,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Y = 4;
-            this.zfsConfigurationPropertiesRetentionMonthlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionMonthlyTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Data = "zfsConfigurationPropertiesRetentionMonthlyTextField";
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Text = "";
@@ -1113,7 +1133,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionYearlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Y = 5;
-            this.zfsConfigurationPropertiesRetentionYearlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionYearlyTextField.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Data = "zfsConfigurationPropertiesRetentionYearlyTextField";
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Text = "";

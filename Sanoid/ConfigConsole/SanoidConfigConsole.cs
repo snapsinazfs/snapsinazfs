@@ -38,13 +38,22 @@ namespace Sanoid.ConfigConsole
 
             SetGlobalSettingsFieldsFromSettingsObject( );
             configCategoryTabView.SelectedTabChanged += ConfigCategoryTabViewOnSelectedTabChanged;
-
+            HideZfsConfigurationPropertyFrames( );
             SetTabStopsForRootLevelObjects( );
             SetCanFocusStateForZfsConfigurationViews( );
             SetTabStopsForZfsConfigurationWindow( );
             SetPropertiesForReadonlyFields( );
 
             EnableEventHandlers();
+        }
+
+        private void HideZfsConfigurationPropertyFrames( )
+        {
+            zfsConfigurationPropertiesFrame.Visible = false;
+        }
+        private void ShowZfsConfigurationPropertyFrames( )
+        {
+            zfsConfigurationPropertiesFrame.Visible = true;
         }
 
         private void ConfigCategoryTabViewOnSelectedTabChanged( object? sender, TabView.TabChangedEventArgs e )
@@ -108,6 +117,19 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesFrame.CanFocus = false;
             zfsConfigurationCommonPropertiesFrame.CanFocus = false;
             zfsConfigurationSnapshotPropertiesFrame.CanFocus = false;
+
+            zfsConfigurationPropertiesRetentionFrequentTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionFrequentTextField.CanFocus = true;
+            zfsConfigurationPropertiesRetentionHourlyTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionHourlyTextField.CanFocus = true;
+            zfsConfigurationPropertiesRetentionDailyTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionDailyTextField.CanFocus = true;
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionWeeklyTextField.CanFocus = true;
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionMonthlyTextField.CanFocus = true;
+            zfsConfigurationPropertiesRetentionYearlyTextField.Enabled = true;
+            zfsConfigurationPropertiesRetentionYearlyTextField.CanFocus = true;
         }
 
         private void SetPropertiesForReadonlyFields( )
@@ -149,6 +171,7 @@ namespace Sanoid.ConfigConsole
             resetGlobalConfigButton.Clicked -= SetGlobalSettingsFieldsFromSettingsObject;
             saveGlobalConfigButton.Clicked -= ShowSaveGlobalConfigDialog;
             zfsConfigurationRefreshButton.Clicked -= RefreshZfsConfigurationTreeViewFromZfs;
+            zfsConfigurationResetCurrentButton.Clicked -= ZfsConfigurationResetCurrentButtonOnClicked;
             zfsConfigurationTreeView.SelectionChanged -= ZfsConfigurationTreeViewOnSelectionChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.MouseClick -= ZfsConfigurationPropertiesEnabledRadioGroupOnMouseClick;
@@ -169,6 +192,7 @@ namespace Sanoid.ConfigConsole
             resetGlobalConfigButton.Clicked += SetGlobalSettingsFieldsFromSettingsObject;
             saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
             zfsConfigurationRefreshButton.Clicked += RefreshZfsConfigurationTreeViewFromZfs;
+            zfsConfigurationResetCurrentButton.Clicked += ZfsConfigurationResetCurrentButtonOnClicked ;
             zfsConfigurationTreeView.SelectionChanged += ZfsConfigurationTreeViewOnSelectionChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.MouseClick += ZfsConfigurationPropertiesEnabledRadioGroupOnMouseClick;
@@ -179,6 +203,14 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationSaveCurrentButton.Clicked += ZfsConfigurationSaveCurrentButtonOnClicked;
             _eventsEnabled = true;
             Logger.Debug( "Event handlers for zfs configuration fields enabled" );
+        }
+
+        private void ZfsConfigurationResetCurrentButtonOnClicked( )
+        {
+            DisableEventHandlers();
+            ClearAllZfsPropertyFields(false);
+            UpdateZfsCommonPropertyFieldsForCurrentlySelectedObject( );
+            EnableEventHandlers();
         }
 
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
@@ -279,32 +311,54 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-        private void UpdateZfsCommonPropertyFieldsForCurrentlySelectedObject( )
+        private void UpdateZfsCommonPropertyFieldsForCurrentlySelectedObject( bool manageEventHandlers = true )
         {
-            DisableEventHandlers( );
+            if(manageEventHandlers)
+                DisableEventHandlers( );
 
             if ( _zfsConfigurationCurrentSelectedItem is { } ds )
             {
+                ShowZfsConfigurationPropertyFrames();
                 zfsConfigurationPropertiesNameTextField.Text = ds.Name;
                 zfsConfigurationPropertiesTypeTextField.Text = ds.Kind;
                 zfsConfigurationPropertiesEnabledRadioGroup.SelectedItem = ds.Enabled.AsTrueFalseRadioIndex( );
+                zfsConfigurationPropertiesEnabledRadioGroup.ColorScheme = ds.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
                 zfsConfigurationPropertiesEnabledSourceTextField.Text = ds.Enabled.IsInherited ? ds.Enabled.Source[ 15.. ] : ds.Enabled.Source;
                 zfsConfigurationPropertiesTakeSnapshotsRadioGroup.SelectedItem = ds.TakeSnapshots.AsTrueFalseRadioIndex( );
+                zfsConfigurationPropertiesTakeSnapshotsRadioGroup.ColorScheme = ds.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
                 zfsConfigurationPropertiesTakeSnapshotsSourceTextField.Text = ds.TakeSnapshots.IsInherited ? ds.TakeSnapshots.Source[ 15.. ] : ds.TakeSnapshots.Source;
                 zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItem = ds.PruneSnapshots.AsTrueFalseRadioIndex( );
+                zfsConfigurationPropertiesPruneSnapshotsRadioGroup.ColorScheme = ds.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
                 zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = ds.TakeSnapshots.IsInherited ? ds.TakeSnapshots.Source[ 15.. ] : ds.PruneSnapshots.Source;
                 zfsConfigurationPropertiesTemplateTextField.Text = ds.Template.Value;
+                zfsConfigurationPropertiesTemplateTextField.ColorScheme = ds.Template.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
                 zfsConfigurationPropertiesTemplateSourceTextField.Text = ds.Template.IsInherited ? ds.Template.Source[ 15.. ] : ds.Template.Source;
                 zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem = ds.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
+                zfsConfigurationPropertiesRecursionRadioGroup.ColorScheme = ds.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
                 zfsConfigurationPropertiesRecursionSourceTextField.Text = ds.Recursion.IsInherited ? ds.Recursion.Source[ 15.. ] : ds.Recursion.Source;
 
                 zfsConfigurationPropertiesRetentionFrequentTextField.Text = ds.SnapshotRetentionFrequent.Value.ToString( );
-                zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = ds.SnapshotRetentionFrequent.IsInherited ? this.inheritedPropertyTextFieldScheme : this.greyOnBlack;
+                zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = ds.SnapshotRetentionFrequent.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
                 zfsConfigurationPropertiesRetentionHourlyTextField.Text = ds.SnapshotRetentionHourly.Value.ToString( );
-                zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = ds.SnapshotRetentionHourly.IsInherited ? this.inheritedPropertyTextFieldScheme : this.greyOnBlack;
-            }
+                zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = ds.SnapshotRetentionHourly.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
+                zfsConfigurationPropertiesRetentionDailyTextField.Text = ds.SnapshotRetentionDaily.Value.ToString( );
+                zfsConfigurationPropertiesRetentionDailyTextField.ColorScheme = ds.SnapshotRetentionDaily.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
+                zfsConfigurationPropertiesRetentionWeeklyTextField.Text = ds.SnapshotRetentionWeekly.Value.ToString( );
+                zfsConfigurationPropertiesRetentionWeeklyTextField.ColorScheme = ds.SnapshotRetentionWeekly.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
+                zfsConfigurationPropertiesRetentionMonthlyTextField.Text = ds.SnapshotRetentionMonthly.Value.ToString( );
+                zfsConfigurationPropertiesRetentionMonthlyTextField.ColorScheme = ds.SnapshotRetentionMonthly.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
+                zfsConfigurationPropertiesRetentionYearlyTextField.Text = ds.SnapshotRetentionYearly.Value.ToString( );
+                zfsConfigurationPropertiesRetentionYearlyTextField.ColorScheme = ds.SnapshotRetentionYearly.IsInherited ? this.inheritedPropertyTextFieldColorScheme : this.localPropertyTextFieldColorScheme;
 
-            EnableEventHandlers( );
+                zfsConfigurationPropertiesRecentFrequentTextField.Text = ds.LastFrequentSnapshotTimestamp.IsLocal ? ds.LastFrequentSnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+                zfsConfigurationPropertiesRecentHourlyTextField.Text = ds.LastHourlySnapshotTimestamp.IsLocal ? ds.LastHourlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+                zfsConfigurationPropertiesRecentDailyTextField.Text = ds.LastDailySnapshotTimestamp.IsLocal ? ds.LastDailySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+                zfsConfigurationPropertiesRecentWeeklyTextField.Text = ds.LastWeeklySnapshotTimestamp.IsLocal ? ds.LastWeeklySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+                zfsConfigurationPropertiesRecentMonthlyTextField.Text = ds.LastMonthlySnapshotTimestamp.IsLocal ? ds.LastMonthlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+                zfsConfigurationPropertiesRecentYearlyTextField.Text = ds.LastYearlySnapshotTimestamp.IsLocal ? ds.LastYearlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+            }
+            if(manageEventHandlers)
+                EnableEventHandlers( );
         }
 
         private async void RefreshZfsConfigurationTreeViewFromZfs( )
