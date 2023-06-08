@@ -21,6 +21,10 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.ColorScheme whiteOnRed;
         
+        private Terminal.Gui.ColorScheme inheritedPropertyTextFieldScheme;
+
+        private Terminal.Gui.ColorScheme localPropertyTextFieldScheme;
+        
         private Terminal.Gui.TabView configCategoryTabView;
         
         private Terminal.Gui.Window globalConfigWindow;
@@ -137,14 +141,6 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextField zfsConfigurationPropertiesPruneSnapshotsSourceTextField;
         
-        private Terminal.Gui.Label zfsConfigurationPropertiesTemplateLabel;
-        
-        private Terminal.Gui.TextField zfsConfigurationPropertiesTemplateTextField;
-        
-        private Terminal.Gui.Label zfsConfigurationPropertiesTemplateSourceLabel;
-        
-        private Terminal.Gui.TextField zfsConfigurationPropertiesTemplateSourceTextField;
-        
         private Terminal.Gui.Label zfsConfigurationPropertiesRecursionLabel;
         
         private Terminal.Gui.RadioGroup zfsConfigurationPropertiesRecursionRadioGroup;
@@ -152,6 +148,14 @@ namespace Sanoid.ConfigConsole {
         private Terminal.Gui.Label zfsConfigurationPropertiesRecursionSourceLabel;
         
         private Terminal.Gui.TextField zfsConfigurationPropertiesRecursionSourceTextField;
+        
+        private Terminal.Gui.Label zfsConfigurationPropertiesTemplateLabel;
+        
+        private Terminal.Gui.TextField zfsConfigurationPropertiesTemplateTextField;
+        
+        private Terminal.Gui.Label zfsConfigurationPropertiesTemplateSourceLabel;
+        
+        private Terminal.Gui.TextField zfsConfigurationPropertiesTemplateSourceTextField;
         
         private Terminal.Gui.FrameView zfsConfigurationPropertiesRetentionFrame;
         
@@ -181,17 +185,17 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView zfsConfigurationPropertiesRecentFrame;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentFrequentTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentFrequentTextField;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentHourlyTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentHourlyTextField;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentDailyTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentDailyTextField;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentWeeklyTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentWeeklyTextField;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentMonthlyTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentMonthlyTextField;
         
-        private Terminal.Gui.TextValidateField zfsConfigurationPropertiesRecentYearlyTextField;
+        private Terminal.Gui.TextField zfsConfigurationPropertiesRecentYearlyTextField;
         
         private Terminal.Gui.FrameView zfsConfigurationSnapshotPropertiesFrame;
         
@@ -216,12 +220,12 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationSaveCurrentButton = new Terminal.Gui.Button();
             this.zfsConfigurationActionsFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationSnapshotPropertiesFrame = new Terminal.Gui.FrameView();
-            this.zfsConfigurationPropertiesRecentYearlyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRecentMonthlyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRecentWeeklyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRecentDailyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRecentHourlyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRecentFrequentTextField = new Terminal.Gui.TextValidateField();
+            this.zfsConfigurationPropertiesRecentYearlyTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecentMonthlyTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecentWeeklyTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecentDailyTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecentHourlyTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecentFrequentTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesRecentFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesRetentionYearlyTextField = new Terminal.Gui.TextValidateField();
             this.zfsConfigurationPropertiesRetentionYearlyLabel = new Terminal.Gui.Label();
@@ -236,14 +240,14 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionFrequentTextField = new Terminal.Gui.TextValidateField();
             this.zfsConfigurationPropertiesRetentionFrequentLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesRetentionFrame = new Terminal.Gui.FrameView();
-            this.zfsConfigurationPropertiesRecursionSourceTextField = new Terminal.Gui.TextField();
-            this.zfsConfigurationPropertiesRecursionSourceLabel = new Terminal.Gui.Label();
-            this.zfsConfigurationPropertiesRecursionRadioGroup = new Terminal.Gui.RadioGroup();
-            this.zfsConfigurationPropertiesRecursionLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesTemplateSourceTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesTemplateSourceLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesTemplateTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesTemplateLabel = new Terminal.Gui.Label();
+            this.zfsConfigurationPropertiesRecursionSourceTextField = new Terminal.Gui.TextField();
+            this.zfsConfigurationPropertiesRecursionSourceLabel = new Terminal.Gui.Label();
+            this.zfsConfigurationPropertiesRecursionRadioGroup = new Terminal.Gui.RadioGroup();
+            this.zfsConfigurationPropertiesRecursionLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesPruneSnapshotsSourceTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesPruneSnapshotsSourceLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesPruneSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
@@ -320,6 +324,18 @@ namespace Sanoid.ConfigConsole {
             this.whiteOnRed.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.whiteOnRed.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.whiteOnRed.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
+            this.inheritedPropertyTextFieldScheme = new Terminal.Gui.ColorScheme();
+            this.inheritedPropertyTextFieldScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyTextFieldScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray );
+            this.inheritedPropertyTextFieldScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
+            this.inheritedPropertyTextFieldScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray );
+            this.inheritedPropertyTextFieldScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
+            this.localPropertyTextFieldScheme = new Terminal.Gui.ColorScheme();
+            this.localPropertyTextFieldScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
+            this.localPropertyTextFieldScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
@@ -911,44 +927,10 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = "";
             this.zfsConfigurationPropertiesPruneSnapshotsSourceTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesPruneSnapshotsSourceTextField);
-            this.zfsConfigurationPropertiesTemplateLabel.Width = 8;
-            this.zfsConfigurationPropertiesTemplateLabel.Height = 1;
-            this.zfsConfigurationPropertiesTemplateLabel.X = 2;
-            this.zfsConfigurationPropertiesTemplateLabel.Y = 6;
-            this.zfsConfigurationPropertiesTemplateLabel.Data = "zfsConfigurationPropertiesTemplateLabel";
-            this.zfsConfigurationPropertiesTemplateLabel.Text = "Template";
-            this.zfsConfigurationPropertiesTemplateLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateLabel);
-            this.zfsConfigurationPropertiesTemplateTextField.Width = 15;
-            this.zfsConfigurationPropertiesTemplateTextField.Height = 1;
-            this.zfsConfigurationPropertiesTemplateTextField.X = 22;
-            this.zfsConfigurationPropertiesTemplateTextField.Y = 6;
-            this.zfsConfigurationPropertiesTemplateTextField.Secret = false;
-            this.zfsConfigurationPropertiesTemplateTextField.Data = "zfsConfigurationPropertiesTemplateTextField";
-            this.zfsConfigurationPropertiesTemplateTextField.Text = "";
-            this.zfsConfigurationPropertiesTemplateTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateTextField);
-            this.zfsConfigurationPropertiesTemplateSourceLabel.Width = 4;
-            this.zfsConfigurationPropertiesTemplateSourceLabel.Height = 1;
-            this.zfsConfigurationPropertiesTemplateSourceLabel.X = 42;
-            this.zfsConfigurationPropertiesTemplateSourceLabel.Y = 6;
-            this.zfsConfigurationPropertiesTemplateSourceLabel.Data = "zfsConfigurationPropertiesTemplateSourceLabel";
-            this.zfsConfigurationPropertiesTemplateSourceLabel.Text = "Source:";
-            this.zfsConfigurationPropertiesTemplateSourceLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateSourceLabel);
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Width = 20;
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Height = 1;
-            this.zfsConfigurationPropertiesTemplateSourceTextField.X = 50;
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Y = 6;
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Secret = false;
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Data = "zfsConfigurationPropertiesTemplateSourceTextField";
-            this.zfsConfigurationPropertiesTemplateSourceTextField.Text = "";
-            this.zfsConfigurationPropertiesTemplateSourceTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateSourceTextField);
             this.zfsConfigurationPropertiesRecursionLabel.Width = 8;
             this.zfsConfigurationPropertiesRecursionLabel.Height = 1;
             this.zfsConfigurationPropertiesRecursionLabel.X = 2;
-            this.zfsConfigurationPropertiesRecursionLabel.Y = 7;
+            this.zfsConfigurationPropertiesRecursionLabel.Y = 6;
             this.zfsConfigurationPropertiesRecursionLabel.Data = "zfsConfigurationPropertiesRecursionLabel";
             this.zfsConfigurationPropertiesRecursionLabel.Text = "Recursion";
             this.zfsConfigurationPropertiesRecursionLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -956,7 +938,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecursionRadioGroup.Width = 16;
             this.zfsConfigurationPropertiesRecursionRadioGroup.Height = 1;
             this.zfsConfigurationPropertiesRecursionRadioGroup.X = 22;
-            this.zfsConfigurationPropertiesRecursionRadioGroup.Y = 7;
+            this.zfsConfigurationPropertiesRecursionRadioGroup.Y = 6;
             this.zfsConfigurationPropertiesRecursionRadioGroup.Data = "zfsConfigurationPropertiesRecursionRadioGroup";
             this.zfsConfigurationPropertiesRecursionRadioGroup.Text = "";
             this.zfsConfigurationPropertiesRecursionRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -968,7 +950,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecursionSourceLabel.Width = 4;
             this.zfsConfigurationPropertiesRecursionSourceLabel.Height = 1;
             this.zfsConfigurationPropertiesRecursionSourceLabel.X = 42;
-            this.zfsConfigurationPropertiesRecursionSourceLabel.Y = 7;
+            this.zfsConfigurationPropertiesRecursionSourceLabel.Y = 6;
             this.zfsConfigurationPropertiesRecursionSourceLabel.Data = "zfsConfigurationPropertiesRecursionSourceLabel";
             this.zfsConfigurationPropertiesRecursionSourceLabel.Text = "Source:";
             this.zfsConfigurationPropertiesRecursionSourceLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -976,19 +958,53 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecursionSourceTextField.Width = 20;
             this.zfsConfigurationPropertiesRecursionSourceTextField.Height = 1;
             this.zfsConfigurationPropertiesRecursionSourceTextField.X = 50;
-            this.zfsConfigurationPropertiesRecursionSourceTextField.Y = 7;
+            this.zfsConfigurationPropertiesRecursionSourceTextField.Y = 6;
             this.zfsConfigurationPropertiesRecursionSourceTextField.Secret = false;
             this.zfsConfigurationPropertiesRecursionSourceTextField.Data = "zfsConfigurationPropertiesRecursionSourceTextField";
             this.zfsConfigurationPropertiesRecursionSourceTextField.Text = "";
             this.zfsConfigurationPropertiesRecursionSourceTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesRecursionSourceTextField);
+            this.zfsConfigurationPropertiesTemplateLabel.Width = 8;
+            this.zfsConfigurationPropertiesTemplateLabel.Height = 1;
+            this.zfsConfigurationPropertiesTemplateLabel.X = 2;
+            this.zfsConfigurationPropertiesTemplateLabel.Y = 7;
+            this.zfsConfigurationPropertiesTemplateLabel.Data = "zfsConfigurationPropertiesTemplateLabel";
+            this.zfsConfigurationPropertiesTemplateLabel.Text = "Template";
+            this.zfsConfigurationPropertiesTemplateLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateLabel);
+            this.zfsConfigurationPropertiesTemplateTextField.Width = 15;
+            this.zfsConfigurationPropertiesTemplateTextField.Height = 1;
+            this.zfsConfigurationPropertiesTemplateTextField.X = 22;
+            this.zfsConfigurationPropertiesTemplateTextField.Y = 7;
+            this.zfsConfigurationPropertiesTemplateTextField.Secret = false;
+            this.zfsConfigurationPropertiesTemplateTextField.Data = "zfsConfigurationPropertiesTemplateTextField";
+            this.zfsConfigurationPropertiesTemplateTextField.Text = "";
+            this.zfsConfigurationPropertiesTemplateTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateTextField);
+            this.zfsConfigurationPropertiesTemplateSourceLabel.Width = 4;
+            this.zfsConfigurationPropertiesTemplateSourceLabel.Height = 1;
+            this.zfsConfigurationPropertiesTemplateSourceLabel.X = 42;
+            this.zfsConfigurationPropertiesTemplateSourceLabel.Y = 7;
+            this.zfsConfigurationPropertiesTemplateSourceLabel.Data = "zfsConfigurationPropertiesTemplateSourceLabel";
+            this.zfsConfigurationPropertiesTemplateSourceLabel.Text = "Source:";
+            this.zfsConfigurationPropertiesTemplateSourceLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateSourceLabel);
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Width = 20;
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Height = 1;
+            this.zfsConfigurationPropertiesTemplateSourceTextField.X = 50;
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Y = 7;
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Secret = false;
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Data = "zfsConfigurationPropertiesTemplateSourceTextField";
+            this.zfsConfigurationPropertiesTemplateSourceTextField.Text = "";
+            this.zfsConfigurationPropertiesTemplateSourceTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationPropertiesGeneralFrame.Add(this.zfsConfigurationPropertiesTemplateSourceTextField);
             this.zfsConfigurationPropertiesRetentionFrame.Width = 21;
             this.zfsConfigurationPropertiesRetentionFrame.Height = 8;
             this.zfsConfigurationPropertiesRetentionFrame.X = 0;
             this.zfsConfigurationPropertiesRetentionFrame.Y = 10;
             this.zfsConfigurationPropertiesRetentionFrame.Data = "zfsConfigurationPropertiesRetentionFrame";
             this.zfsConfigurationPropertiesRetentionFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.BrightGreen;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesRetentionFrame.Border.DrawMarginFrame = true;
@@ -1007,7 +1023,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionFrequentTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Y = 0;
-            this.zfsConfigurationPropertiesRetentionFrequentTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionFrequentTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Data = "zfsConfigurationPropertiesRetentionFrequentTextField";
             this.zfsConfigurationPropertiesRetentionFrequentTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionFrequentTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1024,7 +1041,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionHourlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Y = 1;
-            this.zfsConfigurationPropertiesRetentionHourlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionHourlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Data = "zfsConfigurationPropertiesRetentionHourlyTextField";
             this.zfsConfigurationPropertiesRetentionHourlyTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionHourlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1041,7 +1059,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionDailyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionDailyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionDailyTextField.Y = 2;
-            this.zfsConfigurationPropertiesRetentionDailyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionDailyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionDailyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionDailyTextField.Data = "zfsConfigurationPropertiesRetentionDailyTextField";
             this.zfsConfigurationPropertiesRetentionDailyTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionDailyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1058,7 +1077,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Y = 3;
-            this.zfsConfigurationPropertiesRetentionWeeklyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionWeeklyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionWeeklyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Data = "zfsConfigurationPropertiesRetentionWeeklyTextField";
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionWeeklyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1075,7 +1095,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Y = 4;
-            this.zfsConfigurationPropertiesRetentionMonthlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionMonthlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionMonthlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Data = "zfsConfigurationPropertiesRetentionMonthlyTextField";
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionMonthlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1092,7 +1113,8 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRetentionYearlyTextField.X = 14;
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Y = 5;
-            this.zfsConfigurationPropertiesRetentionYearlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRetentionYearlyTextField.ColorScheme = this.inheritedPropertyTextFieldScheme;
+            this.zfsConfigurationPropertiesRetentionYearlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9]{1,3}");
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Data = "zfsConfigurationPropertiesRetentionYearlyTextField";
             this.zfsConfigurationPropertiesRetentionYearlyTextField.Text = "";
             this.zfsConfigurationPropertiesRetentionYearlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1114,7 +1136,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentFrequentTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentFrequentTextField.X = 1;
             this.zfsConfigurationPropertiesRecentFrequentTextField.Y = 0;
-            this.zfsConfigurationPropertiesRecentFrequentTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentFrequentTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentFrequentTextField.Data = "zfsConfigurationPropertiesRecentFrequentTextField";
             this.zfsConfigurationPropertiesRecentFrequentTextField.Text = "";
             this.zfsConfigurationPropertiesRecentFrequentTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1123,7 +1145,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentHourlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentHourlyTextField.X = 1;
             this.zfsConfigurationPropertiesRecentHourlyTextField.Y = 1;
-            this.zfsConfigurationPropertiesRecentHourlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentHourlyTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentHourlyTextField.Data = "zfsConfigurationPropertiesRecentHourlyTextField";
             this.zfsConfigurationPropertiesRecentHourlyTextField.Text = "";
             this.zfsConfigurationPropertiesRecentHourlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1132,7 +1154,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentDailyTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentDailyTextField.X = 1;
             this.zfsConfigurationPropertiesRecentDailyTextField.Y = 2;
-            this.zfsConfigurationPropertiesRecentDailyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentDailyTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentDailyTextField.Data = "zfsConfigurationPropertiesRecentDailyTextField";
             this.zfsConfigurationPropertiesRecentDailyTextField.Text = "";
             this.zfsConfigurationPropertiesRecentDailyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1141,7 +1163,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentWeeklyTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentWeeklyTextField.X = 1;
             this.zfsConfigurationPropertiesRecentWeeklyTextField.Y = 3;
-            this.zfsConfigurationPropertiesRecentWeeklyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentWeeklyTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentWeeklyTextField.Data = "zfsConfigurationPropertiesRecentWeeklyTextField";
             this.zfsConfigurationPropertiesRecentWeeklyTextField.Text = "";
             this.zfsConfigurationPropertiesRecentWeeklyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1150,7 +1172,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentMonthlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentMonthlyTextField.X = 1;
             this.zfsConfigurationPropertiesRecentMonthlyTextField.Y = 4;
-            this.zfsConfigurationPropertiesRecentMonthlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentMonthlyTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentMonthlyTextField.Data = "zfsConfigurationPropertiesRecentMonthlyTextField";
             this.zfsConfigurationPropertiesRecentMonthlyTextField.Text = "";
             this.zfsConfigurationPropertiesRecentMonthlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -1159,7 +1181,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentYearlyTextField.Height = 1;
             this.zfsConfigurationPropertiesRecentYearlyTextField.X = 1;
             this.zfsConfigurationPropertiesRecentYearlyTextField.Y = 5;
-            this.zfsConfigurationPropertiesRecentYearlyTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider(".*");
+            this.zfsConfigurationPropertiesRecentYearlyTextField.Secret = false;
             this.zfsConfigurationPropertiesRecentYearlyTextField.Data = "zfsConfigurationPropertiesRecentYearlyTextField";
             this.zfsConfigurationPropertiesRecentYearlyTextField.Text = "";
             this.zfsConfigurationPropertiesRecentYearlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;

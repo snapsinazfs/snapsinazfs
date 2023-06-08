@@ -39,6 +39,7 @@ namespace Sanoid.ConfigConsole
             SetGlobalSettingsFieldsFromSettingsObject( );
             configCategoryTabView.SelectedTabChanged += ConfigCategoryTabViewOnSelectedTabChanged;
 
+            SetTabStopsForRootLevelObjects( );
             SetCanFocusStateForZfsConfigurationViews( );
             SetTabStopsForZfsConfigurationWindow( );
             SetPropertiesForReadonlyFields( );
@@ -56,8 +57,6 @@ namespace Sanoid.ConfigConsole
 
         private void SetTabStopsForRootLevelObjects( )
         {
-            globalConfigWindow.TabStop = false;
-            globalConfigWindow.CanFocus = false;
             configCategoryTabView.TabStop = true;
             configCategoryTabView.CanFocus = true;
         }
@@ -125,6 +124,21 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesPruneSnapshotsSourceTextField.CanFocus = false;
             zfsConfigurationPropertiesTemplateSourceTextField.ReadOnly = true;
             zfsConfigurationPropertiesTemplateSourceTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecursionSourceTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecursionSourceTextField.CanFocus = false;
+
+            zfsConfigurationPropertiesRecentFrequentTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentFrequentTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecentHourlyTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentHourlyTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecentDailyTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentDailyTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecentWeeklyTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentWeeklyTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecentMonthlyTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentMonthlyTextField.ReadOnly = true;
+            zfsConfigurationPropertiesRecentYearlyTextField.CanFocus = false;
+            zfsConfigurationPropertiesRecentYearlyTextField.ReadOnly = true;
         }
 
         private void DisableEventHandlers( )
@@ -274,12 +288,20 @@ namespace Sanoid.ConfigConsole
                 zfsConfigurationPropertiesNameTextField.Text = ds.Name;
                 zfsConfigurationPropertiesTypeTextField.Text = ds.Kind;
                 zfsConfigurationPropertiesEnabledRadioGroup.SelectedItem = ds.Enabled.AsTrueFalseRadioIndex( );
-                zfsConfigurationPropertiesEnabledSourceTextField.Text = ds.Enabled.Source;
+                zfsConfigurationPropertiesEnabledSourceTextField.Text = ds.Enabled.IsInherited ? ds.Enabled.Source[ 15.. ] : ds.Enabled.Source;
                 zfsConfigurationPropertiesTakeSnapshotsRadioGroup.SelectedItem = ds.TakeSnapshots.AsTrueFalseRadioIndex( );
-                zfsConfigurationPropertiesTakeSnapshotsSourceTextField.Text = ds.TakeSnapshots.Source;
+                zfsConfigurationPropertiesTakeSnapshotsSourceTextField.Text = ds.TakeSnapshots.IsInherited ? ds.TakeSnapshots.Source[ 15.. ] : ds.TakeSnapshots.Source;
                 zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItem = ds.PruneSnapshots.AsTrueFalseRadioIndex( );
-                zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = ds.PruneSnapshots.Source;
+                zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = ds.TakeSnapshots.IsInherited ? ds.TakeSnapshots.Source[ 15.. ] : ds.PruneSnapshots.Source;
                 zfsConfigurationPropertiesTemplateTextField.Text = ds.Template.Value;
+                zfsConfigurationPropertiesTemplateSourceTextField.Text = ds.Template.IsInherited ? ds.Template.Source[ 15.. ] : ds.Template.Source;
+                zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem = ds.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
+                zfsConfigurationPropertiesRecursionSourceTextField.Text = ds.Recursion.IsInherited ? ds.Recursion.Source[ 15.. ] : ds.Recursion.Source;
+
+                zfsConfigurationPropertiesRetentionFrequentTextField.Text = ds.SnapshotRetentionFrequent.Value.ToString( );
+                zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = ds.SnapshotRetentionFrequent.IsInherited ? this.inheritedPropertyTextFieldScheme : this.greyOnBlack;
+                zfsConfigurationPropertiesRetentionHourlyTextField.Text = ds.SnapshotRetentionHourly.Value.ToString( );
+                zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = ds.SnapshotRetentionHourly.IsInherited ? this.inheritedPropertyTextFieldScheme : this.greyOnBlack;
             }
 
             EnableEventHandlers( );
