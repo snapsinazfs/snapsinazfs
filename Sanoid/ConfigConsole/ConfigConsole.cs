@@ -17,7 +17,7 @@ namespace Sanoid.ConfigConsole;
 
 internal class ConfigConsole
 {
-    internal static ConcurrentDictionary<string, Dataset> Datasets { get; set; } = new( );
+    internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; set; } = new( );
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; set; } = new( );
     internal static IZfsCommandRunner CommandRunner { get; set; }
     internal static SanoidSettings Settings { get; set; }
