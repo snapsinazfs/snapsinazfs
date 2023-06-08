@@ -19,7 +19,12 @@ internal static class ZfsTasks
         await foreach ( string zfsLine in commandRunner.ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            datasets.AddOrUpdate( lineTokens[ 0 ], k => new( k, lineTokens[ 2 ] ), ( k, ds ) =>
+            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            {
+                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ] );
+                nodes.Add( newRootDs );
+                return newRootDs;
+            }, ( k, ds ) =>
             {
                 ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
                 return ds;
