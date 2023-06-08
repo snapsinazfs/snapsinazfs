@@ -16,7 +16,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapshot>
 {
     private Snapshot( string name, ZfsObjectBase poolRoot )
-        : base( name, ZfsObjectKind.Snapshot, poolRoot )
+        : base( name, "snapshot", poolRoot )
     {
     }
 

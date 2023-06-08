@@ -222,7 +222,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
-        if ( !ZfsObjectBase.ValidateName( ZfsObjectKind.FileSystem, zfsPath ) )
+        if ( !ZfsObjectBase.ValidateName( "filesystem", zfsPath ) )
         {
             throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
         }
@@ -298,25 +298,27 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
 
                 // If datasets doesn't already contain this token, it's a new dataset. Add it.
-                if ( !datasets.ContainsKey( lineTokens[ 0 ] ) )
+                string dsName = lineTokens[ 0 ];
+                string dsPropertyName = lineTokens[ 1 ];
+                if ( !datasets.ContainsKey( dsName ) )
                 {
-                    if ( lineTokens[ 1 ] == "type" )
+                    if ( dsPropertyName == "type" )
                     {
-                        Logger.Debug( "Adding new Dataset {0} to collection", lineTokens[ 0 ] );
-                        DatasetKind newDsKind = lineTokens[ 2 ] switch
+                        Logger.Debug( "Adding new Dataset {0} to collection", dsName );
+                        string newDsType = lineTokens[ 2 ];
+                        if ( newDsType is not "filesystem" and not "volume" )
                         {
-                            "filesystem" => DatasetKind.FileSystem,
-                            "volume" => DatasetKind.Volume,
-                            _ => throw new InvalidOperationException( "Type of object from zfs get was unrecognized" )
-                        };
-                        Logger.Debug( "Dataset {0} will be a {1}", lineTokens[ 0 ], newDsKind );
+                            throw new InvalidOperationException( "Type of object from zfs get was unrecognized" );
+                        }
 
-                        Dataset dataset = new( lineTokens[ 0 ], newDsKind );
-                        if ( !datasets.TryAdd( lineTokens[ 0 ], dataset ) )
+                        Logger.Debug( "Dataset {0} will be a {1}", dsName, newDsType );
+
+                        Dataset dataset = new( dsName, newDsType );
+                        if ( !datasets.TryAdd( dsName, dataset ) )
                         {
                             // Log if we somehow try to add a duplicate, but continue processing
                             // Likely not fatal, but needs to be reported if it does happen
-                            Logger.Error( "Attempted to add a duplicate dataset ({0}) to the collection", lineTokens[ 0 ] );
+                            Logger.Error( "Attempted to add a duplicate dataset ({0}) to the collection", dsName );
                         }
                     }
                 }
@@ -325,10 +327,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     // Dataset is already in the collection
                     // This line is a property line
                     // Parse it and add it to the dataset, if it is one of the wanted keys
-                    Logger.Trace( "Checking if property {0} is wanted by sanoid", lineTokens[ 1 ] );
-                    if ( ZfsProperty.KnownDatasetProperties.Contains( lineTokens[ 1 ] ) )
+                    Logger.Trace( "Checking if property {0} is wanted by sanoid", dsPropertyName );
+                    if ( ZfsProperty.KnownDatasetProperties.Contains( dsPropertyName ) )
                     {
-                        Logger.Trace( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", lineTokens[ 1 ], lineTokens[ 0 ] );
+                        Logger.Trace( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", dsPropertyName, dsName );
 
                         // Parse the array starting from the second element (first was dataset name)
                         // The slice does allocate a new array, but it's trivial
@@ -342,7 +344,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     else
                     {
                         // Property name wasn't a key in the set of wanted keys, so we can just ignore it and move on
-                        Logger.Trace( "Property {0} is not wanted by sanoid. Ignoring", lineTokens[ 1 ] );
+                        Logger.Trace( "Property {0} is not wanted by sanoid. Ignoring", dsPropertyName );
                     }
                 }
 
@@ -408,7 +410,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !result.ContainsKey( dsName ) )
             {
                 Logger.Debug( "Key not in result. Creating new dataset {0}", dsName );
-                result[ dsName ] = new( dsName, DatasetKind.FileSystem, null, true );
+                result[ dsName ] = new( dsName, "filesystem", null, true );
             }
 
             Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
@@ -462,7 +464,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( !datasets.ContainsKey( dsName ) )
                 {
                     Logger.Debug( "Dataset {0} not in collection. Attempting to add using Name: {0}, Kind: {1}", dsName, propertyValue );
-                    if ( datasets.TryAdd( dsName, new( dsName, propertyValue.ToDatasetKind( ), datasets[ poolRootName ] ) ) )
+                    if ( datasets.TryAdd( dsName, new( dsName, propertyValue, datasets[ poolRootName ] ) ) )
                     {
                         Logger.Debug( "Added Dataset {0} to collection", dsName );
                         continue;

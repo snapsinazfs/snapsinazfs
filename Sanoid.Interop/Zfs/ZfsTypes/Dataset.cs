@@ -23,7 +23,7 @@ public class Dataset : ZfsObjectBase
     ///     Creates a new <see cref="Dataset" /> with the specified name and kind, optionally performing name validation
     /// </summary>
     /// <param name="name">The name of the new <see cref="Dataset" /></param>
-    /// <param name="kind">The <see cref="DatasetKind" /> of Dataset to create</param>
+    /// <param name="kind">The type of Dataset to create</param>
     /// <param name="poolRoot">
     ///     The root dataset for this dataset. Null for roots.
     /// </param>
@@ -36,8 +36,8 @@ public class Dataset : ZfsObjectBase
     ///     not (<see langword="false" /> - default)
     /// </param>
     /// <param name="validatorRegex">The <see cref="Regex" /> to user for name validation</param>
-    public Dataset( string name, DatasetKind kind, Dataset? poolRoot = null, bool isKnownPoolRoot = false, bool validateName = false, Regex? validatorRegex = null )
-        : base( name, (ZfsObjectKind)kind, poolRoot, isKnownPoolRoot, validateName, validatorRegex )
+    public Dataset( string name, string kind, Dataset? poolRoot = null, bool isKnownPoolRoot = false, bool validateName = false, Regex? validatorRegex = null )
+        : base( name, kind, poolRoot, isKnownPoolRoot, validateName, validatorRegex )
     {
     }
 

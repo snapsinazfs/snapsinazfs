@@ -18,7 +18,7 @@ public abstract class ZfsObjectBase
     ///     Creates a new <see cref="ZfsObjectBase" /> with the specified name and kind
     /// </summary>
     /// <param name="name">The name of the new <see cref="ZfsObjectBase" /></param>
-    /// <param name="kind">The <see cref="ZfsObjectKind" /> of object to create</param>
+    /// <param name="kind">The type of object to create</param>
     /// <param name="poolRoot"></param>
     /// <param name="isKnownPoolRoot">
     ///     Short-circuit if this dataset is known to be a pool root at instantiation, to avoid
@@ -31,7 +31,7 @@ public abstract class ZfsObjectBase
     ///     An optional <see cref="Regex" />. If left null, uses a Regex from <see cref="ZfsIdentifierRegexes" /> based on
     ///     <paramref name="kind" />
     /// </param>
-    protected internal ZfsObjectBase( string name, ZfsObjectKind kind, ZfsObjectBase? poolRoot = null, bool isKnownPoolRoot = false, bool validateName = false, Regex? nameValidatorRegex = null )
+    protected internal ZfsObjectBase( string name, string kind, ZfsObjectBase? poolRoot = null, bool isKnownPoolRoot = false, bool validateName = false, Regex? nameValidatorRegex = null )
     {
         Logger.Debug( "Creating new ZfsObjectBase {0} of kind {1}", name, kind );
         ZfsKind = kind;
@@ -47,10 +47,9 @@ public abstract class ZfsObjectBase
 
         NameValidatorRegex = nameValidatorRegex ?? kind switch
         {
-            ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsObjectKind.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
-            ZfsObjectKind.Unknown => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified for ZfsIdentifierValidator." ),
+            "filesystem" => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            "volume" => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            "snapshot" => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified for ZfsIdentifierValidator." )
         };
 
@@ -175,7 +174,7 @@ public abstract class ZfsObjectBase
 
     public string RootName => Name.GetZfsPathRoot( );
 
-    public ZfsObjectKind ZfsKind { get; }
+    public string ZfsKind { get; }
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -195,13 +194,12 @@ public abstract class ZfsObjectBase
     }
 
     /// <exception cref="ArgumentOutOfRangeException">
-    ///     If an invalid or uninitialized value is provided for
-    ///     <paramref name="kind" />.
+    ///     If an invalid value is provided for <paramref name="kind" />.
     /// </exception>
     /// <exception cref="ArgumentNullException">If <paramref name="name" /> is null, empty, or only whitespace</exception>
-    public static bool ValidateName( ZfsObjectKind kind, string name, Regex? validatorRegex = null )
+    public static bool ValidateName( string kind, string name, Regex? validatorRegex = null )
     {
-        Logger.Debug( "Validating {0} name \"{1}\"", kind.ToString( ), name );
+        Logger.Debug( "Validating name \"{0}\"", name );
         if ( string.IsNullOrWhiteSpace( name ) )
         {
             throw new ArgumentNullException( nameof( name ), "name must be a non-null, non-empty, non-whitespace string" );
@@ -216,9 +214,9 @@ public abstract class ZfsObjectBase
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         validatorRegex ??= kind switch
         {
-            ZfsObjectKind.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsObjectKind.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsObjectKind.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
+            "filesystem" => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            "volume" => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            "snapshot" => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new ArgumentOutOfRangeException( nameof( kind ), "Unknown type of object specified to ValidateName." )
         };
 

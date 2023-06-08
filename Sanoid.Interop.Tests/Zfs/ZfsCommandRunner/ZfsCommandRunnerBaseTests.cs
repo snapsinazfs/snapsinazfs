@@ -48,7 +48,7 @@ public class ZfsCommandRunnerBaseTests
             path = $"{path}/{GetValidZfsPathComponent(pathLength / pathDepth)}";
         }
 
-        Assert.That(() => { ZfsObjectBase.ValidateName(ZfsObjectKind.FileSystem, path); }, Throws.TypeOf<ArgumentOutOfRangeException>());
+        Assert.That(() => { ZfsObjectBase.ValidateName("filesystem", path); }, Throws.TypeOf<ArgumentOutOfRangeException>());
     }
 
     [Test]
@@ -64,8 +64,8 @@ public class ZfsCommandRunnerBaseTests
         }
 
         string nameToTest = testCase.Name;
-        bool fsValidationResult = ZfsObjectBase.ValidateName(ZfsObjectKind.FileSystem, nameToTest) == testCase.Valid;
-        bool volValidationResult = ZfsObjectBase.ValidateName(ZfsObjectKind.Volume, nameToTest) == testCase.Valid;
+        bool fsValidationResult = ZfsObjectBase.ValidateName("filesystem", nameToTest) == testCase.Valid;
+        bool volValidationResult = ZfsObjectBase.ValidateName("volume", nameToTest) == testCase.Valid;
         Assert.Multiple(() =>
         {
             Assert.That(fsValidationResult, Is.True);
@@ -86,7 +86,7 @@ public class ZfsCommandRunnerBaseTests
             Assert.Ignore("Total path depth requested would exceed valid ZFS identifier length (255)");
         }
         string nameToTest = testCase.Name;
-        bool snapshotValidationResult = ZfsObjectBase.ValidateName(ZfsObjectKind.Snapshot, nameToTest) == testCase.Valid;
+        bool snapshotValidationResult = ZfsObjectBase.ValidateName("snapshot", nameToTest) == testCase.Valid;
         Assert.That(snapshotValidationResult, Is.True);
     }
 
@@ -369,6 +369,6 @@ public class ZfsCommandRunnerBaseTests
     [TestCase("bad/PoolName/", ExpectedResult = false)]
     public bool CheckSnapshotNameValidation(string name)
     {
-        return ZfsObjectBase.ValidateName(ZfsObjectKind.Snapshot, name);
+        return ZfsObjectBase.ValidateName( "snapshot", name );
     }
 }

@@ -131,19 +131,12 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             ZfsProperty p = parseResult.prop;
             if ( p.Name == "type" )
             {
-                Logger.Info( "Line is a new dataset" );
-                DatasetKind kind = p.Value switch
-                {
-                    "filesystem" => DatasetKind.FileSystem,
-                    "volume" => DatasetKind.Volume,
-                    _ => throw new InvalidOperationException( $"Unable to parse DatasetKind from line: {stringToParse}" )
-                };
-                Logger.Info( "New dataset is a {0:F}", kind );
+                Logger.Info( "New dataset is a {0:F}", p.Value );
                 string rootPathString = parseResult.parent.GetZfsPathRoot();
                 bool isNewRoot = !datasets.ContainsKey( rootPathString );
-                Dataset newDs = new( parseResult.parent, kind, isNewRoot ? null : datasets[ rootPathString ], isNewRoot );
+                Dataset newDs = new( parseResult.parent, p.Value, isNewRoot ? null : datasets[ rootPathString ], isNewRoot );
                 datasets.TryAdd( parseResult.parent, newDs );
-                Logger.Info( "New {0:F} {1} created and added to result dictionary", kind, newDs.Name );
+                Logger.Info( "New {0:F} {1} created and added to result dictionary", p.Value, newDs.Name );
             }
             else if ( datasets.TryGetValue( parseResult.parent, out Dataset? ds ) )
             {

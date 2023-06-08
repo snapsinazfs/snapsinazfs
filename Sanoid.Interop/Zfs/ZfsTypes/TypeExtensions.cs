@@ -39,28 +39,6 @@ public static class TypeExtensions
         return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
     }
 
-    /// <summary>
-    ///     Gets an equivalent <see cref="DatasetKind" /> from this <see langword="string" /> value.
-    /// </summary>
-    /// <param name="value">The input string to convert to <see cref="DatasetKind" /></param>
-    /// <returns>
-    ///     A <see cref="DatasetKind" /> for the given <see langword="string" /> value, or throws a
-    ///     <see cref="NotSupportedException" /> if an unsupported value is provided
-    /// </returns>
-    /// <exception cref="NotSupportedException">
-    ///     The <paramref name="value" /> does not correspond to a supported conversion to
-    ///     <see cref="DatasetKind" />
-    /// </exception>
-    public static DatasetKind ToDatasetKind( this string value )
-    {
-        return value switch
-        {
-            "volume" => DatasetKind.Volume,
-            "filesystem" => DatasetKind.FileSystem,
-            _ => throw new NotSupportedException( $"Conversion from {value} to a DatasetKind is not supported." )
-        };
-    }
-
     public static string GetZfsPathRoot( this string value )
     {
         int endIndex = value.IndexOf( '/' );
