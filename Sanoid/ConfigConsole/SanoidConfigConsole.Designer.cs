@@ -97,8 +97,6 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView zfsPathTreeFrame;
         
-        private Terminal.Gui.ScrollView zfsConfigTreeScroller;
-        
         private Terminal.Gui.TreeView zfsConfigurationTreeView;
         
         private Terminal.Gui.FrameView zfsConfigurationPropertiesFrame;
@@ -119,7 +117,6 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationSaveAllButton = new Terminal.Gui.Button();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
-            this.zfsConfigTreeScroller = new Terminal.Gui.ScrollView();
             this.zfsPathTreeFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
             this.templateEditingNotImplementedLabel = new Terminal.Gui.Label();
@@ -570,14 +567,6 @@ namespace Sanoid.ConfigConsole {
             this.zfsPathTreeFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsPathTreeFrame.Title = "ZFS Objects";
             this.zfsConfigurationWindow.Add(this.zfsPathTreeFrame);
-            this.zfsConfigTreeScroller.Width = Dim.Fill(0);
-            this.zfsConfigTreeScroller.Height = Dim.Fill(0);
-            this.zfsConfigTreeScroller.X = 0;
-            this.zfsConfigTreeScroller.Y = 0;
-            this.zfsConfigTreeScroller.ContentSize = new Size(20,10);
-            this.zfsConfigTreeScroller.Data = "zfsConfigTreeScroller";
-            this.zfsConfigTreeScroller.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsPathTreeFrame.Add(this.zfsConfigTreeScroller);
             this.zfsConfigurationTreeView.Width = Dim.Fill(1);
             this.zfsConfigurationTreeView.Height = Dim.Fill(1);
             this.zfsConfigurationTreeView.X = -2;
@@ -590,7 +579,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationTreeView.Style.InvertExpandSymbolColors = false;
             this.zfsConfigurationTreeView.Style.LeaveLastRow = false;
             this.zfsConfigurationTreeView.Style.ShowBranchLines = true;
-            this.zfsConfigTreeScroller.Add(this.zfsConfigurationTreeView);
+            this.zfsPathTreeFrame.Add(this.zfsConfigurationTreeView);
             this.zfsConfigurationPropertiesFrame.Width = Dim.Fill(1);
             this.zfsConfigurationPropertiesFrame.Height = Dim.Fill(5);
             this.zfsConfigurationPropertiesFrame.X = Pos.Right(zfsPathTreeFrame) + 2;
