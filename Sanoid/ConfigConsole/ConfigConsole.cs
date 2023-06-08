@@ -45,7 +45,6 @@ internal static class ConfigConsole
         Application.Run<SanoidConfigConsole>( );
         Application.Shutdown( );
 
-        Logger.Info( "Exited Config Console" );
 
         if ( consoleRule != null )
         {
@@ -54,5 +53,6 @@ internal static class ConfigConsole
             LogManager.ReconfigExistingLoggers( );
         }
 
+        Logger.Info( "Exited Config Console" );
     }
 }
