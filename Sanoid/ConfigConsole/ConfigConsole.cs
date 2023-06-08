@@ -34,7 +34,7 @@ internal static class ConfigConsole
 
         if ( consoleRule != null )
         {
-            minConsoleLogLevel = consoleRule.FinalMinLevel;
+            minConsoleLogLevel = consoleRule.Levels.Min();
             consoleRule.DisableLoggingForLevels( LogLevel.Trace, LogLevel.Off );
             LogManager.ReconfigExistingLoggers();
         }
@@ -45,12 +45,14 @@ internal static class ConfigConsole
         Application.Run<SanoidConfigConsole>( );
         Application.Shutdown( );
 
+        Logger.Info( "Exited Config Console" );
+
         if ( consoleRule != null )
         {
-            consoleRule.EnableLoggingForLevels( minConsoleLogLevel, LogLevel.Fatal );
+            Logger.Info( "Setting \"Console\" logging rule to {0}", minConsoleLogLevel ?? LogLevel.Info );
+            consoleRule.EnableLoggingForLevels( minConsoleLogLevel ?? LogLevel.Info, LogLevel.Fatal );
             LogManager.ReconfigExistingLoggers( );
         }
 
-        Logger.Info( "Exited Config Console. Resuming logging" );
     }
 }
