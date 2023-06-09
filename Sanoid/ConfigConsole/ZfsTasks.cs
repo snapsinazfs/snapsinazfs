@@ -7,6 +7,7 @@
 using System.Collections.Concurrent;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Sanoid.Settings.Settings;
 using Terminal.Gui.Trees;
 
 namespace Sanoid.ConfigConsole;
@@ -18,5 +19,10 @@ internal static class ZfsTasks
     {
         Logger.Debug( "Getting zfs objects for tree view" );
         return await commandRunner.GetZfsObjectsForConfigConsoleTreeAsync( datasets ).ConfigureAwait( true );
+    }
+
+    public static void SetPropertiesForDataset(bool dryRun, string zfsPath, List<IZfsProperty> modifiedProperties, IZfsCommandRunner commandRunner )
+    {
+        commandRunner.SetZfsProperties( dryRun, zfsPath, modifiedProperties );
     }
 }

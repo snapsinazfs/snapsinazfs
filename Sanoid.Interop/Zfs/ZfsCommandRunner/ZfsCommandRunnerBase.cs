@@ -29,6 +29,9 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
 
     /// <inheritdoc />
+    public abstract bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
+
+    /// <inheritdoc />
     public abstract Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
 
     /// <inheritdoc />

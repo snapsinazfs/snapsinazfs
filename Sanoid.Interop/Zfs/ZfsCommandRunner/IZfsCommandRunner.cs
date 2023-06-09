@@ -74,6 +74,24 @@ public interface IZfsCommandRunner
     public bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
 
     /// <summary>
+    ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
+    /// </summary>
+    /// <param name="dryRun">
+    ///     If true, instructs the method not to actually call the ZFS utility, but instead just report what
+    ///     it <em>would</em> have done.
+    /// </param>
+    /// <param name="zfsPath">The fully-qualified path to operate on</param>
+    /// <param name="properties">
+    ///     A <see cref="List{T}" /> of <see cref="IZfsProperty" /> objects to set on
+    ///     <paramref name="zfsPath" />
+    /// </param>
+    /// <returns>
+    ///     If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
+    ///     Otherwise, a <see langword="bool" /> indicating success or failure of the operation
+    /// </returns>
+    public bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
+
+    /// <summary>
     ///     Gets all dataset configuration from zfs
     /// </summary>
     /// <returns>

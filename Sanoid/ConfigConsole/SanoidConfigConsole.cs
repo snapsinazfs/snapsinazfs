@@ -245,10 +245,10 @@ namespace Sanoid.ConfigConsole
 
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
-            if ( ValidateZfsObjectConfigValues( ) )
+            if ( ValidateZfsObjectConfigValues( ) && _zfsConfigurationCurrentSelectedItem is not null )
             {
-                using Button cancelButton = new ( "Cancel", true );
-                using Button saveButton = new ( "Save" );
+                using Button cancelButton = new( "Cancel", true );
+                using Button saveButton = new( "Save" );
                 using Dialog saveZfsObjectDialog = new( "Confirm Saving ZFS Object Configuration", 80, 7, cancelButton, saveButton );
                 bool saveConfirmed = false;
 
@@ -260,13 +260,18 @@ namespace Sanoid.ConfigConsole
                 saveZfsObjectDialog.ColorScheme = whiteOnRed;
                 saveZfsObjectDialog.TextAlignment = TextAlignment.Centered;
                 saveZfsObjectDialog.VerticalTextAlignment = VerticalTextAlignment.Middle;
-                saveZfsObjectDialog.Text = $"The following command will be executed:\nzfs set {_modifiedPropertiesForZfsObject.ToStringForZfsSet()} {_zfsConfigurationCurrentSelectedItem.Name}";
+                saveZfsObjectDialog.Text = $"The following command will be executed:\nzfs set {_modifiedPropertiesForZfsObject.ToStringForZfsSet( )} {_zfsConfigurationCurrentSelectedItem.Name}\n\nTHIS OPERATION CANNOT BE UNDONE";
                 saveZfsObjectDialog.Modal = true;
 
                 Application.Run( saveZfsObjectDialog );
 
                 if ( saveConfirmed )
                 {
+                    if ( ConfigConsole.Settings != null && ConfigConsole.CommandRunner != null )
+                    {
+                        ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, _zfsConfigurationCurrentSelectedItem.Name, _modifiedPropertiesForZfsObject, ConfigConsole.CommandRunner );
+                    }
+
                     Logger.Info( "Saving {0}", _zfsConfigurationCurrentSelectedItem.Name );
                 }
 

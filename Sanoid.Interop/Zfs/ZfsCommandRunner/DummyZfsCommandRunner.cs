@@ -72,7 +72,13 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
     {
-        return true;
+        return !dryRun;
+    }
+
+    /// <inheritdoc />
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    {
+        return !dryRun;
     }
 
     /// <inheritdoc />

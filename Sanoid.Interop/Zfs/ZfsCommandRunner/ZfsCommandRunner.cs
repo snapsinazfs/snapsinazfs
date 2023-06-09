@@ -231,6 +231,52 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return PrivateSetZfsProperty( dryRun, zfsPath, properties );
     }
 
+    /// <inheritdoc />
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    {
+        if ( properties.Count == 0 )
+        {
+            Logger.Warn( "Asked to set properties for {0} but no properties provided", zfsPath );
+            return false;
+        }
+
+        string propertiesSetString = properties.ToStringForZfsSet( );
+        Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesSetString );
+        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {zfsPath}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        {
+            if ( dryRun )
+            {
+                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+                return false;
+            }
+
+            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+            try
+            {
+                zfsSetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
+                return false;
+            }
+
+            if ( !zfsSetProcess.HasExited )
+            {
+                Logger.Trace( "Waiting for zfs set process to exit" );
+                zfsSetProcess.WaitForExit( 3000 );
+            }
+
+            Logger.Trace( "zfs set process finished" );
+            return true;
+        }
+    }
+
     /// <summary>Gets properties for datasets, either recursively (default) or using supplied arguments</summary>
     /// <returns>
     ///     A  <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" />
