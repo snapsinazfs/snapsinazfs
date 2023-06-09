@@ -55,4 +55,26 @@ public static class TypeExtensions
         string rootPath = value[ ..endIndex ];
         return rootPath;
     }
+
+    public static string ToStringForZfsSet( this IEnumerable<ZfsProperty> properties )
+    {
+        return string.Join( ' ', properties.Select( p => p.SetString ) );
+    }
+    /// <summary>
+    /// Gets a string of all <see cref="IZfsProperty.SetString"/> values, separated by spaces, to be used in zfs set operations
+    /// </summary>
+    /// <param name="properties">An <see cref="IEnumerable{T}"/> of <see cref="IZfsProperty"/> objects to get a set string for</param>
+    /// <returns></returns>
+    public static string ToStringForZfsSet( this List<IZfsProperty> properties )
+    {
+        if ( properties is null )
+        {
+            throw new ArgumentNullException( nameof( properties ), "Null collection provided" );
+        }
+        if ( !properties.Any( ) )
+        {
+            throw new ArgumentException( "Empty collection provided", nameof( properties ) );
+        }
+        return string.Join( ' ', properties.Select( p => p.SetString ) );
+    }
 }
