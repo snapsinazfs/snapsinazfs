@@ -24,31 +24,31 @@ public class ZfsProperty
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { EnabledPropertyName, new( EnabledPropertyName, "false", ZfsPropertySourceConstants.Local ) },
-        { TakeSnapshotsPropertyName, new( TakeSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
-        { PruneSnapshotsPropertyName, new( PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
-        { RecursionPropertyName, new( RecursionPropertyName, "sanoid", ZfsPropertySourceConstants.Local ) },
-        { TemplatePropertyName, new( TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) },
-        { DatasetLastFrequentSnapshotTimestampPropertyName, new( DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { DatasetLastHourlySnapshotTimestampPropertyName, new( DatasetLastHourlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { DatasetLastDailySnapshotTimestampPropertyName, new( DatasetLastDailySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { DatasetLastWeeklySnapshotTimestampPropertyName, new( DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { DatasetLastMonthlySnapshotTimestampPropertyName, new( DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { DatasetLastYearlySnapshotTimestampPropertyName, new( DatasetLastYearlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionFrequentPropertyName, new( SnapshotRetentionFrequentPropertyName, "0", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionHourlyPropertyName, new( SnapshotRetentionHourlyPropertyName, "48", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionDailyPropertyName, new( SnapshotRetentionDailyPropertyName, "90", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionWeeklyPropertyName, new( SnapshotRetentionWeeklyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionMonthlyPropertyName, new( SnapshotRetentionMonthlyPropertyName, "6", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionYearlyPropertyName, new( SnapshotRetentionYearlyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
-        { SnapshotRetentionPruneDeferralPropertyName, new( SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local ) }
+        { ZfsPropertyNames.EnabledPropertyName, new( ZfsPropertyNames.EnabledPropertyName, "false", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.TakeSnapshotsPropertyName, new( ZfsPropertyNames.TakeSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.PruneSnapshotsPropertyName, new( ZfsPropertyNames.PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.RecursionPropertyName, new( ZfsPropertyNames.RecursionPropertyName, "sanoid", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.TemplatePropertyName, new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "0", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "48", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionDailyPropertyName, new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "90", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "6", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "0", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local ) }
     } );
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { SnapshotNamePropertyName, new( SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
-        { SnapshotPeriodPropertyName, new( SnapshotPeriodPropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
-        { SnapshotTimestampPropertyName, new( SnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Sanoid ) }
+        { ZfsPropertyNames.SnapshotNamePropertyName, new( ZfsPropertyNames.SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
+        { ZfsPropertyNames.SnapshotPeriodPropertyName, new( ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
+        { ZfsPropertyNames.SnapshotTimestampPropertyName, new( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Sanoid ) }
     } );
 
     public bool IsSanoidProperty { get; }
@@ -59,31 +59,31 @@ public class ZfsProperty
 
     public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
-        EnabledPropertyName,
-        TakeSnapshotsPropertyName,
-        PruneSnapshotsPropertyName,
-        RecursionPropertyName,
-        TemplatePropertyName,
-        DatasetLastFrequentSnapshotTimestampPropertyName,
-        DatasetLastHourlySnapshotTimestampPropertyName,
-        DatasetLastDailySnapshotTimestampPropertyName,
-        DatasetLastWeeklySnapshotTimestampPropertyName,
-        DatasetLastMonthlySnapshotTimestampPropertyName,
-        DatasetLastYearlySnapshotTimestampPropertyName,
-        SnapshotRetentionFrequentPropertyName,
-        SnapshotRetentionHourlyPropertyName,
-        SnapshotRetentionDailyPropertyName,
-        SnapshotRetentionWeeklyPropertyName,
-        SnapshotRetentionMonthlyPropertyName,
-        SnapshotRetentionYearlyPropertyName
+        ZfsPropertyNames.EnabledPropertyName,
+        ZfsPropertyNames.TakeSnapshotsPropertyName,
+        ZfsPropertyNames.PruneSnapshotsPropertyName,
+        ZfsPropertyNames.RecursionPropertyName,
+        ZfsPropertyNames.TemplatePropertyName,
+        ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+        ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+        ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+        ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+        ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+        ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+        ZfsPropertyNames.SnapshotRetentionFrequentPropertyName,
+        ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,
+        ZfsPropertyNames.SnapshotRetentionDailyPropertyName,
+        ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
+        ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
+        ZfsPropertyNames.SnapshotRetentionYearlyPropertyName
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
     {
-        SnapshotNamePropertyName,
-        SnapshotPeriodPropertyName,
-        SnapshotTimestampPropertyName,
-        PruneSnapshotsPropertyName
+        ZfsPropertyNames.SnapshotNamePropertyName,
+        ZfsPropertyNames.SnapshotPeriodPropertyName,
+        ZfsPropertyNames.SnapshotTimestampPropertyName,
+        ZfsPropertyNames.PruneSnapshotsPropertyName
     } );
 
     public string Name { get; }
@@ -95,28 +95,6 @@ public class ZfsProperty
 
     [MaxLength( 8192 )]
     public string Value { get; set; }
-
-    public const string DatasetLastDailySnapshotTimestampPropertyName = "sanoid.net:lastdailysnapshottimestamp";
-    public const string DatasetLastFrequentSnapshotTimestampPropertyName = "sanoid.net:lastfrequentsnapshottimestamp";
-    public const string DatasetLastHourlySnapshotTimestampPropertyName = "sanoid.net:lasthourlysnapshottimestamp";
-    public const string DatasetLastMonthlySnapshotTimestampPropertyName = "sanoid.net:lastmonthlysnapshottimestamp";
-    public const string DatasetLastWeeklySnapshotTimestampPropertyName = "sanoid.net:lastweeklysnapshottimestamp";
-    public const string DatasetLastYearlySnapshotTimestampPropertyName = "sanoid.net:lastyearlysnapshottimestamp";
-    public const string EnabledPropertyName = "sanoid.net:enabled";
-    public const string PruneSnapshotsPropertyName = "sanoid.net:prunesnapshots";
-    public const string RecursionPropertyName = "sanoid.net:recursion";
-    public const string SnapshotNamePropertyName = "sanoid.net:snapshot:name";
-    public const string SnapshotPeriodPropertyName = "sanoid.net:snapshot:period";
-    public const string SnapshotRetentionDailyPropertyName = "sanoid.net:retention:daily";
-    public const string SnapshotRetentionFrequentPropertyName = "sanoid.net:retention:frequent";
-    public const string SnapshotRetentionHourlyPropertyName = "sanoid.net:retention:hourly";
-    public const string SnapshotRetentionMonthlyPropertyName = "sanoid.net:retention:monthly";
-    public const string SnapshotRetentionPruneDeferralPropertyName = "sanoid.net:retention:prunedeferral";
-    public const string SnapshotRetentionWeeklyPropertyName = "sanoid.net:retention:weekly";
-    public const string SnapshotRetentionYearlyPropertyName = "sanoid.net:retention:yearly";
-    public const string SnapshotTimestampPropertyName = "sanoid.net:snapshot:timestamp";
-    public const string TakeSnapshotsPropertyName = "sanoid.net:takesnapshots";
-    public const string TemplatePropertyName = "sanoid.net:template";
 
     private const string UnixEpoch = "1970-01-01T00:00:00.0000000+00:00";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );

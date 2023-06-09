@@ -49,7 +49,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( ZfsProperty.EnabledPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsPropertyNames.EnabledPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
@@ -58,22 +58,22 @@ public class Dataset : ZfsObjectBase
     public List<Snapshot> HourlySnapshots { get; } = new( );
 
     [JsonIgnore]
-    public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastDailySnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastFrequentSnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastHourlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastHourlySnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastMonthlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastMonthlySnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastWeeklySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastWeeklySnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     [JsonIgnore]
-    public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
+    public DateTimeOffset LastYearlySnapshotTimestamp => Properties.TryGetValue( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, out ZfsProperty? prop ) && DateTimeOffset.TryParse( prop.Value, out DateTimeOffset timestamp ) ? timestamp : DateTimeOffset.UnixEpoch;
 
     public List<Snapshot> MonthlySnapshots { get; } = new( );
 
@@ -82,7 +82,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( ZfsProperty.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : SnapshotRecursionMode.Sanoid;
+            string valueString = Properties.TryGetValue( ZfsPropertyNames.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : SnapshotRecursionMode.Sanoid;
             return valueString;
         }
     }
@@ -92,13 +92,13 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( ZfsProperty.TakeSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
+            string valueString = Properties.TryGetValue( ZfsPropertyNames.TakeSnapshotsPropertyName, out ZfsProperty? prop ) ? prop.Value : "false";
             return bool.TryParse( valueString, out bool result ) && result;
         }
     }
 
     [JsonIgnore]
-    public string Template => Properties.TryGetValue( ZfsProperty.TemplatePropertyName, out ZfsProperty? prop ) ? prop.Value : "default";
+    public string Template => Properties.TryGetValue( ZfsPropertyNames.TemplatePropertyName, out ZfsProperty? prop ) ? prop.Value : "default";
 
     public List<Snapshot> WeeklySnapshots { get; } = new( );
     public List<Snapshot> YearlySnapshots { get; } = new( );

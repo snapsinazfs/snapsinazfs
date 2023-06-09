@@ -146,7 +146,7 @@ public abstract class ZfsObjectBase
         get
         {
             Logger.Trace( "Trying to get prunesnapshots property for {0}", Name );
-            bool gotValue = Properties.TryGetValue( ZfsProperty.PruneSnapshotsPropertyName, out ZfsProperty? prop );
+            bool gotValue = Properties.TryGetValue( ZfsPropertyNames.PruneSnapshotsPropertyName, out ZfsProperty? prop );
             if ( gotValue )
             {
                 Logger.Trace( "Got property {0} from {1}", prop, Name );
@@ -291,25 +291,25 @@ public abstract class ZfsObjectBase
     {
         switch ( propertyName )
         {
-            case ZfsProperty.SnapshotRetentionFrequentPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
                 RetentionSettings.Frequent = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionHourlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
                 RetentionSettings.Hourly = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionDailyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
                 RetentionSettings.Daily = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionWeeklyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
                 RetentionSettings.Weekly = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionMonthlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
                 RetentionSettings.Monthly = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionYearlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
                 RetentionSettings.Yearly = int.Parse( propertyValue );
                 break;
-            case ZfsProperty.SnapshotRetentionPruneDeferralPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
                 RetentionSettings.PruneDeferral = int.Parse( propertyValue );
                 break;
         }

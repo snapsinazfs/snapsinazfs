@@ -33,32 +33,32 @@ public class SanoidZfsDataset : TreeNode, ITreeNode
         }
     }
 
-    public ZfsProperty<bool> Enabled { get; } = new( ZfsProperty.EnabledPropertyName, false, "local" );
+    public ZfsProperty<bool> Enabled { get; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public bool IsPoolRoot { get; }
     public string Kind { get; private set; }
-    public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; } = new( ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
     public string Name { get; private set; }
     private readonly SanoidZfsDataset _parent;
     public SanoidZfsDataset Parent => IsPoolRoot ? this : _parent;
     public int PathDepth => IsPoolRoot ? 0 : 1 + _parent.PathDepth;
-    public ZfsProperty<bool> PruneSnapshots { get; } = new( ZfsProperty.PruneSnapshotsPropertyName, false, "local" );
-    public ZfsProperty<string> Recursion { get; } = new( ZfsProperty.RecursionPropertyName, "sanoid", "local" );
+    public ZfsProperty<bool> PruneSnapshots { get; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, "local" );
+    public ZfsProperty<string> Recursion { get; } = new( ZfsPropertyNames.RecursionPropertyName, "sanoid", "local" );
     private readonly SanoidZfsDataset _root;
     public SanoidZfsDataset Root => IsPoolRoot ? this : _root;
-    public ZfsProperty<int> SnapshotRetentionDaily { get; } = new( ZfsProperty.SnapshotRetentionDailyPropertyName, -1, "local" );
-    public ZfsProperty<int> SnapshotRetentionFrequent { get; } = new( ZfsProperty.SnapshotRetentionFrequentPropertyName, -1, "local" );
-    public ZfsProperty<int> SnapshotRetentionHourly { get; } = new( ZfsProperty.SnapshotRetentionHourlyPropertyName, -1, "local" );
-    public ZfsProperty<int> SnapshotRetentionMonthly { get; } = new( ZfsProperty.SnapshotRetentionMonthlyPropertyName, -1, "local" );
-    public ZfsProperty<int> SnapshotRetentionPruneDeferral { get; } = new( ZfsProperty.SnapshotRetentionPruneDeferralPropertyName, 0, "local" );
-    public ZfsProperty<int> SnapshotRetentionWeekly { get; } = new( ZfsProperty.SnapshotRetentionWeeklyPropertyName, -1, "local" );
-    public ZfsProperty<int> SnapshotRetentionYearly { get; } = new( ZfsProperty.SnapshotRetentionYearlyPropertyName, -1, "local" );
-    public ZfsProperty<bool> TakeSnapshots { get; } = new( ZfsProperty.TakeSnapshotsPropertyName, false, "local" );
-    public ZfsProperty<string> Template { get; } = new( ZfsProperty.TemplatePropertyName, "default", "local" );
+    public ZfsProperty<int> SnapshotRetentionDaily { get; } = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionFrequent { get; } = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionHourly { get; } = new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionMonthly { get; } = new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionPruneDeferral { get; } = new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, "local" );
+    public ZfsProperty<int> SnapshotRetentionWeekly { get; } = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, "local" );
+    public ZfsProperty<int> SnapshotRetentionYearly { get; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, "local" );
+    public ZfsProperty<bool> TakeSnapshots { get; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, "local" );
+    public ZfsProperty<string> Template { get; } = new( ZfsPropertyNames.TemplatePropertyName, "default", "local" );
 
     /// <inheritdoc />
     public new string Text
@@ -74,75 +74,75 @@ public class SanoidZfsDataset : TreeNode, ITreeNode
             case "type":
                 Kind = propertyValue;
                 return;
-            case ZfsProperty.EnabledPropertyName:
+            case ZfsPropertyNames.EnabledPropertyName:
                 Enabled.Value = bool.Parse( propertyValue );
                 Enabled.Source = propertySource;
                 return;
-            case ZfsProperty.TakeSnapshotsPropertyName:
+            case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 TakeSnapshots.Value = bool.Parse( propertyValue );
                 TakeSnapshots.Source = propertySource;
                 return;
-            case ZfsProperty.PruneSnapshotsPropertyName:
+            case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 PruneSnapshots.Value = bool.Parse( propertyValue );
                 PruneSnapshots.Source = propertySource;
                 return;
-            case ZfsProperty.TemplatePropertyName:
+            case ZfsPropertyNames.TemplatePropertyName:
                 Template.Value = propertyValue;
                 Template.Source = propertySource;
                 return;
-            case ZfsProperty.RecursionPropertyName:
+            case ZfsPropertyNames.RecursionPropertyName:
                 Recursion.Value = propertyValue;
                 Recursion.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
                 LastFrequentSnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastFrequentSnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
                 LastHourlySnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastHourlySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
                 LastDailySnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastDailySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
                 LastWeeklySnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastWeeklySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
                 LastMonthlySnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastMonthlySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
                 LastYearlySnapshotTimestamp.Value = DateTimeOffset.Parse( propertyValue );
                 LastYearlySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionFrequentPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
                 SnapshotRetentionFrequent.Value = int.Parse( propertyValue );
                 SnapshotRetentionFrequent.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionHourlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
                 SnapshotRetentionHourly.Value = int.Parse( propertyValue );
                 SnapshotRetentionHourly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionDailyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
                 SnapshotRetentionDaily.Value = int.Parse( propertyValue );
                 SnapshotRetentionDaily.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionWeeklyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
                 SnapshotRetentionWeekly.Value = int.Parse( propertyValue );
                 SnapshotRetentionWeekly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionMonthlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
                 SnapshotRetentionMonthly.Value = int.Parse( propertyValue );
                 SnapshotRetentionMonthly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionYearlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
                 SnapshotRetentionYearly.Value = int.Parse( propertyValue );
                 SnapshotRetentionYearly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionPruneDeferralPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
                 SnapshotRetentionPruneDeferral.Value = int.Parse( propertyValue );
                 SnapshotRetentionPruneDeferral.Source = propertySource;
                 return;
@@ -155,15 +155,15 @@ public class SanoidZfsDataset : TreeNode, ITreeNode
     {
         switch ( propertyName )
         {
-            case ZfsProperty.EnabledPropertyName:
+            case ZfsPropertyNames.EnabledPropertyName:
                 Enabled.Value = propertyValue;
                 Enabled.Source = propertySource;
                 return;
-            case ZfsProperty.TakeSnapshotsPropertyName:
+            case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 TakeSnapshots.Value = propertyValue;
                 TakeSnapshots.Source = propertySource;
                 return;
-            case ZfsProperty.PruneSnapshotsPropertyName:
+            case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 PruneSnapshots.Value = propertyValue;
                 PruneSnapshots.Source = propertySource;
                 return;
@@ -176,27 +176,27 @@ public class SanoidZfsDataset : TreeNode, ITreeNode
     {
         switch ( propertyName )
         {
-            case ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
                 LastFrequentSnapshotTimestamp.Value = propertyValue;
                 LastFrequentSnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
                 LastHourlySnapshotTimestamp.Value = propertyValue;
                 LastHourlySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
                 LastDailySnapshotTimestamp.Value = propertyValue;
                 LastDailySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
                 LastWeeklySnapshotTimestamp.Value = propertyValue;
                 LastWeeklySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
                 LastMonthlySnapshotTimestamp.Value = propertyValue;
                 LastMonthlySnapshotTimestamp.Source = propertySource;
                 return;
-            case ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
                 LastYearlySnapshotTimestamp.Value = propertyValue;
                 LastYearlySnapshotTimestamp.Source = propertySource;
                 return;
@@ -209,31 +209,31 @@ public class SanoidZfsDataset : TreeNode, ITreeNode
     {
         switch ( propertyName )
         {
-            case ZfsProperty.SnapshotRetentionFrequentPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
                 SnapshotRetentionFrequent.Value = propertyValue;
                 SnapshotRetentionFrequent.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionHourlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
                 SnapshotRetentionHourly.Value = propertyValue;
                 SnapshotRetentionHourly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionDailyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
                 SnapshotRetentionDaily.Value = propertyValue;
                 SnapshotRetentionDaily.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionWeeklyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
                 SnapshotRetentionWeekly.Value = propertyValue;
                 SnapshotRetentionWeekly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionMonthlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
                 SnapshotRetentionMonthly.Value = propertyValue;
                 SnapshotRetentionMonthly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionYearlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
                 SnapshotRetentionYearly.Value = propertyValue;
                 SnapshotRetentionYearly.Source = propertySource;
                 return;
-            case ZfsProperty.SnapshotRetentionPruneDeferralPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
                 SnapshotRetentionPruneDeferral.Value = propertyValue;
                 SnapshotRetentionPruneDeferral.Source = propertySource;
                 return;

@@ -147,12 +147,12 @@ internal static class ZfsTasks
             ZfsProperty? prop = null;
             string datasetSnapshotTimestampPropertyName = period.Kind switch
             {
-                SnapshotPeriodKind.Frequent => ZfsProperty.DatasetLastFrequentSnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Hourly => ZfsProperty.DatasetLastHourlySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Daily => ZfsProperty.DatasetLastDailySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Weekly => ZfsProperty.DatasetLastWeeklySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Monthly => ZfsProperty.DatasetLastMonthlySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Yearly => ZfsProperty.DatasetLastYearlySnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Hourly => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Daily => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+                SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
                 _ => throw new ArgumentOutOfRangeException( nameof( period ) )
             };
             bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out Snapshot? snapshot );
@@ -291,7 +291,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsProperty.RecursionPropertyName ]?.Source != "local" )
+        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsPropertyNames.RecursionPropertyName ]?.Source != "local" )
         {
             Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
             return false;
