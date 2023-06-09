@@ -646,7 +646,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string propertiesToSet = string.Join( ' ', properties.Select( p => p.SetString ) );
+        string propertiesToSet = properties.ToStringForZfsSet();
         Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesToSet} {zfsPath}" )
         {
