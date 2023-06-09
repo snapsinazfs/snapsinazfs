@@ -128,7 +128,7 @@ public class ZfsProperty
     }
 }
 
-public class ZfsProperty<T> where T : notnull
+public class ZfsProperty<T> : IZfsProperty where T : notnull
 {
     public ZfsProperty( string name, T value, string source )
     {
@@ -156,15 +156,20 @@ public class ZfsProperty<T> where T : notnull
     /// <summary>
     ///     Gets or sets the name of the property
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; }
 
     /// <summary>
     ///     Gets or sets the source of the property, as a string
     /// </summary>
     public string Source { get; set; }
 
+    /// <inheritdoc />
+    public string ValueString => Value.ToString( )?.ToLowerInvariant( ) ?? throw new InvalidOperationException( $"Invalid attempt to get a null ValueString from ZfsProperty {Name}" );
+
     /// <summary>
     ///     Gets or sets the value of the property, of type <see cref="T" />
     /// </summary>
     public T Value { get; set; }
+
+    public string SetString => $"{Name}={ValueString}";
 }
