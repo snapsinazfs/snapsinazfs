@@ -246,12 +246,13 @@ namespace Sanoid.ConfigConsole
             EnableEventHandlers( );
         }
 
-        private async void ZfsConfigurationSaveCurrentButtonOnClicked( )
+        private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
             if ( ValidateZfsObjectConfigValues( ) && _modifiedPropertiesForZfsObject.Count > 0 && _zfsConfigurationCurrentSelectedItemOriginal is not null && _zfsConfigurationCurrentSelectedItemModified is not null )
             {
-                using Button cancelButton = new( "Cancel", true );
-                using Button saveButton = new( "Save" );
+                // The buttons are disposable, but the Dialog will dispose them when it is closed
+                Button cancelButton = new( "Cancel", true );
+                Button saveButton = new( "Save" );
                 using Dialog saveZfsObjectDialog = new( "Confirm Saving ZFS Object Configuration", 80, 7, cancelButton, saveButton );
                 bool saveConfirmed = false;
                 string zfsObjectPath = _zfsConfigurationCurrentSelectedItemOriginal.Name;
@@ -289,6 +290,9 @@ namespace Sanoid.ConfigConsole
                     Logger.Info( "Saving {0}", zfsObjectPath );
                 }
 
+                // Fine to ignore this warning here, because we are explicitly un-wiring the events before any disposal will occur.
+                // The button click handlers are un-subscribed and THEN the dialog is asked to exit.
+                // ReSharper disable AccessToDisposedClosure
                 void OnCancelButtonOnClicked( )
                 {
                     cancelButton.Clicked -= OnCancelButtonOnClicked;
@@ -303,6 +307,7 @@ namespace Sanoid.ConfigConsole
                     saveButton.Clicked -= OnSaveButtonOnClicked;
                     RequestStop( saveZfsObjectDialog );
                 }
+                // ReSharper restore AccessToDisposedClosure
             }
         }
 
