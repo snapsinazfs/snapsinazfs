@@ -12,4 +12,13 @@ public interface IZfsProperty
     string Source { get; }
     string ValueString { get; }
     string SetString { get; }
+    bool IsInherited { get; }
+    string InheritedFrom { get; }
+    bool IsLocal { get; }
+
+    /// <summary>
+    ///     Gets whether this is a sanoid property or not
+    /// </summary>
+    /// <remarks>Set by constructor, if property name begins with "sanoid.net:"</remarks>
+    bool IsSanoidProperty { get; }
 }
