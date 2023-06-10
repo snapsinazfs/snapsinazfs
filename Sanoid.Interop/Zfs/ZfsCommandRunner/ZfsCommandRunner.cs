@@ -738,13 +738,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
             {
                 SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ], true, new( k ) );
+                newRootDs.ConfigConsoleTreeNode.Tag = newRootDs;
+                Logger.Debug( "Adding new pool root object {0} to collections", newRootDs.Name );
                 nodes.Add( newRootDs.ConfigConsoleTreeNode );
                 return newRootDs;
             }, ( k, ds ) =>
             {
                 ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                Logger.Debug( "Updating property {0} for {1} to {2}", lineTokens[ 1 ], lineTokens[ 0 ], lineTokens[ 2 ] );
                 return ds;
             } );
+
+
         }
 
         foreach ( string zfsLine in ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ' ', datasets.Keys )}" ) )
@@ -756,6 +761,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string parentName = k[ ..lastSlashIndex ];
                 SanoidZfsDataset parentDs = datasets[ parentName ];
                 SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], false, new( k ) );
+                newDs.ConfigConsoleTreeNode.Tag = newDs;
+                Logger.Debug( "Adding new {0} {1} to {2}", newDs.Kind, newDs.Name, parentDs.Name );
                 parentDs.ConfigConsoleTreeNode.Children.Add( newDs.ConfigConsoleTreeNode );
                 return newDs;
             }, ( k, ds ) =>
@@ -765,7 +772,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     return ds;
                 }
 
-                ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                string propertyName = lineTokens[ 1 ];
+                string propertyValue = lineTokens[ 2 ];
+                string propertySource = lineTokens[ 3 ];
+                Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
+                ds.UpdateProperty( propertyName, propertyValue, propertySource );
                 return ds;
             } );
         }
