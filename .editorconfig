@@ -1,4 +1,9 @@
-﻿[*.cs]
+﻿[*.Designer.cs]
+dotnet_diagnostic.CS1591.severity = none
+[SanoidConfigConsole.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[*.cs]
 
 # IDE0079: Remove unnecessary suppression
 dotnet_diagnostic.IDE0079.severity = silent
