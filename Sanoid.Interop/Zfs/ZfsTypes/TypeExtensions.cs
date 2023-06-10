@@ -82,24 +82,4 @@ public static class TypeExtensions
     {
         return string.Join( ',', strings );
     }
-    public static ZfsProperty<bool> Clone( this ZfsProperty<bool> property, bool? value = null, string? source = null )
-    {
-        return new( new( property.Name ), value ?? property.Value, source ?? new( property.Source ) );
-    }
-
-    public static ZfsProperty<string> Clone( this ZfsProperty<string> property, string? value = null, string? source = null )
-    {
-        return new( new( property.Name ), value ?? new( property.Value ), source ?? new( property.Source ) );
-    }
-
-    public static ZfsProperty<int> Clone( this ZfsProperty<int> property, int? value = null, string? source = null )
-    {
-        return new( new( property.Name ), value ?? property.Value, source ?? new( property.Source ) );
-    }
-
-    public static ZfsProperty<DateTimeOffset> Clone( this ZfsProperty<DateTimeOffset> property, DateTimeOffset? value = null, string? source = null )
-    {
-        return new( new( property.Name ), property.Value, new( property.Source ) );
-    }
-
 }
