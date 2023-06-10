@@ -381,7 +381,8 @@ namespace Sanoid.ConfigConsole
         {
             zfsConfigurationPropertiesRecursionSourceTextField.Text = "local";
             _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.RecursionPropertyName );
-            ZfsProperty<bool> newProperty = _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem == 0, "local" );
+            string recursionTypeString = zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem == 0 ? "sanoid" : "zfs";
+            ZfsProperty<string> newProperty = (ZfsProperty<string>) _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, recursionTypeString, "local" );
             _modifiedPropertiesForZfsObject.Add( newProperty );
         }
 
