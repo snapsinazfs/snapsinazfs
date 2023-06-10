@@ -23,7 +23,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings )
     {
-        return true;
+        return await Task.FromResult( true ).ConfigureAwait( true );
     }
 
     /// <inheritdoc />
