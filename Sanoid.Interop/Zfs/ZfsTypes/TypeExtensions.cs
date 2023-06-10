@@ -55,6 +55,22 @@ public static class TypeExtensions
         string rootPath = value[ ..endIndex ];
         return rootPath;
     }
+    public static string GetZfsPathParent( this string value )
+    {
+        int endIndex = value.IndexOf( '@' );
+        if ( endIndex == -1 )
+        {
+            endIndex = value.LastIndexOf( '/' );
+        }
+
+        if ( endIndex == -1 )
+        {
+            return value;
+        }
+
+        string rootPath = value[ ..endIndex ];
+        return rootPath;
+    }
 
     public static string ToStringForZfsSet( this IEnumerable<ZfsProperty> properties )
     {
