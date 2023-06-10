@@ -502,7 +502,7 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesTakeSnapshotsSourceTextField.Text = ds.TakeSnapshots.InheritedFrom;
             zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItem = ds.PruneSnapshots.AsTrueFalseRadioIndex( );
             zfsConfigurationPropertiesPruneSnapshotsRadioGroup.ColorScheme = ds.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = ds.TakeSnapshots.InheritedFrom;
+            zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = ds.PruneSnapshots.InheritedFrom;
             zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem = ds.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
             zfsConfigurationPropertiesRecursionRadioGroup.ColorScheme = ds.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
             zfsConfigurationPropertiesRecursionSourceTextField.Text = ds.Recursion.InheritedFrom;
