@@ -12,6 +12,7 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
+using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Sanoid.Interop.Zfs.ZfsTypes;
@@ -31,7 +32,9 @@ namespace Sanoid.ConfigConsole
         private List<string> _templateListItems = ConfigConsole.Settings!.Templates.Keys.ToList( );
         private bool _eventsEnabled;
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-        private readonly List<IZfsProperty> _modifiedPropertiesForZfsObject = new( );
+        private readonly ConcurrentDictionary<string,IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
+        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _baseDatasets = new( );
+        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _treeDatasets = new( );
 
         public SanoidConfigConsole( )
         {
@@ -46,9 +49,20 @@ namespace Sanoid.ConfigConsole
             SetCanFocusStateForZfsConfigurationViews( );
             SetTabStopsForZfsConfigurationWindow( );
             SetPropertiesForReadonlyFields( );
+            SetTagsForZfsPropertyFields( );
             UpdateZfsConfigurationButtonState( );
 
             EnableEventHandlers( );
+        }
+
+        private void SetTagsForZfsPropertyFields( )
+        {
+            zfsConfigurationPropertiesEnabledRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup, zfsConfigurationPropertiesEnabledSourceTextField );
+            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.TakeSnapshotsPropertyName, zfsConfigurationPropertiesTakeSnapshotsRadioGroup, zfsConfigurationPropertiesTakeSnapshotsSourceTextField );
+            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.PruneSnapshotsPropertyName, zfsConfigurationPropertiesPruneSnapshotsRadioGroup, zfsConfigurationPropertiesPruneSnapshotsSourceTextField );
+            zfsConfigurationPropertiesRecursionRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.RecursionPropertyName, zfsConfigurationPropertiesRecursionRadioGroup, zfsConfigurationPropertiesRecursionSourceTextField );
+            zfsConfigurationPropertiesTemplateTextField.Data = new TextFieldViewData( ZfsPropertyNames.TemplatePropertyName, zfsConfigurationPropertiesTemplateTextField, zfsConfigurationPropertiesTemplateSourceTextField );
+            //TODO: tag the rest of the fields
         }
 
         private void UpdateZfsConfigurationButtonState( )
@@ -56,7 +70,7 @@ namespace Sanoid.ConfigConsole
             if ( zfsConfigurationTreeView.Objects.Any( ) && zfsConfigurationTreeView.SelectedObject?.Tag is SanoidZfsDataset )
             {
                 zfsConfigurationResetCurrentButton.Enabled =
-                    zfsConfigurationSaveCurrentButton.Enabled = _modifiedPropertiesForZfsObject.Any( );
+                    zfsConfigurationSaveCurrentButton.Enabled = _modifiedPropertiesSinceLastSaveForCurrentItem.Any( );
             }
             else
             {
@@ -201,14 +215,16 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationResetCurrentButton.Clicked -= ZfsConfigurationResetCurrentButtonOnClicked;
             zfsConfigurationTreeView.SelectionChanged -= ZfsConfigurationTreeViewOnSelectionChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesEnabledRadioGroup.MouseClick -= ZfsConfigurationPropertiesEnabledRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesEnabledRadioGroup.MouseClick -= ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTakeSnapshotsRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesTakeSnapshotsRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.MouseClick -= ZfsConfigurationPropertiesTakeSnapshotsRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.MouseClick -= ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesPruneSnapshotsRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.MouseClick -= ZfsConfigurationPropertiesPruneSnapshotsRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.MouseClick -= ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesRecursionRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesRecursionRadioGroup.MouseClick -= ZfsConfigurationPropertiesRecursionRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesRecursionRadioGroup.MouseClick -= ZfsConfigurationPropertiesStringRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTemplateTextField.Leave -= ZfsConfigurationPropertiesTemplateTextFieldOnLeave;
+            
+            //TODO: Change to new generic event handler
             zfsConfigurationSaveCurrentButton.Clicked -= ZfsConfigurationSaveCurrentButtonOnClicked;
             _eventsEnabled = false;
             Logger.Debug( "Event handlers for zfs configuration fields disabled" );
@@ -217,24 +233,17 @@ namespace Sanoid.ConfigConsole
         private void ZfsConfigurationPropertiesTemplateTextFieldOnLeave( FocusEventArgs args )
         {
             ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
 
-            UpdateSelectedItemTemplateProperty( );
-            UpdateZfsConfigurationButtonState( );
-        }
-
-        private void ZfsConfigurationPropertiesRecursionRadioGroupOnMouseClick( MouseEventArgs args )
-        {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-
-            UpdateSelectedItemRecursionProperty( );
+            UpdateSelectedItemTemplatePropertyFromDataset( dsTreeCopy, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
         private void ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
 
-            UpdateSelectedItemRecursionProperty( );
+            UpdateSelectedItemStringRadioGroupProperty( zfsConfigurationPropertiesRecursionRadioGroup, dsTreeCopy, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -252,14 +261,15 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationResetCurrentButton.Clicked += ZfsConfigurationResetCurrentButtonOnClicked;
             zfsConfigurationTreeView.SelectionChanged += ZfsConfigurationTreeViewOnSelectionChanged;
             zfsConfigurationPropertiesEnabledRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesEnabledRadioGroup.MouseClick += ZfsConfigurationPropertiesEnabledRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesEnabledRadioGroup.MouseClick += ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTakeSnapshotsRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesTakeSnapshotsRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.MouseClick += ZfsConfigurationPropertiesTakeSnapshotsRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.MouseClick += ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesPruneSnapshotsRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.MouseClick += ZfsConfigurationPropertiesPruneSnapshotsRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.MouseClick += ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick;
             zfsConfigurationPropertiesRecursionRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged;
-            zfsConfigurationPropertiesRecursionRadioGroup.MouseClick += ZfsConfigurationPropertiesRecursionRadioGroupOnMouseClick;
+            zfsConfigurationPropertiesRecursionRadioGroup.MouseClick += ZfsConfigurationPropertiesStringRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTemplateTextField.Leave += ZfsConfigurationPropertiesTemplateTextFieldOnLeave;
+
             zfsConfigurationSaveCurrentButton.Clicked += ZfsConfigurationSaveCurrentButtonOnClicked;
             _eventsEnabled = true;
             Logger.Debug( "Event handlers for zfs configuration fields enabled" );
@@ -269,15 +279,40 @@ namespace Sanoid.ConfigConsole
         {
             DisableEventHandlers( );
             ClearAllZfsPropertyFields( );
-            UpdateZfsCommonPropertyFieldsFromSanoidZfsDataset( (SanoidZfsDataset)zfsConfigurationTreeView.SelectedObject.Tag, false );
-            _modifiedPropertiesForZfsObject.Clear( );
+            SanoidZfsDataset selectedDs = (SanoidZfsDataset)zfsConfigurationTreeView.SelectedObject.Tag;
+            foreach ( (string? key, IZfsProperty? value) in _modifiedPropertiesSinceLastSaveForCurrentItem )
+            {
+                switch ( value )
+                {
+                    case ZfsProperty<bool> boolProperty:
+                        selectedDs.UpdateProperty( key, boolProperty.Value, boolProperty.Source );
+                        UpdateDescendentBooleanProperties( zfsConfigurationTreeView.SelectedObject, boolProperty, boolProperty.Source );
+                        break;
+                    case ZfsProperty<int> intProperty:
+                        selectedDs.UpdateProperty( key, intProperty.Value, intProperty.Source );
+                        break;
+                    case ZfsProperty<string> stringProperty:
+                        selectedDs.UpdateProperty( key, stringProperty.Value, stringProperty.Source );
+                        UpdateDescendentStringProperties( zfsConfigurationTreeView.SelectedObject, stringProperty, stringProperty.Source );
+                        break;
+                    default:
+                        throw new InvalidOperationException( "Unexpected property type provided" );
+                }
+            }
+
+            if ( _zfsConfigurationCurrentSelectedItemOriginal != null )
+            {
+                UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
+            }
+
+            _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
             UpdateZfsConfigurationButtonState( );
             EnableEventHandlers( );
         }
 
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
-            if ( ValidateZfsObjectConfigValues( ) && _modifiedPropertiesForZfsObject.Count > 0 && _zfsConfigurationCurrentSelectedItemOriginal is not null && _zfsConfigurationCurrentSelectedItemModified is not null )
+            if ( ValidateZfsObjectConfigValues( ) && _modifiedPropertiesSinceLastSaveForCurrentItem.Count > 0 && _zfsConfigurationCurrentSelectedItemOriginal is not null && _zfsConfigurationCurrentSelectedItemModified is not null )
             {
                 // The buttons are disposable, but the Dialog will dispose them when it is closed
                 Button cancelButton = new( "Cancel", true );
@@ -294,7 +329,7 @@ namespace Sanoid.ConfigConsole
                 saveZfsObjectDialog.ColorScheme = whiteOnRed;
                 saveZfsObjectDialog.TextAlignment = TextAlignment.Centered;
                 saveZfsObjectDialog.VerticalTextAlignment = VerticalTextAlignment.Middle;
-                saveZfsObjectDialog.Text = $"The following command will be executed:\nzfs set {_modifiedPropertiesForZfsObject.ToStringForZfsSet( )} {zfsObjectPath}\n\nTHIS OPERATION CANNOT BE UNDONE";
+                saveZfsObjectDialog.Text = $"The following command will be executed:\nzfs set {_modifiedPropertiesSinceLastSaveForCurrentItem.ToStringForZfsSet( )} {zfsObjectPath}\n\nTHIS OPERATION CANNOT BE UNDONE";
                 saveZfsObjectDialog.Modal = true;
 
                 Application.Run( saveZfsObjectDialog );
@@ -303,9 +338,9 @@ namespace Sanoid.ConfigConsole
                 {
                     if ( ConfigConsole.Settings != null && ConfigConsole.CommandRunner != null )
                     {
-                        if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesForZfsObject, ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
+                        if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList(), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
                         {
-                            _modifiedPropertiesForZfsObject.Clear( );
+                            _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
                             zfsConfigurationTreeView.SelectedObject.Tag = _zfsConfigurationCurrentSelectedItemOriginal = _zfsConfigurationCurrentSelectedItemModified;
                             if ( !ReferenceEquals( zfsConfigurationTreeView.SelectedObject, _zfsConfigurationCurrentSelectedItemOriginal.ConfigConsoleTreeNode ) )
                             {
@@ -345,97 +380,149 @@ namespace Sanoid.ConfigConsole
             return true;
         }
 
-        private void ZfsConfigurationPropertiesEnabledRadioGroupOnMouseClick( MouseEventArgs args )
-        {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+        private record RadioGroupViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
+        private record TextFieldViewData( string PropertyName, TextField ValueTextField, TextField SourceTextField );
 
-            UpdateSelectedItemEnabledProperty( );
+        private void ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick( MouseEventArgs args )
+        {
+            RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ selectedObject.Text ];
+            ZfsProperty<bool> newProperty = dsTreeCopy.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel(), "local" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
+
+            viewData.SourceTextField.Text = newProperty.Source;
+            UpdateDescendentBooleanProperties( selectedObject, newProperty, $"inherited from {selectedObject.Text}" );
+            UpdateZfsConfigurationButtonState( );
+        }
+        private void ZfsConfigurationPropertiesStringRadioGroupOnMouseClick( MouseEventArgs args )
+        {
+            RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ selectedObject.Text ];
+            IZfsProperty newProperty = dsTreeCopy.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString(), "local" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
+
+            viewData.SourceTextField.Text = newProperty.Source;
+            UpdateDescendentStringProperties( selectedObject, (ZfsProperty<string>)newProperty, $"inherited from {selectedObject.Text}" );
             UpdateZfsConfigurationButtonState( );
         }
 
-        private void UpdateSelectedItemEnabledProperty( )
+        /// <summary>
+        /// Performs a depth-first recursion on the entire tree, updating all boolean properties appropriately
+        /// </summary>
+        /// <param name="currentNode"></param>
+        /// <param name="prop"></param>
+        /// <param name="source"></param>
+        private void UpdateDescendentBooleanProperties( ITreeNode currentNode, ZfsProperty<bool> prop, string source )
         {
-            zfsConfigurationPropertiesEnabledSourceTextField.Text = "local";
-            _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.EnabledPropertyName );
-            ZfsProperty<bool> newProperty = _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup.SelectedItem == 0, "local" );
-            _modifiedPropertiesForZfsObject.Add( newProperty );
+            foreach ( ITreeNode child in currentNode.Children )
+            {
+                UpdateDescendentBooleanProperties( child, prop, source );
+            }
+
+            // If property is local, stop recursion
+            SanoidZfsDataset baseNodeDs = (SanoidZfsDataset)currentNode.Tag;
+            if ( baseNodeDs[ prop.Name ].IsLocal )
+            {
+                return;
+            }
+
+            baseNodeDs.UpdateProperty( prop.Name, prop.Value, source );
         }
 
-        private void UpdateSelectedItemTakeSnapshotsProperty( )
+        private void UpdateDescendentIntProperties( ITreeNode currentNode, ZfsProperty<int> prop, string source )
         {
-            zfsConfigurationPropertiesTakeSnapshotsSourceTextField.Text = "local";
-            _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.TakeSnapshotsPropertyName );
-            ZfsProperty<bool> newProperty = _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, zfsConfigurationPropertiesTakeSnapshotsRadioGroup.SelectedItem == 0, "local" );
-            _modifiedPropertiesForZfsObject.Add( newProperty );
+            foreach ( ITreeNode child in currentNode.Children )
+            {
+                UpdateDescendentIntProperties( child, prop, source );
+            }
+
+            SanoidZfsDataset baseNodeDs = (SanoidZfsDataset)currentNode.Tag;
+            if ( baseNodeDs[ prop.Name ].IsLocal )
+            {
+                return;
+            }
+
+            baseNodeDs.UpdateProperty( prop.Name, prop.Value, source );
         }
 
-        private void UpdateSelectedItemPruneSnapshotsProperty( )
+        private void UpdateDescendentStringProperties( ITreeNode currentNode, ZfsProperty<string> prop, string source )
         {
-            zfsConfigurationPropertiesPruneSnapshotsSourceTextField.Text = "local";
-            _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.PruneSnapshotsPropertyName );
-            ZfsProperty<bool> newProperty = _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, zfsConfigurationPropertiesPruneSnapshotsRadioGroup.SelectedItem == 0, "local" );
-            _modifiedPropertiesForZfsObject.Add( newProperty );
+            foreach ( ITreeNode child in currentNode.Children )
+            {
+                UpdateDescendentStringProperties( child, prop, source );
+            }
+
+            SanoidZfsDataset baseNodeDs = (SanoidZfsDataset)currentNode.Tag;
+            if ( baseNodeDs[ prop.Name ].IsLocal )
+            {
+                return;
+            }
+
+            baseNodeDs.UpdateProperty( prop.Name, prop.Value, source );
         }
 
-        private void UpdateSelectedItemRecursionProperty( )
+        private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup, SanoidZfsDataset ds, string? propertySource = null )
         {
-            zfsConfigurationPropertiesRecursionSourceTextField.Text = "local";
-            _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.RecursionPropertyName );
-            string recursionTypeString = zfsConfigurationPropertiesRecursionRadioGroup.SelectedItem == 0 ? "sanoid" : "zfs";
-            ZfsProperty<string> newProperty = (ZfsProperty<string>) _zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, recursionTypeString, "local" );
-            _modifiedPropertiesForZfsObject.Add( newProperty );
+            RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
+            viewData.SourceTextField.Text = propertySource ?? ds[ viewData.PropertyName ].Source;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            ZfsProperty<bool> newProperty = ds.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel(), propertySource ?? ds[viewData.PropertyName].Source );
+            UpdateDescendentBooleanProperties( selectedObject, newProperty, $"inherited from {selectedObject.Text}" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         }
 
-        private void UpdateSelectedItemTemplateProperty( )
+        private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup, SanoidZfsDataset ds, string? propertySource = null  )
+        {
+            RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
+            viewData.SourceTextField.Text = propertySource ?? ds[ viewData.PropertyName ].Source;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            ZfsProperty<string> newProperty = (ZfsProperty<string>)ds.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString(), propertySource ?? ds[viewData.PropertyName].Source );
+            UpdateDescendentStringProperties( selectedObject, newProperty, $"inherited from {selectedObject.Text}" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
+        }
+
+        private void UpdateSelectedItemTemplatePropertyFromDataset( SanoidZfsDataset ds, string? propertySource = null  )
         {
             if ( zfsConfigurationPropertiesTemplateTextField.Text?.ToString( ) is not { } templateName || string.IsNullOrWhiteSpace( templateName ) )
             {
                 return;
             }
 
-            zfsConfigurationPropertiesTemplateSourceTextField.Text = "local";
-            _modifiedPropertiesForZfsObject.RemoveAll( p => p.Name == ZfsPropertyNames.TemplatePropertyName );
-            ZfsProperty<string> newProperty = (ZfsProperty<string>)_zfsConfigurationCurrentSelectedItemModified!.UpdateProperty( ZfsPropertyNames.TemplatePropertyName, templateName, "local" );
-            _modifiedPropertiesForZfsObject.Add( newProperty );
+            zfsConfigurationPropertiesTemplateSourceTextField.Text = propertySource ?? ds.Template.Source;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            ZfsProperty<string> newProperty = (ZfsProperty<string>)ds.UpdateProperty( ZfsPropertyNames.TemplatePropertyName, templateName, propertySource ?? ds.Template.Source );
+            UpdateDescendentStringProperties( selectedObject, newProperty, $"inherited from {selectedObject.Text}" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ ZfsPropertyNames.TemplatePropertyName ] = newProperty;
         }
 
         private void ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
+            ZfsProperty<bool> newProperty = dsTreeCopy.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup.GetSelectedBooleanFromLabel(), "local" );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ ZfsPropertyNames.EnabledPropertyName ] = newProperty;
 
-            UpdateSelectedItemEnabledProperty( );
-            UpdateZfsConfigurationButtonState( );
-        }
-
-        private void ZfsConfigurationPropertiesTakeSnapshotsRadioGroupOnMouseClick( MouseEventArgs args )
-        {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-
-            UpdateSelectedItemTakeSnapshotsProperty( );
+            ZfsProperty<bool> newProperty1 = dsTreeCopy.Enabled;
+            zfsConfigurationPropertiesEnabledSourceTextField.Text = newProperty1.Source;
+            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
+            UpdateDescendentBooleanProperties( selectedObject, newProperty1, $"inherited from {selectedObject.Text}" );
             UpdateZfsConfigurationButtonState( );
         }
 
         private void ZfsConfigurationPropertiesTakeSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
 
-            UpdateSelectedItemTakeSnapshotsProperty( );
-            UpdateZfsConfigurationButtonState( );
-        }
-
-        private void ZfsConfigurationPropertiesPruneSnapshotsRadioGroupOnMouseClick( MouseEventArgs args )
-        {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-
-            UpdateSelectedItemPruneSnapshotsProperty( );
+            UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesTakeSnapshotsRadioGroup, dsTreeCopy, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
         private void ZfsConfigurationPropertiesPruneSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+            SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
 
-            UpdateSelectedItemPruneSnapshotsProperty( );
+            UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesPruneSnapshotsRadioGroup, dsTreeCopy, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -445,18 +532,30 @@ namespace Sanoid.ConfigConsole
             ArgumentNullException.ThrowIfNull( sender );
 
             ClearAllZfsPropertyFields( );
-            _modifiedPropertiesForZfsObject.Clear( );
+            _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
 
             if ( e.NewValue.Tag is SanoidZfsDataset ds )
             {
+                // Be sure to set the previously-selected object back to its original state if it wasn't saved
+                if ( e.OldValue is not null )
+                {
+                    RestorePreviousItemAndApplyToChildren( e );
+                }
+
                 _zfsConfigurationCurrentSelectedItemOriginal = ds with { };
                 _zfsConfigurationCurrentSelectedItemModified = ds with { };
-                UpdateZfsCommonPropertyFieldsFromSanoidZfsDataset( _zfsConfigurationCurrentSelectedItemOriginal, false );
+                UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
             }
 
             UpdateZfsConfigurationButtonState( );
 
             EnableEventHandlers( );
+        }
+
+        private void RestorePreviousItemAndApplyToChildren( SelectionChangedEventArgs<ITreeNode> previousItem )
+        {
+            previousItem.OldValue.Tag = _zfsConfigurationCurrentSelectedItemOriginal;
+            UpdateDescendentBooleanProperties(previousItem.OldValue, _zfsConfigurationCurrentSelectedItemOriginal.Enabled, _zfsConfigurationCurrentSelectedItemOriginal.Enabled.Source);
         }
 
         private void ClearAllZfsPropertyFields( bool manageEventHandlers = false )
@@ -485,12 +584,13 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-        private void UpdateZfsCommonPropertyFieldsFromSanoidZfsDataset( SanoidZfsDataset ds, bool manageEventHandlers = true )
+        private void UpdateZfsCommonPropertyFieldsForSelectedTreeNode( bool manageEventHandlers = true )
         {
             if ( manageEventHandlers )
             {
                 DisableEventHandlers( );
             }
+            SanoidZfsDataset ds = zfsConfigurationTreeView.SelectedObject.Tag as SanoidZfsDataset ?? throw new InvalidOperationException( );
 
             ShowZfsConfigurationPropertyFrames( );
             zfsConfigurationPropertiesNameTextField.Text = ds.Name;
@@ -546,13 +646,12 @@ namespace Sanoid.ConfigConsole
                 HideZfsConfigurationPropertyFrames( );
                 Logger.Debug( "Clearing objects from zfs configuration tree view" );
                 zfsConfigurationTreeView.ClearObjects( );
-                ConfigConsole.Snapshots.Clear( );
-                ConfigConsole.Datasets.Clear( );
-                _modifiedPropertiesForZfsObject.Clear( );
+                _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
                 _zfsConfigurationCurrentSelectedItemOriginal = null;
                 _zfsConfigurationCurrentSelectedItemModified = null;
                 Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
-                List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( _originalDatasets, _modifiedDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
+                List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( _baseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
+
                 zfsConfigurationTreeView.AddObjects( treeRootNodes );
                 UpdateZfsConfigurationButtonState( );
                 zfsConfigurationTreeView.SetFocus( );

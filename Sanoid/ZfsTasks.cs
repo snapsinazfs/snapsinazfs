@@ -201,7 +201,8 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        Parallel.ForEach( datasets.Values, new( ) { MaxDegreeOfParallelism = 4, TaskScheduler = null }, async ds => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( true ) );
+        ParallelOptions options = new() { MaxDegreeOfParallelism = 4, TaskScheduler = null };
+        await Parallel.ForEachAsync( datasets.Values, options, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( true ) ).ConfigureAwait( true );
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
@@ -493,7 +494,7 @@ internal static class ZfsTasks
     }
 
     [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
-    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, SanoidSettings settings, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots ).ConfigureAwait( true );
     }

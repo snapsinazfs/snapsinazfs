@@ -120,5 +120,5 @@ public interface IZfsCommandRunner
 
     public IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
     public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
-    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets );
+    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets );
 }

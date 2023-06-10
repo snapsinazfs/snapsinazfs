@@ -178,7 +178,7 @@ internal class Program
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 
-        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( zfsCommandRunner, settings, datasets, snapshots ).ConfigureAwait( true );
+        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
 
         Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
 
