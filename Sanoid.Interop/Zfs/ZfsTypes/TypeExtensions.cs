@@ -76,6 +76,11 @@ public static class TypeExtensions
     {
         return string.Join( ' ', properties.Select( p => p.SetString ) );
     }
+    public static string ToStringForZfsSet( this IDictionary<string,IZfsProperty> properties )
+    {
+        return string.Join( ' ', properties.Select( kvp  => kvp.Value.SetString ) );
+    }
+
     /// <summary>
     /// Gets a string of all <see cref="IZfsProperty.SetString"/> values, separated by spaces, to be used in zfs set operations
     /// </summary>

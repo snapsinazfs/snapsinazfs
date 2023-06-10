@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Terminal.Gui;
 
 namespace Sanoid.ConfigConsole;
 
@@ -27,5 +28,25 @@ public static class TypeExtensions
     public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
     {
         return property.Value ? 0 : 1;
+    }
+
+    /// <summary>
+    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
+    /// </summary>
+    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
+    /// <returns></returns>
+    public static string GetSelectedLabelString( this RadioGroup group )
+    {
+        return group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group selected label string" );
+    }
+
+    /// <summary>
+    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
+    /// </summary>
+    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
+    /// <returns></returns>
+    public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
+    {
+        return bool.Parse( group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group boolean value" ) );
     }
 }
