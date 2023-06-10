@@ -128,48 +128,48 @@ public class ZfsProperty
     }
 }
 
-public class ZfsProperty<T> : IZfsProperty where T : notnull
+public readonly record struct ZfsProperty<T>(string Name, T Value, string Source ) : IZfsProperty where T : notnull
 {
-    public ZfsProperty( string name, T value, string source )
-    {
-        Name = name;
-        Value = value;
-        Source = source;
-        IsSanoidProperty = name.StartsWith( "sanoid.net:" );
-    }
-
+    [JsonIgnore]
     public bool IsInherited => Source.StartsWith( "inherited" );
 
+    [JsonIgnore]
+    public string InheritedFrom => IsInherited ? Source[ 15.. ] : Source;
+
+    [JsonIgnore]
     public bool IsLocal => Source == "local";
 
     /// <summary>
     ///     Gets whether this is a sanoid property or not
     /// </summary>
     /// <remarks>Set by constructor, if property name begins with "sanoid.net:"</remarks>
-    public bool IsSanoidProperty { get; }
+    public bool IsSanoidProperty { get; } = Name.StartsWith( "sanoid.net:" );
 
     /// <summary>
     ///     Gets a boolean indicating if this property is a sanoid property, is a string, and is equal to "-"
     /// </summary>
+    [JsonIgnore]
     public bool IsUndefinedOrDefault => IsSanoidProperty && Value is "-";
 
     /// <summary>
     ///     Gets or sets the name of the property
     /// </summary>
-    public string Name { get; }
+    public string Name { get; init; } = Name;
 
     /// <summary>
     ///     Gets or sets the source of the property, as a string
     /// </summary>
-    public string Source { get; set; }
+    public string Source { get; init; } = Source;
 
     /// <inheritdoc />
+    [JsonIgnore]
     public string ValueString => Value.ToString( )?.ToLowerInvariant( ) ?? throw new InvalidOperationException( $"Invalid attempt to get a null ValueString from ZfsProperty {Name}" );
 
     /// <summary>
     ///     Gets or sets the value of the property, of type <see cref="T" />
     /// </summary>
-    public T Value { get; set; }
+    public T Value { get; init; } = Value;
 
+    [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";
 }

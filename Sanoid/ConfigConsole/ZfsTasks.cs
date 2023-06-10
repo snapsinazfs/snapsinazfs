@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Text.Json;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
@@ -15,14 +16,22 @@ namespace Sanoid.ConfigConsole;
 internal static class ZfsTasks
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
+    internal static List<ITreeNode> GetFullZfsConfigurationTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
     {
         Logger.Debug( "Getting zfs objects for tree view" );
-        return await commandRunner.GetZfsObjectsForConfigConsoleTreeAsync( datasets ).ConfigureAwait( true );
+        try
+        {
+            return commandRunner.GetZfsObjectsForConfigConsoleTree( datasets );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Error( ex );
+            throw;
+        }
     }
 
-    public static void SetPropertiesForDataset(bool dryRun, string zfsPath, List<IZfsProperty> modifiedProperties, IZfsCommandRunner commandRunner )
+    public static bool SetPropertiesForDataset(bool dryRun, string zfsPath, List<IZfsProperty> modifiedProperties, IZfsCommandRunner commandRunner )
     {
-        commandRunner.SetZfsProperties( dryRun, zfsPath, modifiedProperties );
+        return commandRunner.SetZfsProperties( dryRun, zfsPath, modifiedProperties );
     }
 }

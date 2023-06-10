@@ -9,7 +9,7 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 public interface IZfsProperty
 {
     string Name { get; }
-    string Source { get; set; }
+    string Source { get; }
     string ValueString { get; }
     string SetString { get; }
 }

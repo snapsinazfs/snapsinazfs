@@ -109,31 +109,31 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async IAsyncEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    public override IEnumerable<string> ZfsExecEnumerator( string verb, string args )
     {
-        if ( verb == "get" )
+        if ( verb is "get" or "list" )
         {
             using StreamReader rdr = File.OpenText( args );
             while ( !rdr.EndOfStream )
             {
-                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true );
+                yield return rdr.ReadLine( )!;
             }
         }
     }
 
     /// <inheritdoc />
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
+    public override List<ITreeNode> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
     {
         List<ITreeNode> nodes = new( );
-        ConcurrentDictionary<string, SanoidZfsDataset> poolRoots = new( );
-        await foreach ( string zfsLine in ZfsExecEnumerator( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
+        foreach ( string zfsLine in ZfsExecEnumerator( "get", "poolroots-withproperties.txt" ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
             {
-                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ] );
+                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ], true, new( k ) );
+                newRootDs.ConfigConsoleTreeNode.Tag = newRootDs;
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDs.Name );
-                nodes.Add( newRootDs );
+                nodes.Add( newRootDs.ConfigConsoleTreeNode );
                 return newRootDs;
             }, ( k, ds ) =>
             {
@@ -143,23 +143,28 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             } );
         }
 
-        await foreach ( string zfsLine in ZfsExecEnumerator( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
+        foreach ( string zfsGetLine in ZfsExecEnumerator( "get", "alldatasets-withproperties.txt" ) )
         {
-            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            datasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+
+            string dsName = lineTokens[ 0 ];
+            if ( !datasets.ContainsKey( dsName ) )
             {
-                int lastSlashIndex = k.LastIndexOf( '/' );
-                string parentName = k[ ..lastSlashIndex ];
+                int lastSlashIndex = dsName.LastIndexOf( '/' );
+                string parentName = dsName[ ..lastSlashIndex ];
                 SanoidZfsDataset parentDs = datasets[ parentName ];
-                SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], parentDs );
+                SanoidZfsDataset newDs = new( dsName, lineTokens[ 2 ], false, new( dsName ) );
+                newDs.ConfigConsoleTreeNode.Tag = newDs;
                 Logger.Debug( "Adding new {0} {1} to {2}", newDs.Kind, newDs.Name, parentDs.Name );
-                parentDs.Children.Add( newDs );
-                return newDs;
-            }, ( k, ds ) =>
+                parentDs.ConfigConsoleTreeNode.Children.Add( newDs.ConfigConsoleTreeNode );
+                datasets.TryAdd( dsName, newDs );
+            }
+            else
             {
+                SanoidZfsDataset ds = datasets[ dsName ];
                 if ( ds.IsPoolRoot )
                 {
-                    return ds;
+                    continue;
                 }
 
                 string propertyName = lineTokens[ 1 ];
@@ -167,12 +172,11 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 string propertySource = lineTokens[ 3 ];
                 Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
                 ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                return ds;
-            } );
+
+            }
         }
 
         return nodes;
-
     }
 
     private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
