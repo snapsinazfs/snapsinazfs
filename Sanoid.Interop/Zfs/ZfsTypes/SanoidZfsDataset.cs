@@ -4,7 +4,6 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.CodeDom;
 using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
@@ -35,29 +34,25 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, TreeN
     /// <exception cref="ArgumentNullException"><paramref name="propertyValue" /> is <see langword="null" />.</exception>
     /// <exception cref="ArgumentException">For <see cref="DateTimeOffset"/> properties, the offset is greater than 14 hours or less than -14 hours.</exception>
     /// <exception cref="OverflowException">For <see langword="int"/> properties, <paramref name="propertyValue" /> represents a number less than <see cref="int.MinValue"/> or greater than <see cref="int.MaxValue"/>.</exception>
-    public void UpdateProperty( string propertyName, string propertyValue, string propertySource )
+    public IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
     {
         switch ( propertyName )
         {
             case ZfsPropertyNames.EnabledPropertyName:
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
-                UpdateProperty( propertyName, bool.Parse( propertyValue ), propertySource );
-                return;
+                return UpdateProperty( propertyName, bool.Parse( propertyValue ), propertySource );
             case ZfsPropertyNames.TemplatePropertyName:
-                Template = Template with { Value = propertyValue, Source = propertySource };
-                return;
+                return Template = Template with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.RecursionPropertyName:
-                Recursion = Recursion with { Value = propertyValue, Source = propertySource };
-                return;
+                return Recursion = Recursion with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
-                UpdateProperty( propertyName, DateTimeOffset.Parse( propertyValue ), propertySource );
-                return;
+                return UpdateProperty( propertyName, DateTimeOffset.Parse( propertyValue ), propertySource );
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
             case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
             case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
@@ -65,8 +60,7 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, TreeN
             case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
             case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
             case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
-                UpdateProperty( propertyName, int.Parse( propertyValue ), propertySource );
-                return;
+                return UpdateProperty( propertyName, int.Parse( propertyValue ), propertySource );
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported property" );
         }
@@ -90,58 +84,45 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, TreeN
         }
     }
 
-    public void UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
+    public ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
     {
         switch ( propertyName )
         {
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
-                LastFrequentSnapshotTimestamp = LastFrequentSnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastFrequentSnapshotTimestamp = LastFrequentSnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
-                LastHourlySnapshotTimestamp = LastHourlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastHourlySnapshotTimestamp = LastHourlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
-                LastDailySnapshotTimestamp = LastDailySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastDailySnapshotTimestamp = LastDailySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
-                LastWeeklySnapshotTimestamp = LastWeeklySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastWeeklySnapshotTimestamp = LastWeeklySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
-                LastMonthlySnapshotTimestamp = LastMonthlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastMonthlySnapshotTimestamp = LastMonthlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
-                LastYearlySnapshotTimestamp = LastYearlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
-                return;
+                return LastYearlySnapshotTimestamp = LastYearlySnapshotTimestamp with { Value = propertyValue, Source = propertySource };
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported DateTimeOffset property" );
         }
     }
 
-    public void UpdateProperty( string propertyName, int propertyValue, string propertySource )
+    public ZfsProperty<int> UpdateProperty( string propertyName, int propertyValue, string propertySource )
     {
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
-                SnapshotRetentionFrequent = SnapshotRetentionFrequent with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionFrequent = SnapshotRetentionFrequent with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
-                SnapshotRetentionHourly = SnapshotRetentionHourly with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionHourly = SnapshotRetentionHourly with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
-                SnapshotRetentionDaily = SnapshotRetentionDaily with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionDaily = SnapshotRetentionDaily with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
-                SnapshotRetentionWeekly = SnapshotRetentionWeekly with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionWeekly = SnapshotRetentionWeekly with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
-                SnapshotRetentionMonthly = SnapshotRetentionMonthly with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionMonthly = SnapshotRetentionMonthly with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
-                SnapshotRetentionYearly = SnapshotRetentionYearly with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionYearly = SnapshotRetentionYearly with { Value = propertyValue, Source = propertySource };
             case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
-                SnapshotRetentionPruneDeferral = SnapshotRetentionPruneDeferral with { Value = propertyValue, Source = propertySource };
-                return;
+                return SnapshotRetentionPruneDeferral = SnapshotRetentionPruneDeferral with { Value = propertyValue, Source = propertySource };
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" );
         }
