@@ -109,23 +109,26 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override IEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
+    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
     {
+        ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
+
         if ( verb is "get" or "list" )
         {
             using StreamReader rdr = File.OpenText( args );
             while ( !rdr.EndOfStream )
             {
-                yield return rdr.ReadLine( )!;
+                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true )!;
             }
         }
     }
 
     /// <inheritdoc />
-    public override List<ITreeNode> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
     {
         List<ITreeNode> nodes = new( );
-        foreach ( string zfsLine in ZfsExecEnumerator( "get", "poolroots-withproperties.txt" ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
@@ -143,7 +146,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             } );
         }
 
-        foreach ( string zfsGetLine in ZfsExecEnumerator( "get", "alldatasets-withproperties.txt" ) )
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 

@@ -435,7 +435,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         // The run-time cost is minimal, so it's better to be safe, even if a cached configuration is likely to
         // be correct the majority of the time.
         // Comments, corrections, rude commentary, etc. are welcome (but not too rude - this is a labor of love😅).
-        foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"{string.Join( ',', ZfsProperty.DefaultDatasetProperties.Keys )} -t filesystem -s local,default,none -Hpd 0" ) )
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", $"{string.Join( ',', ZfsProperty.DefaultDatasetProperties.Keys )} -t filesystem -s local,default,none -Hpd 0" ).ConfigureAwait( true ) )
         {
             string[] elements = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             if ( elements.Length != 4 )
@@ -490,10 +490,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
 
         // Local function to get datasets starting from the specified path
-        void GetDatasets( string poolRootName )
+        async Task GetDatasets( string poolRootName )
         {
             Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", poolRootName );
-            foreach ( string zfsGetLine in ZfsExecEnumerator( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ) )
+            await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ).ConfigureAwait( true ) )
             {
                 Logger.Debug( "Attempting to parse line {0} from zfs", zfsGetLine );
                 string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
@@ -537,11 +537,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         // Local function to get snapshots, starting from the specified path
-        void GetSnapshots( string poolRootName )
+        async Task GetSnapshots( string poolRootName )
         {
             Logger.Debug( "Getting and parsing snapshot descendents of {0}", poolRootName );
             // This one can use a list operation, because we don't care about inheritance source for snapshots - just the values
-            foreach ( string zfsGetLine in ZfsExecEnumerator( "list", $"-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} {poolRootName}" ) )
+            await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} {poolRootName}" ).ConfigureAwait( true ) )
             {
                 string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
                 int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
@@ -585,8 +585,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <returns>
     ///     An <see cref="IEnumerable{T}" /> of <see langword="string" />s, iterating over the output of the zfs operation
     /// </returns>
-    public override IEnumerable<string> ZfsExecEnumerator( string verb, string args )
+    /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
+    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
     {
+        ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
         ValidateCommonExecArguments( verb, args );
 
         if ( verb is not "get" and not "list" )
@@ -616,7 +618,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             while ( !zfsGetProcess.StandardOutput.EndOfStream )
             {
-                yield return zfsGetProcess.StandardOutput.ReadLine( )!;
+                yield return await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true )!;
             }
         }
     }
@@ -680,7 +682,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    /// <inheritdoc cref="SetZfsProperties" />
+    /// <inheritdoc cref="SetZfsProperties(bool,string,Sanoid.Interop.Zfs.ZfsTypes.ZfsProperty[])" />
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
@@ -729,10 +731,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    public override List<ITreeNode> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets )
     {
         List<ITreeNode> nodes = new( );
-        foreach ( string zfsLine in ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
@@ -752,7 +754,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         }
 
-        foreach ( string zfsLine in ZfsExecEnumerator( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ' ', datasets.Keys )}" ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ' ', datasets.Keys )}" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>

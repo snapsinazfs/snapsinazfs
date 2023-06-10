@@ -481,7 +481,7 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-        private void RefreshZfsConfigurationTreeViewFromZfs( )
+        private async void RefreshZfsConfigurationTreeViewFromZfs( )
         {
             Logger.Debug( "Refreshing zfs configuration tree view" );
             DisableEventHandlers( );
@@ -496,7 +496,7 @@ namespace Sanoid.ConfigConsole
                 _zfsConfigurationCurrentSelectedItemOriginal = null;
                 _zfsConfigurationCurrentSelectedItemModified = null;
                 Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
-                zfsConfigurationTreeView.AddObjects( ZfsTasks.GetFullZfsConfigurationTree( ConfigConsole.Datasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ) );
+                zfsConfigurationTreeView.AddObjects( await ZfsTasks.GetFullZfsConfigurationTreeAsync( ConfigConsole.Datasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true ) );
                 UpdateZfsConfigurationButtonState( );
                 zfsConfigurationTreeView.SetFocus( );
             }

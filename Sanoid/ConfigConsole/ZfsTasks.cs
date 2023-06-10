@@ -16,12 +16,12 @@ namespace Sanoid.ConfigConsole;
 internal static class ZfsTasks
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-    internal static List<ITreeNode> GetFullZfsConfigurationTree( ConcurrentDictionary<string, SanoidZfsDataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
+    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
     {
         Logger.Debug( "Getting zfs objects for tree view" );
         try
         {
-            return commandRunner.GetZfsObjectsForConfigConsoleTree( datasets );
+            return await commandRunner.GetZfsObjectsForConfigConsoleTree( datasets ).ConfigureAwait( true );
         }
         catch ( Exception ex )
         {
