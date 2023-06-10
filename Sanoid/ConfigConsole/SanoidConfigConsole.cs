@@ -552,7 +552,8 @@ namespace Sanoid.ConfigConsole
                 _zfsConfigurationCurrentSelectedItemOriginal = null;
                 _zfsConfigurationCurrentSelectedItemModified = null;
                 Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
-                zfsConfigurationTreeView.AddObjects( await ZfsTasks.GetFullZfsConfigurationTreeAsync( ConfigConsole.Datasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true ) );
+                List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( _originalDatasets, _modifiedDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
+                zfsConfigurationTreeView.AddObjects( treeRootNodes );
                 UpdateZfsConfigurationButtonState( );
                 zfsConfigurationTreeView.SetFocus( );
             }

@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -8,7 +8,7 @@ using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, TreeNode ConfigConsoleTreeNode )
+public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, ITreeNode ConfigConsoleTreeNode )
 {
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
@@ -28,7 +28,7 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, TreeN
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, "local" );
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, "local" );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", "local" );
-    public TreeNode ConfigConsoleTreeNode { get; set; } = ConfigConsoleTreeNode;
+    public ITreeNode ConfigConsoleTreeNode { get; set; } = ConfigConsoleTreeNode;
 
     /// <exception cref="FormatException"><paramref name="propertyValue" /> is not a valid string representation of the target property value type.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="propertyValue" /> is <see langword="null" />.</exception>

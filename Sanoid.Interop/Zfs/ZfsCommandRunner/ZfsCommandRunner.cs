@@ -739,12 +739,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
             datasets.AddOrUpdate( lineTokens[ 0 ], k =>
             {
-                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ], true, new( k ) );
+                SanoidZfsDataset newRootDs = new( k, lineTokens[ 2 ], true, new TreeNode( k ) );
                 newRootDs.ConfigConsoleTreeNode.Tag = newRootDs;
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDs.Name );
                 nodes.Add( newRootDs.ConfigConsoleTreeNode );
                 return newRootDs;
-            }, ( k, ds ) =>
+            }, ( _, ds ) =>
             {
                 ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
                 Logger.Debug( "Updating property {0} for {1} to {2}", lineTokens[ 1 ], lineTokens[ 0 ], lineTokens[ 2 ] );
@@ -762,12 +762,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 int lastSlashIndex = k.LastIndexOf( '/' );
                 string parentName = k[ ..lastSlashIndex ];
                 SanoidZfsDataset parentDs = datasets[ parentName ];
-                SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], false, new( k ) );
+                SanoidZfsDataset newDs = new( k, lineTokens[ 2 ], false, new TreeNode( k ) );
                 newDs.ConfigConsoleTreeNode.Tag = newDs;
                 Logger.Debug( "Adding new {0} {1} to {2}", newDs.Kind, newDs.Name, parentDs.Name );
                 parentDs.ConfigConsoleTreeNode.Children.Add( newDs.ConfigConsoleTreeNode );
                 return newDs;
-            }, ( k, ds ) =>
+            }, ( _, ds ) =>
             {
                 if ( ds.IsPoolRoot )
                 {
