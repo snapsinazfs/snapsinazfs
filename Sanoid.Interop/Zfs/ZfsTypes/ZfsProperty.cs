@@ -151,24 +151,9 @@ public readonly record struct ZfsProperty<T>(string Name, T Value, string Source
     [JsonIgnore]
     public bool IsUndefinedOrDefault => IsSanoidProperty && Value is "-";
 
-    /// <summary>
-    ///     Gets or sets the name of the property
-    /// </summary>
-    public string Name { get; init; } = Name;
-
-    /// <summary>
-    ///     Gets or sets the source of the property, as a string
-    /// </summary>
-    public string Source { get; init; } = Source;
-
     /// <inheritdoc />
     [JsonIgnore]
     public string ValueString => Value.ToString( )?.ToLowerInvariant( ) ?? throw new InvalidOperationException( $"Invalid attempt to get a null ValueString from ZfsProperty {Name}" );
-
-    /// <summary>
-    ///     Gets or sets the value of the property, of type <see cref="T" />
-    /// </summary>
-    public T Value { get; init; } = Value;
 
     [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";
