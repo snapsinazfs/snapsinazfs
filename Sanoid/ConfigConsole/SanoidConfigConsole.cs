@@ -42,7 +42,7 @@ namespace Sanoid.ConfigConsole
 
             quitMenuItem.Action = ( ) => Application.RequestStop( );
 
-            SetGlobalSettingsFieldsFromSettingsObject( );
+            SetGlobalSettingsFieldsFromSettingsObject( false );
             configCategoryTabView.SelectedTabChanged += ConfigCategoryTabViewOnSelectedTabChanged;
             HideZfsConfigurationPropertyFrames( );
             SetTabStopsForRootLevelObjects( );
@@ -209,7 +209,7 @@ namespace Sanoid.ConfigConsole
             }
 
             Logger.Debug( "Disabling event handlers for zfs configuration fields" );
-            resetGlobalConfigButton.Clicked -= SetGlobalSettingsFieldsFromSettingsObject;
+            resetGlobalConfigButton.Clicked -= ResetGlobalConfigButtonOnClicked;
             saveGlobalConfigButton.Clicked -= ShowSaveGlobalConfigDialog;
             zfsConfigurationRefreshButton.Clicked -= RefreshZfsConfigurationTreeViewFromZfs;
             zfsConfigurationResetCurrentButton.Clicked -= ZfsConfigurationResetCurrentButtonOnClicked;
@@ -255,7 +255,7 @@ namespace Sanoid.ConfigConsole
             }
 
             Logger.Debug( "Enabling event handlers for zfs configuration fields" );
-            resetGlobalConfigButton.Clicked += SetGlobalSettingsFieldsFromSettingsObject;
+            resetGlobalConfigButton.Clicked += ResetGlobalConfigButtonOnClicked;
             saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
             zfsConfigurationRefreshButton.Clicked += RefreshZfsConfigurationTreeViewFromZfs;
             zfsConfigurationResetCurrentButton.Clicked += ZfsConfigurationResetCurrentButtonOnClicked;
@@ -708,7 +708,12 @@ namespace Sanoid.ConfigConsole
 
         private bool ValidateGlobalConfigValues( )
         {
-            if ( pathToZfsTextField.Text.IsEmpty )
+            if ( pathToZfsTextField.Text.IsEmpty || pathToZpoolTextField.Text.IsEmpty )
+            {
+                return false;
+            }
+
+            if ( !File.Exists( pathToZfsTextField.Text.ToString( ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) )
             {
                 return false;
             }
@@ -716,9 +721,17 @@ namespace Sanoid.ConfigConsole
             return true;
         }
 
-        private void SetGlobalSettingsFieldsFromSettingsObject( )
+        private void ResetGlobalConfigButtonOnClicked( )
         {
-            DisableEventHandlers( );
+            SetGlobalSettingsFieldsFromSettingsObject( );
+        }
+
+        private void SetGlobalSettingsFieldsFromSettingsObject( bool manageEventHandlers = true )
+        {
+            if ( manageEventHandlers )
+            {
+                DisableEventHandlers( );
+            }
 
             Logger.Debug( "Setting global configuration fields to values in settings" );
 
@@ -738,7 +751,11 @@ namespace Sanoid.ConfigConsole
             snapshotNameYearlySuffixTextField.Text = ConfigConsole.Settings.Formatting.YearlySuffix;
 
             Logger.Debug( "Finished etting global configuration fields to values in settings" );
-            EnableEventHandlers( );
+
+            if ( manageEventHandlers )
+            {
+                EnableEventHandlers( );
+            }
         }
     }
 }
