@@ -500,13 +500,8 @@ namespace Sanoid.ConfigConsole
         private void ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
             SanoidZfsDataset dsTreeCopy = _treeDatasets[ zfsConfigurationTreeView.SelectedObject.Text ];
-            ZfsProperty<bool> newProperty = dsTreeCopy.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup.GetSelectedBooleanFromLabel(), "local" );
-            _modifiedPropertiesSinceLastSaveForCurrentItem[ ZfsPropertyNames.EnabledPropertyName ] = newProperty;
 
-            ZfsProperty<bool> newProperty1 = dsTreeCopy.Enabled;
-            zfsConfigurationPropertiesEnabledSourceTextField.Text = newProperty1.Source;
-            ITreeNode selectedObject = zfsConfigurationTreeView.SelectedObject;
-            UpdateDescendentBooleanProperties( selectedObject, newProperty1, $"inherited from {selectedObject.Text}" );
+            UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesEnabledRadioGroup, dsTreeCopy, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -532,30 +527,29 @@ namespace Sanoid.ConfigConsole
             ArgumentNullException.ThrowIfNull( sender );
 
             ClearAllZfsPropertyFields( );
-            _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
 
-            if ( e.NewValue.Tag is SanoidZfsDataset ds )
+            // Be sure to set the previously-selected object back to its original state if it wasn't saved
+            if ( e.OldValue is not null )
             {
-                // Be sure to set the previously-selected object back to its original state if it wasn't saved
-                if ( e.OldValue is not null )
-                {
-                    RestorePreviousItemAndApplyToChildren( e );
-                }
-
-                _zfsConfigurationCurrentSelectedItemOriginal = ds with { };
-                _zfsConfigurationCurrentSelectedItemModified = ds with { };
-                UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
+                RestorePreviousItemFromBaseCollection( );
+                _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
             }
+
+            SanoidZfsDataset ds = e.NewValue.Tag as SanoidZfsDataset ?? throw new InvalidOperationException( "No data for selected tree node" );
+            _zfsConfigurationCurrentSelectedItemOriginal = ds with { };
+            _zfsConfigurationCurrentSelectedItemModified = ds with { };
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
 
             UpdateZfsConfigurationButtonState( );
 
             EnableEventHandlers( );
         }
 
-        private void RestorePreviousItemAndApplyToChildren( SelectionChangedEventArgs<ITreeNode> previousItem )
+        private void RestorePreviousItemFromBaseCollection( )
         {
-            previousItem.OldValue.Tag = _zfsConfigurationCurrentSelectedItemOriginal;
-            UpdateDescendentBooleanProperties(previousItem.OldValue, _zfsConfigurationCurrentSelectedItemOriginal.Enabled, _zfsConfigurationCurrentSelectedItemOriginal.Enabled.Source);
+            string dsName = zfsConfigurationTreeView.SelectedObject.Text;
+            _treeDatasets[ dsName ] = _baseDatasets[ dsName ] with { ConfigConsoleTreeNode = zfsConfigurationTreeView.SelectedObject };
+            _treeDatasets[ dsName ].ConfigConsoleTreeNode.Tag = _treeDatasets[ dsName ];
         }
 
         private void ClearAllZfsPropertyFields( bool manageEventHandlers = false )
