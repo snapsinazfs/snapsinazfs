@@ -424,15 +424,21 @@ namespace Sanoid.ConfigConsole
         {
             foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
             {
+                // If this child already has the property defined locally, we can skip it (and thus its descendents as well)
+                if ( child.TreeDataset[ prop.Name ].IsLocal )
+                {
+                    continue;
+                }
                 UpdateDescendentsBooleanPropertyInheritance( child, prop, source );
             }
 
-            // If this node already has the property defined locally, we can stop at this level
+            // This is the final base case, for the node we started from
             if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
             {
                 return;
             }
 
+            // For everyone that makes it this far, we need to inherit, so update the tree and base copies of the property
             currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
             currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
         }
