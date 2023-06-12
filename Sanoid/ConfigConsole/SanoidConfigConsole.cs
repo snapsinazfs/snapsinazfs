@@ -24,8 +24,6 @@ using Terminal.Gui.Trees;
 namespace Sanoid.ConfigConsole
 {
     using System;
-    using PowerArgs;
-
     using Terminal.Gui;
 
     public partial class SanoidConfigConsole
@@ -66,12 +64,12 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesRecursionRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.RecursionPropertyName, zfsConfigurationPropertiesRecursionRadioGroup, zfsConfigurationPropertiesRecursionSourceTextField );
             zfsConfigurationPropertiesTemplateTextField.Data = new TextFieldWithSourceViewData( ZfsPropertyNames.TemplatePropertyName, zfsConfigurationPropertiesTemplateTextField, zfsConfigurationPropertiesTemplateSourceTextField );
             zfsConfigurationPropertiesRetentionFrequentTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, zfsConfigurationPropertiesRetentionFrequentTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionHourlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, zfsConfigurationPropertiesRetentionHourlyTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionDailyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionDailyPropertyName, zfsConfigurationPropertiesRetentionDailyTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionWeeklyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, zfsConfigurationPropertiesRetentionWeeklyTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionMonthlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, zfsConfigurationPropertiesRetentionMonthlyTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionYearlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, zfsConfigurationPropertiesRetentionYearlyTextField, 0, int.MaxValue );
-            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, zfsConfigurationPropertiesRetentionPruneDeferralTextField, 0, 100 );
+            zfsConfigurationPropertiesRetentionHourlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, zfsConfigurationPropertiesRetentionHourlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionDailyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, zfsConfigurationPropertiesRetentionDailyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, zfsConfigurationPropertiesRetentionWeeklyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, zfsConfigurationPropertiesRetentionMonthlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionYearlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, zfsConfigurationPropertiesRetentionYearlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, zfsConfigurationPropertiesRetentionPruneDeferralTextField, 0, 100 );
         }
 
         private void UpdateZfsConfigurationButtonState( )
@@ -246,7 +244,7 @@ namespace Sanoid.ConfigConsole
         private void ZfsConfigurationPropertiesTemplateTextFieldOnLeave( FocusEventArgs args )
         {
             ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-            UpdateSelectedItemTextFieldStringProperty( zfsConfigurationPropertiesTemplateTextField, "local" );
+            UpdateSelectedItemTextFieldStringProperty( (TextFieldWithSourceViewData)args.View.Data, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -311,7 +309,7 @@ namespace Sanoid.ConfigConsole
 
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
-            DisableEventHandlers();
+            DisableEventHandlers( );
             if ( SelectedTreeNode.IsModified )
             {
                 // The buttons are disposable, but the Dialog will dispose them when it is closed
@@ -497,15 +495,14 @@ namespace Sanoid.ConfigConsole
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
         }
 
-        private void UpdateSelectedItemTextFieldStringProperty( TextField textField, string? propertySource = null )
+        private void UpdateSelectedItemTextFieldStringProperty(TextFieldWithSourceViewData viewData, string? propertySource = null )
         {
-            if ( textField.Text?.ToString( ) is not { } templateName || string.IsNullOrWhiteSpace( templateName ) )
+            if ( viewData.ValueTextField.Text?.ToString( ) is not { } propertyValue || string.IsNullOrWhiteSpace( propertyValue ) )
             {
                 return;
             }
 
-            TextFieldWithSourceViewData viewData = (TextFieldWithSourceViewData)textField.Data;
-            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, templateName, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
+            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, propertyValue, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
         }
@@ -519,7 +516,7 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
-            ZfsProperty<int> newProperty = (ZfsProperty<int>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, intValue, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
+            ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, intValue, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.ValueTextField.ColorScheme = SelectedTreeNode.TreeDataset[ viewData.PropertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
         }
@@ -598,7 +595,6 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesRecentWeeklyTextField.Clear( );
             zfsConfigurationPropertiesRecentMonthlyTextField.Clear( );
             zfsConfigurationPropertiesRecentYearlyTextField.Clear( );
-
 
             if ( manageEventHandlers )
             {
