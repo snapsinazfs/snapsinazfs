@@ -734,6 +734,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
+        Dictionary<string, TreeNode> allTreeNodes = new( );
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
@@ -741,12 +742,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             string dsName = lineTokens[ 0 ];
             baseDatasets.AddOrUpdate( dsName, k =>
             {
-                SanoidZfsDataset newRootDsBaseCopy = new( k, propertyValue, true, new TreeNode( k ) );
-                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { ConfigConsoleTreeNode = new TreeNode( k ) };
-                newRootDsBaseCopy.ConfigConsoleTreeNode.Tag = newRootDsBaseCopy;
-                newRootDsTreeCopy.ConfigConsoleTreeNode.Tag = newRootDsTreeCopy;
+                SanoidZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
+                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
+                ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
-                treeRootNodes.Add( newRootDsTreeCopy.ConfigConsoleTreeNode );
+                treeRootNodes.Add( node );
+                allTreeNodes[ dsName ] = node;
                 treeDatasets.TryAdd( k, newRootDsTreeCopy );
                 return newRootDsBaseCopy;
             }, ( _, ds ) =>
@@ -771,13 +772,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 string parentName = dsName[ ..lastSlashIndex ];
                 SanoidZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
                 SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
-                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false, new TreeNode( dsName ) );
-                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { ConfigConsoleTreeNode = new TreeNode( dsName ) };
-                newDsBaseCopy.ConfigConsoleTreeNode.Tag = newDsBaseCopy;
-                newDsTreeCopy.ConfigConsoleTreeNode.Tag = newDsTreeCopy;
+                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
+                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
+                ZfsObjectConfigurationTreeNode node = new(dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
+                allTreeNodes[ dsName ] = node;
+                allTreeNodes[ parentName ].Children.Add( node );
                 Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
-                parentDsBaseCopy.ConfigConsoleTreeNode.Children.Add( newDsBaseCopy.ConfigConsoleTreeNode );
-                parentDsTreeCopy.ConfigConsoleTreeNode.Children.Add( newDsTreeCopy.ConfigConsoleTreeNode );
                 baseDatasets.TryAdd( dsName, newDsBaseCopy );
                 treeDatasets.TryAdd( dsName, newDsTreeCopy );
             }

@@ -8,7 +8,7 @@ using Terminal.Gui.Trees;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, ITreeNode ConfigConsoleTreeNode )
+public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot )
 {
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
@@ -28,7 +28,6 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot, ITree
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, "local" );
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, "local" );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", "local" );
-    public ITreeNode ConfigConsoleTreeNode { get; set; } = ConfigConsoleTreeNode;
 
     /// <exception cref="FormatException"><paramref name="propertyValue" /> is not a valid string representation of the target property value type.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="propertyValue" /> is <see langword="null" />.</exception>

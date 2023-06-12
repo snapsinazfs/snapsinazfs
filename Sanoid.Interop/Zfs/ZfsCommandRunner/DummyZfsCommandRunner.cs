@@ -5,6 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
+using System.Xml.Linq;
+
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 using Terminal.Gui.Trees;
@@ -128,24 +130,26 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
+        Dictionary<string, TreeNode> allTreeNodes = new( );
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            baseDatasets.AddOrUpdate( lineTokens[ 0 ], k =>
+            string dsName = lineTokens[ 0 ];
+            baseDatasets.AddOrUpdate( dsName, k =>
             {
-                SanoidZfsDataset newRootDsBaseCopy = new( k, lineTokens[ 2 ], true, new TreeNode( k ) );
-                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { ConfigConsoleTreeNode = new TreeNode( k ) };
-                newRootDsBaseCopy.ConfigConsoleTreeNode.Tag = newRootDsBaseCopy;
-                newRootDsTreeCopy.ConfigConsoleTreeNode.Tag = newRootDsTreeCopy;
+                SanoidZfsDataset newRootDsBaseCopy = new( k, lineTokens[ 2 ], true );
+                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
+                ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
-                treeRootNodes.Add( newRootDsTreeCopy.ConfigConsoleTreeNode );
+                treeRootNodes.Add( node );
+                allTreeNodes[ dsName ] = node;
                 treeDatasets.TryAdd( k, newRootDsTreeCopy );
                 return newRootDsBaseCopy;
             }, ( k, ds ) =>
             {
                 ds.UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
-                treeDatasets[ lineTokens[ 0 ] ].UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
-                Logger.Debug( "Updating property {0} for {1} to {2}", lineTokens[ 1 ], lineTokens[ 0 ], lineTokens[ 2 ] );
+                treeDatasets[ dsName ].UpdateProperty( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] );
+                Logger.Debug( "Updating property {0} for {1} to {2}", lineTokens[ 1 ], dsName, lineTokens[ 2 ] );
                 return ds;
             } );
         }
@@ -161,13 +165,12 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 string parentName = dsName[ ..lastSlashIndex ];
                 SanoidZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
                 SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
-                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false, new TreeNode( dsName ) );
-                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { ConfigConsoleTreeNode = new TreeNode( dsName ) };
-                newDsBaseCopy.ConfigConsoleTreeNode.Tag = newDsBaseCopy;
-                newDsTreeCopy.ConfigConsoleTreeNode.Tag = newDsTreeCopy;
+                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
+                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
+                ZfsObjectConfigurationTreeNode node = new(dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
+                allTreeNodes[ dsName ] = node;
+                allTreeNodes[ parentName ].Children.Add( node );
                 Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
-                parentDsBaseCopy.ConfigConsoleTreeNode.Children.Add( newDsBaseCopy.ConfigConsoleTreeNode );
-                parentDsTreeCopy.ConfigConsoleTreeNode.Children.Add( newDsTreeCopy.ConfigConsoleTreeNode );
                 baseDatasets.TryAdd( dsName, newDsBaseCopy );
                 treeDatasets.TryAdd( dsName, newDsTreeCopy );
             }
