@@ -308,37 +308,34 @@ namespace Sanoid.ConfigConsole
 
                 Application.Run( saveZfsObjectDialog );
 
-                if ( saveConfirmed )
+                if ( saveConfirmed && ConfigConsole.Settings is not null && ConfigConsole.CommandRunner is not null )
                 {
-                    if ( ConfigConsole.Settings != null && ConfigConsole.CommandRunner != null )
-                    {
-                        if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
-                        {
-                            foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
-                            {
-                                switch ( kvp.Value )
-                                {
-                                    case ZfsProperty<bool> boolProp:
-                                        UpdateDescendentsBooleanPropertyInheritance( SelectedTreeNode, boolProp, $"inherited from {SelectedTreeNode.Text}" );
-                                        break;
-                                    case ZfsProperty<int> intProp:
-                                        UpdateDescendentsIntPropertyInheritance( SelectedTreeNode, intProp, $"inherited from {SelectedTreeNode.Text}" );
-                                        break;
-                                    case ZfsProperty<string> stringProp:
-                                        UpdateDescendentsStringPropertyInheritance( SelectedTreeNode, stringProp, $"inherited from {SelectedTreeNode.Text}" );
-                                        break;
-                                    case ZfsProperty<DateTimeOffset> dtoProp:
-                                        UpdateDescendentsDateTimeOffsetPropertyInheritance( SelectedTreeNode, dtoProp, $"inherited from {SelectedTreeNode.Text}" );
-                                        break;
-                                }
-                            }
-
-                            _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-                            SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
-                        }
-                    }
-
                     Logger.Info( "Saving {0}", zfsObjectPath );
+                    if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
+                    {
+                        Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
+                        foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
+                        {
+                            switch ( kvp.Value )
+                            {
+                                case ZfsProperty<bool> boolProp:
+                                    UpdateDescendentsBooleanPropertyInheritance( SelectedTreeNode, boolProp, $"inherited from {SelectedTreeNode.Text}" );
+                                    break;
+                                case ZfsProperty<int> intProp:
+                                    UpdateDescendentsIntPropertyInheritance( SelectedTreeNode, intProp, $"inherited from {SelectedTreeNode.Text}" );
+                                    break;
+                                case ZfsProperty<string> stringProp:
+                                    UpdateDescendentsStringPropertyInheritance( SelectedTreeNode, stringProp, $"inherited from {SelectedTreeNode.Text}" );
+                                    break;
+                                case ZfsProperty<DateTimeOffset> dtoProp:
+                                    UpdateDescendentsDateTimeOffsetPropertyInheritance( SelectedTreeNode, dtoProp, $"inherited from {SelectedTreeNode.Text}" );
+                                    break;
+                            }
+                        }
+
+                        _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
+                        SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
+                    }
                 }
 
                 // Fine to ignore this warning here, because we are explicitly un-wiring the events before any disposal will occur.
