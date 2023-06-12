@@ -1,3 +1,9 @@
+// LICENSE:
+// 
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
+// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
+// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+
 #nullable enable
 // LICENSE:
 // 
@@ -22,18 +28,10 @@ using Terminal.Gui.Trees;
 namespace Sanoid.ConfigConsole
 {
     using System;
-
     using Terminal.Gui;
 
     public partial class SanoidConfigConsole
     {
-        private List<string> _templateListItems = ConfigConsole.Settings!.Templates.Keys.ToList( );
-        private bool _eventsEnabled;
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-        private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
-        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _baseDatasets = new( );
-        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _treeDatasets = new( );
-
         public SanoidConfigConsole( )
         {
             InitializeComponent( );
@@ -52,6 +50,15 @@ namespace Sanoid.ConfigConsole
 
             EnableEventHandlers( );
         }
+
+        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _baseDatasets = new( );
+        private bool _eventsEnabled;
+        private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
+        private List<string> _templateListItems = ConfigConsole.Settings!.Templates.Keys.ToList( );
+        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _treeDatasets = new( );
+
+        private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsConfigurationTreeView.SelectedObject;
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
         private void SetTagsForZfsPropertyFields( )
         {
@@ -271,7 +278,7 @@ namespace Sanoid.ConfigConsole
             DisableEventHandlers( );
             ClearAllZfsPropertyFields( );
             _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-            RestorePreviousSelectedItem();
+            RestorePreviousSelectedItem( );
             UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
             UpdateZfsConfigurationButtonState( );
             EnableEventHandlers( );
@@ -305,9 +312,9 @@ namespace Sanoid.ConfigConsole
                 {
                     if ( ConfigConsole.Settings != null && ConfigConsole.CommandRunner != null )
                     {
-                        if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList(), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
+                        if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
                         {
-                            foreach ( var kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
+                            foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
                             {
                                 switch ( kvp.Value )
                                 {
@@ -325,9 +332,9 @@ namespace Sanoid.ConfigConsole
                                         break;
                                 }
                             }
+
                             _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
                             SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
-
                         }
                     }
 
@@ -361,28 +368,26 @@ namespace Sanoid.ConfigConsole
             return true;
         }
 
-        private record RadioGroupViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
-        private record TextFieldViewData( string PropertyName, TextField ValueTextField, TextField SourceTextField );
-
         private void ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick( MouseEventArgs args )
         {
             RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
-            ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel(), "local" );
+            ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
             UpdateZfsConfigurationButtonState( );
         }
+
         private void ZfsConfigurationPropertiesStringRadioGroupOnMouseClick( MouseEventArgs args )
         {
             RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
-            IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString(), "local" );
+            IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
             UpdateZfsConfigurationButtonState( );
         }
 
         /// <summary>
-        /// Performs a depth-first recursion on the entire tree, updating all boolean properties appropriately
+        ///     Performs a depth-first recursion on the entire tree, updating all boolean properties appropriately
         /// </summary>
         /// <param name="currentNode"></param>
         /// <param name="prop"></param>
@@ -396,7 +401,9 @@ namespace Sanoid.ConfigConsole
 
             // If this node already has the property defined locally, we can stop at this level
             if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
+            {
                 return;
+            }
 
             currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
             currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
@@ -411,7 +418,9 @@ namespace Sanoid.ConfigConsole
 
             // If this node already has the property defined locally, we can stop at this level
             if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
+            {
                 return;
+            }
 
             currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
             currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
@@ -426,7 +435,9 @@ namespace Sanoid.ConfigConsole
 
             // If this node already has the property defined locally, we can stop at this level
             if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
+            {
                 return;
+            }
 
             currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
             currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
@@ -441,7 +452,9 @@ namespace Sanoid.ConfigConsole
 
             // If this node already has the property defined locally, we can stop at this level
             if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
+            {
                 return;
+            }
 
             currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
             currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
@@ -450,7 +463,7 @@ namespace Sanoid.ConfigConsole
         private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
         {
             RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
-            ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel(), propertySource ?? SelectedTreeNode.TreeDataset[viewData.PropertyName].Source );
+            ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
         }
@@ -458,7 +471,7 @@ namespace Sanoid.ConfigConsole
         private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
         {
             RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
-            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString(), propertySource ?? SelectedTreeNode.TreeDataset[viewData.PropertyName].Source );
+            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
         }
@@ -516,8 +529,6 @@ namespace Sanoid.ConfigConsole
         {
             SelectedTreeNode.TreeDataset = SelectedTreeNode.BaseDataset with { };
         }
-
-        private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsConfigurationTreeView.SelectedObject;
 
         private void ClearAllZfsPropertyFields( bool manageEventHandlers = false )
         {
@@ -715,5 +726,9 @@ namespace Sanoid.ConfigConsole
                 EnableEventHandlers( );
             }
         }
+
+        private record RadioGroupViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
+
+        private record TextFieldViewData( string PropertyName, TextField ValueTextField, TextField SourceTextField );
     }
 }
