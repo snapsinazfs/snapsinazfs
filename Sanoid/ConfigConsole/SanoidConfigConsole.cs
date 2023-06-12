@@ -326,8 +326,8 @@ namespace Sanoid.ConfigConsole
                                 }
                             }
                             _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-                            SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset;
-                            //TODO: Need to inherit local properties after save
+                            SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
+
                         }
                     }
 
