@@ -12,6 +12,7 @@ namespace Sanoid.Settings.Settings;
 /// <summary>
 ///     Snapshot timing policies for use in <see cref="TemplateSettings" />
 /// </summary>
+[JsonSourceGenerationOptions( DefaultIgnoreCondition = JsonIgnoreCondition.Never )]
 public sealed class SnapshotTimingSettings
 {
     /// <summary>

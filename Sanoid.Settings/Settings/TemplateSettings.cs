@@ -11,24 +11,16 @@ namespace Sanoid.Settings.Settings;
 /// <summary>
 ///     Settings definitions for templates
 /// </summary>
+[JsonSerializable(typeof(TemplateSettings) )]
+[JsonSourceGenerationOptions( DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull)]
 public sealed class TemplateSettings
 {
-    [JsonIgnore( Condition = JsonIgnoreCondition.WhenWritingNull )]
-    public FormattingSettings? Formatting { get; set; }
+    public required FormattingSettings Formatting { get; set; }
 
     /// <summary>
     ///     Gets or sets the snapshot timing settings sub-section
     /// </summary>
     public required SnapshotTimingSettings SnapshotTiming { get; set; }
-
-    /// <summary>
-    ///     Gets formatting settings for this template, or the fallback settings provided
-    /// </summary>
-    /// <param name="fallbackSettings">Fallback settings to use if this template doesn't have a Formatting section.</param>
-    public FormattingSettings GetFormattingSettings( FormattingSettings fallbackSettings )
-    {
-        return Formatting ?? fallbackSettings;
-    }
 
     public string GenerateFullSnapshotName( string datasetName, SnapshotPeriodKind periodKind, DateTimeOffset timestamp, FormattingSettings fallbackSettings )
     {

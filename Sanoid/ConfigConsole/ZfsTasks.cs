@@ -5,10 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using System.Text.Json;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
-using Sanoid.Settings.Settings;
 using Terminal.Gui.Trees;
 
 namespace Sanoid.ConfigConsole;

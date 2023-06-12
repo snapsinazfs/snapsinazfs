@@ -120,29 +120,15 @@ public class ZfsProperty
 
         return ( false, null, null );
     }
-
-    /// <inheritdoc />
-    public override string ToString( )
-    {
-        return $"{Name}: {Value}";
-    }
 }
 
-public readonly record struct ZfsProperty<T>(string Name, T Value, string Source ) : IZfsProperty where T : notnull
+public readonly record struct ZfsProperty<T>( string Name, T Value, string Source ) : IZfsProperty where T : notnull
 {
-    [JsonIgnore]
-    public bool IsInherited => Source.StartsWith( "inherited" );
-
-    [JsonIgnore]
-    public string InheritedFrom => IsInherited ? Source[ 15.. ] : Source;
-
-    [JsonIgnore]
-    public bool IsLocal => Source == "local";
-
     /// <summary>
     ///     Gets whether this is a sanoid property or not
     /// </summary>
     /// <remarks>Set by constructor, if property name begins with "sanoid.net:"</remarks>
+    [JsonIgnore]
     public bool IsSanoidProperty { get; } = Name.StartsWith( "sanoid.net:" );
 
     /// <summary>
@@ -151,7 +137,9 @@ public readonly record struct ZfsProperty<T>(string Name, T Value, string Source
     [JsonIgnore]
     public bool IsUndefinedOrDefault => IsSanoidProperty && Value is "-";
 
-    /// <inheritdoc />
+    /// <summary>
+    ///     Gets a string representation of the Value property, in an appropriate form for its type
+    /// </summary>
     [JsonIgnore]
     public string ValueString => Value switch
     {
@@ -159,8 +147,17 @@ public readonly record struct ZfsProperty<T>(string Name, T Value, string Source
         string value => value,
         bool boolValue => boolValue.ToString( ).ToLowerInvariant( ),
         DateTimeOffset dtoValue => dtoValue.ToString( "O" ),
-        _ => throw new InvalidOperationException($"Invalid value type for ZfsProperty {Name} ({typeof(T).FullName})")
+        _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
+
+    [JsonIgnore]
+    public bool IsInherited => Source.StartsWith( "inherited" );
+
+    [JsonIgnore]
+    public string InheritedFrom => IsInherited ? Source[ 15.. ] : Source;
+
+    [JsonIgnore]
+    public bool IsLocal => Source == "local";
 
     [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";

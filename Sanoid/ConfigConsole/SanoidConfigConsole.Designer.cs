@@ -97,15 +97,15 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Button resetGlobalConfigButton;
         
-        private Terminal.Gui.Window window;
+        private Terminal.Gui.Window templateEditorWindow;
         
-        private Terminal.Gui.Label templateEditingNotImplementedLabel;
+        private Terminal.Gui.LineView lineView;
+        
+        private Terminal.Gui.FrameView templateConfigurationTemplateListFrame;
+        
+        private Terminal.Gui.FrameView templateConfigurationTemplatePropertiesFrame;
         
         private Terminal.Gui.Window zfsConfigurationWindow;
-        
-        private Terminal.Gui.FrameView zfsConfigurationTreeFrame;
-        
-        private Terminal.Gui.TreeView zfsConfigurationTreeView;
         
         private Terminal.Gui.FrameView zfsConfigurationPropertiesFrame;
         
@@ -209,11 +209,15 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView zfsConfigurationActionsFrame;
         
-        private Terminal.Gui.Button zfsConfigurationSaveCurrentButton;
-        
         private Terminal.Gui.Button zfsConfigurationResetCurrentButton;
         
+        private Terminal.Gui.Button zfsConfigurationSaveCurrentButton;
+        
         private Terminal.Gui.Button zfsConfigurationRefreshButton;
+        
+        private Terminal.Gui.FrameView zfsConfigurationTreeFrame;
+        
+        private Terminal.Gui.TreeView zfsConfigurationTreeView;
         
         private Terminal.Gui.MenuBar topMenuBar;
         
@@ -223,9 +227,11 @@ namespace Sanoid.ConfigConsole {
         
         private void InitializeComponent() {
             this.topMenuBar = new Terminal.Gui.MenuBar();
+            this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
+            this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationRefreshButton = new Terminal.Gui.Button();
-            this.zfsConfigurationResetCurrentButton = new Terminal.Gui.Button();
             this.zfsConfigurationSaveCurrentButton = new Terminal.Gui.Button();
+            this.zfsConfigurationResetCurrentButton = new Terminal.Gui.Button();
             this.zfsConfigurationActionsFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationSnapshotPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesRecentYearlyTextField = new Terminal.Gui.TextField();
@@ -235,10 +241,10 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentHourlyTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesRecentFrequentTextField = new Terminal.Gui.TextField();
             this.zfsConfigurationPropertiesRecentFrame = new Terminal.Gui.FrameView();
-            this.zfsConfigurationPropertiesRetentionYearlyTextField = new Terminal.Gui.TextValidateField();
-            this.zfsConfigurationPropertiesRetentionYearlyLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesRetentionPruneDeferralTextField = new Terminal.Gui.TextValidateField();
             this.zfsConfigurationPropertiesRetentionPruneDeferralLabel = new Terminal.Gui.Label();
+            this.zfsConfigurationPropertiesRetentionYearlyTextField = new Terminal.Gui.TextValidateField();
+            this.zfsConfigurationPropertiesRetentionYearlyLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesRetentionMonthlyTextField = new Terminal.Gui.TextValidateField();
             this.zfsConfigurationPropertiesRetentionMonthlyLabel = new Terminal.Gui.Label();
             this.zfsConfigurationPropertiesRetentionWeeklyTextField = new Terminal.Gui.TextValidateField();
@@ -277,11 +283,11 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesGeneralFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationCommonPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
-            this.zfsConfigurationTreeView = new Terminal.Gui.TreeView();
-            this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
-            this.templateEditingNotImplementedLabel = new Terminal.Gui.Label();
-            this.window = new Terminal.Gui.Window();
+            this.templateConfigurationTemplatePropertiesFrame = new Terminal.Gui.FrameView();
+            this.templateConfigurationTemplateListFrame = new Terminal.Gui.FrameView();
+            this.lineView = new Terminal.Gui.LineView();
+            this.templateEditorWindow = new Terminal.Gui.Window();
             this.resetGlobalConfigButton = new Terminal.Gui.Button();
             this.saveGlobalConfigButton = new Terminal.Gui.Button();
             this.snapshotNameYearlySuffixTextField = new Terminal.Gui.TextValidateField();
@@ -398,7 +404,7 @@ namespace Sanoid.ConfigConsole {
             this.globalConfigWindow.Border.Effect3DBrush = null;
             this.globalConfigWindow.Border.DrawMarginFrame = true;
             this.globalConfigWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.globalConfigWindow.Title = "";
+            this.globalConfigWindow.Title = "Global Configuration";
             configCategoryTabViewglobalConfiguration.View.Add(this.globalConfigWindow);
             this.generalSettingsFrameView.Width = 64;
             this.generalSettingsFrameView.Height = 9;
@@ -696,30 +702,55 @@ namespace Sanoid.ConfigConsole {
             configCategoryTabViewtemplates = new Terminal.Gui.TabView.Tab("Templates", new View());
             configCategoryTabViewtemplates.View.Width = Dim.Fill();
             configCategoryTabViewtemplates.View.Height = Dim.Fill();
-            this.window.Width = 60;
-            this.window.Height = 9;
-            this.window.X = Pos.Center();
-            this.window.Y = Pos.Center();
-            this.window.ColorScheme = this.redOnBlack;
-            this.window.Modal = true;
-            this.window.Data = "window";
-            this.window.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.window.Border.BorderBrush = Terminal.Gui.Color.Black;
-            this.window.Border.Effect3D = false;
-            this.window.Border.Effect3DBrush = null;
-            this.window.Border.DrawMarginFrame = true;
-            this.window.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.window.Title = "";
-            configCategoryTabViewtemplates.View.Add(this.window);
-            this.templateEditingNotImplementedLabel.Width = 4;
-            this.templateEditingNotImplementedLabel.Height = 1;
-            this.templateEditingNotImplementedLabel.X = Pos.Center();
-            this.templateEditingNotImplementedLabel.Y = Pos.Center();
-            this.templateEditingNotImplementedLabel.ColorScheme = this.whiteOnRed;
-            this.templateEditingNotImplementedLabel.Data = "templateEditingNotImplementedLabel";
-            this.templateEditingNotImplementedLabel.Text = "Template Editing Not Yet Implemented";
-            this.templateEditingNotImplementedLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.window.Add(this.templateEditingNotImplementedLabel);
+            this.templateEditorWindow.Width = Dim.Fill(2);
+            this.templateEditorWindow.Height = Dim.Fill(2);
+            this.templateEditorWindow.X = Pos.Center();
+            this.templateEditorWindow.Y = Pos.Center();
+            this.templateEditorWindow.Modal = true;
+            this.templateEditorWindow.Data = "templateEditorWindow";
+            this.templateEditorWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.templateEditorWindow.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateEditorWindow.Border.Effect3D = false;
+            this.templateEditorWindow.Border.Effect3DBrush = null;
+            this.templateEditorWindow.Border.DrawMarginFrame = true;
+            this.templateEditorWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateEditorWindow.Title = "Templates";
+            configCategoryTabViewtemplates.View.Add(this.templateEditorWindow);
+            this.lineView.Width = 1;
+            this.lineView.Height = Dim.Fill(0);
+            this.lineView.X = Pos.Center();
+            this.lineView.Y = 0;
+            this.lineView.Data = "lineView";
+            this.lineView.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.lineView.LineRune = '│';
+            this.lineView.Orientation = Terminal.Gui.Graphs.Orientation.Vertical;
+            this.templateEditorWindow.Add(this.lineView);
+            this.templateConfigurationTemplateListFrame.Width = 30;
+            this.templateConfigurationTemplateListFrame.Height = 15;
+            this.templateConfigurationTemplateListFrame.X = Pos.Center() - 32;
+            this.templateConfigurationTemplateListFrame.Y = Pos.Center();
+            this.templateConfigurationTemplateListFrame.Data = "templateConfigurationTemplateListFrame";
+            this.templateConfigurationTemplateListFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.templateConfigurationTemplateListFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationTemplateListFrame.Border.Effect3D = false;
+            this.templateConfigurationTemplateListFrame.Border.Effect3DBrush = null;
+            this.templateConfigurationTemplateListFrame.Border.DrawMarginFrame = true;
+            this.templateConfigurationTemplateListFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationTemplateListFrame.Title = "Templates";
+            this.templateEditorWindow.Add(this.templateConfigurationTemplateListFrame);
+            this.templateConfigurationTemplatePropertiesFrame.Width = 30;
+            this.templateConfigurationTemplatePropertiesFrame.Height = 15;
+            this.templateConfigurationTemplatePropertiesFrame.X = Pos.Center() + 1;
+            this.templateConfigurationTemplatePropertiesFrame.Y = Pos.Center();
+            this.templateConfigurationTemplatePropertiesFrame.Data = "templateConfigurationTemplatePropertiesFrame";
+            this.templateConfigurationTemplatePropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.templateConfigurationTemplatePropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationTemplatePropertiesFrame.Border.Effect3D = false;
+            this.templateConfigurationTemplatePropertiesFrame.Border.Effect3DBrush = null;
+            this.templateConfigurationTemplatePropertiesFrame.Border.DrawMarginFrame = true;
+            this.templateConfigurationTemplatePropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationTemplatePropertiesFrame.Title = "Templates";
+            this.templateEditorWindow.Add(this.templateConfigurationTemplatePropertiesFrame);
             configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());
@@ -732,46 +763,20 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationWindow.Modal = false;
             this.zfsConfigurationWindow.Data = "zfsConfigurationWindow";
             this.zfsConfigurationWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationWindow.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationWindow.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationWindow.Border.Effect3D = false;
             this.zfsConfigurationWindow.Border.Effect3DBrush = null;
             this.zfsConfigurationWindow.Border.DrawMarginFrame = true;
             this.zfsConfigurationWindow.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.zfsConfigurationWindow.Title = "";
             configCategoryTabViewzFSConfiguration.View.Add(this.zfsConfigurationWindow);
-            this.zfsConfigurationTreeFrame.Width = 84;
-            this.zfsConfigurationTreeFrame.Height = 34;
-            this.zfsConfigurationTreeFrame.X = 1;
-            this.zfsConfigurationTreeFrame.Y = 0;
-            this.zfsConfigurationTreeFrame.Data = "zfsConfigurationTreeFrame";
-            this.zfsConfigurationTreeFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationTreeFrame.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.zfsConfigurationTreeFrame.Border.Effect3D = false;
-            this.zfsConfigurationTreeFrame.Border.Effect3DBrush = null;
-            this.zfsConfigurationTreeFrame.Border.DrawMarginFrame = true;
-            this.zfsConfigurationTreeFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationTreeFrame.Title = "ZFS Objects";
-            this.zfsConfigurationWindow.Add(this.zfsConfigurationTreeFrame);
-            this.zfsConfigurationTreeView.Width = Dim.Fill(1);
-            this.zfsConfigurationTreeView.Height = Dim.Fill(1);
-            this.zfsConfigurationTreeView.X = -2;
-            this.zfsConfigurationTreeView.Y = 0;
-            this.zfsConfigurationTreeView.Data = "zfsConfigurationTreeView";
-            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.zfsConfigurationTreeView.Style.CollapseableSymbol = '-';
-            this.zfsConfigurationTreeView.Style.ColorExpandSymbol = false;
-            this.zfsConfigurationTreeView.Style.ExpandableSymbol = '+';
-            this.zfsConfigurationTreeView.Style.InvertExpandSymbolColors = false;
-            this.zfsConfigurationTreeView.Style.LeaveLastRow = false;
-            this.zfsConfigurationTreeView.Style.ShowBranchLines = true;
-            this.zfsConfigurationTreeFrame.Add(this.zfsConfigurationTreeView);
             this.zfsConfigurationPropertiesFrame.Width = Dim.Fill(1);
             this.zfsConfigurationPropertiesFrame.Height = 34;
             this.zfsConfigurationPropertiesFrame.X = Pos.Right(zfsConfigurationTreeFrame) + 2;
             this.zfsConfigurationPropertiesFrame.Y = 0;
             this.zfsConfigurationPropertiesFrame.Data = "zfsConfigurationPropertiesFrame";
             this.zfsConfigurationPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationPropertiesFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesFrame.Border.DrawMarginFrame = true;
@@ -784,7 +789,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationCommonPropertiesFrame.Y = 0;
             this.zfsConfigurationCommonPropertiesFrame.Data = "zfsConfigurationCommonPropertiesFrame";
             this.zfsConfigurationCommonPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationCommonPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.BrightGreen;
+            this.zfsConfigurationCommonPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationCommonPropertiesFrame.Border.Effect3D = false;
             this.zfsConfigurationCommonPropertiesFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationCommonPropertiesFrame.Border.DrawMarginFrame = true;
@@ -797,7 +802,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesGeneralFrame.Y = 0;
             this.zfsConfigurationPropertiesGeneralFrame.Data = "zfsConfigurationPropertiesGeneralFrame";
             this.zfsConfigurationPropertiesGeneralFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesGeneralFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesGeneralFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationPropertiesGeneralFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesGeneralFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesGeneralFrame.Border.DrawMarginFrame = true;
@@ -1030,7 +1035,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRetentionFrame.Y = 10;
             this.zfsConfigurationPropertiesRetentionFrame.Data = "zfsConfigurationPropertiesRetentionFrame";
             this.zfsConfigurationPropertiesRetentionFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesRetentionFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesRetentionFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesRetentionFrame.Border.DrawMarginFrame = true;
@@ -1169,7 +1174,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationPropertiesRecentFrame.Y = 10;
             this.zfsConfigurationPropertiesRecentFrame.Data = "zfsConfigurationPropertiesRecentFrame";
             this.zfsConfigurationPropertiesRecentFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationPropertiesRecentFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationPropertiesRecentFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationPropertiesRecentFrame.Border.Effect3D = false;
             this.zfsConfigurationPropertiesRecentFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationPropertiesRecentFrame.Border.DrawMarginFrame = true;
@@ -1236,7 +1241,7 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationSnapshotPropertiesFrame.Y = 21;
             this.zfsConfigurationSnapshotPropertiesFrame.Data = "zfsConfigurationSnapshotPropertiesFrame";
             this.zfsConfigurationSnapshotPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationSnapshotPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.BrightGreen;
+            this.zfsConfigurationSnapshotPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationSnapshotPropertiesFrame.Border.Effect3D = false;
             this.zfsConfigurationSnapshotPropertiesFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationSnapshotPropertiesFrame.Border.DrawMarginFrame = true;
@@ -1249,40 +1254,66 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationActionsFrame.Y = Pos.Bottom(zfsConfigurationTreeFrame);
             this.zfsConfigurationActionsFrame.Data = "zfsConfigurationActionsFrame";
             this.zfsConfigurationActionsFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.zfsConfigurationActionsFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.zfsConfigurationActionsFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.zfsConfigurationActionsFrame.Border.Effect3D = false;
             this.zfsConfigurationActionsFrame.Border.Effect3DBrush = null;
             this.zfsConfigurationActionsFrame.Border.DrawMarginFrame = true;
             this.zfsConfigurationActionsFrame.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.zfsConfigurationActionsFrame.Title = "Actions";
             this.zfsConfigurationWindow.Add(this.zfsConfigurationActionsFrame);
-            this.zfsConfigurationSaveCurrentButton.Width = 20;
-            this.zfsConfigurationSaveCurrentButton.Height = 1;
-            this.zfsConfigurationSaveCurrentButton.X = 1;
-            this.zfsConfigurationSaveCurrentButton.Y = Pos.Center();
-            this.zfsConfigurationSaveCurrentButton.Data = "zfsConfigurationSaveCurrentButton";
-            this.zfsConfigurationSaveCurrentButton.Text = "Save Current Item";
-            this.zfsConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.zfsConfigurationSaveCurrentButton.IsDefault = false;
-            this.zfsConfigurationActionsFrame.Add(this.zfsConfigurationSaveCurrentButton);
             this.zfsConfigurationResetCurrentButton.Width = 22;
             this.zfsConfigurationResetCurrentButton.Height = 1;
-            this.zfsConfigurationResetCurrentButton.X = Pos.Right(zfsConfigurationSaveCurrentButton) + 1;
+            this.zfsConfigurationResetCurrentButton.X = Pos.Right(zfsConfigurationRefreshButton) + 1;
             this.zfsConfigurationResetCurrentButton.Y = Pos.Center();
             this.zfsConfigurationResetCurrentButton.Data = "zfsConfigurationResetCurrentButton";
             this.zfsConfigurationResetCurrentButton.Text = "Reset Current Item";
             this.zfsConfigurationResetCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.zfsConfigurationResetCurrentButton.IsDefault = false;
             this.zfsConfigurationActionsFrame.Add(this.zfsConfigurationResetCurrentButton);
+            this.zfsConfigurationSaveCurrentButton.Width = 20;
+            this.zfsConfigurationSaveCurrentButton.Height = 1;
+            this.zfsConfigurationSaveCurrentButton.X = Pos.Right(zfsConfigurationResetCurrentButton) + 1;
+            this.zfsConfigurationSaveCurrentButton.Y = Pos.Center();
+            this.zfsConfigurationSaveCurrentButton.Data = "zfsConfigurationSaveCurrentButton";
+            this.zfsConfigurationSaveCurrentButton.Text = "Save Current Item";
+            this.zfsConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.zfsConfigurationSaveCurrentButton.IsDefault = false;
+            this.zfsConfigurationActionsFrame.Add(this.zfsConfigurationSaveCurrentButton);
             this.zfsConfigurationRefreshButton.Width = 11;
             this.zfsConfigurationRefreshButton.Height = 1;
-            this.zfsConfigurationRefreshButton.X = Pos.Right(zfsConfigurationResetCurrentButton) + 1;
+            this.zfsConfigurationRefreshButton.X = 1;
             this.zfsConfigurationRefreshButton.Y = Pos.Center();
             this.zfsConfigurationRefreshButton.Data = "zfsConfigurationRefreshButton";
             this.zfsConfigurationRefreshButton.Text = "Refresh";
             this.zfsConfigurationRefreshButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.zfsConfigurationRefreshButton.IsDefault = false;
             this.zfsConfigurationActionsFrame.Add(this.zfsConfigurationRefreshButton);
+            this.zfsConfigurationTreeFrame.Width = 84;
+            this.zfsConfigurationTreeFrame.Height = 34;
+            this.zfsConfigurationTreeFrame.X = 1;
+            this.zfsConfigurationTreeFrame.Y = 0;
+            this.zfsConfigurationTreeFrame.Data = "zfsConfigurationTreeFrame";
+            this.zfsConfigurationTreeFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.zfsConfigurationTreeFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.zfsConfigurationTreeFrame.Border.Effect3D = false;
+            this.zfsConfigurationTreeFrame.Border.Effect3DBrush = null;
+            this.zfsConfigurationTreeFrame.Border.DrawMarginFrame = true;
+            this.zfsConfigurationTreeFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationTreeFrame.Title = "ZFS Objects";
+            this.zfsConfigurationWindow.Add(this.zfsConfigurationTreeFrame);
+            this.zfsConfigurationTreeView.Width = Dim.Fill(1);
+            this.zfsConfigurationTreeView.Height = Dim.Fill(1);
+            this.zfsConfigurationTreeView.X = -2;
+            this.zfsConfigurationTreeView.Y = 0;
+            this.zfsConfigurationTreeView.Data = "zfsConfigurationTreeView";
+            this.zfsConfigurationTreeView.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.zfsConfigurationTreeView.Style.CollapseableSymbol = '-';
+            this.zfsConfigurationTreeView.Style.ColorExpandSymbol = false;
+            this.zfsConfigurationTreeView.Style.ExpandableSymbol = '+';
+            this.zfsConfigurationTreeView.Style.InvertExpandSymbolColors = false;
+            this.zfsConfigurationTreeView.Style.LeaveLastRow = false;
+            this.zfsConfigurationTreeView.Style.ShowBranchLines = true;
+            this.zfsConfigurationTreeFrame.Add(this.zfsConfigurationTreeView);
             configCategoryTabView.AddTab(configCategoryTabViewzFSConfiguration, false);
             this.configCategoryTabView.ApplyStyleChanges();
             this.Add(this.configCategoryTabView);
