@@ -312,7 +312,7 @@ namespace Sanoid.ConfigConsole
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
             DisableEventHandlers();
-            if ( ValidateZfsObjectConfigValues( ) && SelectedTreeNode.IsModified )
+            if ( SelectedTreeNode.IsModified )
             {
                 // The buttons are disposable, but the Dialog will dispose them when it is closed
                 Button cancelButton = new( "Cancel", true );
@@ -387,12 +387,6 @@ namespace Sanoid.ConfigConsole
                 }
                 // ReSharper restore AccessToDisposedClosure
             }
-        }
-
-        private bool ValidateZfsObjectConfigValues( )
-        {
-            //TODO: Validate input fields beyond what the regexes already do, if necessary
-            return true;
         }
 
         private void ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick( MouseEventArgs args )
