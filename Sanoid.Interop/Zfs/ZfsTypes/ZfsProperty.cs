@@ -153,7 +153,14 @@ public readonly record struct ZfsProperty<T>(string Name, T Value, string Source
 
     /// <inheritdoc />
     [JsonIgnore]
-    public string ValueString => Value.ToString( )?.ToLowerInvariant( ) ?? throw new InvalidOperationException( $"Invalid attempt to get a null ValueString from ZfsProperty {Name}" );
+    public string ValueString => Value switch
+    {
+        int intValue => intValue.ToString( ),
+        string value => value,
+        bool boolValue => boolValue.ToString( ).ToLowerInvariant( ),
+        DateTimeOffset dtoValue => dtoValue.ToString( "O" ),
+        _ => throw new InvalidOperationException($"Invalid value type for ZfsProperty {Name} ({typeof(T).FullName})")
+    };
 
     [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";
