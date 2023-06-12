@@ -16,6 +16,7 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using NStack;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 using Terminal.Gui.Trees;
@@ -23,6 +24,8 @@ using Terminal.Gui.Trees;
 namespace Sanoid.ConfigConsole
 {
     using System;
+    using PowerArgs;
+
     using Terminal.Gui;
 
     public partial class SanoidConfigConsole
@@ -57,12 +60,18 @@ namespace Sanoid.ConfigConsole
 
         private void SetTagsForZfsPropertyFields( )
         {
-            zfsConfigurationPropertiesEnabledRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup, zfsConfigurationPropertiesEnabledSourceTextField );
-            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.TakeSnapshotsPropertyName, zfsConfigurationPropertiesTakeSnapshotsRadioGroup, zfsConfigurationPropertiesTakeSnapshotsSourceTextField );
-            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.PruneSnapshotsPropertyName, zfsConfigurationPropertiesPruneSnapshotsRadioGroup, zfsConfigurationPropertiesPruneSnapshotsSourceTextField );
-            zfsConfigurationPropertiesRecursionRadioGroup.Data = new RadioGroupViewData( ZfsPropertyNames.RecursionPropertyName, zfsConfigurationPropertiesRecursionRadioGroup, zfsConfigurationPropertiesRecursionSourceTextField );
-            zfsConfigurationPropertiesTemplateTextField.Data = new TextFieldViewData( ZfsPropertyNames.TemplatePropertyName, zfsConfigurationPropertiesTemplateTextField, zfsConfigurationPropertiesTemplateSourceTextField );
-            //TODO: tag the rest of the fields
+            zfsConfigurationPropertiesEnabledRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup, zfsConfigurationPropertiesEnabledSourceTextField );
+            zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.TakeSnapshotsPropertyName, zfsConfigurationPropertiesTakeSnapshotsRadioGroup, zfsConfigurationPropertiesTakeSnapshotsSourceTextField );
+            zfsConfigurationPropertiesPruneSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.PruneSnapshotsPropertyName, zfsConfigurationPropertiesPruneSnapshotsRadioGroup, zfsConfigurationPropertiesPruneSnapshotsSourceTextField );
+            zfsConfigurationPropertiesRecursionRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.RecursionPropertyName, zfsConfigurationPropertiesRecursionRadioGroup, zfsConfigurationPropertiesRecursionSourceTextField );
+            zfsConfigurationPropertiesTemplateTextField.Data = new TextFieldWithSourceViewData( ZfsPropertyNames.TemplatePropertyName, zfsConfigurationPropertiesTemplateTextField, zfsConfigurationPropertiesTemplateSourceTextField );
+            zfsConfigurationPropertiesRetentionFrequentTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, zfsConfigurationPropertiesRetentionFrequentTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionHourlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, zfsConfigurationPropertiesRetentionHourlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionDailyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionDailyPropertyName, zfsConfigurationPropertiesRetentionDailyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, zfsConfigurationPropertiesRetentionWeeklyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, zfsConfigurationPropertiesRetentionMonthlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionYearlyTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, zfsConfigurationPropertiesRetentionYearlyTextField, 0, int.MaxValue );
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Data = new RetentionTextValidateFieldViewData(ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, zfsConfigurationPropertiesRetentionPruneDeferralTextField, 0, 100 );
         }
 
         private void UpdateZfsConfigurationButtonState( )
@@ -222,6 +231,13 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesRecursionRadioGroup.SelectedItemChanged -= ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged;
             zfsConfigurationPropertiesRecursionRadioGroup.MouseClick -= ZfsConfigurationPropertiesStringRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTemplateTextField.Leave -= ZfsConfigurationPropertiesTemplateTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionFrequentTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionHourlyTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionDailyTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionYearlyTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
             zfsConfigurationSaveCurrentButton.Clicked -= ZfsConfigurationSaveCurrentButtonOnClicked;
             _eventsEnabled = false;
             Logger.Debug( "Event handlers for zfs configuration fields disabled" );
@@ -230,7 +246,7 @@ namespace Sanoid.ConfigConsole
         private void ZfsConfigurationPropertiesTemplateTextFieldOnLeave( FocusEventArgs args )
         {
             ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-            UpdateSelectedItemTemplateProperty( "local" );
+            UpdateSelectedItemTextFieldStringProperty( zfsConfigurationPropertiesTemplateTextField, "local" );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -262,10 +278,24 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesRecursionRadioGroup.SelectedItemChanged += ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged;
             zfsConfigurationPropertiesRecursionRadioGroup.MouseClick += ZfsConfigurationPropertiesStringRadioGroupOnMouseClick;
             zfsConfigurationPropertiesTemplateTextField.Leave += ZfsConfigurationPropertiesTemplateTextFieldOnLeave;
-
+            zfsConfigurationPropertiesRetentionFrequentTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionHourlyTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionDailyTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionYearlyTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
             zfsConfigurationSaveCurrentButton.Clicked += ZfsConfigurationSaveCurrentButtonOnClicked;
             _eventsEnabled = true;
             Logger.Debug( "Event handlers for zfs configuration fields enabled" );
+        }
+
+        private void ZfsConfigurationPropertiesRetentionTextFieldOnLeave( FocusEventArgs args )
+        {
+            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+
+            UpdateSelectedItemTextValidateFieldIntProperty( (RetentionTextValidateFieldViewData)args.View.Data, "local" );
+            UpdateZfsConfigurationButtonState( );
         }
 
         private void ZfsConfigurationResetCurrentButtonOnClicked( )
@@ -362,7 +392,7 @@ namespace Sanoid.ConfigConsole
 
         private void ZfsConfigurationPropertiesBooleanRadioGroupOnMouseClick( MouseEventArgs args )
         {
-            RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
+            RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
             ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
@@ -371,7 +401,7 @@ namespace Sanoid.ConfigConsole
 
         private void ZfsConfigurationPropertiesStringRadioGroupOnMouseClick( MouseEventArgs args )
         {
-            RadioGroupViewData viewData = (RadioGroupViewData)args.MouseEvent.View.Data;
+            RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
             IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
@@ -454,7 +484,7 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
         {
-            RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
+            RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
             ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
@@ -462,22 +492,37 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
         {
-            RadioGroupViewData viewData = (RadioGroupViewData)radioGroup.Data;
+            RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
             ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
         }
 
-        private void UpdateSelectedItemTemplateProperty( string? propertySource = null )
+        private void UpdateSelectedItemTextFieldStringProperty( TextField textField, string? propertySource = null )
         {
-            if ( zfsConfigurationPropertiesTemplateTextField.Text?.ToString( ) is not { } templateName || string.IsNullOrWhiteSpace( templateName ) )
+            if ( textField.Text?.ToString( ) is not { } templateName || string.IsNullOrWhiteSpace( templateName ) )
             {
                 return;
             }
 
-            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( ZfsPropertyNames.TemplatePropertyName, templateName, propertySource ?? SelectedTreeNode.TreeDataset.Template.Source );
-            _modifiedPropertiesSinceLastSaveForCurrentItem[ ZfsPropertyNames.TemplatePropertyName ] = newProperty;
-            zfsConfigurationPropertiesTemplateSourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset.Template.Source;
+            TextFieldWithSourceViewData viewData = (TextFieldWithSourceViewData)textField.Data;
+            ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, templateName, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
+            viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
+        }
+
+        private void UpdateSelectedItemTextValidateFieldIntProperty( RetentionTextValidateFieldViewData viewData, string? propertySource = null )
+        {
+            if ( !int.TryParse( viewData.ValueTextField.Text?.ToString( ), out int intValue ) && ( intValue < viewData.MinValue || intValue > viewData.MaxValue ) )
+            {
+                Logger.Info( "Invalid value entered for {0}: {1}. Must be a valid integer between {2} and {3}", viewData.PropertyName, viewData.ValueTextField.Text, viewData.MinValue, viewData.MaxValue );
+                viewData.ValueTextField.Text = ustring.Make( ( (ZfsProperty<int>)SelectedTreeNode.TreeDataset[ viewData.PropertyName ] ).Value );
+                return;
+            }
+
+            ZfsProperty<int> newProperty = (ZfsProperty<int>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, intValue, propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
+            viewData.ValueTextField.ColorScheme = SelectedTreeNode.TreeDataset[ viewData.PropertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
         }
 
         private void ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
@@ -719,8 +764,10 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-        private record RadioGroupViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
+        private record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
 
-        private record TextFieldViewData( string PropertyName, TextField ValueTextField, TextField SourceTextField );
+        private record TextFieldWithSourceViewData( string PropertyName, TextField ValueTextField, TextField SourceTextField );
+
+        private record RetentionTextValidateFieldViewData( string PropertyName, TextValidateField ValueTextField, int MinValue, int MaxValue );
     }
 }
