@@ -311,6 +311,7 @@ namespace Sanoid.ConfigConsole
 
         private void ZfsConfigurationSaveCurrentButtonOnClicked( )
         {
+            DisableEventHandlers();
             if ( ValidateZfsObjectConfigValues( ) && SelectedTreeNode.IsModified )
             {
                 // The buttons are disposable, but the Dialog will dispose them when it is closed
@@ -361,6 +362,10 @@ namespace Sanoid.ConfigConsole
                         _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
                         SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
                     }
+
+                    UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
+                    UpdateZfsConfigurationButtonState( );
+                    EnableEventHandlers( );
                 }
 
                 // Fine to ignore this warning here, because we are explicitly un-wiring the events before any disposal will occur.
