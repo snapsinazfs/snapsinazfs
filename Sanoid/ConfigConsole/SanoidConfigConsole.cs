@@ -586,6 +586,20 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesRecursionSourceTextField.Clear( );
             zfsConfigurationPropertiesTemplateTextField.Clear( );
             zfsConfigurationPropertiesTemplateSourceTextField.Clear( );
+            zfsConfigurationPropertiesRetentionFrequentTextField.Clear( );
+            zfsConfigurationPropertiesRetentionHourlyTextField.Clear( );
+            zfsConfigurationPropertiesRetentionDailyTextField.Clear( );
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Clear( );
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Clear( );
+            zfsConfigurationPropertiesRetentionYearlyTextField.Clear( );
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Clear( );
+            zfsConfigurationPropertiesRecentFrequentTextField.Clear( );
+            zfsConfigurationPropertiesRecentHourlyTextField.Clear( );
+            zfsConfigurationPropertiesRecentDailyTextField.Clear( );
+            zfsConfigurationPropertiesRecentWeeklyTextField.Clear( );
+            zfsConfigurationPropertiesRecentMonthlyTextField.Clear( );
+            zfsConfigurationPropertiesRecentYearlyTextField.Clear( );
+
 
             if ( manageEventHandlers )
             {
