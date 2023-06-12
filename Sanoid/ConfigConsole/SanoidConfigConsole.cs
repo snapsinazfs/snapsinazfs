@@ -421,7 +421,7 @@ namespace Sanoid.ConfigConsole
         /// <param name="source"></param>
         private void UpdateDescendentsBooleanPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<bool> prop, string source )
         {
-            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children )
+            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
             {
                 UpdateDescendentsBooleanPropertyInheritance( child, prop, source );
             }
@@ -438,7 +438,7 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateDescendentsIntPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<int> prop, string source )
         {
-            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children )
+            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
             {
                 UpdateDescendentsIntPropertyInheritance( child, prop, source );
             }
@@ -455,7 +455,7 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateDescendentsStringPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<string> prop, string source )
         {
-            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children )
+            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
             {
                 UpdateDescendentsStringPropertyInheritance( child, prop, source );
             }
@@ -472,7 +472,7 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateDescendentsDateTimeOffsetPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<DateTimeOffset> prop, string source )
         {
-            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children )
+            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
             {
                 UpdateDescendentsDateTimeOffsetPropertyInheritance( child, prop, source );
             }
