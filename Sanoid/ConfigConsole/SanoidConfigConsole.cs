@@ -245,12 +245,14 @@ namespace Sanoid.ConfigConsole
         {
             ArgumentNullException.ThrowIfNull( args, nameof( args ) );
             UpdateSelectedItemTextFieldStringProperty( (TextFieldWithSourceViewData)args.View.Data, "local" );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
             UpdateZfsConfigurationButtonState( );
         }
 
         private void ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
             UpdateSelectedItemStringRadioGroupProperty( zfsConfigurationPropertiesRecursionRadioGroup, "local" );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -293,6 +295,7 @@ namespace Sanoid.ConfigConsole
             ArgumentNullException.ThrowIfNull( args, nameof( args ) );
 
             UpdateSelectedItemTextValidateFieldIntProperty( (RetentionTextValidateFieldViewData)args.View.Data, "local" );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -402,6 +405,7 @@ namespace Sanoid.ConfigConsole
             ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -411,6 +415,7 @@ namespace Sanoid.ConfigConsole
             IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ), "local" );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = newProperty.Source;
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
             UpdateZfsConfigurationButtonState( );
         }
 
@@ -540,18 +545,21 @@ namespace Sanoid.ConfigConsole
         {
             UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesEnabledRadioGroup, "local" );
             UpdateZfsConfigurationButtonState( );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
         }
 
         private void ZfsConfigurationPropertiesTakeSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
             UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesTakeSnapshotsRadioGroup, "local" );
             UpdateZfsConfigurationButtonState( );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
         }
 
         private void ZfsConfigurationPropertiesPruneSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
         {
             UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesPruneSnapshotsRadioGroup, "local" );
             UpdateZfsConfigurationButtonState( );
+            UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
         }
 
         private void ZfsConfigurationTreeViewOnSelectionChanged( object? sender, SelectionChangedEventArgs<ITreeNode> e )
