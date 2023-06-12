@@ -619,25 +619,27 @@ namespace Sanoid.ConfigConsole
             zfsConfigurationPropertiesTemplateTextField.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             zfsConfigurationPropertiesTemplateSourceTextField.Text = SelectedTreeNode.TreeDataset.Template.InheritedFrom;
 
-            zfsConfigurationPropertiesRetentionFrequentTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.Value.ToString( );
+            zfsConfigurationPropertiesRetentionFrequentTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.ValueString;
             zfsConfigurationPropertiesRetentionFrequentTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            zfsConfigurationPropertiesRetentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value.ToString( );
+            zfsConfigurationPropertiesRetentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.ValueString;
             zfsConfigurationPropertiesRetentionHourlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            zfsConfigurationPropertiesRetentionDailyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.Value.ToString( );
+            zfsConfigurationPropertiesRetentionDailyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.ValueString;
             zfsConfigurationPropertiesRetentionDailyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            zfsConfigurationPropertiesRetentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value.ToString( );
+            zfsConfigurationPropertiesRetentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.ValueString;
             zfsConfigurationPropertiesRetentionWeeklyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            zfsConfigurationPropertiesRetentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value.ToString( );
+            zfsConfigurationPropertiesRetentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.ValueString;
             zfsConfigurationPropertiesRetentionMonthlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            zfsConfigurationPropertiesRetentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value.ToString( );
+            zfsConfigurationPropertiesRetentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.ValueString;
             zfsConfigurationPropertiesRetentionYearlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.ValueString;
+            zfsConfigurationPropertiesRetentionPruneDeferralTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
 
-            zfsConfigurationPropertiesRecentFrequentTextField.Text = SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
-            zfsConfigurationPropertiesRecentHourlyTextField.Text = SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
-            zfsConfigurationPropertiesRecentDailyTextField.Text = SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
-            zfsConfigurationPropertiesRecentWeeklyTextField.Text = SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
-            zfsConfigurationPropertiesRecentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
-            zfsConfigurationPropertiesRecentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.Value.ToString( "O" ) : string.Empty;
+            zfsConfigurationPropertiesRecentFrequentTextField.Text = SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.ValueString : string.Empty;
+            zfsConfigurationPropertiesRecentHourlyTextField.Text = SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.ValueString : string.Empty;
+            zfsConfigurationPropertiesRecentDailyTextField.Text = SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.ValueString : string.Empty;
+            zfsConfigurationPropertiesRecentWeeklyTextField.Text = SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.ValueString : string.Empty;
+            zfsConfigurationPropertiesRecentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.ValueString : string.Empty;
+            zfsConfigurationPropertiesRecentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.ValueString : string.Empty;
 
             if ( manageEventHandlers )
             {
