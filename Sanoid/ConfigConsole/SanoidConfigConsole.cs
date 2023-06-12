@@ -680,6 +680,8 @@ namespace Sanoid.ConfigConsole
                 HideZfsConfigurationPropertyFrames( );
                 Logger.Debug( "Clearing objects from zfs configuration tree view" );
                 zfsConfigurationTreeView.ClearObjects( );
+                _treeDatasets.Clear( );
+                _baseDatasets.Clear(  );
                 _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
                 Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
                 List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( _baseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
