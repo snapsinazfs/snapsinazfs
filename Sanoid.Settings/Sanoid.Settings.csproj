@@ -25,6 +25,7 @@
 		<PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
 		<PackageReference Include="PowerArgs" Version="4.0.2" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+		<PackageReference Include="Terminal.Gui" Version="1.12.1" />
 	</ItemGroup>
 
 </Project>
