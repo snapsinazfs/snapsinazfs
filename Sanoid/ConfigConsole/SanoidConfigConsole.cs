@@ -133,15 +133,6 @@ namespace Sanoid.ConfigConsole
             pruneSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.PruneSnapshots ? 0 : 1;
             pathToZfsTextField.Text = ConfigConsole.Settings.ZfsPath;
             pathToZpoolTextField.Text = ConfigConsole.Settings.ZpoolPath;
-            snapshotNameComponentSeparatorValidatorField.Text = ConfigConsole.Settings.Formatting.ComponentSeparator;
-            snapshotNamePrefixTextField.Text = ConfigConsole.Settings.Formatting.Prefix;
-            snapshotNameTimestampFormatTextField.Text = ConfigConsole.Settings.Formatting.TimestampFormatString;
-            snapshotNameFrequentSuffixTextField.Text = ConfigConsole.Settings.Formatting.FrequentSuffix;
-            snapshotNameHourlySuffixTextField.Text = ConfigConsole.Settings.Formatting.HourlySuffix;
-            snapshotNameDailySuffixTextField.Text = ConfigConsole.Settings.Formatting.DailySuffix;
-            snapshotNameWeeklySuffixTextField.Text = ConfigConsole.Settings.Formatting.WeeklySuffix;
-            snapshotNameMonthlySuffixTextField.Text = ConfigConsole.Settings.Formatting.MonthlySuffix;
-            snapshotNameYearlySuffixTextField.Text = ConfigConsole.Settings.Formatting.YearlySuffix;
 
             Logger.Debug( "Finished etting global configuration fields to values in settings" );
 

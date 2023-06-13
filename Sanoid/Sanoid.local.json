@@ -17,32 +17,31 @@
       "Snapshots": false
     }
   },
-  "Formatting": {
-    "ComponentSeparator": "_",
-    "Prefix": "autosnap",
-    "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
-    "FrequentSuffix": "frequently",
-    "HourlySuffix": "hourly",
-    "DailySuffix": "daily",
-    "WeeklySuffix": "weekly",
-    "MonthlySuffix": "monthly",
-    "YearlySuffix": "yearly"
-  },
   "Templates": {
     "production": {
-      "$comments": "Sample template. Has similar settings as PERL sanoid's sample 'template_production' template.",
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "DailySuffix": "daily",
+        "WeeklySuffix": "weekly",
+        "MonthlySuffix": "monthly",
+        "YearlySuffix": "yearly"
+      },
       "SnapshotTiming": {
-        "FrequentPeriod": 15,
         "UseLocalTime": true,
-        "HourlyMinute": 59,
-        "DailyTime": "00:00",
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "DailyTime": "00:00:00",
         "WeeklyDay": 1,
-        "WeeklyTime": "00:00",
-        "MonthlyDay": 31,
-        "MonthlyTime": "00:00",
-        "YearlyMonth": 12,
-        "YearlyDay": 31,
-        "YearlyTime": "00:00"
+        "WeeklyTime": "00:00:00",
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "YearlyMonth": 1,
+        "YearlyDay": 1,
+        "YearlyTime": "00:00:00"
       }
     }
   }

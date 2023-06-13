@@ -27,12 +27,6 @@ public record SanoidSettings
     public bool DryRun { get; set; }
 
     /// <summary>
-    ///     Gets or sets the global formatting settings sanoid.net will use
-    /// </summary>
-    [JsonPropertyOrder( 7 )]
-    public FormattingSettings Formatting { get; set; } = FormattingSettings.GetDefault();
-
-    /// <summary>
     ///     Gets or sets the global PruneSnapshots setting
     /// </summary>
     [JsonPropertyOrder( 3 )]
@@ -48,7 +42,7 @@ public record SanoidSettings
     ///     Gets or sets the templates sub-section
     /// </summary>
     // ReSharper disable once CollectionNeverUpdated.Global
-    [JsonPropertyOrder( 8 )]
+    [JsonPropertyOrder( 7 )]
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>

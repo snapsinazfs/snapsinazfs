@@ -57,44 +57,6 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextField pathToZpoolTextField;
         
-        private Terminal.Gui.FrameView snapshotNameFormattingFrameView;
-        
-        private Terminal.Gui.Label snapshotNameComponentSeparatorLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameComponentSeparatorValidatorField;
-        
-        private Terminal.Gui.Label snapshotNamePrefixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNamePrefixTextField;
-        
-        private Terminal.Gui.Label snapshotNameTimestampFormatLabel;
-        
-        private Terminal.Gui.TextField snapshotNameTimestampFormatTextField;
-        
-        private Terminal.Gui.Label snapshotNameFrequentSuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameFrequentSuffixTextField;
-        
-        private Terminal.Gui.Label snapshotNameHourlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameHourlySuffixTextField;
-        
-        private Terminal.Gui.Label snapshotNameDailySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameDailySuffixTextField;
-        
-        private Terminal.Gui.Label snapshotNameWeeklySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameWeeklySuffixTextField;
-        
-        private Terminal.Gui.Label snapshotNameMonthlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameMonthlySuffixTextField;
-        
-        private Terminal.Gui.Label snapshotNameYearlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField snapshotNameYearlySuffixTextField;
-        
         private Terminal.Gui.Button saveGlobalConfigButton;
         
         private Terminal.Gui.Button resetGlobalConfigButton;
@@ -379,25 +341,6 @@ namespace Sanoid.ConfigConsole {
             this.templateEditorWindow = new Terminal.Gui.Window();
             this.resetGlobalConfigButton = new Terminal.Gui.Button();
             this.saveGlobalConfigButton = new Terminal.Gui.Button();
-            this.snapshotNameYearlySuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameYearlySuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameMonthlySuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameMonthlySuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameWeeklySuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameWeeklySuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameDailySuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameDailySuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameHourlySuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameHourlySuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameFrequentSuffixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameFrequentSuffixLabel = new Terminal.Gui.Label();
-            this.snapshotNameTimestampFormatTextField = new Terminal.Gui.TextField();
-            this.snapshotNameTimestampFormatLabel = new Terminal.Gui.Label();
-            this.snapshotNamePrefixTextField = new Terminal.Gui.TextValidateField();
-            this.snapshotNamePrefixLabel = new Terminal.Gui.Label();
-            this.snapshotNameComponentSeparatorValidatorField = new Terminal.Gui.TextValidateField();
-            this.snapshotNameComponentSeparatorLabel = new Terminal.Gui.Label();
-            this.snapshotNameFormattingFrameView = new Terminal.Gui.FrameView();
             this.pathToZpoolTextField = new Terminal.Gui.TextField();
             this.pathToZpoolLabel = new Terminal.Gui.Label();
             this.pathToZfsTextField = new Terminal.Gui.TextField();
@@ -488,7 +431,7 @@ namespace Sanoid.ConfigConsole {
             configCategoryTabViewglobalConfiguration.View.Width = Dim.Fill();
             configCategoryTabViewglobalConfiguration.View.Height = Dim.Fill();
             this.globalConfigWindow.Width = 76;
-            this.globalConfigWindow.Height = 29;
+            this.globalConfigWindow.Height = 16;
             this.globalConfigWindow.X = Pos.Center();
             this.globalConfigWindow.Y = Pos.Center();
             this.globalConfigWindow.Modal = false;
@@ -608,176 +551,10 @@ namespace Sanoid.ConfigConsole {
             this.pathToZpoolTextField.Text = "";
             this.pathToZpoolTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.generalSettingsFrameView.Add(this.pathToZpoolTextField);
-            this.snapshotNameFormattingFrameView.Width = 64;
-            this.snapshotNameFormattingFrameView.Height = 13;
-            this.snapshotNameFormattingFrameView.X = 5;
-            this.snapshotNameFormattingFrameView.Y = 11;
-            this.snapshotNameFormattingFrameView.Data = "snapshotNameFormattingFrameView";
-            this.snapshotNameFormattingFrameView.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.snapshotNameFormattingFrameView.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.snapshotNameFormattingFrameView.Border.Effect3D = false;
-            this.snapshotNameFormattingFrameView.Border.Effect3DBrush = null;
-            this.snapshotNameFormattingFrameView.Border.DrawMarginFrame = true;
-            this.snapshotNameFormattingFrameView.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Title = "Snapshot Name Formatting";
-            this.globalConfigWindow.Add(this.snapshotNameFormattingFrameView);
-            this.snapshotNameComponentSeparatorLabel.Width = 4;
-            this.snapshotNameComponentSeparatorLabel.Height = 1;
-            this.snapshotNameComponentSeparatorLabel.X = 1;
-            this.snapshotNameComponentSeparatorLabel.Y = 1;
-            this.snapshotNameComponentSeparatorLabel.Data = "snapshotNameComponentSeparatorLabel";
-            this.snapshotNameComponentSeparatorLabel.Text = "Component Separator";
-            this.snapshotNameComponentSeparatorLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameComponentSeparatorLabel);
-            this.snapshotNameComponentSeparatorValidatorField.Width = 1;
-            this.snapshotNameComponentSeparatorValidatorField.Height = 1;
-            this.snapshotNameComponentSeparatorValidatorField.X = 26;
-            this.snapshotNameComponentSeparatorValidatorField.Y = 1;
-            this.snapshotNameComponentSeparatorValidatorField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z:.+_-]{1}");
-            this.snapshotNameComponentSeparatorValidatorField.Data = "snapshotNameComponentSeparatorValidatorField";
-            this.snapshotNameComponentSeparatorValidatorField.Text = "";
-            this.snapshotNameComponentSeparatorValidatorField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameComponentSeparatorValidatorField);
-            this.snapshotNamePrefixLabel.Width = 3;
-            this.snapshotNamePrefixLabel.Height = 1;
-            this.snapshotNamePrefixLabel.X = 1;
-            this.snapshotNamePrefixLabel.Y = 2;
-            this.snapshotNamePrefixLabel.Data = "snapshotNamePrefixLabel";
-            this.snapshotNamePrefixLabel.Text = "Prefix";
-            this.snapshotNamePrefixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNamePrefixLabel);
-            this.snapshotNamePrefixTextField.Width = 12;
-            this.snapshotNamePrefixTextField.Height = 1;
-            this.snapshotNamePrefixTextField.X = 26;
-            this.snapshotNamePrefixTextField.Y = 2;
-            this.snapshotNamePrefixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^([0-9a-zA-Z]){1,12}$");
-            this.snapshotNamePrefixTextField.Data = "snapshotNamePrefixTextField";
-            this.snapshotNamePrefixTextField.Text = "";
-            this.snapshotNamePrefixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNamePrefixTextField);
-            this.snapshotNameTimestampFormatLabel.Width = 3;
-            this.snapshotNameTimestampFormatLabel.Height = 1;
-            this.snapshotNameTimestampFormatLabel.X = 1;
-            this.snapshotNameTimestampFormatLabel.Y = 3;
-            this.snapshotNameTimestampFormatLabel.Data = "snapshotNameTimestampFormatLabel";
-            this.snapshotNameTimestampFormatLabel.Text = "Timestamp Format String";
-            this.snapshotNameTimestampFormatLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameTimestampFormatLabel);
-            this.snapshotNameTimestampFormatTextField.Width = 30;
-            this.snapshotNameTimestampFormatTextField.Height = 1;
-            this.snapshotNameTimestampFormatTextField.X = 26;
-            this.snapshotNameTimestampFormatTextField.Y = 3;
-            this.snapshotNameTimestampFormatTextField.Secret = false;
-            this.snapshotNameTimestampFormatTextField.Data = "snapshotNameTimestampFormatTextField";
-            this.snapshotNameTimestampFormatTextField.Text = "";
-            this.snapshotNameTimestampFormatTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameTimestampFormatTextField);
-            this.snapshotNameFrequentSuffixLabel.Width = 4;
-            this.snapshotNameFrequentSuffixLabel.Height = 1;
-            this.snapshotNameFrequentSuffixLabel.X = 1;
-            this.snapshotNameFrequentSuffixLabel.Y = 4;
-            this.snapshotNameFrequentSuffixLabel.Data = "snapshotNameFrequentSuffixLabel";
-            this.snapshotNameFrequentSuffixLabel.Text = "Frequent Suffix";
-            this.snapshotNameFrequentSuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameFrequentSuffixLabel);
-            this.snapshotNameFrequentSuffixTextField.Width = 12;
-            this.snapshotNameFrequentSuffixTextField.Height = 1;
-            this.snapshotNameFrequentSuffixTextField.X = 26;
-            this.snapshotNameFrequentSuffixTextField.Y = 4;
-            this.snapshotNameFrequentSuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[0-9a-zA-Z]{1,12}$");
-            this.snapshotNameFrequentSuffixTextField.Data = "snapshotNameFrequentSuffixTextField";
-            this.snapshotNameFrequentSuffixTextField.Text = "";
-            this.snapshotNameFrequentSuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameFrequentSuffixTextField);
-            this.snapshotNameHourlySuffixLabel.Width = 4;
-            this.snapshotNameHourlySuffixLabel.Height = 1;
-            this.snapshotNameHourlySuffixLabel.X = 1;
-            this.snapshotNameHourlySuffixLabel.Y = 5;
-            this.snapshotNameHourlySuffixLabel.Data = "snapshotNameHourlySuffixLabel";
-            this.snapshotNameHourlySuffixLabel.Text = "Hourly Suffix";
-            this.snapshotNameHourlySuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameHourlySuffixLabel);
-            this.snapshotNameHourlySuffixTextField.Width = 12;
-            this.snapshotNameHourlySuffixTextField.Height = 1;
-            this.snapshotNameHourlySuffixTextField.X = 26;
-            this.snapshotNameHourlySuffixTextField.Y = 5;
-            this.snapshotNameHourlySuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z]{1,12}");
-            this.snapshotNameHourlySuffixTextField.Data = "snapshotNameHourlySuffixTextField";
-            this.snapshotNameHourlySuffixTextField.Text = "";
-            this.snapshotNameHourlySuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameHourlySuffixTextField);
-            this.snapshotNameDailySuffixLabel.Width = 4;
-            this.snapshotNameDailySuffixLabel.Height = 1;
-            this.snapshotNameDailySuffixLabel.X = 1;
-            this.snapshotNameDailySuffixLabel.Y = 6;
-            this.snapshotNameDailySuffixLabel.Data = "snapshotNameDailySuffixLabel";
-            this.snapshotNameDailySuffixLabel.Text = "Daily Suffix";
-            this.snapshotNameDailySuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameDailySuffixLabel);
-            this.snapshotNameDailySuffixTextField.Width = 12;
-            this.snapshotNameDailySuffixTextField.Height = 1;
-            this.snapshotNameDailySuffixTextField.X = 26;
-            this.snapshotNameDailySuffixTextField.Y = 6;
-            this.snapshotNameDailySuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z]{1,12}");
-            this.snapshotNameDailySuffixTextField.Data = "snapshotNameDailySuffixTextField";
-            this.snapshotNameDailySuffixTextField.Text = "";
-            this.snapshotNameDailySuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameDailySuffixTextField);
-            this.snapshotNameWeeklySuffixLabel.Width = 4;
-            this.snapshotNameWeeklySuffixLabel.Height = 1;
-            this.snapshotNameWeeklySuffixLabel.X = 1;
-            this.snapshotNameWeeklySuffixLabel.Y = 7;
-            this.snapshotNameWeeklySuffixLabel.Data = "snapshotNameWeeklySuffixLabel";
-            this.snapshotNameWeeklySuffixLabel.Text = "Weekly Suffix";
-            this.snapshotNameWeeklySuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameWeeklySuffixLabel);
-            this.snapshotNameWeeklySuffixTextField.Width = 12;
-            this.snapshotNameWeeklySuffixTextField.Height = 1;
-            this.snapshotNameWeeklySuffixTextField.X = 26;
-            this.snapshotNameWeeklySuffixTextField.Y = 7;
-            this.snapshotNameWeeklySuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z]{1,12}");
-            this.snapshotNameWeeklySuffixTextField.Data = "snapshotNameWeeklySuffixTextField";
-            this.snapshotNameWeeklySuffixTextField.Text = "";
-            this.snapshotNameWeeklySuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameWeeklySuffixTextField);
-            this.snapshotNameMonthlySuffixLabel.Width = 4;
-            this.snapshotNameMonthlySuffixLabel.Height = 1;
-            this.snapshotNameMonthlySuffixLabel.X = 1;
-            this.snapshotNameMonthlySuffixLabel.Y = 8;
-            this.snapshotNameMonthlySuffixLabel.Data = "snapshotNameMonthlySuffixLabel";
-            this.snapshotNameMonthlySuffixLabel.Text = "Monthly Suffix";
-            this.snapshotNameMonthlySuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameMonthlySuffixLabel);
-            this.snapshotNameMonthlySuffixTextField.Width = 12;
-            this.snapshotNameMonthlySuffixTextField.Height = 1;
-            this.snapshotNameMonthlySuffixTextField.X = 26;
-            this.snapshotNameMonthlySuffixTextField.Y = 8;
-            this.snapshotNameMonthlySuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z]{1,12}");
-            this.snapshotNameMonthlySuffixTextField.Data = "snapshotNameMonthlySuffixTextField";
-            this.snapshotNameMonthlySuffixTextField.Text = "";
-            this.snapshotNameMonthlySuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameMonthlySuffixTextField);
-            this.snapshotNameYearlySuffixLabel.Width = 4;
-            this.snapshotNameYearlySuffixLabel.Height = 1;
-            this.snapshotNameYearlySuffixLabel.X = 1;
-            this.snapshotNameYearlySuffixLabel.Y = 9;
-            this.snapshotNameYearlySuffixLabel.Data = "snapshotNameYearlySuffixLabel";
-            this.snapshotNameYearlySuffixLabel.Text = "Yearly Suffix";
-            this.snapshotNameYearlySuffixLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameYearlySuffixLabel);
-            this.snapshotNameYearlySuffixTextField.Width = 12;
-            this.snapshotNameYearlySuffixTextField.Height = 1;
-            this.snapshotNameYearlySuffixTextField.X = 26;
-            this.snapshotNameYearlySuffixTextField.Y = 9;
-            this.snapshotNameYearlySuffixTextField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("[0-9a-zA-Z]{1,12}");
-            this.snapshotNameYearlySuffixTextField.Data = "snapshotNameYearlySuffixTextField";
-            this.snapshotNameYearlySuffixTextField.Text = "";
-            this.snapshotNameYearlySuffixTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNameFormattingFrameView.Add(this.snapshotNameYearlySuffixTextField);
             this.saveGlobalConfigButton.Width = 8;
             this.saveGlobalConfigButton.Height = 1;
             this.saveGlobalConfigButton.X = 27;
-            this.saveGlobalConfigButton.Y = 25;
+            this.saveGlobalConfigButton.Y = Pos.AnchorEnd(2);
             this.saveGlobalConfigButton.Data = "saveGlobalConfigButton";
             this.saveGlobalConfigButton.Text = "Save";
             this.saveGlobalConfigButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
@@ -786,7 +563,7 @@ namespace Sanoid.ConfigConsole {
             this.resetGlobalConfigButton.Width = 9;
             this.resetGlobalConfigButton.Height = 1;
             this.resetGlobalConfigButton.X = 39;
-            this.resetGlobalConfigButton.Y = 25;
+            this.resetGlobalConfigButton.Y = Pos.AnchorEnd(2);
             this.resetGlobalConfigButton.Data = "resetGlobalConfigButton";
             this.resetGlobalConfigButton.Text = "Reset";
             this.resetGlobalConfigButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
@@ -804,7 +581,7 @@ namespace Sanoid.ConfigConsole {
             this.templateEditorWindow.Modal = true;
             this.templateEditorWindow.Data = "templateEditorWindow";
             this.templateEditorWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateEditorWindow.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateEditorWindow.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.templateEditorWindow.Border.Effect3D = false;
             this.templateEditorWindow.Border.Effect3DBrush = null;
             this.templateEditorWindow.Border.DrawMarginFrame = true;
@@ -826,7 +603,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplatePropertiesFrame.Y = Pos.Center();
             this.templateConfigurationTemplatePropertiesFrame.Data = "templateConfigurationTemplatePropertiesFrame";
             this.templateConfigurationTemplatePropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationTemplatePropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationTemplatePropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.templateConfigurationTemplatePropertiesFrame.Border.Effect3D = false;
             this.templateConfigurationTemplatePropertiesFrame.Border.Effect3DBrush = null;
             this.templateConfigurationTemplatePropertiesFrame.Border.DrawMarginFrame = true;
@@ -840,7 +617,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationSnapshotNamingFrame.ColorScheme = this.tgDefault;
             this.templateConfigurationSnapshotNamingFrame.Data = "templateConfigurationSnapshotNamingFrame";
             this.templateConfigurationSnapshotNamingFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationSnapshotNamingFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationSnapshotNamingFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.templateConfigurationSnapshotNamingFrame.Border.Effect3D = false;
             this.templateConfigurationSnapshotNamingFrame.Border.Effect3DBrush = null;
             this.templateConfigurationSnapshotNamingFrame.Border.DrawMarginFrame = true;
@@ -1006,7 +783,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesSnapshotTimingFrame.Y = Pos.Bottom(templateConfigurationSnapshotNamingFrame);
             this.templateConfigurationPropertiesSnapshotTimingFrame.Data = "templateConfigurationPropertiesSnapshotTimingFrame";
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.Effect3D = false;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.Effect3DBrush = null;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.DrawMarginFrame = true;
@@ -1093,7 +870,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplateListFrame.Y = Pos.Center();
             this.templateConfigurationTemplateListFrame.Data = "templateConfigurationTemplateListFrame";
             this.templateConfigurationTemplateListFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationTemplateListFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.templateConfigurationTemplateListFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
             this.templateConfigurationTemplateListFrame.Border.Effect3D = false;
             this.templateConfigurationTemplateListFrame.Border.Effect3DBrush = null;
             this.templateConfigurationTemplateListFrame.Border.DrawMarginFrame = true;

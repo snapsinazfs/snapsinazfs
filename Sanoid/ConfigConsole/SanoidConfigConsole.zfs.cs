@@ -619,7 +619,6 @@ public partial class SanoidConfigConsole
                     PruneSnapshots = pruneSnapshotsRadioGroup.SelectedItem == 0,
                     ZfsPath = pathToZfsTextField.Text?.ToString( ) ?? string.Empty,
                     ZpoolPath = pathToZpoolTextField.Text?.ToString( ) ?? string.Empty,
-                    Formatting = new( ) { ComponentSeparator = snapshotNameComponentSeparatorValidatorField.Text?.ToString( ) ?? string.Empty, Prefix = snapshotNamePrefixTextField.Text?.ToString( ) ?? string.Empty, TimestampFormatString = snapshotNameTimestampFormatTextField.Text?.ToString( ) ?? string.Empty, FrequentSuffix = snapshotNameFrequentSuffixTextField.Text?.ToString( ) ?? string.Empty, HourlySuffix = snapshotNameHourlySuffixTextField.Text?.ToString( ) ?? string.Empty, DailySuffix = snapshotNameDailySuffixTextField.Text?.ToString( ) ?? string.Empty, WeeklySuffix = snapshotNameWeeklySuffixTextField.Text?.ToString( ) ?? string.Empty, MonthlySuffix = snapshotNameMonthlySuffixTextField.Text?.ToString( ) ?? string.Empty, YearlySuffix = snapshotNameYearlySuffixTextField.Text.ToString( ) ?? throw new InvalidOperationException( ) },
                     Templates = ConfigConsole.Settings.Templates,
                     CacheDirectory = ConfigConsole.Settings.CacheDirectory
                 };

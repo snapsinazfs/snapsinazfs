@@ -102,11 +102,84 @@
                 "YearlyDay",
                 "YearlyTime"
             ]
+        },
+        "Formatting": {
+            "type": "object",
+            "description": "Configuration section for configurable formatting options for output, naming, etc.",
+            "properties": {
+                "ComponentSeparator": {
+                    "type": "string",
+                    "description": "The string used for separating the prefix, timestamp, and suffix components of a snapshot name. Can be an empty string.",
+                    "default": "_",
+                    "pattern": "^[a-zA-Z0-9:._-]{0,2}$"
+                },
+                "Prefix": {
+                    "type": "string",
+                    "description": "The prefix component of all snapshot names.",
+                    "default": "autosnap",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "TimestampFormatString": {
+                    "type": "string",
+                    "description": ".net-style DateTimeOffset format string for the timestamp component of snapshot names.",
+                    "default": "yyyy-MM-dd_HH\\:mm\\:ss",
+                    "$comment": "See the Microsoft documentation for DateTimeOffset.ToString() format strings. Note that backslash must be escaped for JSON and that the resulting string must be properly escaped for the ToString function."
+                },
+                "FrequentSuffix": {
+                    "type": "string",
+                    "description": "The suffix component of frequent snapshot names.",
+                    "default": "frequently",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "HourlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of hourly snapshot names.",
+                    "default": "hourly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "DailySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of daily snapshot names.",
+                    "default": "daily",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "WeeklySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of weekly snapshot names.",
+                    "default": "weekly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "MonthlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of monthly snapshot names.",
+                    "default": "monthly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                },
+                "YearlySuffix": {
+                    "type": "string",
+                    "description": "The suffix component of yearly snapshot names.",
+                    "default": "yearly",
+                    "pattern": "^[a-zA-Z0-9:._-]+$"
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "ComponentSeparator",
+                "Prefix",
+                "TimestampFormatString",
+                "FrequentSuffix",
+                "HourlySuffix",
+                "DailySuffix",
+                "WeeklySuffix",
+                "MonthlySuffix",
+                "YearlySuffix"
+            ]
         }
     },
     "additionalProperties": false,
     "required": [
-        "SnapshotTiming"
+        "SnapshotTiming",
+        "Formatting"
     ],
     "$comment": "Note that we will not take snapshots for a given type if that type is set to 0 in SnapshotRetention, regardless of the autosnap setting. For example, if yearly = 0, we will not take yearly snapshots, even if we've defined a preferred time for yearlies and autosnap is on. If multiple snapshots are scheduled to be taken at the same time of day, they will be taken in order of shortest to longest period, so that a Yearly always contains Monthlies, Monthlies contain Weeklies, and so on."
 }
