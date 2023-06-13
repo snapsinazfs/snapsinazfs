@@ -36,7 +36,7 @@ namespace Sanoid.ConfigConsole
             SetPropertiesForReadonlyFields( );
             SetTagsForZfsPropertyFields( );
             UpdateZfsConfigurationButtonState( );
-            PopulateTemplatesListViewsWithStandardOptions();
+            InitializeTemplateEditorView();
 
             EnableEventHandlers( );
         }
@@ -47,6 +47,7 @@ namespace Sanoid.ConfigConsole
 
         private void ConfigCategoryTabViewOnSelectedTabChanged( object? sender, TabView.TabChangedEventArgs e )
         {
+            e.NewTab.View.CanFocus = false;
             if ( e.NewTab.View.Text == "ZFS Configuration" )
             {
                 zfsConfigurationTreeView.SetFocus( );
@@ -63,8 +64,7 @@ namespace Sanoid.ConfigConsole
 
         private void SetTabStopsForRootLevelObjects( )
         {
-            configCategoryTabView.TabStop = true;
-            configCategoryTabView.CanFocus = true;
+            configCategoryTabView.TabStop = false;
         }
 
         private void DisableEventHandlers( )

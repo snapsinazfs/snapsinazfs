@@ -19,7 +19,7 @@ internal static class ConfigConsole
 {
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; } = new( );
-    internal static SanoidSettings Settings { get; private set; }
+    internal static SanoidSettings Settings { get; set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

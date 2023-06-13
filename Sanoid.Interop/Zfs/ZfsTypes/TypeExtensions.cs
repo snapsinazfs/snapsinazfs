@@ -76,7 +76,7 @@ public static class TypeExtensions
     {
         return string.Join( ' ', properties.Select( p => p.SetString ) );
     }
-    public static string ToStringForZfsSet( this IDictionary<string,IZfsProperty> properties )
+    public static string ToStringForZfsSet( this IDictionary<string, IZfsProperty> properties )
     {
         return string.Join( ' ', properties.Select( kvp  => kvp.Value.SetString ) );
     }
@@ -102,5 +102,21 @@ public static class TypeExtensions
     public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
     {
         return string.Join( ',', strings );
+    }
+
+    /// <summary>
+    ///     Gets an integer index for radio button groups assuming the order of true,false,inherited from this
+    ///     <see cref="ZfsProperty{T}" />
+    /// </summary>
+    /// <param name="property">The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups</param>
+    /// <returns>
+    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
+    ///     0: true<br />
+    ///     1: false<br />
+    ///     2: inherited
+    /// </returns>
+    public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
+    {
+        return property.Value ? 0 : 1;
     }
 }

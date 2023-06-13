@@ -5,6 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NStack;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
@@ -14,26 +16,87 @@ namespace Sanoid.ConfigConsole;
 
 public partial class SanoidConfigConsole
 {
-    public record TemplateConfigurationTextValidateFieldViewData( string PropertyName );
-    private void PopulateTemplatesListViewsWithStandardOptions( )
+    private bool _templateConfigurationEventsEnabled;
+    private readonly List<TemplateConfigurationListItem> _templateListItems = ConfigConsole.Settings!.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( );
+
+    private TemplateConfigurationListItem SelectedTemplateItem => _templateListItems[ templateConfigurationTemplateListView.SelectedItem ];
+    private static readonly List<string> DayNamesLongAndAbbreviated = DateTimeFormatInfo.CurrentInfo.GetLongAndAbbreviatedDayNames( );
+    private static readonly List<string> MonthNamesLongAndAbbreviated = DateTimeFormatInfo.CurrentInfo.GetMonthNames( );
+    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
+    private static Dictionary<string, TemplateSettings> Templates = new( );
+
+    private void InitializeTemplateEditorView( )
     {
         DisableTemplateConfigurationTabEventHandlers( );
         templateConfigurationTemplateListView.SetSource( _templateListItems );
+        Templates.Clear( );
+        Templates = new ( ConfigConsole.Settings.Templates );
         EnableTemplateConfigurationTabEventHandlers( );
+        templateConfigurationPropertiesSnapshotTimingFrame.CanFocus = false;
+        templateConfigurationTemplatePropertiesFrame.CanFocus = false;
+        templateConfigurationTemplateListFrame.CanFocus = false;
+        templateConfigurationSnapshotNamingFrame.CanFocus = false;
+        templateEditorWindow.CanFocus = false;
+        TemplateConfigurationUpdateButtonState( );
     }
+
     private void EnableTemplateConfigurationTabEventHandlers( )
     {
         if ( _templateConfigurationEventsEnabled )
+        {
             return;
+        }
 
         templateConfigurationTemplateListView.SelectedItemChanged += TemplateConfigurationTemplateListViewOnSelectedItemChanged;
+        templateConfigurationSaveCurrentButton.Clicked += TemplateSettingsSaveSelectedTemplate;
+        templateConfigurationResetCurrentButton.Clicked += TemplateConfigurationResetCurrentButtonOnClicked;
+        templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave += TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
+        templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave += TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;
         _templateConfigurationEventsEnabled = true;
+    }
+
+    private void TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave( FocusEventArgs args )
+    {
+        if ( templateConfigurationPropertiesTimingDailyTimeTextValidateField.IsValid )
+        {
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { DailyTime = TimeOnly.Parse( templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text.ToString( ) ) };
+        }
+
+        TemplateConfigurationUpdateButtonState( );
+        args.Handled = true;
+    }
+
+    private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave( FocusEventArgs args )
+    {
+        if ( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid )
+        {
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { HourlyMinute = int.Parse( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToString( ) ) };
+        }
+
+        TemplateConfigurationUpdateButtonState( );
+        args.Handled = true;
+    }
+
+    private void TemplateConfigurationResetCurrentButtonOnClicked( )
+    {
+        DisableTemplateConfigurationTabEventHandlers( );
+        SelectedTemplateItem.ViewSettings = SelectedTemplateItem.BaseSettings with { };
+        TemplateConfigurationSetFieldsForSelectedItem( );
+        TemplateConfigurationUpdateButtonState( );
+        EnableTemplateConfigurationTabEventHandlers( );
+    }
+
+    private void TemplateConfigurationUpdateButtonState( )
+    {
+        templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
+        templateConfigurationSaveCurrentButton.Enabled = SelectedTemplateItem.IsModified;
     }
 
     private void HideTemplateConfigurationPropertiesFrame( )
     {
         templateConfigurationTemplatePropertiesFrame.Visible = false;
     }
+
     private void ShowTemplateConfigurationPropertiesFrame( )
     {
         templateConfigurationTemplatePropertiesFrame.Visible = true;
@@ -42,12 +105,24 @@ public partial class SanoidConfigConsole
     private void TemplateConfigurationTemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
     {
         DisableTemplateConfigurationTabEventHandlers( );
+
         templateConfigurationTemplateListView.EnsureSelectedItemVisible( );
-        TemplateConfigurationListItem item = SelectedTemplateItem;
+
+        TemplateConfigurationSetFieldsForSelectedItem( );
+
+        TemplateConfigurationUpdateButtonState( );
+
+        EnableTemplateConfigurationTabEventHandlers( );
+    }
+
+    private void TemplateConfigurationSetFieldsForSelectedItem( )
+    {
         if ( !templateConfigurationTemplatePropertiesFrame.Visible )
         {
             ShowTemplateConfigurationPropertiesFrame( );
         }
+
+        TemplateConfigurationListItem item = SelectedTemplateItem;
 
         templateConfigurationPropertiesNamingComponentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
         templateConfigurationPropertiesNamingPrefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
@@ -58,33 +133,305 @@ public partial class SanoidConfigConsole
         templateConfigurationPropertiesNamingMonthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
         templateConfigurationPropertiesNamingYearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
         templateConfigurationPropertiesNamingTimestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
-        templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem = _templateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
+        templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( );
         templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.DailyTime.ToString( "HH:mm:ss" );
         templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
-        EnableTemplateConfigurationTabEventHandlers( );
+        templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.WeeklyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
+        templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetMonthName( item.ViewSettings.SnapshotTiming.YearlyMonth );
+        templateConfigurationPropertiesTimingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
+        templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyTime.ToString( "HH:mm:ss" );
     }
 
     private void TemplateSettingsSaveSelectedTemplate( )
     {
-        List<string> dayNamesLongAndAbbreviated = DateTimeFormatInfo.CurrentInfo.DayNames.Union(DateTimeFormatInfo.CurrentInfo.AbbreviatedDayNames).ToList();
-        DayOfWeek dayOfWeek = (DayOfWeek)( dayNamesLongAndAbbreviated.FindIndex( m => m.ToLowerInvariant( ) == "mon" ) % 7 );
+        TemplateConfigurationValidator validator = new( );
+
+        if ( !validator.ValidateFieldValues( this ) )
+        {
+            return;
+        }
+
+        SelectedTemplateItem.ViewSettings = SelectedTemplateItem.ViewSettings with
+        {
+            Formatting = new( )
+            {
+                ComponentSeparator = validator.NamingComponentSeparator!,
+                Prefix = validator.NamingPrefix!,
+                TimestampFormatString = validator.NamingTimestampFormatString!,
+                FrequentSuffix = validator.NamingFrequentSuffix!,
+                HourlySuffix = validator.NamingHourlySuffix!,
+                DailySuffix = validator.NamingDailySuffix!,
+                WeeklySuffix = validator.NamingWeeklySuffix!,
+                MonthlySuffix = validator.NamingMonthlySuffix!,
+                YearlySuffix = validator.NamingYearlySuffix!
+            },
+            SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
+            {
+                FrequentPeriod = validator.TimingFrequentPeriod!.Value,
+                HourlyMinute = validator.TimingHourlyMinute!.Value,
+                DailyTime = validator.TimingDailyTime!.Value,
+                WeeklyDay = validator.TimingWeeklyDay!.Value,
+                WeeklyTime = validator.TimingWeeklyTime!.Value,
+                MonthlyDay = validator.TimingMonthlyDay!.Value,
+                MonthlyTime = validator.TimingMonthlyTime!.Value,
+                YearlyMonth = validator.TimingYearlyMonth!.Value,
+                YearlyDay = validator.TimingYearlyDay!.Value,
+                YearlyTime = validator.TimingYearlyTime!.Value
+            }
+        };
+
+        if ( SelectedTemplateItem.IsModified )
+        {
+            Templates[ SelectedTemplateItem.TemplateName ] = SelectedTemplateItem.ViewSettings;
+            TemplateConfigurationShowSaveDialog( );
+        }
+
+        TemplateConfigurationUpdateButtonState( );
+    }
+
+    private void TemplateConfigurationShowSaveDialog( )
+    {
+        using ( SaveDialog saveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+        {
+            saveDialog.AllowsOtherFileTypes = true;
+            saveDialog.CanCreateDirectories = true;
+            saveDialog.Modal = true;
+            Application.Run( saveDialog );
+            if ( saveDialog.Canceled )
+            {
+                return;
+            }
+
+            if ( saveDialog.FileName.IsEmpty )
+            {
+                return;
+            }
+
+            SanoidSettings settings = ConfigConsole.Settings with
+            {
+                Templates = Templates
+            };
+            SelectedTemplateItem.BaseSettings = SelectedTemplateItem.ViewSettings with { };
+            ConfigConsole.Settings = settings with { };
+
+            File.WriteAllText( saveDialog.FileName.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" ), JsonSerializer.Serialize( ConfigConsole.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
+        }
+
+        TemplateConfigurationUpdateButtonState( );
     }
 
     private void DisableTemplateConfigurationTabEventHandlers( )
     {
         if ( !_templateConfigurationEventsEnabled )
+        {
             return;
+        }
 
         templateConfigurationTemplateListView.SelectedItemChanged -= TemplateConfigurationTemplateListViewOnSelectedItemChanged;
+        templateConfigurationSaveCurrentButton.Clicked -= TemplateSettingsSaveSelectedTemplate;
+        templateConfigurationResetCurrentButton.Clicked -= TemplateConfigurationResetCurrentButtonOnClicked;
+        templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave -= TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
+        templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave -= TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;
 
         _templateConfigurationEventsEnabled = false;
     }
 
-    private TemplateConfigurationListItem SelectedTemplateItem => _templateListItems[ templateConfigurationTemplateListView.SelectedItem ];
+    private class TemplateConfigurationValidator
+    {
+        public SanoidConfigConsole? ConfigConsole { get; private set; }
+        public string? NamingComponentSeparator { get; private set; }
+        public string? NamingDailySuffix { get; private set; }
+        public string? NamingFrequentSuffix { get; private set; }
+        public string? NamingHourlySuffix { get; private set; }
+        public string? NamingMonthlySuffix { get; private set; }
+        public string? NamingPrefix { get; private set; }
+        public string? NamingTimestampFormatString { get; private set; }
+        public string? NamingWeeklySuffix { get; private set; }
+        public string? NamingYearlySuffix { get; private set; }
+        public TimeOnly? TimingDailyTime { get; private set; }
+        public int? TimingFrequentPeriod { get; private set; }
+        public int? TimingHourlyMinute { get; private set; }
+        public int? TimingMonthlyDay { get; private set; }
+        public TimeOnly? TimingMonthlyTime { get; private set; }
+        public DayOfWeek? TimingWeeklyDay { get; private set; }
+        public TimeOnly? TimingWeeklyTime { get; private set; }
+        public int? TimingYearlyDay { get; private set; }
+        public int? TimingYearlyMonth { get; private set; }
+        public TimeOnly? TimingYearlyTime { get; private set; }
 
-    private bool _templateConfigurationEventsEnabled;
-    private readonly List<TemplateConfigurationListItem> _templateListItems = ConfigConsole.Settings!.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with{}, kvp.Value with { } ) ).ToList( );
-    private readonly List<int> _templateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
-    private readonly List<int> _templateConfigurationHourlyMinuteOptions = Enumerable.Range( 0, 60 ).ToList( );
+        public bool ValidateFieldValues( SanoidConfigConsole configConsole )
+        {
+            ConfigConsole = configConsole;
+            if ( ConfigConsole is null )
+            {
+                return false;
+            }
+
+            bool isValid = true;
+            string templateName = ConfigConsole.SelectedTemplateItem.TemplateName;
+
+            // Naming fields
+            NamingComponentSeparator = ConfigConsole.templateConfigurationPropertiesNamingComponentSeparatorValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingComponentSeparatorValidateField?.Text?.ToString( ) : null;
+            NamingPrefix = ConfigConsole.templateConfigurationPropertiesNamingPrefixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingPrefixTextValidateField?.Text?.ToString( ) : null;
+            NamingTimestampFormatString = ConfigConsole.templateConfigurationPropertiesNamingTimestampFormatTextField?.Text?.ToString( );
+            NamingFrequentSuffix = ConfigConsole.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField?.Text?.ToString( ) : null;
+            NamingHourlySuffix = ConfigConsole.templateConfigurationPropertiesNamingHourlySuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingHourlySuffixTextValidateField?.Text?.ToString( ) : null;
+            NamingDailySuffix = ConfigConsole.templateConfigurationPropertiesNamingDailySuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingDailySuffixTextValidateField?.Text?.ToString( ) : null;
+            NamingWeeklySuffix = ConfigConsole.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField?.Text?.ToString( ) : null;
+            NamingMonthlySuffix = ConfigConsole.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField?.Text?.ToString( ) : null;
+            NamingYearlySuffix = ConfigConsole.templateConfigurationPropertiesNamingYearlySuffixTextValidateField.IsValid ? ConfigConsole.templateConfigurationPropertiesNamingYearlySuffixTextValidateField?.Text?.ToString( ) : null;
+            if ( string.IsNullOrWhiteSpace( NamingComponentSeparator ) )
+            {
+                Logger.Warn( "Snapshot template component separator value {0} for template {1} is invalid", NamingComponentSeparator, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingPrefixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingPrefix ) )
+            {
+                Logger.Warn( "Snapshot template prefix value {0} for template {1} is invalid", NamingPrefix, templateName );
+                isValid = false;
+            }
+
+            if ( string.IsNullOrWhiteSpace( NamingTimestampFormatString ) )
+            {
+                Logger.Warn( "Snapshot template timestamp format string value {0} for template {1} is invalid", NamingTimestampFormatString, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingFrequentSuffix ) )
+            {
+                Logger.Warn( "Snapshot template frequent suffix value {0} for template {1} is invalid", NamingFrequentSuffix, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingHourlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingHourlySuffix ) )
+            {
+                Logger.Warn( "Snapshot template hourly suffix value {0} for template {1} is invalid", NamingHourlySuffix, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingDailySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingDailySuffix ) )
+            {
+                Logger.Warn( "Snapshot template daily suffix value {0} for template {1} is invalid", NamingDailySuffix, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingWeeklySuffix ) )
+            {
+                Logger.Warn( "Snapshot template weekly suffix value {0} for template {1} is invalid", NamingWeeklySuffix, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingMonthlySuffix ) )
+            {
+                Logger.Warn( "Snapshot template monthly suffix value {0} for template {1} is invalid", NamingMonthlySuffix, templateName );
+                isValid = false;
+            }
+
+            if ( !ConfigConsole.templateConfigurationPropertiesNamingYearlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingYearlySuffix ) )
+            {
+                Logger.Warn( "Snapshot template yearly suffix value {0} for template {1} is invalid", NamingYearlySuffix, templateName );
+                isValid = false;
+            }
+
+            // Timing fields
+            string? weeklyDayString = ConfigConsole.templateConfigurationPropertiesTimingWeeklyDayTextValidateField?.Text?.ToString( );
+            int findIndex = DayNamesLongAndAbbreviated.FindIndex( m => m.ToLowerInvariant( ) == weeklyDayString?.ToLowerInvariant( ) );
+            int index = findIndex % 7;
+            DayOfWeek? dayOfWeek = (DayOfWeek)index;
+            TimingFrequentPeriod = TemplateConfigurationFrequentPeriodOptions[ ConfigConsole.templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem ];
+            TimingHourlyMinute = ConfigConsole.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToNullableInt32( );
+            TimingDailyTime = ConfigConsole.templateConfigurationPropertiesTimingDailyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            TimingWeeklyDay = dayOfWeek;
+            TimingWeeklyTime = ConfigConsole.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            ustring monthlyDayString = ConfigConsole.templateConfigurationPropertiesTimingMonthlyDayTextValidateField?.Text;
+            TimingMonthlyDay = monthlyDayString?.ToNullableInt32( );
+            TimingMonthlyTime = ConfigConsole.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            string? enteredYearlyMonthString = ConfigConsole.templateConfigurationPropertiesTimingYearlyMonthTextValidateField?.Text?.ToString( );
+            if ( int.TryParse( enteredYearlyMonthString, out int enteredYearlyMonthIntValue ) )
+            {
+                TimingYearlyMonth = enteredYearlyMonthIntValue;
+            }
+            else
+            {
+                if ( !string.IsNullOrWhiteSpace( enteredYearlyMonthString ) )
+                {
+                    int numberOfMonthsInYear = CultureInfo.CurrentCulture.Calendar.GetMonthsInYear( DateTimeOffset.Now.Year );
+                    int monthIndex = MonthNamesLongAndAbbreviated.FindIndex( m => m.ToLower( CultureInfo.CurrentCulture ) == enteredYearlyMonthString.ToLower( CultureInfo.CurrentCulture ) );
+                    if ( monthIndex >= 0 )
+                    {
+                        TimingYearlyMonth = ( monthIndex % numberOfMonthsInYear ) + 1;
+                    }
+                }
+            }
+
+            TimingYearlyDay = ConfigConsole.templateConfigurationPropertiesTimingYearlyDayTextValidateField?.Text?.ToNullableInt32( );
+            TimingYearlyTime = ConfigConsole.templateConfigurationPropertiesTimingYearlyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+
+            if ( TimingFrequentPeriod is null || !TemplateConfigurationFrequentPeriodOptions.Contains( (int)TimingFrequentPeriod ) )
+            {
+                Logger.Warn( "Snapshot template frequent period value {0:00} for template {1} is invalid", TimingFrequentPeriod, templateName );
+                isValid = false;
+            }
+
+            if ( TimingHourlyMinute is null or < 0 or > 59 )
+            {
+                Logger.Warn( "Snapshot template hourly minute value {0:00} for template {1} is invalid", TimingHourlyMinute, templateName );
+                isValid = false;
+            }
+
+            if ( TimingDailyTime is null )
+            {
+                Logger.Warn( "Snapshot template daily time value for template {0} is invalid", templateName );
+                isValid = false;
+            }
+
+            if ( TimingWeeklyDay is null )
+            {
+                Logger.Warn( "Snapshot template weekly day value {0} for template {1} is invalid", weeklyDayString, templateName );
+                isValid = false;
+            }
+
+            if ( TimingWeeklyTime is null )
+            {
+                Logger.Warn( "Snapshot template weekly time value for template {0} is invalid", templateName );
+                isValid = false;
+            }
+
+            if ( TimingMonthlyDay is null )
+            {
+                Logger.Warn( "Snapshot template monthly day value {0} for template {1} is invalid", monthlyDayString, templateName );
+                isValid = false;
+            }
+
+            if ( TimingMonthlyTime is null )
+            {
+                Logger.Warn( "Snapshot template monthly time value for template {0} is invalid", templateName );
+                isValid = false;
+            }
+
+            if ( TimingYearlyMonth is null )
+            {
+                Logger.Warn( "Snapshot template yearly month value {0} for template {1} is invalid", enteredYearlyMonthString, templateName );
+                isValid = false;
+            }
+
+            if ( TimingYearlyDay is null )
+            {
+                Logger.Warn( "Snapshot template yearly day value {0} for template {1} is invalid", TimingYearlyDay, templateName );
+                isValid = false;
+            }
+
+            if ( TimingYearlyTime is null )
+            {
+                Logger.Warn( "Snapshot template yearly time value for template {0} is invalid", templateName );
+                isValid = false;
+            }
+
+            return isValid;
+        }
+    }
 }

@@ -23,6 +23,8 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.ColorScheme localPropertyTextFieldColorScheme;
         
+        private Terminal.Gui.ColorScheme templateConfigurationTextValidateFieldColorScheme;
+        
         private Terminal.Gui.ColorScheme inheritedPropertyTextFieldColorScheme;
         
         private Terminal.Gui.ColorScheme localPropertyRadioGroupColorScheme;
@@ -123,9 +125,37 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingWeeklyDayTextValidateField;
         
+        private Terminal.Gui.Label templateConfigurationPropertiesWeeklyTimeLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingWeeklyTimeTextValidateField;
+        
+        private Terminal.Gui.Label templateConfigurationPropertiesMonthlyDayLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingMonthlyDayTextValidateField;
+        
+        private Terminal.Gui.Label templateConfigurationPropertiesMonthlyTimeLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingMonthlyTimeTextValidateField;
+        
+        private Terminal.Gui.Label templateConfigurationPropertiesTimingYearlyMonthLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingYearlyMonthTextValidateField;
+        
+        private Terminal.Gui.Label templateConfigurationPropertiesYearlyDayLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingYearlyDayTextValidateField;
+        
+        private Terminal.Gui.Label templateConfigurationPropertiesYearlyTimeLabel;
+        
+        private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingYearlyTimeTextValidateField;
+        
         private Terminal.Gui.FrameView templateConfigurationTemplateListFrame;
         
         private Terminal.Gui.ListView templateConfigurationTemplateListView;
+        
+        private Terminal.Gui.Button templateConfigurationSaveCurrentButton;
+        
+        private Terminal.Gui.Button templateConfigurationResetCurrentButton;
         
         private Terminal.Gui.Window zfsConfigurationWindow;
         
@@ -306,8 +336,22 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationCommonPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
+            this.templateConfigurationResetCurrentButton = new Terminal.Gui.Button();
+            this.templateConfigurationSaveCurrentButton = new Terminal.Gui.Button();
             this.templateConfigurationTemplateListView = new Terminal.Gui.ListView();
             this.templateConfigurationTemplateListFrame = new Terminal.Gui.FrameView();
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesYearlyTimeLabel = new Terminal.Gui.Label();
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesYearlyDayLabel = new Terminal.Gui.Label();
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel = new Terminal.Gui.Label();
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesMonthlyTimeLabel = new Terminal.Gui.Label();
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesMonthlyDayLabel = new Terminal.Gui.Label();
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField = new Terminal.Gui.TextValidateField();
+            this.templateConfigurationPropertiesWeeklyTimeLabel = new Terminal.Gui.Label();
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField = new Terminal.Gui.TextValidateField();
             this.templateConfigurationPropertiesWeeklyDayLabel = new Terminal.Gui.Label();
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField = new Terminal.Gui.TextValidateField();
@@ -378,6 +422,12 @@ namespace Sanoid.ConfigConsole {
             this.localPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
             this.localPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
             this.localPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
+            this.templateConfigurationTextValidateFieldColorScheme = new Terminal.Gui.ColorScheme();
+            this.templateConfigurationTextValidateFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.White);
+            this.templateConfigurationTextValidateFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
+            this.templateConfigurationTextValidateFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.templateConfigurationTextValidateFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
+            this.templateConfigurationTextValidateFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
             this.inheritedPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
             this.inheritedPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
             this.inheritedPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
@@ -581,7 +631,7 @@ namespace Sanoid.ConfigConsole {
             this.templateEditorWindow.Modal = true;
             this.templateEditorWindow.Data = "templateEditorWindow";
             this.templateEditorWindow.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateEditorWindow.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.templateEditorWindow.Border.BorderBrush = Terminal.Gui.Color.White;
             this.templateEditorWindow.Border.Effect3D = false;
             this.templateEditorWindow.Border.Effect3DBrush = null;
             this.templateEditorWindow.Border.DrawMarginFrame = true;
@@ -603,7 +653,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplatePropertiesFrame.Y = Pos.Center();
             this.templateConfigurationTemplatePropertiesFrame.Data = "templateConfigurationTemplatePropertiesFrame";
             this.templateConfigurationTemplatePropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationTemplatePropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.templateConfigurationTemplatePropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
             this.templateConfigurationTemplatePropertiesFrame.Border.Effect3D = false;
             this.templateConfigurationTemplatePropertiesFrame.Border.Effect3DBrush = null;
             this.templateConfigurationTemplatePropertiesFrame.Border.DrawMarginFrame = true;
@@ -617,7 +667,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationSnapshotNamingFrame.ColorScheme = this.tgDefault;
             this.templateConfigurationSnapshotNamingFrame.Data = "templateConfigurationSnapshotNamingFrame";
             this.templateConfigurationSnapshotNamingFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationSnapshotNamingFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.templateConfigurationSnapshotNamingFrame.Border.BorderBrush = Terminal.Gui.Color.White;
             this.templateConfigurationSnapshotNamingFrame.Border.Effect3D = false;
             this.templateConfigurationSnapshotNamingFrame.Border.Effect3DBrush = null;
             this.templateConfigurationSnapshotNamingFrame.Border.DrawMarginFrame = true;
@@ -783,7 +833,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesSnapshotTimingFrame.Y = Pos.Bottom(templateConfigurationSnapshotNamingFrame);
             this.templateConfigurationPropertiesSnapshotTimingFrame.Data = "templateConfigurationPropertiesSnapshotTimingFrame";
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Border.BorderBrush = Terminal.Gui.Color.White;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.Effect3D = false;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.Effect3DBrush = null;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Border.DrawMarginFrame = true;
@@ -821,10 +871,11 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingHourlyMinuteLabel.Text = "Hourly Minute";
             this.templateConfigurationPropertiesTimingHourlyMinuteLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingHourlyMinuteLabel);
-            this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Width = 4;
+            this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Width = 10;
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Height = 1;
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.X = 26;
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Y = 1;
+            this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[0-5]?[0-9]$");
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Data = "templateConfigurationPropertiesTimingHourlyMinuteTextValidateField";
             this.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text = "";
@@ -838,16 +889,17 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingDailyTimeLabel.Text = "Daily Time";
             this.templateConfigurationPropertiesTimingDailyTimeLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingDailyTimeLabel);
-            this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Width = 8;
+            this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Width = 10;
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Height = 1;
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.X = 26;
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Y = 2;
+            this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d\\d:\\d\\d(:\\d\\d)?$");
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Data = "templateConfigurationPropertiesTimingDailyTimeTextValidateField";
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text = "";
             this.templateConfigurationPropertiesTimingDailyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingDailyTimeTextValidateField);
-            this.templateConfigurationPropertiesWeeklyDayLabel.Width = 4;
+            this.templateConfigurationPropertiesWeeklyDayLabel.Width = 10;
             this.templateConfigurationPropertiesWeeklyDayLabel.Height = 1;
             this.templateConfigurationPropertiesWeeklyDayLabel.X = 0;
             this.templateConfigurationPropertiesWeeklyDayLabel.Y = 3;
@@ -859,18 +911,127 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Height = 1;
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.X = 26;
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Y = 3;
-            this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[a-zA-Z]+$");
+            this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\w+$");
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Data = "templateConfigurationPropertiesTimingWeeklyDayTextValidateField";
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Text = "";
             this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingWeeklyDayTextValidateField);
+            this.templateConfigurationPropertiesWeeklyTimeLabel.Width = 4;
+            this.templateConfigurationPropertiesWeeklyTimeLabel.Height = 1;
+            this.templateConfigurationPropertiesWeeklyTimeLabel.X = 0;
+            this.templateConfigurationPropertiesWeeklyTimeLabel.Y = 4;
+            this.templateConfigurationPropertiesWeeklyTimeLabel.Data = "templateConfigurationPropertiesWeeklyTimeLabel";
+            this.templateConfigurationPropertiesWeeklyTimeLabel.Text = "Weekly Time";
+            this.templateConfigurationPropertiesWeeklyTimeLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesWeeklyTimeLabel);
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Y = 4;
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d\\d:\\d\\d(:\\d\\d)?$");
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Data = "templateConfigurationPropertiesTimingWeeklyTimeTextValidateField";
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField);
+            this.templateConfigurationPropertiesMonthlyDayLabel.Width = 11;
+            this.templateConfigurationPropertiesMonthlyDayLabel.Height = 1;
+            this.templateConfigurationPropertiesMonthlyDayLabel.X = 0;
+            this.templateConfigurationPropertiesMonthlyDayLabel.Y = 5;
+            this.templateConfigurationPropertiesMonthlyDayLabel.Data = "templateConfigurationPropertiesMonthlyDayLabel";
+            this.templateConfigurationPropertiesMonthlyDayLabel.Text = "Monthly Day";
+            this.templateConfigurationPropertiesMonthlyDayLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesMonthlyDayLabel);
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Y = 5;
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d?\\d$");
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Data = "templateConfigurationPropertiesTimingMonthlyDayTextValidateField";
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingMonthlyDayTextValidateField);
+            this.templateConfigurationPropertiesMonthlyTimeLabel.Width = 4;
+            this.templateConfigurationPropertiesMonthlyTimeLabel.Height = 1;
+            this.templateConfigurationPropertiesMonthlyTimeLabel.X = 0;
+            this.templateConfigurationPropertiesMonthlyTimeLabel.Y = 6;
+            this.templateConfigurationPropertiesMonthlyTimeLabel.Data = "templateConfigurationPropertiesMonthlyTimeLabel";
+            this.templateConfigurationPropertiesMonthlyTimeLabel.Text = "Monthly Time";
+            this.templateConfigurationPropertiesMonthlyTimeLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesMonthlyTimeLabel);
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Y = 6;
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d\\d:\\d\\d(:\\d\\d)?$");
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Data = "templateConfigurationPropertiesTimingMonthlyTimeTextValidateField";
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField);
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.Width = 12;
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.Height = 1;
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.X = 0;
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.Y = 7;
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.Data = "templateConfigurationPropertiesTimingYearlyMonthLabel";
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.Text = "Yearly Month";
+            this.templateConfigurationPropertiesTimingYearlyMonthLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyMonthLabel);
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Y = 7;
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\w+$");
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Data = "templateConfigurationPropertiesTimingYearlyMonthTextValidateField";
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyMonthTextValidateField);
+            this.templateConfigurationPropertiesYearlyDayLabel.Width = 19;
+            this.templateConfigurationPropertiesYearlyDayLabel.Height = 1;
+            this.templateConfigurationPropertiesYearlyDayLabel.X = 0;
+            this.templateConfigurationPropertiesYearlyDayLabel.Y = 8;
+            this.templateConfigurationPropertiesYearlyDayLabel.Data = "templateConfigurationPropertiesYearlyDayLabel";
+            this.templateConfigurationPropertiesYearlyDayLabel.Text = "Yearly Day";
+            this.templateConfigurationPropertiesYearlyDayLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesYearlyDayLabel);
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Y = 8;
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d?\\d$");
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Data = "templateConfigurationPropertiesTimingYearlyDayTextValidateField";
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingYearlyDayTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyDayTextValidateField);
+            this.templateConfigurationPropertiesYearlyTimeLabel.Width = 4;
+            this.templateConfigurationPropertiesYearlyTimeLabel.Height = 1;
+            this.templateConfigurationPropertiesYearlyTimeLabel.X = 0;
+            this.templateConfigurationPropertiesYearlyTimeLabel.Y = 9;
+            this.templateConfigurationPropertiesYearlyTimeLabel.Data = "templateConfigurationPropertiesYearlyTimeLabel";
+            this.templateConfigurationPropertiesYearlyTimeLabel.Text = "Yearly Time";
+            this.templateConfigurationPropertiesYearlyTimeLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesYearlyTimeLabel);
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Width = 10;
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Height = 1;
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.X = 26;
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Y = 9;
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d\\d:\\d\\d(:\\d\\d)?$");
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Data = "templateConfigurationPropertiesTimingYearlyTimeTextValidateField";
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = "";
+            this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField);
             this.templateConfigurationTemplateListFrame.Width = 42;
-            this.templateConfigurationTemplateListFrame.Height = 15;
+            this.templateConfigurationTemplateListFrame.Height = 16;
             this.templateConfigurationTemplateListFrame.X = 0;
             this.templateConfigurationTemplateListFrame.Y = Pos.Center();
             this.templateConfigurationTemplateListFrame.Data = "templateConfigurationTemplateListFrame";
             this.templateConfigurationTemplateListFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.templateConfigurationTemplateListFrame.Border.BorderBrush = Terminal.Gui.Color.Black;
+            this.templateConfigurationTemplateListFrame.Border.BorderBrush = Terminal.Gui.Color.White;
             this.templateConfigurationTemplateListFrame.Border.Effect3D = false;
             this.templateConfigurationTemplateListFrame.Border.Effect3DBrush = null;
             this.templateConfigurationTemplateListFrame.Border.DrawMarginFrame = true;
@@ -887,6 +1048,24 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplateListView.AllowsMarking = false;
             this.templateConfigurationTemplateListView.AllowsMultipleSelection = false;
             this.templateConfigurationTemplateListFrame.Add(this.templateConfigurationTemplateListView);
+            this.templateConfigurationSaveCurrentButton.Width = 16;
+            this.templateConfigurationSaveCurrentButton.Height = 1;
+            this.templateConfigurationSaveCurrentButton.X = 4;
+            this.templateConfigurationSaveCurrentButton.Y = 23;
+            this.templateConfigurationSaveCurrentButton.Data = "templateConfigurationSaveCurrentButton";
+            this.templateConfigurationSaveCurrentButton.Text = "Save Current";
+            this.templateConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationSaveCurrentButton.IsDefault = false;
+            this.templateEditorWindow.Add(this.templateConfigurationSaveCurrentButton);
+            this.templateConfigurationResetCurrentButton.Width = 17;
+            this.templateConfigurationResetCurrentButton.Height = 1;
+            this.templateConfigurationResetCurrentButton.X = 21;
+            this.templateConfigurationResetCurrentButton.Y = 23;
+            this.templateConfigurationResetCurrentButton.Data = "templateConfigurationResetCurrentButton";
+            this.templateConfigurationResetCurrentButton.Text = "Reset Current";
+            this.templateConfigurationResetCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationResetCurrentButton.IsDefault = false;
+            this.templateEditorWindow.Add(this.templateConfigurationResetCurrentButton);
             configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());

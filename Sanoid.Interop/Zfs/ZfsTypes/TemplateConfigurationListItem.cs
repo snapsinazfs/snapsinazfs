@@ -4,6 +4,7 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Text.Json.Serialization;
 using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
@@ -24,6 +25,8 @@ public record TemplateConfigurationListItem
     }
 
     public string TemplateName { get; init; }
-    public TemplateSettings ViewSettings { get; init; }
-    public TemplateSettings BaseSettings { get; init; }
+    public TemplateSettings ViewSettings { get; set; }
+    public TemplateSettings BaseSettings { get; set; }
+    [JsonIgnore]
+    public bool IsModified => ViewSettings != BaseSettings;
 }
