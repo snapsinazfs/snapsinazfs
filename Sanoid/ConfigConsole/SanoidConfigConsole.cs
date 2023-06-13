@@ -29,12 +29,14 @@ namespace Sanoid.ConfigConsole
             SetGlobalSettingsFieldsFromSettingsObject( false );
             configCategoryTabView.SelectedTabChanged += ConfigCategoryTabViewOnSelectedTabChanged;
             HideZfsConfigurationPropertyFrames( );
+            HideTemplateConfigurationPropertiesFrame( );
             SetTabStopsForRootLevelObjects( );
             SetCanFocusStateForZfsConfigurationViews( );
             SetTabStopsForZfsConfigurationWindow( );
             SetPropertiesForReadonlyFields( );
             SetTagsForZfsPropertyFields( );
             UpdateZfsConfigurationButtonState( );
+            PopulateTemplatesListViewsWithStandardOptions();
 
             EnableEventHandlers( );
         }
@@ -48,6 +50,14 @@ namespace Sanoid.ConfigConsole
             if ( e.NewTab.View.Text == "ZFS Configuration" )
             {
                 zfsConfigurationTreeView.SetFocus( );
+            }
+            if ( e.NewTab.View.Text == "Templates" )
+            {
+                if ( templateConfigurationTemplateListView.Source.Count > 0 )
+                {
+                    templateConfigurationTemplateListView.SetFocus( );
+                    templateConfigurationTemplateListView.SelectedItem = 0;
+                }
             }
         }
 
@@ -68,6 +78,7 @@ namespace Sanoid.ConfigConsole
             resetGlobalConfigButton.Clicked -= ResetGlobalConfigButtonOnClicked;
             saveGlobalConfigButton.Clicked -= ShowSaveGlobalConfigDialog;
             DisableZfsConfigurationTabEventHandlers( );
+            DisableTemplateConfigurationTabEventHandlers( );
             _eventsEnabled = false;
             Logger.Debug( "Event handlers for zfs configuration fields disabled" );
         }
@@ -82,6 +93,7 @@ namespace Sanoid.ConfigConsole
             Logger.Debug( "Enabling event handlers for zfs configuration fields" );
             resetGlobalConfigButton.Clicked += ResetGlobalConfigButtonOnClicked;
             saveGlobalConfigButton.Clicked += ShowSaveGlobalConfigDialog;
+            EnableTemplateConfigurationTabEventHandlers();
             EnableZfsConfigurationTabEventHandlers( );
             _eventsEnabled = true;
             Logger.Debug( "Event handlers for zfs configuration fields enabled" );
@@ -94,7 +106,7 @@ namespace Sanoid.ConfigConsole
                 return false;
             }
 
-            if ( !File.Exists( pathToZfsTextField.Text.ToString( ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) )
+            if ( Environment.OSVersion.Platform == PlatformID.Unix && !File.Exists( pathToZfsTextField.Text.ToString( ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) )
             {
                 return false;
             }
