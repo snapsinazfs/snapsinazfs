@@ -226,7 +226,7 @@ public partial class SanoidConfigConsole
 
             Application.Run( saveZfsObjectDialog );
 
-            if ( saveConfirmed && ConfigConsole.Settings is not null && ConfigConsole.CommandRunner is not null )
+            if ( saveConfirmed && ConfigConsole.CommandRunner is not null )
             {
                 Logger.Info( "Saving {0}", zfsObjectPath );
                 if ( ZfsTasks.SetPropertiesForDataset( ConfigConsole.Settings.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner ) || ConfigConsole.Settings.DryRun )
@@ -596,7 +596,7 @@ public partial class SanoidConfigConsole
     {
         if ( ValidateGlobalConfigValues( ) )
         {
-            using ( SaveDialog globalConfigSaveDialog = new( "Save GLobal Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+            using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
             {
                 globalConfigSaveDialog.AllowsOtherFileTypes = true;
                 globalConfigSaveDialog.CanCreateDirectories = true;
@@ -612,21 +612,17 @@ public partial class SanoidConfigConsole
                     return;
                 }
 
-                SanoidSettings? settings = ConfigConsole.Settings;
-                settings!.DryRun = dryRunRadioGroup.SelectedItem == 0;
-                settings.TakeSnapshots = takeSnapshotsRadioGroup.SelectedItem == 0;
-                settings.PruneSnapshots = pruneSnapshotsRadioGroup.SelectedItem == 0;
-                settings.ZfsPath = pathToZfsTextField.Text?.ToString( ) ?? string.Empty;
-                settings.ZpoolPath = pathToZpoolTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.ComponentSeparator = snapshotNameComponentSeparatorValidatorField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.Prefix = snapshotNamePrefixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.TimestampFormatString = snapshotNameTimestampFormatTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.FrequentSuffix = snapshotNameFrequentSuffixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.HourlySuffix = snapshotNameHourlySuffixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.DailySuffix = snapshotNameDailySuffixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.WeeklySuffix = snapshotNameWeeklySuffixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.MonthlySuffix = snapshotNameMonthlySuffixTextField.Text?.ToString( ) ?? string.Empty;
-                settings.Formatting.YearlySuffix = snapshotNameYearlySuffixTextField.Text.ToString( ) ?? throw new InvalidOperationException( );
+                SanoidSettings settings = new( )
+                {
+                    DryRun = dryRunRadioGroup.SelectedItem == 0,
+                    TakeSnapshots = takeSnapshotsRadioGroup.SelectedItem == 0,
+                    PruneSnapshots = pruneSnapshotsRadioGroup.SelectedItem == 0,
+                    ZfsPath = pathToZfsTextField.Text?.ToString( ) ?? string.Empty,
+                    ZpoolPath = pathToZpoolTextField.Text?.ToString( ) ?? string.Empty,
+                    Formatting = new( ) { ComponentSeparator = snapshotNameComponentSeparatorValidatorField.Text?.ToString( ) ?? string.Empty, Prefix = snapshotNamePrefixTextField.Text?.ToString( ) ?? string.Empty, TimestampFormatString = snapshotNameTimestampFormatTextField.Text?.ToString( ) ?? string.Empty, FrequentSuffix = snapshotNameFrequentSuffixTextField.Text?.ToString( ) ?? string.Empty, HourlySuffix = snapshotNameHourlySuffixTextField.Text?.ToString( ) ?? string.Empty, DailySuffix = snapshotNameDailySuffixTextField.Text?.ToString( ) ?? string.Empty, WeeklySuffix = snapshotNameWeeklySuffixTextField.Text?.ToString( ) ?? string.Empty, MonthlySuffix = snapshotNameMonthlySuffixTextField.Text?.ToString( ) ?? string.Empty, YearlySuffix = snapshotNameYearlySuffixTextField.Text.ToString( ) ?? throw new InvalidOperationException( ) },
+                    Templates = ConfigConsole.Settings.Templates,
+                    CacheDirectory = ConfigConsole.Settings.CacheDirectory
+                };
 
                 File.WriteAllText( globalConfigSaveDialog.FileName.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" ), JsonSerializer.Serialize( ConfigConsole.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
             }

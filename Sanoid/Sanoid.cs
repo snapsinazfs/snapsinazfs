@@ -111,11 +111,14 @@ internal class Program
                                                .Build( );
 
         Logger.Trace( "Building settings objects from IConfiguration" );
-        SanoidSettings? settings = rootConfiguration.Get<SanoidSettings>( );
-
-        if ( settings is null )
+        SanoidSettings settings;
+        try
         {
-            Logger.Fatal( "Unable to parse settings from JSON" );
+            settings = rootConfiguration.Get<SanoidSettings>( ) ?? throw new InvalidOperationException( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Fatal( ex, "Unable to parse settings from JSON" );
             return (int)Errno.EFTYPE;
         }
 
@@ -219,7 +222,6 @@ internal class Program
     ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
     ///     the CLI
     /// </summary>
-    /// <param name="settings">The <see cref="SanoidSettings" /> object to get <see cref="TemplateSettings" /> from</param>
     /// <param name="args"></param>
     public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, ref SanoidSettings settings )
     {
@@ -256,39 +258,8 @@ internal class Program
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
-        if ( args.TakeSnapshots )
-        {
-            Logger.Debug( "TakeSnapshots argument specified" );
-
-            settings.TakeSnapshots = true;
-        }
-
-        if ( args.NoTakeSnapshots )
-        {
-            Logger.Debug( "NoTakeSnapshots argument specified" );
-
-            settings.TakeSnapshots = false;
-        }
-
-        if ( args.PruneSnapshots )
-        {
-            Logger.Debug( "PruneSnapshots argument specified" );
-
-            settings.PruneSnapshots = true;
-        }
-
-        if ( args.NoPruneSnapshots )
-        {
-            Logger.Debug( "NoPruneSnapshots argument specified" );
-
-            settings.PruneSnapshots = false;
-        }
-
-        if ( args.DryRun )
-        {
-            Logger.Debug( "DryRun argument specified" );
-
-            settings.DryRun = true;
-        }
+        settings.DryRun |= args.DryRun;
+        settings.TakeSnapshots = settings.TakeSnapshots & args.TakeSnapshots & !args.NoTakeSnapshots;
+        settings.PruneSnapshots = settings.PruneSnapshots & args.PruneSnapshots & !args.NoPruneSnapshots;
     }
 }

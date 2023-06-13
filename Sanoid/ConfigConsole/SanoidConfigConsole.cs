@@ -116,7 +116,7 @@ namespace Sanoid.ConfigConsole
 
             Logger.Debug( "Setting global configuration fields to values in settings" );
 
-            dryRunRadioGroup.SelectedItem = ConfigConsole.Settings!.DryRun ? 0 : 1;
+            dryRunRadioGroup.SelectedItem = ConfigConsole.Settings.DryRun ? 0 : 1;
             takeSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.TakeSnapshots ? 0 : 1;
             pruneSnapshotsRadioGroup.SelectedItem = ConfigConsole.Settings.PruneSnapshots ? 0 : 1;
             pathToZfsTextField.Text = ConfigConsole.Settings.ZfsPath;

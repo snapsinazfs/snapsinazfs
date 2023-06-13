@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -10,10 +10,9 @@ using JetBrains.Annotations;
 namespace Sanoid.Settings.Settings;
 
 /// <summary>
-///     Snapshot timing policies for use in <see cref="TemplateSettings" />
+///     Snapshot timing policies
 /// </summary>
-[JsonSourceGenerationOptions( DefaultIgnoreCondition = JsonIgnoreCondition.Never )]
-public sealed class SnapshotTimingSettings
+public record SnapshotTimingSettings
 {
     /// <summary>
     ///     Gets or sets the time of day that daily snapshots are taken
@@ -95,6 +94,21 @@ public sealed class SnapshotTimingSettings
     /// </summary>
     [JsonPropertyOrder( 11 )]
     public required TimeOnly YearlyTime { get; init; }
+
+    public static SnapshotTimingSettings GetDefault( ) => new( )
+    {
+        UseLocalTime = true,
+        FrequentPeriod = 15,
+        HourlyMinute = 0,
+        DailyTime = TimeOnly.MinValue,
+        WeeklyDay = DayOfWeek.Monday,
+        WeeklyTime = TimeOnly.MinValue,
+        MonthlyDay = 1,
+        MonthlyTime = TimeOnly.MinValue,
+        YearlyMonth = 1,
+        YearlyDay = 1,
+        YearlyTime = TimeOnly.MinValue
+    };
 
     public int GetPeriodOfHour( DateTimeOffset timestamp )
     {

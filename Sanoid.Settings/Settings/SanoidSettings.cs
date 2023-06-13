@@ -12,54 +12,54 @@ namespace Sanoid.Settings.Settings;
 /// <summary>
 ///     Settings class for use with the .net <see cref="IConfiguration" /> binder
 /// </summary>
-public sealed class SanoidSettings
+public record SanoidSettings
 {
     /// <summary>
     ///     Gets or sets sanoid.net's directory for temporary files
     /// </summary>
     [JsonPropertyOrder( 6 )]
-    public required string CacheDirectory { get; set; }
+    public string CacheDirectory { get; set; }
 
     /// <summary>
     ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS
     /// </summary>
     [JsonPropertyOrder( 1 )]
-    public required bool DryRun { get; set; }
+    public bool DryRun { get; set; }
 
     /// <summary>
     ///     Gets or sets the global formatting settings sanoid.net will use
     /// </summary>
     [JsonPropertyOrder( 7 )]
-    public required FormattingSettings Formatting { get; set; }
+    public FormattingSettings Formatting { get; set; } = FormattingSettings.GetDefault();
 
     /// <summary>
     ///     Gets or sets the global PruneSnapshots setting
     /// </summary>
     [JsonPropertyOrder( 3 )]
-    public required bool PruneSnapshots { get; set; }
+    public bool PruneSnapshots { get; set; }
 
     /// <summary>
     ///     Gets or sets the global TakeSnapshots setting
     /// </summary>
     [JsonPropertyOrder( 2 )]
-    public required bool TakeSnapshots { get; set; }
+    public bool TakeSnapshots { get; set; }
 
     /// <summary>
     ///     Gets or sets the templates sub-section
     /// </summary>
     // ReSharper disable once CollectionNeverUpdated.Global
     [JsonPropertyOrder( 8 )]
-    public required Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
+    public Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>
     ///     Gets or sets the path to the zfs utility
     /// </summary>
     [JsonPropertyOrder( 4 )]
-    public required string ZfsPath { get; set; }
+    public string ZfsPath { get; set; }
 
     /// <summary>
     ///     Gets or sets the path to the zpool utility
     /// </summary>
     [JsonPropertyOrder( 5 )]
-    public required string ZpoolPath { get; set; }
+    public string ZpoolPath { get; set; }
 }
