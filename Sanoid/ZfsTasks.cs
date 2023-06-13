@@ -52,7 +52,7 @@ internal static class ZfsTasks
 
         foreach ( ( string _, Dataset ds ) in datasets )
         {
-            if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings? template ) )
+            if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings template ) )
             {
                 string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
                 Logger.Error( errorMessage );
@@ -76,7 +76,7 @@ internal static class ZfsTasks
 
             Logger.Debug( "Checking for and taking needed snapshots for dataset {0}", ds.Name );
 
-            if ( ds.IsFrequentSnapshotNeeded( template, timestamp ) )
+            if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
@@ -94,7 +94,7 @@ internal static class ZfsTasks
                 TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
             }
 
-            if ( ds.IsWeeklySnapshotNeeded( template, timestamp ) )
+            if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
@@ -360,7 +360,7 @@ internal static class ZfsTasks
 
         Logger.Trace( "Dataset {0} will have a snapshot taken with these settings: {1}", ds.Name, JsonSerializer.Serialize( new { ds, template } ) );
 
-        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, out snapshot ) )
+        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, settings.Templates[ ds.Template ], out snapshot ) )
         {
             ds.AddSnapshot( snapshot );
             Logger.Info( "Snapshot {0} successfully taken", snapshot.Name );

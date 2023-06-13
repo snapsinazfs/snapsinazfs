@@ -68,10 +68,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
     {
         Logger.Debug( "{0:G} snapshot requested for dataset {1}", period.Kind, ds.Name );
-        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, settings );
+        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, template );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
@@ -94,7 +94,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = false
         };
-        if ( settings.DryRun )
+        if ( sanoidSettings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
             return false;

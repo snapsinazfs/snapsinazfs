@@ -16,9 +16,9 @@ namespace Sanoid.Interop.Zfs.ZfsCommandRunner;
 internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
-    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings settings, out Snapshot snapshot )
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
     {
-        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, settings );
+        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, template );
         return true;
     }
 
