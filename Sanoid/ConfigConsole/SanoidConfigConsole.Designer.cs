@@ -149,13 +149,19 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingYearlyTimeTextValidateField;
         
+        private Terminal.Gui.Button templateConfigurationSaveCurrentButton;
+        
+        private Terminal.Gui.Button templateConfigurationResetCurrentButton;
+        
         private Terminal.Gui.FrameView templateConfigurationTemplateListFrame;
         
         private Terminal.Gui.ListView templateConfigurationTemplateListView;
         
-        private Terminal.Gui.Button templateConfigurationSaveCurrentButton;
+        private Terminal.Gui.TextValidateField templateConfigurationNewTemplateNameTextValidateField;
         
-        private Terminal.Gui.Button templateConfigurationResetCurrentButton;
+        private Terminal.Gui.Button templateConfigurationAddTemplateButton;
+        
+        private Terminal.Gui.Button templateConfigurationDeleteTemplateButton;
         
         private Terminal.Gui.Window zfsConfigurationWindow;
         
@@ -336,10 +342,13 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationCommonPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
-            this.templateConfigurationResetCurrentButton = new Terminal.Gui.Button();
-            this.templateConfigurationSaveCurrentButton = new Terminal.Gui.Button();
+            this.templateConfigurationDeleteTemplateButton = new Terminal.Gui.Button();
+            this.templateConfigurationAddTemplateButton = new Terminal.Gui.Button();
+            this.templateConfigurationNewTemplateNameTextValidateField = new Terminal.Gui.TextValidateField();
             this.templateConfigurationTemplateListView = new Terminal.Gui.ListView();
             this.templateConfigurationTemplateListFrame = new Terminal.Gui.FrameView();
+            this.templateConfigurationResetCurrentButton = new Terminal.Gui.Button();
+            this.templateConfigurationSaveCurrentButton = new Terminal.Gui.Button();
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField = new Terminal.Gui.TextValidateField();
             this.templateConfigurationPropertiesYearlyTimeLabel = new Terminal.Gui.Label();
             this.templateConfigurationPropertiesTimingYearlyDayTextValidateField = new Terminal.Gui.TextValidateField();
@@ -625,7 +634,7 @@ namespace Sanoid.ConfigConsole {
             configCategoryTabViewtemplates.View.Width = Dim.Fill();
             configCategoryTabViewtemplates.View.Height = Dim.Fill();
             this.templateEditorWindow.Width = 107;
-            this.templateEditorWindow.Height = 28;
+            this.templateEditorWindow.Height = 30;
             this.templateEditorWindow.X = Pos.Center();
             this.templateEditorWindow.Y = Pos.Center();
             this.templateEditorWindow.Modal = true;
@@ -1025,6 +1034,24 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = "";
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField);
+            this.templateConfigurationSaveCurrentButton.Width = 8;
+            this.templateConfigurationSaveCurrentButton.Height = 1;
+            this.templateConfigurationSaveCurrentButton.X = Pos.Center() - 10;
+            this.templateConfigurationSaveCurrentButton.Y = 12;
+            this.templateConfigurationSaveCurrentButton.Data = "templateConfigurationSaveCurrentButton";
+            this.templateConfigurationSaveCurrentButton.Text = "Save";
+            this.templateConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationSaveCurrentButton.IsDefault = false;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationSaveCurrentButton);
+            this.templateConfigurationResetCurrentButton.Width = 9;
+            this.templateConfigurationResetCurrentButton.Height = 1;
+            this.templateConfigurationResetCurrentButton.X = Pos.Center() + 1;
+            this.templateConfigurationResetCurrentButton.Y = 12;
+            this.templateConfigurationResetCurrentButton.Data = "templateConfigurationResetCurrentButton";
+            this.templateConfigurationResetCurrentButton.Text = "Reset";
+            this.templateConfigurationResetCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationResetCurrentButton.IsDefault = false;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationResetCurrentButton);
             this.templateConfigurationTemplateListFrame.Width = 42;
             this.templateConfigurationTemplateListFrame.Height = 16;
             this.templateConfigurationTemplateListFrame.X = 0;
@@ -1048,24 +1075,33 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplateListView.AllowsMarking = false;
             this.templateConfigurationTemplateListView.AllowsMultipleSelection = false;
             this.templateConfigurationTemplateListFrame.Add(this.templateConfigurationTemplateListView);
-            this.templateConfigurationSaveCurrentButton.Width = 16;
-            this.templateConfigurationSaveCurrentButton.Height = 1;
-            this.templateConfigurationSaveCurrentButton.X = 4;
-            this.templateConfigurationSaveCurrentButton.Y = 23;
-            this.templateConfigurationSaveCurrentButton.Data = "templateConfigurationSaveCurrentButton";
-            this.templateConfigurationSaveCurrentButton.Text = "Save Current";
-            this.templateConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.templateConfigurationSaveCurrentButton.IsDefault = false;
-            this.templateEditorWindow.Add(this.templateConfigurationSaveCurrentButton);
-            this.templateConfigurationResetCurrentButton.Width = 17;
-            this.templateConfigurationResetCurrentButton.Height = 1;
-            this.templateConfigurationResetCurrentButton.X = 21;
-            this.templateConfigurationResetCurrentButton.Y = 23;
-            this.templateConfigurationResetCurrentButton.Data = "templateConfigurationResetCurrentButton";
-            this.templateConfigurationResetCurrentButton.Text = "Reset Current";
-            this.templateConfigurationResetCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.templateConfigurationResetCurrentButton.IsDefault = false;
-            this.templateEditorWindow.Add(this.templateConfigurationResetCurrentButton);
+            this.templateConfigurationNewTemplateNameTextValidateField.Width = 25;
+            this.templateConfigurationNewTemplateNameTextValidateField.Height = 1;
+            this.templateConfigurationNewTemplateNameTextValidateField.X = 8;
+            this.templateConfigurationNewTemplateNameTextValidateField.Y = 22;
+            this.templateConfigurationNewTemplateNameTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[a-zA-Z0-9]+$");
+            this.templateConfigurationNewTemplateNameTextValidateField.Data = "templateConfigurationNewTemplateNameTextValidateField";
+            this.templateConfigurationNewTemplateNameTextValidateField.Text = "";
+            this.templateConfigurationNewTemplateNameTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.templateEditorWindow.Add(this.templateConfigurationNewTemplateNameTextValidateField);
+            this.templateConfigurationAddTemplateButton.Width = 11;
+            this.templateConfigurationAddTemplateButton.Height = 1;
+            this.templateConfigurationAddTemplateButton.X = 8;
+            this.templateConfigurationAddTemplateButton.Y = 24;
+            this.templateConfigurationAddTemplateButton.Data = "templateConfigurationAddTemplateButton";
+            this.templateConfigurationAddTemplateButton.Text = "Add New";
+            this.templateConfigurationAddTemplateButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationAddTemplateButton.IsDefault = false;
+            this.templateEditorWindow.Add(this.templateConfigurationAddTemplateButton);
+            this.templateConfigurationDeleteTemplateButton.Width = 10;
+            this.templateConfigurationDeleteTemplateButton.Height = 1;
+            this.templateConfigurationDeleteTemplateButton.X = 23;
+            this.templateConfigurationDeleteTemplateButton.Y = 24;
+            this.templateConfigurationDeleteTemplateButton.Data = "templateConfigurationDeleteTemplateButton";
+            this.templateConfigurationDeleteTemplateButton.Text = "Delete";
+            this.templateConfigurationDeleteTemplateButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationDeleteTemplateButton.IsDefault = false;
+            this.templateEditorWindow.Add(this.templateConfigurationDeleteTemplateButton);
             configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());

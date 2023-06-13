@@ -192,7 +192,7 @@ public partial class SanoidConfigConsole
         RestorePreviousSelectedItem( );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
         UpdateZfsConfigurationButtonState( );
-        EnableEventHandlers( );
+        EnableZfsConfigurationTabEventHandlers( );
     }
 
     private void ZfsConfigurationSaveCurrentButtonOnClicked( )
@@ -564,7 +564,7 @@ public partial class SanoidConfigConsole
         }
     }
 
-    private async void RefreshZfsConfigurationTreeViewFromZfs( )
+    private async Task RefreshZfsConfigurationTreeViewFromZfsAsync( )
     {
         Logger.Debug( "Refreshing zfs configuration tree view" );
         DisableZfsConfigurationTabEventHandlers( );
@@ -594,7 +594,7 @@ public partial class SanoidConfigConsole
 
     private void ShowSaveGlobalConfigDialog( )
     {
-        if ( ValidateGlobalConfigValues( ) )
+        if ( GlobalConfigurationValidateGlobalConfigValues( ) )
         {
             using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
             {
@@ -634,6 +634,7 @@ public partial class SanoidConfigConsole
         {
             return;
         }
+        Logger.Debug( "Disabling event handlers for zfs configuration fields" );
 
         zfsConfigurationRefreshButton.Clicked -= RefreshZfsConfigurationTreeViewFromZfs;
         zfsConfigurationResetCurrentButton.Clicked -= ZfsConfigurationResetCurrentButtonOnClicked;
@@ -656,6 +657,12 @@ public partial class SanoidConfigConsole
         zfsConfigurationPropertiesRetentionPruneDeferralTextField.Leave -= ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
         zfsConfigurationSaveCurrentButton.Clicked -= ZfsConfigurationSaveCurrentButtonOnClicked;
         _zfsConfigurationEventsEnabled = false;
+        Logger.Debug( "Event handlers for zfs configuration fields disabled" );
+    }
+
+    private async void RefreshZfsConfigurationTreeViewFromZfs( )
+    {
+        await RefreshZfsConfigurationTreeViewFromZfsAsync( ).ConfigureAwait( true );
     }
 
     private void EnableZfsConfigurationTabEventHandlers( )
@@ -664,6 +671,7 @@ public partial class SanoidConfigConsole
         {
             return;
         }
+        Logger.Debug( "Enabling event handlers for zfs configuration fields" );
 
         zfsConfigurationRefreshButton.Clicked += RefreshZfsConfigurationTreeViewFromZfs;
         zfsConfigurationResetCurrentButton.Clicked += ZfsConfigurationResetCurrentButtonOnClicked;
@@ -686,6 +694,7 @@ public partial class SanoidConfigConsole
         zfsConfigurationPropertiesRetentionPruneDeferralTextField.Leave += ZfsConfigurationPropertiesRetentionTextFieldOnLeave;
         zfsConfigurationSaveCurrentButton.Clicked += ZfsConfigurationSaveCurrentButtonOnClicked;
         _zfsConfigurationEventsEnabled = true;
+        Logger.Debug( "Event handlers for zfs configuration fields enabled" );
     }
 
     private record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
