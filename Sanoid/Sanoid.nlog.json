@@ -80,6 +80,10 @@
               "layout": "${message}"
             },
             {
+              "name": "exception",
+              "layout": "${exception}"
+            },
+            {
               "name": "properties",
               "encode": false,
               "layout": {
