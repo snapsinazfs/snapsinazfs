@@ -149,8 +149,6 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextValidateField templateConfigurationPropertiesTimingYearlyTimeTextValidateField;
         
-        private Terminal.Gui.Button templateConfigurationSaveCurrentButton;
-        
         private Terminal.Gui.Button templateConfigurationResetCurrentButton;
         
         private Terminal.Gui.FrameView templateConfigurationTemplateListFrame;
@@ -162,6 +160,8 @@ namespace Sanoid.ConfigConsole {
         private Terminal.Gui.Button templateConfigurationAddTemplateButton;
         
         private Terminal.Gui.Button templateConfigurationDeleteTemplateButton;
+        
+        private Terminal.Gui.Button templateConfigurationSaveAllButton;
         
         private Terminal.Gui.Window zfsConfigurationWindow;
         
@@ -342,13 +342,13 @@ namespace Sanoid.ConfigConsole {
             this.zfsConfigurationCommonPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationPropertiesFrame = new Terminal.Gui.FrameView();
             this.zfsConfigurationWindow = new Terminal.Gui.Window();
+            this.templateConfigurationSaveAllButton = new Terminal.Gui.Button();
             this.templateConfigurationDeleteTemplateButton = new Terminal.Gui.Button();
             this.templateConfigurationAddTemplateButton = new Terminal.Gui.Button();
             this.templateConfigurationNewTemplateNameTextValidateField = new Terminal.Gui.TextValidateField();
             this.templateConfigurationTemplateListView = new Terminal.Gui.ListView();
             this.templateConfigurationTemplateListFrame = new Terminal.Gui.FrameView();
             this.templateConfigurationResetCurrentButton = new Terminal.Gui.Button();
-            this.templateConfigurationSaveCurrentButton = new Terminal.Gui.Button();
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField = new Terminal.Gui.TextValidateField();
             this.templateConfigurationPropertiesYearlyTimeLabel = new Terminal.Gui.Label();
             this.templateConfigurationPropertiesTimingYearlyDayTextValidateField = new Terminal.Gui.TextValidateField();
@@ -836,8 +836,8 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesNamingYearlySuffixTextValidateField.Text = "";
             this.templateConfigurationPropertiesNamingYearlySuffixTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationSnapshotNamingFrame.Add(this.templateConfigurationPropertiesNamingYearlySuffixTextValidateField);
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Width = 58;
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Height = Dim.Fill(0);
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Width = 59;
+            this.templateConfigurationPropertiesSnapshotTimingFrame.Height = Dim.Fill(1);
             this.templateConfigurationPropertiesSnapshotTimingFrame.X = 0;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Y = Pos.Bottom(templateConfigurationSnapshotNamingFrame);
             this.templateConfigurationPropertiesSnapshotTimingFrame.Data = "templateConfigurationPropertiesSnapshotTimingFrame";
@@ -1034,24 +1034,15 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = "";
             this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyTimeTextValidateField);
-            this.templateConfigurationSaveCurrentButton.Width = 8;
-            this.templateConfigurationSaveCurrentButton.Height = 1;
-            this.templateConfigurationSaveCurrentButton.X = Pos.Center() - 10;
-            this.templateConfigurationSaveCurrentButton.Y = 12;
-            this.templateConfigurationSaveCurrentButton.Data = "templateConfigurationSaveCurrentButton";
-            this.templateConfigurationSaveCurrentButton.Text = "Save";
-            this.templateConfigurationSaveCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.templateConfigurationSaveCurrentButton.IsDefault = false;
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationSaveCurrentButton);
             this.templateConfigurationResetCurrentButton.Width = 9;
             this.templateConfigurationResetCurrentButton.Height = 1;
-            this.templateConfigurationResetCurrentButton.X = Pos.Center() + 1;
-            this.templateConfigurationResetCurrentButton.Y = 12;
+            this.templateConfigurationResetCurrentButton.X = Pos.Center();
+            this.templateConfigurationResetCurrentButton.Y = 25;
             this.templateConfigurationResetCurrentButton.Data = "templateConfigurationResetCurrentButton";
             this.templateConfigurationResetCurrentButton.Text = "Reset";
             this.templateConfigurationResetCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.templateConfigurationResetCurrentButton.IsDefault = false;
-            this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationResetCurrentButton);
+            this.templateConfigurationTemplatePropertiesFrame.Add(this.templateConfigurationResetCurrentButton);
             this.templateConfigurationTemplateListFrame.Width = 42;
             this.templateConfigurationTemplateListFrame.Height = 16;
             this.templateConfigurationTemplateListFrame.X = 0;
@@ -1079,9 +1070,9 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationNewTemplateNameTextValidateField.Height = 1;
             this.templateConfigurationNewTemplateNameTextValidateField.X = 8;
             this.templateConfigurationNewTemplateNameTextValidateField.Y = 22;
-            this.templateConfigurationNewTemplateNameTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[a-zA-Z0-9]+$");
+            this.templateConfigurationNewTemplateNameTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^[a-zA-Z0-9][a-zA-Z0-9 _-]{0,24}$");
             this.templateConfigurationNewTemplateNameTextValidateField.Data = "templateConfigurationNewTemplateNameTextValidateField";
-            this.templateConfigurationNewTemplateNameTextValidateField.Text = "";
+            this.templateConfigurationNewTemplateNameTextValidateField.Text = "New Template Name";
             this.templateConfigurationNewTemplateNameTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateEditorWindow.Add(this.templateConfigurationNewTemplateNameTextValidateField);
             this.templateConfigurationAddTemplateButton.Width = 11;
@@ -1102,6 +1093,15 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationDeleteTemplateButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.templateConfigurationDeleteTemplateButton.IsDefault = false;
             this.templateEditorWindow.Add(this.templateConfigurationDeleteTemplateButton);
+            this.templateConfigurationSaveAllButton.Width = 12;
+            this.templateConfigurationSaveAllButton.Height = 1;
+            this.templateConfigurationSaveAllButton.X = 14;
+            this.templateConfigurationSaveAllButton.Y = 26;
+            this.templateConfigurationSaveAllButton.Data = "templateConfigurationSaveAllButton";
+            this.templateConfigurationSaveAllButton.Text = "Save All";
+            this.templateConfigurationSaveAllButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationSaveAllButton.IsDefault = false;
+            this.templateEditorWindow.Add(this.templateConfigurationSaveAllButton);
             configCategoryTabView.AddTab(configCategoryTabViewtemplates, false);
             Terminal.Gui.TabView.Tab configCategoryTabViewzFSConfiguration;
             configCategoryTabViewzFSConfiguration = new Terminal.Gui.TabView.Tab("ZFS Configuration", new View());

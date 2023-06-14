@@ -24,16 +24,20 @@ namespace Sanoid.ConfigConsole
     {
         public SanoidConfigConsole( )
         {
-            InitializeComponent( );
-
-            quitMenuItem.Action = ( ) => Application.RequestStop( );
-
+            Initialized+= OnInitialized;
             Ready += OnReady;
 
-            HideTemplateConfigurationPropertiesFrame( );
+            InitializeComponent( );
+
             SetTabStopsForRootLevelObjects( );
-            SetTabStopsForZfsConfigurationWindow( );
             SetPropertiesForReadonlyFields( );
+        }
+
+        private void OnInitialized( object? sender, EventArgs e )
+        {
+            AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
+            quitMenuItem.Action = Application.Top.RequestStop;
+            GlobalConfigurationSetFieldsFromSettingsObject( false );
         }
 
         private bool _eventsEnabled;
@@ -42,14 +46,10 @@ namespace Sanoid.ConfigConsole
 
         private async void OnReady( )
         {
-            GlobalConfigurationSetFieldsFromSettingsObject( false );
             ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsConfigurationTreeViewFromZfsAsync( ).ConfigureAwait( true );
             configCategoryTabView.SelectedTabChanged += ConfigCategoryTabViewOnSelectedTabChanged;
-            UpdateZfsConfigurationButtonState( );
             InitializeTemplateEditorView( );
-            HideZfsConfigurationPropertyFrames( );
-            SetCanFocusStateForZfsConfigurationViews( );
-            SetTagsForZfsPropertyFields( );
+            InitializeZfsConfigurationView( );
             await zfsRefreshTask;
             EnableEventHandlers( );
         }

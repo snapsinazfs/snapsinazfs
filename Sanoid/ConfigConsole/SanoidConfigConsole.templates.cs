@@ -4,15 +4,15 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using NLog.Fluent;
 using NStack;
-using PowerArgs;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 using Terminal.Gui;
+using Terminal.Gui.TextValidateProviders;
 
 namespace Sanoid.ConfigConsole;
 
@@ -22,18 +22,23 @@ namespace Sanoid.ConfigConsole;
 public partial class SanoidConfigConsole
 {
     private bool _templateConfigurationEventsEnabled;
+    private bool _templateConfigurationTemplatesAddedOrRemoved;
     private readonly List<TextValidateField> _templateConfigurationTextValidateFieldList = new( );
-    private readonly List<TemplateConfigurationListItem> _templateListItems = ConfigConsole.Settings!.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( );
+    private readonly List<TemplateConfigurationListItem> _templateListItems = ConfigConsole.Settings.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( );
+    private bool IsAnyTemplateModified => _templateListItems.Any( t => t.IsModified );
+    private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.IsValid );
+    private bool IsSelectedTemplateInUse => _baseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
 
     private TemplateConfigurationListItem SelectedTemplateItem => _templateListItems[ templateConfigurationTemplateListView.SelectedItem ];
     private static readonly List<string> DayNamesLongAndAbbreviated = DateTimeFormatInfo.CurrentInfo.GetLongAndAbbreviatedDayNames( );
     private static readonly List<string> MonthNamesLongAndAbbreviated = DateTimeFormatInfo.CurrentInfo.GetMonthNames( );
     private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
-    private static Dictionary<string, TemplateSettings> Templates = new( );
+    private static ConcurrentDictionary<string, TemplateSettings> Templates = new( );
 
     private void InitializeTemplateEditorView( )
     {
         DisableTemplateConfigurationTabEventHandlers( );
+        TemplateConfigurationHideTemplateConfigurationPropertiesFrame( );
         templateConfigurationTemplateListView.SetSource( _templateListItems );
         Templates.Clear( );
         Templates = new( ConfigConsole.Settings.Templates );
@@ -43,8 +48,15 @@ public partial class SanoidConfigConsole
         templateConfigurationSnapshotNamingFrame.CanFocus = false;
         templateEditorWindow.CanFocus = false;
         templateConfigurationDeleteTemplateButton.Enabled = false;
-        templateConfigurationNewTemplateNameTextValidateField.Text = "NewTemplateName";
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationNewTemplateNameTextValidateField );
+        TemplateConfigurationInitializeTemplatePropertiesTextValidateFieldList( );
+        TemplateConfigurationDisableValidateOnInputForAllFields( );
+        TemplateConfigurationUpdateButtonState( );
+        EnableTemplateConfigurationTabEventHandlers( );
+    }
+
+    private void TemplateConfigurationInitializeTemplatePropertiesTextValidateFieldList( )
+    {
+        _templateConfigurationTextValidateFieldList.Clear( );
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingComponentSeparatorValidateField );
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingPrefixTextValidateField );
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingFrequentSuffixTextValidateField );
@@ -53,8 +65,21 @@ public partial class SanoidConfigConsole
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingWeeklySuffixTextValidateField );
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingMonthlySuffixTextValidateField );
         _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingYearlySuffixTextValidateField );
-        TemplateConfigurationUpdateButtonState( );
-        EnableTemplateConfigurationTabEventHandlers( );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingDailyTimeTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingWeeklyDayTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingWeeklyTimeTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingMonthlyDayTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingMonthlyTimeTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyMonthTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyDayTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyTimeTextValidateField );
+    }
+
+    private void TemplateConfigurationDisableValidateOnInputForAllFields( )
+    {
+        _templateConfigurationTextValidateFieldList.ForEach( field => ( (TextRegexProvider)field.Provider ).ValidateOnInput = false );
+        ( (TextRegexProvider)templateConfigurationNewTemplateNameTextValidateField.Provider ).ValidateOnInput = false;
     }
 
     private void EnableTemplateConfigurationTabEventHandlers( )
@@ -68,7 +93,7 @@ public partial class SanoidConfigConsole
         templateConfigurationAddTemplateButton.Clicked += TemplateConfigurationAddTemplateButtonOnClicked;
         templateConfigurationDeleteTemplateButton.Clicked += TemplateConfigurationDeleteTemplateButtonOnClicked;
         templateConfigurationNewTemplateNameTextValidateField.KeyPress += TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress;
-        templateConfigurationSaveCurrentButton.Clicked += TemplateSettingsSaveSelectedTemplate;
+        templateConfigurationSaveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
         templateConfigurationResetCurrentButton.Clicked += TemplateConfigurationResetCurrentButtonOnClicked;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave += TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
         templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave += TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;
@@ -79,17 +104,17 @@ public partial class SanoidConfigConsole
 
     private void TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnKeyPress( KeyEventEventArgs args )
     {
-        templateConfigurationSaveCurrentButton.Enabled = _templateConfigurationTextValidateFieldList.TrueForAll( t => t.IsValid );
+        templateConfigurationSaveAllButton.Enabled = templateConfigurationPropertiesTimingDailyTimeTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs args )
     {
-        templateConfigurationSaveCurrentButton.Enabled &= templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid;
+        templateConfigurationSaveAllButton.Enabled = templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress( KeyEventEventArgs args )
     {
-        if ( templateConfigurationNewTemplateNameTextValidateField.IsValid )
+        if ( !templateConfigurationNewTemplateNameTextValidateField.Text.IsEmpty && templateConfigurationNewTemplateNameTextValidateField.IsValid )
         {
             string newTemplateName = templateConfigurationNewTemplateNameTextValidateField.Text.ToString( )!;
             templateConfigurationAddTemplateButton.Enabled = newTemplateName != "default" && !Templates.ContainsKey( newTemplateName );
@@ -100,13 +125,69 @@ public partial class SanoidConfigConsole
         }
     }
 
+    /// <exception cref="ApplicationException">
+    ///     If removal of the selected template from <see cref="Templates" /> fails.<br />
+    ///     Should be treated as fatal by any consumers
+    /// </exception>
     private void TemplateConfigurationDeleteTemplateButtonOnClicked( )
     {
+        try
+        {
+            DisableTemplateConfigurationTabEventHandlers( );
+            string templateName = SelectedTemplateItem.TemplateName;
+            Logger.Debug( "Validating selected template {0} for removal", templateName );
+            if ( templateName == "default" )
+            {
+                const string errorMessage = "Cannot delete the default template.";
+                Logger.Warn( errorMessage );
+                MessageBox.ErrorQuery( "Cannot Delete Template", errorMessage, 0, "OK" );
+                return;
+            }
+
+            if ( IsSelectedTemplateInUse )
+            {
+                string errorMessage = $"Selected template {templateName} is in use by one or more objects in ZFS. Cannot delete template.";
+                Logger.Warn( errorMessage );
+                MessageBox.ErrorQuery( "Cannot Delete Template", errorMessage, 0, "OK" );
+                return;
+            }
+
+            Logger.Debug( "Template {0} can be removed. Removing", templateName );
+
+            // Grab the currently selected index, decrement the selection in the ListView,
+            // and remove the saved index from the source collection
+            int indexToRemove = templateConfigurationTemplateListView.SelectedItem;
+            templateConfigurationTemplateListView.SelectedItem -= 1;
+            templateConfigurationTemplateListView.EnsureSelectedItemVisible( );
+            _templateListItems.RemoveAt( indexToRemove );
+            if ( !Templates.TryRemove( templateName, out _ ) )
+            {
+                // The application state is inconsistent if this happens, and it isn't safe to continue
+                string errorMessage = $"Failed to remove template {templateName} from UI dictionary";
+                TemplateRemovalException ex = new( errorMessage );
+                Logger.Fatal( ex, errorMessage );
+                throw ex;
+            }
+
+            _templateConfigurationTemplatesAddedOrRemoved = true;
+        }
+        catch ( ApplicationException )
+        {
+            // If we threw the KeyNotFoundException above, we need to exit.
+            // Also, re-throw so we can deal with it in the caller as well.
+            Application.Top.RequestStop( );
+            throw;
+        }
+        finally
+        {
+            TemplateConfigurationUpdateButtonState( );
+            EnableTemplateConfigurationTabEventHandlers( );
+        }
     }
 
     private void TemplateConfigurationAddTemplateButtonOnClicked( )
     {
-        if ( !Templates.TryGetValue( "default", out TemplateSettings? defaultTemplate ) )
+        if ( !Templates.TryGetValue( "default", out _ ) )
         {
             string errorMessage = "'default' template does not exist. Not creating new template.";
             Logger.Error( errorMessage );
@@ -131,8 +212,9 @@ public partial class SanoidConfigConsole
             return;
         }
 
-        Templates[ newTemplateName! ] = defaultTemplate with { };
-        _templateListItems.Add( new( newTemplateName!, defaultTemplate with { }, defaultTemplate with { } ) );
+        Templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
+        _templateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
+        _templateConfigurationTemplatesAddedOrRemoved = true;
         TemplateConfigurationUpdateButtonState( );
     }
 
@@ -140,7 +222,7 @@ public partial class SanoidConfigConsole
     {
         if ( templateConfigurationPropertiesTimingDailyTimeTextValidateField.IsValid )
         {
-            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { DailyTime = TimeOnly.Parse( templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text.ToString( ) ) };
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { DailyTime = TimeOnly.Parse( templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text.ToString( )! ) };
         }
 
         TemplateConfigurationUpdateButtonState( );
@@ -150,7 +232,16 @@ public partial class SanoidConfigConsole
     {
         if ( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid )
         {
-            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { HourlyMinute = int.Parse( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToString( ) ) };
+            if ( !int.TryParse( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToString( ), out int hourlyMinute ) && hourlyMinute is < 0 or > 59 )
+            {
+                const string errorMessage = "The value entered for Hourly Minute is invalid. Field will be reset to previous value.";
+                Logger.Warn( errorMessage );
+                MessageBox.ErrorQuery( "Invalid Hourly Minute Value", errorMessage, "OK" );
+                templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
+                return;
+            }
+
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { HourlyMinute = hourlyMinute };
         }
 
         TemplateConfigurationUpdateButtonState( );
@@ -168,17 +259,18 @@ public partial class SanoidConfigConsole
     private void TemplateConfigurationUpdateButtonState( )
     {
         templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
-        templateConfigurationSaveCurrentButton.Enabled = SelectedTemplateItem.IsModified;
+        templateConfigurationSaveAllButton.Enabled = IsAnyTemplateModified && IsEveryPropertyTextValidateFieldValid;
 
-        templateConfigurationDeleteTemplateButton.Enabled = templateConfigurationTemplateListView.SelectedItem >= 0 && _baseDatasets.All( kvp => kvp.Value.Template.Value != SelectedTemplateItem.TemplateName );
+        templateConfigurationDeleteTemplateButton.Enabled = templateConfigurationTemplateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse;
+        templateConfigurationAddTemplateButton.Enabled = templateConfigurationNewTemplateNameTextValidateField.IsValid;
     }
 
-    private void HideTemplateConfigurationPropertiesFrame( )
+    private void TemplateConfigurationHideTemplateConfigurationPropertiesFrame( )
     {
         templateConfigurationTemplatePropertiesFrame.Visible = false;
     }
 
-    private void ShowTemplateConfigurationPropertiesFrame( )
+    private void TemplateConfigurationShowTemplateConfigurationPropertiesFrame( )
     {
         templateConfigurationTemplatePropertiesFrame.Visible = true;
     }
@@ -200,7 +292,7 @@ public partial class SanoidConfigConsole
     {
         if ( !templateConfigurationTemplatePropertiesFrame.Visible )
         {
-            ShowTemplateConfigurationPropertiesFrame( );
+            TemplateConfigurationShowTemplateConfigurationPropertiesFrame( );
         }
 
         TemplateConfigurationListItem item = SelectedTemplateItem;
@@ -226,7 +318,7 @@ public partial class SanoidConfigConsole
         templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyTime.ToString( "HH:mm:ss" );
     }
 
-    private void TemplateSettingsSaveSelectedTemplate( )
+    private void TemplateSettingsSaveAllButtonOnClicked( )
     {
         TemplateConfigurationValidator validator = new( );
 
@@ -293,7 +385,7 @@ public partial class SanoidConfigConsole
 
             SanoidSettings settings = ConfigConsole.Settings with
             {
-                Templates = Templates
+                Templates = Templates.ToDictionary( kvp => kvp.Key, kvp => kvp.Value )
             };
             SelectedTemplateItem.BaseSettings = SelectedTemplateItem.ViewSettings with { };
             ConfigConsole.Settings = settings with { };
@@ -315,7 +407,7 @@ public partial class SanoidConfigConsole
         templateConfigurationAddTemplateButton.Clicked -= TemplateConfigurationAddTemplateButtonOnClicked;
         templateConfigurationDeleteTemplateButton.Clicked -= TemplateConfigurationDeleteTemplateButtonOnClicked;
         templateConfigurationNewTemplateNameTextValidateField.KeyPress -= TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress;
-        templateConfigurationSaveCurrentButton.Clicked -= TemplateSettingsSaveSelectedTemplate;
+        templateConfigurationSaveAllButton.Clicked -= TemplateSettingsSaveAllButtonOnClicked;
         templateConfigurationResetCurrentButton.Clicked -= TemplateConfigurationResetCurrentButtonOnClicked;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave -= TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
         templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave -= TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;

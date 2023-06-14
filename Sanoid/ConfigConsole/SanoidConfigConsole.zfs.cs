@@ -23,7 +23,15 @@ public partial class SanoidConfigConsole
     private bool _zfsConfigurationEventsEnabled;
     private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsConfigurationTreeView.SelectedObject;
 
-    private void UpdateZfsConfigurationButtonState( )
+    private void InitializeZfsConfigurationView( )
+    {
+        ZfsConfigurationHideZfsConfigurationPropertyFrames( );
+        ZfsConfigurationSetCanFocusStateForZfsConfigurationViews( );
+        ZfsConfigurationSetTagsForZfsPropertyFields( );
+        ZfsConfigurationSetTabStopsForFields( );
+        ZfsConfigurationUpdateButtonState( );
+    }
+    private void ZfsConfigurationUpdateButtonState( )
     {
         if ( zfsConfigurationTreeView.Objects.Any( ) && zfsConfigurationTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
         {
@@ -45,13 +53,13 @@ public partial class SanoidConfigConsole
         }
     }
 
-    private void HideZfsConfigurationPropertyFrames( )
+    private void ZfsConfigurationHideZfsConfigurationPropertyFrames( )
     {
         zfsConfigurationPropertiesFrame.Visible = false;
         zfsConfigurationSnapshotPropertiesFrame.Visible = false;
     }
 
-    private void SetTagsForZfsPropertyFields( )
+    private void ZfsConfigurationSetTagsForZfsPropertyFields( )
     {
         zfsConfigurationPropertiesEnabledRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.EnabledPropertyName, zfsConfigurationPropertiesEnabledRadioGroup, zfsConfigurationPropertiesEnabledSourceTextField );
         zfsConfigurationPropertiesTakeSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.TakeSnapshotsPropertyName, zfsConfigurationPropertiesTakeSnapshotsRadioGroup, zfsConfigurationPropertiesTakeSnapshotsSourceTextField );
@@ -67,7 +75,7 @@ public partial class SanoidConfigConsole
         zfsConfigurationPropertiesRetentionPruneDeferralTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, zfsConfigurationPropertiesRetentionPruneDeferralTextField, 0, 100 );
     }
 
-    private void SetTabStopsForZfsConfigurationWindow( )
+    private void ZfsConfigurationSetTabStopsForFields( )
     {
         zfsConfigurationWindow.TabStop = true;
         zfsConfigurationTreeFrame.TabStop = true;
@@ -107,7 +115,7 @@ public partial class SanoidConfigConsole
         zfsConfigurationPropertiesTemplateTextField.TabIndex = 4;
     }
 
-    private void SetCanFocusStateForZfsConfigurationViews( )
+    private void ZfsConfigurationSetCanFocusStateForZfsConfigurationViews( )
     {
         zfsConfigurationTreeFrame.CanFocus = false;
         zfsConfigurationActionsFrame.CanFocus = false;
@@ -165,14 +173,14 @@ public partial class SanoidConfigConsole
         ArgumentNullException.ThrowIfNull( args, nameof( args ) );
         UpdateSelectedItemTextFieldStringProperty( (TextFieldWithSourceViewData)args.View.Data, "local" );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
     }
 
     private void ZfsConfigurationPropertiesRecursionRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemStringRadioGroupProperty( zfsConfigurationPropertiesRecursionRadioGroup, "local" );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
     }
 
     private void ZfsConfigurationPropertiesRetentionTextFieldOnLeave( FocusEventArgs args )
@@ -181,7 +189,7 @@ public partial class SanoidConfigConsole
 
         UpdateSelectedItemTextValidateFieldIntProperty( (RetentionTextValidateFieldViewData)args.View.Data, "local" );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
     }
 
     private void ZfsConfigurationResetCurrentButtonOnClicked( )
@@ -191,7 +199,7 @@ public partial class SanoidConfigConsole
         _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
         RestorePreviousSelectedItem( );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
         EnableZfsConfigurationTabEventHandlers( );
     }
 
@@ -278,7 +286,7 @@ public partial class SanoidConfigConsole
         finally
         {
             UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
-            UpdateZfsConfigurationButtonState( );
+            ZfsConfigurationUpdateButtonState( );
             EnableZfsConfigurationTabEventHandlers( );
         }
     }
@@ -290,7 +298,7 @@ public partial class SanoidConfigConsole
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
     }
 
     private void ZfsConfigurationPropertiesStringRadioGroupOnMouseClick( MouseEventArgs args )
@@ -300,7 +308,7 @@ public partial class SanoidConfigConsole
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
     }
 
     /// <summary>
@@ -429,21 +437,21 @@ public partial class SanoidConfigConsole
     private void ZfsConfigurationPropertiesEnabledRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesEnabledRadioGroup, "local" );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
     }
 
     private void ZfsConfigurationPropertiesTakeSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesTakeSnapshotsRadioGroup, "local" );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
     }
 
     private void ZfsConfigurationPropertiesPruneSnapshotsRadioGroup_SelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty( zfsConfigurationPropertiesPruneSnapshotsRadioGroup, "local" );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( );
     }
 
@@ -462,7 +470,7 @@ public partial class SanoidConfigConsole
         }
 
         UpdateZfsCommonPropertyFieldsForSelectedTreeNode( false );
-        UpdateZfsConfigurationButtonState( );
+        ZfsConfigurationUpdateButtonState( );
         EnableZfsConfigurationTabEventHandlers( );
     }
 
@@ -570,7 +578,7 @@ public partial class SanoidConfigConsole
         DisableZfsConfigurationTabEventHandlers( );
         try
         {
-            HideZfsConfigurationPropertyFrames( );
+            ZfsConfigurationHideZfsConfigurationPropertyFrames( );
             Logger.Debug( "Clearing objects from zfs configuration tree view" );
             zfsConfigurationTreeView.ClearObjects( );
             _treeDatasets.Clear( );
@@ -580,7 +588,7 @@ public partial class SanoidConfigConsole
             List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( _baseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
 
             zfsConfigurationTreeView.AddObjects( treeRootNodes );
-            UpdateZfsConfigurationButtonState( );
+            ZfsConfigurationUpdateButtonState( );
             zfsConfigurationTreeView.SetFocus( );
         }
         catch ( Exception e )
