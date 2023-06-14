@@ -231,11 +231,12 @@ public partial class SanoidConfigConsole
         _templateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
         _templateConfigurationTemplatesAddedOrRemoved = true;
         TemplateConfigurationUpdateTemplateListButtonStates( );
+        TemplateConfigurationUpdateTemplatePropertiesButtonStates( );
     }
 
     private void TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnLeave( FocusEventArgs args )
     {
-        TemplateConfigurationUpdateTemplateListButtonStates( );
+        TemplateConfigurationUpdateTemplatePropertiesButtonStates( );
     }
 
     private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave( FocusEventArgs args )
@@ -262,6 +263,7 @@ public partial class SanoidConfigConsole
         DisableTemplateConfigurationTabEventHandlers( );
         SelectedTemplateItem.ViewSettings = SelectedTemplateItem.BaseSettings with { };
         TemplateConfigurationSetFieldsForSelectedItem( );
+        TemplateConfigurationUpdateTemplatePropertiesButtonStates( );
         TemplateConfigurationUpdateTemplateListButtonStates( );
         EnableTemplateConfigurationTabEventHandlers( );
     }
