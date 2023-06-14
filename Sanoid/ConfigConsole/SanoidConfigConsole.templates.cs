@@ -195,11 +195,8 @@ public partial class SanoidConfigConsole
             Application.Top.RequestStop( );
             throw;
         }
-        finally
-        {
-            TemplateConfigurationUpdateButtonState( );
-            EnableTemplateConfigurationTabEventHandlers( );
-        }
+        TemplateConfigurationUpdateTemplateListButtonStates( );
+        EnableTemplateConfigurationTabEventHandlers( );
     }
 
     private void TemplateConfigurationAddTemplateButtonOnClicked( )
