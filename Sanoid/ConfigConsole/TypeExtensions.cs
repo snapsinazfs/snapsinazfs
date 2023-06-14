@@ -185,7 +185,7 @@ public static class TypeExtensions
         {
             // This case is checking if it's a non-null string, and if it can be parsed as an integer
             // All other conditions will throw an ArgumentOutOfRangeException for value
-            { } stringValue when int.TryParse( stringValue, out int intValue ) => intValue,
+            { } stringValue when stringValue.Trim( ) is [_, ..] trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
             _ => null
         };
     }
