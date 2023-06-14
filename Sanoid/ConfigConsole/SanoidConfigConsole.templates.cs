@@ -21,12 +21,13 @@ namespace Sanoid.ConfigConsole;
 /// </summary>
 public partial class SanoidConfigConsole
 {
+    private record TextValidateFieldSettings( TextValidateField Field, bool ValidateOnInput );
     private bool _templateConfigurationEventsEnabled;
     private bool _templateConfigurationTemplatesAddedOrRemoved;
-    private readonly List<TextValidateField> _templateConfigurationTextValidateFieldList = new( );
+    private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
     private readonly List<TemplateConfigurationListItem> _templateListItems = ConfigConsole.Settings.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( );
     private bool IsAnyTemplateModified => _templateListItems.Any( t => t.IsModified );
-    private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.IsValid );
+    private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.Field.IsValid );
     private bool IsSelectedTemplateInUse => _baseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
 
     private TemplateConfigurationListItem SelectedTemplateItem => _templateListItems[ templateConfigurationTemplateListView.SelectedItem ];
@@ -57,28 +58,24 @@ public partial class SanoidConfigConsole
     private void TemplateConfigurationInitializeTemplatePropertiesTextValidateFieldList( )
     {
         _templateConfigurationTextValidateFieldList.Clear( );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingComponentSeparatorValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingPrefixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingFrequentSuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingHourlySuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingDailySuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingWeeklySuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingMonthlySuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesNamingYearlySuffixTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingDailyTimeTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingWeeklyDayTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingWeeklyTimeTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingMonthlyDayTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingMonthlyTimeTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyMonthTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyDayTextValidateField );
-        _templateConfigurationTextValidateFieldList.Add( templateConfigurationPropertiesTimingYearlyTimeTextValidateField );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingComponentSeparatorValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingPrefixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingFrequentSuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingHourlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingDailySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingWeeklySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingMonthlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingYearlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingHourlyMinuteTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingWeeklyDayTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingMonthlyDayTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingYearlyMonthTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingYearlyDayTextValidateField, true ) );
     }
 
     private void TemplateConfigurationDisableValidateOnInputForAllFields( )
     {
-        _templateConfigurationTextValidateFieldList.ForEach( field => ( (TextRegexProvider)field.Provider ).ValidateOnInput = false );
+        _templateConfigurationTextValidateFieldList.ForEach( item => ( (TextRegexProvider)item.Field.Provider ).ValidateOnInput = item.ValidateOnInput );
         ( (TextRegexProvider)templateConfigurationNewTemplateNameTextValidateField.Provider ).ValidateOnInput = false;
     }
 
@@ -92,24 +89,39 @@ public partial class SanoidConfigConsole
         templateConfigurationTemplateListView.SelectedItemChanged += TemplateConfigurationTemplateListViewOnSelectedItemChanged;
         templateConfigurationAddTemplateButton.Clicked += TemplateConfigurationAddTemplateButtonOnClicked;
         templateConfigurationDeleteTemplateButton.Clicked += TemplateConfigurationDeleteTemplateButtonOnClicked;
+        templateConfigurationApplyButton.Clicked+= TemplateConfigurationApplyButtonOnClicked;
         templateConfigurationNewTemplateNameTextValidateField.KeyPress += TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress;
         templateConfigurationSaveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
         templateConfigurationResetCurrentButton.Clicked += TemplateConfigurationResetCurrentButtonOnClicked;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave += TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
-        templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave += TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;
+        templateConfigurationPropertiesTimingDailyTimeTimeField.Leave += TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnLeave;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.KeyPress += TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnKeyPress;
-        templateConfigurationPropertiesTimingDailyTimeTextValidateField.KeyPress += TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnKeyPress;
+        templateConfigurationPropertiesTimingDailyTimeTimeField.KeyPress += TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnKeyPress;
         _templateConfigurationEventsEnabled = true;
     }
 
-    private void TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnKeyPress( KeyEventEventArgs args )
+    private void TemplateConfigurationApplyButtonOnClicked( )
     {
-        templateConfigurationSaveAllButton.Enabled = templateConfigurationPropertiesTimingDailyTimeTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
+        if ( !IsEveryPropertyTextValidateFieldValid )
+        {
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
+            {
+                DailyTime = TimeOnly.FromTimeSpan( templateConfigurationPropertiesTimingDailyTimeTimeField.Time ),
+                WeeklyTime = TimeOnly.FromTimeSpan( templateConfigurationPropertiesTimingWeeklyTimeTimeField.Time ),
+                MonthlyTime = TimeOnly.FromTimeSpan( templateConfigurationPropertiesTimingMonthlyTimeTimeField.Time ),
+                YearlyTime = TimeOnly.FromTimeSpan( templateConfigurationPropertiesTimingYearlyTimeTimeField.Time )
+            };
+        }
+    }
+
+    private void TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnKeyPress( KeyEventEventArgs args )
+    {
+        templateConfigurationApplyButton.Enabled = IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs args )
     {
-        templateConfigurationSaveAllButton.Enabled = templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
+        templateConfigurationApplyButton.Enabled = templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress( KeyEventEventArgs args )
@@ -218,13 +230,8 @@ public partial class SanoidConfigConsole
         TemplateConfigurationUpdateButtonState( );
     }
 
-    private void TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave( FocusEventArgs args )
+    private void TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnLeave( FocusEventArgs args )
     {
-        if ( templateConfigurationPropertiesTimingDailyTimeTextValidateField.IsValid )
-        {
-            SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { DailyTime = TimeOnly.Parse( templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text.ToString( )! ) };
-        }
-
         TemplateConfigurationUpdateButtonState( );
     }
 
@@ -259,7 +266,7 @@ public partial class SanoidConfigConsole
     private void TemplateConfigurationUpdateButtonState( )
     {
         templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
-        templateConfigurationSaveAllButton.Enabled = IsAnyTemplateModified && IsEveryPropertyTextValidateFieldValid;
+        templateConfigurationSaveAllButton.Enabled = ( _templateConfigurationTemplatesAddedOrRemoved || IsAnyTemplateModified ) && IsEveryPropertyTextValidateFieldValid;
 
         templateConfigurationDeleteTemplateButton.Enabled = templateConfigurationTemplateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse;
         templateConfigurationAddTemplateButton.Enabled = templateConfigurationNewTemplateNameTextValidateField.IsValid;
@@ -296,7 +303,6 @@ public partial class SanoidConfigConsole
         }
 
         TemplateConfigurationListItem item = SelectedTemplateItem;
-
         templateConfigurationPropertiesNamingComponentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
         templateConfigurationPropertiesNamingPrefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
         templateConfigurationPropertiesNamingFrequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
@@ -307,15 +313,15 @@ public partial class SanoidConfigConsole
         templateConfigurationPropertiesNamingYearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
         templateConfigurationPropertiesNamingTimestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
         templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
-        templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( );
-        templateConfigurationPropertiesTimingDailyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.DailyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
+        templateConfigurationPropertiesTimingDailyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
         templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
-        templateConfigurationPropertiesTimingWeeklyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.WeeklyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingWeeklyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
         templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
-        templateConfigurationPropertiesTimingMonthlyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingMonthlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
         templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetMonthName( item.ViewSettings.SnapshotTiming.YearlyMonth );
         templateConfigurationPropertiesTimingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
-        templateConfigurationPropertiesTimingYearlyTimeTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyTime.ToString( "HH:mm:ss" );
+        templateConfigurationPropertiesTimingYearlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
     }
 
     private void TemplateSettingsSaveAllButtonOnClicked( )
@@ -345,14 +351,14 @@ public partial class SanoidConfigConsole
             {
                 FrequentPeriod = validator.TimingFrequentPeriod!.Value,
                 HourlyMinute = validator.TimingHourlyMinute!.Value,
-                DailyTime = validator.TimingDailyTime!.Value,
+                DailyTime = validator.TimingDailyTime,
                 WeeklyDay = validator.TimingWeeklyDay!.Value,
-                WeeklyTime = validator.TimingWeeklyTime!.Value,
+                WeeklyTime = validator.TimingWeeklyTime,
                 MonthlyDay = validator.TimingMonthlyDay!.Value,
-                MonthlyTime = validator.TimingMonthlyTime!.Value,
+                MonthlyTime = validator.TimingMonthlyTime,
                 YearlyMonth = validator.TimingYearlyMonth!.Value,
                 YearlyDay = validator.TimingYearlyDay!.Value,
-                YearlyTime = validator.TimingYearlyTime!.Value
+                YearlyTime = validator.TimingYearlyTime
             }
         };
 
@@ -410,9 +416,9 @@ public partial class SanoidConfigConsole
         templateConfigurationSaveAllButton.Clicked -= TemplateSettingsSaveAllButtonOnClicked;
         templateConfigurationResetCurrentButton.Clicked -= TemplateConfigurationResetCurrentButtonOnClicked;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Leave -= TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave;
-        templateConfigurationPropertiesTimingDailyTimeTextValidateField.Leave -= TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnLeave;
+        templateConfigurationPropertiesTimingDailyTimeTimeField.Leave -= TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnLeave;
         templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.KeyPress -= TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnKeyPress;
-        templateConfigurationPropertiesTimingDailyTimeTextValidateField.KeyPress -= TemplateConfigurationPropertiesTimingDailyTimeTextValidateFieldOnKeyPress;
+        templateConfigurationPropertiesTimingDailyTimeTimeField.KeyPress -= TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnKeyPress;
 
         _templateConfigurationEventsEnabled = false;
     }
@@ -429,16 +435,16 @@ public partial class SanoidConfigConsole
         public string? NamingTimestampFormatString { get; private set; }
         public string? NamingWeeklySuffix { get; private set; }
         public string? NamingYearlySuffix { get; private set; }
-        public TimeOnly? TimingDailyTime { get; private set; }
+        public TimeOnly TimingDailyTime { get; private set; }
         public int? TimingFrequentPeriod { get; private set; }
         public int? TimingHourlyMinute { get; private set; }
         public int? TimingMonthlyDay { get; private set; }
-        public TimeOnly? TimingMonthlyTime { get; private set; }
+        public TimeOnly TimingMonthlyTime { get; private set; }
         public DayOfWeek? TimingWeeklyDay { get; private set; }
-        public TimeOnly? TimingWeeklyTime { get; private set; }
+        public TimeOnly TimingWeeklyTime { get; private set; }
         public int? TimingYearlyDay { get; private set; }
         public int? TimingYearlyMonth { get; private set; }
-        public TimeOnly? TimingYearlyTime { get; private set; }
+        public TimeOnly TimingYearlyTime { get; private set; }
 
         public bool ValidateFieldValues( SanoidConfigConsole configConsole )
         {
@@ -522,12 +528,12 @@ public partial class SanoidConfigConsole
             DayOfWeek? dayOfWeek = (DayOfWeek)index;
             TimingFrequentPeriod = TemplateConfigurationFrequentPeriodOptions[ ConfigConsole.templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem ];
             TimingHourlyMinute = ConfigConsole.templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToNullableInt32( );
-            TimingDailyTime = ConfigConsole.templateConfigurationPropertiesTimingDailyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            TimingDailyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingDailyTimeTimeField.Time );
             TimingWeeklyDay = dayOfWeek;
-            TimingWeeklyTime = ConfigConsole.templateConfigurationPropertiesTimingWeeklyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            TimingWeeklyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingWeeklyTimeTimeField.Time );
             ustring monthlyDayString = ConfigConsole.templateConfigurationPropertiesTimingMonthlyDayTextValidateField?.Text;
             TimingMonthlyDay = monthlyDayString?.ToNullableInt32( );
-            TimingMonthlyTime = ConfigConsole.templateConfigurationPropertiesTimingMonthlyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
+            TimingMonthlyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingMonthlyTimeTimeField.Time );
             string? enteredYearlyMonthString = ConfigConsole.templateConfigurationPropertiesTimingYearlyMonthTextValidateField?.Text?.ToString( );
             if ( int.TryParse( enteredYearlyMonthString, out int enteredYearlyMonthIntValue ) )
             {
@@ -547,8 +553,7 @@ public partial class SanoidConfigConsole
             }
 
             TimingYearlyDay = ConfigConsole.templateConfigurationPropertiesTimingYearlyDayTextValidateField?.Text?.ToNullableInt32( );
-            TimingYearlyTime = ConfigConsole.templateConfigurationPropertiesTimingYearlyTimeTextValidateField?.Text?.ToNullableTimeOnly( );
-
+            TimingYearlyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingYearlyTimeTimeField.Time );
             if ( TimingFrequentPeriod is null || !TemplateConfigurationFrequentPeriodOptions.Contains( (int)TimingFrequentPeriod ) )
             {
                 Logger.Warn( "Snapshot template frequent period value {0:00} for template {1} is invalid", TimingFrequentPeriod, templateName );
@@ -561,33 +566,15 @@ public partial class SanoidConfigConsole
                 isValid = false;
             }
 
-            if ( TimingDailyTime is null )
-            {
-                Logger.Warn( "Snapshot template daily time value for template {0} is invalid", templateName );
-                isValid = false;
-            }
-
             if ( TimingWeeklyDay is null )
             {
                 Logger.Warn( "Snapshot template weekly day value {0} for template {1} is invalid", weeklyDayString, templateName );
                 isValid = false;
             }
 
-            if ( TimingWeeklyTime is null )
-            {
-                Logger.Warn( "Snapshot template weekly time value for template {0} is invalid", templateName );
-                isValid = false;
-            }
-
             if ( TimingMonthlyDay is null )
             {
                 Logger.Warn( "Snapshot template monthly day value {0} for template {1} is invalid", monthlyDayString, templateName );
-                isValid = false;
-            }
-
-            if ( TimingMonthlyTime is null )
-            {
-                Logger.Warn( "Snapshot template monthly time value for template {0} is invalid", templateName );
                 isValid = false;
             }
 
@@ -600,12 +587,6 @@ public partial class SanoidConfigConsole
             if ( TimingYearlyDay is null )
             {
                 Logger.Warn( "Snapshot template yearly day value {0} for template {1} is invalid", TimingYearlyDay, templateName );
-                isValid = false;
-            }
-
-            if ( TimingYearlyTime is null )
-            {
-                Logger.Warn( "Snapshot template yearly time value for template {0} is invalid", templateName );
                 isValid = false;
             }
 
