@@ -130,6 +130,42 @@ public static class TypeExtensions
     }
 
     /// <summary>
+    ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int" /> version of it, with the
+    ///     specified fallback value
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="fallbackValue"></param>
+    /// <returns>
+    ///     If the <paramref name="value" /> is a valid integer, the <see langword="int" /> representation of
+    ///     <paramref name="value" /><br />For all other cases, <paramref name="fallbackValue" />
+    /// </returns>
+    /// <remarks>Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue" /></remarks>
+    [Pure]
+    [SuppressMessage( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
+    public static int ToInt32( this ustring value, int fallbackValue )
+    {
+        try
+        {
+            if ( value.IsEmpty )
+            {
+                return fallbackValue;
+            }
+
+            return value.ToString( ) switch
+            {
+                // This case is checking if it's a non-null string, and if it can be parsed as an integer
+                // All other conditions will throw an ArgumentOutOfRangeException for value
+                { } stringValue when int.TryParse( stringValue, out int intValue ) => intValue,
+                _ => fallbackValue
+            };
+        }
+        catch
+        {
+            return fallbackValue;
+        }
+    }
+
+    /// <summary>
     ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int?" /> version of it
     /// </summary>
     /// <param name="value"></param>
@@ -180,14 +216,13 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    /// A shortcut to calling <see cref="TimeOnly.FromTimeSpan"/> on <paramref name="value"/>
+    ///     A shortcut to calling <see cref="TimeOnly.FromTimeSpan" /> on <paramref name="value" />
     /// </summary>
     /// <param name="value"></param>
-    /// <returns>The time portion of <paramref name="value"/></returns>
+    /// <returns>The time portion of <paramref name="value" /></returns>
     [Pure]
     public static TimeOnly ToTimeOnly( this TimeSpan value )
     {
         return TimeOnly.FromTimeSpan( value );
     }
-
 }
