@@ -53,7 +53,8 @@ public partial class SanoidConfigConsole
         templateConfigurationApplyCurrentButton.Enabled = false;
         TemplateConfigurationInitializeTemplatePropertiesTextValidateFieldList( );
         TemplateConfigurationSetValidateOnInputForAllTextValidateFields( );
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
+        TemplateConfigurationUpdateTemplatePropertiesButtonStates( );
         EnableTemplateConfigurationTabEventHandlers( );
     }
 
@@ -229,12 +230,12 @@ public partial class SanoidConfigConsole
         Templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
         _templateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
         _templateConfigurationTemplatesAddedOrRemoved = true;
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
     }
 
     private void TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnLeave( FocusEventArgs args )
     {
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
     }
 
     private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnLeave( FocusEventArgs args )
@@ -253,7 +254,7 @@ public partial class SanoidConfigConsole
             SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with { HourlyMinute = hourlyMinute };
         }
 
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
     }
 
     private void TemplateConfigurationResetCurrentButtonOnClicked( )
@@ -261,17 +262,20 @@ public partial class SanoidConfigConsole
         DisableTemplateConfigurationTabEventHandlers( );
         SelectedTemplateItem.ViewSettings = SelectedTemplateItem.BaseSettings with { };
         TemplateConfigurationSetFieldsForSelectedItem( );
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
         EnableTemplateConfigurationTabEventHandlers( );
     }
 
-    private void TemplateConfigurationUpdateButtonState( )
+    private void TemplateConfigurationUpdateTemplateListButtonStates( )
     {
-        templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
         templateConfigurationSaveAllButton.Enabled = ( _templateConfigurationTemplatesAddedOrRemoved || IsAnyTemplateModified ) && IsEveryPropertyTextValidateFieldValid;
-
         templateConfigurationDeleteTemplateButton.Enabled = templateConfigurationTemplateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse;
         templateConfigurationAddTemplateButton.Enabled = templateConfigurationNewTemplateNameTextValidateField.IsValid;
+    }
+
+    private void TemplateConfigurationUpdateTemplatePropertiesButtonStates( )
+    {
+        templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
     }
 
     private void TemplateConfigurationHideTemplateConfigurationPropertiesFrame( )
@@ -292,7 +296,7 @@ public partial class SanoidConfigConsole
 
         TemplateConfigurationSetFieldsForSelectedItem( );
 
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
 
         EnableTemplateConfigurationTabEventHandlers( );
     }
@@ -370,7 +374,7 @@ public partial class SanoidConfigConsole
             TemplateConfigurationShowSaveDialog( );
         }
 
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
     }
 
     private void TemplateConfigurationShowSaveDialog( )
@@ -401,7 +405,7 @@ public partial class SanoidConfigConsole
             File.WriteAllText( saveDialog.FileName.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" ), JsonSerializer.Serialize( ConfigConsole.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
         }
 
-        TemplateConfigurationUpdateButtonState( );
+        TemplateConfigurationUpdateTemplateListButtonStates( );
     }
 
     private void DisableTemplateConfigurationTabEventHandlers( )
