@@ -149,7 +149,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TimeField templateConfigurationPropertiesTimingYearlyTimeTimeField;
         
-        private Terminal.Gui.Button templateConfigurationApplyButton;
+        private Terminal.Gui.Button templateConfigurationApplyCurrentButton;
         
         private Terminal.Gui.Button templateConfigurationResetCurrentButton;
         
@@ -351,7 +351,7 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationTemplateListView = new Terminal.Gui.ListView();
             this.templateConfigurationTemplateListFrame = new Terminal.Gui.FrameView();
             this.templateConfigurationResetCurrentButton = new Terminal.Gui.Button();
-            this.templateConfigurationApplyButton = new Terminal.Gui.Button();
+            this.templateConfigurationApplyCurrentButton = new Terminal.Gui.Button();
             this.templateConfigurationPropertiesTimingYearlyTimeTimeField = new Terminal.Gui.TimeField();
             this.templateConfigurationPropertiesYearlyTimeLabel = new Terminal.Gui.Label();
             this.templateConfigurationPropertiesTimingYearlyDayTextValidateField = new Terminal.Gui.TextValidateField();
@@ -1037,15 +1037,15 @@ namespace Sanoid.ConfigConsole {
             this.templateConfigurationPropertiesTimingYearlyTimeTimeField.Text = "00:00:00";
             this.templateConfigurationPropertiesTimingYearlyTimeTimeField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.templateConfigurationPropertiesSnapshotTimingFrame.Add(this.templateConfigurationPropertiesTimingYearlyTimeTimeField);
-            this.templateConfigurationApplyButton.Width = 9;
-            this.templateConfigurationApplyButton.Height = 1;
-            this.templateConfigurationApplyButton.X = 19;
-            this.templateConfigurationApplyButton.Y = 25;
-            this.templateConfigurationApplyButton.Data = "templateConfigurationApplyButton";
-            this.templateConfigurationApplyButton.Text = "Apply";
-            this.templateConfigurationApplyButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.templateConfigurationApplyButton.IsDefault = false;
-            this.templateConfigurationTemplatePropertiesFrame.Add(this.templateConfigurationApplyButton);
+            this.templateConfigurationApplyCurrentButton.Width = 9;
+            this.templateConfigurationApplyCurrentButton.Height = 1;
+            this.templateConfigurationApplyCurrentButton.X = 19;
+            this.templateConfigurationApplyCurrentButton.Y = 25;
+            this.templateConfigurationApplyCurrentButton.Data = "templateConfigurationApplyCurrentButton";
+            this.templateConfigurationApplyCurrentButton.Text = "Apply";
+            this.templateConfigurationApplyCurrentButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateConfigurationApplyCurrentButton.IsDefault = false;
+            this.templateConfigurationTemplatePropertiesFrame.Add(this.templateConfigurationApplyCurrentButton);
             this.templateConfigurationResetCurrentButton.Width = 9;
             this.templateConfigurationResetCurrentButton.Height = 1;
             this.templateConfigurationResetCurrentButton.X = 31;

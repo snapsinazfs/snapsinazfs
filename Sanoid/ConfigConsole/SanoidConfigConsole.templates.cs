@@ -49,8 +49,10 @@ public partial class SanoidConfigConsole
         templateConfigurationSnapshotNamingFrame.CanFocus = false;
         templateEditorWindow.CanFocus = false;
         templateConfigurationDeleteTemplateButton.Enabled = false;
+        templateConfigurationResetCurrentButton.Enabled = false;
+        templateConfigurationApplyCurrentButton.Enabled = false;
         TemplateConfigurationInitializeTemplatePropertiesTextValidateFieldList( );
-        TemplateConfigurationDisableValidateOnInputForAllFields( );
+        TemplateConfigurationSetValidateOnInputForAllTextValidateFields( );
         TemplateConfigurationUpdateButtonState( );
         EnableTemplateConfigurationTabEventHandlers( );
     }
@@ -73,7 +75,7 @@ public partial class SanoidConfigConsole
         _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingYearlyDayTextValidateField, true ) );
     }
 
-    private void TemplateConfigurationDisableValidateOnInputForAllFields( )
+    private void TemplateConfigurationSetValidateOnInputForAllTextValidateFields( )
     {
         _templateConfigurationTextValidateFieldList.ForEach( item => ( (TextRegexProvider)item.Field.Provider ).ValidateOnInput = item.ValidateOnInput );
         ( (TextRegexProvider)templateConfigurationNewTemplateNameTextValidateField.Provider ).ValidateOnInput = false;
@@ -89,7 +91,7 @@ public partial class SanoidConfigConsole
         templateConfigurationTemplateListView.SelectedItemChanged += TemplateConfigurationTemplateListViewOnSelectedItemChanged;
         templateConfigurationAddTemplateButton.Clicked += TemplateConfigurationAddTemplateButtonOnClicked;
         templateConfigurationDeleteTemplateButton.Clicked += TemplateConfigurationDeleteTemplateButtonOnClicked;
-        templateConfigurationApplyButton.Clicked+= TemplateConfigurationApplyButtonOnClicked;
+        templateConfigurationApplyCurrentButton.Clicked+= TemplateConfigurationApplyCurrentButtonOnClicked;
         templateConfigurationNewTemplateNameTextValidateField.KeyPress += TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress;
         templateConfigurationSaveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
         templateConfigurationResetCurrentButton.Clicked += TemplateConfigurationResetCurrentButtonOnClicked;
@@ -100,7 +102,7 @@ public partial class SanoidConfigConsole
         _templateConfigurationEventsEnabled = true;
     }
 
-    private void TemplateConfigurationApplyButtonOnClicked( )
+    private void TemplateConfigurationApplyCurrentButtonOnClicked( )
     {
         if ( !IsEveryPropertyTextValidateFieldValid )
         {
@@ -116,12 +118,15 @@ public partial class SanoidConfigConsole
 
     private void TemplateConfigurationPropertiesTimingDailyTimeTimeFieldOnKeyPress( KeyEventEventArgs args )
     {
-        templateConfigurationApplyButton.Enabled = IsEveryPropertyTextValidateFieldValid;
+        bool isTimeValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.DailyTime != templateConfigurationPropertiesTimingDailyTimeTimeField.Time.ToTimeOnly( );
+        templateConfigurationApplyCurrentButton.Enabled = isTimeValueDifferent && IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationPropertiesTimingHourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs args )
     {
-        templateConfigurationApplyButton.Enabled = templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid & IsEveryPropertyTextValidateFieldValid;
+        bool fieldIsValid = templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.IsValid;
+        bool isMinuteValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != templateConfigurationPropertiesTimingHourlyMinuteTextValidateField.Text.ToInt32( int.MinValue );
+        templateConfigurationApplyCurrentButton.Enabled = fieldIsValid && isMinuteValueDifferent && IsEveryPropertyTextValidateFieldValid;
     }
 
     private void TemplateConfigurationNewTemplateNameTextValidateFieldOnKeyPress( KeyEventEventArgs args )
