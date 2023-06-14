@@ -185,7 +185,7 @@ public static class TypeExtensions
         {
             // This case is checking if it's a non-null string, and if it can be parsed as an integer
             // All other conditions will throw an ArgumentOutOfRangeException for value
-            { } stringValue when stringValue.Trim( ) is [_, ..] trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
+            { Length: >0 } stringValue when stringValue.Trim( ) is { Length: >0 } trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
             _ => null
         };
     }
@@ -208,9 +208,9 @@ public static class TypeExtensions
 
         return value.ToString( ) switch
         {
-            // This case is checking if it's a non-null string, and if it can be parsed as an integer
+            // This case is checking if it's a non-null string at least 5 characters long
             // All other conditions will throw an ArgumentOutOfRangeException for value
-            { } stringValue when TimeOnly.TryParse( stringValue, out TimeOnly timeOnlyValue ) => timeOnlyValue,
+            { Length: > 4 } stringValue when stringValue.Trim( ) is { Length: > 4 } trimmedValue && TimeOnly.TryParse( trimmedValue, out TimeOnly timeOnlyValue ) => timeOnlyValue,
             _ => null
         };
     }
