@@ -53,6 +53,21 @@ public class TemplateValidationException<T> : ApplicationException where T : not
     }
 
     /// <summary>
+    ///     Creates a new <see cref="TemplateValidationException{T}" /> with the given name, value, entry field, and message
+    /// </summary>
+    /// <param name="propertyName">The name of the property that caused this exception</param>
+    /// <param name="propertyValue">The value of the property that caused this exception</param>
+    /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
+    /// <param name="message"><inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='message']" /></param>
+    /// <param name="innerException"><inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='innerException']" /></param>
+    public TemplateValidationException( string propertyName, T propertyValue, View entryField, string message, Exception innerException ) : base( message, innerException )
+    {
+        PropertyName = propertyName;
+        PropertyValue = propertyValue;
+        EntryField = entryField;
+    }
+
+    /// <summary>
     ///     Gets the <see cref="View" /> that contains the value that caused this exception
     /// </summary>
     public View? EntryField { get; init; }
