@@ -276,6 +276,7 @@ public partial class SanoidConfigConsole
     private void TemplateConfigurationUpdateTemplatePropertiesButtonStates( )
     {
         templateConfigurationResetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
+        templateConfigurationApplyCurrentButton.Enabled = SelectedTemplateItem.IsModified;
     }
 
     private void TemplateConfigurationHideTemplateConfigurationPropertiesFrame( )
