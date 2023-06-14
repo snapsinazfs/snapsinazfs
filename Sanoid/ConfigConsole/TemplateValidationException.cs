@@ -19,7 +19,7 @@ public class TemplateValidationException<T> : ApplicationException where T : not
     /// </summary>
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="propertyValue">The value of the property that caused this exception</param>
-    /// <param name="message">A message describing the exception</param>
+    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
     public TemplateValidationException( string propertyName, T propertyValue, string message ) : base( message )
     {
         PropertyName = propertyName;
@@ -31,7 +31,7 @@ public class TemplateValidationException<T> : ApplicationException where T : not
     /// </summary>
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
-    /// <param name="message">A message describing the exception</param>
+    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
     public TemplateValidationException( string propertyName, View entryField, string message ) : base( message )
     {
         PropertyName = propertyName;
@@ -44,7 +44,7 @@ public class TemplateValidationException<T> : ApplicationException where T : not
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="propertyValue">The value of the property that caused this exception</param>
     /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
-    /// <param name="message">A message describing the exception</param>
+    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
     public TemplateValidationException( string propertyName, T propertyValue, View entryField, string message ) : base( message )
     {
         PropertyName = propertyName;
