@@ -537,7 +537,7 @@ public partial class SanoidConfigConsole
             TimingDailyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingDailyTimeTimeField.Time );
             TimingWeeklyDay = dayOfWeek;
             TimingWeeklyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingWeeklyTimeTimeField.Time );
-            ustring monthlyDayString = ConfigConsole.templateConfigurationPropertiesTimingMonthlyDayTextValidateField?.Text;
+            ustring monthlyDayString = ConfigConsole.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text;
             TimingMonthlyDay = monthlyDayString?.ToNullableInt32( );
             TimingMonthlyTime = TimeOnly.FromTimeSpan( ConfigConsole.templateConfigurationPropertiesTimingMonthlyTimeTimeField.Time );
             string? enteredYearlyMonthString = ConfigConsole.templateConfigurationPropertiesTimingYearlyMonthTextValidateField?.Text?.ToString( );
