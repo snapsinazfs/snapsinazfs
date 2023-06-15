@@ -49,6 +49,8 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.MenuBarItem fileMenu;
         
+        private Terminal.Gui.MenuItem saveMenuItem;
+        
         private Terminal.Gui.MenuItem quitMenuItem;
         
         private Terminal.Gui.MenuBarItem windowMenu;
@@ -173,10 +175,14 @@ namespace Sanoid.ConfigConsole {
             this.topMenuBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.fileMenu = new Terminal.Gui.MenuBarItem();
             this.fileMenu.Title = "_File";
+            this.saveMenuItem = new Terminal.Gui.MenuItem();
+            this.saveMenuItem.Title = "_Save";
+            this.saveMenuItem.Data = "saveMenuItem";
             this.quitMenuItem = new Terminal.Gui.MenuItem();
             this.quitMenuItem.Title = "_Quit";
             this.quitMenuItem.Data = "quitMenuItem";
             this.fileMenu.Children = new Terminal.Gui.MenuItem[] {
+                    this.saveMenuItem,
                     this.quitMenuItem};
             this.windowMenu = new Terminal.Gui.MenuBarItem();
             this.windowMenu.Title = "_Window";
