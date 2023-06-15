@@ -38,69 +38,66 @@ namespace Sanoid.ConfigConsole
 
         private void ShowGlobalConfigurationWindow( )
         {
-            if ( _globalConfigurationWindow is null )
+            _globalConfigurationWindow ??= new( );
+            Add( _globalConfigurationWindow );
+            if ( ShowChild( _globalConfigurationWindow ) )
             {
-                _globalConfigurationWindow ??= new( );
-                Add( _globalConfigurationWindow );
-                if ( ShowChild( _globalConfigurationWindow ) )
-                {
-                    Logger.Debug("Showing global configuration window");
-                }
-                else
-                {
-                    Logger.Error( "Unable to show global configuration window" );
-                }
+                Logger.Debug("Showing global configuration window");
+                globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
             }
+            else
+            {
+                Remove( _globalConfigurationWindow );
+                Logger.Error( "Unable to show global configuration window" );
+            }
+        }
 
-            BringSubviewToFront( _globalConfigurationWindow );
+        private void HideGlobalConfigurationWindow( )
+        {
+            Remove( _globalConfigurationWindow );
+            globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
         }
 
         private void ShowTemplateConfigurationWindow( )
         {
-            if ( _templateConfigurationWindow is null )
+            _templateConfigurationWindow ??= new( );
+            Add( _templateConfigurationWindow );
+            if ( ShowChild( _templateConfigurationWindow ) )
             {
-                _templateConfigurationWindow ??= new( );
-                Add( _templateConfigurationWindow );
-                if ( ShowChild( _templateConfigurationWindow ) )
-                {
-                    Logger.Debug( "Showing template configuration window" );
-                }
-                else
-                {
-                    Logger.Error( "Unable to show template configuration window" );
-                }
+                Logger.Debug( "Showing template configuration window" );
+                templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
             }
+            else
+            {
+                Logger.Error( "Unable to show template configuration window" );
+            }
+        }
 
-            BringSubviewToFront( _templateConfigurationWindow );
+        private void HideTemplateConfigurationWindow()
+        {
+            Remove( _templateConfigurationWindow );
+            templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
         }
 
         private void ShowZfsConfigurationWindow( )
         {
-            if ( _zfsConfigurationWindow is null )
+            _zfsConfigurationWindow ??= new( );
+            Add( _zfsConfigurationWindow );
+            if ( ShowChild( _zfsConfigurationWindow ) )
             {
-                _zfsConfigurationWindow ??= new( );
-                Add( _zfsConfigurationWindow );
-                if ( ShowChild( _zfsConfigurationWindow ) )
-                {
-                    Logger.Debug( "Showing ZFS configuration window" );
-                }
-                else
-                {
-                    Logger.Error( "Unable to show ZFS configuration window" );
-                }
+                Logger.Debug( "Showing ZFS configuration window" );
+                zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
             }
-
-            if ( _globalConfigurationWindow is not null )
+            else
             {
-                SendSubviewToBack( _globalConfigurationWindow );
+                Logger.Error( "Unable to show ZFS configuration window" );
             }
+        }
 
-            if ( _templateConfigurationWindow is not null )
-            {
-                SendSubviewToBack( _templateConfigurationWindow );
-            }
-
-            BringSubviewToFront( _zfsConfigurationWindow );
+        private void HideZfsConfigurationWindow( )
+        {
+            Remove( _zfsConfigurationWindow );
+            zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
         }
 
         private void SanoidConfigConsoleOnInitialized( object? sender, EventArgs e )
