@@ -82,17 +82,17 @@ namespace Sanoid.ConfigConsole
             _templateConfigurationTextValidateFieldList.Clear( );
             _templateConfigurationTextValidateFieldList.Add( new( namingComponentSeparatorValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( namingPrefixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingFrequentSuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingHourlySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingDailySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingWeeklySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingMonthlySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesNamingYearlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingFrequentSuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingHourlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingDailySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingWeeklySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingMonthlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( namingYearlySuffixTextValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( hourlyMinuteTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingWeeklyDayTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingMonthlyDayTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingYearlyMonthTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( templateConfigurationPropertiesTimingYearlyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( timingWeeklyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( timingMonthlyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( timingYearlyMonthTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( timingYearlyDayTextValidateField, true ) );
         }
 
         private void SetValidateOnInputForAllTextValidateFields( )
@@ -335,22 +335,22 @@ namespace Sanoid.ConfigConsole
             TemplateConfigurationListItem item = SelectedTemplateItem;
             namingComponentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
             namingPrefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
-            templateConfigurationPropertiesNamingFrequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
-            templateConfigurationPropertiesNamingHourlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
-            templateConfigurationPropertiesNamingDailySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
-            templateConfigurationPropertiesNamingWeeklySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
-            templateConfigurationPropertiesNamingMonthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
-            templateConfigurationPropertiesNamingYearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
-            templateConfigurationPropertiesNamingTimestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
-            templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
+            namingFrequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
+            namingHourlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
+            namingDailySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
+            namingWeeklySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
+            namingMonthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
+            namingYearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
+            namingTimestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
+            frequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
             hourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
             dailyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
-            templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
+            timingWeeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
             weeklyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
-            templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
+            timingMonthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
             monthlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
-            templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetMonthName( item.ViewSettings.SnapshotTiming.YearlyMonth );
-            templateConfigurationPropertiesTimingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
+            timingYearlyMonthTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetMonthName( item.ViewSettings.SnapshotTiming.YearlyMonth );
+            timingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
             yearlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
             comboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth;
         }
@@ -504,13 +504,13 @@ namespace Sanoid.ConfigConsole
                 // Naming fields
                 NamingComponentSeparator = TemplateWindow.namingComponentSeparatorValidateField.IsValid ? TemplateWindow.namingComponentSeparatorValidateField?.Text?.ToString( ) : null;
                 NamingPrefix = TemplateWindow.namingPrefixTextValidateField.IsValid ? TemplateWindow.namingPrefixTextValidateField?.Text?.ToString( ) : null;
-                NamingTimestampFormatString = TemplateWindow.templateConfigurationPropertiesNamingTimestampFormatTextField?.Text?.ToString( );
-                NamingFrequentSuffix = TemplateWindow.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField?.Text?.ToString( ) : null;
-                NamingHourlySuffix = TemplateWindow.templateConfigurationPropertiesNamingHourlySuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingHourlySuffixTextValidateField?.Text?.ToString( ) : null;
-                NamingDailySuffix = TemplateWindow.templateConfigurationPropertiesNamingDailySuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingDailySuffixTextValidateField?.Text?.ToString( ) : null;
-                NamingWeeklySuffix = TemplateWindow.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField?.Text?.ToString( ) : null;
-                NamingMonthlySuffix = TemplateWindow.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField?.Text?.ToString( ) : null;
-                NamingYearlySuffix = TemplateWindow.templateConfigurationPropertiesNamingYearlySuffixTextValidateField.IsValid ? TemplateWindow.templateConfigurationPropertiesNamingYearlySuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingTimestampFormatString = TemplateWindow.namingTimestampFormatTextField?.Text?.ToString( );
+                NamingFrequentSuffix = TemplateWindow.namingFrequentSuffixTextValidateField.IsValid ? TemplateWindow.namingFrequentSuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingHourlySuffix = TemplateWindow.namingHourlySuffixTextValidateField.IsValid ? TemplateWindow.namingHourlySuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingDailySuffix = TemplateWindow.namingDailySuffixTextValidateField.IsValid ? TemplateWindow.namingDailySuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingWeeklySuffix = TemplateWindow.namingWeeklySuffixTextValidateField.IsValid ? TemplateWindow.namingWeeklySuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingMonthlySuffix = TemplateWindow.namingMonthlySuffixTextValidateField.IsValid ? TemplateWindow.namingMonthlySuffixTextValidateField?.Text?.ToString( ) : null;
+                NamingYearlySuffix = TemplateWindow.namingYearlySuffixTextValidateField.IsValid ? TemplateWindow.namingYearlySuffixTextValidateField?.Text?.ToString( ) : null;
                 if ( string.IsNullOrWhiteSpace( NamingComponentSeparator ) )
                 {
                     string errorMessage = $"Snapshot name component separator value {NamingComponentSeparator} for template {templateName} is invalid";
@@ -532,7 +532,7 @@ namespace Sanoid.ConfigConsole
                 if ( string.IsNullOrWhiteSpace( NamingTimestampFormatString ) )
                 {
                     string errorMessage = $"Snapshot timestamp format string value {NamingTimestampFormatString} for template {templateName} is invalid";
-                    TemplateValidationException ex = new( "Timestamp Format String", NamingTimestampFormatString, TemplateWindow.templateConfigurationPropertiesNamingTimestampFormatTextField, errorMessage );
+                    TemplateValidationException ex = new( "Timestamp Format String", NamingTimestampFormatString, TemplateWindow.namingTimestampFormatTextField, errorMessage );
                     validationExceptions.Add( ex );
                     Logger.Warn( ex, errorMessage );
                     isValid = false;
@@ -547,51 +547,51 @@ namespace Sanoid.ConfigConsole
                     catch ( FormatException ex )
                     {
                         string errorMessage = $"Snapshot timestamp format string value {NamingTimestampFormatString} for template {templateName} is not in the correct format. Please see Microsoft documentation for DateTime format strings.";
-                        TemplateValidationException tve = new( "Timestamp Format String", NamingTimestampFormatString, TemplateWindow.templateConfigurationPropertiesNamingTimestampFormatTextField, errorMessage, ex );
+                        TemplateValidationException tve = new( "Timestamp Format String", NamingTimestampFormatString, TemplateWindow.namingTimestampFormatTextField, errorMessage, ex );
                         validationExceptions.Add( tve );
                         Logger.Warn( tve, errorMessage );
                         isValid = false;
                     }
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingFrequentSuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingFrequentSuffix ) )
+                if ( !TemplateWindow.namingFrequentSuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingFrequentSuffix ) )
                 {
                     Logger.Warn( "Snapshot template frequent suffix value {0} for template {1} is invalid", NamingFrequentSuffix, templateName );
                     isValid = false;
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingHourlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingHourlySuffix ) )
+                if ( !TemplateWindow.namingHourlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingHourlySuffix ) )
                 {
                     Logger.Warn( "Snapshot template hourly suffix value {0} for template {1} is invalid", NamingHourlySuffix, templateName );
                     isValid = false;
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingDailySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingDailySuffix ) )
+                if ( !TemplateWindow.namingDailySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingDailySuffix ) )
                 {
                     Logger.Warn( "Snapshot template daily suffix value {0} for template {1} is invalid", NamingDailySuffix, templateName );
                     isValid = false;
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingWeeklySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingWeeklySuffix ) )
+                if ( !TemplateWindow.namingWeeklySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingWeeklySuffix ) )
                 {
                     Logger.Warn( "Snapshot template weekly suffix value {0} for template {1} is invalid", NamingWeeklySuffix, templateName );
                     isValid = false;
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingMonthlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingMonthlySuffix ) )
+                if ( !TemplateWindow.namingMonthlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingMonthlySuffix ) )
                 {
                     Logger.Warn( "Snapshot template monthly suffix value {0} for template {1} is invalid", NamingMonthlySuffix, templateName );
                     isValid = false;
                 }
 
-                if ( !TemplateWindow.templateConfigurationPropertiesNamingYearlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingYearlySuffix ) )
+                if ( !TemplateWindow.namingYearlySuffixTextValidateField!.IsValid || string.IsNullOrWhiteSpace( NamingYearlySuffix ) )
                 {
                     Logger.Warn( "Snapshot template yearly suffix value {0} for template {1} is invalid", NamingYearlySuffix, templateName );
                     isValid = false;
                 }
 
                 // Timing fields
-                string weeklyDayString = TemplateWindow.templateConfigurationPropertiesTimingWeeklyDayTextValidateField.Text.ToString( )!;
+                string weeklyDayString = TemplateWindow.timingWeeklyDayTextValidateField.Text.ToString( )!;
 
                 // This exception can't be thrown by the call to string.Equals, because it only happens if the third argument isn't valid
                 // ReSharper disable ExceptionNotDocumentedOptional
@@ -599,17 +599,17 @@ namespace Sanoid.ConfigConsole
                 // ReSharper disable ExceptionNotDocumentedOptional
                 DayOfWeek dayOfWeek = (DayOfWeek)( weeklyDayStringIndex % 7 );
 
-                TimingFrequentPeriod = TemplateConfigurationFrequentPeriodOptions[ TemplateWindow.templateConfigurationPropertiesTimingFrequentPeriodRadioGroup.SelectedItem ];
+                TimingFrequentPeriod = TemplateConfigurationFrequentPeriodOptions[ TemplateWindow.frequentPeriodRadioGroup.SelectedItem ];
                 TimingHourlyMinute = TemplateWindow.hourlyMinuteTextValidateField.Text.ToNullableInt32( );
                 TimingDailyTime = TimeOnly.FromTimeSpan( TemplateWindow.dailyTimeTimeField.Time );
                 TimingWeeklyDay = dayOfWeek;
                 TimingWeeklyTime = TimeOnly.FromTimeSpan( TemplateWindow.weeklyTimeTimeField.Time );
-                ustring monthlyDayString = TemplateWindow.templateConfigurationPropertiesTimingMonthlyDayTextValidateField.Text;
+                ustring monthlyDayString = TemplateWindow.timingMonthlyDayTextValidateField.Text;
                 int monthlyDayInt = monthlyDayString.ToInt32( -1 );
                 int numberOfMonthsInYear = CultureInfo.CurrentCulture.Calendar.GetMonthsInYear( DateTimeOffset.Now.Year );
                 TimingMonthlyDay = monthlyDayInt;
                 TimingMonthlyTime = TimeOnly.FromTimeSpan( TemplateWindow.monthlyTimeTimeField.Time );
-                string? enteredYearlyMonthString = TemplateWindow.templateConfigurationPropertiesTimingYearlyMonthTextValidateField.Text.ToString( );
+                string? enteredYearlyMonthString = TemplateWindow.timingYearlyMonthTextValidateField.Text.ToString( );
                 if ( int.TryParse( enteredYearlyMonthString, out int enteredYearlyMonthIntValue ) )
                 {
                     TimingYearlyMonth = enteredYearlyMonthIntValue;
@@ -626,7 +626,7 @@ namespace Sanoid.ConfigConsole
                     }
                 }
 
-                TimingYearlyDay = TemplateWindow.templateConfigurationPropertiesTimingYearlyDayTextValidateField?.Text?.ToNullableInt32( );
+                TimingYearlyDay = TemplateWindow.timingYearlyDayTextValidateField?.Text?.ToNullableInt32( );
                 TimingYearlyTime = TimeOnly.FromTimeSpan( TemplateWindow.yearlyTimeTimeField.Time );
                 if ( TimingFrequentPeriod is null || !TemplateConfigurationFrequentPeriodOptions.Contains( (int)TimingFrequentPeriod ) )
                 {
