@@ -29,7 +29,6 @@ namespace Sanoid.ConfigConsole
         {
             Initialized += ZfsConfigurationWindowOnInitialized;
             InitializeComponent( );
-            SetReadOnlyStates( );
         }
 
         private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
@@ -47,9 +46,11 @@ namespace Sanoid.ConfigConsole
             SetCanFocusStates( );
             SetTagsForPropertyFields( );
             SetTabStops( );
+            SetReadOnlyStates( );
             await setListSourceTask;
             await zfsRefreshTask;
             UpdateButtonState( );
+            EnableEventHandlers();
         }
 
         private void UpdateButtonState( )

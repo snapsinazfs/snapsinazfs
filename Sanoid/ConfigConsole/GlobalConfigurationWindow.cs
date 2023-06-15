@@ -45,7 +45,6 @@ namespace Sanoid.ConfigConsole
             }
 
             resetGlobalConfigButton.Clicked -= ResetButtonOnClicked;
-            saveGlobalConfigButton.Clicked -= ShowSaveDialog;
 
             _eventsEnabled = false;
         }
@@ -58,7 +57,6 @@ namespace Sanoid.ConfigConsole
             }
 
             resetGlobalConfigButton.Clicked += ResetButtonOnClicked;
-            saveGlobalConfigButton.Clicked += ShowSaveDialog;
             _eventsEnabled = true;
         }
 
