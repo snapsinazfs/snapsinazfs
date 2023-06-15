@@ -39,10 +39,18 @@ public static class CultureTimeHelpers
         return CultureInfo.CurrentCulture.Calendar.GetMonth( value );
     }
 
+    /// <summary>
+    ///     Gets the month number of the given <see cref="ustring" /> as its index in the
+    ///     <see cref="MonthNamesLongAndAbbreviated" /> collection + 1
+    /// </summary>
+    /// <param name="ustringValue"></param>
+    /// <returns>
+    ///     An <see langword="int" /> value for the month
+    /// </returns>
     public static int GetCalendarMonth( this ustring ustringValue )
     {
         string stringValue = ustringValue.ToString( )!;
-        return MonthNamesLongAndAbbreviated.IndexOf( stringValue! ) + 1;
+        return MonthNamesLongAndAbbreviated.IndexOf( stringValue ) + 1;
     }
 
     /// <summary>
