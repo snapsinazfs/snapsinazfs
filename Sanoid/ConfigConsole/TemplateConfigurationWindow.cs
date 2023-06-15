@@ -51,7 +51,6 @@ namespace Sanoid.ConfigConsole
         private void InitializeTemplateEditorView( )
         {
             DisableEventHandlers( );
-            //HidePropertiesFrame( );
             templateListView.SetSource( ConfigConsole.TemplateListItems );
             Templates.Clear( );
             Templates = new( Program.Settings!.Templates );
@@ -63,6 +62,8 @@ namespace Sanoid.ConfigConsole
             UpdateTemplateListButtonStates( );
             UpdateTemplatePropertiesButtonStates( );
             EnableEventHandlers( );
+            templateListView.SelectedItem = 0;
+            templateListView.SetFocus();
         }
 
         private void InitializeComboBoxes( )
@@ -139,6 +140,11 @@ namespace Sanoid.ConfigConsole
 
         private void DailyTimeTimeFieldOnKeyPress( KeyEventEventArgs args )
         {
+            //if ( args.KeyEvent is { Key: ( Key.CtrlMask | Key.q ) or ( Key.CtrlMask | Key.Q ) } )
+            //{
+            //    return;
+            //}
+
             bool isTimeValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.DailyTime != dailyTimeTimeField.Time.ToTimeOnly( );
             applyCurrentButton.Enabled = isTimeValueDifferent && IsEveryPropertyTextValidateFieldValid;
         }
@@ -302,16 +308,6 @@ namespace Sanoid.ConfigConsole
             applyCurrentButton.Enabled = SelectedTemplateItem.IsModified;
         }
 
-        private void HidePropertiesFrame( )
-        {
-            propertiesFrame.Visible = false;
-        }
-
-        private void ShowPropertiesFrame( )
-        {
-            propertiesFrame.Visible = true;
-        }
-
         private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
         {
             DisableEventHandlers( );
@@ -327,11 +323,6 @@ namespace Sanoid.ConfigConsole
 
         private void SetFieldsForSelectedItem( )
         {
-            if ( !propertiesFrame.Visible )
-            {
-                ShowPropertiesFrame( );
-            }
-
             TemplateConfigurationListItem item = SelectedTemplateItem;
             namingComponentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
             namingPrefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
