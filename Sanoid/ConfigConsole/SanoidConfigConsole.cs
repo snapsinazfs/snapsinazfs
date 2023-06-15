@@ -121,6 +121,7 @@ namespace Sanoid.ConfigConsole
             {
                 using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
                 {
+                    globalConfigSaveDialog.DirectoryPath = "/etc/sanoid";
                     globalConfigSaveDialog.AllowsOtherFileTypes = true;
                     globalConfigSaveDialog.CanCreateDirectories = true;
                     globalConfigSaveDialog.Modal = true;
