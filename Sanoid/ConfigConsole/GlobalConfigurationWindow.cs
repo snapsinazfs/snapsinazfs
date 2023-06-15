@@ -60,14 +60,14 @@ namespace Sanoid.ConfigConsole
             _eventsEnabled = true;
         }
 
-        private bool ValidateGlobalConfigValues( )
+        internal bool ValidateGlobalConfigValues( )
         {
             if ( pathToZfsTextField.Text.IsEmpty || pathToZpoolTextField.Text.IsEmpty )
             {
                 return false;
             }
 
-            if ( ( Environment.OSVersion.Platform == PlatformID.Unix && !File.Exists( pathToZfsTextField.Text.ToString( ) ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) )
+            if ( Environment.OSVersion.Platform == PlatformID.Unix && (!File.Exists( pathToZfsTextField.Text.ToString( ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) ))
             {
                 return false;
             }
@@ -100,42 +100,6 @@ namespace Sanoid.ConfigConsole
             if ( manageEventHandlers )
             {
                 EnableEventHandlers( );
-            }
-        }
-
-        private void ShowSaveDialog( )
-        {
-            if ( ValidateGlobalConfigValues( ) )
-            {
-                using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
-                {
-                    globalConfigSaveDialog.AllowsOtherFileTypes = true;
-                    globalConfigSaveDialog.CanCreateDirectories = true;
-                    globalConfigSaveDialog.Modal = true;
-                    Application.Run( globalConfigSaveDialog );
-                    if ( globalConfigSaveDialog.Canceled )
-                    {
-                        return;
-                    }
-
-                    if ( globalConfigSaveDialog.FileName.IsEmpty )
-                    {
-                        return;
-                    }
-
-                    SanoidSettings settings = new( )
-                    {
-                        DryRun = dryRunRadioGroup.GetSelectedBooleanFromLabel(),
-                        TakeSnapshots = takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel(),
-                        PruneSnapshots = pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel(),
-                        ZfsPath = pathToZfsTextField.Text?.ToString( ) ?? string.Empty,
-                        ZpoolPath = pathToZpoolTextField.Text?.ToString( ) ?? string.Empty,
-                        Templates = Program.Settings!.Templates,
-                        CacheDirectory = Program.Settings.CacheDirectory
-                    };
-
-                    File.WriteAllText( globalConfigSaveDialog.FileName.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" ), JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
-                }
             }
         }
     }

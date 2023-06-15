@@ -20,24 +20,24 @@ namespace Sanoid.ConfigConsole {
         private Terminal.Gui.ColorScheme tgDefault;
         
         private Terminal.Gui.Label dryRunLabel;
-        
-        private Terminal.Gui.RadioGroup dryRunRadioGroup;
+
+        internal Terminal.Gui.RadioGroup dryRunRadioGroup;
         
         private Terminal.Gui.Label takeSnapshotsLabel;
-        
-        private Terminal.Gui.RadioGroup takeSnapshotsRadioGroup;
+
+        internal Terminal.Gui.RadioGroup takeSnapshotsRadioGroup;
         
         private Terminal.Gui.Label pruneSnapshotsLabel;
-        
-        private Terminal.Gui.RadioGroup pruneSnapshotsRadioGroup;
+
+        internal Terminal.Gui.RadioGroup pruneSnapshotsRadioGroup;
         
         private Terminal.Gui.Label pathToZfsLabel;
-        
-        private Terminal.Gui.TextField pathToZfsTextField;
+
+        internal Terminal.Gui.TextField pathToZfsTextField;
         
         private Terminal.Gui.Label pathToZpoolLabel;
-        
-        private Terminal.Gui.TextField pathToZpoolTextField;
+
+        internal Terminal.Gui.TextField pathToZpoolTextField;
         
         private Terminal.Gui.Button resetGlobalConfigButton;
         
