@@ -11,60 +11,85 @@ namespace Sanoid.ConfigConsole;
 /// <summary>
 ///     An exception to be thrown when validation of a template from input values fails
 /// </summary>
-/// <typeparam name="T">Any <see langword="notnull" /> type</typeparam>
-public class TemplateValidationException<T> : ApplicationException where T : notnull
+public class TemplateValidationException : ApplicationException
 {
     /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException{T}" /> with the given name, value, and message
+    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, value, and message
     /// </summary>
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="propertyValue">The value of the property that caused this exception</param>
-    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
-    public TemplateValidationException( string propertyName, T propertyValue, string message ) : base( message )
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
+    /// </param>
+    public TemplateValidationException( string? propertyName, string? propertyValue, string message ) : base( message )
     {
         PropertyName = propertyName;
         PropertyValue = propertyValue;
+        InnerExceptions = new( );
     }
 
     /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException{T}" /> with the given name, entry field, and message
+    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, entry field, and message
     /// </summary>
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
-    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
-    public TemplateValidationException( string propertyName, View entryField, string message ) : base( message )
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
+    /// </param>
+    public TemplateValidationException( string? propertyName, View entryField, string message ) : base( message )
     {
         PropertyName = propertyName;
         EntryField = entryField;
+        InnerExceptions = new( );
     }
 
     /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException{T}" /> with the given name, value, entry field, and message
-    /// </summary>
-    /// <param name="propertyName">The name of the property that caused this exception</param>
-    /// <param name="propertyValue">The value of the property that caused this exception</param>
-    /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
-    /// <param name="message"><inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" /></param>
-    public TemplateValidationException( string propertyName, T propertyValue, View entryField, string message ) : base( message )
-    {
-        PropertyName = propertyName;
-        PropertyValue = propertyValue;
-        EntryField = entryField;
-    }
-
-    /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException{T}" /> with the given name, value, entry field, and message
+    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, value, entry field, and message
     /// </summary>
     /// <param name="propertyName">The name of the property that caused this exception</param>
     /// <param name="propertyValue">The value of the property that caused this exception</param>
     /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
-    /// <param name="message"><inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='message']" /></param>
-    /// <param name="innerException"><inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='innerException']" /></param>
-    public TemplateValidationException( string propertyName, T propertyValue, View entryField, string message, Exception innerException ) : base( message, innerException )
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
+    /// </param>
+    public TemplateValidationException( string? propertyName, string? propertyValue, View? entryField, string message ) : base( message )
     {
         PropertyName = propertyName;
         PropertyValue = propertyValue;
         EntryField = entryField;
+        InnerExceptions = new( );
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, value, entry field, and message
+    /// </summary>
+    /// <param name="propertyName">The name of the property that caused this exception</param>
+    /// <param name="propertyValue">The value of the property that caused this exception</param>
+    /// <param name="entryField">The <see cref="View" /> that contains the invalid value</param>
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='message']" />
+    /// </param>
+    /// <param name="innerException">
+    ///     <inheritdoc cref="ApplicationException(string,Exception)" path="/param[@name='innerException']" />
+    /// </param>
+    public TemplateValidationException( string? propertyName, string? propertyValue, View entryField, string message, Exception innerException ) : base( message, innerException )
+    {
+        PropertyName = propertyName;
+        PropertyValue = propertyValue;
+        EntryField = entryField;
+        InnerExceptions = new( );
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="TemplateValidationException" /> message and inner exceptions
+    /// </summary>
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
+    /// </param>
+    /// <param name="innerExceptions">A list of exceptions to use, if this is an aggregated exception</param>
+    public TemplateValidationException( string message, List<TemplateValidationException> innerExceptions ) : base( message )
+    {
+        InnerExceptions = innerExceptions;
     }
 
     /// <summary>
@@ -73,12 +98,17 @@ public class TemplateValidationException<T> : ApplicationException where T : not
     public View? EntryField { get; init; }
 
     /// <summary>
+    ///     Gets a list of inner exceptions
+    /// </summary>
+    public List<TemplateValidationException> InnerExceptions { get; init; }
+
+    /// <summary>
     ///     Gets the name of the property that caused this exception
     /// </summary>
-    public string PropertyName { get; init; }
+    public string? PropertyName { get; init; }
 
     /// <summary>
     ///     Gets the value of the property that caused this exception
     /// </summary>
-    public T? PropertyValue { get; init; }
+    public string? PropertyValue { get; init; }
 }

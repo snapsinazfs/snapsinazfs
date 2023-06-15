@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -8,7 +8,6 @@ using System.Collections.Concurrent;
 using NLog.Config;
 using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
-using Sanoid.Settings.Settings;
 using Terminal.Gui;
 
 #pragma warning disable CA2000
@@ -21,6 +20,8 @@ internal static class ConfigConsole
     internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; } = new( );
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
+    internal static readonly ConcurrentDictionary<string, SanoidZfsDataset> BaseDatasets = new( );
 
     public static void RunConsoleInterface( IZfsCommandRunner commandRunner )
     {
