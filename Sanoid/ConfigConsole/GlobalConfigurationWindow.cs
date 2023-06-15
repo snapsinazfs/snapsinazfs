@@ -23,11 +23,12 @@ namespace Sanoid.ConfigConsole
     {
         public GlobalConfigurationWindow( )
         {
-            Ready += GlobalConfigurationWindowOnReady;
+            Initialized += GlobalConfigurationWindowOnInitialized;
             InitializeComponent( );
+            EnableEventHandlers( );
         }
 
-        private void GlobalConfigurationWindowOnReady( )
+        private void GlobalConfigurationWindowOnInitialized( object sender, EventArgs e )
         {
             SetFieldsFromSettingsObject( false );
         }
@@ -96,7 +97,7 @@ namespace Sanoid.ConfigConsole
             pathToZfsTextField.Text = Program.Settings.ZfsPath;
             pathToZpoolTextField.Text = Program.Settings.ZpoolPath;
 
-            Logger.Debug( "Finished etting global configuration fields to values in Settings" );
+            Logger.Debug( "Finished setting global configuration fields to values in Settings" );
 
             if ( manageEventHandlers )
             {

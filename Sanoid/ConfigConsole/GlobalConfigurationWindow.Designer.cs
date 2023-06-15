@@ -14,7 +14,7 @@ namespace Sanoid.ConfigConsole {
     
     
     public partial class GlobalConfigurationWindow : Terminal.Gui.Window {
-
+        
         private Terminal.Gui.ColorScheme whiteOnBlue;
         
         private Terminal.Gui.ColorScheme tgDefault;
@@ -39,26 +39,10 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextField pathToZpoolTextField;
         
-        private Terminal.Gui.Button saveGlobalConfigButton;
-        
         private Terminal.Gui.Button resetGlobalConfigButton;
-
-       
+        
         private void InitializeComponent() {
-            this.tgDefault = new Terminal.Gui.ColorScheme();
-            this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
-            this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
-            this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
-            this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue = new Terminal.Gui.ColorScheme();
-            this.whiteOnBlue.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
             this.resetGlobalConfigButton = new Terminal.Gui.Button();
-            this.saveGlobalConfigButton = new Terminal.Gui.Button();
             this.pathToZpoolTextField = new Terminal.Gui.TextField();
             this.pathToZpoolLabel = new Terminal.Gui.Label();
             this.pathToZfsTextField = new Terminal.Gui.TextField();
@@ -69,6 +53,31 @@ namespace Sanoid.ConfigConsole {
             this.takeSnapshotsLabel = new Terminal.Gui.Label();
             this.dryRunRadioGroup = new Terminal.Gui.RadioGroup();
             this.dryRunLabel = new Terminal.Gui.Label();
+            this.whiteOnBlue = new Terminal.Gui.ColorScheme();
+            this.whiteOnBlue.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.whiteOnBlue.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.whiteOnBlue.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.whiteOnBlue.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.whiteOnBlue.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
+            this.tgDefault = new Terminal.Gui.ColorScheme();
+            this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
+            this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
+            this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
+            this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
+            this.Width = 68;
+            this.Height = 11;
+            this.X = Pos.Center();
+            this.Y = Pos.Center();
+            this.ColorScheme = this.whiteOnBlue;
+            this.Modal = false;
+            this.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.Border.Effect3D = false;
+            this.Border.Effect3DBrush = null;
+            this.Border.DrawMarginFrame = true;
+            this.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.Title = "Global Configuration";
             this.dryRunLabel.Width = 6;
             this.dryRunLabel.Height = 1;
             this.dryRunLabel.X = 3;
@@ -168,19 +177,9 @@ namespace Sanoid.ConfigConsole {
             this.pathToZpoolTextField.Text = "";
             this.pathToZpoolTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.Add(this.pathToZpoolTextField);
-            this.saveGlobalConfigButton.Width = 8;
-            this.saveGlobalConfigButton.Height = 1;
-            this.saveGlobalConfigButton.X = 24;
-            this.saveGlobalConfigButton.Y = Pos.AnchorEnd(2);
-            this.saveGlobalConfigButton.ColorScheme = this.tgDefault;
-            this.saveGlobalConfigButton.Data = "saveGlobalConfigButton";
-            this.saveGlobalConfigButton.Text = "Save";
-            this.saveGlobalConfigButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.saveGlobalConfigButton.IsDefault = false;
-            this.Add(this.saveGlobalConfigButton);
             this.resetGlobalConfigButton.Width = 9;
             this.resetGlobalConfigButton.Height = 1;
-            this.resetGlobalConfigButton.X = Pos.AnchorEnd(31);
+            this.resetGlobalConfigButton.X = Pos.Center();
             this.resetGlobalConfigButton.Y = Pos.AnchorEnd(2);
             this.resetGlobalConfigButton.ColorScheme = this.tgDefault;
             this.resetGlobalConfigButton.Data = "resetGlobalConfigButton";
@@ -188,20 +187,6 @@ namespace Sanoid.ConfigConsole {
             this.resetGlobalConfigButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.resetGlobalConfigButton.IsDefault = false;
             this.Add(this.resetGlobalConfigButton);
-            this.Width = 68;
-            this.Height = 11;
-            this.X = Pos.Center();
-            this.Y = Pos.Center();
-            this.ColorScheme = this.whiteOnBlue;
-            this.Modal = false;
-            this.Data = "globalConfigWindow";
-            this.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.Border.Effect3D = false;
-            this.Border.Effect3DBrush = null;
-            this.Border.DrawMarginFrame = true;
-            this.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.Title = "Global Configuration";
         }
     }
 }
