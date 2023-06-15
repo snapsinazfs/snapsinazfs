@@ -2,6 +2,12 @@
 dotnet_diagnostic.CS1591.severity = none
 [SanoidConfigConsole.cs]
 dotnet_diagnostic.CS1591.severity = none
+[TemplateConfigurationWindow.cs]
+dotnet_diagnostic.CS1591.severity = none
+[ZfsConfigurationWindow.cs]
+dotnet_diagnostic.CS1591.severity = none
+[GlobalConfigurationWindow.cs]
+dotnet_diagnostic.CS1591.severity = none
 
 [*.cs]
 
