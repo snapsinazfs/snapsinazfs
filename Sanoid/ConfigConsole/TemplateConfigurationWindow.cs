@@ -343,7 +343,7 @@ namespace Sanoid.ConfigConsole
             timingYearlyMonthTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetMonthName( item.ViewSettings.SnapshotTiming.YearlyMonth );
             timingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
             yearlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
-            comboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth;
+            comboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
         }
 
         private void TemplateSettingsSaveAllButtonOnClicked( )
