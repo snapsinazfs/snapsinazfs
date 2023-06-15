@@ -359,7 +359,7 @@ namespace Sanoid.ConfigConsole
         {
             TemplateConfigurationValidator validator = new( );
 
-            if ( validator.ValidateFieldValues( this ) is { IsValid: false, ValidationExceptions: { Count: > 0 } } result )
+            if ( validator.ValidateFieldValues( this ) is { IsValid: false, ValidationExceptions.Count: > 0 } result )
             {
                 TemplateValidationException ex = new( "One or more template fields failed to validate", result.ValidationExceptions );
                 Logger.Warn( ex );
