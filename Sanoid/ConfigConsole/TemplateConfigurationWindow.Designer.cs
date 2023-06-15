@@ -52,94 +52,94 @@ namespace Sanoid.ConfigConsole {
         private Terminal.Gui.FrameView templateConfigurationSnapshotNamingFrame;
         
         private Terminal.Gui.Label namingComponentSeparatorLabel;
-        
-        private Terminal.Gui.TextValidateField namingComponentSeparatorValidateField;
+
+        internal Terminal.Gui.TextValidateField namingComponentSeparatorValidateField;
         
         private Terminal.Gui.Label namingPrefixLabel;
-        
-        private Terminal.Gui.TextValidateField namingPrefixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingPrefixTextValidateField;
         
         private Terminal.Gui.Label namingTimestampFormatLabel;
-        
-        private Terminal.Gui.TextField namingTimestampFormatTextField;
+
+        internal Terminal.Gui.TextField namingTimestampFormatTextField;
         
         private Terminal.Gui.Label namingFrequentSuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingFrequentSuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingFrequentSuffixTextValidateField;
         
         private Terminal.Gui.Label namingHourlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingHourlySuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingHourlySuffixTextValidateField;
         
         private Terminal.Gui.Label namingDailySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingDailySuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingDailySuffixTextValidateField;
         
         private Terminal.Gui.Label namingWeeklySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingWeeklySuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingWeeklySuffixTextValidateField;
         
         private Terminal.Gui.Label namingMonthlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingMonthlySuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingMonthlySuffixTextValidateField;
         
         private Terminal.Gui.Label namingYearlySuffixLabel;
-        
-        private Terminal.Gui.TextValidateField namingYearlySuffixTextValidateField;
+
+        internal Terminal.Gui.TextValidateField namingYearlySuffixTextValidateField;
         
         private Terminal.Gui.FrameView templateConfigurationPropertiesSnapshotTimingFrame;
         
         private Terminal.Gui.Label stimingFrequentPeriodLabel;
-        
-        private Terminal.Gui.RadioGroup frequentPeriodRadioGroup;
+
+        internal Terminal.Gui.RadioGroup frequentPeriodRadioGroup;
         
         private Terminal.Gui.Label timingHourlyLabel;
         
         private Terminal.Gui.Label timingHourlyMinuteLabel;
-        
-        private Terminal.Gui.TextValidateField hourlyMinuteTextValidateField;
+
+        internal Terminal.Gui.TextValidateField hourlyMinuteTextValidateField;
         
         private Terminal.Gui.ComboBox comboBox;
         
         private Terminal.Gui.Label timingDailyLabel;
         
         private Terminal.Gui.Label templateConfigurationPropertiesDailyTimeLabel;
-        
-        private Terminal.Gui.TimeField dailyTimeTimeField;
+
+        internal Terminal.Gui.TimeField dailyTimeTimeField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesWeeklyLabel;
         
         private Terminal.Gui.Label templateConfigurationPropertiesWeeklyLabel2;
-        
-        private Terminal.Gui.TextValidateField timingWeeklyDayTextValidateField;
+
+        internal Terminal.Gui.TextValidateField timingWeeklyDayTextValidateField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesWeeklyTimeLabel;
-        
-        private Terminal.Gui.TimeField weeklyTimeTimeField;
+
+        internal Terminal.Gui.TimeField weeklyTimeTimeField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesMonthlyLabel;
         
         private Terminal.Gui.Label templateConfigurationPropertiesMonthlyDayLabel;
-        
-        private Terminal.Gui.TextValidateField timingMonthlyDayTextValidateField;
+
+        internal Terminal.Gui.TextValidateField timingMonthlyDayTextValidateField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesMonthlyTimeLabel;
-        
-        private Terminal.Gui.TimeField monthlyTimeTimeField;
+
+        internal Terminal.Gui.TimeField monthlyTimeTimeField;
         
         private Terminal.Gui.Label timingYearlyLabel;
         
         private Terminal.Gui.Label templateConfigurationPropertiesYearlyMonthLabel;
-        
-        private Terminal.Gui.TextValidateField timingYearlyMonthTextValidateField;
+
+        internal Terminal.Gui.TextValidateField timingYearlyMonthTextValidateField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesYearlyDayLabel;
-        
-        private Terminal.Gui.TextValidateField timingYearlyDayTextValidateField;
+
+        internal Terminal.Gui.TextValidateField timingYearlyDayTextValidateField;
         
         private Terminal.Gui.Label templateConfigurationPropertiesYearlyTimeLabel;
-        
-        private Terminal.Gui.TimeField yearlyTimeTimeField;
+
+        internal Terminal.Gui.TimeField yearlyTimeTimeField;
         
         private Terminal.Gui.Button applyCurrentButton;
         
