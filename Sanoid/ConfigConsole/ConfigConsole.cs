@@ -19,11 +19,10 @@ internal static class ConfigConsole
 {
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; } = new( );
-    internal static SanoidSettings Settings { get; set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public static void RunConsoleInterface( SanoidSettings settings, IZfsCommandRunner commandRunner )
+    public static void RunConsoleInterface( IZfsCommandRunner commandRunner )
     {
         Logger.Info( "Config Console requested. \"Console\" logging rule will be suspended until exit" );
 
@@ -39,7 +38,6 @@ internal static class ConfigConsole
             LogManager.ReconfigExistingLoggers( );
         }
 
-        Settings = settings;
         CommandRunner = commandRunner;
 
         Application.Run<SanoidConfigConsole>( ErrorHandler );

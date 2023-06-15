@@ -23,6 +23,7 @@ internal class Program
     // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in Sanoid.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    internal static SanoidSettings? Settings;
 
     public static async Task<int> Main( string[] argv )
     {
@@ -111,10 +112,9 @@ internal class Program
                                                .Build( );
 
         Logger.Trace( "Building settings objects from IConfiguration" );
-        SanoidSettings settings;
         try
         {
-            settings = rootConfiguration.Get<SanoidSettings>( ) ?? throw new InvalidOperationException( );
+            Settings = rootConfiguration.Get<SanoidSettings>( ) ?? throw new InvalidOperationException( );
         }
         catch ( Exception ex )
         {
@@ -122,16 +122,16 @@ internal class Program
             return (int)Errno.EFTYPE;
         }
 
-        ApplyCommandLineArgumentOverrides( in args, ref settings );
+        ApplyCommandLineArgumentOverrides( in args );
 
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
         {
-            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
+            PlatformID.Unix => new ZfsCommandRunner( Settings.ZfsPath, Settings.ZpoolPath ),
             _ => new DummyZfsCommandRunner( )
         };
 
-        Logger.Debug( "Using settings: {0}", JsonSerializer.Serialize( settings ) );
+        Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
 
         ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
 
@@ -164,7 +164,7 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( settings.DryRun, schemaCheckResult.MissingPoolPropertyCollections, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( Settings.DryRun, schemaCheckResult.MissingPoolPropertyCollections, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
@@ -172,7 +172,7 @@ internal class Program
 
         if ( args.ConfigConsole )
         {
-            ConfigConsole.ConfigConsole.RunConsoleInterface( settings, zfsCommandRunner );
+            ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
             return (int)Errno.EOK;
         }
 
@@ -186,10 +186,10 @@ internal class Program
         Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
 
         // Handle taking new snapshots, if requested
-        if ( settings is { TakeSnapshots: true } )
+        if ( Settings is { TakeSnapshots: true } )
         {
             Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, settings, currentTimestamp, datasets );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets );
         }
         else
         {
@@ -197,10 +197,10 @@ internal class Program
         }
 
         // Handle pruning old snapshots, if requested
-        if ( settings is { PruneSnapshots: true } )
+        if ( Settings is { PruneSnapshots: true } )
         {
             Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
-            await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, settings, datasets ).ConfigureAwait( true );
+            await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, Settings, datasets ).ConfigureAwait( true );
         }
         else
         {
@@ -223,7 +223,7 @@ internal class Program
     ///     the CLI
     /// </summary>
     /// <param name="args"></param>
-    public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, ref SanoidSettings settings )
+    public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args )
     {
         Logger.Debug( "Overriding settings using arguments from command line." );
 
@@ -254,12 +254,12 @@ internal class Program
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
 
-            settings.CacheDirectory = args.CacheDir;
+            Settings.CacheDirectory = args.CacheDir;
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 
-        settings.DryRun |= args.DryRun;
-        settings.TakeSnapshots = settings.TakeSnapshots & args.TakeSnapshots & !args.NoTakeSnapshots;
-        settings.PruneSnapshots = settings.PruneSnapshots & args.PruneSnapshots & !args.NoPruneSnapshots;
+        Settings!.DryRun |= args.DryRun;
+        Settings.TakeSnapshots = Settings.TakeSnapshots & args.TakeSnapshots & !args.NoTakeSnapshots;
+        Settings.PruneSnapshots = Settings.PruneSnapshots & args.PruneSnapshots & !args.NoPruneSnapshots;
     }
 }
