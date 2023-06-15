@@ -143,7 +143,7 @@ internal class TemplateConfigurationValidator
         DayOfWeek dayOfWeek = (DayOfWeek)( weeklyDayStringIndex % 7 );
 
         TimingFrequentPeriod = TemplateConfigurationWindow.TemplateConfigurationFrequentPeriodOptions[ TemplateWindow.frequentPeriodRadioGroup.SelectedItem ];
-        TimingHourlyMinute = TemplateWindow.hourlyMinuteTextValidateField.Text.ToNullableInt32( );
+        TimingHourlyMinute = TemplateWindow.timingHourlyMinuteTextValidateField.Text.ToNullableInt32( );
         TimingDailyTime = TimeOnly.FromTimeSpan( TemplateWindow.dailyTimeTimeField.Time );
         TimingWeeklyDay = dayOfWeek;
         TimingWeeklyTime = TimeOnly.FromTimeSpan( TemplateWindow.weeklyTimeTimeField.Time );
@@ -152,23 +152,7 @@ internal class TemplateConfigurationValidator
         int numberOfMonthsInYear = CultureInfo.CurrentCulture.Calendar.GetMonthsInYear( DateTimeOffset.Now.Year );
         TimingMonthlyDay = monthlyDayInt;
         TimingMonthlyTime = TimeOnly.FromTimeSpan( TemplateWindow.monthlyTimeTimeField.Time );
-        string? enteredYearlyMonthString = TemplateWindow.timingYearlyMonthTextValidateField.Text.ToString( );
-        if ( int.TryParse( enteredYearlyMonthString, out int enteredYearlyMonthIntValue ) )
-        {
-            TimingYearlyMonth = enteredYearlyMonthIntValue;
-        }
-        else
-        {
-            if ( !string.IsNullOrWhiteSpace( enteredYearlyMonthString ) )
-            {
-                int monthIndex = CultureTimeHelpers.MonthNamesLongAndAbbreviated.FindIndex( m => m.ToLower( CultureInfo.CurrentCulture ) == enteredYearlyMonthString.ToLower( CultureInfo.CurrentCulture ) );
-                if ( monthIndex >= 0 )
-                {
-                    TimingYearlyMonth = ( monthIndex % numberOfMonthsInYear ) + 1;
-                }
-            }
-        }
-
+        TimingYearlyMonth = TemplateWindow.yearlyMonthComboBox.SelectedItem + 1;
         TimingYearlyDay = TemplateWindow.timingYearlyDayTextValidateField?.Text?.ToNullableInt32( );
         TimingYearlyTime = TimeOnly.FromTimeSpan( TemplateWindow.yearlyTimeTimeField.Time );
         if ( TimingFrequentPeriod is null || !TemplateConfigurationWindow.TemplateConfigurationFrequentPeriodOptions.Contains( (int)TimingFrequentPeriod ) )
@@ -192,12 +176,6 @@ internal class TemplateConfigurationValidator
         if ( TimingMonthlyDay is null )
         {
             Logger.Warn( "Snapshot template monthly day value {0} for template {1} is invalid", monthlyDayString, templateName );
-            isValid = false;
-        }
-
-        if ( TimingYearlyMonth is null )
-        {
-            Logger.Warn( "Snapshot template yearly month value {0} for template {1} is invalid", enteredYearlyMonthString, templateName );
             isValid = false;
         }
 
