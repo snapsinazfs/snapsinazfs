@@ -145,10 +145,10 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Button deleteTemplateButton;
         
-        internal Terminal.Gui.Button saveAllButton;
+        internal Terminal.Gui.Button commitAllButton;
         
         private void InitializeComponent() {
-            this.saveAllButton = new Terminal.Gui.Button();
+            this.commitAllButton = new Terminal.Gui.Button();
             this.deleteTemplateButton = new Terminal.Gui.Button();
             this.addTemplateButton = new Terminal.Gui.Button();
             this.newTemplateNameTextValidateField = new Terminal.Gui.TextValidateField();
@@ -799,16 +799,16 @@ namespace Sanoid.ConfigConsole {
             this.deleteTemplateButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
             this.deleteTemplateButton.IsDefault = false;
             this.Add(this.deleteTemplateButton);
-            this.saveAllButton.Width = 12;
-            this.saveAllButton.Height = 1;
-            this.saveAllButton.X = 14;
-            this.saveAllButton.Y = 26;
-            this.saveAllButton.ColorScheme = this.tgDefault;
-            this.saveAllButton.Data = "saveAllButton";
-            this.saveAllButton.Text = "Save All";
-            this.saveAllButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
-            this.saveAllButton.IsDefault = false;
-            this.Add(this.saveAllButton);
+            this.commitAllButton.Width = 14;
+            this.commitAllButton.Height = 1;
+            this.commitAllButton.X = 14;
+            this.commitAllButton.Y = 26;
+            this.commitAllButton.ColorScheme = this.tgDefault;
+            this.commitAllButton.Data = "commitAllButton";
+            this.commitAllButton.Text = "Commit All";
+            this.commitAllButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.commitAllButton.IsDefault = false;
+            this.Add(this.commitAllButton);
         }
     }
 }

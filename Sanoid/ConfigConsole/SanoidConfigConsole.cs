@@ -42,10 +42,15 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers( );
-                bool bothWindowsNull = _globalConfigurationWindow is null && _templateConfigurationWindow is null;
-                bool onlyGlobalWindowNotNullAndNoChanges = _globalConfigurationWindow is not null && !_globalConfigurationWindow.IsConfigurationChanged && _templateConfigurationWindow is null;
-                bool onlyTemplateWindowNotNullAndNoChanges = _globalConfigurationWindow is null && _templateConfigurationWindow is not null && !TemplateConfigurationWindow.IsAnyTemplateModified;
-                bool bothWindowsNotNullAndNoChanges = _globalConfigurationWindow is not null && _templateConfigurationWindow is not null && !_globalConfigurationWindow.IsConfigurationChanged && !TemplateConfigurationWindow.IsAnyTemplateModified && !_templateConfigurationWindow.templatesAddedOrRemoved;
+                bool globalWindowNull = _globalConfigurationWindow is null;
+                bool templateWindowNull = _templateConfigurationWindow is null;
+                bool bothWindowsNull = globalWindowNull && templateWindowNull;
+                bool globalConfigurationIsChanged = !globalWindowNull && _globalConfigurationWindow!.IsConfigurationChanged;
+                bool onlyGlobalWindowNotNullAndNoChanges = !globalWindowNull && !globalConfigurationIsChanged && templateWindowNull;
+                bool isAnyTemplateModified = TemplateConfigurationWindow.IsAnyTemplateModified;
+                bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.templatesAddedRemovedOrModified;
+                bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
+                bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
                 if (bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
                 {
                     Logger.Warn( "Save configuration requested when no changes were made." );
@@ -77,14 +82,24 @@ namespace Sanoid.ConfigConsole
                     }
                 }
 
-                if ( !_globalConfigurationWindow.ValidateGlobalConfigValues( ) )
+                if ( !globalWindowNull && !_globalConfigurationWindow!.ValidateGlobalConfigValues( ) )
                 {
                     Logger.Warn("Global configuration input validation failed. Configuration not saved.");
                     MessageBox.ErrorQuery( "Invalid Global Configuration", "One or more entries in the global configuration window are invalid. Correct any invalid entries and try again.", "OK" );
                     return;
                 }
 
-                SanoidSettings settingsFromGlobalConfigWindow = new( )
+                if ( !templateWindowNull && isAnyTemplateModified )
+                {
+                    int dialogResult = MessageBox.Query( "Commit Modified Templates?", "You have pending template modifications that have not been committed and will therefore not be saved unless committed.\n\nCommit pending template changes now?", "Cancel Save", "Commit Templates" );
+                    if ( dialogResult != 1 )
+                    {
+                        return;
+                    }
+                    TemplateConfigurationWindow.CommitModifiedTemplates( );
+                }
+
+                SanoidSettings newSettingsToSave = new( )
                 {
                     DryRun = _globalConfigurationWindow.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
                     TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
@@ -95,7 +110,7 @@ namespace Sanoid.ConfigConsole
                     CacheDirectory = Program.Settings.CacheDirectory
                 };
 
-                (bool status, string reasonOrFile) = ContinueWithSave( settingsFromGlobalConfigWindow );
+                (bool status, string reasonOrFile) = ContinueWithSave( newSettingsToSave );
 
                 if ( status )
                 {

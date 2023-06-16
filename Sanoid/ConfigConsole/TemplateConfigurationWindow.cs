@@ -34,11 +34,11 @@ namespace Sanoid.ConfigConsole
         }
 
         private readonly HashSet<string> _modifiedProperties = new( );
-        private readonly HashSet<string> _namingProperties = new( new[] { ComponentSeparator, "prefix", "timestamp format", "frequent suffix", "hourly suffix", "daily suffix", "weekly suffix", "monthly suffix", "yearly suffix" } );
+        private readonly HashSet<string> _namingProperties = new( new[] { ComponentSeparator, PrefixTitleCase, TimestampFormatTitleCase, FrequentSuffixTitleCase, HourlySuffixTitleCase, DailySuffixTitleCase, WeeklySuffixTitleCase, MonthlySuffixTitleCase, YearlySuffixTitleCase } );
 
         private bool _templateConfigurationEventsEnabled;
         private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
-        internal bool templatesAddedOrRemoved;
+        internal static bool templatesAddedRemovedOrModified;
         private readonly HashSet<string> _timingProperties = new( new[] { FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase } );
         internal static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any( t => t.IsModified );
         private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.Field.IsValid );
@@ -48,11 +48,10 @@ namespace Sanoid.ConfigConsole
         private const string InvalidFieldValueDialogTitleString = "Invalid Field Value";
         private static readonly ustring InvalidFieldValueDialogTitle = ustring.Make( InvalidFieldValueDialogTitleString );
 
-        [NotNull]
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
         internal static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
-        private static ConcurrentDictionary<string, TemplateSettings> Templates = new( );
+        internal static ConcurrentDictionary<string, TemplateSettings> Templates = new( );
 
         private const string FrequentPeriodTitleCase = "Frequent Period";
         private const string HourlyMinuteTitleCase = "Hourly Minute";
@@ -65,6 +64,14 @@ namespace Sanoid.ConfigConsole
         private const string WeeklyTimeTitleCase = "Weekly Time";
         private const string DailyTimeTitleCase = "Daily Time";
         private const string ComponentSeparator = "Component Separator";
+        private const string PrefixTitleCase = "Prefix";
+        private const string TimestampFormatTitleCase = "Timestamp Format";
+        private const string FrequentSuffixTitleCase = "Frequent Suffix";
+        private const string HourlySuffixTitleCase = "Hourly Suffix";
+        private const string DailySuffixTitleCase = "Daily Suffix";
+        private const string WeeklySuffixTitleCase = "Weekly Suffix";
+        private const string MonthlySuffixTitleCase = "Monthly Suffix";
+        private const string YearlySuffixTitleCase = "Yearly Suffix";
 
         private void InitializeTemplateEditorView( )
         {
@@ -163,7 +170,7 @@ namespace Sanoid.ConfigConsole
             addTemplateButton.Clicked += AddTemplateButtonOnClicked;
             deleteTemplateButton.Clicked += DeleteDeleteTemplateButtonOnClicked;
             newTemplateNameTextValidateField.KeyPress += NewTemplateNameTextValidateFieldOnKeyPress;
-            saveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
+            commitAllButton.Clicked += ShowCommitConfirmationDialog;
 
             // Properties area field/button events
             //TODO: Warn user if they try to modify the default template
@@ -293,7 +300,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers();
-                _modifiedProperties.Remove( "yearly suffix" );
+                _modifiedProperties.Remove( YearlySuffixTitleCase );
 
                 if ( !yearlySuffixTextValidateField.IsValid )
                 {
@@ -312,7 +319,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = yearlySuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.YearlySuffix != suffix )
                 {
-                    _modifiedProperties.Add( "monthly suffix" );
+                    _modifiedProperties.Add( YearlySuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -328,7 +335,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers();
-                _modifiedProperties.Remove( "monthly suffix" );
+                _modifiedProperties.Remove( MonthlySuffixTitleCase );
 
                 if ( !monthlySuffixTextValidateField.IsValid )
                 {
@@ -347,7 +354,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = monthlySuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.MonthlySuffix != suffix )
                 {
-                    _modifiedProperties.Add( "monthly suffix" );
+                    _modifiedProperties.Add( MonthlySuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -363,7 +370,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers();
-                _modifiedProperties.Remove( "weekly suffix" );
+                _modifiedProperties.Remove( WeeklySuffixTitleCase );
 
                 if ( !weeklySuffixTextValidateField.IsValid )
                 {
@@ -382,7 +389,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = weeklySuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.WeeklySuffix != suffix )
                 {
-                    _modifiedProperties.Add( "weekly suffix" );
+                    _modifiedProperties.Add( WeeklySuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -398,7 +405,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers();
-                _modifiedProperties.Remove( "daily suffix" );
+                _modifiedProperties.Remove( DailySuffixTitleCase );
 
                 if ( !dailySuffixTextValidateField.IsValid )
                 {
@@ -417,7 +424,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = dailySuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.DailySuffix != suffix )
                 {
-                    _modifiedProperties.Add( "daily suffix" );
+                    _modifiedProperties.Add( DailySuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -433,7 +440,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers();
-                _modifiedProperties.Remove( "hourly suffix" );
+                _modifiedProperties.Remove( HourlySuffixTitleCase );
 
                 if ( !hourlySuffixTextValidateField.IsValid )
                 {
@@ -452,7 +459,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = hourlySuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.HourlySuffix != suffix )
                 {
-                    _modifiedProperties.Add( "hourly suffix" );
+                    _modifiedProperties.Add( HourlySuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -468,7 +475,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers( );
-                _modifiedProperties.Remove( "frequent suffix" );
+                _modifiedProperties.Remove( FrequentSuffixTitleCase );
 
                 if ( !frequentSuffixTextValidateField.IsValid )
                 {
@@ -487,7 +494,7 @@ namespace Sanoid.ConfigConsole
                 string suffix = frequentSuffixTextValidateField.Text.ToString( )!;
                 if ( SelectedTemplateItem.ViewSettings.Formatting.FrequentSuffix != suffix )
                 {
-                    _modifiedProperties.Add( "frequent suffix" );
+                    _modifiedProperties.Add( FrequentSuffixTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( suffix );
@@ -503,7 +510,7 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers( );
-                _modifiedProperties.Remove( "timestamp format" );
+                _modifiedProperties.Remove( TimestampFormatTitleCase );
 
                 if ( timestampFormatTextField.Text.IsEmpty )
                 {
@@ -532,7 +539,7 @@ namespace Sanoid.ConfigConsole
 
                 if ( SelectedTemplateItem.ViewSettings.Formatting.TimestampFormatString != timestampFormatTextField.Text.ToString( ) )
                 {
-                    _modifiedProperties.Add( "timestamp format" );
+                    _modifiedProperties.Add( TimestampFormatTitleCase );
                 }
 
                 UpdatePropertiesFrameViewState( );
@@ -545,7 +552,7 @@ namespace Sanoid.ConfigConsole
 
         private void PrefixTextValidateFieldOnLeave( FocusEventArgs e )
         {
-            _modifiedProperties.Remove( "prefix" );
+            _modifiedProperties.Remove( PrefixTitleCase );
 
             if ( !prefixTextValidateField.IsValid )
             {
@@ -556,7 +563,7 @@ namespace Sanoid.ConfigConsole
 
             if ( SelectedTemplateItem.ViewSettings.Formatting.Prefix != prefixTextValidateField.Text.ToString( ) )
             {
-                _modifiedProperties.Add( "prefix" );
+                _modifiedProperties.Add( PrefixTitleCase );
             }
 
             UpdatePropertiesFrameViewState( );
@@ -720,7 +727,7 @@ namespace Sanoid.ConfigConsole
                     throw ex;
                 }
 
-                templatesAddedOrRemoved = true;
+                templatesAddedRemovedOrModified = true;
             }
             catch ( ApplicationException )
             {
@@ -763,7 +770,7 @@ namespace Sanoid.ConfigConsole
 
             Templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
             ConfigConsole.TemplateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
-            templatesAddedOrRemoved = true;
+            templatesAddedRemovedOrModified = true;
             UpdateTemplateListButtonStates( );
             UpdateTemplatePropertiesButtonStates( );
         }
@@ -802,6 +809,7 @@ namespace Sanoid.ConfigConsole
         private void ResetCurrentButtonOnClicked( )
         {
             DisableEventHandlers( );
+            _modifiedProperties.Clear( );
             SelectedTemplateItem.ViewSettings = SelectedTemplateItem.BaseSettings with { };
             SetFieldsForSelectedItem( );
             UpdateTemplatePropertiesButtonStates( );
@@ -811,9 +819,9 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateTemplateListButtonStates( )
         {
-            saveAllButton.Enabled = ( templatesAddedOrRemoved || IsAnyTemplateModified ) && IsEveryPropertyTextValidateFieldValid;
-            deleteTemplateButton.Enabled = templateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse;
-            addTemplateButton.Enabled = newTemplateNameTextValidateField.IsValid;
+            commitAllButton.Enabled = IsAnyTemplateModified;
+            deleteTemplateButton.Enabled = templateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse && SelectedTemplateItem.TemplateName != "default";
+            addTemplateButton.Enabled = newTemplateNameTextValidateField.IsValid && newTemplateNameTextValidateField.Text.ToString( )! != "default";
         }
 
         private void UpdateTemplatePropertiesButtonStates( )
@@ -825,6 +833,8 @@ namespace Sanoid.ConfigConsole
         private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs e )
         {
             DisableEventHandlers( );
+
+            _modifiedProperties.Clear();
 
             templateListView.EnsureSelectedItemVisible( );
 
@@ -859,84 +869,36 @@ namespace Sanoid.ConfigConsole
             yearlyMonthComboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
         }
 
-        private void TemplateSettingsSaveAllButtonOnClicked( )
+        private void ShowCommitConfirmationDialog( )
         {
-            TemplateConfigurationValidator validator = new( );
-
-            if ( validator.ValidateFieldValues( this ) is { IsValid: false, ValidationExceptions.Count: > 0 } result )
+            int dialogResult = MessageBox.Query( "Commit Templates?", "This will commit all currently applied changes to templates to memory.\n\nNOTE: THIS WILL NOT SAVE YOUR CHANGES TO DISK!\n\nYou must use the Save option in the File menu to save changes to disk.\n\nChanges to templates that have not been applied will not be committed.", 0, "Cancel", "Commit" );
+            if ( dialogResult == 0 )
             {
-                TemplateValidationException ex = new( "One or more template fields failed to validate", result.ValidationExceptions );
-                Logger.Warn( ex );
+                Logger.Debug("User canceled template commit dialog");
                 return;
             }
 
-            SelectedTemplateItem.ViewSettings = SelectedTemplateItem.ViewSettings with
+            if ( dialogResult == 1 )
             {
-                Formatting = new( )
-                {
-                    ComponentSeparator = validator.NamingComponentSeparator!,
-                    Prefix = validator.NamingPrefix!,
-                    TimestampFormatString = validator.NamingTimestampFormatString!,
-                    FrequentSuffix = validator.NamingFrequentSuffix!,
-                    HourlySuffix = validator.NamingHourlySuffix!,
-                    DailySuffix = validator.NamingDailySuffix!,
-                    WeeklySuffix = validator.NamingWeeklySuffix!,
-                    MonthlySuffix = validator.NamingMonthlySuffix!,
-                    YearlySuffix = validator.NamingYearlySuffix!
-                },
-                SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
-                {
-                    FrequentPeriod = validator.TimingFrequentPeriod!.Value,
-                    HourlyMinute = validator.TimingHourlyMinute!.Value,
-                    DailyTime = validator.TimingDailyTime,
-                    WeeklyDay = validator.TimingWeeklyDay!.Value,
-                    WeeklyTime = validator.TimingWeeklyTime,
-                    MonthlyDay = validator.TimingMonthlyDay!.Value,
-                    MonthlyTime = validator.TimingMonthlyTime,
-                    YearlyMonth = validator.TimingYearlyMonth!.Value,
-                    YearlyDay = validator.TimingYearlyDay!.Value,
-                    YearlyTime = validator.TimingYearlyTime
-                }
-            };
-
-            if ( SelectedTemplateItem.IsModified )
-            {
-                Templates[ SelectedTemplateItem.TemplateName ] = SelectedTemplateItem.ViewSettings;
-                TemplateConfigurationShowSaveDialog( );
+                Logger.Debug("User confirmed commit dialog");
+                CommitModifiedTemplates( );
             }
-
-            UpdateTemplateListButtonStates( );
         }
 
-        private void TemplateConfigurationShowSaveDialog( )
+        internal static void CommitModifiedTemplates( )
         {
-            using ( SaveDialog saveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+            Logger.Debug("Committing modified templates to base collections");
+            foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems )
             {
-                saveDialog.AllowsOtherFileTypes = true;
-                saveDialog.CanCreateDirectories = true;
-                saveDialog.Modal = true;
-                Application.Run( saveDialog );
-                if ( saveDialog.Canceled )
+                if ( currentTemplate.IsModified )
                 {
-                    return;
+                    templatesAddedRemovedOrModified = true;
+                    currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
+                    Templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
                 }
-
-                if ( saveDialog.FileName.IsEmpty )
-                {
-                    return;
-                }
-
-                SanoidSettings settings = Program.Settings! with
-                {
-                    Templates = Templates.ToDictionary( kvp => kvp.Key, kvp => kvp.Value )
-                };
-                SelectedTemplateItem.BaseSettings = SelectedTemplateItem.ViewSettings with { };
-                Program.Settings = settings with { };
-
-                File.WriteAllText( saveDialog.FileName.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" ), JsonSerializer.Serialize( Program.Settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
             }
 
-            UpdateTemplateListButtonStates( );
+            Program.Settings!.Templates = Templates.ToDictionary( pair => pair.Key, pair => pair.Value );
         }
 
         private void DisableEventHandlers( )
@@ -951,7 +913,7 @@ namespace Sanoid.ConfigConsole
             addTemplateButton.Clicked -= AddTemplateButtonOnClicked;
             deleteTemplateButton.Clicked -= DeleteDeleteTemplateButtonOnClicked;
             newTemplateNameTextValidateField.KeyPress -= NewTemplateNameTextValidateFieldOnKeyPress;
-            saveAllButton.Clicked -= TemplateSettingsSaveAllButtonOnClicked;
+            commitAllButton.Clicked -= ShowCommitConfirmationDialog;
 
             // Properties area field/button events
             //TODO: Warn user if they try to modify the default template
