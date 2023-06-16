@@ -574,6 +574,7 @@ namespace Sanoid.ConfigConsole
             recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
             recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
             recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
+            templateListView.SetSource( ConfigConsole.TemplateListItems );
             templateListView.SelectedItem = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
             templateListView.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
             templateListView.EnsureSelectedItemVisible( );
