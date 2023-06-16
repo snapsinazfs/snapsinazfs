@@ -18,6 +18,7 @@ using Sanoid.Settings.Settings;
 
 namespace Sanoid;
 
+[UsedImplicitly]
 internal class Program
 {
     // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
@@ -254,7 +255,11 @@ internal class Program
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
 
-            Settings.CacheDirectory = args.CacheDir;
+            if ( Settings is not null )
+            {
+                Settings.CacheDirectory = args.CacheDir;
+            }
+
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 

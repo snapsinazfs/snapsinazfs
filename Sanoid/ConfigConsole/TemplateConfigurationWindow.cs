@@ -14,8 +14,6 @@
 #nullable enable
 
 using System.Collections.Concurrent;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using NStack;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
@@ -38,47 +36,47 @@ namespace Sanoid.ConfigConsole
 
         private bool _templateConfigurationEventsEnabled;
         private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
-        internal static bool templatesAddedRemovedOrModified;
         private readonly HashSet<string> _timingProperties = new( new[] { FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase } );
         internal static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any( t => t.IsModified );
         private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.Field.IsValid );
         private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
         internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
+        private const string ComponentSeparator = "Component Separator";
+        private const string DailySuffixTitleCase = "Daily Suffix";
+        private const string DailyTimeTitleCase = "Daily Time";
+
+        private const string FrequentPeriodTitleCase = "Frequent Period";
+        private const string FrequentSuffixTitleCase = "Frequent Suffix";
+        private const string HourlyMinuteTitleCase = "Hourly Minute";
+        private const string HourlySuffixTitleCase = "Hourly Suffix";
 
         private const string InvalidFieldValueDialogTitleString = "Invalid Field Value";
+        private const string MonthlyDayTitleCase = "Monthly Day";
+        private const string MonthlySuffixTitleCase = "Monthly Suffix";
+        private const string MonthlyTimeTitleCase = "Monthly Time";
+        private const string PrefixTitleCase = "Prefix";
+        private const string TimestampFormatTitleCase = "Timestamp Format";
+        private const string WeeklyDayTitleCase = "Weekly Day";
+        private const string WeeklySuffixTitleCase = "Weekly Suffix";
+        private const string WeeklyTimeTitleCase = "Weekly Time";
+        private const string YearlyDayTitleCase = "Yearly Day";
+        private const string YearlyMonthTitleCase = "Yearly Month";
+        private const string YearlySuffixTitleCase = "Yearly Suffix";
+        private const string YearlyTimeTitleCase = "Yearly Time";
+        internal static bool templatesAddedRemovedOrModified;
         private static readonly ustring InvalidFieldValueDialogTitle = ustring.Make( InvalidFieldValueDialogTitleString );
 
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
         internal static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
-        internal static ConcurrentDictionary<string, TemplateSettings> Templates = new( );
-
-        private const string FrequentPeriodTitleCase = "Frequent Period";
-        private const string HourlyMinuteTitleCase = "Hourly Minute";
-        private const string YearlyMonthTitleCase = "Yearly Month";
-        private const string YearlyDayTitleCase = "Yearly Day";
-        private const string YearlyTimeTitleCase = "Yearly Time";
-        private const string MonthlyDayTitleCase = "Monthly Day";
-        private const string MonthlyTimeTitleCase = "Monthly Time";
-        private const string WeeklyDayTitleCase = "Weekly Day";
-        private const string WeeklyTimeTitleCase = "Weekly Time";
-        private const string DailyTimeTitleCase = "Daily Time";
-        private const string ComponentSeparator = "Component Separator";
-        private const string PrefixTitleCase = "Prefix";
-        private const string TimestampFormatTitleCase = "Timestamp Format";
-        private const string FrequentSuffixTitleCase = "Frequent Suffix";
-        private const string HourlySuffixTitleCase = "Hourly Suffix";
-        private const string DailySuffixTitleCase = "Daily Suffix";
-        private const string WeeklySuffixTitleCase = "Weekly Suffix";
-        private const string MonthlySuffixTitleCase = "Monthly Suffix";
-        private const string YearlySuffixTitleCase = "Yearly Suffix";
+        private static ConcurrentDictionary<string, TemplateSettings> _templates = new( );
 
         private void InitializeTemplateEditorView( )
         {
             DisableEventHandlers( );
             templateListView.SetSource( ConfigConsole.TemplateListItems );
-            Templates.Clear( );
-            Templates = new( Program.Settings!.Templates );
+            _templates.Clear( );
+            _templates = new( Program.Settings!.Templates );
             InitializeComboBoxes( );
             SetInitialButtonState( );
             InitializeTemplatePropertiesTextValidateFieldList( );
@@ -86,9 +84,15 @@ namespace Sanoid.ConfigConsole
             SetReadOnlyFields( );
             UpdateTemplateListButtonStates( );
             UpdateTemplatePropertiesButtonStates( );
+            SetTabStops( );
             EnableEventHandlers( );
             templateListView.SelectedItem = 0;
             templateListView.SetFocus( );
+        }
+
+        private void SetTabStops( )
+        {
+            //TODO: Set up tab order
         }
 
         private void SetReadOnlyFields( )
@@ -203,7 +207,7 @@ namespace Sanoid.ConfigConsole
         {
             _modifiedProperties.Remove( WeeklyTimeTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.WeeklyTime != weeklyTimeTimeField.Time.ToTimeOnly())
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.WeeklyTime != weeklyTimeTimeField.Time.ToTimeOnly( ) )
             {
                 _modifiedProperties.Add( WeeklyTimeTitleCase );
             }
@@ -215,7 +219,7 @@ namespace Sanoid.ConfigConsole
         {
             _modifiedProperties.Remove( MonthlyTimeTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyTime != monthlyTimeTimeField.Time.ToTimeOnly())
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyTime != monthlyTimeTimeField.Time.ToTimeOnly( ) )
             {
                 _modifiedProperties.Add( MonthlyTimeTitleCase );
             }
@@ -234,7 +238,7 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse(monthlyDayTextValidateField.Text.ToString( )!) )
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse( monthlyDayTextValidateField.Text.ToString( )! ) )
             {
                 _modifiedProperties.Add( MonthlyDayTitleCase );
             }
@@ -246,7 +250,7 @@ namespace Sanoid.ConfigConsole
         {
             _modifiedProperties.Remove( YearlyTimeTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyTime != yearlyTimeTimeField.Time.ToTimeOnly())
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyTime != yearlyTimeTimeField.Time.ToTimeOnly( ) )
             {
                 _modifiedProperties.Add( YearlyTimeTitleCase );
             }
@@ -265,7 +269,7 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse(yearlyDayTextValidateField.Text.ToString( )!) )
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse( yearlyDayTextValidateField.Text.ToString( )! ) )
             {
                 _modifiedProperties.Add( YearlyDayTitleCase );
             }
@@ -277,10 +281,10 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( FrequentPeriodTitleCase );
 
-                if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse(frequentPeriodRadioGroup.GetSelectedLabelString()) )
+                if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ) ) )
                 {
                     _modifiedProperties.Add( FrequentPeriodTitleCase );
                 }
@@ -289,7 +293,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -297,7 +301,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( YearlySuffixTitleCase );
 
                 if ( !yearlySuffixTextValidateField.IsValid )
@@ -324,7 +328,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -332,7 +336,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( MonthlySuffixTitleCase );
 
                 if ( !monthlySuffixTextValidateField.IsValid )
@@ -359,7 +363,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -367,7 +371,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( WeeklySuffixTitleCase );
 
                 if ( !weeklySuffixTextValidateField.IsValid )
@@ -394,7 +398,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -402,7 +406,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( DailySuffixTitleCase );
 
                 if ( !dailySuffixTextValidateField.IsValid )
@@ -429,7 +433,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -437,7 +441,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( HourlySuffixTitleCase );
 
                 if ( !hourlySuffixTextValidateField.IsValid )
@@ -464,7 +468,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
         }
 
@@ -574,7 +578,7 @@ namespace Sanoid.ConfigConsole
         private void UpdatePropertiesFrameViewState( string? periodString = null )
         {
             UpdateTemplatePropertiesButtonStates( );
-            string dailySuffixString = ( dailySuffixTextValidateField.IsValid && dailySuffixTextValidateField.Text.Length > 0 ) ? dailySuffixTextValidateField.Text.ToString( )! : "invalid";
+            string dailySuffixString = dailySuffixTextValidateField.IsValid && dailySuffixTextValidateField.Text.Length > 0 ? dailySuffixTextValidateField.Text.ToString( )! : "invalid";
             UpdateExampleText( periodString ?? dailySuffixString );
         }
 
@@ -682,7 +686,7 @@ namespace Sanoid.ConfigConsole
             if ( !newTemplateNameTextValidateField.Text.IsEmpty && newTemplateNameTextValidateField.IsValid )
             {
                 string newTemplateName = newTemplateNameTextValidateField.Text.ToString( )!;
-                addTemplateButton.Enabled = newTemplateName != "default" && !Templates.ContainsKey( newTemplateName );
+                addTemplateButton.Enabled = newTemplateName != "default" && !_templates.ContainsKey( newTemplateName );
             }
             else
             {
@@ -691,7 +695,7 @@ namespace Sanoid.ConfigConsole
         }
 
         /// <exception cref="ApplicationException">
-        ///     If removal of the selected template from <see cref="Templates" /> fails.<br />
+        ///     If removal of the selected template from <see cref="_templates" /> fails.<br />
         ///     Should be treated as fatal by any consumers
         /// </exception>
         private void DeleteDeleteTemplateButtonOnClicked( )
@@ -725,7 +729,7 @@ namespace Sanoid.ConfigConsole
                 templateListView.SelectedItem -= 1;
                 templateListView.EnsureSelectedItemVisible( );
                 ConfigConsole.TemplateListItems.RemoveAt( indexToRemove );
-                if ( !Templates.TryRemove( templateName, out _ ) )
+                if ( !_templates.TryRemove( templateName, out _ ) )
                 {
                     // The application state is inconsistent if this happens, and it isn't safe to continue
                     string errorMessage = $"Failed to remove template {templateName} from UI dictionary";
@@ -750,7 +754,7 @@ namespace Sanoid.ConfigConsole
 
         private void AddTemplateButtonOnClicked( )
         {
-            if ( !Templates.TryGetValue( "default", out _ ) )
+            if ( !_templates.TryGetValue( "default", out _ ) )
             {
                 string errorMessage = "'default' template does not exist. Not creating new template.";
                 Logger.Error( errorMessage );
@@ -767,7 +771,7 @@ namespace Sanoid.ConfigConsole
             }
 
             string? newTemplateName = newTemplateNameTextValidateField.Text.ToString( );
-            if ( Templates.ContainsKey( newTemplateName! ) )
+            if ( _templates.ContainsKey( newTemplateName! ) )
             {
                 string errorMessage = $"A template named {newTemplateName} already exists.";
                 Logger.Error( errorMessage );
@@ -775,7 +779,7 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
-            Templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
+            _templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
             ConfigConsole.TemplateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
             templatesAddedRemovedOrModified = true;
             UpdateTemplateListButtonStates( );
@@ -786,7 +790,7 @@ namespace Sanoid.ConfigConsole
         {
             _modifiedProperties.Remove( DailyTimeTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.DailyTime != dailyTimeTimeField.Time.ToTimeOnly())
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.DailyTime != dailyTimeTimeField.Time.ToTimeOnly( ) )
             {
                 _modifiedProperties.Add( DailyTimeTitleCase );
             }
@@ -805,7 +809,7 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse(hourlyMinuteTextValidateField.Text.ToString( )!) )
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse( hourlyMinuteTextValidateField.Text.ToString( )! ) )
             {
                 _modifiedProperties.Add( HourlyMinuteTitleCase );
             }
@@ -841,7 +845,7 @@ namespace Sanoid.ConfigConsole
         {
             DisableEventHandlers( );
 
-            _modifiedProperties.Clear();
+            _modifiedProperties.Clear( );
             templateListView.EnsureSelectedItemVisible( );
             SetFieldsForSelectedItem( );
             UpdatePropertiesFrameViewState( );
@@ -879,31 +883,31 @@ namespace Sanoid.ConfigConsole
             int dialogResult = MessageBox.Query( "Commit Templates?", "This will commit all currently applied changes to templates to memory.\n\nNOTE: THIS WILL NOT SAVE YOUR CHANGES TO DISK!\n\nYou must use the Save option in the File menu to save changes to disk.\n\nChanges to templates that have not been applied will not be committed.", 0, "Cancel", "Commit" );
             if ( dialogResult == 0 )
             {
-                Logger.Debug("User canceled template commit dialog");
+                Logger.Debug( "User canceled template commit dialog" );
                 return;
             }
 
             if ( dialogResult == 1 )
             {
-                Logger.Debug("User confirmed commit dialog");
+                Logger.Debug( "User confirmed commit dialog" );
                 CommitModifiedTemplates( );
             }
         }
 
         internal static void CommitModifiedTemplates( )
         {
-            Logger.Debug("Committing modified templates to base collections");
+            Logger.Debug( "Committing modified templates to base collections" );
             foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems )
             {
                 if ( currentTemplate.IsModified )
                 {
                     templatesAddedRemovedOrModified = true;
                     currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
-                    Templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
+                    _templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
                 }
             }
 
-            Program.Settings!.Templates = Templates.ToDictionary( pair => pair.Key, pair => pair.Value );
+            Program.Settings!.Templates = _templates.ToDictionary( pair => pair.Key, pair => pair.Value );
         }
 
         private void DisableEventHandlers( )
@@ -952,7 +956,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( WeeklyDayTitleCase );
                 if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.WeeklyDay != (DayOfWeek)e.Item )
                 {
@@ -961,7 +965,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
 
             UpdatePropertiesFrameViewState( );
@@ -971,7 +975,7 @@ namespace Sanoid.ConfigConsole
         {
             try
             {
-                DisableEventHandlers();
+                DisableEventHandlers( );
                 _modifiedProperties.Remove( YearlyMonthTitleCase );
                 if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyMonth != e.Item + 1 )
                 {
@@ -980,7 +984,7 @@ namespace Sanoid.ConfigConsole
             }
             finally
             {
-                EnableEventHandlers();
+                EnableEventHandlers( );
             }
 
             UpdatePropertiesFrameViewState( );

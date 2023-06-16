@@ -11,9 +11,7 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using Sanoid.Settings.Settings;
+#nullable enable
 
 namespace Sanoid.ConfigConsole
 {
@@ -28,7 +26,7 @@ namespace Sanoid.ConfigConsole
             EnableEventHandlers( );
         }
 
-        private void GlobalConfigurationWindowOnInitialized( object sender, EventArgs e )
+        private void GlobalConfigurationWindowOnInitialized( object? sender, EventArgs e )
         {
             SetFieldsFromSettingsObject( false );
         }
