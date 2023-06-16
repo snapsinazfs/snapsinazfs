@@ -26,6 +26,8 @@ public static class CultureTimeHelpers
     /// </summary>
     public static List<string> MonthNamesLongAndAbbreviated { get; } = DateTimeFormatInfo.CurrentInfo.GetMonthNames( );
 
+    public static List<string> MonthNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.MonthNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
+
     /// <summary>
     ///     Gets the month number of this <see cref="DateTime" />, for the current culture of the executing thread.
     /// </summary>

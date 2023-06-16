@@ -68,7 +68,7 @@ namespace Sanoid.ConfigConsole
 
         private void InitializeComboBoxes( )
         {
-            yearlyMonthComboBox.SetSource( DateTimeFormatInfo.CurrentInfo.MonthNames );
+            yearlyMonthComboBox.SetSource( CultureTimeHelpers.MonthNamesLong );
         }
 
         private void SetInitialButtonState( )
