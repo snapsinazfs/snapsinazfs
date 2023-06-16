@@ -7,9 +7,9 @@
 namespace Sanoid.Interop.Libc.Enums;
 
 /// <summary>
-/// An enumeration of file modes, in standard unix octal form, for a specific component of a file mode
+///     An enumeration of file modes, in standard unix octal form, for a specific component of a file mode
 /// </summary>
-/// <remarks>Used by functions such as <see cref="NativeMethods.EuidAccess"/></remarks>
+/// <remarks>Used by functions such as <see cref="NativeMethods.EuidAccess" /></remarks>
 [Flags]
 public enum UnixFileTestMode
 {

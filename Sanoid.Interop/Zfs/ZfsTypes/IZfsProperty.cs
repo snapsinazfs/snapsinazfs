@@ -8,10 +8,10 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 
 public interface IZfsProperty
 {
-    string Name { get; }
-    string Source { get; }
-    string SetString { get; }
-    bool IsInherited { get; }
     string InheritedFrom { get; }
+    bool IsInherited { get; }
     bool IsLocal { get; }
+    string Name { get; }
+    string SetString { get; }
+    string Source { get; }
 }

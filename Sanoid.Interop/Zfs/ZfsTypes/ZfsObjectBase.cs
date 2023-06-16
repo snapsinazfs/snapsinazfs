@@ -141,6 +141,7 @@ public abstract class ZfsObjectBase
     ///     A dictionary of property names and their values, as strings
     /// </summary>
     public ConcurrentDictionary<string, ZfsProperty> Properties { get; }
+
     public bool PruneSnapshots
     {
         get
@@ -238,7 +239,7 @@ public abstract class ZfsObjectBase
                 continue;
             }
 
-            Logger.Error( "Name of {0} {1} is invalid", kind.ToString( ), name );
+            Logger.Error( "Name of {0} {1} is invalid", kind, name );
             return false;
         }
 

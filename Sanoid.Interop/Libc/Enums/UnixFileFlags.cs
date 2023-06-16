@@ -7,8 +7,8 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable MissingXmlDoc
 // ReSharper disable IdentifierTypo
-#pragma warning disable CS1591
 
+#pragma warning disable CS1591
 
 namespace Sanoid.Interop.Libc.Enums;
 

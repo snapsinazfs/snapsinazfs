@@ -20,15 +20,15 @@ namespace Sanoid.Interop.Concurrency;
 /// </remarks>
 public sealed class Mutexes : IDisposable
 {
+    static Mutexes( )
+    {
+        Logger = LogManager.GetCurrentClassLogger( );
+    }
+
     private Mutexes( )
     {
         Logger = LogManager.GetCurrentClassLogger( );
         Logger.Trace( "Creating mutex manager" );
-    }
-
-    static Mutexes()
-    {
-        Logger = LogManager.GetCurrentClassLogger( );
     }
 
     private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );

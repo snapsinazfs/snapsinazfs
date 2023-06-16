@@ -146,7 +146,9 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         }
 
         // If timestamps are different, sort on period
-        return Period != other.Period ? Period.CompareTo( other.Period ) :
+        return Period != other.Period
+            ? Period.CompareTo( other.Period )
+            :
             // If periods are the same, sort by name
             Name.CompareTo( other.Name );
     }
@@ -236,7 +238,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     ///         </item>
     ///     </list>
     /// </remarks>
-    public static Snapshot FromListSnapshots( string[] lineTokens, ConcurrentDictionary<string,Dataset> datasets )
+    public static Snapshot FromListSnapshots( string[] lineTokens, ConcurrentDictionary<string, Dataset> datasets )
     {
         if ( lineTokens.Length < ZfsProperty.KnownSnapshotProperties.Count + 1 )
         {
@@ -250,13 +252,14 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         Dataset poolRoot = datasets[ snapshotName.GetZfsPathRoot( ) ];
         Snapshot snap = new( snapshotName, poolRoot )
         {
-            RetentionSettings = datasets[parentName].RetentionSettings
+            RetentionSettings = datasets[ parentName ].RetentionSettings
         };
 
         for ( int i = 1; i < lineTokens.Length; i++ )
         {
             snap.AddOrUpdateProperty( ZfsProperty.KnownSnapshotProperties[ i - 1 ], lineTokens[ i ], "local" );
         }
+
         return snap;
     }
 }

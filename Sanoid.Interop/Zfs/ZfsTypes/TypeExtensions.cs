@@ -55,6 +55,7 @@ public static class TypeExtensions
         string rootPath = value[ ..endIndex ];
         return rootPath;
     }
+
     public static string GetZfsPathParent( this string value )
     {
         int endIndex = value.IndexOf( '@' );
@@ -76,15 +77,20 @@ public static class TypeExtensions
     {
         return string.Join( ' ', properties.Select( p => p.SetString ) );
     }
+
     public static string ToStringForZfsSet( this IDictionary<string, IZfsProperty> properties )
     {
-        return string.Join( ' ', properties.Select( kvp  => kvp.Value.SetString ) );
+        return string.Join( ' ', properties.Select( kvp => kvp.Value.SetString ) );
     }
 
     /// <summary>
-    /// Gets a string of all <see cref="IZfsProperty.SetString"/> values, separated by spaces, to be used in zfs set operations
+    ///     Gets a string of all <see cref="IZfsProperty.SetString" /> values, separated by spaces, to be used in zfs set
+    ///     operations
     /// </summary>
-    /// <param name="properties">An <see cref="IEnumerable{T}"/> of <see cref="IZfsProperty"/> objects to get a set string for</param>
+    /// <param name="properties">
+    ///     An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string
+    ///     for
+    /// </param>
     /// <returns></returns>
     public static string ToStringForZfsSet( this List<IZfsProperty> properties )
     {
@@ -92,10 +98,12 @@ public static class TypeExtensions
         {
             throw new ArgumentNullException( nameof( properties ), "Null collection provided" );
         }
+
         if ( !properties.Any( ) )
         {
             throw new ArgumentException( "Empty collection provided", nameof( properties ) );
         }
+
         return string.Join( ' ', properties.Select( p => p.SetString ) );
     }
 

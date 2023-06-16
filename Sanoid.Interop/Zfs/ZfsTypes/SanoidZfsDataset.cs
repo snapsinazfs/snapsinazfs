@@ -9,6 +9,37 @@ namespace Sanoid.Interop.Zfs.ZfsTypes;
 public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot )
 {
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
+
+    public IZfsProperty this[ string propName ]
+    {
+        get
+        {
+            ArgumentException.ThrowIfNullOrEmpty( propName );
+            return propName switch
+            {
+                ZfsPropertyNames.EnabledPropertyName => Enabled,
+                ZfsPropertyNames.TakeSnapshotsPropertyName => TakeSnapshots,
+                ZfsPropertyNames.PruneSnapshotsPropertyName => PruneSnapshots,
+                ZfsPropertyNames.RecursionPropertyName => Recursion,
+                ZfsPropertyNames.TemplatePropertyName => Template,
+                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => SnapshotRetentionFrequent,
+                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => SnapshotRetentionHourly,
+                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => SnapshotRetentionDaily,
+                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => SnapshotRetentionWeekly,
+                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => SnapshotRetentionMonthly,
+                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => SnapshotRetentionYearly,
+                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral,
+                ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => LastHourlySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => LastDailySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
+                _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
+            };
+        }
+    }
+
     public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
     public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
     public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
@@ -27,10 +58,19 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot )
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, "local" );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", "local" );
 
-    /// <exception cref="FormatException"><paramref name="propertyValue" /> is not a valid string representation of the target property value type.</exception>
+    /// <exception cref="FormatException">
+    ///     <paramref name="propertyValue" /> is not a valid string representation of the target
+    ///     property value type.
+    /// </exception>
     /// <exception cref="ArgumentNullException"><paramref name="propertyValue" /> is <see langword="null" />.</exception>
-    /// <exception cref="ArgumentException">For <see cref="DateTimeOffset"/> properties, the offset is greater than 14 hours or less than -14 hours.</exception>
-    /// <exception cref="OverflowException">For <see langword="int"/> properties, <paramref name="propertyValue" /> represents a number less than <see cref="int.MinValue"/> or greater than <see cref="int.MaxValue"/>.</exception>
+    /// <exception cref="ArgumentException">
+    ///     For <see cref="DateTimeOffset" /> properties, the offset is greater than 14 hours
+    ///     or less than -14 hours.
+    /// </exception>
+    /// <exception cref="OverflowException">
+    ///     For <see langword="int" /> properties, <paramref name="propertyValue" /> represents
+    ///     a number less than <see cref="int.MinValue" /> or greater than <see cref="int.MaxValue" />.
+    /// </exception>
     public IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
     {
         return propertyName switch
@@ -56,6 +96,7 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot )
             _ => throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported property" )
         };
     }
+
     public ZfsProperty<bool> UpdateProperty( string propertyName, bool propertyValue, string propertySource )
     {
         return propertyName switch
@@ -94,35 +135,5 @@ public record SanoidZfsDataset( string Name, string Kind, bool IsPoolRoot )
             ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral = SnapshotRetentionPruneDeferral with { Value = propertyValue, Source = propertySource },
             _ => throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" )
         };
-    }
-
-    public IZfsProperty this[ string propName ]
-    {
-        get
-        {
-            ArgumentException.ThrowIfNullOrEmpty( propName );
-            return propName switch
-            {
-                ZfsPropertyNames.EnabledPropertyName => Enabled,
-                ZfsPropertyNames.TakeSnapshotsPropertyName => TakeSnapshots,
-                ZfsPropertyNames.PruneSnapshotsPropertyName => PruneSnapshots,
-                ZfsPropertyNames.RecursionPropertyName => Recursion,
-                ZfsPropertyNames.TemplatePropertyName => Template,
-                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => SnapshotRetentionFrequent,
-                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => SnapshotRetentionHourly,
-                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => SnapshotRetentionDaily,
-                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => SnapshotRetentionWeekly,
-                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => SnapshotRetentionMonthly,
-                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => SnapshotRetentionYearly,
-                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral,
-                ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => LastHourlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => LastDailySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
-                _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
-            };
-        }
     }
 }

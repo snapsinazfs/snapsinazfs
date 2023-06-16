@@ -486,7 +486,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Task[] zfsGetSnapshotTasks =
             ( from poolName
                   in poolRootNames
-              select Task.Run( ( ) => GetSnapshots( poolName )) ).ToArray( );
+              select Task.Run( ( ) => GetSnapshots( poolName ) ) ).ToArray( );
         await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
 
         // Local function to get datasets starting from the specified path
@@ -669,68 +669,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    private static void ValidateCommonExecArguments( string verb, string args )
-    {
-        if ( string.IsNullOrWhiteSpace( verb ) )
-        {
-            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
-        }
-
-        if ( string.IsNullOrWhiteSpace( args ) )
-        {
-            throw new ArgumentNullException( nameof( args ), "Arguments are required for zfs/zpool exec operations" );
-        }
-    }
-
-    /// <inheritdoc cref="SetZfsProperties(bool,string,Sanoid.Interop.Zfs.ZfsTypes.ZfsProperty[])" />
-    /// <remarks>
-    ///     Does not perform name validation
-    /// </remarks>
-    private bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params ZfsProperty[] properties )
-    {
-        if ( properties.Length == 0 )
-        {
-            Logger.Trace( "No properties to set" );
-            return false;
-        }
-
-        string propertiesToSet = properties.ToStringForZfsSet();
-        Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
-        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesToSet} {zfsPath}" )
-        {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
-        {
-            if ( dryRun )
-            {
-                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-                return false;
-            }
-
-            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-            try
-            {
-                zfsSetProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
-                return false;
-            }
-
-            if ( !zfsSetProcess.HasExited )
-            {
-                Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 3000 );
-            }
-
-            Logger.Trace( "zfs set process finished" );
-            return true;
-        }
-    }
-
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
@@ -774,7 +712,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
                 SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
                 SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new(dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
+                ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
                 Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
@@ -799,5 +737,67 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         return treeRootNodes;
+    }
+
+    private static void ValidateCommonExecArguments( string verb, string args )
+    {
+        if ( string.IsNullOrWhiteSpace( verb ) )
+        {
+            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
+        }
+
+        if ( string.IsNullOrWhiteSpace( args ) )
+        {
+            throw new ArgumentNullException( nameof( args ), "Arguments are required for zfs/zpool exec operations" );
+        }
+    }
+
+    /// <inheritdoc cref="SetZfsProperties(bool,string,Sanoid.Interop.Zfs.ZfsTypes.ZfsProperty[])" />
+    /// <remarks>
+    ///     Does not perform name validation
+    /// </remarks>
+    private bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params ZfsProperty[] properties )
+    {
+        if ( properties.Length == 0 )
+        {
+            Logger.Trace( "No properties to set" );
+            return false;
+        }
+
+        string propertiesToSet = properties.ToStringForZfsSet( );
+        Logger.Trace( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
+        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesToSet} {zfsPath}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        {
+            if ( dryRun )
+            {
+                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+                return false;
+            }
+
+            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+            try
+            {
+                zfsSetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
+                return false;
+            }
+
+            if ( !zfsSetProcess.HasExited )
+            {
+                Logger.Trace( "Waiting for zfs set process to exit" );
+                zfsSetProcess.WaitForExit( 3000 );
+            }
+
+            Logger.Trace( "zfs set process finished" );
+            return true;
+        }
     }
 }

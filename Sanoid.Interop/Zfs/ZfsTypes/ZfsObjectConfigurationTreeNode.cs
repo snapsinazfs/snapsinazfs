@@ -19,9 +19,10 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         BaseParentDataset = baseParentDataset ?? baseDataset;
     }
 
+    public SanoidZfsDataset BaseDataset { get; set; }
+    public SanoidZfsDataset BaseParentDataset { get; set; }
+
     public bool IsModified => TreeDataset != BaseDataset;
     public SanoidZfsDataset TreeDataset { get; set; }
-    public SanoidZfsDataset BaseDataset { get; set; }
     public SanoidZfsDataset TreeParentDataset { get; set; }
-    public SanoidZfsDataset BaseParentDataset { get; set; }
 }

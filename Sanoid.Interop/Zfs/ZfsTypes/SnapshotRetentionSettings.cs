@@ -51,7 +51,6 @@ public sealed class SnapshotRetentionSettings
     /// </summary>
     public int Monthly { get; set; }
 
-
     /// <summary>
     ///     Gets or sets what percentage of remaining pool capacity must be reached before snapshots will be pruned by this
     ///     policy

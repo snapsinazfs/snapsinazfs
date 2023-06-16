@@ -1,4 +1,10 @@
-﻿// ReSharper disable RedundantUsingDirective.Global
+﻿// LICENSE:
+// 
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
+// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
+// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+
+// ReSharper disable RedundantUsingDirective.Global
 // ReSharper disable IdentifierTypo
 // LICENSE:
 // 
@@ -86,4 +92,3 @@ global using __loff_t = System.Int64;
 global using __intptr_t = System.Int32;
 global using __socklen_t = System.UInt32;
 global using __sig_atomic_t = System.Int32;
-

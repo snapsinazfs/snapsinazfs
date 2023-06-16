@@ -5,8 +5,6 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using System.Xml.Linq;
-
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 using Terminal.Gui.Trees;
@@ -170,7 +168,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
                 SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
                 SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new(dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
+                ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
                 Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
@@ -203,7 +201,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         while ( !rdr.EndOfStream )
         {
-
             string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
             if ( string.IsNullOrWhiteSpace( stringToParse ) )
             {
@@ -223,7 +220,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             if ( p.Name == "type" )
             {
                 Logger.Info( "New dataset is a {0:F}", p.Value );
-                string rootPathString = parseResult.parent.GetZfsPathRoot();
+                string rootPathString = parseResult.parent.GetZfsPathRoot( );
                 bool isNewRoot = !datasets.ContainsKey( rootPathString );
                 Dataset newDs = new( parseResult.parent, p.Value, isNewRoot ? null : datasets[ rootPathString ], isNewRoot );
                 datasets.TryAdd( parseResult.parent, newDs );
@@ -236,6 +233,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
         }
     }
+
     private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
     {
         Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} pool1" );
