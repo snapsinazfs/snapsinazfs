@@ -81,18 +81,18 @@ namespace Sanoid.ConfigConsole
         private void InitializeTemplatePropertiesTextValidateFieldList( )
         {
             _templateConfigurationTextValidateFieldList.Clear( );
-            _templateConfigurationTextValidateFieldList.Add( new( namingComponentSeparatorValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingPrefixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingFrequentSuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingHourlySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingDailySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingWeeklySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingMonthlySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( namingYearlySuffixTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( timingHourlyMinuteTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( timingWeeklyDayTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( timingMonthlyDayTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( timingYearlyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( componentSeparatorValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( prefixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( frequentSuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( hourlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( dailySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( weeklySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( monthlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( yearlySuffixTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( hourlyMinuteTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( weeklyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( monthlyDayTextValidateField, true ) );
+            _templateConfigurationTextValidateFieldList.Add( new( yearlyDayTextValidateField, true ) );
         }
 
         private void SetValidateOnInputForAllTextValidateFields( )
@@ -115,8 +115,8 @@ namespace Sanoid.ConfigConsole
             newTemplateNameTextValidateField.KeyPress += NewTemplateNameTextValidateFieldOnKeyPress;
             saveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
             resetCurrentButton.Clicked += ResetCurrentButtonOnClicked;
-            timingHourlyMinuteTextValidateField.Leave += HourlyMinuteTextValidateFieldOnLeave;
-            timingHourlyMinuteTextValidateField.KeyPress += HourlyMinuteTextValidateFieldOnKeyPress;
+            hourlyMinuteTextValidateField.Leave += HourlyMinuteTextValidateFieldOnLeave;
+            hourlyMinuteTextValidateField.KeyPress += HourlyMinuteTextValidateFieldOnKeyPress;
             dailyTimeTimeField.Leave += DailyTimeTimeFieldOnLeave;
             dailyTimeTimeField.KeyPress += DailyTimeTimeFieldOnKeyPress;
             yearlyMonthComboBox.SelectedItemChanged += YearlyMonthComboBoxOnSelectedItemChanged;
@@ -129,7 +129,7 @@ namespace Sanoid.ConfigConsole
             {
                 SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
                 {
-                    HourlyMinute = timingHourlyMinuteTextValidateField.Text.ToInt32(),
+                    HourlyMinute = hourlyMinuteTextValidateField.Text.ToInt32(),
                     DailyTime = TimeOnly.FromTimeSpan( dailyTimeTimeField.Time ),
                     WeeklyTime = TimeOnly.FromTimeSpan( weeklyTimeTimeField.Time ),
                     MonthlyTime = TimeOnly.FromTimeSpan( monthlyTimeTimeField.Time ),
@@ -148,8 +148,8 @@ namespace Sanoid.ConfigConsole
 
         private void HourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs args )
         {
-            bool fieldIsValid = timingHourlyMinuteTextValidateField.IsValid;
-            bool isMinuteValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != timingHourlyMinuteTextValidateField.Text.ToInt32( int.MinValue );
+            bool fieldIsValid = hourlyMinuteTextValidateField.IsValid;
+            bool isMinuteValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != hourlyMinuteTextValidateField.Text.ToInt32( int.MinValue );
             applyCurrentButton.Enabled = fieldIsValid && isMinuteValueDifferent && IsEveryPropertyTextValidateFieldValid;
         }
 
@@ -265,14 +265,14 @@ namespace Sanoid.ConfigConsole
 
         private void HourlyMinuteTextValidateFieldOnLeave( FocusEventArgs args )
         {
-            if ( timingHourlyMinuteTextValidateField.IsValid )
+            if ( hourlyMinuteTextValidateField.IsValid )
             {
-                if ( !int.TryParse( timingHourlyMinuteTextValidateField.Text.ToString( ), out int hourlyMinute ) && hourlyMinute is < 0 or > 59 )
+                if ( !int.TryParse( hourlyMinuteTextValidateField.Text.ToString( ), out int hourlyMinute ) && hourlyMinute is < 0 or > 59 )
                 {
                     const string errorMessage = "The value entered for Hourly Minute is invalid. Field will be reset to previous value.";
                     Logger.Warn( errorMessage );
                     MessageBox.ErrorQuery( "Invalid Hourly Minute Value", errorMessage, "OK" );
-                    timingHourlyMinuteTextValidateField.Text = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
+                    hourlyMinuteTextValidateField.Text = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
                     return;
                 }
 
@@ -321,23 +321,23 @@ namespace Sanoid.ConfigConsole
         private void SetFieldsForSelectedItem( )
         {
             TemplateConfigurationListItem item = SelectedTemplateItem;
-            namingComponentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
-            namingPrefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
-            namingFrequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
-            namingHourlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
-            namingDailySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
-            namingWeeklySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
-            namingMonthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
-            namingYearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
-            namingTimestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
+            componentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
+            prefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
+            frequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
+            hourlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
+            dailySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
+            weeklySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
+            monthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
+            yearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
+            timestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
             frequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
-            timingHourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
+            hourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
             dailyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
-            timingWeeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
+            weeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
             weeklyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
-            timingMonthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
+            monthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
             monthlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
-            timingYearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
+            yearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
             yearlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
             yearlyMonthComboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
         }
@@ -435,9 +435,9 @@ namespace Sanoid.ConfigConsole
             newTemplateNameTextValidateField.KeyPress -= NewTemplateNameTextValidateFieldOnKeyPress;
             saveAllButton.Clicked -= TemplateSettingsSaveAllButtonOnClicked;
             resetCurrentButton.Clicked -= ResetCurrentButtonOnClicked;
-            timingHourlyMinuteTextValidateField.Leave -= HourlyMinuteTextValidateFieldOnLeave;
+            hourlyMinuteTextValidateField.Leave -= HourlyMinuteTextValidateFieldOnLeave;
             dailyTimeTimeField.Leave -= DailyTimeTimeFieldOnLeave;
-            timingHourlyMinuteTextValidateField.KeyPress -= HourlyMinuteTextValidateFieldOnKeyPress;
+            hourlyMinuteTextValidateField.KeyPress -= HourlyMinuteTextValidateFieldOnKeyPress;
             dailyTimeTimeField.KeyPress -= DailyTimeTimeFieldOnKeyPress;
             yearlyMonthComboBox.SelectedItemChanged -= YearlyMonthComboBoxOnSelectedItemChanged;
             _templateConfigurationEventsEnabled = false;
