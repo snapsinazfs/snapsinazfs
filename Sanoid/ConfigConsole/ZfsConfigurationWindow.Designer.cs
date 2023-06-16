@@ -15,13 +15,9 @@ namespace Sanoid.ConfigConsole {
     
     public partial class ZfsConfigurationWindow : Terminal.Gui.Window {
         
-        private Terminal.Gui.ColorScheme greyOnBlack;
-        
         private Terminal.Gui.ColorScheme whiteOnRed;
         
         private Terminal.Gui.ColorScheme localPropertyTextFieldColorScheme;
-        
-        private Terminal.Gui.ColorScheme templateConfigurationTextValidateFieldColorScheme;
         
         private Terminal.Gui.ColorScheme inheritedPropertyTextFieldColorScheme;
         
@@ -34,12 +30,6 @@ namespace Sanoid.ConfigConsole {
         private Terminal.Gui.ColorScheme inheritedPropertyListViewColorScheme;
         
         private Terminal.Gui.ColorScheme tgDefault;
-        
-        private Terminal.Gui.ColorScheme allBlackColorScheme;
-        
-        private Terminal.Gui.ColorScheme blackAndWhiteColorScheme;
-        
-        private Terminal.Gui.ColorScheme midnightColorScheme;
         
         private Terminal.Gui.ColorScheme whiteOnBlue;
         
@@ -149,7 +139,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.TextField snapshotNameTextField;
         
-        private Terminal.Gui.Label snapshotNameLabel2;
+        private Terminal.Gui.Label snapshotPeriodLabel;
         
         private Terminal.Gui.TextField snapshotNameTextField2;
         
@@ -173,7 +163,7 @@ namespace Sanoid.ConfigConsole {
             this.snapshotNameTextField3 = new Terminal.Gui.TextField();
             this.snapshotNameLabel3 = new Terminal.Gui.Label();
             this.snapshotNameTextField2 = new Terminal.Gui.TextField();
-            this.snapshotNameLabel2 = new Terminal.Gui.Label();
+            this.snapshotPeriodLabel = new Terminal.Gui.Label();
             this.snapshotNameTextField = new Terminal.Gui.TextField();
             this.snapshotNameLabel = new Terminal.Gui.Label();
             this.snapshotPropertiesFrame = new Terminal.Gui.FrameView();
@@ -226,12 +216,6 @@ namespace Sanoid.ConfigConsole {
             this.generalFrame = new Terminal.Gui.FrameView();
             this.zfsTreeView = new Terminal.Gui.TreeView();
             this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
-            this.greyOnBlack = new Terminal.Gui.ColorScheme();
-            this.greyOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.greyOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
             this.whiteOnRed = new Terminal.Gui.ColorScheme();
             this.whiteOnRed.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
             this.whiteOnRed.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
@@ -244,12 +228,6 @@ namespace Sanoid.ConfigConsole {
             this.localPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
             this.localPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
             this.localPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
-            this.templateConfigurationTextValidateFieldColorScheme = new Terminal.Gui.ColorScheme();
-            this.templateConfigurationTextValidateFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.White);
-            this.templateConfigurationTextValidateFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.templateConfigurationTextValidateFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.templateConfigurationTextValidateFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.templateConfigurationTextValidateFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
             this.inheritedPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
             this.inheritedPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
             this.inheritedPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
@@ -286,24 +264,6 @@ namespace Sanoid.ConfigConsole {
             this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
             this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
             this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
-            this.allBlackColorScheme = new Terminal.Gui.ColorScheme();
-            this.allBlackColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme = new Terminal.Gui.ColorScheme();
-            this.blackAndWhiteColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.midnightColorScheme = new Terminal.Gui.ColorScheme();
-            this.midnightColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
             this.whiteOnBlue = new Terminal.Gui.ColorScheme();
             this.whiteOnBlue.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
             this.whiteOnBlue.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
@@ -842,14 +802,14 @@ namespace Sanoid.ConfigConsole {
             this.snapshotNameTextField.Text = "";
             this.snapshotNameTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.snapshotPropertiesFrame.Add(this.snapshotNameTextField);
-            this.snapshotNameLabel2.Width = 4;
-            this.snapshotNameLabel2.Height = 1;
-            this.snapshotNameLabel2.X = 2;
-            this.snapshotNameLabel2.Y = 1;
-            this.snapshotNameLabel2.Data = "snapshotNameLabel2";
-            this.snapshotNameLabel2.Text = "Period";
-            this.snapshotNameLabel2.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameLabel2);
+            this.snapshotPeriodLabel.Width = 4;
+            this.snapshotPeriodLabel.Height = 1;
+            this.snapshotPeriodLabel.X = 2;
+            this.snapshotPeriodLabel.Y = 1;
+            this.snapshotPeriodLabel.Data = "snapshotPeriodLabel";
+            this.snapshotPeriodLabel.Text = "Period";
+            this.snapshotPeriodLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.snapshotPropertiesFrame.Add(this.snapshotPeriodLabel);
             this.snapshotNameTextField2.Width = Dim.Fill(1);
             this.snapshotNameTextField2.Height = 1;
             this.snapshotNameTextField2.X = 12;
