@@ -220,8 +220,8 @@ namespace Sanoid.ConfigConsole {
             this.textValidateFieldColorScheme = new Terminal.Gui.ColorScheme();
             this.textValidateFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.White);
             this.textValidateFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.textValidateFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.textValidateFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
+            this.textValidateFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.BrightYellow);
+            this.textValidateFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightYellow, Terminal.Gui.Color.Black);
             this.textValidateFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
             this.localPropertyRadioGroupColorScheme = new Terminal.Gui.ColorScheme();
             this.localPropertyRadioGroupColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
@@ -513,7 +513,7 @@ namespace Sanoid.ConfigConsole {
             this.frequentPeriodRadioGroup.Height = 1;
             this.frequentPeriodRadioGroup.X = 18;
             this.frequentPeriodRadioGroup.Y = 0;
-            this.frequentPeriodRadioGroup.ColorScheme = this.tgDefault;
+            this.frequentPeriodRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.frequentPeriodRadioGroup.Data = "frequentPeriodRadioGroup";
             this.frequentPeriodRadioGroup.Text = "";
             this.frequentPeriodRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
