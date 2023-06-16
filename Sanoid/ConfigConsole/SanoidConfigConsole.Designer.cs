@@ -15,35 +15,9 @@ namespace Sanoid.ConfigConsole {
     
     public partial class SanoidConfigConsole : Terminal.Gui.Window {
         
-        private Terminal.Gui.ColorScheme greyOnBlack;
-        
-        private Terminal.Gui.ColorScheme whiteOnRed;
-        
-        private Terminal.Gui.ColorScheme localPropertyTextFieldColorScheme;
-        
-        private Terminal.Gui.ColorScheme templateConfigurationTextValidateFieldColorScheme;
-        
-        private Terminal.Gui.ColorScheme inheritedPropertyTextFieldColorScheme;
-        
-        private Terminal.Gui.ColorScheme localPropertyRadioGroupColorScheme;
-        
-        private Terminal.Gui.ColorScheme inheritedPropertyRadioGroupColorScheme;
-        
-        private Terminal.Gui.ColorScheme localPropertyListViewColorScheme;
-        
-        private Terminal.Gui.ColorScheme inheritedPropertyListViewColorScheme;
-        
         private Terminal.Gui.ColorScheme tgDefault;
         
-        private Terminal.Gui.ColorScheme allBlackColorScheme;
-        
-        private Terminal.Gui.ColorScheme blackAndWhiteColorScheme;
-        
         private Terminal.Gui.ColorScheme midnightColorScheme;
-        
-        private Terminal.Gui.ColorScheme whiteOnBlue;
-        
-        private Terminal.Gui.ColorScheme treeAndListViewColorScheme;
         
         private Terminal.Gui.MenuBar topMenuBar;
         
@@ -63,96 +37,18 @@ namespace Sanoid.ConfigConsole {
         
         private void InitializeComponent() {
             this.topMenuBar = new Terminal.Gui.MenuBar();
-            this.greyOnBlack = new Terminal.Gui.ColorScheme();
-            this.greyOnBlack.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.greyOnBlack.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.greyOnBlack.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.whiteOnRed = new Terminal.Gui.ColorScheme();
-            this.whiteOnRed.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.whiteOnRed.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.whiteOnRed.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.whiteOnRed.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.whiteOnRed.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightRed);
-            this.localPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
-            this.localPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Gray);
-            this.localPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
-            this.templateConfigurationTextValidateFieldColorScheme = new Terminal.Gui.ColorScheme();
-            this.templateConfigurationTextValidateFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.White);
-            this.templateConfigurationTextValidateFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.templateConfigurationTextValidateFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.templateConfigurationTextValidateFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.templateConfigurationTextValidateFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
-            this.inheritedPropertyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.inheritedPropertyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.inheritedPropertyTextFieldColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyTextFieldColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyTextFieldColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.localPropertyRadioGroupColorScheme = new Terminal.Gui.ColorScheme();
-            this.localPropertyRadioGroupColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.localPropertyRadioGroupColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
-            this.localPropertyRadioGroupColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
-            this.localPropertyRadioGroupColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.DarkGray);
-            this.localPropertyRadioGroupColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyRadioGroupColorScheme = new Terminal.Gui.ColorScheme();
-            this.inheritedPropertyRadioGroupColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyRadioGroupColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
-            this.inheritedPropertyRadioGroupColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyRadioGroupColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Gray);
-            this.inheritedPropertyRadioGroupColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.localPropertyListViewColorScheme = new Terminal.Gui.ColorScheme();
-            this.localPropertyListViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
-            this.localPropertyListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.inheritedPropertyListViewColorScheme = new Terminal.Gui.ColorScheme();
-            this.inheritedPropertyListViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyListViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
-            this.inheritedPropertyListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.DarkGray);
             this.tgDefault = new Terminal.Gui.ColorScheme();
             this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
             this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
             this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
             this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
             this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
-            this.allBlackColorScheme = new Terminal.Gui.ColorScheme();
-            this.allBlackColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.allBlackColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme = new Terminal.Gui.ColorScheme();
-            this.blackAndWhiteColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
-            this.blackAndWhiteColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Black);
             this.midnightColorScheme = new Terminal.Gui.ColorScheme();
             this.midnightColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
             this.midnightColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
             this.midnightColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
             this.midnightColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
             this.midnightColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.whiteOnBlue = new Terminal.Gui.ColorScheme();
-            this.whiteOnBlue.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.whiteOnBlue.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
-            this.treeAndListViewColorScheme = new Terminal.Gui.ColorScheme();
-            this.treeAndListViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.treeAndListViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Blue);
-            this.treeAndListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightBlue);
-            this.treeAndListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightYellow, Terminal.Gui.Color.Cyan);
-            this.treeAndListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Blue);
             this.Width = Dim.Fill(0);
             this.Height = Dim.Fill(0);
             this.X = 0;
