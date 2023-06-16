@@ -37,6 +37,14 @@ namespace Sanoid.ConfigConsole
         [NotNull]
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
+        internal bool IsConfigurationChanged =>
+            ValidateGlobalConfigValues( )
+            && ( Program.Settings!.DryRun != dryRunRadioGroup.GetSelectedBooleanFromLabel( )
+                 || Program.Settings.TakeSnapshots != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
+                 || Program.Settings.PruneSnapshots != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
+                 || Program.Settings.ZfsPath != pathToZfsTextField.Text.ToString( )!
+                 || Program.Settings.ZpoolPath != pathToZpoolTextField.Text.ToString( )! );
+
         private void DisableEventHandlers( )
         {
             if ( !_eventsEnabled )
