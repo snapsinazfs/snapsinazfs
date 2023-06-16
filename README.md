@@ -4,19 +4,13 @@
 
  ## Status
 
- As of today (2023-06-06), Sanoid.net is capable of taking and pruning snapshots, using configuration
+ As of today (2023-06-16), Sanoid.net is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
- in configuration files.
+ in configuration files, and provides a TUI for making configuration easy.
 
  I may make an alpha release tag soon and possibly provide a pre-built release, here on github. This comes with
  what should be the obvious disclaimer that this is an alpha-stage project and you should not trust important
  systems with it.
-
- To make configuration even easier, I'm thinking I may introduce a command-line configuration grammar to
- Sanoid.net or else maybe provide an admin tool that provides a text-mode UI to configure Sanoid.net in ZFS.\
- If I do go that route, I'll make a configuration library with an API that can be used by any other tools anyone
- may want to write (for example, a web-based config tool or other graphical UI).
-
  
  ## Goals
 
@@ -25,8 +19,8 @@
  that is sanoid release 2.1.0 plus all sanoid master branch commits up to
  [jimsalterjrs/sanoid@55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0](https://github.com/jimsalterjrs/sanoid/commit/55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0)
 
- I have been making various changes and enhancements along the way, so far, especially in the area of configuration, which is now going to depend on native facilities provided by ZFS, via user properties.\
- This will keep all of the zfs-related configuration in ZFS itself, and will make the settings and how they are going to apply to each dataset much easier both for the user and also for me, in developing Sanoid.net.
+ I have been making various changes and enhancements along the way, so far, especially in the area of configuration, which now uses native facilities provided by ZFS, via user properties.\
+ This keeps all of the zfs-related configuration in ZFS itself, and makes the settings and how they are going to apply to each dataset much easier to understand and configure.
 
  ### Long-Term Goals
 
@@ -64,9 +58,9 @@
 
  ## Project Organization
 
- I intend to organize the project differently than sanoid/syncoid/findoid, partially thanks to the benefit of hindsight, but also in an attempt to make it easier to maintain, modify, and extend.
+ The project is organized differently than sanoid/syncoid/findoid, partially thanks to the benefit of hindsight, but also in an attempt to make it easier to maintain, modify, and extend.
 
- Most significantly, I intend to separate the code into one or more common library projects, to help avoid code
+ Most significantly, I have separated parts of the code out into library projects, to help avoid code
  duplication and aid in organization.
  
  Currently, the solution is laid out as follows:
@@ -119,6 +113,7 @@
   - NLog.Extensions.Logging
   - NLog.Targets.Journald
   - JetBrains.Annotations
+  - Teminal.Gui
 
   Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils are installed. I may also use autoconf, at a later time, though it hasn't been strictly necessary, so far.
 
@@ -167,10 +162,9 @@
 
  **NB: Sanoid.net is an early alpha project, and its configuration is not to be considered stable until Sanoid.net reaches beta, at which time significant changes to configuration method and schema will be avoided as much as possible.**
 
- Configuration for Sanoid.net will be quite different from PERL sanoid.\
- Most importantly, many/most settings that PERL sanoid currently keeps in text files will instead be stored directly in ZFS, using custom user properties.\
- Settings not relevant to ZFS or Sanoid.net's interaction with it will be stored in JSON configuration files.\
- Templates and timing/retention settings will also stay in JSON, to avoid setting a ton of user properties in zfs and to make quick changes easier for the user.
+ Configuration for Sanoid.net is different from PERL sanoid.\
+ Most importantly, many/most settings that PERL sanoid currently keeps in text files are instead stored directly in ZFS, using custom user properties.\
+ Settings not relevant to ZFS or Sanoid.net's interaction with it, such as templates for naming and timing of snapshots, are stored in JSON configuration files.\
  
  Continue reading below for specifics on where and how settings are stored.
 
@@ -191,7 +185,6 @@
  | PruneSnapshots | boolean | false | If true, Sanoid.net will run its snapshot pruning functionality. |
  | Templates | Template[^templatesnote1][^templatesnote3] | [^templatesnote2] | A dictionary of string names to template definitions, as defined in Sanoid.template.schema.json] |
  | CacheDirectory | string[^cachedir1] | /var/cache/sanoid | The directory Sanoid.net will use to store cache data, as needed.[^cachedir2][^cachedir3] |
- | Formatting | Formatting[^formatting1] | | Definitions for the various components of snapshot names. |
  | ZfsPath | string[^zfspath1] | /usr/local/sbin/zfs | The path to the zfs utility |
 
  [^dryrunnote1]: Setting TakeSnapshots or PruneSnapshots to true will still control Sanoid.net's output, but no changes will be made to ZFS.
@@ -207,8 +200,6 @@
  [^cachedir2]: If the directory does not exist, it will be created.
 
  [^cachedir3]: Any user that executes Sanoid.net must have read and write access to this directory.
-
- [^formatting1]: The schema for this section can be found in Sanoid.schema.json.
 
  [^zfspath1]: Must be a valid path pointing to the zfs utility itself or a resolveable link to it, that the user running Sanoid.net has execute access to.
 
