@@ -9,24 +9,17 @@ using Sanoid.Settings.Settings;
 
 namespace Sanoid.Interop.Zfs.ZfsTypes;
 
-public record TemplateConfigurationListItem
+public record TemplateConfigurationListItem(string TemplateName, TemplateSettings ViewSettings, TemplateSettings BaseSettings )
 {
-    public TemplateConfigurationListItem(string TemplateName, TemplateSettings ViewSettings, TemplateSettings BaseSettings )
-    {
-        this.TemplateName = TemplateName;
-        this.ViewSettings = ViewSettings;
-        this.BaseSettings = BaseSettings;
-    }
-
     /// <inheritdoc />
     public override string ToString( )
     {
         return TemplateName;
     }
 
-    public string TemplateName { get; init; }
-    public TemplateSettings ViewSettings { get; set; }
-    public TemplateSettings BaseSettings { get; set; }
+    public TemplateSettings ViewSettings { get; set; } = ViewSettings;
+    public TemplateSettings BaseSettings { get; set; } = BaseSettings;
+
     [JsonIgnore]
     public bool IsModified => ViewSettings != BaseSettings;
 }
