@@ -145,7 +145,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Button deleteTemplateButton;
         
-        private Terminal.Gui.Button saveAllButton;
+        internal Terminal.Gui.Button saveAllButton;
         
         private void InitializeComponent() {
             this.saveAllButton = new Terminal.Gui.Button();

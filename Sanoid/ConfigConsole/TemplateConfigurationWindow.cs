@@ -38,9 +38,9 @@ namespace Sanoid.ConfigConsole
 
         private bool _templateConfigurationEventsEnabled;
         private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
-        private bool _templatesAddedOrRemoved;
+        internal bool templatesAddedOrRemoved;
         private readonly HashSet<string> _timingProperties = new( new[] { FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase } );
-        private static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any( t => t.IsModified );
+        internal static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any( t => t.IsModified );
         private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.Field.IsValid );
         private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
         internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
@@ -720,7 +720,7 @@ namespace Sanoid.ConfigConsole
                     throw ex;
                 }
 
-                _templatesAddedOrRemoved = true;
+                templatesAddedOrRemoved = true;
             }
             catch ( ApplicationException )
             {
@@ -763,7 +763,7 @@ namespace Sanoid.ConfigConsole
 
             Templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
             ConfigConsole.TemplateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
-            _templatesAddedOrRemoved = true;
+            templatesAddedOrRemoved = true;
             UpdateTemplateListButtonStates( );
             UpdateTemplatePropertiesButtonStates( );
         }
@@ -811,7 +811,7 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateTemplateListButtonStates( )
         {
-            saveAllButton.Enabled = ( _templatesAddedOrRemoved || IsAnyTemplateModified ) && IsEveryPropertyTextValidateFieldValid;
+            saveAllButton.Enabled = ( templatesAddedOrRemoved || IsAnyTemplateModified ) && IsEveryPropertyTextValidateFieldValid;
             deleteTemplateButton.Enabled = templateListView.SelectedItem >= 0 && !IsSelectedTemplateInUse;
             addTemplateButton.Enabled = newTemplateNameTextValidateField.IsValid;
         }
