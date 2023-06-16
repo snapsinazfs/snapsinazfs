@@ -15,18 +15,28 @@ namespace Sanoid.ConfigConsole;
 public static class CultureTimeHelpers
 {
     /// <summary>
+    ///     Gets a <see cref="List{T}" /> of string values for all full day names for the current culture of the executing
+    ///     thread
+    /// </summary>
+    public static List<string> DayNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
+
+    /// <summary>
     ///     Gets a <see cref="List{T}" /> of string values for all full and standard abbreviated day names for the current
     ///     culture of the executing thread
     /// </summary>
     public static List<string> DayNamesLongAndAbbreviated { get; } = DateTimeFormatInfo.CurrentInfo.GetLongAndAbbreviatedDayNames( );
 
     /// <summary>
+    ///     Gets a <see cref="List{T}" /> of string values for all full month names for the current culture of the executing
+    ///     thread
+    /// </summary>
+    public static List<string> MonthNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.MonthNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
+
+    /// <summary>
     ///     Gets a <see cref="List{T}" /> of string values for all full and standard abbreviated month names for the current
     ///     culture of the executing thread
     /// </summary>
     public static List<string> MonthNamesLongAndAbbreviated { get; } = DateTimeFormatInfo.CurrentInfo.GetMonthNames( );
-
-    public static List<string> MonthNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.MonthNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
 
     /// <summary>
     ///     Gets the month number of this <see cref="DateTime" />, for the current culture of the executing thread.
@@ -39,6 +49,19 @@ public static class CultureTimeHelpers
     public static int GetCalendarMonth( this DateTime value )
     {
         return CultureInfo.CurrentCulture.Calendar.GetMonth( value );
+    }
+
+    /// <summary>
+    ///     Gets the name of the month with the specified <paramref name="value" />
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns>
+    ///     A <see langword="string" /> containing the name of the month corresponding to <paramref name="value" />,
+    ///     according to <see cref="DateTimeFormatInfo.CurrentInfo" />
+    /// </returns>
+    public static string GetCalendarMonth( int value )
+    {
+        return DateTimeFormatInfo.CurrentInfo.GetMonthName( value );
     }
 
     /// <summary>
