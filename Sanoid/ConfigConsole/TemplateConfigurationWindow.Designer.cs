@@ -23,13 +23,13 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.ColorScheme localPropertyRadioGroupColorScheme;
         
-        private Terminal.Gui.ColorScheme localPropertyListViewColorScheme;
+        private Terminal.Gui.ColorScheme comboBoxColorScheme;
         
         private Terminal.Gui.ColorScheme tgDefault;
         
         private Terminal.Gui.ColorScheme whiteOnBlue;
         
-        private Terminal.Gui.ColorScheme treeAndListViewColorScheme;
+        private Terminal.Gui.ColorScheme listViewColorScheme;
         
         private Terminal.Gui.ColorScheme readOnlyTextFieldColorScheme;
         
@@ -75,7 +75,7 @@ namespace Sanoid.ConfigConsole {
         
         internal Terminal.Gui.TextValidateField frequentSuffixTextValidateField;
         
-        private Terminal.Gui.Label label;
+        private Terminal.Gui.Label exampleLabel;
         
         internal Terminal.Gui.TextField exampleTextField;
         
@@ -113,7 +113,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.Label weeklyDayLabel;
         
-        internal Terminal.Gui.TextValidateField weeklyDayTextValidateField;
+        internal Terminal.Gui.ComboBox weeklyDayComboBox;
         
         private Terminal.Gui.Label weeklyTimeLabel;
         
@@ -164,7 +164,7 @@ namespace Sanoid.ConfigConsole {
             this.dailyLabel = new Terminal.Gui.Label();
             this.weeklyTimeTimeField = new Terminal.Gui.TimeField();
             this.weeklyTimeLabel = new Terminal.Gui.Label();
-            this.weeklyDayTextValidateField = new Terminal.Gui.TextValidateField();
+            this.weeklyDayComboBox = new Terminal.Gui.ComboBox();
             this.weeklyDayLabel = new Terminal.Gui.Label();
             this.weeklyLabel = new Terminal.Gui.Label();
             this.monthlyTimeTimeField = new Terminal.Gui.TimeField();
@@ -183,7 +183,7 @@ namespace Sanoid.ConfigConsole {
             this.frequentPeriodLabel = new Terminal.Gui.Label();
             this.snapshotTimingFrame = new Terminal.Gui.FrameView();
             this.exampleTextField = new Terminal.Gui.TextField();
-            this.label = new Terminal.Gui.Label();
+            this.exampleLabel = new Terminal.Gui.Label();
             this.frequentSuffixTextValidateField = new Terminal.Gui.TextValidateField();
             this.frequentSuffixLabel = new Terminal.Gui.Label();
             this.hourlySuffixTextValidateField = new Terminal.Gui.TextValidateField();
@@ -229,12 +229,12 @@ namespace Sanoid.ConfigConsole {
             this.localPropertyRadioGroupColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
             this.localPropertyRadioGroupColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.DarkGray);
             this.localPropertyRadioGroupColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
-            this.localPropertyListViewColorScheme = new Terminal.Gui.ColorScheme();
-            this.localPropertyListViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
-            this.localPropertyListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
-            this.localPropertyListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.comboBoxColorScheme = new Terminal.Gui.ColorScheme();
+            this.comboBoxColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.comboBoxColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
+            this.comboBoxColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.White);
+            this.comboBoxColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
+            this.comboBoxColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
             this.tgDefault = new Terminal.Gui.ColorScheme();
             this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
             this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
@@ -247,12 +247,12 @@ namespace Sanoid.ConfigConsole {
             this.whiteOnBlue.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
             this.whiteOnBlue.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
             this.whiteOnBlue.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Cyan);
-            this.treeAndListViewColorScheme = new Terminal.Gui.ColorScheme();
-            this.treeAndListViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.treeAndListViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Blue);
-            this.treeAndListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightBlue);
-            this.treeAndListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightYellow, Terminal.Gui.Color.Cyan);
-            this.treeAndListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Blue);
+            this.listViewColorScheme = new Terminal.Gui.ColorScheme();
+            this.listViewColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
+            this.listViewColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightGreen, Terminal.Gui.Color.Blue);
+            this.listViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightBlue);
+            this.listViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightYellow, Terminal.Gui.Color.Cyan);
+            this.listViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Blue);
             this.readOnlyTextFieldColorScheme = new Terminal.Gui.ColorScheme();
             this.readOnlyTextFieldColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
             this.readOnlyTextFieldColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.DarkGray);
@@ -470,14 +470,14 @@ namespace Sanoid.ConfigConsole {
             this.frequentSuffixTextValidateField.Text = "";
             this.frequentSuffixTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.snapshotNamingFrame.Add(this.frequentSuffixTextValidateField);
-            this.label.Width = 4;
-            this.label.Height = 1;
-            this.label.X = 0;
-            this.label.Y = 9;
-            this.label.Data = "label";
-            this.label.Text = "Example";
-            this.label.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotNamingFrame.Add(this.label);
+            this.exampleLabel.Width = 4;
+            this.exampleLabel.Height = 1;
+            this.exampleLabel.X = 0;
+            this.exampleLabel.Y = 9;
+            this.exampleLabel.Data = "exampleLabel";
+            this.exampleLabel.Text = "Example";
+            this.exampleLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.snapshotNamingFrame.Add(this.exampleLabel);
             this.exampleTextField.Width = Dim.Fill(2);
             this.exampleTextField.Height = 1;
             this.exampleTextField.X = 12;
@@ -545,7 +545,7 @@ namespace Sanoid.ConfigConsole {
             this.yearlyMonthComboBox.Height = 6;
             this.yearlyMonthComboBox.X = 9;
             this.yearlyMonthComboBox.Y = 2;
-            this.yearlyMonthComboBox.ColorScheme = this.textValidateFieldColorScheme;
+            this.yearlyMonthComboBox.ColorScheme = this.comboBoxColorScheme;
             this.yearlyMonthComboBox.Data = "yearlyMonthComboBox";
             this.yearlyMonthComboBox.Text = "";
             this.yearlyMonthComboBox.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -646,16 +646,15 @@ namespace Sanoid.ConfigConsole {
             this.weeklyDayLabel.Text = "Day";
             this.weeklyDayLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.snapshotTimingFrame.Add(this.weeklyDayLabel);
-            this.weeklyDayTextValidateField.Width = 10;
-            this.weeklyDayTextValidateField.Height = 1;
-            this.weeklyDayTextValidateField.X = 9;
-            this.weeklyDayTextValidateField.Y = 6;
-            this.weeklyDayTextValidateField.ColorScheme = this.textValidateFieldColorScheme;
-            this.weeklyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\w+$");
-            this.weeklyDayTextValidateField.Data = "weeklyDayTextValidateField";
-            this.weeklyDayTextValidateField.Text = "";
-            this.weeklyDayTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotTimingFrame.Add(this.weeklyDayTextValidateField);
+            this.weeklyDayComboBox.Width = 10;
+            this.weeklyDayComboBox.Height = 4;
+            this.weeklyDayComboBox.X = 9;
+            this.weeklyDayComboBox.Y = 6;
+            this.weeklyDayComboBox.ColorScheme = this.textValidateFieldColorScheme;
+            this.weeklyDayComboBox.Data = "weeklyDayComboBox";
+            this.weeklyDayComboBox.Text = "";
+            this.weeklyDayComboBox.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.snapshotTimingFrame.Add(this.weeklyDayComboBox);
             this.weeklyTimeLabel.Width = 4;
             this.weeklyTimeLabel.Height = 1;
             this.weeklyTimeLabel.X = 24;

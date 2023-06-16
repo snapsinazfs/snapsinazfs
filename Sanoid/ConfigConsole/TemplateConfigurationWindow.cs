@@ -10,10 +10,10 @@
 //      You can make changes to this file and they will not be overwritten when saving.
 //  </auto-generated>
 // -----------------------------------------------------------------------------
+
 #nullable enable
 
 using System.Collections.Concurrent;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using NStack;
@@ -33,14 +33,19 @@ namespace Sanoid.ConfigConsole
             InitializeTemplateEditorView( );
         }
 
+        private readonly HashSet<string> _modifiedProperties = new( );
+        private readonly HashSet<string> _namingProperties = new( new[] { "component separator", "prefix", "timestamp format", "frequent suffix", "hourly suffix", "daily suffix", "weekly suffix", "monthly suffix", "yearly suffix" } );
+
         private bool _templateConfigurationEventsEnabled;
-        private bool _templateConfigurationTemplatePropertiesModified;
-        private bool _templatesAddedOrRemoved;
         private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
+        private bool _templatesAddedOrRemoved;
+        private readonly HashSet<string> _timingProperties = new( new[] { "frequent period", "hourly minute", "daily time", "weekly day", "weekly time", "monthly day", "monthly time", "yearly month", "yearly day", "yearly time" } );
         private static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any( t => t.IsModified );
         private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( tvf => tvf.Field.IsValid );
         private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
         internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
+
+        private const string InvalidFieldValueDialogTitle = "Invalid Field Value";
 
         [NotNull]
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
@@ -59,16 +64,49 @@ namespace Sanoid.ConfigConsole
             SetInitialButtonState( );
             InitializeTemplatePropertiesTextValidateFieldList( );
             SetValidateOnInputForAllTextValidateFields( );
+            SetReadOnlyFields( );
             UpdateTemplateListButtonStates( );
             UpdateTemplatePropertiesButtonStates( );
             EnableEventHandlers( );
             templateListView.SelectedItem = 0;
-            templateListView.SetFocus();
+            templateListView.SetFocus( );
+        }
+
+        private void SetReadOnlyFields( )
+        {
+            exampleTextField.ReadOnly = true;
+            exampleTextField.CanFocus = false;
+            exampleTextField.TabStop = false;
         }
 
         private void InitializeComboBoxes( )
         {
             yearlyMonthComboBox.SetSource( CultureTimeHelpers.MonthNamesLong );
+            yearlyMonthComboBox.ReadOnly = true;
+            yearlyMonthComboBox.HideDropdownListOnClick = true;
+            yearlyMonthComboBox.KeyPress += EatKeyPresses;
+
+            weeklyDayComboBox.SetSource( CultureTimeHelpers.DayNamesLong );
+            weeklyDayComboBox.ReadOnly = true;
+            weeklyDayComboBox.HideDropdownListOnClick = true;
+            weeklyDayComboBox.KeyPress += EatKeyPresses;
+        }
+
+        private void EatKeyPresses( KeyEventEventArgs e )
+        {
+            // Disallow editing this combobox text
+            // If the key press event is any control sequence, just return (to allow hotkeys to work).
+            // If it's a character, set Handled=true to swallow the event and not change the text.
+            // The Key enum is an unsigned int, so we can mask and check for greater than zero
+            if ( e.KeyEvent.IsCtrl )
+            {
+                return;
+            }
+
+            if ( ( e.KeyEvent.Key & Key.CharMask ) > 0 )
+            {
+                e.Handled = true;
+            }
         }
 
         private void SetInitialButtonState( )
@@ -90,7 +128,6 @@ namespace Sanoid.ConfigConsole
             _templateConfigurationTextValidateFieldList.Add( new( monthlySuffixTextValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( yearlySuffixTextValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( hourlyMinuteTextValidateField, true ) );
-            _templateConfigurationTextValidateFieldList.Add( new( weeklyDayTextValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( monthlyDayTextValidateField, true ) );
             _templateConfigurationTextValidateFieldList.Add( new( yearlyDayTextValidateField, true ) );
         }
@@ -108,52 +145,355 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
+            // Template list object events
             templateListView.SelectedItemChanged += TemplateListViewOnSelectedItemChanged;
             addTemplateButton.Clicked += AddTemplateButtonOnClicked;
             deleteTemplateButton.Clicked += DeleteDeleteTemplateButtonOnClicked;
-            applyCurrentButton.Clicked += ApplyCurrentButtonOnClicked;
             newTemplateNameTextValidateField.KeyPress += NewTemplateNameTextValidateFieldOnKeyPress;
             saveAllButton.Clicked += TemplateSettingsSaveAllButtonOnClicked;
+
+            // Properties area field/button events
+            //TODO: Warn user if they try to modify the default template
+            applyCurrentButton.Clicked += ApplyCurrentButtonOnClicked;
             resetCurrentButton.Clicked += ResetCurrentButtonOnClicked;
+
+            componentSeparatorValidateField.Leave += ComponentSeparatorValidateFieldOnLeave;
+            prefixTextValidateField.Leave += PrefixTextValidateFieldOnLeave;
+            timestampFormatTextField.Leave += TimestampFormatTextFieldOnLeave;
+            frequentSuffixTextValidateField.Leave += FrequentSuffixTextValidateFieldOnLeave;
+            hourlySuffixTextValidateField.Leave += HourlySuffixTextValidateFieldOnLeave;
+            dailySuffixTextValidateField.Leave += DailySuffixTextValidateFieldOnLeave;
+            weeklySuffixTextValidateField.Leave += WeeklySuffixTextValidateFieldOnLeave;
+
             hourlyMinuteTextValidateField.Leave += HourlyMinuteTextValidateFieldOnLeave;
             hourlyMinuteTextValidateField.KeyPress += HourlyMinuteTextValidateFieldOnKeyPress;
             dailyTimeTimeField.Leave += DailyTimeTimeFieldOnLeave;
             dailyTimeTimeField.KeyPress += DailyTimeTimeFieldOnKeyPress;
+            weeklyDayComboBox.SelectedItemChanged += WeeklyDayComboBoxOnSelectedItemChanged;
             yearlyMonthComboBox.SelectedItemChanged += YearlyMonthComboBoxOnSelectedItemChanged;
+
             _templateConfigurationEventsEnabled = true;
+        }
+
+        private void WeeklySuffixTextValidateFieldOnLeave( FocusEventArgs obj )
+        {
+            try
+            {
+                DisableEventHandlers();
+                _modifiedProperties.Remove( "weekly suffix" );
+
+                if ( !weeklySuffixTextValidateField.IsValid )
+                {
+                    int messageBoxResult = MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Weekly Suffix is invalid. Must be 1-12 characters from the following set: [0-9a-zA-Z].\nDefault is \"weekly\".", 1, "Fix It Myself", "Use Default Value" );
+                    if ( messageBoxResult == 1 )
+                    {
+                        weeklySuffixTextValidateField.Text = "weekly";
+                    }
+                    else
+                    {
+                        weeklySuffixTextValidateField.SetFocus( );
+                        return;
+                    }
+                }
+
+                if ( SelectedTemplateItem.ViewSettings.Formatting.WeeklySuffix != weeklySuffixTextValidateField.Text.ToString( ) )
+                {
+                    _modifiedProperties.Add( "weekly suffix" );
+                }
+
+                UpdatePropertiesFrameViewState( );
+            }
+            finally
+            {
+                EnableEventHandlers();
+            }
+        }
+
+        private void DailySuffixTextValidateFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers();
+                _modifiedProperties.Remove( "daily suffix" );
+
+                if ( !dailySuffixTextValidateField.IsValid )
+                {
+                    int messageBoxResult = MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Daily Suffix is invalid. Must be 1-12 characters from the following set: [0-9a-zA-Z].\nDefault is \"daily\".", 1, "Fix It Myself", "Use Default Value" );
+                    if ( messageBoxResult == 1 )
+                    {
+                        dailySuffixTextValidateField.Text = "hourly";
+                    }
+                    else
+                    {
+                        dailySuffixTextValidateField.SetFocus( );
+                        return;
+                    }
+                }
+
+                if ( SelectedTemplateItem.ViewSettings.Formatting.DailySuffix != dailySuffixTextValidateField.Text.ToString( ) )
+                {
+                    _modifiedProperties.Add( "daily suffix" );
+                }
+
+                UpdatePropertiesFrameViewState( );
+            }
+            finally
+            {
+                EnableEventHandlers();
+            }
+        }
+
+        private void HourlySuffixTextValidateFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers();
+                _modifiedProperties.Remove( "hourly suffix" );
+
+                if ( !hourlySuffixTextValidateField.IsValid )
+                {
+                    int messageBoxResult = MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Hourly Suffix is invalid. Must be 1-12 characters from the following set: [0-9a-zA-Z].\nDefault is \"hourly\".", 1, "Fix It Myself", "Use Default Value" );
+                    if ( messageBoxResult == 1 )
+                    {
+                        hourlySuffixTextValidateField.Text = "hourly";
+                    }
+                    else
+                    {
+                        hourlySuffixTextValidateField.SetFocus( );
+                        return;
+                    }
+                }
+
+                if ( SelectedTemplateItem.ViewSettings.Formatting.HourlySuffix != hourlySuffixTextValidateField.Text.ToString( ) )
+                {
+                    _modifiedProperties.Add( "hourly suffix" );
+                }
+
+                UpdatePropertiesFrameViewState( );
+            }
+            finally
+            {
+                EnableEventHandlers();
+            }
+        }
+
+        private void FrequentSuffixTextValidateFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                _modifiedProperties.Remove( "frequent suffix" );
+
+                if ( !frequentSuffixTextValidateField.IsValid )
+                {
+                    int messageBoxResult = MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Frequent Suffix is invalid. Must be 1-12 characters from the following set: [0-9a-zA-Z].\nDefault is \"frequently\".", 1, "Fix It Myself", "Use Default Value" );
+                    if ( messageBoxResult == 1 )
+                    {
+                        frequentSuffixTextValidateField.Text = "frequently";
+                    }
+                    else
+                    {
+                        frequentSuffixTextValidateField.SetFocus( );
+                        return;
+                    }
+                }
+
+                if ( SelectedTemplateItem.ViewSettings.Formatting.FrequentSuffix != frequentSuffixTextValidateField.Text.ToString( ) )
+                {
+                    _modifiedProperties.Add( "frequent suffix" );
+                }
+
+                UpdatePropertiesFrameViewState( );
+            }
+            finally
+            {
+                EnableEventHandlers( );
+            }
+        }
+
+        private void TimestampFormatTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                _modifiedProperties.Remove( "timestamp format" );
+
+                if ( timestampFormatTextField.Text.IsEmpty )
+                {
+                    int messageBoxResult = MessageBox.ErrorQuery( "Invalid Field Value", "Timestamp format string cannot be empty or whitespace-only", "Fix It Myself", "Use Default" );
+                    if ( messageBoxResult == 1 )
+                    {
+                        timestampFormatTextField.Text = FormattingSettings.GetDefault( ).TimestampFormatString;
+                    }
+                    else
+                    {
+                        timestampFormatTextField.SetFocus( );
+                        return;
+                    }
+                }
+
+                string timestampFormatString = timestampFormatTextField.Text.ToString( )!;
+                DateTimeOffset now = DateTimeOffset.Now;
+                char[] buffer = new char[128];
+                if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+                {
+                    Logger.Warn( "Invalid timestamp format string specified." );
+                    const string formatDocumentationUrl = "https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings";
+                    MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, $"Timestamp Format String is not a valid format string. See the following documentation for valid format strings:\n{formatDocumentationUrl}" );
+                    return;
+                }
+
+                if ( SelectedTemplateItem.ViewSettings.Formatting.TimestampFormatString != timestampFormatTextField.Text.ToString( ) )
+                {
+                    _modifiedProperties.Add( "timestamp format" );
+                }
+
+                UpdatePropertiesFrameViewState( );
+            }
+            finally
+            {
+                EnableEventHandlers( );
+            }
+        }
+
+        private void PrefixTextValidateFieldOnLeave( FocusEventArgs e )
+        {
+            _modifiedProperties.Remove( "prefix" );
+
+            if ( !prefixTextValidateField.IsValid )
+            {
+                MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Prefix is invalid. Must be 1-12 characters from the following set: [0-9a-zA-Z]" );
+                prefixTextValidateField.SetFocus( );
+                return;
+            }
+
+            if ( SelectedTemplateItem.ViewSettings.Formatting.Prefix != prefixTextValidateField.Text.ToString( ) )
+            {
+                _modifiedProperties.Add( "prefix" );
+            }
+
+            UpdatePropertiesFrameViewState( );
+        }
+
+        /// <summary>
+        ///     Updates buttons and other input-dependent fields
+        /// </summary>
+        /// <remarks>Intended to be run after an input field value has changed</remarks>
+        private void UpdatePropertiesFrameViewState( string periodString = "daily" )
+        {
+            UpdateTemplatePropertiesButtonStates( );
+            UpdateExampleText( periodString );
+        }
+
+        private void UpdateExampleText( string periodString )
+        {
+            if ( !IsEveryPropertyTextValidateFieldValid )
+            {
+                return;
+            }
+
+            string timestampFormatString = timestampFormatTextField.Text.ToString( )!;
+            DateTimeOffset now = DateTimeOffset.Now;
+            char[] buffer = new char[128];
+            if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+            {
+                Logger.Warn( "Invalid timestamp format string specified." );
+                return;
+            }
+
+            string prefixString = prefixTextValidateField.Text.ToString( )!;
+            string componentSeparator = componentSeparatorValidateField.Text.ToString( )!;
+            exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString( timestampFormatString )}{componentSeparator}{periodString}";
+        }
+
+        private void ComponentSeparatorValidateFieldOnLeave( FocusEventArgs e )
+        {
+            _modifiedProperties.Remove( "component separator" );
+
+            if ( !componentSeparatorValidateField.IsValid )
+            {
+                MessageBox.ErrorQuery( InvalidFieldValueDialogTitle, "Value entered for Component Separator is invalid. Must be exactly one character from the following set: [0-9a-zA-Z:.+_-]" );
+                componentSeparatorValidateField.SetFocus( );
+            }
+
+            if ( SelectedTemplateItem.ViewSettings.Formatting.ComponentSeparator != componentSeparatorValidateField.Text.ToString( ) )
+            {
+                _modifiedProperties.Add( "component separator" );
+            }
+
+            UpdatePropertiesFrameViewState( );
         }
 
         private void ApplyCurrentButtonOnClicked( )
         {
             if ( !IsEveryPropertyTextValidateFieldValid )
             {
-                SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
+                Logger.Error( "Apply template button was clicked while fields were not valid. This should not happen. Please report this." );
+                return;
+            }
+
+            if ( _modifiedProperties.Count == 0 )
+            {
+                Logger.Error( "Apply template button was clicked while no values were different from their original values. This should not happen. Please report this." );
+                return;
+            }
+
+            if ( _modifiedProperties.Overlaps( _namingProperties ) )
+            {
+                SelectedTemplateItem.ViewSettings.Formatting = new( )
                 {
-                    HourlyMinute = hourlyMinuteTextValidateField.Text.ToInt32(),
-                    DailyTime = TimeOnly.FromTimeSpan( dailyTimeTimeField.Time ),
-                    WeeklyTime = TimeOnly.FromTimeSpan( weeklyTimeTimeField.Time ),
-                    MonthlyTime = TimeOnly.FromTimeSpan( monthlyTimeTimeField.Time ),
-                    YearlyTime = TimeOnly.FromTimeSpan( yearlyTimeTimeField.Time )
+                    ComponentSeparator = componentSeparatorValidateField.Text.ToString( )!,
+                    Prefix = prefixTextValidateField.Text.ToString( )!,
+                    TimestampFormatString = timestampFormatTextField.Text.ToString( )!,
+                    FrequentSuffix = frequentSuffixTextValidateField.Text.ToString( )!,
+                    HourlySuffix = hourlySuffixTextValidateField.Text.ToString( )!,
+                    DailySuffix = dailySuffixTextValidateField.Text.ToString( )!,
+                    WeeklySuffix = weeklySuffixTextValidateField.Text.ToString( )!,
+                    MonthlySuffix = monthlySuffixTextValidateField.Text.ToString( )!,
+                    YearlySuffix = yearlySuffixTextValidateField.Text.ToString( )!
                 };
             }
+
+            if ( _modifiedProperties.Overlaps( _timingProperties ) )
+            {
+                SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
+                {
+                    FrequentPeriod = int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ) ),
+                    HourlyMinute = hourlyMinuteTextValidateField.Text.ToInt32( ),
+                    DailyTime = dailyTimeTimeField.Time.ToTimeOnly( ),
+                    WeeklyDay = (DayOfWeek)weeklyDayComboBox.SelectedItem,
+                    WeeklyTime = weeklyTimeTimeField.Time.ToTimeOnly( ),
+                    MonthlyDay = monthlyDayTextValidateField.Text.ToInt32( ),
+                    MonthlyTime = monthlyTimeTimeField.Time.ToTimeOnly( ),
+                    YearlyMonth = yearlyMonthComboBox.SelectedItem + 1,
+                    YearlyDay = yearlyDayTextValidateField.Text.ToInt32( ),
+                    YearlyTime = yearlyTimeTimeField.Time.ToTimeOnly( )
+                };
+            }
+
+            _modifiedProperties.Clear( );
+            UpdatePropertiesFrameViewState( );
         }
 
-        private void DailyTimeTimeFieldOnKeyPress( KeyEventEventArgs args )
+        private void DailyTimeTimeFieldOnKeyPress( KeyEventEventArgs e )
         {
             if ( !dailyTimeTimeField.IsDirty )
+            {
                 return;
+            }
+
             bool isTimeValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.DailyTime != dailyTimeTimeField.Time.ToTimeOnly( );
             applyCurrentButton.Enabled = isTimeValueDifferent && IsEveryPropertyTextValidateFieldValid;
         }
 
-        private void HourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs args )
+        private void HourlyMinuteTextValidateFieldOnKeyPress( KeyEventEventArgs e )
         {
             bool fieldIsValid = hourlyMinuteTextValidateField.IsValid;
             bool isMinuteValueDifferent = SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != hourlyMinuteTextValidateField.Text.ToInt32( int.MinValue );
             applyCurrentButton.Enabled = fieldIsValid && isMinuteValueDifferent && IsEveryPropertyTextValidateFieldValid;
         }
 
-        private void NewTemplateNameTextValidateFieldOnKeyPress( KeyEventEventArgs args )
+        private void NewTemplateNameTextValidateFieldOnKeyPress( KeyEventEventArgs e )
         {
             if ( !newTemplateNameTextValidateField.Text.IsEmpty && newTemplateNameTextValidateField.IsValid )
             {
@@ -258,12 +598,12 @@ namespace Sanoid.ConfigConsole
             UpdateTemplatePropertiesButtonStates( );
         }
 
-        private void DailyTimeTimeFieldOnLeave( FocusEventArgs args )
+        private void DailyTimeTimeFieldOnLeave( FocusEventArgs e )
         {
             UpdateTemplatePropertiesButtonStates( );
         }
 
-        private void HourlyMinuteTextValidateFieldOnLeave( FocusEventArgs args )
+        private void HourlyMinuteTextValidateFieldOnLeave( FocusEventArgs e )
         {
             if ( hourlyMinuteTextValidateField.IsValid )
             {
@@ -301,11 +641,11 @@ namespace Sanoid.ConfigConsole
 
         private void UpdateTemplatePropertiesButtonStates( )
         {
-            resetCurrentButton.Enabled = SelectedTemplateItem.IsModified;
-            applyCurrentButton.Enabled = SelectedTemplateItem.IsModified;
+            resetCurrentButton.Enabled = _modifiedProperties.Count > 0;
+            applyCurrentButton.Enabled = _modifiedProperties.Count > 0;
         }
 
-        private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
+        private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs e )
         {
             DisableEventHandlers( );
 
@@ -333,7 +673,7 @@ namespace Sanoid.ConfigConsole
             frequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
             hourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
             dailyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
-            weeklyDayTextValidateField.Text = DateTimeFormatInfo.CurrentInfo.GetDayName( item.ViewSettings.SnapshotTiming.WeeklyDay );
+            weeklyDayComboBox.SelectedItem = (int)item.ViewSettings.SnapshotTiming.WeeklyDay;
             weeklyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
             monthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
             monthlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
@@ -429,25 +769,44 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
+            // Template list object events
             templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
             addTemplateButton.Clicked -= AddTemplateButtonOnClicked;
             deleteTemplateButton.Clicked -= DeleteDeleteTemplateButtonOnClicked;
             newTemplateNameTextValidateField.KeyPress -= NewTemplateNameTextValidateFieldOnKeyPress;
             saveAllButton.Clicked -= TemplateSettingsSaveAllButtonOnClicked;
+
+            // Properties area field/button events
+            //TODO: Warn user if they try to modify the default template
+            applyCurrentButton.Clicked -= ApplyCurrentButtonOnClicked;
             resetCurrentButton.Clicked -= ResetCurrentButtonOnClicked;
+
+            componentSeparatorValidateField.Leave -= ComponentSeparatorValidateFieldOnLeave;
+            prefixTextValidateField.Leave -= PrefixTextValidateFieldOnLeave;
+            timestampFormatTextField.Leave -= TimestampFormatTextFieldOnLeave;
+            frequentSuffixTextValidateField.Leave -= FrequentSuffixTextValidateFieldOnLeave;
+            hourlySuffixTextValidateField.Leave -= HourlySuffixTextValidateFieldOnLeave;
+            dailySuffixTextValidateField.Leave -= DailySuffixTextValidateFieldOnLeave;
+
             hourlyMinuteTextValidateField.Leave -= HourlyMinuteTextValidateFieldOnLeave;
-            dailyTimeTimeField.Leave -= DailyTimeTimeFieldOnLeave;
             hourlyMinuteTextValidateField.KeyPress -= HourlyMinuteTextValidateFieldOnKeyPress;
+            dailyTimeTimeField.Leave -= DailyTimeTimeFieldOnLeave;
             dailyTimeTimeField.KeyPress -= DailyTimeTimeFieldOnKeyPress;
+            weeklyDayComboBox.SelectedItemChanged -= WeeklyDayComboBoxOnSelectedItemChanged;
             yearlyMonthComboBox.SelectedItemChanged -= YearlyMonthComboBoxOnSelectedItemChanged;
+
             _templateConfigurationEventsEnabled = false;
         }
 
-        private void YearlyMonthComboBoxOnSelectedItemChanged( ListViewItemEventArgs args )
+        private void WeeklyDayComboBoxOnSelectedItemChanged( ListViewItemEventArgs e )
+        {
+        }
+
+        private void YearlyMonthComboBoxOnSelectedItemChanged( ListViewItemEventArgs e )
         {
             SelectedTemplateItem.ViewSettings.SnapshotTiming = SelectedTemplateItem.ViewSettings.SnapshotTiming with
             {
-                YearlyMonth = args.Item + 1
+                YearlyMonth = e.Item + 1
             };
             UpdateTemplatePropertiesButtonStates( );
         }

@@ -134,7 +134,7 @@ internal class TemplateConfigurationValidator
         }
 
         // Timing fields
-        string weeklyDayString = TemplateWindow.weeklyDayTextValidateField.Text.ToString( )!;
+        string weeklyDayString = TemplateWindow.weeklyDayComboBox.Text.ToString( )!;
 
         // This exception can't be thrown by the call to string.Equals, because it only happens if the third argument isn't valid
         // ReSharper disable ExceptionNotDocumentedOptional
