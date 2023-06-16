@@ -235,19 +235,6 @@ namespace Sanoid.ConfigConsole
             EnableEventHandlers( );
         }
 
-        private void GetAllSubviewTabInfo<T>( T startingPoint ) where T : View
-        {
-            //Logger.Warn( startingPoint.ToString( ) );
-            //Logger.Warn( JsonSerializer.Serialize( new { TabStop = startingPoint.TabStop, TabIndex = startingPoint.TabIndex, TabIndexes = startingPoint.TabIndexes.Select( t => new { Type = t.GetType( ).Name, Index = t.TabIndex } ).ToArray( ) } ) );
-            if ( startingPoint.Subviews.Count > 0 )
-            {
-                foreach ( var subview in startingPoint.Subviews )
-                {
-                    GetAllSubviewTabInfo( subview );
-                }
-            }
-        }
-
         private void DisableEventHandlers( )
         {
             if ( !_eventsEnabled )
