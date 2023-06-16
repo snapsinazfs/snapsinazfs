@@ -79,7 +79,6 @@ namespace Sanoid.ConfigConsole
             templateListView.SetSource( ConfigConsole.TemplateListItems );
             Templates.Clear( );
             Templates = new( Program.Settings!.Templates );
-            Templates.TryRemove( "default", out _ );
             InitializeComboBoxes( );
             SetInitialButtonState( );
             InitializeTemplatePropertiesTextValidateFieldList( );
@@ -173,7 +172,6 @@ namespace Sanoid.ConfigConsole
             commitAllButton.Clicked += ShowCommitConfirmationDialog;
 
             // Properties area field/button events
-            //TODO: Warn user if they try to modify the default template
             applyCurrentButton.Clicked += ApplyCurrentButtonOnClicked;
             resetCurrentButton.Clicked += ResetCurrentButtonOnClicked;
 
@@ -633,6 +631,15 @@ namespace Sanoid.ConfigConsole
                 return;
             }
 
+            if ( SelectedTemplateItem.TemplateName == "default" )
+            {
+                int dialogResult = MessageBox.ErrorQuery( "Modifying Default Template", "You are about to modify the default template.\nThis is not recommended.\nApply changes anyway?", "Cancel", "Apply Default Template Changes" );
+                if ( dialogResult == 0 )
+                {
+                    return;
+                }
+            }
+
             if ( _modifiedProperties.Overlaps( _namingProperties ) )
             {
                 SelectedTemplateItem.ViewSettings.Formatting = new( )
@@ -835,11 +842,9 @@ namespace Sanoid.ConfigConsole
             DisableEventHandlers( );
 
             _modifiedProperties.Clear();
-
             templateListView.EnsureSelectedItemVisible( );
-
             SetFieldsForSelectedItem( );
-
+            UpdatePropertiesFrameViewState( );
             UpdateTemplateListButtonStates( );
 
             EnableEventHandlers( );
@@ -916,7 +921,6 @@ namespace Sanoid.ConfigConsole
             commitAllButton.Clicked -= ShowCommitConfirmationDialog;
 
             // Properties area field/button events
-            //TODO: Warn user if they try to modify the default template
             applyCurrentButton.Clicked -= ApplyCurrentButtonOnClicked;
             resetCurrentButton.Clicked -= ResetCurrentButtonOnClicked;
 
