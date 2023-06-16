@@ -42,7 +42,11 @@ namespace Sanoid.ConfigConsole
             try
             {
                 DisableEventHandlers( );
-                if ( _globalConfigurationWindow is null )
+                bool bothWindowsNull = _globalConfigurationWindow is null && _templateConfigurationWindow is null;
+                bool onlyGlobalWindowNotNullAndNoChanges = _globalConfigurationWindow is not null && !_globalConfigurationWindow.IsConfigurationChanged && _templateConfigurationWindow is null;
+                bool onlyTemplateWindowNotNullAndNoChanges = _globalConfigurationWindow is null && _templateConfigurationWindow is not null && !TemplateConfigurationWindow.IsAnyTemplateModified;
+                bool bothWindowsNotNullAndNoChanges = _globalConfigurationWindow is not null && _templateConfigurationWindow is not null && !_globalConfigurationWindow.IsConfigurationChanged && !TemplateConfigurationWindow.IsAnyTemplateModified && !_templateConfigurationWindow.templatesAddedOrRemoved;
+                if (bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
                 {
                     Logger.Warn( "Save configuration requested when no changes were made." );
                     int messageBoxResult = MessageBox.Query( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
