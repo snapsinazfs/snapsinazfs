@@ -607,7 +607,7 @@ namespace Sanoid.ConfigConsole {
             this.timingMonthlyDayTextValidateField.X = 9;
             this.timingMonthlyDayTextValidateField.Y = 4;
             this.timingMonthlyDayTextValidateField.ColorScheme = this.templateConfigurationTextValidateFieldColorScheme;
-            this.timingMonthlyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d\\d$");
+            this.timingMonthlyDayTextValidateField.Provider = new Terminal.Gui.TextValidateProviders.TextRegexProvider("^\\d?\\d$");
             this.timingMonthlyDayTextValidateField.Data = "timingMonthlyDayTextValidateField";
             this.timingMonthlyDayTextValidateField.Text = "";
             this.timingMonthlyDayTextValidateField.TextAlignment = Terminal.Gui.TextAlignment.Left;
