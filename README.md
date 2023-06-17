@@ -4,7 +4,7 @@
 
  ## Status
 
- As of today (2023-06-16), Sanoid.net is capable of taking and pruning snapshots, using configuration
+ As of today (2023-06-17), Sanoid.net is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
 
@@ -120,8 +120,6 @@
   Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. Sanoid.net itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all Sanoid.net needs to run properly (binaries only - header files are not needed). The goal is for Sanoid.net to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
  ## Installing From Source
-
- ### Likely broken at the moment - I will revisit this when I've finished my current tasks
  
  After cloning this repository, execute the following commands to build and install Sanoid.net using make:
 
@@ -134,12 +132,13 @@
 
  To uninstall, run `make uninstall`\
  This will delete the executable file from `/usr/local/bin`, delete the base configuration files from 
- `/usr/local/share/Sanoid.net`, and delete the local configuration file at `/etc/sanoid/Sanoid.local.json`.\
- This will not remove any local configuration files in `~/.config/Sanoid.net`.\
+ `/usr/local/share/Sanoid.net`.\
+ This will not remove any local configuration files in `~/.config/Sanoid.net` or `/etc/sanoid`.\
  This will also not remove the last build artifacts created by `make install`.
 
- To clean all build artifacts, run `make clean`\
- To clean specific build target target artifacts, run `make clean-release` or `make clean-debug`
+ To clean all build artifacts, run `make clean`.\
+ To clean specific build target target artifacts, run `make clean-release` or `make clean-debug`.\
+ To clean everything, including empty build directories, run `make extraclean`.
 
  ## Installing From Pre-Built Packages
 
