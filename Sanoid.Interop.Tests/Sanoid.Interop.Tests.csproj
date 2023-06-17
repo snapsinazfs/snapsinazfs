@@ -8,7 +8,7 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Configurations>Debug;Release;Debug-Windows</Configurations>
+    <Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
