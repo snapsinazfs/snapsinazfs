@@ -56,6 +56,7 @@ public class CommandLineArguments
     [ArgDescription( "Shows this help" )]
     [ArgShortcut( "-h" )]
     [ArgShortcut( "--help" )]
+    [HelpHook]
     public bool Help { get; set; }
 
     [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in the sanoid.conf file." )]
