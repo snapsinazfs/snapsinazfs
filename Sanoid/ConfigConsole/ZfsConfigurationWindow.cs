@@ -576,9 +576,34 @@ namespace Sanoid.ConfigConsole
             pruneSnapshotsRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
             pruneSnapshotsRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
             pruneSnapshotsSourceTextField.Text = SelectedTreeNode.TreeDataset.PruneSnapshots.InheritedFrom;
-            recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
-            recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
+            try
+            {
+                recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( $"Invalid recursion value {SelectedTreeNode.TreeDataset.Recursion.Value}" ) };
+                recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
+            }
+            catch ( InvalidOperationException e )
+            {
+                int dialogResult = MessageBox.ErrorQuery( "Invalid ZFS Property Value", e.Message, 2, "Set to 'sanoid'", "Set to 'zfs'", "Do Nothing", "Exit" );
+                switch ( dialogResult )
+                {
+                    case 0:
+                    case 1:
+                        recursionRadioGroup.SelectedItem = dialogResult;
+                        UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
+                        recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                        recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
+                        UpdateButtonState( );
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Application.RequestStop();
+                        return;
+                    default:
+                        throw new InvalidOperationException( $"Unexpected dialogResult received: {dialogResult}", e );
+                }
+            }
             int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
             if ( templateIndex == -1 )
             {
