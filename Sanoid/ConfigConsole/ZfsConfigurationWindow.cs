@@ -42,12 +42,11 @@ namespace Sanoid.ConfigConsole
         private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
         {
             ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait( true );
-            ConfiguredTaskAwaitable setListSourceTask = templateListView.SetSourceAsync( ConfigConsole.TemplateListItems ).ConfigureAwait( true );
+            await templateListView.SetSourceAsync( ConfigConsole.TemplateListItems ).ConfigureAwait( true );
             SetCanFocusStates( );
             SetTagsForPropertyFields( );
             SetTabStops( );
             SetReadOnlyStates( );
-            await setListSourceTask;
             await zfsRefreshTask;
             UpdateButtonState( );
             EnableEventHandlers();

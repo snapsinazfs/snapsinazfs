@@ -242,7 +242,6 @@ namespace Sanoid.ConfigConsole
             AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
             quitMenuItem.Action = Application.Top.RequestStop;
             IsMdiContainer = true;
-            Logger.Fatal( Application.MdiTop.Text );
         }
 
         private bool _eventsEnabled;

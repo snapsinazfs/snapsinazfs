@@ -17,7 +17,6 @@ namespace Sanoid.ConfigConsole;
 internal static class ConfigConsole
 {
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
-    internal static ConcurrentDictionary<string, SanoidZfsDataset> Datasets { get; } = new( );
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
     internal static readonly ConcurrentDictionary<string, SanoidZfsDataset> BaseDatasets = new( );
