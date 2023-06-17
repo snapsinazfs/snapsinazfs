@@ -223,18 +223,25 @@ namespace Sanoid.ConfigConsole
             UpdateButtonState( );
         }
 
-        private void RecursionRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+        private void RecursionRadioGroupSelectedItemChanged( SelectedItemChangedArgs e )
         {
-            UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
+            RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)recursionRadioGroup.Data;
+            if ( viewData.RadioGroup.GetSelectedLabelString( ) != SelectedTreeNode.TreeDataset.Recursion.Value )
+            {
+                UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
+            }
             UpdateFieldsForSelectedTreeNode( );
             UpdateButtonState( );
         }
 
-        private void RetentionTextFieldOnLeave( FocusEventArgs args )
+        private void RetentionTextFieldOnLeave( FocusEventArgs e )
         {
-            ArgumentNullException.ThrowIfNull( args, nameof( args ) );
-
-            UpdateSelectedItemTextValidateFieldIntProperty( (RetentionTextValidateFieldViewData)args.View.Data, "local" );
+            ArgumentNullException.ThrowIfNull( e, nameof( e ) );
+            RetentionTextValidateFieldViewData viewData = (RetentionTextValidateFieldViewData)e.View.Data;
+            if ( viewData.ValueTextField.Text.ToInt32( -1 ) != ( (ZfsProperty<int>)SelectedTreeNode.TreeDataset[ viewData.PropertyName ] ).Value )
+            {
+                UpdateSelectedItemTextValidateFieldIntProperty( viewData, "local" );
+            }
             UpdateFieldsForSelectedTreeNode( );
             UpdateButtonState( );
         }
