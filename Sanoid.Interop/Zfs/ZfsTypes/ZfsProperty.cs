@@ -75,7 +75,8 @@ public class ZfsProperty
         ZfsPropertyNames.SnapshotRetentionDailyPropertyName,
         ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
         ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionYearlyPropertyName
+        ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,
+        ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName
     } );
 
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
