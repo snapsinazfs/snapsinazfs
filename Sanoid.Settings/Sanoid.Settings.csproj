@@ -18,7 +18,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">
-	  <DebugType>embedded</DebugType>
+		<Optimize>True</Optimize>
+		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<PublishReadyToRun>True</PublishReadyToRun>
+		<PublishSingleFile>True</PublishSingleFile>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
