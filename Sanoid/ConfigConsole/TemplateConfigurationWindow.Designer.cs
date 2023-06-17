@@ -650,7 +650,7 @@ namespace Sanoid.ConfigConsole {
             this.weeklyDayComboBox.Height = 4;
             this.weeklyDayComboBox.X = 9;
             this.weeklyDayComboBox.Y = 6;
-            this.weeklyDayComboBox.ColorScheme = this.textValidateFieldColorScheme;
+            this.weeklyDayComboBox.ColorScheme = this.comboBoxColorScheme;
             this.weeklyDayComboBox.Data = "weeklyDayComboBox";
             this.weeklyDayComboBox.Text = "";
             this.weeklyDayComboBox.TextAlignment = Terminal.Gui.TextAlignment.Left;
