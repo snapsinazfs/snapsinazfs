@@ -137,7 +137,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView templateListFrame;
         
-        private Terminal.Gui.ListView templateListView;
+        internal Terminal.Gui.ListView templateListView;
         
         internal Terminal.Gui.TextValidateField newTemplateNameTextValidateField;
         

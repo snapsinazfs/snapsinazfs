@@ -37,7 +37,7 @@ namespace Sanoid.ConfigConsole {
         
         private Terminal.Gui.FrameView zfsConfigurationTreeFrame;
         
-        private Terminal.Gui.TreeView zfsTreeView;
+        internal Terminal.Gui.TreeView zfsTreeView;
         
         private Terminal.Gui.FrameView generalFrame;
         

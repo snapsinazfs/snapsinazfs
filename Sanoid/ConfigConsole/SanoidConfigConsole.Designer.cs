@@ -83,13 +83,13 @@ namespace Sanoid.ConfigConsole {
             this.windowMenu = new Terminal.Gui.MenuBarItem();
             this.windowMenu.Title = "_Window";
             this.globalConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.globalConfigMenuItem.Title = "_Global Configuration";
+            this.globalConfigMenuItem.Title = "Show _Global Configuration Window";
             this.globalConfigMenuItem.Data = "globalConfigMenuItem";
             this.templateConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.templateConfigMenuItem.Title = "_Template Configuration";
+            this.templateConfigMenuItem.Title = "Show _Template Configuration Window";
             this.templateConfigMenuItem.Data = "templateConfigMenuItem";
             this.zfsConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.zfsConfigMenuItem.Title = "_ZFS Configuration";
+            this.zfsConfigMenuItem.Title = "Show _ZFS Configuration Window";
             this.zfsConfigMenuItem.Data = "zfsConfigMenuItem";
             this.windowMenu.Children = new Terminal.Gui.MenuItem[] {
                     this.globalConfigMenuItem,
