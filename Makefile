@@ -11,8 +11,8 @@ DEBUGCONFIG ?= Debug
 DEBUGDIR ?= $(BUILDDIR)/$(DEBUGCONFIG)
 DEBUGPUBLISHDIR ?= $(PUBLISHROOT)/$(DEBUGCONFIG)
 
-PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/Sanoid.json $(RELEASEPUBLISHDIR)/Sanoid.nlog.json $(RELEASEPUBLISHDIR)/Sanoid.schema.json $(RELEASEPUBLISHDIR)/Sanoid.template.schema.json
-PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/Sanoid.dataset.schema.json $(RELEASEPUBLISHDIR)/Sanoid.monitoring.schema.json $(RELEASEPUBLISHDIR)/Sanoid.local.schema.json
+PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/Sanoid.json $(RELEASEPUBLISHDIR)/Sanoid.nlog.json $(RELEASEPUBLISHDIR)/Sanoid.schema.json
+PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/Sanoid.monitoring.schema.json $(RELEASEPUBLISHDIR)/Sanoid.local.schema.json
 
 all:	clean-release   restore build-release
 
@@ -32,6 +32,14 @@ clean-debug:
 	rm -rfv Sanoid.Common/obj/$(DEBUGCONFIG)
 	rmdir -v Sanoid.Common/bin || true
 	rmdir -v Sanoid.Common/obj || true
+	rm -rfv Sanoid.Interop/bin/$(DEBUGCONFIG)
+	rm -rfv Sanoid.Interop/obj/$(DEBUGCONFIG)
+	rmdir -v Sanoid.Interop/bin || true
+	rmdir -v Sanoid.Interop/obj || true
+	rm -rfv Sanoid.Settings/bin/$(DEBUGCONFIG)
+	rm -rfv Sanoid.Settings/obj/$(DEBUGCONFIG)
+	rmdir -v Sanoid.Settings/bin || true
+	rmdir -v Sanoid.Settings/obj || true
 
 clean-release:
 	dotnet clean --configuration $(RELEASECONFIG) -o $(RELEASEDIR)
@@ -48,12 +56,24 @@ clean-release:
 	rm -rfv Sanoid.Common/obj/$(RELEASECONFIG)
 	rmdir -v Sanoid.Common/bin || true
 	rmdir -v Sanoid.Common/obj || true
+	rm -rfv Sanoid.Interop/bin/$(RELEASECONFIG)
+	rm -rfv Sanoid.Interop/obj/$(RELEASECONFIG)
+	rmdir -v Sanoid.Interop/bin || true
+	rmdir -v Sanoid.Interop/obj || true
+	rm -rfv Sanoid.Settings/bin/$(RELEASECONFIG)
+	rm -rfv Sanoid.Settings/obj/$(RELEASECONFIG)
+	rmdir -v Sanoid.Settings/bin || true
+	rmdir -v Sanoid.Settings/obj || true
 
 extraclean:	clean-debug	clean-release
 	rm -rfv Sanoid/bin
 	rm -rfv Sanoid/obj
 	rm -rfv Sanoid.Common/bin
 	rm -rfv Sanoid.Common/obj
+	rm -rfv Sanoid.Interop/bin
+	rm -rfv Sanoid.Interop/obj
+	rm -rfv Sanoid.Settings/bin
+	rm -rfv Sanoid.Settings/obj
 
 
 build:	build-release
@@ -87,7 +107,7 @@ uninstall-release:
 	rm -rfv /usr/local/share/Sanoid.net
 	rm -rfv /etc/sanoid/Sanoid.local.json
 	rm -fv /usr/local/bin/Sanoid
-	@echo "Not removing configuration files in user home directories."
+	@echo "Not removing configuration files in /etc/sanoid or user home directories."
 
 test:	test-everything
 
