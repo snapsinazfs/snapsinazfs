@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -471,9 +471,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        string[] poolRootNames = datasets.Keys.ToArray( );
+        List<string> poolRootNames = new( );
+        Logger.Debug("Getting pool names for parallel property retrieval");
+        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", "-Ho name" ).ConfigureAwait( true ) )
+        {
+            poolRootNames.Add( zpoolListLine.Trim( ) );
+        }
         string datasetPropertiesString = ZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( );
-        Logger.Debug( "Getting remaining dataset configuration from ZFS" );
+        Logger.Debug( "Getting all dataset configurations from ZFS" );
         Task[] zfsGetDatasetTasks =
             ( from poolName
                   in poolRootNames
@@ -510,6 +515,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 Logger.Debug( "Checking for existence of dataset {0} in collection", dsName );
                 if ( !datasets.ContainsKey( dsName ) )
                 {
+                    if ( dsName.GetZfsPathParent( ) == dsName )
+                    {
+                        Logger.Debug("Dataset {0} is a pool root",dsName  );
+                        if ( datasets.TryAdd( dsName, new( dsName, propertyValue, null, true ) ) )
+                        {
+                            Logger.Debug( "Added Dataset {0} to collection", dsName );
+                            continue;
+                        }
+                        Logger.Error( "Failed adding root dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName );
+                        continue;
+                    }
+
                     Logger.Debug( "Dataset {0} not in collection. Attempting to add using Name: {0}, Kind: {1}", dsName, propertyValue );
                     if ( datasets.TryAdd( dsName, new( dsName, propertyValue, datasets[ poolRootName ] ) ) )
                     {
@@ -517,15 +534,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                         continue;
                     }
 
-                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset may not be performed", dsName );
-                    continue;
-                }
-
-                // We can ignore and continue if this is the type property
-                // This case happens for the pool roots, since they've already been created and the first
-                // encountered property will always be type
-                if ( propertyName == "type" )
-                {
+                    Logger.Error( "Failed adding dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName );
                     continue;
                 }
 
@@ -889,14 +898,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
+        if ( dryRun )
+        {
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+            return false;
+        }
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
         {
-            if ( dryRun )
-            {
-                Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-                return false;
-            }
-
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             try
             {

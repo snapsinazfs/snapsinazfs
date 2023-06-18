@@ -165,7 +165,7 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( Settings.DryRun, schemaCheckResult.MissingPoolPropertyCollections, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( Settings.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
@@ -177,7 +177,7 @@ internal class Program
             return (int)Errno.EOK;
         }
 
-        ConcurrentDictionary<string, Dataset> datasets = schemaCheckResult.Datasets;
+        ConcurrentDictionary<string, Dataset> datasets = new( );
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );

@@ -377,21 +377,21 @@ internal static class ZfsTasks
         return false;
     }
 
-    internal static bool UpdateZfsDatasetSchema( bool dryRun, Dictionary<string, Dictionary<string, ZfsProperty>> missingPropertiesByPool, IZfsCommandRunner zfsCommandRunner )
+    internal static bool UpdateZfsDatasetSchema( bool dryRun, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
     {
         bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
-        foreach ( ( string poolName, Dictionary<string, ZfsProperty> propertiesToAdd ) in missingPropertiesByPool )
+        foreach ( ( string poolName, ConcurrentDictionary<string, bool> propertiesToAdd ) in poolRootsWithPropertyValidities )
         {
             Logger.Info( "Updating properties for pool {0}", poolName );
 
             // It's not a nullable type...
             // ReSharper disable once ExceptionNotDocumentedOptional
-            ZfsProperty[] propertyArray = propertiesToAdd.Values.ToArray( );
+            string[] propertyArray = propertiesToAdd.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToArray( );
 
             // Attempt to set the missing properties for the pool.
             // Log an error if unsuccessful
-            if ( zfsCommandRunner.SetZfsProperties( dryRun, poolName, propertyArray ) )
+            if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( dryRun, poolName, propertyArray ) )
             {
                 Logger.Info( "Finished updating properties for pool {0}", poolName );
             }
@@ -418,79 +418,78 @@ internal static class ZfsTasks
         return !errorsEncountered;
     }
 
-    public record CheckZfsPropertiesSchemaResult( Dictionary<string, Dictionary<string, ZfsProperty>> MissingPoolPropertyCollections, bool MissingPropertiesFound, ConcurrentDictionary<string, Dataset> Datasets );
+    public record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
     public static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
-
-        Dictionary<string, Dictionary<string, ZfsProperty>> missingPoolPropertyCollections = new( );
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetRootPoolsAndPropertyValidityAsync( ).ConfigureAwait( true );
         bool missingPropertiesFound = false;
-
-        foreach ( ( string poolName, Dataset? pool ) in poolRoots )
+        foreach ( (string poolName, ConcurrentDictionary<string, bool>? propertyValidities) in poolRootsWithPropertyValidities )
         {
-            Logger.Debug( "Checking properties for pool {0}", poolName );
-            Logger.Trace( "Pool {0} current properties collection: {1}", poolName, JsonSerializer.Serialize( pool.Properties ) );
-            Dictionary<string, ZfsProperty> missingProperties = new( );
-
-            foreach ( ( string propertyName, ZfsProperty property ) in pool.Properties )
+            Logger.Debug( "Checking property validities for pool root {0}", poolName );
+            bool missingPropertiesFoundForPool = false;
+            foreach ( ( string propName, bool propValue ) in propertyValidities )
             {
-                Logger.Trace( "Checking pool {0} for property {1}", poolName, propertyName );
-                if ( pool.HasProperty( propertyName ) && property.Value != ZfsPropertyValueConstants.None && property.Source == ZfsPropertySourceConstants.Local )
+                Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
+                if ( propValue )
                 {
-                    Logger.Trace( "Pool {0} already has property {1}", poolName, propertyName );
+                    Logger.Trace( "Pool root {0} has property {1} with a valid value", poolName, propName );
                     continue;
                 }
 
-                Logger.Debug( "Pool {0} does not have property {1}", poolName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
-                missingProperties.Add( propertyName, ZfsProperty.DefaultDatasetProperties[ propertyName ] );
+                Logger.Debug( "Pool root {0} has missing or invalid property {1}", poolName, propName );
+                if ( !missingPropertiesFound )
+                {
+                    missingPropertiesFound = missingPropertiesFoundForPool = true;
+                }
             }
+            Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
 
-            if ( missingProperties.Count > 0 )
-            {
-                missingPoolPropertyCollections.Add( poolName, missingProperties );
-            }
-
-            Logger.Debug( "Finished checking properties for pool {0}", poolName );
-
-            // Can't be null because we literally constructed it above...
-            // ReSharper disable ExceptionNotDocumentedOptional
-            missingPropertiesFound = missingPoolPropertyCollections.Any( );
-            bool missingPropertiesFoundForPool = missingProperties.Any( );
-            // ReSharper restore ExceptionNotDocumentedOptional
-
-            // Now let's act on what we found for this pool, based on command-line arguments
             switch ( args )
             {
                 case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
                     break;
                 case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
                     break;
                 case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
                     break;
                 case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
                     break;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
-                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", missingProperties.Keys ) );
+                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
                     break;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
                     Logger.Debug( "No missing properties in pool {0}", poolName );
                     break;
             }
+
         }
+
+        return new( poolRootsWithPropertyValidities, missingPropertiesFound );
+    }
+
+    /// <summary>
+    /// Gets the pool roots with all sanoid.net properties and capacity properties
+    /// </summary>
+    /// <param name="zfsCommandRunner"></param>
+    /// <returns></returns>
+    /// <remarks>Should only be called once schema validity has been checked, or else results are undefined and unsupported</remarks>
+    public static async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithPropertiesAndCapacities(IZfsCommandRunner zfsCommandRunner )
+    {
+        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
 
         if ( poolRoots.Any( ) )
         {
             await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( true );
         }
 
-        return new( missingPoolPropertyCollections, missingPropertiesFound, poolRoots );
+        return poolRoots;
     }
 
     [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
