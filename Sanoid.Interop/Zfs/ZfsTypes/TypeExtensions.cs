@@ -61,14 +61,20 @@ public static class TypeExtensions
         int endIndex = value.IndexOf( '@' );
         if ( endIndex == -1 )
         {
+            // This means it's not a snapshot.
+            // Check for the last '/' character
             endIndex = value.LastIndexOf( '/' );
         }
 
         if ( endIndex == -1 )
         {
+            // This is a pool root.
+            // Returned value is the same as input
             return value;
         }
 
+        // This is a non-root dataset or is a snapshot
+        // Return its parent dataset name
         string rootPath = value[ ..endIndex ];
         return rootPath;
     }
