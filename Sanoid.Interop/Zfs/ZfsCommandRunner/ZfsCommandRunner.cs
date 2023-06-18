@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -739,6 +739,70 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         return treeRootNodes;
     }
 
+    /// <inheritdoc />
+    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( )
+    {
+        string zfsGetArgs = $"{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0";
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get",zfsGetArgs ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            string poolName = lineTokens[ 0 ];
+            string propName = lineTokens[ 1 ];
+            string propValue = lineTokens[ 2 ];
+            string propSource = lineTokens[ 3 ];
+            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
+
+            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
+            {
+                ConcurrentDictionary<string,bool> newDs = new( )
+                {
+                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
+                };
+                return newDs;
+            }
+
+            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
+            {
+                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
+                return properties;
+            }
+
+            bool CheckIfPropertyIsValid( string name, string value, string source )
+            {
+                if ( source == "-" )
+                {
+                    return false;
+
+                }
+
+                return name switch
+                {
+                    ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
+                    ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
+                    ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
+                    ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is "sanoid" or "zfs",
+                    ZfsPropertyNames.TemplatePropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionDailyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                    _ => throw new ArgumentOutOfRangeException( nameof( name ) )
+                };
+            }
+        }
+
+        return rootsAndTheirProperties;
+    }
     private static void ValidateCommonExecArguments( string verb, string args )
     {
         if ( string.IsNullOrWhiteSpace( verb ) )

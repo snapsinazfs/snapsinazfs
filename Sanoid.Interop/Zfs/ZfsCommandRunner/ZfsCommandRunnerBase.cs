@@ -46,4 +46,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 
     public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets );
+
+    /// <inheritdoc />
+    public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( );
 }

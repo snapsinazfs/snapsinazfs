@@ -121,4 +121,14 @@ public interface IZfsCommandRunner
     public IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
     public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
     public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets );
+
+    /// <summary>
+    ///     Gets a collection of datasets and their property validity
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as pool root names, to
+    ///     TValue=<see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as property names, to
+    ///     TValue=<see langword="bool" />s indicating whether that property is defined and has a valid value for its type
+    /// </returns>
+    Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( );
 }
