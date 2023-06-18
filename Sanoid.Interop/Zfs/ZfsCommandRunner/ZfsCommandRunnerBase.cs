@@ -49,4 +49,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     /// <inheritdoc />
     public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( );
+
+    /// <inheritdoc />
+    public abstract bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 }

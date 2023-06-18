@@ -803,6 +803,60 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         return rootsAndTheirProperties;
     }
+
+    /// <inheritdoc />
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string dsName, string[] properties )
+    {
+        if ( properties.Length == 0 )
+        {
+            Logger.Warn( "Asked to set properties for {0} but no properties provided", dsName );
+            return false;
+        }
+
+        List<string> setStrings = new();
+
+        foreach ( string propName in properties )
+        {
+            setStrings.Add( ZfsProperty.DefaultDatasetProperties[ propName ].SetString );
+        }
+
+        string propertiesSetString = string.Join( ' ',  setStrings );
+        Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
+        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        if ( dryRun )
+        {
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+            return false;
+        }
+        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        {
+
+            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+            try
+            {
+                zfsSetProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
+                return false;
+            }
+
+            if ( !zfsSetProcess.HasExited )
+            {
+                Logger.Trace( "Waiting for zfs set process to exit" );
+                zfsSetProcess.WaitForExit( 3000 );
+            }
+
+            Logger.Trace( "zfs set process finished" );
+            return true;
+        }
+    }
+
     private static void ValidateCommonExecArguments( string verb, string args )
     {
         if ( string.IsNullOrWhiteSpace( verb ) )

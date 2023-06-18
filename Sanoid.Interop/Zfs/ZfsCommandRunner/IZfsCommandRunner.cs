@@ -131,4 +131,6 @@ public interface IZfsCommandRunner
     ///     TValue=<see langword="bool" />s indicating whether that property is defined and has a valid value for its type
     /// </returns>
     Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( );
+
+    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 }
