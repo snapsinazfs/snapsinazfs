@@ -223,39 +223,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
                 return properties;
             }
-
-            bool CheckIfPropertyIsValid( string name, string value, string source )
-            {
-                if ( source == "-" )
-                {
-                    return false;
-
-                }
-
-                return name switch
-                {
-                    "type" => !string.IsNullOrWhiteSpace(value) && value == "filesystem",
-                    ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
-                    ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
-                    ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
-                    ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is "sanoid" or "zfs",
-                    ZfsPropertyNames.TemplatePropertyName => !string.IsNullOrWhiteSpace( value ),
-                    ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionDailyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => int.TryParse( value, out int intValue ) && intValue is >= 0 and <= 100,
-                    ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-                    _ => throw new ArgumentOutOfRangeException( nameof( name ) )
-                };
-            }
         }
 
         return rootsAndTheirProperties;
