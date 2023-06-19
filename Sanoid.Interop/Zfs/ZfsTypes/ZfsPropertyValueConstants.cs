@@ -11,4 +11,5 @@ public static class ZfsPropertyValueConstants
     public const string Default = "default";
     public const string None = "-";
     public const string Sanoid = "sanoid";
+    public const string ZfsRecursion = "zfs";
 }
