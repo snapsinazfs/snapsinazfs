@@ -99,8 +99,8 @@ public record FormattingSettings
     }
 
     /// <summary>
-    ///     Gets ONLY the snapshot name for a snapshot, using the given <paramref name="datasetName" />,
-    ///     <paramref name="periodKind" />, and <paramref name="timestamp" />, in conjunction with configured settings for this
+    ///     Gets ONLY the snapshot name for a snapshot, using the given <paramref name="periodKind" /> and
+    ///     <paramref name="timestamp" />, in conjunction with configured settings for this
     ///     object
     /// </summary>
     public string GenerateShortSnapshotName( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
