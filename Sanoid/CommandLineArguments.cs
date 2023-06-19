@@ -132,5 +132,6 @@ public class CommandLineArguments
     [ArgDescription("Launches Sanoid.net's built-in interactive configuration console")]
     [ArgShortcut( "--configconsole" )]
     [ArgShortcut( "--config-console" )]
+    [ArgCantBeCombinedWith( "DryRun|TakeSnapshots|PruneSnapshots|ForcePrune|CheckZfsProperties|PrepareZfsProperties" )]
     public bool ConfigConsole { get; set; }
 }
