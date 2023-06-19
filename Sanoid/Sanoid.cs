@@ -260,7 +260,7 @@ internal class Program
         }
 
         Settings!.DryRun |= args.DryRun;
-        Settings.TakeSnapshots = Settings.TakeSnapshots & args.TakeSnapshots & !args.NoTakeSnapshots;
-        Settings.PruneSnapshots = Settings.PruneSnapshots & args.PruneSnapshots & !args.NoPruneSnapshots;
+        Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
+        Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
     }
 }
