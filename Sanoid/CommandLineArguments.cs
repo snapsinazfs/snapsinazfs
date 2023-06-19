@@ -133,49 +133,4 @@ public class CommandLineArguments
     [ArgShortcut( "--configconsole" )]
     [ArgShortcut( "--config-console" )]
     public bool ConfigConsole { get; set; }
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
-    /// <summary>
-    ///     Called by main thread to set logging settings early, before we load the rest of the configuration.
-    /// </summary>
-    public void Main( )
-    {
-        if ( Version )
-        {
-            Version version = Assembly.GetExecutingAssembly( ).GetName( ).Version!;
-            LogManager.GetLogger( "MessageOnly" ).Info( "Sanoid.net version {0}", version );
-            return;
-        }
-
-        if ( ReallyQuiet )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Off, LogLevel.Off ) );
-        }
-
-        if ( Quiet )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Error, LogLevel.Fatal ) );
-        }
-
-        if ( Verbose )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Info, LogLevel.Fatal ) );
-        }
-
-        if ( Debug )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Debug, LogLevel.Fatal ) );
-        }
-
-        if ( Trace )
-        {
-            LogManager.Configuration!.LoggingRules.ForEach( rule => rule.SetLoggingLevels( LogLevel.Trace, LogLevel.Fatal ) );
-        }
-
-        if ( ReallyQuiet || Quiet || Verbose || Debug || Trace )
-        {
-            LogManager.ReconfigExistingLoggers( );
-        }
-    }
 }
