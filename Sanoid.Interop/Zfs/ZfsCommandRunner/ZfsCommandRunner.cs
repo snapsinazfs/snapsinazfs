@@ -70,7 +70,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
     {
-        Logger.Debug( "{0:G} snapshot requested for dataset {1}", period.Kind, ds.Name );
+        bool zfsRecursionWanted = ds.Recursion == ZfsPropertyValueConstants.ZfsRecursion;
+        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
         try
         {
@@ -88,7 +89,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string arguments = $"snapshot {((ds.Recursion == ZfsPropertyValueConstants.ZfsRecursion) ? "-r " : "")}{string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
+        string arguments = $"snapshot {(zfsRecursionWanted ? "-r " : "")}{string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
         ProcessStartInfo zfsSnapshotStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
@@ -100,12 +101,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, arguments );
+        Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
         try
         {
             using ( Process? snapshotProcess = Process.Start( zfsSnapshotStartInfo ) )
             {
-                Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
+                Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
                 snapshotProcess?.WaitForExit( );
                 if ( snapshotProcess?.ExitCode == 0 )
                 {
