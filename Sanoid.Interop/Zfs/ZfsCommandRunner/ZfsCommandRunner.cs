@@ -788,6 +788,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                 return name switch
                 {
+                    "type" => !string.IsNullOrWhiteSpace(value) && value == "filesystem",
                     ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
                     ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
                     ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),

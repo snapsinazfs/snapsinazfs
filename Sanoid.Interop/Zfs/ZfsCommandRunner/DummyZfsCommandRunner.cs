@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -234,18 +234,19 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
                 return name switch
                 {
+                    "type" => !string.IsNullOrWhiteSpace(value) && value == "filesystem",
                     ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
                     ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
                     ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
                     ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is "sanoid" or "zfs",
-                    ZfsPropertyNames.TemplatePropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.TemplatePropertyName => !string.IsNullOrWhiteSpace( value ),
                     ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
                     ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
                     ZfsPropertyNames.SnapshotRetentionDailyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
                     ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
                     ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
                     ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-                    ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
+                    ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => int.TryParse( value, out int intValue ) && intValue is >= 0 and <= 100,
                     ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
                     ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
                     ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
