@@ -8,6 +8,9 @@ dotnet_diagnostic.CS1591.severity = none
 dotnet_diagnostic.CS1591.severity = none
 [GlobalConfigurationWindow.cs]
 dotnet_diagnostic.CS1591.severity = none
+[CommandLineArguments.cs]
+# This class is only ever instantiated by PowerArgs, so we don't need to care about things not being assigned explicitly in code
+dotnet_diagnostic.CS8618.severity = none
 
 [*.cs]
 
