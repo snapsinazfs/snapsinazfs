@@ -210,15 +210,9 @@ internal class Program
             Logger.Info( "Not pruning snapshots" );
         }
 
-        Logger.Fatal( "Not yet implemented." );
-        Logger.Fatal( "Please use the Perl-based sanoid/syncoid for now." );
-        Logger.Fatal( "This program will now exit with an error (status 38 - ENOSYS) to prevent accidental usage in scripts." );
-
-// Let's be tidy and clean up the default mutex ourselves
         Mutexes.DisposeMutexes( );
 
-// Be sure we clean up any mutexes we have acquired, and log warnings for those that this has to deal with.
-        return (int)Errno.ENOSYS;
+        return (int)Errno.EOK;
     }
 
     /// <summary>
