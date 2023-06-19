@@ -16,7 +16,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
     {
-        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, template );
+        snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
         return true;
     }
 

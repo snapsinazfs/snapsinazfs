@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -71,7 +71,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
     {
         Logger.Debug( "{0:G} snapshot requested for dataset {1}", period.Kind, ds.Name );
-        snapshot = Snapshot.GetNewSnapshotForCommandRunner( ds, period, timestamp, template );
+        snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
