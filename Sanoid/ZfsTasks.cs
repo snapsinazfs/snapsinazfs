@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -52,12 +52,15 @@ internal static class ZfsTasks
 
         foreach ( ( string _, Dataset ds ) in datasets )
         {
+            //OK to disable this warning here. We don't use it if the result is false, and we don't put null in the collection in the first place
+#pragma warning disable CS8600
             if ( !settings.Templates.TryGetValue( ds.Template, out TemplateSettings template ) )
             {
                 string errorMessage = $"Template {ds.Template} specified for {ds.Name} not found in configuration - skipping";
                 Logger.Error( errorMessage );
                 continue;
             }
+#pragma warning restore CS8600
 
             // The MaxBy function will fail if the sort key is a value type (it is - DateTimeOffset) and the collection is null
             // ReSharper disable SimplifyLinqExpressionUseMinByAndMaxBy
