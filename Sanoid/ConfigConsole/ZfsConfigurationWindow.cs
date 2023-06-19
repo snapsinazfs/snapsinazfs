@@ -262,79 +262,65 @@ namespace Sanoid.ConfigConsole
             {
                 DisableEventHandlers( );
 
+                if ( ConfigConsole.CommandRunner is null )
+                {
+                    Logger.Error("ZFS Command runner is null. Cannot continue with save operation");
+                }
+
                 if ( !SelectedTreeNode.IsModified )
                 {
+                    Logger.Info( "Selected ZFS object was not modified when save was requested. This should not happen" );
                     return;
                 }
 
-                // The buttons are disposable, but the Dialog will dispose them when it is closed
-                Button cancelButton = new( "Cancel", true );
-                Button saveButton = new( "Save" );
-                using Dialog saveZfsObjectDialog = new( "Confirm Saving ZFS Object Configuration", 80, 7, cancelButton, saveButton );
-                bool saveConfirmed = false;
                 string zfsObjectPath = SelectedTreeNode.Text;
+                string pendingCommand = $"zfs set {_modifiedPropertiesSinceLastSaveForCurrentItem.ToStringForZfsSet( )} {zfsObjectPath}";
+                int dialogResult = MessageBox.ErrorQuery( "Confirm Saving ZFS Object Configuration", $"The following command will be executed:\n{pendingCommand}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
 
-                cancelButton.Clicked += OnCancelButtonOnClicked;
-                saveButton.Clicked += OnSaveButtonOnClicked;
-
-                saveZfsObjectDialog.ButtonAlignment = Dialog.ButtonAlignments.Center;
-                saveZfsObjectDialog.AutoSize = true;
-                saveZfsObjectDialog.ColorScheme = whiteOnRed;
-                saveZfsObjectDialog.TextAlignment = TextAlignment.Centered;
-                saveZfsObjectDialog.VerticalTextAlignment = VerticalTextAlignment.Middle;
-                saveZfsObjectDialog.Text = $"The following command will be executed:\nzfs set {_modifiedPropertiesSinceLastSaveForCurrentItem.ToStringForZfsSet( )} {zfsObjectPath}\n\nTHIS OPERATION CANNOT BE UNDONE";
-                saveZfsObjectDialog.Modal = true;
-
-                Application.Run( saveZfsObjectDialog );
-
-                if ( saveConfirmed && ConfigConsole.CommandRunner is not null )
+                switch ( dialogResult )
                 {
-                    Logger.Info( "Saving {0}", zfsObjectPath );
-                    if ( ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner ) || Program.Settings!.DryRun )
-                    {
-                        Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
-                        foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
-                        {
-                            switch ( kvp.Value )
-                            {
-                                case ZfsProperty<bool> boolProp:
-                                    UpdateDescendentsBooleanPropertyInheritance( SelectedTreeNode, boolProp, $"inherited from {SelectedTreeNode.Text}" );
-                                    break;
-                                case ZfsProperty<int> intProp:
-                                    UpdateDescendentsIntPropertyInheritance( SelectedTreeNode, intProp, $"inherited from {SelectedTreeNode.Text}" );
-                                    break;
-                                case ZfsProperty<string> stringProp:
-                                    UpdateDescendentsStringPropertyInheritance( SelectedTreeNode, stringProp, $"inherited from {SelectedTreeNode.Text}" );
-                                    break;
-                                case ZfsProperty<DateTimeOffset> dtoProp:
-                                    UpdateDescendentsDateTimeOffsetPropertyInheritance( SelectedTreeNode, dtoProp, $"inherited from {SelectedTreeNode.Text}" );
-                                    break;
-                            }
-                        }
+                    case 0:
+                        Logger.Debug( "User canceled save confirmation for ZFS object {0}", zfsObjectPath );
+                        return;
+                    case 1:
+                        Logger.Debug( "User confirmed the pending zfs set operation {0}", pendingCommand );
+                        break;
+                }
 
-                        _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-                        SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
+                Logger.Info( "Saving {0}", zfsObjectPath );
+                if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, _modifiedPropertiesSinceLastSaveForCurrentItem.Values.ToList( ), ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
+                {
+                    Logger.Trace( "Result from SetPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.SetPropertiesForDataset" );
+                    if ( !Program.Settings.DryRun )
+                    {
+                        Logger.Error( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                    }
+
+                    return;
+                }
+
+                Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
+                foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
+                {
+                    switch ( kvp.Value )
+                    {
+                        case ZfsProperty<bool> boolProp:
+                            UpdateDescendentsBooleanPropertyInheritance( SelectedTreeNode, boolProp, $"inherited from {SelectedTreeNode.Text}" );
+                            break;
+                        case ZfsProperty<int> intProp:
+                            UpdateDescendentsIntPropertyInheritance( SelectedTreeNode, intProp, $"inherited from {SelectedTreeNode.Text}" );
+                            break;
+                        case ZfsProperty<string> stringProp:
+                            UpdateDescendentsStringPropertyInheritance( SelectedTreeNode, stringProp, $"inherited from {SelectedTreeNode.Text}" );
+                            break;
+                        case ZfsProperty<DateTimeOffset> dtoProp:
+                            UpdateDescendentsDateTimeOffsetPropertyInheritance( SelectedTreeNode, dtoProp, $"inherited from {SelectedTreeNode.Text}" );
+                            break;
                     }
                 }
 
-                // Fine to ignore this warning here, because we are explicitly un-wiring the events before any disposal will occur.
-                // The button click handlers are un-subscribed and THEN the dialog is asked to exit.
-                // ReSharper disable AccessToDisposedClosure
-                void OnCancelButtonOnClicked( )
-                {
-                    cancelButton.Clicked -= OnCancelButtonOnClicked;
-                    saveButton.Clicked -= OnSaveButtonOnClicked;
-                    RequestStop( saveZfsObjectDialog );
-                }
-
-                void OnSaveButtonOnClicked( )
-                {
-                    saveConfirmed = true;
-                    cancelButton.Clicked -= OnCancelButtonOnClicked;
-                    saveButton.Clicked -= OnSaveButtonOnClicked;
-                    RequestStop( saveZfsObjectDialog );
-                }
-                // ReSharper restore AccessToDisposedClosure
+                _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
+                SelectedTreeNode.BaseDataset = SelectedTreeNode.TreeDataset with { };
             }
             finally
             {
@@ -372,14 +358,8 @@ namespace Sanoid.ConfigConsole
         /// <param name="source"></param>
         private static void UpdateDescendentsBooleanPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<bool> prop, string source )
         {
-            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
+            foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ).Where( child => !child.TreeDataset[ prop.Name ].IsLocal ) )
             {
-                // If this child already has the property defined locally, we can skip it (and thus its descendents as well)
-                if ( child.TreeDataset[ prop.Name ].IsLocal )
-                {
-                    continue;
-                }
-
                 UpdateDescendentsBooleanPropertyInheritance( child, prop, source );
             }
 
