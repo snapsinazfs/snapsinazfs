@@ -424,7 +424,7 @@ internal static class ZfsTasks
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetRootPoolsAndPropertyValidityAsync( ).ConfigureAwait( true );
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( true );
         bool missingPropertiesFound = false;
         foreach ( (string poolName, ConcurrentDictionary<string, bool>? propertyValidities) in poolRootsWithPropertyValidities )
         {
