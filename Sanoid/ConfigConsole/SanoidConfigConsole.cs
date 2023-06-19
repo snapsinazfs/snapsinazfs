@@ -24,12 +24,9 @@ namespace Sanoid.ConfigConsole
 
     public partial class SanoidConfigConsole
     {
-        private GlobalConfigurationWindow? _globalConfigurationWindow;
-        private ZfsConfigurationWindow? _zfsConfigurationWindow;
-        private TemplateConfigurationWindow? _templateConfigurationWindow;
         public SanoidConfigConsole( )
         {
-            Initialized+= SanoidConfigConsoleOnInitialized;
+            Initialized += SanoidConfigConsoleOnInitialized;
             Ready += SanoidConfigConsoleOnReady;
             InitializeComponent( );
             globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
@@ -42,7 +39,17 @@ namespace Sanoid.ConfigConsole
             Application.RootKeyEvent += ApplicationRootKeyEvent;
         }
 
+        private bool _eventsEnabled;
+        private GlobalConfigurationWindow? _globalConfigurationWindow;
+        private bool _globalConfigurationWindowShown;
+        private TemplateConfigurationWindow? _templateConfigurationWindow;
+        private bool _templateConfigurationWindowShown;
+        private ZfsConfigurationWindow? _zfsConfigurationWindow;
+        private bool _zfsConfigurationWindowShown;
+
         public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
+
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
         private bool ApplicationRootKeyEvent( KeyEvent e )
         {
@@ -82,7 +89,7 @@ namespace Sanoid.ConfigConsole
                 bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.templatesAddedRemovedOrModified;
                 bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
                 bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
-                if (bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
+                if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
                 {
                     Logger.Warn( "Save configuration requested when no changes were made." );
                     int messageBoxResult = MessageBox.Query( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
@@ -113,11 +120,16 @@ namespace Sanoid.ConfigConsole
                     }
                 }
 
-                if ( !globalWindowNull && !_globalConfigurationWindow!.ValidateGlobalConfigValues( ) )
+                switch ( globalWindowNull )
                 {
-                    Logger.Warn("Global configuration input validation failed. Configuration not saved.");
-                    MessageBox.ErrorQuery( "Invalid Global Configuration", "One or more entries in the global configuration window are invalid. Correct any invalid entries and try again.", "OK" );
-                    return;
+                    case true:
+                        Logger.Warn( "Global Configuration Window was still null when we tried to access it. Creating new instance" );
+                        _globalConfigurationWindow = new( );
+                        break;
+                    case false when !_globalConfigurationWindow!.ValidateGlobalConfigValues( ):
+                        Logger.Warn( "Global configuration input validation failed. Configuration not saved." );
+                        MessageBox.ErrorQuery( "Invalid Global Configuration", "One or more entries in the global configuration window are invalid. Correct any invalid entries and try again.", "OK" );
+                        return;
                 }
 
                 if ( !templateWindowNull && isAnyTemplateModified )
@@ -127,12 +139,13 @@ namespace Sanoid.ConfigConsole
                     {
                         return;
                     }
+
                     TemplateConfigurationWindow.CommitModifiedTemplates( );
                 }
 
                 SanoidSettings newSettingsToSave = new( )
                 {
-                    DryRun = _globalConfigurationWindow.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
+                    DryRun = _globalConfigurationWindow!.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
                     TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
                     PruneSnapshots = _globalConfigurationWindow.pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
                     ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
@@ -141,7 +154,7 @@ namespace Sanoid.ConfigConsole
                     CacheDirectory = Program.Settings.CacheDirectory
                 };
 
-                (bool status, string reasonOrFile) = ContinueWithSave( newSettingsToSave );
+                ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
 
                 if ( status )
                 {
@@ -167,7 +180,7 @@ namespace Sanoid.ConfigConsole
                 EnableEventHandlers( );
             }
 
-            static (bool,string) ContinueWithSave( SanoidSettings settings )
+            static (bool, string) ContinueWithSave( SanoidSettings settings )
             {
                 using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
                 {
@@ -183,7 +196,7 @@ namespace Sanoid.ConfigConsole
 
                     if ( globalConfigSaveDialog.FileName.IsEmpty )
                     {
-                        return (false,"no file name");
+                        return ( false, "no file name" );
                     }
 
                     string path = globalConfigSaveDialog.FilePath.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" );
@@ -203,25 +216,25 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-
         private void ShowGlobalConfigurationWindow( )
         {
             if ( _templateConfigurationWindowShown )
             {
-                HideTemplateConfigurationWindow();
+                HideTemplateConfigurationWindow( );
             }
 
             if ( _zfsConfigurationWindowShown )
             {
-                HideZfsConfigurationWindow();
+                HideZfsConfigurationWindow( );
             }
+
             _globalConfigurationWindow ??= new( );
             Add( _globalConfigurationWindow );
             if ( ShowChild( _globalConfigurationWindow ) )
             {
                 _globalConfigurationWindowShown = true;
-                _globalConfigurationWindow.dryRunRadioGroup.SetFocus();
-                Logger.Debug("Showing global configuration window");
+                _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
+                Logger.Debug( "Showing global configuration window" );
                 globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
                 globalConfigMenuItem.Title = "Hide _Global Configuration Window";
             }
@@ -244,19 +257,20 @@ namespace Sanoid.ConfigConsole
         {
             if ( _globalConfigurationWindowShown )
             {
-                HideGlobalConfigurationWindow();
+                HideGlobalConfigurationWindow( );
             }
 
             if ( _zfsConfigurationWindowShown )
             {
-                HideZfsConfigurationWindow();
+                HideZfsConfigurationWindow( );
             }
+
             _templateConfigurationWindow ??= new( );
             Add( _templateConfigurationWindow );
             if ( ShowChild( _templateConfigurationWindow ) )
             {
                 _templateConfigurationWindowShown = true;
-                _templateConfigurationWindow.templateListView.SetFocus();
+                _templateConfigurationWindow.templateListView.SetFocus( );
                 Logger.Debug( "Showing template configuration window" );
                 templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
                 templateConfigMenuItem.Title = "Hide _Template Configuration Window";
@@ -267,7 +281,7 @@ namespace Sanoid.ConfigConsole
             }
         }
 
-        private void HideTemplateConfigurationWindow()
+        private void HideTemplateConfigurationWindow( )
         {
             Remove( _templateConfigurationWindow );
             templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
@@ -284,21 +298,23 @@ namespace Sanoid.ConfigConsole
                 zfsConfigMenuItem.Action = null;
                 return;
             }
+
             if ( _globalConfigurationWindowShown )
             {
-                HideGlobalConfigurationWindow();
+                HideGlobalConfigurationWindow( );
             }
 
             if ( _templateConfigurationWindowShown )
             {
-                HideTemplateConfigurationWindow();
+                HideTemplateConfigurationWindow( );
             }
+
             _zfsConfigurationWindow ??= new( );
             Add( _zfsConfigurationWindow );
             if ( ShowChild( _zfsConfigurationWindow ) )
             {
                 _zfsConfigurationWindowShown = true;
-                _zfsConfigurationWindow.zfsTreeView.SetFocus();
+                _zfsConfigurationWindow.zfsTreeView.SetFocus( );
                 Logger.Debug( "Showing ZFS configuration window" );
                 zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
                 zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
@@ -323,13 +339,6 @@ namespace Sanoid.ConfigConsole
             quitMenuItem.Action = Application.Top.RequestStop;
             IsMdiContainer = true;
         }
-
-        private bool _eventsEnabled;
-
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-        private bool _templateConfigurationWindowShown;
-        private bool _zfsConfigurationWindowShown;
-        private bool _globalConfigurationWindowShown;
 
         private void SanoidConfigConsoleOnReady( )
         {
