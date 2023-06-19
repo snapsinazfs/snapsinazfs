@@ -451,22 +451,22 @@ internal static class ZfsTasks
             {
                 case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
                     Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
-                    break;
+                    continue;
                 case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
-                    break;
+                    continue;
                 case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
                     Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
-                    break;
+                    continue;
                 case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
-                    break;
+                    continue;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
                     Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, string.Join( ", ", propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ) ) );
-                    break;
+                    continue;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
                     Logger.Debug( "No missing properties in pool {0}", poolName );
-                    break;
+                    continue;
             }
 
         }
