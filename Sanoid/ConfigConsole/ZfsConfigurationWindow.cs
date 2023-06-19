@@ -579,8 +579,15 @@ namespace Sanoid.ConfigConsole
             recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
             recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
             recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
-            Logger.Trace( "Looking for index of {0} in TemplateListItems collection", SelectedTreeNode.TreeDataset.Template.Value );
-            templateListView.SelectedItem = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
+            int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
+            if ( templateIndex == -1 )
+            {
+                MessageBox.ErrorQuery( "Template Not Found", $"The template \"{SelectedTreeNode.TreeDataset.Template.Value}\", for {SelectedTreeNode.TreeDataset.Kind} \"{SelectedTreeNode.TreeDataset.Name}\", was not found in Sanoid.net's configuration.\nIs the template defined in one of the expected Sanoid[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.", "OK - ZFS Configuration Window will be disabled for this session" );
+                SanoidConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
+                this.SuperView.Remove( this );
+                return;
+            }
+            templateListView.SelectedItem = templateIndex;
             templateListView.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
             templateListView.EnsureSelectedItemVisible( );
             templateSourceTextField.Text = SelectedTreeNode.TreeDataset.Template.InheritedFrom;

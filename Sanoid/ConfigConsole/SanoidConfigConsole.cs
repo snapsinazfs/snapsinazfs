@@ -42,6 +42,8 @@ namespace Sanoid.ConfigConsole
             Application.RootKeyEvent += ApplicationRootKeyEvent;
         }
 
+        public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
+
         private bool ApplicationRootKeyEvent( KeyEvent e )
         {
             if ( e.IsCtrl )
@@ -275,6 +277,13 @@ namespace Sanoid.ConfigConsole
 
         private void ShowZfsConfigurationWindow( )
         {
+            if ( ZfsConfigurationWindowDisabledDueToError )
+            {
+                MessageBox.ErrorQuery( "ZFS Configuration Disabled", "ZFS Configuration Window has been disabled due to errors in configuration.\nResolve any reported errors and run the Configuration Console again.", "Bummer" );
+                zfsConfigMenuItem.CanExecute = ( ) => false;
+                zfsConfigMenuItem.Action = null;
+                return;
+            }
             if ( _globalConfigurationWindowShown )
             {
                 HideGlobalConfigurationWindow();
