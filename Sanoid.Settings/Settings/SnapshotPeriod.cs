@@ -4,10 +4,11 @@
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
-using System.Reflection.Metadata.Ecma335;
-
 namespace Sanoid.Settings.Settings;
 
+/// <summary>
+///     A class for extra convenience when dealing with the <see cref="SnapshotPeriodKind" /> enum
+/// </summary>
 public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<SnapshotPeriod>
 {
     private SnapshotPeriod( SnapshotPeriodKind kind )
@@ -15,16 +16,62 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         Kind = kind;
     }
 
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Daily" />
+    /// </summary>
     public static SnapshotPeriod Daily { get; } = new( SnapshotPeriodKind.Daily );
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Frequent" />
+    /// </summary>
     public static SnapshotPeriod Frequent { get; } = new( SnapshotPeriodKind.Frequent );
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Hourly" />
+    /// </summary>
     public static SnapshotPeriod Hourly { get; } = new( SnapshotPeriodKind.Hourly );
-    public SnapshotPeriodKind Kind { get; set; }
+
+    /// <summary>
+    ///     Gets the <see cref="SnapshotPeriodKind" /> value for this object
+    /// </summary>
+    public SnapshotPeriodKind Kind { get; }
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Manual" />
+    /// </summary>
     public static SnapshotPeriod Manual { get; } = new( SnapshotPeriodKind.Manual );
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Monthly" />
+    /// </summary>
     public static SnapshotPeriod Monthly { get; } = new( SnapshotPeriodKind.Monthly );
 
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to
+    ///     <see cref="SnapshotPeriodKind.Temporary" />
+    /// </summary>
     public static SnapshotPeriod Temporary { get; } = new( SnapshotPeriodKind.Temporary );
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Weekly" />
+    /// </summary>
     public static SnapshotPeriod Weekly { get; } = new( SnapshotPeriodKind.Weekly );
+
+    /// <summary>
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Yearly" />
+    /// </summary>
     public static SnapshotPeriod Yearly { get; } = new( SnapshotPeriodKind.Yearly );
+
+    private const string DailyString = "daily";
+    private const string FrequentString = "frequently";
+
+    private const string HourlyString = "hourly";
+    private const string ManualString = "manual";
+    private const string MonthlyString = "monthly";
+    private const string TemporaryString = "temporary";
+    private const string UnsetString = "-";
+    private const string WeeklyString = "weekly";
+    private const string YearlyString = "yearly";
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException"><paramref name="other" /> and this instance are not the same type.</exception>
@@ -50,33 +97,41 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         return this;
     }
 
+    /// <summary>
+    ///     Implicit or explicit conversion to <see langword="string" />, for the given <see cref="SnapshotPeriod" /> object
+    /// </summary>
+    /// <param name="self"></param>
     public static implicit operator string( SnapshotPeriod self )
     {
         return self.Kind switch
         {
-            SnapshotPeriodKind.Temporary => "temporary",
-            SnapshotPeriodKind.Frequent => "frequently",
-            SnapshotPeriodKind.Hourly => "hourly",
-            SnapshotPeriodKind.Daily => "daily",
-            SnapshotPeriodKind.Weekly => "weekly",
-            SnapshotPeriodKind.Monthly => "monthly",
-            SnapshotPeriodKind.Yearly => "yearly",
-            SnapshotPeriodKind.Manual => "manual",
-            _ => "-"
+            SnapshotPeriodKind.Temporary => TemporaryString,
+            SnapshotPeriodKind.Frequent => FrequentString,
+            SnapshotPeriodKind.Hourly => HourlyString,
+            SnapshotPeriodKind.Daily => DailyString,
+            SnapshotPeriodKind.Weekly => WeeklyString,
+            SnapshotPeriodKind.Monthly => MonthlyString,
+            SnapshotPeriodKind.Yearly => YearlyString,
+            SnapshotPeriodKind.Manual => ManualString,
+            _ => UnsetString
         };
     }
 
+    /// <summary>
+    ///     Explicit conversion from <see langword="string" /> to <see cref="SnapshotPeriod" />
+    /// </summary>
+    /// <param name="value"></param>
     public static explicit operator SnapshotPeriod( string value )
     {
         return value switch
         {
-            "frequently" => Frequent,
-            "hourly" => Hourly,
-            "daily" => Daily,
-            "weekly" => Weekly,
-            "monthly" => Monthly,
-            "yearly" => Yearly,
-            "manual" => Manual,
+            FrequentString => Frequent,
+            HourlyString => Hourly,
+            DailyString => Daily,
+            WeeklyString => Weekly,
+            MonthlyString => Monthly,
+            YearlyString => Yearly,
+            ManualString => Manual,
             _ => Temporary
         };
     }

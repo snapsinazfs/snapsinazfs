@@ -95,21 +95,34 @@ public record SnapshotTimingSettings
     [JsonPropertyOrder( 11 )]
     public required TimeOnly YearlyTime { get; init; }
 
-    public static SnapshotTimingSettings GetDefault( ) => new( )
+    /// <summary>
+    ///     Gets a default instance of a <see cref="SnapshotTimingSettings" /> object, with hard-coded default values
+    /// </summary>
+    /// <returns></returns>
+    public static SnapshotTimingSettings GetDefault( )
     {
-        UseLocalTime = true,
-        FrequentPeriod = 15,
-        HourlyMinute = 0,
-        DailyTime = TimeOnly.MinValue,
-        WeeklyDay = DayOfWeek.Monday,
-        WeeklyTime = TimeOnly.MinValue,
-        MonthlyDay = 1,
-        MonthlyTime = TimeOnly.MinValue,
-        YearlyMonth = 1,
-        YearlyDay = 1,
-        YearlyTime = TimeOnly.MinValue
-    };
+        return new( )
+        {
+            UseLocalTime = true,
+            FrequentPeriod = 15,
+            HourlyMinute = 0,
+            DailyTime = TimeOnly.MinValue,
+            WeeklyDay = DayOfWeek.Monday,
+            WeeklyTime = TimeOnly.MinValue,
+            MonthlyDay = 1,
+            MonthlyTime = TimeOnly.MinValue,
+            YearlyMonth = 1,
+            YearlyDay = 1,
+            YearlyTime = TimeOnly.MinValue
+        };
+    }
 
+    /// <summary>
+    ///     Gets the period of the hour the given <paramref name="timestamp" /> is in, according to the value set for
+    ///     <see cref="FrequentPeriod" />
+    /// </summary>
+    /// <param name="timestamp"></param>
+    /// <returns></returns>
     public int GetPeriodOfHour( DateTimeOffset timestamp )
     {
         return timestamp.Minute / FrequentPeriod;
