@@ -18,7 +18,7 @@ public record SanoidSettings
     ///     Gets or sets sanoid.net's directory for temporary files
     /// </summary>
     [JsonPropertyOrder( 6 )]
-    public string CacheDirectory { get; set; }
+    public string CacheDirectory { get; set; } = "/var/cache/sanoid";
 
     /// <summary>
     ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS
@@ -49,11 +49,11 @@ public record SanoidSettings
     ///     Gets or sets the path to the zfs utility
     /// </summary>
     [JsonPropertyOrder( 4 )]
-    public string ZfsPath { get; set; }
+    public string ZfsPath { get; set; } = "/usr/local/sbin/zfs";
 
     /// <summary>
     ///     Gets or sets the path to the zpool utility
     /// </summary>
     [JsonPropertyOrder( 5 )]
-    public string ZpoolPath { get; set; }
+    public string ZpoolPath { get; set; } = "/usr/local/sbin/zpool";
 }
