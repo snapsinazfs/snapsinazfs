@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -472,11 +472,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         List<string> poolRootNames = new( );
-        Logger.Debug("Getting pool names for parallel property retrieval");
+        Logger.Debug( "Getting pool names for parallel property retrieval" );
         await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", "-Ho name" ).ConfigureAwait( true ) )
         {
             poolRootNames.Add( zpoolListLine.Trim( ) );
         }
+
         string datasetPropertiesString = ZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( );
         Logger.Debug( "Getting all dataset configurations from ZFS" );
         Task[] zfsGetDatasetTasks =
@@ -517,12 +518,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 {
                     if ( dsName.GetZfsPathParent( ) == dsName )
                     {
-                        Logger.Debug("Dataset {0} is a pool root",dsName  );
+                        Logger.Debug( "Dataset {0} is a pool root", dsName );
                         if ( datasets.TryAdd( dsName, new( dsName, propertyValue, null, true ) ) )
                         {
                             Logger.Debug( "Added Dataset {0} to collection", dsName );
                             continue;
                         }
+
                         Logger.Error( "Failed adding root dataset {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName );
                         continue;
                     }
@@ -749,11 +751,11 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetRootPoolsAndPropertyValidityAsync( )
+    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
         string zfsGetArgs = $"{string.Join( ',', ZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0";
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get",zfsGetArgs ).ConfigureAwait( true ) )
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             string poolName = lineTokens[ 0 ];
@@ -764,7 +766,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
             {
-                ConcurrentDictionary<string,bool> newDs = new( )
+                ConcurrentDictionary<string, bool> newDs = new( )
                 {
                     [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
                 };
@@ -782,7 +784,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 if ( source == "-" )
                 {
                     return false;
-
                 }
 
                 return name switch
@@ -822,14 +823,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        List<string> setStrings = new();
+        List<string> setStrings = new( );
 
         foreach ( string propName in properties )
         {
             setStrings.Add( ZfsProperty.DefaultDatasetProperties[ propName ].SetString );
         }
 
-        string propertiesSetString = string.Join( ' ',  setStrings );
+        string propertiesSetString = string.Join( ' ', setStrings );
         Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
         {
@@ -841,9 +842,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             return false;
         }
+
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
         {
-
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             try
             {
@@ -903,6 +904,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             return false;
         }
+
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
         {
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
