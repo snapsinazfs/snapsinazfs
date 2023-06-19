@@ -108,6 +108,8 @@ internal class Program
                                                .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
                                                .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
                                                .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
+                                           #endif
+                                           #if ALLOW_ADJACENT_CONFIG_FILE
                                                .AddJsonFile( "Sanoid.local.json", true, false )
                                            #endif
                                                .Build( );
