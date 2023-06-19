@@ -440,7 +440,7 @@ internal static class ZfsTasks
                 }
 
                 Logger.Debug( "Pool root {0} has missing or invalid property {1}", poolName, propName );
-                if ( !missingPropertiesFound )
+                if ( !missingPropertiesFoundForPool )
                 {
                     missingPropertiesFound = missingPropertiesFoundForPool = true;
                 }
