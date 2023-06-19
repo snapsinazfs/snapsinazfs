@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
 // from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
@@ -204,7 +204,7 @@ internal static class ZfsTasks
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        ParallelOptions options = new() { MaxDegreeOfParallelism = 4, TaskScheduler = null };
+        ParallelOptions options = new( ) { MaxDegreeOfParallelism = 4, TaskScheduler = null };
         await Parallel.ForEachAsync( datasets.Values, options, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( true ) ).ConfigureAwait( true );
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
@@ -226,7 +226,6 @@ internal static class ZfsTasks
                 Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
                 return;
             }
-
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
@@ -429,7 +428,7 @@ internal static class ZfsTasks
 
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( true );
         bool missingPropertiesFound = false;
-        foreach ( (string poolName, ConcurrentDictionary<string, bool>? propertyValidities) in poolRootsWithPropertyValidities )
+        foreach ( ( string poolName, ConcurrentDictionary<string, bool>? propertyValidities ) in poolRootsWithPropertyValidities )
         {
             Logger.Debug( "Checking property validities for pool root {0}", poolName );
             bool missingPropertiesFoundForPool = false;
@@ -440,6 +439,7 @@ internal static class ZfsTasks
                     Logger.Trace( "Not interested in property {0} for pool root schema check", propName );
                     continue;
                 }
+
                 Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
                 if ( propValue )
                 {
@@ -453,6 +453,7 @@ internal static class ZfsTasks
                     missingPropertiesFound = missingPropertiesFoundForPool = true;
                 }
             }
+
             Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
 
             switch ( args )
@@ -476,19 +477,18 @@ internal static class ZfsTasks
                     Logger.Debug( "No missing properties in pool {0}", poolName );
                     continue;
             }
-
         }
 
         return new( poolRootsWithPropertyValidities, missingPropertiesFound );
     }
 
     /// <summary>
-    /// Gets the pool roots with all sanoid.net properties and capacity properties
+    ///     Gets the pool roots with all sanoid.net properties and capacity properties
     /// </summary>
     /// <param name="zfsCommandRunner"></param>
     /// <returns></returns>
     /// <remarks>Should only be called once schema validity has been checked, or else results are undefined and unsupported</remarks>
-    public static async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithPropertiesAndCapacities(IZfsCommandRunner zfsCommandRunner )
+    public static async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithPropertiesAndCapacities( IZfsCommandRunner zfsCommandRunner )
     {
         ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
 
