@@ -36,7 +36,6 @@ namespace Sanoid.ConfigConsole
         private bool _eventsEnabled;
         private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
 
-        [NotNull]
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
         private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
@@ -228,18 +227,6 @@ namespace Sanoid.ConfigConsole
             if ( viewData.RadioGroup.GetSelectedLabelString( ) != SelectedTreeNode.TreeDataset.Recursion.Value )
             {
                 UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
-            }
-            UpdateFieldsForSelectedTreeNode( );
-            UpdateButtonState( );
-        }
-
-        private void RetentionTextFieldOnLeave( FocusEventArgs e )
-        {
-            ArgumentNullException.ThrowIfNull( e, nameof( e ) );
-            RetentionTextValidateFieldViewData viewData = (RetentionTextValidateFieldViewData)e.View.Data;
-            if ( viewData.ValueTextField.Text.ToInt32( -1 ) != ( (ZfsProperty<int>)SelectedTreeNode.TreeDataset[ viewData.PropertyName ] ).Value )
-            {
-                UpdateSelectedItemTextValidateFieldIntProperty( viewData, "local" );
             }
             UpdateFieldsForSelectedTreeNode( );
             UpdateButtonState( );
@@ -439,6 +426,13 @@ namespace Sanoid.ConfigConsole
             ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
             _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
             viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
+        }
+
+        private void UpdateSelectedItemIntProperty(TextValidateField field, string propertyName, int propertyValue, string? propertySource = null )
+        {
+            ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( propertyName, propertyValue, propertySource ?? SelectedTreeNode.TreeDataset[ propertyName ].Source );
+            _modifiedPropertiesSinceLastSaveForCurrentItem[ propertyName ] = newProperty;
+            field.ColorScheme = SelectedTreeNode.TreeDataset[ propertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
         }
 
         private void UpdateSelectedItemTextValidateFieldIntProperty( RetentionTextValidateFieldViewData viewData, string? propertySource = null )
@@ -673,16 +667,212 @@ namespace Sanoid.ConfigConsole
             recursionRadioGroup.SelectedItemChanged -= RecursionRadioGroupSelectedItemChanged;
             recursionRadioGroup.MouseClick -= StringRadioGroupOnMouseClick;
             templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
-            retentionFrequentTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionHourlyTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionDailyTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionWeeklyTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionMonthlyTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionYearlyTextField.Leave -= RetentionTextFieldOnLeave;
-            retentionPruneDeferralTextField.Leave -= RetentionTextFieldOnLeave;
+            retentionFrequentTextField.Leave -= RetentionFrequentTextFieldOnLeave;
+            retentionHourlyTextField.Leave -= RetentionHourlyTextFieldOnLeave;
+            retentionDailyTextField.Leave -= RetentionDailyTextFieldOnLeave;
+            retentionWeeklyTextField.Leave -= RetentionWeeklyTextFieldOnLeave;
+            retentionMonthlyTextField.Leave -= RetentionMonthlyTextFieldOnLeave;
+            retentionYearlyTextField.Leave -= RetentionYearlyTextFieldOnLeave;
+            retentionPruneDeferralTextField.Leave -= RetentionPruneDeferralTextFieldOnLeave;
             saveCurrentButton.Clicked -= SaveCurrentButtonOnClicked;
             _eventsEnabled = false;
             Logger.Debug( "Event handlers for zfs configuration fields disabled" );
+        }
+
+        private void RetentionDailyTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionDailyTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionDailyPropertyName, retentionDailyTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Daily snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionDailyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionDailyTextField, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionWeeklyTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionWeeklyTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, retentionWeeklyTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionMonthlyTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionMonthlyTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, retentionMonthlyTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionMonthlyTextField, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionYearlyTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionYearlyTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, retentionYearlyTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionYearlyTextField, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionHourlyTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionHourlyTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, retentionHourlyTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionHourlyTextField, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionPruneDeferralTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionPruneDeferralTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
+        }
+
+        private void RetentionFrequentTextFieldOnLeave( FocusEventArgs e )
+        {
+            try
+            {
+                DisableEventHandlers( );
+                int fieldIntValue = retentionFrequentTextField.Text.ToInt32( -1 );
+                ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ];
+                if ( fieldIntValue < min || fieldIntValue > max )
+                {
+                    Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, retentionFrequentTextField.Text, min, max );
+                    MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Frequent snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                    retentionFrequentTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.Value.ToString( );
+                    return;
+                }
+
+                if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.Value )
+                {
+                    UpdateSelectedItemIntProperty( retentionFrequentTextField, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, fieldIntValue, "local" );
+                }
+            }
+            finally
+            {
+                UpdateFieldsForSelectedTreeNode( false );
+                UpdateButtonState( );
+                EnableEventHandlers( );
+            }
         }
 
         private async void RefreshZfsTreeViewFromZfs( )
@@ -711,13 +901,13 @@ namespace Sanoid.ConfigConsole
             recursionRadioGroup.SelectedItemChanged += RecursionRadioGroupSelectedItemChanged;
             recursionRadioGroup.MouseClick += StringRadioGroupOnMouseClick;
             templateListView.SelectedItemChanged += TemplateListViewOnSelectedItemChanged;
-            retentionFrequentTextField.Leave += RetentionTextFieldOnLeave;
-            retentionHourlyTextField.Leave += RetentionTextFieldOnLeave;
-            retentionDailyTextField.Leave += RetentionTextFieldOnLeave;
-            retentionWeeklyTextField.Leave += RetentionTextFieldOnLeave;
-            retentionMonthlyTextField.Leave += RetentionTextFieldOnLeave;
-            retentionYearlyTextField.Leave += RetentionTextFieldOnLeave;
-            retentionPruneDeferralTextField.Leave += RetentionTextFieldOnLeave;
+            retentionFrequentTextField.Leave += RetentionFrequentTextFieldOnLeave;
+            retentionHourlyTextField.Leave += RetentionHourlyTextFieldOnLeave;
+            retentionDailyTextField.Leave += RetentionDailyTextFieldOnLeave;
+            retentionWeeklyTextField.Leave += RetentionWeeklyTextFieldOnLeave;
+            retentionMonthlyTextField.Leave += RetentionMonthlyTextFieldOnLeave;
+            retentionYearlyTextField.Leave += RetentionYearlyTextFieldOnLeave;
+            retentionPruneDeferralTextField.Leave += RetentionPruneDeferralTextFieldOnLeave;
             saveCurrentButton.Clicked += SaveCurrentButtonOnClicked;
             _eventsEnabled = true;
             Logger.Debug( "Event handlers for zfs configuration fields enabled" );
