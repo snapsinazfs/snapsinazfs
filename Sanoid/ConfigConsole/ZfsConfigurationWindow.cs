@@ -537,7 +537,6 @@ namespace Sanoid.ConfigConsole
             pruneSnapshotsSourceTextField.Clear( );
             recursionRadioGroup.Clear( );
             recursionSourceTextField.Clear( );
-            templateListView.Clear( );
             templateSourceTextField.Clear( );
             retentionFrequentTextField.Clear( );
             retentionHourlyTextField.Clear( );
@@ -580,7 +579,7 @@ namespace Sanoid.ConfigConsole
             recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { "sanoid" => 0, "zfs" => 1, _ => throw new InvalidOperationException( "Invalid recursion value" ) };
             recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
             recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
-            templateListView.SetSource( ConfigConsole.TemplateListItems );
+            Logger.Trace( "Looking for index of {0} in TemplateListItems collection", SelectedTreeNode.TreeDataset.Template.Value );
             templateListView.SelectedItem = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
             templateListView.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
             templateListView.EnsureSelectedItemVisible( );
