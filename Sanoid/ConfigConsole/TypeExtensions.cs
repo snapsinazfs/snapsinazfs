@@ -151,13 +151,9 @@ public static class TypeExtensions
                 return fallbackValue;
             }
 
-            return value.ToString( ) switch
-            {
-                // This case is checking if it's a non-null string, and if it can be parsed as an integer
-                // All other conditions will throw an ArgumentOutOfRangeException for value
-                { } stringValue when int.TryParse( stringValue, out int intValue ) => intValue,
-                _ => fallbackValue
-            };
+            string stringValue = value.ToString( )!;
+
+            return int.TryParse( stringValue, out int intValue ) ? intValue : fallbackValue;
         }
         catch
         {
