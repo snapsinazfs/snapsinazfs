@@ -432,6 +432,11 @@ internal static class ZfsTasks
             bool missingPropertiesFoundForPool = false;
             foreach ( ( string propName, bool propValue ) in propertyValidities )
             {
+                if ( !ZfsProperty.DefaultDatasetProperties.ContainsKey( propName ) )
+                {
+                    Logger.Trace( "Not interested in property {0} for pool root schema check", propName );
+                    continue;
+                }
                 Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
                 if ( propValue )
                 {
