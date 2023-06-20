@@ -95,9 +95,6 @@ build-release:
 
 reinstall:	uninstall	clean	install
 
-restore:
-	dotnet restore -f
-
 install:	install-release	|	install-config	install-doc
 
 install-config:	install-config-local	|	install-config-base
