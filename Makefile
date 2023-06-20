@@ -105,6 +105,21 @@ restore:
 
 install:	install-release	install-doc
 
+install-config: install-config-local	|	install-config-base
+
+install-config-base:
+	install --backup=existing -D -C -v -m 444 -t $(LOCALSHAREDIR)/Sanoid.net/ $(PUBLISHBASECONFIGFILELIST)
+
+#This target installs a fresh copy of the built Sanoid.local.json to $(SANOIDETCDIR)/Sanoid.local.json
+install-config-local:
+	[ ! -d /etc/sanoid ] && [ -w /etc ] && mkdir -p /etc/sanoid || true
+	install --backup=existing -C -v -m 660 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
+
+install-doc:
+	install -C -v $(SANOIDDOCDIR)/Sanoid.1 $(MANDIR)/man1/Sanoid.1
+	cp -l $(MANDIR)/man1/Sanoid.1 $(MANDIR)/man1/Sanoid.net.1
+	mandb
+
 install-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
 	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -o $(RELEASEPUBLISHDIR) Sanoid/Sanoid.csproj
