@@ -17,6 +17,12 @@ PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/Sanoid.monitoring.schema.json 
 SANOIDDOCDIR ?= $(SANOID_DOTNET_SOLUTION_ROOT)/Documentation
 MANDIR ?= /usr/local/man
 
+LOCALSBINDIR ?= /usr/local/sbin
+LOCALSHAREDIR ?= /usr/local/share
+ETCDIR ?= /etc
+
+SANOIDETCDIR ?= $(ETCDIR)/sanoid
+
 all:	clean-release   restore build-release
 
 clean:  clean-all
