@@ -128,8 +128,8 @@ uninstall-config-local:
 	rmdir -v $(SANOIDETCDIR) 2>/dev/null
 
 uninstall-doc:
-	rm -fv /usr/local/man/man1/Sanoid.1 2>/dev/null
-	rm -fv /usr/local/man/man1/Sanoid.net.1 2>/dev/null
+	rm -fv $(MANDIR)/man1/Sanoid.1 2>/dev/null
+	rm -fv $(MANDIR)/man1/Sanoid.net.1 2>/dev/null
 	mandb
 
 uninstall-everything:	uninstall	uninstall-config-local
