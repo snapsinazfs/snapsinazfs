@@ -85,9 +85,6 @@ extraclean:	clean-debug	clean-release
 
 build:	build-release
 
-build-doc:
-	
-
 build-debug:
 	mkdir -p $(DEBUGDIR)
 	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR)
