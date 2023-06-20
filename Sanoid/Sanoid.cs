@@ -55,6 +55,8 @@ internal class Program
             return (int)Errno.ECANCELED;
         }
 
+        SetCommandLineLoggingOverride( args );
+
         using Mutexes mutexes = Mutexes.Instance;
         using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\Sanoid.net" );
 
@@ -262,5 +264,28 @@ internal class Program
         Settings!.DryRun |= args.DryRun;
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
+    }
+
+    private static void SetCommandLineLoggingOverride( CommandLineArguments args )
+    {
+        if ( args.Debug )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Debug );
+        }
+
+        if ( args.Quiet )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Warn );
+        }
+
+        if ( args.ReallyQuiet )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Off );
+        }
+
+        if ( args.Trace )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Trace );
+        }
     }
 }

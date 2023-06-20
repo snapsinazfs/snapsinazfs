@@ -5,6 +5,7 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using Microsoft.Extensions.Configuration;
+using NLog.Config;
 using NLog.Extensions.Logging;
 
 namespace Sanoid.Common.Logging;
@@ -32,5 +33,18 @@ public static class LoggingSettings
                                                 .Build( );
 #pragma warning restore CA2000
         LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
+    }
+
+    public static void OverrideConsoleLoggingLevel( LogLevel level )
+    {
+        if ( LogManager.Configuration == null )
+        {
+            return;
+        }
+
+        foreach ( LoggingRule? rule in LogManager.Configuration.LoggingRules )
+        {
+            rule?.SetLoggingLevels( level, LogLevel.Off );
+        }
     }
 }
