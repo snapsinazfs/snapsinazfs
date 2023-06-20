@@ -108,7 +108,7 @@ install-config-local:
 	install --backup=existing -C -v -m 660 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
 
 install-doc:
-	install -C -v $(SANOIDDOCDIR)/Sanoid.1 $(MANDIR)/man1/Sanoid.1
+	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.1 $(MANDIR)/man1/Sanoid.1
 	cp -l $(MANDIR)/man1/Sanoid.1 $(MANDIR)/man1/Sanoid.net.1
 	mandb
 
