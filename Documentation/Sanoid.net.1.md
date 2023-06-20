@@ -1,12 +1,12 @@
 % Sanoid.net(1) Sanoid.net 1.0.0-Beta1
-% Brandon Thetford
+% Brandon Thetford, Jim Salter
 % June 2023
 
 # Name
 Sanoid.net - Snapshot manager for ZFS on Linux
 
 # Synopsis
-**Sanoid.net** \[options\]
+**Sanoid** \[options\]
 
 # Description
 Sanoid.net is a snapshot manager for ZFS on Linux.
@@ -100,3 +100,9 @@ on output.
 **-V**, **\-\-version**, **-Version**
 : Outputs Sanoid.net version to configured logging targets and exits,
 performing no other operations.
+
+# Copyright
+Sanoid.net is created by Brandon Thetford and is based on sanoid, created by
+Jim Salter.\
+This software is licensed for use under the Free Software Foundation's
+GPL v3.0 license, or later. See https://www.gnu.org/licenses/gpl-3.0.html
