@@ -130,6 +130,13 @@ install-release:
 
 uninstall:	uninstall-release	uninstall-doc
 
+uninstall-config-base:
+	rm -fv $(LOCALSHAREDIR)/Sanoid.net/*.json 2>/dev/null
+
+uninstall-config-local:
+	rm -fv $(SANOIDETCDIR)/Sanoid.local.json 2>/dev/null
+	rmdir -v $(SANOIDETCDIR) 2>/dev/null
+
 uninstall-doc:
 	rm -fv /usr/local/man/man1/Sanoid.1
 	rm -fv /usr/local/man/man1/Sanoid.net.1
