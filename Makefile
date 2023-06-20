@@ -14,6 +14,9 @@ DEBUGPUBLISHDIR ?= $(PUBLISHROOT)/$(DEBUGCONFIG)
 PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/Sanoid.json $(RELEASEPUBLISHDIR)/Sanoid.nlog.json $(RELEASEPUBLISHDIR)/Sanoid.schema.json
 PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/Sanoid.monitoring.schema.json $(RELEASEPUBLISHDIR)/Sanoid.local.schema.json
 
+SANOIDDOCDIR ?= $(SANOID_DOTNET_SOLUTION_ROOT)/Documentation
+MANDIR ?= /usr/local/man
+
 all:	clean-release   restore build-release
 
 clean:  clean-all
@@ -86,12 +89,17 @@ build-release:
 	mkdir -p $(RELEASEDIR)
 	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 Sanoid/Sanoid.csproj
 
+install-doc:
+	install -C -v $(SANOIDDOCDIR)/Sanoid.1 $(MANDIR)/man1/Sanoid.1
+	cp -l $(MANDIR)/man1/Sanoid.1 $(MANDIR)/man1/Sanoid.net.1
+	mandb
+
 reinstall:	uninstall-release	clean-release	install-release
 
 restore:
 	dotnet restore -f
 
-install:	install-release
+install:	install-release	install-doc
 
 install-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
@@ -101,7 +109,12 @@ install-release:
 	install --backup=existing -C -v $(RELEASEPUBLISHDIR)/Sanoid.local.json /etc/sanoid/Sanoid.local.json
 	install --backup=existing -C -v $(RELEASEPUBLISHDIR)/Sanoid /usr/local/bin/Sanoid
 
-uninstall:	uninstall-release
+uninstall:	uninstall-release	uninstall-doc
+
+uninstall-doc:
+	rm -fv /usr/local/man/man1/Sanoid.1
+	rm -fv /usr/local/man/man1/Sanoid.net.1
+	mandb
 
 uninstall-release:
 	rm -rfv /usr/local/share/Sanoid.net
