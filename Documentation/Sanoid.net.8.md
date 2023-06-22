@@ -1,4 +1,4 @@
-% Sanoid.net(1) Sanoid.net 1.0.0-Beta1
+% Sanoid.net(8) Sanoid.net 1.0.0-Beta1
 % Brandon Thetford, Jim Salter
 % June 2023
 
