@@ -2,6 +2,7 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SnapsInAZfs.Settings.Settings;
@@ -52,6 +53,7 @@ public record FormattingSettings
     ///     portion of a snapshot name
     /// </summary>
     [JsonPropertyOrder( 3 )]
+    [StringSyntax(StringSyntaxAttribute.DateTimeFormat)]
     public required string TimestampFormatString { get; init; }
 
     /// <summary>
