@@ -24,7 +24,7 @@ public static class LoggingSettings
                                             #if WINDOWS
                                                 .AddJsonFile("SnapsInAZfs.nlog.json", true, false)
                                             #else
-                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs.net/SnapsInAZfs.nlog.json", false, false )
+                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", false, false )
                                                 .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, false )
                                                 .AddJsonFile( "SnapsInAZfs.nlog.json", true, false )
                                             #endif
