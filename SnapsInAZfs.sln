@@ -18,18 +18,18 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{ED331CBD-09F6-4C14-A686-D675761E4979}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\SnapsInAZfs.5 = Documentation\SnapsInAZfs.5
-		Documentation\SnapsInAZfs.8 = Documentation\SnapsInAZfs.8
 		Documentation\SnapsInAZfs.5.md = Documentation\SnapsInAZfs.5.md
+		Documentation\SnapsInAZfs.8 = Documentation\SnapsInAZfs.8
 		Documentation\SnapsInAZfs.8.md = Documentation\SnapsInAZfs.8.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs", "SnapsInAZfs\SnapsInAZfs.csproj", "{9E62331B-EE99-45B8-916F-04DA39EB3829}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Common", "SnapsInAZfs.Common\SnapsInAZfs.Common.csproj", "{CEEE37C5-6087-4794-97DD-7577D19FEBF2}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop", "SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj", "{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings", "SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj", "{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop.Tests", "SnapsInAZfs.Interop.Tests\SnapsInAZfs.Interop.Tests.csproj", "{527FCFD8-6D39-429F-B067-EDFB6A98AC97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,14 +47,6 @@ Global
 		{9E62331B-EE99-45B8-916F-04DA39EB3829}.Release|x64.Build.0 = Release|x64
 		{9E62331B-EE99-45B8-916F-04DA39EB3829}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
 		{9E62331B-EE99-45B8-916F-04DA39EB3829}.Release-R2R|x64.Build.0 = Release-R2R|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Debug|x64.ActiveCfg = Debug|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Debug|x64.Build.0 = Debug|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Debug-Windows|x64.ActiveCfg = Debug-Windows|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Debug-Windows|x64.Build.0 = Debug-Windows|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Release|x64.ActiveCfg = Release|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Release|x64.Build.0 = Release|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2}.Release-R2R|x64.Build.0 = Release-R2R|x64
 		{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}.Debug|x64.ActiveCfg = Debug|x64
 		{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}.Debug|x64.Build.0 = Debug|x64
 		{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}.Debug-Windows|x64.ActiveCfg = Debug-Windows|x64
@@ -71,15 +63,23 @@ Global
 		{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}.Release|x64.Build.0 = Release|x64
 		{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
 		{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}.Release-R2R|x64.Build.0 = Release-R2R|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Debug|x64.ActiveCfg = Debug|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Debug|x64.Build.0 = Debug|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Debug-Windows|x64.ActiveCfg = Debug-Windows|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Debug-Windows|x64.Build.0 = Debug-Windows|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Release|x64.ActiveCfg = Release|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Release|x64.Build.0 = Release|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97}.Release-R2R|x64.Build.0 = Release-R2R|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9E62331B-EE99-45B8-916F-04DA39EB3829} = {4D503858-739F-4BCE-92DA-10163F9EFA39}
-		{CEEE37C5-6087-4794-97DD-7577D19FEBF2} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 		{172C9DDB-CCFE-4E31-9F6D-A58A484D561E} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 		{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
+		{527FCFD8-6D39-429F-B067-EDFB6A98AC97} = {F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C48CFF09-F3F8-4708-B33C-C996B0B4C693}
