@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -257,12 +257,12 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             ZfsProperty p = parseResult.prop;
             if ( p.Name == "type" )
             {
-                Logger.Info( "New dataset is a {0:F}", p.Value );
+                Logger.Info( "New dataset is a {0}", p.Value );
                 string rootPathString = parseResult.parent.GetZfsPathRoot( );
                 bool isNewRoot = !datasets.ContainsKey( rootPathString );
                 Dataset newDs = new( parseResult.parent, p.Value, isNewRoot ? null : datasets[ rootPathString ], isNewRoot );
                 datasets.TryAdd( parseResult.parent, newDs );
-                Logger.Info( "New {0:F} {1} created and added to result dictionary", p.Value, newDs.Name );
+                Logger.Info( "New {0} {1} created and added to result dictionary", p.Value, newDs.Name );
             }
             else if ( datasets.TryGetValue( parseResult.parent, out Dataset? ds ) )
             {
