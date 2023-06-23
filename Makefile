@@ -1,9 +1,9 @@
-SANOID_DOTNET_SOLUTION_ROOT ?= .
+SNAPSINAZFS_SOLUTION_ROOT ?= .
 
-PROJECTFILE ?= $(SANOID_DOTNET_SOLUTION_ROOT)Sanoid/Sanoid.csproj
+PROJECTFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)SnapsInAZfs/SnapsInAZfs.csproj
 
-BUILDDIR ?= $(SANOID_DOTNET_SOLUTION_ROOT)/build
-PUBLISHROOT ?= $(SANOID_DOTNET_SOLUTION_ROOT)/publish
+BUILDDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/build
+PUBLISHROOT ?= $(SNAPSINAZFS_SOLUTION_ROOT)/publish
 RELEASECONFIG ?= Release-R2R
 RELEASEDIR ?= $(BUILDDIR)/$(RELEASECONFIG)
 RELEASEPUBLISHDIR ?= $(PUBLISHROOT)/$(RELEASECONFIG)
@@ -11,17 +11,17 @@ DEBUGCONFIG ?= Debug
 DEBUGDIR ?= $(BUILDDIR)/$(DEBUGCONFIG)
 DEBUGPUBLISHDIR ?= $(PUBLISHROOT)/$(DEBUGCONFIG)
 
-PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/Sanoid.json $(RELEASEPUBLISHDIR)/Sanoid.nlog.json $(RELEASEPUBLISHDIR)/Sanoid.schema.json
-PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/Sanoid.monitoring.schema.json $(RELEASEPUBLISHDIR)/Sanoid.local.schema.json
+PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/SnapsInAZfs.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.schema.json
+PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/SnapsInAZfs.monitoring.schema.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.schema.json
 
-SANOIDDOCDIR ?= $(SANOID_DOTNET_SOLUTION_ROOT)/Documentation
+SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
 MANDIR ?= /usr/local/man
 
 LOCALSBINDIR ?= /usr/local/sbin
 LOCALSHAREDIR ?= /usr/local/share
 ETCDIR ?= /etc
 
-SANOIDETCDIR ?= $(ETCDIR)/sanoid
+SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
 
 all:	build-release
 
@@ -33,22 +33,22 @@ clean-debug:
 	dotnet clean --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
 	[ -d $(DEBUGDIR) ] && rm -rvf $(DEBUGDIR) || true
 	rmdir -v $(BUILDDIR) || true
-	rm -rfv Sanoid/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv Sanoid/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v Sanoid/bin || true
-	rmdir -v Sanoid/obj || true
-	rm -rfv Sanoid.Common/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv Sanoid.Common/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v Sanoid.Common/bin || true
-	rmdir -v Sanoid.Common/obj || true
-	rm -rfv Sanoid.Interop/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv Sanoid.Interop/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v Sanoid.Interop/bin || true
-	rmdir -v Sanoid.Interop/obj || true
-	rm -rfv Sanoid.Settings/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv Sanoid.Settings/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v Sanoid.Settings/bin || true
-	rmdir -v Sanoid.Settings/obj || true
+	rm -rfv SnapsInAZfs/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs/bin || true
+	rmdir -v SnapsInAZfs/obj || true
+	rm -rfv SnapsInAZfs.Common/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Common/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Common/bin || true
+	rmdir -v SnapsInAZfs.Common/obj || true
+	rm -rfv SnapsInAZfs.Interop/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Interop/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Interop/bin || true
+	rmdir -v SnapsInAZfs.Interop/obj || true
+	rm -rfv SnapsInAZfs.Settings/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Settings/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Settings/bin || true
+	rmdir -v SnapsInAZfs.Settings/obj || true
 
 clean-release:
 	dotnet clean --configuration $(RELEASECONFIG) -o $(RELEASEDIR) 2>/dev/null
@@ -57,32 +57,32 @@ clean-release:
 	[ -d $(PUBLISHROOT) ]  && rm -rvf $(PUBLISHROOT) || true
 	rmdir -v $(PUBLISHROOT) || true
 	rmdir -v $(BUILDDIR) || true
-	rm -rfv Sanoid/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv Sanoid/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v Sanoid/bin || true
-	rmdir -v Sanoid/obj || true
-	rm -rfv Sanoid.Common/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv Sanoid.Common/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v Sanoid.Common/bin || true
-	rmdir -v Sanoid.Common/obj || true
-	rm -rfv Sanoid.Interop/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv Sanoid.Interop/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v Sanoid.Interop/bin || true
-	rmdir -v Sanoid.Interop/obj || true
-	rm -rfv Sanoid.Settings/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv Sanoid.Settings/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v Sanoid.Settings/bin || true
-	rmdir -v Sanoid.Settings/obj || true
+	rm -rfv SnapsInAZfs/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs/bin || true
+	rmdir -v SnapsInAZfs/obj || true
+	rm -rfv SnapsInAZfs.Common/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Common/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Common/bin || true
+	rmdir -v SnapsInAZfs.Common/obj || true
+	rm -rfv SnapsInAZfs.Interop/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Interop/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Interop/bin || true
+	rmdir -v SnapsInAZfs.Interop/obj || true
+	rm -rfv SnapsInAZfs.Settings/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv SnapsInAZfs.Settings/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v SnapsInAZfs.Settings/bin || true
+	rmdir -v SnapsInAZfs.Settings/obj || true
 
 extraclean:	clean-debug	clean-release
-	rm -rfv Sanoid/bin 2>/dev/null
-	rm -rfv Sanoid/obj 2>/dev/null
-	rm -rfv Sanoid.Common/bin 2>/dev/null
-	rm -rfv Sanoid.Common/obj 2>/dev/null
-	rm -rfv Sanoid.Interop/bin 2>/dev/null
-	rm -rfv Sanoid.Interop/obj 2>/dev/null
-	rm -rfv Sanoid.Settings/bin 2>/dev/null
-	rm -rfv Sanoid.Settings/obj 2>/dev/null
+	rm -rfv SnapsInAZfs/bin 2>/dev/null
+	rm -rfv SnapsInAZfs/obj 2>/dev/null
+	rm -rfv SnapsInAZfs.Common/bin 2>/dev/null
+	rm -rfv SnapsInAZfs.Common/obj 2>/dev/null
+	rm -rfv SnapsInAZfs.Interop/bin 2>/dev/null
+	rm -rfv SnapsInAZfs.Interop/obj 2>/dev/null
+	rm -rfv SnapsInAZfs.Settings/bin 2>/dev/null
+	rm -rfv SnapsInAZfs.Settings/obj 2>/dev/null
 
 
 build:	build-release
@@ -93,7 +93,7 @@ build-debug:
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 Sanoid/Sanoid.csproj
+	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 SnapsInAZfs/SnapsInAZfs.csproj
 
 reinstall:	uninstall	clean	install
 
@@ -102,82 +102,79 @@ install:	install-release	|	install-config	install-doc
 install-config:	install-config-local	|	install-config-base
 
 install-config-base:
-	install --backup=existing -D -C -v -m 664 -t $(LOCALSHAREDIR)/Sanoid.net/ $(PUBLISHBASECONFIGFILELIST)
+	install --backup=existing -D -C -v -m 664 -t $(LOCALSHAREDIR)/SnapsInAZfs/ $(PUBLISHBASECONFIGFILELIST)
 
 install-config-local:
-	[ ! -d /etc/sanoid ] && [ -w /etc ] && mkdir -p /etc/sanoid || true
-	[ ! /etc/sanoid/Sanoid.local.json ] && install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
+	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
+	[ ! $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json ] && install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json
 
 install-config-local-force:
-	[ ! -d /etc/sanoid ] && [ -w /etc ] && mkdir -p /etc/sanoid || true
-	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
+	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json
 
 install-doc:
-	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.8 $(MANDIR)/man8/Sanoid.8
-	cp -fl $(MANDIR)/man8/Sanoid.8 $(MANDIR)/man8/Sanoid.net.8
-	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.5 $(MANDIR)/man5/Sanoid.5
-	cp -fl $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.net.5
-	cp -fl $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.json.5
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
+	cp -fl $(MANDIR)/man8/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
+	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
+	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.json.5
 	mandb -q
 
 install-release:	publish-release
-	install --backup=existing -C -v -m 750 $(RELEASEPUBLISHDIR)/Sanoid $(LOCALSBINDIR)/Sanoid
-	cp -fs -v $(LOCALSBINDIR)/Sanoid $(LOCALSBINDIR)/Sanoid.net
+	install --backup=existing -C -v -m 750 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
+	cp -fs -v $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) Sanoid/Sanoid.csproj
+	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
 
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
 uninstall-config-base:
-	rm -fv $(LOCALSHAREDIR)/Sanoid.net/*.json 2>/dev/null
+	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
 
 uninstall-config-local:
-	rm -fv $(SANOIDETCDIR)/Sanoid.local.json 2>/dev/null
-	rmdir -v $(SANOIDETCDIR) 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json 2>/dev/null
+	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:
-	rm -fv $(MANDIR)/man8/Sanoid.8 2>/dev/null
-	rm -fv $(MANDIR)/man8/Sanoid.net.8 2>/dev/null
-	rm -fv $(MANDIR)/man5/Sanoid.5 2>/dev/null
-	rm -fv $(MANDIR)/man5/Sanoid.net.5 2>/dev/null
+	rm -fv $(MANDIR)/man8/SnapsInAZfs.8 2>/dev/null
+	rm -fv $(MANDIR)/man5/SnapsInAZfs.5 2>/dev/null
 	mandb -q
 
 uninstall-everything:	uninstall	uninstall-config-local
 
 uninstall-release:
-	rm -rfv $(LOCALSHAREDIR)/Sanoid.net 2>/dev/null
-	rm -fv $(LOCALSBINDIR)/Sanoid 2>/dev/null
-	tm -fv $(LOCALSBINDIR)/Sanoid.net 2>/dev/null
+	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
+	rm -fv $(LOCALSBINDIR)/SnapsInAZfs 2>/dev/null
 
 test:	test-everything
 
 test-everything:
-	dotnet test --settings=Sanoid.Common.Tests/everything.runsettings
+	dotnet test --settings=SnapsInAZfs.Common.Tests/everything.runsettings
 
 test-everything-dangerous:
-	dotnet test --settings=Sanoid.Common.Tests/everything-dangerous.runsettings
+	dotnet test --settings=SnapsInAZfs.Common.Tests/everything-dangerous.runsettings
 
 test-dangerous:
-	dotnet test --settings=Sanoid.Common.Tests/dangerous.runsettings
+	dotnet test --settings=SnapsInAZfs.Common.Tests/dangerous.runsettings
 
-save-sanoid-zfs-properties:
-	@test ! -s $(SANOID_DOTNET_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
+save-snapsinazfs-zfs-properties:
+	@test ! -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
 	@echo "#!/bin/bash -x" >propWipeUndoScript.sh
-	zfs get all -s local -rHo name,property,value | grep sanoid.net | while read obj prop val ; do echo zfs set $${prop}\=\"$${val}\" $${obj} >>propWipeUndoScript.sh ; done
+	zfs get all -s local -rHo name,property,value | grep snapsinazfs.com | while read obj prop val ; do echo zfs set $${prop}\=\"$${val}\" $${obj} >>propWipeUndoScript.sh ; done
 	chmod 774 propWipeUndoScript.sh
 	@echo Undo script saved as ./propWipeUndoScript
-	@echo Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore sanoid.net properties
+	@echo Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore snapsinazfs.com properties
 
-wipe-sanoid-zfs-properties:
-	@test -s $(SANOID_DOTNET_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Must save properties before wiping ; false ; }
-	zfs get all -s local -rHo name,property | grep sanoid.net | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
+wipe-snapsinazfs-zfs-properties:
+	@test -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Must save properties before wiping ; false ; }
+	zfs get all -s local -rHo name,property | grep snapsinazfs.com | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
 	$(info All properties removed)
 	$(info Run make restore-wiped-zfs-properties to restore configuration)
 
 restore-wiped-zfs-properties:
-	@test -s $(SANOID_DOTNET_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo No restore script. Did you forget to run make save-sanoid-zfs-properties\? ; false ; }
+	@test -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo No restore script. Did you forget to run make save-snapsinazfs-zfs-properties\? ; false ; }
 	./propWipeUndoScript.sh
-	$(info Properties restored to the state they were in when you last ran make save-sanoid-zfs-properties)
+	$(info Properties restored to the state they were in when you last ran make save-snapsinazfs-zfs-properties)
