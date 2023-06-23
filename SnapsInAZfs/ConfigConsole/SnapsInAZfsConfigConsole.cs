@@ -148,8 +148,7 @@ namespace SnapsInAZfs.ConfigConsole
                     PruneSnapshots = _globalConfigurationWindow.pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
                     ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
                     ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
-                    Templates = Program.Settings!.Templates,
-                    CacheDirectory = Program.Settings.CacheDirectory
+                    Templates = Program.Settings!.Templates
                 };
 
                 ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );

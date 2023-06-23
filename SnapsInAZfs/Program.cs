@@ -253,11 +253,6 @@ internal class Program
                 throw new UnauthorizedAccessException( cantWriteDirMessage );
             }
 
-            if ( Settings is not null )
-            {
-                Settings.CacheDirectory = args.CacheDir;
-            }
-
             Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
         }
 

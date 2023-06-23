@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
@@ -14,12 +12,6 @@ namespace SnapsInAZfs.Settings.Settings;
 /// </summary>
 public record SnapsInAZfsSettings
 {
-    /// <summary>
-    ///     Gets or sets sanoid.net's directory for temporary files
-    /// </summary>
-    [JsonPropertyOrder( 6 )]
-    public string CacheDirectory { get; set; } = "/var/cache/sanoid";
-
     /// <summary>
     ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS
     /// </summary>
@@ -42,7 +34,7 @@ public record SnapsInAZfsSettings
     ///     Gets or sets the templates sub-section
     /// </summary>
     // ReSharper disable once CollectionNeverUpdated.Global
-    [JsonPropertyOrder( 7 )]
+    [JsonPropertyOrder( 6 )]
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>

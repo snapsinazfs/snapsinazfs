@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 namespace SnapsInAZfs.Settings.Settings;
 
@@ -91,10 +89,23 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         return Kind.CompareTo( other );
     }
 
-    /// <inheritdoc />
-    public override string ToString( )
+    /// <summary>
+    ///     Explicit conversion from <see langword="string" /> to <see cref="SnapshotPeriod" />
+    /// </summary>
+    /// <param name="value"></param>
+    public static explicit operator SnapshotPeriod( string value )
     {
-        return this;
+        return value switch
+        {
+            FrequentString => Frequent,
+            HourlyString => Hourly,
+            DailyString => Daily,
+            WeeklyString => Weekly,
+            MonthlyString => Monthly,
+            YearlyString => Yearly,
+            ManualString => Manual,
+            _ => Temporary
+        };
     }
 
     /// <summary>
@@ -117,22 +128,9 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         };
     }
 
-    /// <summary>
-    ///     Explicit conversion from <see langword="string" /> to <see cref="SnapshotPeriod" />
-    /// </summary>
-    /// <param name="value"></param>
-    public static explicit operator SnapshotPeriod( string value )
+    /// <inheritdoc />
+    public override string ToString( )
     {
-        return value switch
-        {
-            FrequentString => Frequent,
-            HourlyString => Hourly,
-            DailyString => Daily,
-            WeeklyString => Weekly,
-            MonthlyString => Monthly,
-            YearlyString => Yearly,
-            ManualString => Manual,
-            _ => Temporary
-        };
+        return this;
     }
 }

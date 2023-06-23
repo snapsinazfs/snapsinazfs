@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Text.Json.Serialization;
 
@@ -79,26 +77,6 @@ public record FormattingSettings
     }
 
     /// <summary>
-    ///     Gets a default <see cref="FormattingSettings" /> object, with hard-coded default values
-    /// </summary>
-    /// <returns></returns>
-    public static FormattingSettings GetDefault( )
-    {
-        return new( )
-        {
-            Prefix = "autosnap",
-            ComponentSeparator = "_",
-            TimestampFormatString = "yyyy-MM-dd_HH\\:mm\\:ss",
-            FrequentSuffix = "frequently",
-            HourlySuffix = "hourly",
-            DailySuffix = "daily",
-            WeeklySuffix = "weekly",
-            MonthlySuffix = "monthly",
-            YearlySuffix = "yearly"
-        };
-    }
-
-    /// <summary>
     ///     Gets ONLY the snapshot name for a snapshot, using the given <paramref name="periodKind" /> and
     ///     <paramref name="timestamp" />, in conjunction with configured settings for this
     ///     object
@@ -117,5 +95,25 @@ public record FormattingSettings
             SnapshotPeriodKind.Manual => "manual",
             _ => throw new ArgumentOutOfRangeException( nameof( periodKind ), periodKind, null )
         }}";
+    }
+
+    /// <summary>
+    ///     Gets a default <see cref="FormattingSettings" /> object, with hard-coded default values
+    /// </summary>
+    /// <returns></returns>
+    public static FormattingSettings GetDefault( )
+    {
+        return new( )
+        {
+            Prefix = "autosnap",
+            ComponentSeparator = "_",
+            TimestampFormatString = "yyyy-MM-dd_HH\\:mm\\:ss",
+            FrequentSuffix = "frequently",
+            HourlySuffix = "hourly",
+            DailySuffix = "daily",
+            WeeklySuffix = "weekly",
+            MonthlySuffix = "monthly",
+            YearlySuffix = "yearly"
+        };
     }
 }

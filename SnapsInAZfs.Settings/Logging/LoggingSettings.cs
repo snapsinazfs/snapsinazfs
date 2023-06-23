@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using Microsoft.Extensions.Configuration;
 using NLog;
@@ -16,19 +14,19 @@ namespace SnapsInAZfs.Settings.Logging;
 public static class LoggingSettings
 {
     /// <summary>
-    ///     Configures NLog using Sanoid.nlog.json
+    ///     Configures NLog using SnapsInAZfs.nlog.json
     /// </summary>
     public static void ConfigureLogger( )
     {
 #pragma warning disable CA2000
         IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
                                             #if WINDOWS
-                                                .AddJsonFile("Sanoid.nlog.json", true, false)
+                                                .AddJsonFile("SnapsInAZfs.nlog.json", true, false)
                                             #else
-                                                .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.nlog.json", false, false )
-                                                .AddJsonFile( "/etc/sanoid/Sanoid.nlog.json", true, false )
-                                                .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.nlog.json" ), true, false )
-                                                .AddJsonFile( "Sanoid.nlog.json", true, false )
+                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs.net/SnapsInAZfs.nlog.json", false, false )
+                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, false )
+                                                .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/SnapsInAZfs.net/SnapsInAZfs.nlog.json" ), true, false )
+                                                .AddJsonFile( "SnapsInAZfs.nlog.json", true, false )
                                             #endif
                                                 .Build( );
 #pragma warning restore CA2000
