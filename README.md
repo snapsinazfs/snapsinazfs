@@ -8,44 +8,16 @@
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
 
- I may make an alphaor beta release tag soon and possibly provide a pre-built release, here on github. This comes with
- what should be the obvious disclaimer that this is an alpha/beta-stage project and you should not trust important
- systems with it.
- 
- ## Goals
-
- Ideally, the goal is to create a .net 7.0+ application having at least feature parity with the version/commit
- of sanoid that this project was originally forked fromwhich is sanoid release 2.1.0 plus all sanoid master branch commits up to
- [jimsalterjrs/sanoid@55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0](https://github.com/jimsalterjrs/sanoid/commit/55c5e0ee09df7664cf5ac84a43a167a0f65f1fc0)
-
- I have been making various changes and enhancements along the way, so far, especially in the area of configuration, which now uses native facilities provided by ZFS, via user properties.\
- This keeps all of the zfs-related configuration in ZFS itself, and makes the settings and how they are going to apply to each dataset much easier to understand and configure.
-
- ### Long-Term Goals
-
- I intend to, at some point, implement some functionality that sanoid/syncoid currently depends on external utilities for, such as sending snapshots to remote machines, as native calls within the application, using sockets, openssl, etc, as appropriate. Same goes for compression of send streams.
-
- I also want to build SnapsInAZfs to eventually support running as a daemon, which could have various advantages, such as more consistent and reliable timestamps (since it will not depend on systemd timers to run) and anything else that having a long-running resident process may provide.
-
- #### Long-Term Lofty Goals
-
- I would love to, once SnapsInAZfs is stable, attempt to implement interaction with zfs via native calls through
- libzfs. This may or may not be easily achievable without *significant* additional work, to marshall all the
- various C++ constructs in zfs (some of which are quite cumbersome) into the .net world.
-
- I've already written a few basic P/Invoke methods to make calls directly to libc functions, to avoid spawning
- processes for equivalent commands, but zfs is a completely different beast.
+ I may make an alpha or beta release tag soon and possibly provide a pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an alpha/beta-stage project and you should not trust important systems with it.
  
  ## Project Organization
  
-  - SnapsInAZfs: The main SnapsInAZfs executable. This project should only contain code relevant specifically to SnapsInAZfs
+  - SnapsInAZfs: The main SnapsInAZfs executable. This project should only contain code relevant specifically to SnapsInAZfs. Also contains the configuration console TUI.
   - SnapsInAZfs.Interop: Code such as native platform calls, Concurrency management, and other Interop layer code, as
   well as types used to interact with and define structures relevant to ZFS, such as snapshots and datasets.
   - SnapsInAZfs.Settings: Contains formal definitions of settings in code. The .net configuration binder is used to
   populate an instance of this class, in SnapsInAZfs, and command line arguments are used to override individual
   values, as appropriate.
-  - SnapsInAZfs.Common: Intended to be a common library that SnapsInAZfs and associated utilities use, with types
-  relevant to all, but which don't belong in SnapsInAZfs.Interop
   - Test projects: Each class library project will have a test project defined, for unit tests. I'm not doing this
   by TDD, so these are likely to not be well-defined until later in the project development cycle, when things
   stabilize a bit.
@@ -82,7 +54,7 @@
   - JetBrains.Annotations
   - Teminal.Gui
 
-  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils are installed.
+  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils and zfs 2.1 or higher are installed.
 
   Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. SnapsInAZfs itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all SnapsInAZfs needs to run properly (binaries only - header files are not needed). The goal is for SnapsInAZfs to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
@@ -93,7 +65,7 @@
      make
      make install
 
- This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to usr/local/bin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any replaced configuration files along the way.
+ This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any replaced configuration files along the way.
 
  ## Uninstalling From Source
 
@@ -110,12 +82,10 @@
  ## Running
 
  After installing, SnapsInAZfs can be run from any shell, so long as your `$PATH` includes
- the  `/usr/local/bin` directory and the system has the same version of .net installed as SnapsInAZfs was
+ the  `/usr/local/sbin` directory and the system has the same version of .net installed as SnapsInAZfs was
  built on. The Makefile will not modify your PATH variable, as it shouldn't be necessary on most distros, since 
- SnapsInAZfs is installed in a common binary path. If `/usr/local/bin` is not in your PATH, you should add it at
+ SnapsInAZfs is installed in a common binary path. If `/usr/local/sbin` is not in your PATH, you should add it at
  least for the users intended to run it, or system-wide, if you so desire.
-
- You can also invoke it directly from the project folder itself by running `dotnet run`.
  
  ## Configuration
 
@@ -124,9 +94,9 @@
 
  ### ZFS Properties
 
- Settings that apply to zfs and SnapsInAZfs's interaction with it will be stored as custom user properties on the datasets themselves.
+ Settings that apply to zfs and SnapsInAZfs's interaction with it are stored as custom user properties on the datasets themselves, using the `snapsinazfs.com:` namespace.
 
- When SnapsInAZfs runs, it will get all properties for all datasets and use those values to inform its operation.
+ When SnapsInAZfs runs, it will get all properties for all pool root datasets and use those values to inform its operation.
 
  ##### Missing Properties
 
@@ -146,7 +116,8 @@
 
  If you no longer wish to use SnapsInAZfs, you can clean up all of its settings from ZFS in either of two ways:
 
- - By running SnapsInAZfs with the `--remove-zfs-properties` command line switch, which will clear all SnapsInAZfs settings on all datasets via a call to `zfs inherit $setting -r` on every pool root dataset. Once a user property is no longer explicitly set to a value other than inherit, in ZFS, ZFS removes the property completely.
+ -  To clean up zfs properties set by SnapsInAZfs, run `make save-snapsinazfs-zfs-properties` and then `make wipe-snapsinazfs-zfs-properties`. The first recipe will save all zfs properties that SnapsInAZfs has set, to enable full restore. The second completely removes all SnapsInAZfs properties from all datasets in all pools and will refuse to run unless the recovery script exists.\
+ If you need to restore properties to the state they were in the last time you ran `make save-snapsinazfs-zfs-properties`, run `make restore-wiped-zfs-properties`, and the restore script will run, setting the properties back to how they were when you ran `make save-snapsinazfs-zfs-properties`
  - By manually calling `zfs inherit -r  $setting` on each pool root dataset, where $setting is the setting to remove from ZFS entirely. 
  
  Configuration is applied in the following order, with each element in the list superceding the settings defined at the level above it:
