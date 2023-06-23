@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Sanoid": {
+    "SnapsInAZfs": {
       "commandName": "Project"
     },
     "DryRun": {

@@ -1,6 +1,6 @@
 testpool	type	filesystem	-
 testpool	snapsinazfs.com:enabled	true	local
-testpool	snapsinazfs.com:recursion	sanoid	local
+testpool	snapsinazfs.com:recursion	siaz	local
 testpool	snapsinazfs.com:lastyearlysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
 testpool	snapsinazfs.com:lastdailysnapshottimestamp	2023-06-05T18:54:38.9789380-07:00	local
 testpool	snapsinazfs.com:retention:yearly	1	local

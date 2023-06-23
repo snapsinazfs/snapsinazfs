@@ -36,7 +36,7 @@ noPropsPool	snapsinazfs.com:lastyearlysnapshottimestamp	-	-
 noPropsPool	snapsinazfs.com:lastweeklysnapshottimestamp	-	-
 somePropsPool	snapsinazfs.com:retention:yearly	1	local
 somePropsPool	snapsinazfs.com:retention:frequent	2	local
-somePropsPool	snapsinazfs.com:recursion	sanoid	local
+somePropsPool	snapsinazfs.com:recursion	siaz	local
 somePropsPool	snapsinazfs.com:template	default	local
 somePropsPool	snapsinazfs.com:enabled	true	local
 somePropsPool	snapsinazfs.com:retention:hourly	2	local

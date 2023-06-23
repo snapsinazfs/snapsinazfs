@@ -499,7 +499,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.recursionRadioGroup.Text = "";
             this.recursionRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.recursionRadioGroup.RadioLabels = new NStack.ustring[] {
-                    "sanoid",
+                    "siaz",
                     "zfs"};
             this.recursionRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.generalFrame.Add(this.recursionRadioGroup);
