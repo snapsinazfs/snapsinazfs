@@ -8,11 +8,11 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
-using SnapsInAZfs.Common.Logging;
 using SnapsInAZfs.Interop.Concurrency;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
 using NativeMethods = SnapsInAZfs.Interop.Libc.NativeMethods;
 

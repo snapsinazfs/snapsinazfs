@@ -61,4 +61,8 @@
 		<Using Include="JetBrains.Annotations" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Logging\" />
+	</ItemGroup>
+
 </Project>

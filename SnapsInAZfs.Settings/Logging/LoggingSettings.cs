@@ -4,6 +4,7 @@
 
 using Microsoft.Extensions.Configuration;
 using NLog;
+using NLog.Config;
 using NLog.Extensions.Logging;
 
 namespace SnapsInAZfs.Settings.Logging;
@@ -25,11 +26,25 @@ public static class LoggingSettings
                                             #else
                                                 .AddJsonFile( "/usr/local/share/SnapsInAZfs.net/SnapsInAZfs.nlog.json", false, false )
                                                 .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, false )
-                                                .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/SnapsInAZfs.net/SnapsInAZfs.nlog.json" ), true, false )
                                                 .AddJsonFile( "SnapsInAZfs.nlog.json", true, false )
                                             #endif
                                                 .Build( );
 #pragma warning restore CA2000
         LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
     }
+    public static void OverrideConsoleLoggingLevel( LogLevel level )
+    {
+        if ( LogManager.Configuration == null )
+        {
+            return;
+        }
+
+        foreach ( LoggingRule? rule in LogManager.Configuration.LoggingRules )
+        {
+            rule?.SetLoggingLevels( level, LogLevel.Off );
+        }
+    }
 }
+
+
+
