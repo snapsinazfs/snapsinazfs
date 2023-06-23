@@ -118,6 +118,22 @@ dataset, the retention properties on each ZFS dataset or snapshot, or
 the age of the snapshot.
 The command-line options \f[B]--prune-snapshots\f[R] and
 \f[B]--no-prune-snapshots\f[R] override this setting.
+.TP
+\f[B]/ZfsPath\f[R] (string)
+This is the path to the \f[V]zfs\f[R] executable.
+The default path should be correct for most installations.
+Default is \[lq]/usr/local/sbin/zfs\[rq].
+This path must point to your zfs executable or a hard or symbolic link
+to it, and must be readable and executable by the user that will execute
+sanoid, including for running the configuration console.
+.TP
+\f[B]/ZpoolPath\f[R] (string)
+This is the path to the \f[V]zpool\f[R] executable.
+The default path should be correct for most installations.
+Default is \[lq]/usr/local/sbin/zpool\[rq].
+This path must point to your zpool executable or a hard or symbolic link
+to it, and must be readable and executable by the user that will execute
+sanoid, including for running the configuration console.
 .SS Templates
 .PP
 Templates, which provide common timing and formatting settings for
@@ -444,8 +460,8 @@ implemented, so the Monitoring section will be ignored.
   \[dq]$id\[dq]: \[dq]Sanoid.local.json\[dq],
   \[dq]$comments\[dq]: \[dq]Values specified here supersede and extend the base configuration in Sanoid.json.\[dq],
   \[dq]CacheDirectory\[dq]: \[dq]var/cache/sanoid\[dq],
-  \[dq]ZfsPath\[dq]: \[dq]/usr/local/sbin/zfs\[dq], 
-  \[dq]ZpoolPath\[dq]: \[dq]/usr/local/sbin/zpool\[dq], 
+  \[dq]ZfsPath\[dq]: \[dq]/usr/local/sbin/zfs\[dq],
+  \[dq]ZpoolPath\[dq]: \[dq]/usr/local/sbin/zpool\[dq],
   \[dq]TakeSnapshots\[dq]: false,
   \[dq]PruneSnapshots\[dq]: false,
   \[dq]DryRun\[dq]: false,

@@ -77,6 +77,20 @@ ZFS dataset, the retention properties on each ZFS dataset or snapshot, or the
 age of the snapshot. The command-line options **\-\-prune-snapshots** and
 **\-\-no-prune-snapshots** override this setting.
 
+**/ZfsPath** (string)
+: This is the path to the `zfs` executable. The default path should be correct
+for most installations. Default is "/usr/local/sbin/zfs". This path must point
+to your zfs executable or a hard or symbolic link to it, and must be readable
+and executable by the user that will execute sanoid, including for running the
+configuration console.
+
+**/ZpoolPath** (string)
+: This is the path to the `zpool` executable. The default path should be correct
+for most installations. Default is "/usr/local/sbin/zpool". This path must point
+to your zpool executable or a hard or symbolic link to it, and must be readable
+and executable by the user that will execute sanoid, including for running the
+configuration console.
+
 ## Templates
 
 Templates, which provide common timing and formatting settings for snapshots,
@@ -365,8 +379,8 @@ so the Monitoring section will be ignored.
   "$id": "Sanoid.local.json",
   "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
   "CacheDirectory": "var/cache/sanoid",
-  "ZfsPath": "/usr/local/sbin/zfs", 
-  "ZpoolPath": "/usr/local/sbin/zpool", 
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
