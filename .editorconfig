@@ -1,6 +1,6 @@
 ﻿[*.Designer.cs]
 dotnet_diagnostic.CS1591.severity = none
-[SanoidConfigConsole.cs]
+[SnapsInAZfsConfigConsole.cs]
 dotnet_diagnostic.CS1591.severity = none
 [TemplateConfigurationWindow.cs]
 dotnet_diagnostic.CS1591.severity = none

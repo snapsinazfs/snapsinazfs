@@ -16,7 +16,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using NStack;
-using Sanoid.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
 
@@ -581,7 +581,7 @@ namespace SnapsInAZfs.ConfigConsole
             if ( templateIndex == -1 )
             {
                 MessageBox.ErrorQuery( "Template Not Found", $"The template \"{SelectedTreeNode.TreeDataset.Template.Value}\", for {SelectedTreeNode.TreeDataset.Kind} \"{SelectedTreeNode.TreeDataset.Name}\", was not found in Sanoid.net's configuration.\nIs the template defined in one of the expected Sanoid[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.", "OK - ZFS Configuration Window will be disabled for this session" );
-                SanoidConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
+                SnapsInAZfsConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
                 this.SuperView.Remove( this );
                 return;
             }

@@ -14,7 +14,7 @@
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
-    <StartupObject>Sanoid.Program</StartupObject>
+    <StartupObject>SnapsInAZfs.Program</StartupObject>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
@@ -79,11 +79,6 @@
     <PackageReference Include="Terminal.Gui" Version="1.12.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Sanoid.Common\Sanoid.Common.csproj" />
-    <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
-  </ItemGroup>
-
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
     <None Update="alldatasets-withproperties.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -103,6 +98,12 @@
     <None Update="poolroots-capacities.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SnapsInAZfs.Common\SnapsInAZfs.Common.csproj" />
+    <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
+    <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
   </ItemGroup>
 
   <ItemGroup>

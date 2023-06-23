@@ -15,8 +15,8 @@
 
 using System.Collections.Concurrent;
 using NStack;
-using Sanoid.Interop.Zfs.ZfsTypes;
-using Sanoid.Settings.Settings;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
 

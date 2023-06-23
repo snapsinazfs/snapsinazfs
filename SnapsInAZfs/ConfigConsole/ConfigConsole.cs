@@ -6,8 +6,8 @@
 
 using System.Collections.Concurrent;
 using NLog.Config;
-using Sanoid.Interop.Zfs.ZfsCommandRunner;
-using Sanoid.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui;
 
 #pragma warning disable CA2000
@@ -23,7 +23,7 @@ internal static class ConfigConsole
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
-    ///     Suspends console logging and runs the <see cref="SanoidConfigConsole">Sanoid.net Configuration Console</see>.<br />
+    ///     Suspends console logging and runs the <see cref="SnapsInAZfsConfigConsole">Sanoid.net Configuration Console</see>.<br />
     ///     Resumes console logging after shutdown of the TUI.
     /// </summary>
     /// <param name="commandRunner">An <see cref="IZfsCommandRunner" /> to use when performing ZFS operations</param>
@@ -45,7 +45,7 @@ internal static class ConfigConsole
 
         CommandRunner = commandRunner;
 
-        Application.Run<SanoidConfigConsole>( ErrorHandler );
+        Application.Run<SnapsInAZfsConfigConsole>( ErrorHandler );
         Application.Shutdown( );
 
         if ( consoleRule != null )

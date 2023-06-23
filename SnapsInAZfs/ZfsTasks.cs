@@ -5,11 +5,11 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using Sanoid.Interop.Concurrency;
-using Sanoid.Interop.Libc.Enums;
-using Sanoid.Interop.Zfs.ZfsCommandRunner;
-using Sanoid.Interop.Zfs.ZfsTypes;
-using Sanoid.Settings.Settings;
+using SnapsInAZfs.Interop.Concurrency;
+using SnapsInAZfs.Interop.Libc.Enums;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs;
 

@@ -6,9 +6,7 @@
 
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using Sanoid.Interop.Zfs.ZfsCommandRunner;
-using Sanoid.Interop.Zfs.ZfsTypes;
-using Sanoid.Interop.Zfs.ZfsTypes.Validation;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace Sanoid.Interop.Tests.Zfs.ZfsCommandRunner;
 

@@ -7,8 +7,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Sanoid.Interop.Libc;
-using Sanoid.Interop.Libc.Enums;
+using SnapsInAZfs.Interop.Libc.Enums;
+using NativeMethods = SnapsInAZfs.Interop.Libc.NativeMethods;
 
 namespace Sanoid.Common.Tests;
 

@@ -5,8 +5,8 @@
 // project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
 
 using System.Collections.Concurrent;
-using Sanoid.Interop.Zfs.ZfsCommandRunner;
-using Sanoid.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.ConfigConsole;
