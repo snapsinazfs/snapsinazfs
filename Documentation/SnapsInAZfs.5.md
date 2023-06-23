@@ -1,46 +1,46 @@
-% Sanoid.json(5) Sanoid.net 1.0.0-Beta1 Configuration
+% SnapsInAZfs.json(5) SnapsInAZfs 1.0.0-Beta1 Configuration
 % Brandon Thetford
 % June 2023
 
 # Name
-Sanoid.json - Configuration files for Sanoid.net
+SnapsInAZfs.json - Configuration files for SnapsInAZfs
 
 # Synopsis
-**/usr/local/share/Sanoid.net/Sanoid.json** (Sanoid.json)\
-**/etc/sanoid/Sanoid.local.json** (Sanoid.local.json)
+**/usr/local/share/SnapsInAZfs/SnapsInAZfs.json** (SnapsInAZfs.json)\
+**/etc/SnapsInAZfs/SnapsInAZfs.local.json** (SnapsInAZfs.local.json)
 
 # Description
-These files contain general configuration and templates for Sanoid.net.
+These files contain general configuration and templates for SnapsInAZfs.
 
 All configuration files are formatted as plain-text JSON files, in UTF-8
 encoding.
 
 Note: Command line arguments which affect settings in any configuration file
 have highest precedence and will override their matching settings, at run-time.\
-See Sanoid.net(8) for details on command line arguments.
+See SnapsInAZfs(8) for details on command line arguments.
 
 ## Configuration Files
-**/usr/local/share/Sanoid.net/Sanoid.json** is the base configuration file and
+**/usr/local/share/SnapsInAZfs/SnapsInAZfs.json** is the base configuration file and
 is not intended, recommended, or supported to be changed by the end user.\
 This file is installed with read-only permissions, by default, to help avoid
 unintended modifications.
 
-**/etc/sanoid/Sanoid.local.json** is the local configuration file.\
+**/etc/SnapsInAZfs/SnapsInAZfs.local.json** is the local configuration file.\
 All settings specified in this file extend the configuration contained in
-Sanoid.json. Any leaf-level settings in Sanoid.local.json that have the same
-fully-qualified JSON path as leaf-level settings defined in Sanoid.json will
-override the matching settings in Sanoid.json, at run-time.
+SnapsInAZfs.json. Any leaf-level settings in SnapsInAZfs.local.json that have the same
+fully-qualified JSON path as leaf-level settings defined in SnapsInAZfs.json will
+override the matching settings in SnapsInAZfs.json, at run-time.
 
 ## Configuration File Schemas
-The schemas for Sanoid.json and Sanoid.local.json are identical, except for
-required elements. Both can be found in /usr/local/share/Sanoid.net as
-Sanoid.schema.json and Sanoid.local.schema.json.\
+The schemas for SnapsInAZfs.json and SnapsInAZfs.local.json are identical, except for
+required elements. Both can be found in /usr/local/share/SnapsInAZfs as
+SnapsInAZfs.schema.json and SnapsInAZfs.local.schema.json.\
 The schema documents fully describe the layout and legal format for these
 configuration files, and are to be considered authoritative, if any
 discrepancies exist between this document and those files.
 
 Changes to the schema documents are NOT supported and are likely to cause
-run-time errors in Sanoid.net. DO NOT MODIFY THE SCHEMA DOCUMENTS.
+run-time errors in SnapsInAZfs. DO NOT MODIFY THE SCHEMA DOCUMENTS.
 
 # Settings
 
@@ -49,30 +49,30 @@ description including type, default value, and what each settings does.
 
 ## General Settings
 
-These are general settings that affect the behavior of Sanoid.net.\
+These are general settings that affect the behavior of SnapsInAZfs.\
 They can be overridden by command-line arguments, as noted.
 
 **/DryRun** (boolean - "true" or "false")
-: This is a global setting that controls whether Sanoid.net will perform
-a dry run, when invoked. If this setting is "true," Sanoid.net will perform
+: This is a global setting that controls whether SnapsInAZfs will perform
+a dry run, when invoked. If this setting is "true," SnapsInAZfs will perform
 a dry run and make no changes to ZFS. The command-line option **\-\-dry-run**
 overrides this setting.
 
 **/TakeSnapshots** (boolean - "true" or "false")
-: This is a global setting that controls whether Sanoid.net will take new
-snapshots. If this setting is true, Sanoid.net will take snapshots according
+: This is a global setting that controls whether SnapsInAZfs will take new
+snapshots. If this setting is true, SnapsInAZfs will take snapshots according
 to the properties set on each ZFS dataset. If this setting is false, new
 snapshot processing is skipped and no new snapshots will be taken, regardless
-of the sanoid.net:takesnapshots property set on each ZFS dataset. The
+of the snapsinazfs.com:takesnapshots property set on each ZFS dataset. The
 command-line options **\-\-take-snapshots** and **\-\-no-take-snapshots**
 override this setting.
 
 **/PruneSnapshots** (boolean - "true" or "false")
-: This is a global setting that controls whether Sanoid.net will prune
-expired snapshots. If this setting is true, Sanoid.net will prune eligible
+: This is a global setting that controls whether SnapsInAZfs will prune
+expired snapshots. If this setting is true, SnapsInAZfs will prune eligible
 snapshots according to the properties set on each snapshot or inherited from
 its parent dataset. If this setting is false, existing snapshots will not be
-pruned, regardless of the sanoid.net:prunesnapshots property setting on each
+pruned, regardless of the snapsinazfs.com:prunesnapshots property setting on each
 ZFS dataset, the retention properties on each ZFS dataset or snapshot, or the
 age of the snapshot. The command-line options **\-\-prune-snapshots** and
 **\-\-no-prune-snapshots** override this setting.
@@ -81,14 +81,14 @@ age of the snapshot. The command-line options **\-\-prune-snapshots** and
 : This is the path to the `zfs` executable. The default path should be correct
 for most installations. Default is "/usr/local/sbin/zfs". This path must point
 to your zfs executable or a hard or symbolic link to it, and must be readable
-and executable by the user that will execute sanoid, including for running the
+and executable by the user that will execute SnapsInAZfs, including for running the
 configuration console.
 
 **/ZpoolPath** (string)
 : This is the path to the `zpool` executable. The default path should be correct
 for most installations. Default is "/usr/local/sbin/zpool". This path must point
 to your zpool executable or a hard or symbolic link to it, and must be readable
-and executable by the user that will execute sanoid, including for running the
+and executable by the user that will execute SnapsInAZfs, including for running the
 configuration console.
 
 ## Templates
@@ -97,7 +97,7 @@ Templates, which provide common timing and formatting settings for snapshots,
 are defined under the **/Templates** node, which is a dcitionary of key:value
 pairs, where the key is the template's name, as a quoted string, and the
 value is the template itself, as a JSON object, with a schema defined in
-Sanoid.template.schema.json.
+SnapsInAZfs.template.schema.json.
 
 For a template to be valid for use, it must be fully defined, with all options
 explicitly set. As with other configuration elements, it is possible to
@@ -112,23 +112,23 @@ A template is a JSON object consisting of two sections: "Formatting" and
 ### Template Formatting Section
 
 The **Formatting** section of a template defines elements used for naming of
-new snapshots that Sanoid.net creates. The default Formatting options
+new snapshots that SnapsInAZfs creates. The default Formatting options
 provided in the "default" template, on a new install, will result in snapshot
-names that follow the same format that PERL sanoid creates. For example, a
+names that follow the same format that Jim Salter's sanoid creates. For example, a
 daily snapshot taken on 2023-06-22 at 14:00:00 (local time) will be named
 "path/to/dataset@**autosnap\_2023-06-22\_14:00:00_daily**".
 
-These settings do not affect operation of Sanoid.net in any way _other_ than
+These settings do not affect operation of SnapsInAZfs in any way _other_ than
 in how it will name snapshots created on datasets with that template applied.
 
 Pruning of existing snapshots is in no way affected by these settings, as
-Sanoid.net keeps metadata defining what a snapshot _is_ in ZFS properties,
+SnapsInAZfs keeps metadata defining what a snapshot _is_ in ZFS properties,
 which are not affected by these settings.
 
-If you use a heterogeneous setup combining both PERL sanoid and Sanoid.net,
-you MUST use Formatting settings that correspond identically to PERL sanoid's
-configuration, or else PERL sanoid will misinterpret or skip them entirely,
-as PERL sanoid decides what a snapshot is and what to do with it based solely
+If you use a heterogeneous setup combining both sanoid and SnapsInAZfs,
+you MUST use Formatting settings that correspond identically to sanoid's
+configuration, or else sanoid will misinterpret or skip them entirely,
+as sanoid decides what a snapshot is and what to do with it based solely
 off of its name.
 
 Note that all settings must conform to ZFS identifier rules, as they apply
@@ -147,7 +147,7 @@ case-sensitive. By default, it is the string "autosnap"
 
 **/Templates/templateName/Formatting/TimestampFormatString**
 : The Timestamp Format String is a special format string that determines how
-the timestamp is formatted in the name of a snapshot. Sanoid.net uses the .net
+the timestamp is formatted in the name of a snapshot. SnapsInAZfs uses the .net
 DateTimeOffset type, internally, for representation of time, which contains
 the full date, time, and timezone offset (in local time, by default) that
 the operation was executed at. This string must be escaped, following both JSON
@@ -198,14 +198,14 @@ alphanumeric string and is case-sensitive. By default, it is the string
 ### Template Snapshot Timing Section
 
 The **SnapshotTiming** section of a template allows you to fine-tune the times
-at which Sanoid.net will take specific types of snapshots, and when existing
+at which SnapsInAZfs will take specific types of snapshots, and when existing
 snapshots will be considered eligible for pruning.
 
-Default settings correspond to the same behavior that PERL sanoid exhibits.
+Default settings correspond to the same behavior that sanoid exhibits.
 
 **/Templates/templateName/SnapshotTiming/UseLocalTime**
-: This setting is currently not used by Sanoid.net and is reserved for future
-changes. When this setting is implemented, it will control whether Sanoid.net
+: This setting is currently not used by SnapsInAZfs and is reserved for future
+changes. When this setting is implemented, it will control whether SnapsInAZfs
 uses local system time (true) or UTC (false) for snapshot timestamps and all
 associated processing, such as calculating eligibility for pruning. The
 current behavior is the same as a setting of "true"
@@ -217,7 +217,7 @@ While other values may work, they are not recommended nor are they supported.
 The value must be an un-quoted integer from 1 to 59.
 
 **/Templates/templateName/SnapshotTiming/HourlyMinute**
-: This setting is the minute of the hour on which Sanoid.net will take hourly
+: This setting is the minute of the hour on which SnapsInAZfs will take hourly
 snapshots. This value must be an un-quoted whole number from 0 to 59. The
 default value is 0, meaning that snapshots will be taken at the top of the
 following hour. For example, the hourly snapshot for the hour period from
@@ -229,18 +229,18 @@ components), and is the time of day that daily snapshots will be taken. Time
 strings can be any valid time of day from 00:00:00 to 23:59:59 and may
 optionally include fractional seconds, up to 7 decimal places, though the
 accuracy of actual snapshot timing will depend on the precision of your
-system's clock and the precision of the mechanism used to invoke Sanoid.net.
+system's clock and the precision of the mechanism used to invoke SnapsInAZfs.
 For example, a time string of "12:34:56.789" is perfectly legal. This will
-be more reliable once Sanoid.net has the ability to run as a daemon.
+be more reliable once SnapsInAZfs has the ability to run as a daemon.
 
 **/Templates/templateName/SnapshotTiming/WeeklyDay**
 : This setting is a number, from 0 to 6, specifying the day of the week on
-which weekly snapshots will be taken. Note that Sanoid.net attempts to be
+which weekly snapshots will be taken. Note that SnapsInAZfs attempts to be
 culture-aware, and the meaning of the number may depend on your system
 locale's definition of a week and which day is the start of that week.
 In the invariant or US culture, 0 is Sunday. The default setting is 1,
 which, in the invariant or US culture is Monday, which is the default
-behavior of PERL sanoid, as well. The configuraiton colsole will present
+behavior of sanoid, as well. The configuraiton colsole will present
 this setting to you as the name of the days of the week, in the system
 locale's language and calendar.
 
@@ -284,27 +284,26 @@ for details.
 
 These are example valid configurations.
 
-## Default Base Configuration (/usr/local/share/Sanoid.net/Sanoid.json)
+## Default Base Configuration (/usr/local/share/SnapsInAZfs/SnapsInAZfs.json)
 
-This is the default configuration shipped in Sanoid.json, which is the base
-configuration file Sanoid.net builds the rest of its configuration from and is
+This is the default configuration shipped in SnapsInAZfs.json, which is the base
+configuration file SnapsInAZfs builds the rest of its configuration from and is
 not intended to be modified by the user. Elements beginning with a \$ symbol
-are metadata and do not affect operation of Sanoid.net itself (though they
+are metadata and do not affect operation of SnapsInAZfs itself (though they
 should not be modified by the user, as that may affect schema validation).
 
-This configuration results in a default invocation of Sanoid.net performing
+This configuration results in a default invocation of SnapsInAZfs performing
 no actions that change ZFS (snapshots and pruning are disabled). Naming and
 timing settings for the default template included in this configuration are
-the same as PERL sanoid's defaults.
+the same as sanoid's defaults.
 
 ```
 {
-  "$schema": "Sanoid.schema.json",
-  "$id": "Sanoid.json",
-  "$comments": "Default settings for sanoid.net. It is not recommended to modify this file. Customized settings should be specified in /etc/sanoid/Sanoid.local.json",
+  "$schema": "SnapsInAZfs.schema.json",
+  "$id": "SnapsInAZfs.json",
+  "$comments": "Default settings for SnapsInAZfs. It is not recommended to modify this file. Customized settings should be specified in /etc/SnapsInAZfs/SnapsInAZfs.local.json",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
-  "CacheDirectory": "/var/cache/sanoid",
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
   "DryRun": false,
@@ -348,9 +347,9 @@ the same as PERL sanoid's defaults.
 }
 ```
 
-## Default Local Configuration (/etc/sanoid/Sanoid.local.json)
+## Default Local Configuration (/etc/SnapsInAZfs/SnapsInAZfs.local.json)
 
-This is the default local configuration shipped with Sanoid.net. This is the
+This is the default local configuration shipped with SnapsInAZfs. This is the
 configuration that is intended to be modified by the user and supercedes the
 base configuration as described at the top of this help document. Keys and
 values are case-sensitive. Whitespace not contained within quotation marks
@@ -366,7 +365,7 @@ can be added and removed, and the "production" template can be modified or
 removed as desired by the user.
 
 It is strongly recommended that all modifications to this configuration be
-made using the configuration console, by invoking Sanoid.net with the
+made using the configuration console, by invoking SnapsInAZfs with the
 \-\-config-console command-line argument. This will ensure that your settings
 are valid and that in-use templates are not accidentally removed.
 
@@ -375,10 +374,9 @@ so the Monitoring section will be ignored.
 
 ```
 {
-  "$schema": "Sanoid.local.schema.json",
-  "$id": "Sanoid.local.json",
-  "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
-  "CacheDirectory": "var/cache/sanoid",
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "$id": "SnapsInAZfs.local.json",
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
   "TakeSnapshots": false,
