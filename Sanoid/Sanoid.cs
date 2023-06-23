@@ -16,7 +16,7 @@ using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Sanoid.Settings.Settings;
 
-namespace Sanoid;
+namespace SnapsInAZfs;
 
 [UsedImplicitly]
 internal class Program

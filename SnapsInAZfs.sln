@@ -25,7 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{4D503858-739F-4BCE-92DA-10163F9EFA39}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanoid", "Sanoid\Sanoid.csproj", "{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs", "Sanoid\SnapsInAZfs.csproj", "{89B42EDA-D6C8-42B8-AC8F-C7E5D78C2345}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{ED331CBD-09F6-4C14-A686-D675761E4979}"
 	ProjectSection(SolutionItems) = preProject

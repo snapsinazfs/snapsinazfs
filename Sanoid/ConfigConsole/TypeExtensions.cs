@@ -9,7 +9,7 @@ using System.Globalization;
 using NStack;
 using Terminal.Gui;
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 /// <summary>
 ///     Extension methods

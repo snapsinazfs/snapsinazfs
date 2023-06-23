@@ -9,7 +9,7 @@ using Sanoid.Interop.Zfs.ZfsCommandRunner;
 using Sanoid.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 internal static class ZfsTasks
 {

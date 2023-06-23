@@ -6,7 +6,7 @@
 
 using Terminal.Gui;
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 /// <summary>
 ///     An exception to be thrown when validation of a template from input values fails

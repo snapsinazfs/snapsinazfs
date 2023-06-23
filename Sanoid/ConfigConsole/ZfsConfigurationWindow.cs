@@ -17,12 +17,11 @@ using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using NStack;
 using Sanoid.Interop.Zfs.ZfsTypes;
+using Terminal.Gui;
 using Terminal.Gui.Trees;
 
-namespace Sanoid.ConfigConsole
+namespace SnapsInAZfs.ConfigConsole
 {
-    using Terminal.Gui;
-
     public partial class ZfsConfigurationWindow
     {
         public ZfsConfigurationWindow( )

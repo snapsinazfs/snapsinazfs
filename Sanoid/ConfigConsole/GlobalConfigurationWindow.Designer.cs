@@ -8,11 +8,10 @@
 //      the code is regenerated.
 //  </auto-generated>
 // -----------------------------------------------------------------------------
-namespace Sanoid.ConfigConsole {
-    using System;
-    using Terminal.Gui;
-    
-    
+
+using Terminal.Gui;
+
+namespace SnapsInAZfs.ConfigConsole {
     public partial class GlobalConfigurationWindow : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme whiteOnBlue;

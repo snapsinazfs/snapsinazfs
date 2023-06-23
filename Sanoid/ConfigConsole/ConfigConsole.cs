@@ -12,7 +12,7 @@ using Terminal.Gui;
 
 #pragma warning disable CA2000
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 internal static class ConfigConsole
 {

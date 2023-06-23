@@ -7,7 +7,7 @@
 using System.Globalization;
 using NStack;
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 /// <summary>
 ///     A static class with some helpers for dealing with dates and times in a culture-aware way

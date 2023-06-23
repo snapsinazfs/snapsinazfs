@@ -13,10 +13,8 @@
 
 #nullable enable
 
-namespace Sanoid.ConfigConsole
+namespace SnapsInAZfs.ConfigConsole
 {
-    using Terminal.Gui;
-
     public partial class GlobalConfigurationWindow
     {
         public GlobalConfigurationWindow( )

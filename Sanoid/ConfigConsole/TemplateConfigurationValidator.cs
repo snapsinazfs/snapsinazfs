@@ -7,7 +7,7 @@
 using System.Globalization;
 using NStack;
 
-namespace Sanoid.ConfigConsole;
+namespace SnapsInAZfs.ConfigConsole;
 
 internal class TemplateConfigurationValidator
 {
