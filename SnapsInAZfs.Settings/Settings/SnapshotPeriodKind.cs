@@ -3,7 +3,6 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 
 namespace SnapsInAZfs.Settings.Settings;
 
@@ -68,62 +67,4 @@ public enum SnapshotPeriodKind
     /// <value>100</value>
     [JsonPropertyName( "manual" )]
     Manual = 100
-}
-
-/// <summary>
-///     Extension methods for the <see cref="SnapshotPeriodKind" /> <see langword="enum" />
-/// </summary>
-public static class SnapshotPeriodKindExtensions
-{
-    /// <summary>
-    ///     Gets a <see cref="SnapshotPeriodKind" /> <see langword="enum" /> value for the provided string.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    /// <remarks>Faster and slightly more flexible than Enum.Parse</remarks>
-    [Pure]
-    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string value )
-    {
-        return value switch
-        {
-            "frequent" => SnapshotPeriodKind.Frequent,
-            "Frequent" => SnapshotPeriodKind.Frequent,
-            "frequently" => SnapshotPeriodKind.Frequent,
-            "Frequently" => SnapshotPeriodKind.Frequent,
-            "hourly" => SnapshotPeriodKind.Hourly,
-            "Hourly" => SnapshotPeriodKind.Hourly,
-            "daily" => SnapshotPeriodKind.Daily,
-            "Daily" => SnapshotPeriodKind.Daily,
-            "weekly" => SnapshotPeriodKind.Weekly,
-            "Weekly" => SnapshotPeriodKind.Weekly,
-            "monthly" => SnapshotPeriodKind.Monthly,
-            "Monthly" => SnapshotPeriodKind.Monthly,
-            "yearly" => SnapshotPeriodKind.Yearly,
-            "Yearly" => SnapshotPeriodKind.Yearly,
-            _ => throw new ArgumentOutOfRangeException( nameof( value ), $"Invalid value ({value}) for SnapshotPeriodKind" )
-        };
-    }
-
-    /// <summary>
-    ///     Gets a standardized string representation of a <see cref="SnapshotPeriodKind" /> value, for internal use, in
-    ///     English lower case
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public static string ToString( this SnapshotPeriodKind value )
-    {
-        return value switch
-        {
-            SnapshotPeriodKind.Temporary => "temporary",
-            SnapshotPeriodKind.Frequent => "frequently",
-            SnapshotPeriodKind.Hourly => "hourly",
-            SnapshotPeriodKind.Daily => "daily",
-            SnapshotPeriodKind.Weekly => "weekly",
-            SnapshotPeriodKind.Monthly => "monthly",
-            SnapshotPeriodKind.Yearly => "yearly",
-            SnapshotPeriodKind.Manual => "manual",
-            _ => throw new ArgumentOutOfRangeException( nameof( value ), "Unknown value for SnapshotPeriodKind" )
-        };
-    }
 }
