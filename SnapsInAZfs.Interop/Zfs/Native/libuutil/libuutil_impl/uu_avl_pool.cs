@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sanoid.Interop.Zfs.libuutil.libuutil_impl;
+namespace SnapsInAZfs.Interop.Zfs.libuutil.libuutil_impl;
 
 using uu_avl_pool_t = uu_avl_pool;
 using uu_avl_t = uu_avl;

@@ -1,10 +1,10 @@
 ﻿global using uint8_t = System.Byte;
 using System.ComponentModel.DataAnnotations;
-using Sanoid.Interop.Zfs.Enums;
-using Sanoid.Interop.Zfs.libuutil.libuutil_impl;
-using Sanoid.Interop.Zfs.sys.avl_impl;
+using SnapsInAZfs.Interop.Zfs.Enums;
+using SnapsInAZfs.Interop.Zfs.libuutil.libuutil_impl;
+using SnapsInAZfs.Interop.Zfs.sys.avl_impl;
 
-namespace Sanoid.Interop.Zfs.libzfs.libzfs_impl;
+namespace SnapsInAZfs.Interop.Zfs.libzfs.libzfs_impl;
 
 using zpool_handle_t = zpool_handle;
 using uu_avl_pool_t = uu_avl_pool;

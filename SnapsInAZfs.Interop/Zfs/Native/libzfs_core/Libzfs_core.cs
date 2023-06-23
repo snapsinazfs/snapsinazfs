@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sanoid.Interop.Zfs.Libzfs_core;
+namespace SnapsInAZfs.Interop.Zfs.Libzfs_core;
 
 public static partial class libzfs_core
 {
