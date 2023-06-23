@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 #nullable enable
 
@@ -18,348 +16,347 @@ using Terminal.Gui;
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
-namespace SnapsInAZfs.ConfigConsole
+namespace SnapsInAZfs.ConfigConsole;
+
+public partial class SnapsInAZfsConfigConsole
 {
-    public partial class SnapsInAZfsConfigConsole
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    public SnapsInAZfsConfigConsole( )
     {
-        public SnapsInAZfsConfigConsole( )
+        Initialized += SnapsInAZfsConfigConsoleOnInitialized;
+        Ready += SnapsInAZfsConfigConsoleOnReady;
+        InitializeComponent( );
+        globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
+        globalConfigMenuItem.Shortcut = Key.CtrlMask | Key.g;
+        templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
+        templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.t;
+        zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
+        zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.z;
+        saveMenuItem.Action = ShowSaveDialog;
+        Application.RootKeyEvent += ApplicationRootKeyEvent;
+    }
+
+    private bool _eventsEnabled;
+    private GlobalConfigurationWindow? _globalConfigurationWindow;
+    private bool _globalConfigurationWindowShown;
+    private TemplateConfigurationWindow? _templateConfigurationWindow;
+    private bool _templateConfigurationWindowShown;
+    private ZfsConfigurationWindow? _zfsConfigurationWindow;
+    private bool _zfsConfigurationWindowShown;
+
+    public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
+
+    private bool ApplicationRootKeyEvent( KeyEvent e )
+    {
+        if ( e.IsCtrl )
         {
-            Initialized += SnapsInAZfsConfigConsoleOnInitialized;
-            Ready += SnapsInAZfsConfigConsoleOnReady;
-            InitializeComponent( );
-            globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
-            globalConfigMenuItem.Shortcut = Key.CtrlMask | Key.g;
-            templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
-            templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.t;
-            zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
-            zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.z;
-            saveMenuItem.Action = ShowSaveDialog;
-            Application.RootKeyEvent += ApplicationRootKeyEvent;
-        }
-
-        private bool _eventsEnabled;
-        private GlobalConfigurationWindow? _globalConfigurationWindow;
-        private bool _globalConfigurationWindowShown;
-        private TemplateConfigurationWindow? _templateConfigurationWindow;
-        private bool _templateConfigurationWindowShown;
-        private ZfsConfigurationWindow? _zfsConfigurationWindow;
-        private bool _zfsConfigurationWindowShown;
-
-        public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
-
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
-        private bool ApplicationRootKeyEvent( KeyEvent e )
-        {
-            if ( e.IsCtrl )
+            switch ( e.Key & Key.CharMask )
             {
-                switch ( e.Key & Key.CharMask )
-                {
-                    case Key.g:
-                    case Key.G:
-                        globalConfigMenuItem.Action( );
-                        return true;
-                    case Key.t:
-                    case Key.T:
-                        templateConfigMenuItem.Action( );
-                        return true;
-                    case Key.z:
-                    case Key.Z:
-                        zfsConfigMenuItem.Action( );
-                        return true;
-                }
+                case Key.g:
+                case Key.G:
+                    globalConfigMenuItem.Action( );
+                    return true;
+                case Key.t:
+                case Key.T:
+                    templateConfigMenuItem.Action( );
+                    return true;
+                case Key.z:
+                case Key.Z:
+                    zfsConfigMenuItem.Action( );
+                    return true;
             }
-
-            return false;
         }
 
-        private void ShowSaveDialog( )
+        return false;
+    }
+
+    private void DisableEventHandlers( )
+    {
+        if ( !_eventsEnabled )
         {
-            try
+            return;
+        }
+
+        _eventsEnabled = false;
+    }
+
+    private void EnableEventHandlers( )
+    {
+        if ( _eventsEnabled )
+        {
+            return;
+        }
+
+        _eventsEnabled = true;
+    }
+
+    private void HideGlobalConfigurationWindow( )
+    {
+        Remove( _globalConfigurationWindow );
+        globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
+        globalConfigMenuItem.Title = "Show _Global Configuration Window";
+        _globalConfigurationWindowShown = false;
+    }
+
+    private void HideTemplateConfigurationWindow( )
+    {
+        Remove( _templateConfigurationWindow );
+        templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
+        templateConfigMenuItem.Title = "Show _Template Configuration Window";
+        _templateConfigurationWindowShown = false;
+    }
+
+    private void HideZfsConfigurationWindow( )
+    {
+        Remove( _zfsConfigurationWindow );
+        zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
+        zfsConfigMenuItem.Title = "Show _Template Configuration Window";
+        _zfsConfigurationWindowShown = false;
+    }
+
+    private void ShowGlobalConfigurationWindow( )
+    {
+        if ( _templateConfigurationWindowShown )
+        {
+            HideTemplateConfigurationWindow( );
+        }
+
+        if ( _zfsConfigurationWindowShown )
+        {
+            HideZfsConfigurationWindow( );
+        }
+
+        _globalConfigurationWindow ??= new( );
+        Add( _globalConfigurationWindow );
+        if ( ShowChild( _globalConfigurationWindow ) )
+        {
+            _globalConfigurationWindowShown = true;
+            _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
+            Logger.Debug( "Showing global configuration window" );
+            globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
+            globalConfigMenuItem.Title = "Hide _Global Configuration Window";
+        }
+        else
+        {
+            Remove( _globalConfigurationWindow );
+            Logger.Error( "Unable to show global configuration window" );
+        }
+    }
+
+    private void ShowSaveDialog( )
+    {
+        try
+        {
+            DisableEventHandlers( );
+            bool globalWindowNull = _globalConfigurationWindow is null;
+            bool templateWindowNull = _templateConfigurationWindow is null;
+            bool bothWindowsNull = globalWindowNull && templateWindowNull;
+            bool globalConfigurationIsChanged = !globalWindowNull && _globalConfigurationWindow!.IsConfigurationChanged;
+            bool onlyGlobalWindowNotNullAndNoChanges = !globalWindowNull && !globalConfigurationIsChanged && templateWindowNull;
+            bool isAnyTemplateModified = TemplateConfigurationWindow.IsAnyTemplateModified;
+            bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.templatesAddedRemovedOrModified;
+            bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
+            bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
+            if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
             {
-                DisableEventHandlers( );
-                bool globalWindowNull = _globalConfigurationWindow is null;
-                bool templateWindowNull = _templateConfigurationWindow is null;
-                bool bothWindowsNull = globalWindowNull && templateWindowNull;
-                bool globalConfigurationIsChanged = !globalWindowNull && _globalConfigurationWindow!.IsConfigurationChanged;
-                bool onlyGlobalWindowNotNullAndNoChanges = !globalWindowNull && !globalConfigurationIsChanged && templateWindowNull;
-                bool isAnyTemplateModified = TemplateConfigurationWindow.IsAnyTemplateModified;
-                bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.templatesAddedRemovedOrModified;
-                bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
-                bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
-                if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
+                Logger.Warn( "Save configuration requested when no changes were made." );
+                int messageBoxResult = MessageBox.Query( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
+                if ( messageBoxResult == 0 )
                 {
-                    Logger.Warn( "Save configuration requested when no changes were made." );
-                    int messageBoxResult = MessageBox.Query( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
-                    if ( messageBoxResult == 0 )
-                    {
-                        return;
-                    }
-
-                    SnapsInAZfsSettings copyOfCurrentSettings = Program.Settings! with { };
-                    (bool status, string reasonOrFile) copyConfigResult = ContinueWithSave( copyOfCurrentSettings );
-                    if ( copyConfigResult.status )
-                    {
-                        Logger.Info( "Copy of existing configuration saved to {0}", copyConfigResult.Item2 );
-                        return;
-                    }
-
-                    switch ( copyConfigResult.reasonOrFile )
-                    {
-                        case "canceled":
-                            Logger.Debug( "Canceled configuration save dialog" );
-                            return;
-                        case "no file name":
-                            Logger.Error( "No file name provided in save dialog. Configuration copy not saved." );
-                            return;
-                        default:
-                            Logger.Error( "Failed to save copy of configuration." );
-                            return;
-                    }
-                }
-
-                switch ( globalWindowNull )
-                {
-                    case true:
-                        Logger.Warn( "Global Configuration Window was still null when we tried to access it. Creating new instance" );
-                        _globalConfigurationWindow = new( );
-                        break;
-                    case false when !_globalConfigurationWindow!.ValidateGlobalConfigValues( ):
-                        Logger.Warn( "Global configuration input validation failed. Configuration not saved." );
-                        MessageBox.ErrorQuery( "Invalid Global Configuration", "One or more entries in the global configuration window are invalid. Correct any invalid entries and try again.", "OK" );
-                        return;
-                }
-
-                if ( !templateWindowNull && isAnyTemplateModified )
-                {
-                    int dialogResult = MessageBox.Query( "Commit Modified Templates?", "You have pending template modifications that have not been committed and will therefore not be saved unless committed.\n\nCommit pending template changes now?", "Cancel Save", "Commit Templates" );
-                    if ( dialogResult != 1 )
-                    {
-                        return;
-                    }
-
-                    TemplateConfigurationWindow.CommitModifiedTemplates( );
-                }
-
-                SnapsInAZfsSettings newSettingsToSave = new( )
-                {
-                    DryRun = _globalConfigurationWindow!.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
-                    TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
-                    PruneSnapshots = _globalConfigurationWindow.pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
-                    ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
-                    ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
-                    Templates = Program.Settings!.Templates
-                };
-
-                ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
-
-                if ( status )
-                {
-                    Logger.Info( "Configuration saved to {0}", reasonOrFile );
                     return;
                 }
 
-                switch ( reasonOrFile )
+                SnapsInAZfsSettings copyOfCurrentSettings = Program.Settings! with { };
+                (bool status, string reasonOrFile) copyConfigResult = ContinueWithSave( copyOfCurrentSettings );
+                if ( copyConfigResult.status )
+                {
+                    Logger.Info( "Copy of existing configuration saved to {0}", copyConfigResult.Item2 );
+                    return;
+                }
+
+                switch ( copyConfigResult.reasonOrFile )
                 {
                     case "canceled":
                         Logger.Debug( "Canceled configuration save dialog" );
                         return;
                     case "no file name":
-                        Logger.Error( "No file name provided in save dialog. Configuration not saved." );
+                        Logger.Error( "No file name provided in save dialog. Configuration copy not saved." );
                         return;
                     default:
-                        Logger.Error( "Failed to save configuration." );
+                        Logger.Error( "Failed to save copy of configuration." );
                         return;
                 }
             }
-            finally
+
+            switch ( globalWindowNull )
             {
-                EnableEventHandlers( );
+                case true:
+                    Logger.Warn( "Global Configuration Window was still null when we tried to access it. Creating new instance" );
+                    _globalConfigurationWindow = new( );
+                    break;
+                case false when !_globalConfigurationWindow!.ValidateGlobalConfigValues( ):
+                    Logger.Warn( "Global configuration input validation failed. Configuration not saved." );
+                    MessageBox.ErrorQuery( "Invalid Global Configuration", "One or more entries in the global configuration window are invalid. Correct any invalid entries and try again.", "OK" );
+                    return;
             }
 
-            static (bool, string) ContinueWithSave( SnapsInAZfsSettings settings )
+            if ( !templateWindowNull && isAnyTemplateModified )
             {
-                using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+                int dialogResult = MessageBox.Query( "Commit Modified Templates?", "You have pending template modifications that have not been committed and will therefore not be saved unless committed.\n\nCommit pending template changes now?", "Cancel Save", "Commit Templates" );
+                if ( dialogResult != 1 )
                 {
-                    globalConfigSaveDialog.DirectoryPath = "/etc/sanoid";
-                    globalConfigSaveDialog.AllowsOtherFileTypes = true;
-                    globalConfigSaveDialog.CanCreateDirectories = true;
-                    globalConfigSaveDialog.Modal = true;
-                    Application.Run( globalConfigSaveDialog );
-                    if ( globalConfigSaveDialog.Canceled )
-                    {
-                        return ( false, "canceled" );
-                    }
-
-                    if ( globalConfigSaveDialog.FileName.IsEmpty )
-                    {
-                        return ( false, "no file name" );
-                    }
-
-                    string path = globalConfigSaveDialog.FilePath.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" );
-
-                    if ( File.Exists( path ) )
-                    {
-                        int overwriteResult = MessageBox.ErrorQuery( "Overwrite Existing File?", $"The file '{path}' already exists. Continue saving and overwrite this file?", "Cancel", "Overwrite" );
-                        if ( overwriteResult == 0 )
-                        {
-                            return ( false, "canceled" );
-                        }
-                    }
-
-                    File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
-                    return ( true, path );
+                    return;
                 }
-            }
-        }
 
-        private void ShowGlobalConfigurationWindow( )
-        {
-            if ( _templateConfigurationWindowShown )
-            {
-                HideTemplateConfigurationWindow( );
+                TemplateConfigurationWindow.CommitModifiedTemplates( );
             }
 
-            if ( _zfsConfigurationWindowShown )
+            SnapsInAZfsSettings newSettingsToSave = new( )
             {
-                HideZfsConfigurationWindow( );
-            }
+                DryRun = _globalConfigurationWindow!.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
+                TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
+                PruneSnapshots = _globalConfigurationWindow.pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
+                ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
+                ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
+                Templates = Program.Settings!.Templates
+            };
 
-            _globalConfigurationWindow ??= new( );
-            Add( _globalConfigurationWindow );
-            if ( ShowChild( _globalConfigurationWindow ) )
-            {
-                _globalConfigurationWindowShown = true;
-                _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
-                Logger.Debug( "Showing global configuration window" );
-                globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
-                globalConfigMenuItem.Title = "Hide _Global Configuration Window";
-            }
-            else
-            {
-                Remove( _globalConfigurationWindow );
-                Logger.Error( "Unable to show global configuration window" );
-            }
-        }
+            ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
 
-        private void HideGlobalConfigurationWindow( )
-        {
-            Remove( _globalConfigurationWindow );
-            globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
-            globalConfigMenuItem.Title = "Show _Global Configuration Window";
-            _globalConfigurationWindowShown = false;
-        }
-
-        private void ShowTemplateConfigurationWindow( )
-        {
-            if ( _globalConfigurationWindowShown )
+            if ( status )
             {
-                HideGlobalConfigurationWindow( );
-            }
-
-            if ( _zfsConfigurationWindowShown )
-            {
-                HideZfsConfigurationWindow( );
-            }
-
-            _templateConfigurationWindow ??= new( );
-            Add( _templateConfigurationWindow );
-            if ( ShowChild( _templateConfigurationWindow ) )
-            {
-                _templateConfigurationWindowShown = true;
-                _templateConfigurationWindow.templateListView.SetFocus( );
-                Logger.Debug( "Showing template configuration window" );
-                templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
-                templateConfigMenuItem.Title = "Hide _Template Configuration Window";
-            }
-            else
-            {
-                Logger.Error( "Unable to show template configuration window" );
-            }
-        }
-
-        private void HideTemplateConfigurationWindow( )
-        {
-            Remove( _templateConfigurationWindow );
-            templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
-            templateConfigMenuItem.Title = "Show _Template Configuration Window";
-            _templateConfigurationWindowShown = false;
-        }
-
-        private void ShowZfsConfigurationWindow( )
-        {
-            if ( ZfsConfigurationWindowDisabledDueToError )
-            {
-                MessageBox.ErrorQuery( "ZFS Configuration Disabled", "ZFS Configuration Window has been disabled due to errors in configuration.\nResolve any reported errors and run the Configuration Console again.", "Bummer" );
-                zfsConfigMenuItem.CanExecute = ( ) => false;
-                zfsConfigMenuItem.Action = null;
+                Logger.Info( "Configuration saved to {0}", reasonOrFile );
                 return;
             }
 
-            if ( _globalConfigurationWindowShown )
+            switch ( reasonOrFile )
             {
-                HideGlobalConfigurationWindow( );
-            }
-
-            if ( _templateConfigurationWindowShown )
-            {
-                HideTemplateConfigurationWindow( );
-            }
-
-            _zfsConfigurationWindow ??= new( );
-            Add( _zfsConfigurationWindow );
-            if ( ShowChild( _zfsConfigurationWindow ) )
-            {
-                _zfsConfigurationWindowShown = true;
-                _zfsConfigurationWindow.zfsTreeView.SetFocus( );
-                Logger.Debug( "Showing ZFS configuration window" );
-                zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
-                zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
-            }
-            else
-            {
-                Logger.Error( "Unable to show ZFS configuration window" );
+                case "canceled":
+                    Logger.Debug( "Canceled configuration save dialog" );
+                    return;
+                case "no file name":
+                    Logger.Error( "No file name provided in save dialog. Configuration not saved." );
+                    return;
+                default:
+                    Logger.Error( "Failed to save configuration." );
+                    return;
             }
         }
-
-        private void HideZfsConfigurationWindow( )
-        {
-            Remove( _zfsConfigurationWindow );
-            zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
-            zfsConfigMenuItem.Title = "Show _Template Configuration Window";
-            _zfsConfigurationWindowShown = false;
-        }
-
-        private void SnapsInAZfsConfigConsoleOnInitialized( object? sender, EventArgs e )
-        {
-            AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
-            quitMenuItem.Action = Application.Top.RequestStop;
-            IsMdiContainer = true;
-        }
-
-        private void SnapsInAZfsConfigConsoleOnReady( )
+        finally
         {
             EnableEventHandlers( );
         }
 
-        private void DisableEventHandlers( )
+        static (bool, string) ContinueWithSave( SnapsInAZfsSettings settings )
         {
-            if ( !_eventsEnabled )
+            using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
             {
-                return;
-            }
+                globalConfigSaveDialog.DirectoryPath = "/etc/sanoid";
+                globalConfigSaveDialog.AllowsOtherFileTypes = true;
+                globalConfigSaveDialog.CanCreateDirectories = true;
+                globalConfigSaveDialog.Modal = true;
+                Application.Run( globalConfigSaveDialog );
+                if ( globalConfigSaveDialog.Canceled )
+                {
+                    return ( false, "canceled" );
+                }
 
-            _eventsEnabled = false;
+                if ( globalConfigSaveDialog.FileName.IsEmpty )
+                {
+                    return ( false, "no file name" );
+                }
+
+                string path = globalConfigSaveDialog.FilePath.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" );
+
+                if ( File.Exists( path ) )
+                {
+                    int overwriteResult = MessageBox.ErrorQuery( "Overwrite Existing File?", $"The file '{path}' already exists. Continue saving and overwrite this file?", "Cancel", "Overwrite" );
+                    if ( overwriteResult == 0 )
+                    {
+                        return ( false, "canceled" );
+                    }
+                }
+
+                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
+                return ( true, path );
+            }
+        }
+    }
+
+    private void ShowTemplateConfigurationWindow( )
+    {
+        if ( _globalConfigurationWindowShown )
+        {
+            HideGlobalConfigurationWindow( );
         }
 
-        private void EnableEventHandlers( )
+        if ( _zfsConfigurationWindowShown )
         {
-            if ( _eventsEnabled )
-            {
-                return;
-            }
-
-            _eventsEnabled = true;
+            HideZfsConfigurationWindow( );
         }
+
+        _templateConfigurationWindow ??= new( );
+        Add( _templateConfigurationWindow );
+        if ( ShowChild( _templateConfigurationWindow ) )
+        {
+            _templateConfigurationWindowShown = true;
+            _templateConfigurationWindow.templateListView.SetFocus( );
+            Logger.Debug( "Showing template configuration window" );
+            templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
+            templateConfigMenuItem.Title = "Hide _Template Configuration Window";
+        }
+        else
+        {
+            Logger.Error( "Unable to show template configuration window" );
+        }
+    }
+
+    private void ShowZfsConfigurationWindow( )
+    {
+        if ( ZfsConfigurationWindowDisabledDueToError )
+        {
+            MessageBox.ErrorQuery( "ZFS Configuration Disabled", "ZFS Configuration Window has been disabled due to errors in configuration.\nResolve any reported errors and run the Configuration Console again.", "Bummer" );
+            zfsConfigMenuItem.CanExecute = ( ) => false;
+            zfsConfigMenuItem.Action = null;
+            return;
+        }
+
+        if ( _globalConfigurationWindowShown )
+        {
+            HideGlobalConfigurationWindow( );
+        }
+
+        if ( _templateConfigurationWindowShown )
+        {
+            HideTemplateConfigurationWindow( );
+        }
+
+        _zfsConfigurationWindow ??= new( );
+        Add( _zfsConfigurationWindow );
+        if ( ShowChild( _zfsConfigurationWindow ) )
+        {
+            _zfsConfigurationWindowShown = true;
+            _zfsConfigurationWindow.zfsTreeView.SetFocus( );
+            Logger.Debug( "Showing ZFS configuration window" );
+            zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
+            zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
+        }
+        else
+        {
+            Logger.Error( "Unable to show ZFS configuration window" );
+        }
+    }
+
+    private void SnapsInAZfsConfigConsoleOnInitialized( object? sender, EventArgs e )
+    {
+        AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
+        quitMenuItem.Action = Application.Top.RequestStop;
+        IsMdiContainer = true;
+    }
+
+    private void SnapsInAZfsConfigConsoleOnReady( )
+    {
+        EnableEventHandlers( );
     }
 }

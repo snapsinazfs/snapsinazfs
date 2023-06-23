@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using Terminal.Gui;
 
@@ -14,18 +12,15 @@ namespace SnapsInAZfs.ConfigConsole;
 public class TemplateValidationException : ApplicationException
 {
     /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, value, and message
+    ///     Creates a new <see cref="TemplateValidationException" /> message and inner exceptions
     /// </summary>
-    /// <param name="propertyName">The name of the property that caused this exception</param>
-    /// <param name="propertyValue">The value of the property that caused this exception</param>
     /// <param name="message">
     ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
     /// </param>
-    public TemplateValidationException( string? propertyName, string? propertyValue, string message ) : base( message )
+    /// <param name="innerExceptions">A list of exceptions to use, if this is an aggregated exception</param>
+    public TemplateValidationException( string message, List<TemplateValidationException> innerExceptions ) : base( message )
     {
-        PropertyName = propertyName;
-        PropertyValue = propertyValue;
-        InnerExceptions = new( );
+        InnerExceptions = innerExceptions;
     }
 
     /// <summary>
@@ -40,6 +35,21 @@ public class TemplateValidationException : ApplicationException
     {
         PropertyName = propertyName;
         EntryField = entryField;
+        InnerExceptions = new( );
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="TemplateValidationException" /> with the given name, value, and message
+    /// </summary>
+    /// <param name="propertyName">The name of the property that caused this exception</param>
+    /// <param name="propertyValue">The value of the property that caused this exception</param>
+    /// <param name="message">
+    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
+    /// </param>
+    public TemplateValidationException( string? propertyName, string? propertyValue, string message ) : base( message )
+    {
+        PropertyName = propertyName;
+        PropertyValue = propertyValue;
         InnerExceptions = new( );
     }
 
@@ -78,18 +88,6 @@ public class TemplateValidationException : ApplicationException
         PropertyValue = propertyValue;
         EntryField = entryField;
         InnerExceptions = new( );
-    }
-
-    /// <summary>
-    ///     Creates a new <see cref="TemplateValidationException" /> message and inner exceptions
-    /// </summary>
-    /// <param name="message">
-    ///     <inheritdoc cref="ApplicationException(string)" path="/param[@name='message']" />
-    /// </param>
-    /// <param name="innerExceptions">A list of exceptions to use, if this is an aggregated exception</param>
-    public TemplateValidationException( string message, List<TemplateValidationException> innerExceptions ) : base( message )
-    {
-        InnerExceptions = innerExceptions;
     }
 
     /// <summary>

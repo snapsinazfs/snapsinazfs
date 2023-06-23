@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Text.Json;
@@ -14,17 +12,30 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
-using NativeMethods = SnapsInAZfs.Interop.Libc.NativeMethods;
 
 namespace SnapsInAZfs;
 
 [UsedImplicitly]
 internal class Program
 {
-    // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
-    // Desired logging parameters should be set in Sanoid.nlog.json
+    // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
+    // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     internal static SnapsInAZfsSettings? Settings;
+
+    /// <summary>
+    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+    ///     the CLI
+    /// </summary>
+    /// <param name="args"></param>
+    public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args )
+    {
+        Logger.Debug( "Overriding settings using arguments from command line." );
+
+        Settings!.DryRun |= args.DryRun;
+        Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
+        Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
+    }
 
     public static async Task<int> Main( string[] argv )
     {
@@ -58,7 +69,7 @@ internal class Program
         SetCommandLineLoggingOverride( args );
 
         using Mutexes mutexes = Mutexes.Instance;
-        using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\Sanoid.net" );
+        using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\SnapsInAZfs" );
 
         switch ( mutexResult.ErrorCode )
         {
@@ -69,16 +80,16 @@ internal class Program
                 Logger.Fatal( mutexResult.Exception, "Exiting due to IOException: {0}", mutexResult.Exception.Message );
                 return (int)mutexResult.ErrorCode;
             case MutexAcquisitionErrno.AbandonedMutex:
-                Logger.Fatal( mutexResult.Exception, "A previous instance of Sanoid.net exited without properly releasing the mutex. Sanoid.net will now exit after releasing the abandoned mutex. Try running again." );
+                Logger.Fatal( mutexResult.Exception, "A previous instance of SnapsInAZfs exited without properly releasing the mutex. SnapsInAZfs will now exit after releasing the abandoned mutex. Try running again." );
                 return (int)mutexResult.ErrorCode;
             case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
-                Logger.Fatal( mutexResult.Exception, "Unable to acquire mutex. Sanoid.net will exit." );
+                Logger.Fatal( mutexResult.Exception, "Unable to acquire mutex. SnapsInAZfs will exit." );
                 return (int)mutexResult.ErrorCode;
             case MutexAcquisitionErrno.PossiblyNullMutex:
-                Logger.Fatal( "Unable to acquire mutex. Sanoid.net will exit." );
+                Logger.Fatal( "Unable to acquire mutex. SnapsInAZfs will exit." );
                 return (int)mutexResult.ErrorCode;
             case MutexAcquisitionErrno.AnotherProcessIsBusy:
-                Logger.Fatal( "Another Sanoid.net process is running. This process will terminate." );
+                Logger.Fatal( "Another SnapsInAZfs process is running. This process will terminate." );
                 return (int)mutexResult.ErrorCode;
             case MutexAcquisitionErrno.InvalidMutexNameRequested:
                 return (int)mutexResult.ErrorCode;
@@ -91,28 +102,25 @@ internal class Program
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
         // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
         // override earlier values.
-        // Note that nlog-specific configuration is separate, in Sanoid.nlog.json, and is not affected by the configuration specified below,
+        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
         // and is loaded/parsed FIRST, before any configuration specified below.
-        // See the Sanoid.Common.Logging.LoggingSettings class for nlog configuration details.
+        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
         // See documentation for a more detailed explanation with examples.
         // Configuration order:
-        // 1. /usr/local/share/Sanoid.net/Sanoid.json   #(Required - Base configuration - Should not be modified by the user)
-        // 2. /etc/sanoid/Sanoid.local.json
-        // 3. ~/.config/Sanoid.net/Sanoid.user.json     #(Located in executing user's home directory)
-        // 4. ./Sanoid.local.json                       #(Located in Sanoid.net's working directory)
-        // 6. Command-line arguments passed on invocation of Sanoid.net
+        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
+        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
+        // 6. Command-line arguments passed on invocation of SnapsInAZfs
         Logger.Debug( "Getting base configuration from files" );
         IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                            #if WINDOWS
-                                               .AddJsonFile( "Sanoid.json", true, false )
-                                               .AddJsonFile( "Sanoid.local.json", true, false )
+                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
                                            #else
-                                               .AddJsonFile( "/usr/local/share/Sanoid.net/Sanoid.json", true, false )
-                                               .AddJsonFile( "/etc/sanoid/Sanoid.local.json", true, false )
-                                               .AddJsonFile( Path.Combine( Path.GetFullPath( Environment.GetEnvironmentVariable( "HOME" ) ?? "~/" ), ".config/Sanoid.net/Sanoid.user.json" ), true, false )
+                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
                                            #endif
                                            #if ALLOW_ADJACENT_CONFIG_FILE
-                                               .AddJsonFile( "Sanoid.local.json", true, false )
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
                                            #endif
                                                .Build( );
 
@@ -215,50 +223,6 @@ internal class Program
         Mutexes.DisposeMutexes( );
 
         return (int)Errno.EOK;
-    }
-
-    /// <summary>
-    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-    ///     the CLI
-    /// </summary>
-    /// <param name="args"></param>
-    public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args )
-    {
-        Logger.Debug( "Overriding settings using arguments from command line." );
-
-        // Let's go through all args in an order that makes sense
-        if ( !string.IsNullOrEmpty( args.CacheDir ) )
-        {
-            Logger.Debug( "CacheDir argument specified. Value: {0}", args.CacheDir );
-            string canonicalCacheDirPath = NativeMethods.CanonicalizeFileName( args.CacheDir );
-            Logger.Trace( "CacheDir canonical path: {0}", canonicalCacheDirPath );
-            if ( !Directory.Exists( canonicalCacheDirPath ) )
-            {
-                string badDirectoryMessage = $"CacheDir argument value {canonicalCacheDirPath} is a non-existent directory. Program will terminate.";
-                Logger.Error( badDirectoryMessage );
-                throw new DirectoryNotFoundException( badDirectoryMessage );
-            }
-
-            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Read ) != 0 )
-            {
-                string cantReadDirMessage = $"CacheDir {canonicalCacheDirPath} is not readable by the current user {Environment.UserName}. Program will terminate.";
-                Logger.Error( cantReadDirMessage );
-                throw new UnauthorizedAccessException( cantReadDirMessage );
-            }
-
-            if ( NativeMethods.EuidAccess( canonicalCacheDirPath, UnixFileTestMode.Write ) != 0 )
-            {
-                string cantWriteDirMessage = $"CacheDir {canonicalCacheDirPath} is not writeable by the current user {Environment.UserName}. Program will terminate.";
-                Logger.Error( cantWriteDirMessage );
-                throw new UnauthorizedAccessException( cantWriteDirMessage );
-            }
-
-            Logger.Trace( "CacheDirectory is now {0}", canonicalCacheDirPath );
-        }
-
-        Settings!.DryRun |= args.DryRun;
-        Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
-        Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )

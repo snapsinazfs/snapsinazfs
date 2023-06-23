@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -16,26 +14,6 @@ namespace SnapsInAZfs.ConfigConsole;
 /// </summary>
 public static class TypeExtensions
 {
-    /// <summary>
-    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
-    /// </summary>
-    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
-    /// <returns></returns>
-    public static string GetSelectedLabelString( this RadioGroup group )
-    {
-        return group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group selected label string" );
-    }
-
-    /// <summary>
-    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
-    /// </summary>
-    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
-    /// <returns></returns>
-    public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
-    {
-        return bool.Parse( group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group boolean value" ) );
-    }
-
     /// <summary>
     ///     Gets a list of strings containing day names
     /// </summary>
@@ -101,6 +79,26 @@ public static class TypeExtensions
         monthNamesList.AddRange( value.MonthGenitiveNames );
         monthNamesList.AddRange( value.AbbreviatedMonthGenitiveNames );
         return monthNamesList;
+    }
+
+    /// <summary>
+    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
+    /// </summary>
+    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
+    /// <returns></returns>
+    public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
+    {
+        return bool.Parse( group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group boolean value" ) );
+    }
+
+    /// <summary>
+    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
+    /// </summary>
+    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
+    /// <returns></returns>
+    public static string GetSelectedLabelString( this RadioGroup group )
+    {
+        return group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group selected label string" );
     }
 
     /// <summary>
@@ -181,7 +179,7 @@ public static class TypeExtensions
         {
             // This case is checking if it's a non-null string, and if it can be parsed as an integer
             // All other conditions will throw an ArgumentOutOfRangeException for value
-            { Length: >0 } stringValue when stringValue.Trim( ) is { Length: >0 } trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
+            { Length: > 0 } stringValue when stringValue.Trim( ) is { Length: > 0 } trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
             _ => null
         };
     }

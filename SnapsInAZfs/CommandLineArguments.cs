@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using PowerArgs;
 
@@ -11,23 +9,21 @@ using PowerArgs;
 namespace SnapsInAZfs;
 
 /// <summary>
-///     The command line arguments that sanoid can accept
+///     The command line arguments that SnapsInAZfs can accept
 /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
 // ReSharper disable once ClassNeverInstantiated.Global
 public class CommandLineArguments
 {
-    /// <summary>
-    ///     Gets or sets the cache directory to use, overriding the same setting from all other levels
-    /// </summary>
-    [ArgDescription( "Cache directory for sanoid. Does not require trailing slash." )]
-    [ArgShortcut( "--cache-dir" )]
-    [ArgExistingDirectory]
-    public string CacheDir { get; set; }
-
-    [ArgDescription( "Checks the property schema for sanoid.net in zfs and reports any missing properties for pool roots." )]
+    [ArgDescription( "Checks the property schema for SnapsInAZfs in zfs and reports any missing properties for pool roots." )]
     [ArgShortcut( "--check-zfs-properties" )]
     public bool CheckZfsProperties { get; set; }
+
+    [ArgDescription( "Launches SnapsInAZfs' built-in interactive configuration console" )]
+    [ArgShortcut( "--configconsole" )]
+    [ArgShortcut( "--config-console" )]
+    [ArgCantBeCombinedWith( "DryRun|TakeSnapshots|PruneSnapshots|ForcePrune|CheckZfsProperties|PrepareZfsProperties" )]
+    public bool ConfigConsole { get; set; }
 
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]
@@ -83,7 +79,7 @@ public class CommandLineArguments
     [ArgCantBeCombinedWith( "TakeSnapshots" )]
     public bool NoTakeSnapshots { get; set; }
 
-    [ArgDescription( "Updates the property schema for sanoid.net in zfs, using default values. Will not overwrite values that are already set." )]
+    [ArgDescription( "Updates the property schema for SnapsInAZfs in zfs, using default values. Will not overwrite values that are already set." )]
     [ArgShortcut( "--prepare-zfs-properties" )]
     public bool PrepareZfsProperties { get; set; }
 
@@ -122,15 +118,9 @@ public class CommandLineArguments
     [ArgCantBeCombinedWith( "Debug|Quiet|ReallyQuiet|Trace" )]
     public bool Verbose { get; set; }
 
-    [ArgDescription( "Outputs Sanoid.net version to configured logging targets and exits, making no changes." )]
+    [ArgDescription( "Outputs SnapsInAZfs version to configured logging targets and exits, making no changes." )]
     [ArgShortcut( "V" )]
     [ArgShortcut( "--version" )]
     [ArgEnforceCase]
     public bool Version { get; set; }
-
-    [ArgDescription("Launches Sanoid.net's built-in interactive configuration console")]
-    [ArgShortcut( "--configconsole" )]
-    [ArgShortcut( "--config-console" )]
-    [ArgCantBeCombinedWith( "DryRun|TakeSnapshots|PruneSnapshots|ForcePrune|CheckZfsProperties|PrepareZfsProperties" )]
-    public bool ConfigConsole { get; set; }
 }

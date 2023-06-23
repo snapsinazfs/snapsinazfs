@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using NLog.Config;
@@ -16,14 +14,15 @@ namespace SnapsInAZfs.ConfigConsole;
 
 internal static class ConfigConsole
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
     internal static readonly ConcurrentDictionary<string, SnapsInAZfsZfsDataset> BaseDatasets = new( );
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
-    ///     Suspends console logging and runs the <see cref="SnapsInAZfsConfigConsole">Sanoid.net Configuration Console</see>.<br />
+    ///     Suspends console logging and runs the <see cref="SnapsInAZfsConfigConsole">SnapsInAZfs Configuration Console</see>.
+    ///     <br />
     ///     Resumes console logging after shutdown of the TUI.
     /// </summary>
     /// <param name="commandRunner">An <see cref="IZfsCommandRunner" /> to use when performing ZFS operations</param>
