@@ -1,15 +1,9 @@
-﻿// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
-
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 
-namespace Sanoid.Common.Tests;
+namespace SnapsInAZfs.Common.Tests;
 
-[TestFixture( Description = "These tests are for basic system-level prerequisites before we even get into bothering with anything specific to Sanoid.net" )]
+[TestFixture( Description = "These tests are for basic system-level prerequisites before we even get into bothering with anything specific to SnapsInAZfs" )]
 [Order( 1 )]
 [Category( "General" )]
 [Category( "Prerequisites" )]

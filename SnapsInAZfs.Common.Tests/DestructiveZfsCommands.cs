@@ -1,15 +1,9 @@
-﻿// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
-
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using SnapsInAZfs.Interop.Libc.Enums;
 using NativeMethods = SnapsInAZfs.Interop.Libc.NativeMethods;
 
-namespace Sanoid.Common.Tests;
+namespace SnapsInAZfs.Common.Tests;
 
 [TestFixture]
 [Explicit( "These tests involve creating and deleting files, zpools, datasets, zvols, and snapshots." )]
@@ -22,7 +16,7 @@ public class DestructiveZfsCommands
     public void Setup( )
     {
         _thisDirectory = NativeMethods.CanonicalizeFileName( "." ).Trim( );
-        _zpoolFileName = Path.Combine( _thisDirectory, "Sanoid.net.test.zpool" );
+        _zpoolFileName = Path.Combine( _thisDirectory, "SnapsInAZfs.test.zpool" );
     }
 
     [OneTimeTearDown]
@@ -36,7 +30,7 @@ public class DestructiveZfsCommands
 
     private static string _thisDirectory;
     private static string _zpoolFileName;
-    private const string ZpoolName = "SanoidDotnetTestZpool";
+    private const string ZpoolName = "SnapsInAZfsDotnetTestZpool";
 
     private static TestState _state = TestState.Init;
 

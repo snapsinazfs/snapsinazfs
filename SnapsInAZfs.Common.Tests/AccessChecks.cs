@@ -1,16 +1,10 @@
-// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
-
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using SnapsInAZfs.Interop.Libc.Enums;
 using NativeMethods = SnapsInAZfs.Interop.Libc.NativeMethods;
 
-namespace Sanoid.Common.Tests;
+namespace SnapsInAZfs.Common.Tests;
 
 [TestFixture]
 [Platform( Include = "Unix" )]
@@ -75,11 +69,11 @@ public class AccessChecks
     [Order( 2 )]
     [TestCase( "." )]
     [TestCase( "/etc" )]
-    [TestCase( "/etc/sanoid" )]
+    [TestCase( "/etc/SnapsInAZfs" )]
     [TestCase( "/usr/local" )]
     [TestCase( "/usr/local/bin" )]
     [TestCase( "/usr/local/share" )]
-    [TestCase( "/usr/local/share/Sanoid.net" )]
+    [TestCase( "/usr/local/share/SnapsInAZfs" )]
     public void CheckUserCanWriteTo( string path )
     {
         string canonicalPath = NativeMethods.CanonicalizeFileName( path );
