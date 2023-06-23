@@ -37,10 +37,6 @@ clean-debug:
 	rm -rfv SnapsInAZfs/obj/$(DEBUGCONFIG) 2>/dev/null
 	rmdir -v SnapsInAZfs/bin || true
 	rmdir -v SnapsInAZfs/obj || true
-	rm -rfv SnapsInAZfs.Common/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Common/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Common/bin || true
-	rmdir -v SnapsInAZfs.Common/obj || true
 	rm -rfv SnapsInAZfs.Interop/bin/$(DEBUGCONFIG) 2>/dev/null
 	rm -rfv SnapsInAZfs.Interop/obj/$(DEBUGCONFIG) 2>/dev/null
 	rmdir -v SnapsInAZfs.Interop/bin || true
@@ -61,10 +57,6 @@ clean-release:
 	rm -rfv SnapsInAZfs/obj/$(RELEASECONFIG) 2>/dev/null
 	rmdir -v SnapsInAZfs/bin || true
 	rmdir -v SnapsInAZfs/obj || true
-	rm -rfv SnapsInAZfs.Common/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Common/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Common/bin || true
-	rmdir -v SnapsInAZfs.Common/obj || true
 	rm -rfv SnapsInAZfs.Interop/bin/$(RELEASECONFIG) 2>/dev/null
 	rm -rfv SnapsInAZfs.Interop/obj/$(RELEASECONFIG) 2>/dev/null
 	rmdir -v SnapsInAZfs.Interop/bin || true
@@ -77,8 +69,6 @@ clean-release:
 extraclean:	clean-debug	clean-release
 	rm -rfv SnapsInAZfs/bin 2>/dev/null
 	rm -rfv SnapsInAZfs/obj 2>/dev/null
-	rm -rfv SnapsInAZfs.Common/bin 2>/dev/null
-	rm -rfv SnapsInAZfs.Common/obj 2>/dev/null
 	rm -rfv SnapsInAZfs.Interop/bin 2>/dev/null
 	rm -rfv SnapsInAZfs.Interop/obj 2>/dev/null
 	rm -rfv SnapsInAZfs.Settings/bin 2>/dev/null
@@ -146,16 +136,16 @@ uninstall-release:
 	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
 	rm -fv $(LOCALSBINDIR)/SnapsInAZfs 2>/dev/null
 
-test:	test-everything
-
-test-everything:
-	dotnet test --settings=SnapsInAZfs.Common.Tests/everything.runsettings
-
-test-everything-dangerous:
-	dotnet test --settings=SnapsInAZfs.Common.Tests/everything-dangerous.runsettings
-
-test-dangerous:
-	dotnet test --settings=SnapsInAZfs.Common.Tests/dangerous.runsettings
+#test:	test-everything
+#
+#test-everything:
+#	dotnet test --settings=SnapsInAZfs.Common.Tests/everything.runsettings
+#
+#test-everything-dangerous:
+#	dotnet test --settings=SnapsInAZfs.Common.Tests/everything-dangerous.runsettings
+#
+#test-dangerous:
+#	dotnet test --settings=SnapsInAZfs.Common.Tests/dangerous.runsettings
 
 save-snapsinazfs-zfs-properties:
 	@test ! -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
