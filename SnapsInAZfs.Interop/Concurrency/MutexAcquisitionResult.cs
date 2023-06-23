@@ -37,7 +37,7 @@ public sealed class MutexAcquisitionResult : IDisposable
 
     /// <exception cref="InvalidOperationException" accessor="get">
     ///     with an InnerException of type
-    ///     <see cref="MutexAcquisitionException" /> if <see cref="ErrorCode" /> is not quivalent to <see cref="Errno.EOK" />.
+    ///     <see cref="MutexAcquisitionException" /> if <see cref="ErrorCode" /> is not equivalent to <see cref="Errno.EOK" />.
     /// </exception>
     public Mutex Mutex
     {

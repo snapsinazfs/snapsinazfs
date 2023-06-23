@@ -48,7 +48,7 @@ namespace SnapsInAZfs.Interop.Libc.Enums;
 ///     application are known and expected to correspond to these enumeration values, or you can expect
 ///     <see cref="InvalidCastException" />s and other issues.
 /// </remarks>
-// General recommendation for types used with P/Invoke is to matain the native library's naming conventions, so
+// General recommendation for types used with P/Invoke is to maintain the native library's naming conventions, so
 // let's silence ReSharper against the various ways this type violates recommended C# naming conventions.
 // Also, a lot of values aren't used, but I'm leaving them here, so silencing the unused member warning, too.
 [SuppressMessage( "ReSharper", "InconsistentNaming", Justification = "Following recommendations for types used with P/Invoke" )]
