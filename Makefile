@@ -110,6 +110,8 @@ install-config-local:
 install-doc:
 	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.8 $(MANDIR)/man8/Sanoid.8
 	cp -l $(MANDIR)/man8/Sanoid.8 $(MANDIR)/man8/Sanoid.net.8
+	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.5 $(MANDIR)/man5/Sanoid.5
+	cp -l $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.net.5
 	mandb
 
 install-release:
@@ -130,6 +132,8 @@ uninstall-config-local:
 uninstall-doc:
 	rm -fv $(MANDIR)/man8/Sanoid.8 2>/dev/null
 	rm -fv $(MANDIR)/man8/Sanoid.net.8 2>/dev/null
+	rm -fv $(MANDIR)/man5/Sanoid.5 2>/dev/null
+	rm -fv $(MANDIR)/man5/Sanoid.net.5 2>/dev/null
 	mandb
 
 uninstall-everything:	uninstall	uninstall-config-local
