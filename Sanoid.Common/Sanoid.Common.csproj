@@ -5,7 +5,6 @@
 		<LangVersion>11</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<DefineConstants>JETBRAINS_ANNOTATIONS</DefineConstants>
 		<Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -20,10 +19,13 @@
 	  <GenerateDocumentationFile>False</GenerateDocumentationFile>
 	  <PublishReadyToRun>True</PublishReadyToRun>
 	  <PublishSingleFile>True</PublishSingleFile>
+          <DebugType>embedded</DebugType>
+          <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
 	  <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+          <GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

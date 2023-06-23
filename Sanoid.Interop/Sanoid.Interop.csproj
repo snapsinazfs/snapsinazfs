@@ -7,6 +7,7 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
     <Platforms>x64</Platforms>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -28,6 +29,8 @@
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <PublishReadyToRun>True</PublishReadyToRun>
     <PublishSingleFile>True</PublishSingleFile>
+    <DebugType>embedded</DebugType>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
 
