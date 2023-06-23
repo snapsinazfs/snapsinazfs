@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using NLog;
@@ -15,6 +13,8 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapshot>
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     private Snapshot( string name, ZfsObjectBase poolRoot )
         : base( name, "snapshot", poolRoot )
     {
@@ -30,7 +30,7 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
             }
 
             int sliceEnd = prop.Value.IndexOf( '@' );
-            return prop.Value[ ..sliceEnd ] ?? throw new InvalidOperationException( "snapshotname property not defined on Snapshot" );
+            return prop.Value[ ..sliceEnd ] ?? throw new InvalidOperationException( "snapshot:name property not defined on Snapshot" );
         }
     }
 
@@ -64,8 +64,6 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
             return result;
         }
     }
-
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>
     ///     Compares the current instance with another <see cref="Snapshot" /> and returns an integer that indicates
@@ -178,27 +176,6 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         return obj is Snapshot s && Equals( s );
     }
 
-    /// <inheritdoc />
-    /// <remarks>Delegates responsibility for this to <see cref="ZfsObjectBase.Name" /></remarks>
-    public override int GetHashCode( )
-    {
-        return Name.GetHashCode( );
-    }
-
-    public static Snapshot GetNewSnapshotObjectForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, TemplateSettings template )
-    {
-        string snapshotName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        Snapshot newSnapshot = new( snapshotName, ds.PoolRoot )
-        {
-            RetentionSettings = ds.RetentionSettings
-        };
-        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ) );
-        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ) );
-        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySourceConstants.Local ) );
-        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.RecursionPropertyName, ds.Recursion, ZfsPropertySourceConstants.Local ) );
-        return newSnapshot;
-    }
-
     /// <summary>
     ///     Gets a new <see cref="Snapshot" /> from a string array in a pre-defined order
     /// </summary>
@@ -214,27 +191,27 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
     ///     <list type="bullet">
     ///         <item>
     ///             <term>0</term>
-    ///             <description>sanoid.net:prunesnapshots</description>
+    ///             <description>snapsinazfs.com:prunesnapshots</description>
     ///         </item>
     ///         <item>
     ///             <term>1</term>
-    ///             <description>sanoid.net:recursion</description>
+    ///             <description>snapsinazfs.com:recursion</description>
     ///         </item>
     ///         <item>
     ///             <term>2</term>
-    ///             <description>sanoid.net:snapshotname</description>
+    ///             <description>snapsinazfs.com:snapshotname</description>
     ///         </item>
     ///         <item>
     ///             <term>3</term>
-    ///             <description>sanoid.net:snapshotperiod</description>
+    ///             <description>snapsinazfs.com:snapshotperiod</description>
     ///         </item>
     ///         <item>
     ///             <term>4</term>
-    ///             <description>sanoid.net:snapshottimestamp</description>
+    ///             <description>snapsinazfs.com:snapshottimestamp</description>
     ///         </item>
     ///         <item>
     ///             <term>5</term>
-    ///             <description>sanoid.net:template</description>
+    ///             <description>snapsinazfs.com:template</description>
     ///         </item>
     ///     </list>
     /// </remarks>
@@ -261,5 +238,26 @@ public class Snapshot : ZfsObjectBase, IComparable<Snapshot>, IEquatable<Snapsho
         }
 
         return snap;
+    }
+
+    /// <inheritdoc />
+    /// <remarks>Delegates responsibility for this to <see cref="ZfsObjectBase.Name" /></remarks>
+    public override int GetHashCode( )
+    {
+        return Name.GetHashCode( );
+    }
+
+    public static Snapshot GetNewSnapshotObjectForCommandRunner( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, TemplateSettings template )
+    {
+        string snapshotName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
+        Snapshot newSnapshot = new( snapshotName, ds.PoolRoot )
+        {
+            RetentionSettings = ds.RetentionSettings
+        };
+        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ) );
+        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ) );
+        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp.ToString( "O" ), ZfsPropertySourceConstants.Local ) );
+        newSnapshot.AddOrUpdateProperty( new( ZfsPropertyNames.RecursionPropertyName, ds.Recursion, ZfsPropertySourceConstants.Local ) );
+        return newSnapshot;
     }
 }

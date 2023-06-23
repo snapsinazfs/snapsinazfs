@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -17,6 +15,8 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 /// </summary>
 public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 {
+    private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <summary>
     ///     Creates a new instance of the standard <see cref="ZfsCommandRunner" /> class, which uses calls zfs at the path
     ///     provided in <paramref name="pathToZfs" />
@@ -65,8 +65,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     private string PathToZpoolUtility { get; }
 
-    private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
     /// <inheritdoc />
     public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot )
     {
@@ -89,7 +87,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        string arguments = $"snapshot {(zfsRecursionWanted ? "-r " : "")}{string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
+        string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{string.Join( ' ', snapshot.Properties.Values.Select( p => $"-o {p.SetString} " ) )} {snapshot.Name}";
         ProcessStartInfo zfsSnapshotStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
@@ -281,7 +279,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <summary>Gets properties for datasets, either recursively (default) or using supplied arguments</summary>
     /// <returns>
     ///     A  <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" />
-    ///     of all datasets in zfs, with sanoid.net properties populated
+    ///     of all datasets in zfs, with SnapsInAZfs properties populated
     /// </returns>
     /// <exception cref="InvalidOperationException">
     ///     <list type="bullet">
@@ -375,10 +373,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     // Dataset is already in the collection
                     // This line is a property line
                     // Parse it and add it to the dataset, if it is one of the wanted keys
-                    Logger.Trace( "Checking if property {0} is wanted by sanoid", dsPropertyName );
+                    Logger.Trace( "Checking if property {0} is wanted by SnapsInAZfs", dsPropertyName );
                     if ( ZfsProperty.KnownDatasetProperties.Contains( dsPropertyName ) )
                     {
-                        Logger.Trace( "Property {0} is wanted by sanoid. Adding new property {0} to Dataset {1}", dsPropertyName, dsName );
+                        Logger.Trace( "Property {0} is wanted by SnapsInAZfs. Adding new property {0} to Dataset {1}", dsPropertyName, dsName );
 
                         // Parse the array starting from the second element (first was dataset name)
                         // The slice does allocate a new array, but it's trivial
@@ -392,7 +390,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     else
                     {
                         // Property name wasn't a key in the set of wanted keys, so we can just ignore it and move on
-                        Logger.Trace( "Property {0} is not wanted by sanoid. Ignoring", dsPropertyName );
+                        Logger.Trace( "Property {0} is not wanted by SnapsInAZfs. Ignoring", dsPropertyName );
                     }
                 }
 
@@ -417,7 +415,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( )
+    public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( )
     {
         ConcurrentDictionary<string, Dataset> result = new( );
         Logger.Debug( "Requested pool root configuration" );
@@ -430,9 +428,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         // The line feed is swallowed by the ReadLine method in the iterator, so we don't need to worry about it.
         // Pool roots are the schema root, and must have all required properties defined locally.
         // ZFS User Properties are always inherited, so this guarantees the minimum required schema will be there
-        // for Sanoid.net to depend on.
+        // for SnapsInAZfs to depend on.
         // The user can, of course, break things, if they want to, but that's their own fault.
-        // That's why Sanoid.net will do at least this check on every startup.
+        // That's why SnapsInAZfs will do at least this check on every startup.
         // The run-time cost is minimal, so it's better to be safe, even if a cached configuration is likely to
         // be correct the majority of the time.
         // Comments, corrections, rude commentary, etc. are welcome (but not too rude - this is a labor of love😅).
@@ -565,7 +563,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
                 if ( zfsListTokens[ 2 ] == "-" )
                 {
-                    Logger.Debug( "Line was not a sanoid.net snapshot. Skipping" );
+                    Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
                     continue;
                 }
 
@@ -681,7 +679,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets )
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
         Dictionary<string, TreeNode> allTreeNodes = new( );
@@ -692,8 +690,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             string dsName = lineTokens[ 0 ];
             baseDatasets.AddOrUpdate( dsName, k =>
             {
-                SanoidZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
-                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
+                SnapsInAZfsZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
+                SnapsInAZfsZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
                 treeRootNodes.Add( node );
@@ -720,10 +718,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             {
                 int lastSlashIndex = dsName.LastIndexOf( '/' );
                 string parentName = dsName[ ..lastSlashIndex ];
-                SanoidZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
-                SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
-                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
-                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
+                SnapsInAZfsZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
+                SnapsInAZfsZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
+                SnapsInAZfsZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
+                SnapsInAZfsZfsDataset newDsTreeCopy = newDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
@@ -733,7 +731,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             else
             {
-                SanoidZfsDataset ds = baseDatasets[ dsName ];
+                SnapsInAZfsZfsDataset ds = baseDatasets[ dsName ];
                 if ( ds.IsPoolRoot )
                 {
                     continue;
@@ -837,19 +835,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    private static void ValidateCommonExecArguments( string verb, string args )
-    {
-        if ( string.IsNullOrWhiteSpace( verb ) )
-        {
-            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
-        }
-
-        if ( string.IsNullOrWhiteSpace( args ) )
-        {
-            throw new ArgumentNullException( nameof( args ), "Arguments are required for zfs/zpool exec operations" );
-        }
-    }
-
     /// <inheritdoc cref="SetZfsProperties(bool,string,SnapsInAZfs.Interop.Zfs.ZfsTypes.ZfsProperty[])" />
     /// <remarks>
     ///     Does not perform name validation
@@ -896,6 +881,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             Logger.Trace( "zfs set process finished" );
             return true;
+        }
+    }
+
+    private static void ValidateCommonExecArguments( string verb, string args )
+    {
+        if ( string.IsNullOrWhiteSpace( verb ) )
+        {
+            throw new ArgumentNullException( nameof( verb ), "verb cannot be null" );
+        }
+
+        if ( string.IsNullOrWhiteSpace( args ) )
+        {
+            throw new ArgumentNullException( nameof( args ), "Arguments are required for zfs/zpool exec operations" );
         }
     }
 }

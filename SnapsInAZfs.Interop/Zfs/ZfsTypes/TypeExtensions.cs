@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Diagnostics.CodeAnalysis;
 
@@ -14,46 +12,19 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 public static class TypeExtensions
 {
     /// <summary>
-    ///     Gets a string, suitable for use at the command line, of all flags specified
+    ///     Gets an integer index for radio button groups assuming the order of true,false,inherited from this
+    ///     <see cref="ZfsProperty{T}" />
     /// </summary>
-    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
+    /// <param name="property">The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups</param>
     /// <returns>
-    ///     A string, on a single line, with comma-separated string representations of each specified flag,
-    ///     in lower case, and with no whitespace
+    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
+    ///     0: true<br />
+    ///     1: false<br />
+    ///     2: inherited
     /// </returns>
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "Inputs are incapable of causing these exceptions" )]
-    public static string ToStringForCommandLine( this ZfsObjectKind value )
+    public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
     {
-        return value.ToString( ).Replace( " ", "" ).ToLower( );
-    }
-
-    /// <summary>
-    ///     Gets an array of <see langword="string" />s representing each of the flags specified
-    /// </summary>
-    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
-    /// <returns>
-    ///     A string array, containing one value per specified flag, converted to lower-case using the invariant culture
-    /// </returns>
-    public static string[] ToStringArray( this ZfsObjectKind value )
-    {
-        return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-    }
-
-    public static string GetZfsPathRoot( this string value )
-    {
-        int endIndex = value.IndexOf( '/' );
-        if ( endIndex == -1 )
-        {
-            endIndex = value.IndexOf( '@' );
-        }
-
-        if ( endIndex == -1 )
-        {
-            return value;
-        }
-
-        string rootPath = value[ ..endIndex ];
-        return rootPath;
+        return property.Value ? 0 : 1;
     }
 
     public static string GetZfsPathParent( this string value )
@@ -77,6 +48,54 @@ public static class TypeExtensions
         // Return its parent dataset name
         string rootPath = value[ ..endIndex ];
         return rootPath;
+    }
+
+    public static string GetZfsPathRoot( this string value )
+    {
+        int endIndex = value.IndexOf( '/' );
+        if ( endIndex == -1 )
+        {
+            endIndex = value.IndexOf( '@' );
+        }
+
+        if ( endIndex == -1 )
+        {
+            return value;
+        }
+
+        string rootPath = value[ ..endIndex ];
+        return rootPath;
+    }
+
+    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
+    {
+        return string.Join( ',', strings );
+    }
+
+    /// <summary>
+    ///     Gets an array of <see langword="string" />s representing each of the flags specified
+    /// </summary>
+    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
+    /// <returns>
+    ///     A string array, containing one value per specified flag, converted to lower-case using the invariant culture
+    /// </returns>
+    public static string[] ToStringArray( this ZfsObjectKind value )
+    {
+        return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+    }
+
+    /// <summary>
+    ///     Gets a string, suitable for use at the command line, of all flags specified
+    /// </summary>
+    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
+    /// <returns>
+    ///     A string, on a single line, with comma-separated string representations of each specified flag,
+    ///     in lower case, and with no whitespace
+    /// </returns>
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "Inputs are incapable of causing these exceptions" )]
+    public static string ToStringForCommandLine( this ZfsObjectKind value )
+    {
+        return value.ToString( ).Replace( " ", "" ).ToLower( );
     }
 
     public static string ToStringForZfsSet( this IEnumerable<ZfsProperty> properties )
@@ -111,26 +130,5 @@ public static class TypeExtensions
         }
 
         return string.Join( ' ', properties.Select( p => p.SetString ) );
-    }
-
-    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
-    {
-        return string.Join( ',', strings );
-    }
-
-    /// <summary>
-    ///     Gets an integer index for radio button groups assuming the order of true,false,inherited from this
-    ///     <see cref="ZfsProperty{T}" />
-    /// </summary>
-    /// <param name="property">The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups</param>
-    /// <returns>
-    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
-    ///     0: true<br />
-    ///     1: false<br />
-    ///     2: inherited
-    /// </returns>
-    public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
-    {
-        return property.Value ? 0 : 1;
     }
 }

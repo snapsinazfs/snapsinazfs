@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -14,16 +12,16 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
-    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot )
-    {
-        snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
-        return true;
-    }
-
-    /// <inheritdoc />
     public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
         return await Task.FromResult( true ).ConfigureAwait( true );
+    }
+
+    /// <inheritdoc />
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    {
+        await GetMockZfsDatasetsFromTextFileAsync( datasets, "alldatasets-withproperties.txt" ).ConfigureAwait( true );
+        await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
     }
 
     /// <inheritdoc />
@@ -70,15 +68,45 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
+    public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( )
     {
-        return !dryRun;
+        ConcurrentDictionary<string, Dataset> poolRoots = new( );
+        await GetMockZfsDatasetsFromTextFileAsync( poolRoots, "poolroots-withproperties.txt" ).ConfigureAwait( true );
+        return poolRoots;
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
-        return !dryRun;
+        //string fileName = "poolprops-bad-schemacheck.txt";
+        string fileName = "poolroots-withproperties.txt";
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
+        {
+            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            string poolName = lineTokens[ 0 ];
+            string propName = lineTokens[ 1 ];
+            string propValue = lineTokens[ 2 ];
+            string propSource = lineTokens[ 3 ];
+            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
+
+            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
+            {
+                ConcurrentDictionary<string, bool> newDs = new( )
+                {
+                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
+                };
+                return newDs;
+            }
+
+            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
+            {
+                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
+                return properties;
+            }
+        }
+
+        return rootsAndTheirProperties;
     }
 
     /// <inheritdoc />
@@ -88,44 +116,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( )
-    {
-        ConcurrentDictionary<string, Dataset> poolRoots = new( );
-        await GetMockZfsDatasetsFromTextFileAsync( poolRoots, "poolroots-withproperties.txt" ).ConfigureAwait( true );
-        return poolRoots;
-    }
-
-    /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
-    {
-        await GetMockZfsDatasetsFromTextFileAsync( datasets, "alldatasets-withproperties.txt" ).ConfigureAwait( true );
-        await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
-    }
-
-    /// <inheritdoc />
-    public override IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
-    {
-        throw new NotImplementedException( );
-    }
-
-    /// <inheritdoc />
-    /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
-    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
-    {
-        ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
-
-        if ( verb is "get" or "list" )
-        {
-            using StreamReader rdr = File.OpenText( args );
-            while ( !rdr.EndOfStream )
-            {
-                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets )
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
         Dictionary<string, TreeNode> allTreeNodes = new( );
@@ -136,8 +127,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             string propertyValue = lineTokens[ 2 ];
             baseDatasets.AddOrUpdate( dsName, k =>
             {
-                SanoidZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
-                SanoidZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
+                SnapsInAZfsZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
+                SnapsInAZfsZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
                 treeRootNodes.Add( node );
@@ -164,10 +155,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             {
                 int lastSlashIndex = dsName.LastIndexOf( '/' );
                 string parentName = dsName[ ..lastSlashIndex ];
-                SanoidZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
-                SanoidZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
-                SanoidZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
-                SanoidZfsDataset newDsTreeCopy = newDsBaseCopy with { };
+                SnapsInAZfsZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
+                SnapsInAZfsZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
+                SnapsInAZfsZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
+                SnapsInAZfsZfsDataset newDsTreeCopy = newDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
@@ -177,7 +168,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
             else
             {
-                SanoidZfsDataset ds = baseDatasets[ dsName ];
+                SnapsInAZfsZfsDataset ds = baseDatasets[ dsName ];
                 if ( ds.IsPoolRoot )
                 {
                     continue;
@@ -196,43 +187,50 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
-    {
-        //string fileName = "poolprops-bad-schemacheck.txt";
-        string fileName = "poolroots-withproperties.txt";
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            string poolName = lineTokens[ 0 ];
-            string propName = lineTokens[ 1 ];
-            string propValue = lineTokens[ 2 ];
-            string propSource = lineTokens[ 3 ];
-            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
-
-            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
-            {
-                ConcurrentDictionary<string,bool> newDs = new( )
-                {
-                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
-                };
-                return newDs;
-            }
-
-            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
-            {
-                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
-                return properties;
-            }
-        }
-
-        return rootsAndTheirProperties;
-    }
-
-    /// <inheritdoc />
     public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray )
     {
         return !dryRun;
+    }
+
+    /// <inheritdoc />
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
+    {
+        return !dryRun;
+    }
+
+    /// <inheritdoc />
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    {
+        return !dryRun;
+    }
+
+    /// <inheritdoc />
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot )
+    {
+        snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
+        return true;
+    }
+
+    /// <inheritdoc />
+    /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
+    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
+    {
+        ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
+
+        if ( verb is "get" or "list" )
+        {
+            using StreamReader rdr = File.OpenText( args );
+            while ( !rdr.EndOfStream )
+            {
+                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public override IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
+    {
+        throw new NotImplementedException( );
     }
 
     private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
@@ -292,7 +290,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
             if ( zfsListTokens[ 2 ] == "-" )
             {
-                Logger.Debug( "Line was not a sanoid.net snapshot. Skipping" );
+                Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
                 continue;
             }
 

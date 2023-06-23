@@ -31,7 +31,7 @@ namespace SnapsInAZfs.ConfigConsole
         }
 
         private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
-        private readonly ConcurrentDictionary<string, SanoidZfsDataset> _treeDatasets = new( );
+        private readonly ConcurrentDictionary<string, SnapsInAZfsZfsDataset> _treeDatasets = new( );
         private bool _eventsEnabled;
         private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
 

@@ -19,7 +19,7 @@ internal static class ConfigConsole
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
-    internal static readonly ConcurrentDictionary<string, SanoidZfsDataset> BaseDatasets = new( );
+    internal static readonly ConcurrentDictionary<string, SnapsInAZfsZfsDataset> BaseDatasets = new( );
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <summary>

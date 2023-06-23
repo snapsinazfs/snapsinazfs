@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -23,28 +21,6 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 public interface IZfsCommandRunner
 {
     /// <summary>
-    ///     Gets a list of ZFS datasets (filesystems and volumes)
-    /// </summary>
-    /// <returns>
-    ///     An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s, each representing the ZFS path of a dataset
-    ///     on the system.
-    /// </returns>
-    ImmutableSortedSet<string> ZfsListAll( )
-    {
-        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union( new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" } );
-        LogManager.GetCurrentClassLogger( ).Warn( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize( dataSets ) );
-        return dataSets;
-    }
-
-    /// <summary>
-    ///     Creates a zfs snapshot
-    /// </summary>
-    /// <returns>
-    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
-    /// </returns>
-    public bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot );
-
-    /// <summary>
     ///     Destroys a zfs snapshot
     /// </summary>
     /// <returns>
@@ -53,11 +29,52 @@ public interface IZfsCommandRunner
     public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <summary>
+    ///     Gets everything SnapsInAZfs cares about from ZFS, via separate processes executing in parallel using the thread pool
+    /// </summary>
+    /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
+    /// <param name="snapshots">A collection of snapshots for this method to populate</param>
+    /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
+    public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+
+    /// <summary>
     ///     Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
     /// </summary>
     /// <param name="datasets"></param>
     /// <returns>A boolean indicating success or failure of the operation</returns>
     public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets );
+
+    /// <summary>
+    ///     Gets configuration defined at all pool roots
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of pool root
+    ///     datasets in
+    ///     zfs, with SnapsInAZfs properties populated
+    /// </returns>
+    public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
+
+    /// <summary>
+    ///     Gets a collection of datasets and their property validity
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as pool root names, to
+    ///     TValue=<see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as property names, to
+    ///     TValue=<see langword="bool" />s indicating whether that property is defined and has a valid value for its type
+    /// </returns>
+    Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
+
+    /// <summary>
+    ///     Gets all dataset configuration from zfs
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of all datasets in
+    ///     zfs, with SnapsInAZfs properties populated
+    /// </returns>
+    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
+
+    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets );
+
+    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 
     /// <summary>
     ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
@@ -92,45 +109,28 @@ public interface IZfsCommandRunner
     public bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
     /// <summary>
-    ///     Gets all dataset configuration from zfs
+    ///     Creates a zfs snapshot
     /// </summary>
     /// <returns>
-    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of all datasets in
-    ///     zfs, with sanoid.net properties populated
+    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
+    public bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot );
+
+    public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 
     /// <summary>
-    ///     Gets configuration defined at all pool roots
+    ///     Gets a list of ZFS datasets (filesystems and volumes)
     /// </summary>
     /// <returns>
-    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of pool root
-    ///     datasets in
-    ///     zfs, with sanoid.net properties populated
+    ///     An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s, each representing the ZFS path of a dataset
+    ///     on the system.
     /// </returns>
-    public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( );
-
-    /// <summary>
-    ///     Gets everything Sanoid.net cares about from ZFS, via separate processes executing in parallel using the thread pool
-    /// </summary>
-    /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
-    /// <param name="snapshots">A collection of snapshots for this method to populate</param>
-    /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
-    public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+    ImmutableSortedSet<string> ZfsListAll( )
+    {
+        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union( new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" } );
+        LogManager.GetCurrentClassLogger( ).Warn( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize( dataSets ) );
+        return dataSets;
+    }
 
     public IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
-    public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
-    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets );
-
-    /// <summary>
-    ///     Gets a collection of datasets and their property validity
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as pool root names, to
-    ///     TValue=<see cref="ConcurrentDictionary{TKey,TValue}" /> of TKey=<see langword="string" />s, as property names, to
-    ///     TValue=<see langword="bool" />s indicating whether that property is defined and has a valid value for its type
-    /// </returns>
-    Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
-
-    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 }

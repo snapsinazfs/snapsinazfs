@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
@@ -14,6 +12,10 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public abstract class ZfsObjectBase
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    private readonly object _propertiesDictionaryLock = new( );
+
     /// <summary>
     ///     Creates a new <see cref="ZfsObjectBase" /> with the specified name and kind
     /// </summary>
@@ -70,8 +72,6 @@ public abstract class ZfsObjectBase
 
     private int _poolUsedCapacity;
 
-    private readonly object _propertiesDictionaryLock = new( );
-
     public bool IsPoolRoot { get; }
 
     public ZfsProperty? this[ string key ]
@@ -116,26 +116,7 @@ public abstract class ZfsObjectBase
     public string Name { get; }
 
     [JsonIgnore]
-    internal Regex NameValidatorRegex { get; }
-
-    [JsonIgnore]
     public ZfsObjectBase PoolRoot { get; }
-
-    internal int PoolUsedCapacity
-    {
-        get => IsPoolRoot ? _poolUsedCapacity : PoolRoot.PoolUsedCapacity;
-        set
-        {
-            if ( IsPoolRoot )
-            {
-                _poolUsedCapacity = value;
-            }
-            else
-            {
-                Logger.Error( "Invalid attempt to set capacity on non-root object {0}", Name );
-            }
-        }
-    }
 
     /// <summary>
     ///     A dictionary of property names and their values, as strings
@@ -177,21 +158,68 @@ public abstract class ZfsObjectBase
 
     public string ZfsKind { get; }
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    [JsonIgnore]
+    internal Regex NameValidatorRegex { get; }
+
+    internal int PoolUsedCapacity
+    {
+        get => IsPoolRoot ? _poolUsedCapacity : PoolRoot.PoolUsedCapacity;
+        set
+        {
+            if ( IsPoolRoot )
+            {
+                _poolUsedCapacity = value;
+            }
+            else
+            {
+                Logger.Error( "Invalid attempt to set capacity on non-root object {0}", Name );
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Adds the <see cref="ZfsProperty" /> <paramref name="prop" /> to this <see name="ZfsObjectBase" />
+    /// </summary>
+    /// <param name="prop">The property to add</param>
+    public ZfsProperty AddOrUpdateProperty( ZfsProperty prop )
+    {
+        lock ( _propertiesDictionaryLock )
+        {
+            SetRetentionProperty( prop.Name, prop.Value );
+
+            return Properties[ prop.Name ] = prop;
+        }
+    }
+
+    /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null" />.</exception>
+    public ZfsProperty AddOrUpdateProperty( string propertyName, string propertyValue, string propertyValueSource )
+    {
+        // Unfortunately, the AddOrUpdate method isn't atomic, so we need to enforce a lock ourselves
+        // There's no built-in atomic way to perform a check for the key, update if it exists, and insert if not.
+        // It can only atomically test and perform one operation
+        lock ( _propertiesDictionaryLock )
+        {
+            SetRetentionProperty( propertyName, propertyValue );
+
+            return Properties.AddOrUpdate( propertyName, AddValueFactory, UpdateValueFactory );
+
+            ZfsProperty UpdateValueFactory( string key, ZfsProperty oldProperty )
+            {
+                oldProperty.Value = propertyValue;
+                oldProperty.Source = propertyValueSource;
+                return oldProperty;
+            }
+
+            ZfsProperty AddValueFactory( string arg )
+            {
+                return new( propertyName, propertyValue, propertyValueSource );
+            }
+        }
+    }
 
     public bool HasProperty( string propertyName )
     {
         return Properties.ContainsKey( propertyName );
-    }
-
-    protected internal bool ValidateName( string name )
-    {
-        return ValidateName( ZfsKind, name, NameValidatorRegex );
-    }
-
-    protected internal bool ValidateName( )
-    {
-        return ValidateName( Name );
     }
 
     /// <exception cref="ArgumentOutOfRangeException">
@@ -248,44 +276,14 @@ public abstract class ZfsObjectBase
         return true;
     }
 
-    /// <summary>
-    ///     Adds the <see cref="ZfsProperty" /> <paramref name="prop" /> to this <see name="ZfsObjectBase" />
-    /// </summary>
-    /// <param name="prop">The property to add</param>
-    public ZfsProperty AddOrUpdateProperty( ZfsProperty prop )
+    protected internal bool ValidateName( string name )
     {
-        lock ( _propertiesDictionaryLock )
-        {
-            SetRetentionProperty( prop.Name, prop.Value );
-
-            return Properties[ prop.Name ] = prop;
-        }
+        return ValidateName( ZfsKind, name, NameValidatorRegex );
     }
 
-    /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null" />.</exception>
-    public ZfsProperty AddOrUpdateProperty( string propertyName, string propertyValue, string propertyValueSource )
+    protected internal bool ValidateName( )
     {
-        // Unfortunately, the AddOrUpdate method isn't atomic, so we need to enforce a lock ourselves
-        // There's no built-in atomic way to perform a check for the key, update if it exists, and insert if not.
-        // It can only atomically test and perform one operation
-        lock ( _propertiesDictionaryLock )
-        {
-            SetRetentionProperty( propertyName, propertyValue );
-
-            return Properties.AddOrUpdate( propertyName, AddValueFactory, UpdateValueFactory );
-
-            ZfsProperty UpdateValueFactory( string key, ZfsProperty oldProperty )
-            {
-                oldProperty.Value = propertyValue;
-                oldProperty.Source = propertyValueSource;
-                return oldProperty;
-            }
-
-            ZfsProperty AddValueFactory( string arg )
-            {
-                return new( propertyName, propertyValue, propertyValueSource );
-            }
-        }
+        return ValidateName( Name );
     }
 
     private void SetRetentionProperty( string propertyName, string propertyValue )

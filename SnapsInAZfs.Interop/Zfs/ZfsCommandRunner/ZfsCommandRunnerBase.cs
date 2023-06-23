@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using NLog;
@@ -35,7 +33,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
 
     /// <inheritdoc />
-    public abstract Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( );
+    public abstract Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
 
     /// <inheritdoc />
     public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
@@ -45,7 +43,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     /// <inheritdoc />
     public abstract IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 
-    public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SanoidZfsDataset> baseDatasets, ConcurrentDictionary<string, SanoidZfsDataset> treeDatasets );
+    public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets );
 
     /// <inheritdoc />
     public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
@@ -66,7 +64,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
             ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
             ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
-            ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is "sanoid" or "zfs",
+            ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is ZfsPropertyValueConstants.SnapsInAZfs or ZfsPropertyValueConstants.ZfsRecursion,
             ZfsPropertyNames.TemplatePropertyName => !string.IsNullOrWhiteSpace( value ),
             ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
             ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,

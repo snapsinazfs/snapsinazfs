@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Globalization;
@@ -19,6 +17,8 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 /// </summary>
 public class Dataset : ZfsObjectBase
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <summary>
     ///     Creates a new <see cref="Dataset" /> with the specified name and kind, optionally performing name validation
     /// </summary>
@@ -82,7 +82,7 @@ public class Dataset : ZfsObjectBase
     {
         get
         {
-            string valueString = Properties.TryGetValue( ZfsPropertyNames.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : SnapshotRecursionMode.Sanoid;
+            string valueString = Properties.TryGetValue( ZfsPropertyNames.RecursionPropertyName, out ZfsProperty? prop ) ? prop.Value : ZfsPropertyValueConstants.SnapsInAZfs;
             return valueString;
         }
     }
@@ -103,7 +103,34 @@ public class Dataset : ZfsObjectBase
     public List<Snapshot> WeeklySnapshots { get; } = new( );
     public List<Snapshot> YearlySnapshots { get; } = new( );
 
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    public Snapshot AddSnapshot( Snapshot snap )
+    {
+        Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
+        AllSnapshots[ snap.Name ] = snap;
+        switch ( snap.Period.Kind )
+        {
+            case SnapshotPeriodKind.Frequent:
+                FrequentSnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Hourly:
+                HourlySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Daily:
+                DailySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Weekly:
+                WeeklySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Monthly:
+                MonthlySnapshots.Add( snap );
+                break;
+            case SnapshotPeriodKind.Yearly:
+                YearlySnapshots.Add( snap );
+                break;
+        }
+
+        return snap;
+    }
 
     public (bool MissingAny, List<string>? MissingPropertyNames) GetMissingMandatoryProperties( )
     {
@@ -235,6 +262,45 @@ public class Dataset : ZfsObjectBase
     }
 
     /// <summary>
+    ///     Gets whether a daily snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
+    ///     <paramref name="timestamp" />
+    /// </summary>
+    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>Snapshot retention settings define daily greater than 0</description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <paramref name="timestamp" /> is either more than one day ahead of the last daily
+    ///                 snapshot OR the last daily snapshot is not in the same day of the year
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </returns>
+    public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
+    {
+        //Exit early if retention settings say no dailies
+        if ( !RetentionSettings.IsDailyWanted )
+        {
+            return false;
+        }
+
+        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
+        // going to optimize it all away anyway.
+        Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
+        bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
+        // Check if more than a day ago or if a different day of the year
+        bool lastDailyOnDifferentDayOfYear = LastDailySnapshotTimestamp.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
+        bool dailySnapshotNeeded = atLeastOneDaySinceLastDailySnapshot || lastDailyOnDifferentDayOfYear;
+        Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
+        return dailySnapshotNeeded;
+    }
+
+    /// <summary>
     ///     Gets whether a frequent snapshot is needed, according to the provided <see cref="SnapshotTimingSettings" /> and
     ///     <paramref name="timestamp" />
     /// </summary>
@@ -315,42 +381,47 @@ public class Dataset : ZfsObjectBase
     }
 
     /// <summary>
-    ///     Gets whether a daily snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
-    ///     <paramref name="timestamp" />
+    ///     Gets whether a monthly snapshot is needed
     /// </summary>
     /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
-    ///             <description>Snapshot retention settings define daily greater than 0</description>
+    ///             <description>Snapshot retention settings define monthly greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp" /> is either more than one day ahead of the last daily
-    ///                 snapshot OR the last daily snapshot is not in the same day of the year
+    ///                 <paramref name="timestamp" /> is either in a different month than the last monthly snapshot OR the last
+    ///                 monthly snapshot is in a different year
     ///             </description>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
+    /// <remarks>
+    ///     Uses culture-aware definitions of months, using the executing user's culture.
+    /// </remarks>
+    public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        //Exit early if retention settings say no dailies
-        if ( !RetentionSettings.IsDailyWanted )
+        //Exit early if retention settings say no monthlies
+        if ( !RetentionSettings.IsMonthlyWanted )
         {
             return false;
         }
 
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
-        Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
-        TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp;
-        bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
-        // Check if more than a day ago or if a different day of the year
-        bool lastDailyOnDifferentDayOfYear = LastDailySnapshotTimestamp.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
-        bool dailySnapshotNeeded = atLeastOneDaySinceLastDailySnapshot || lastDailyOnDifferentDayOfYear;
-        Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
-        return dailySnapshotNeeded;
+        Logger.Trace( "Checking if monthly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        int lastMonthlySnapshotMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( LastMonthlySnapshotTimestamp.LocalDateTime );
+        int currentMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( timestamp.LocalDateTime );
+        int lastMonthlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastMonthlySnapshotTimestamp.LocalDateTime );
+        int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
+        // Check if the last monthly snapshot was in a different month or if same month but different year
+        bool lastMonthlySnapshotInDifferentMonth = lastMonthlySnapshotMonth != currentMonth;
+        bool lastMonthlySnapshotInDifferentYear = currentYear != lastMonthlySnapshotYear;
+        bool monthlySnapshotNeeded = lastMonthlySnapshotInDifferentMonth || lastMonthlySnapshotInDifferentYear;
+        Logger.Debug( "Monthly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, monthlySnapshotNeeded ? "" : "not " );
+        return monthlySnapshotNeeded;
     }
 
     /// <summary>
@@ -401,50 +472,6 @@ public class Dataset : ZfsObjectBase
     }
 
     /// <summary>
-    ///     Gets whether a monthly snapshot is needed
-    /// </summary>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
-    /// <returns>
-    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
-    ///     <list type="bullet">
-    ///         <item>
-    ///             <description>Snapshot retention settings define monthly greater than 0</description>
-    ///         </item>
-    ///         <item>
-    ///             <description>
-    ///                 <paramref name="timestamp" /> is either in a different month than the last monthly snapshot OR the last
-    ///                 monthly snapshot is in a different year
-    ///             </description>
-    ///         </item>
-    ///     </list>
-    /// </returns>
-    /// <remarks>
-    ///     Uses culture-aware definitions of months, using the executing user's culture.
-    /// </remarks>
-    public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
-    {
-        //Exit early if retention settings say no monthlies
-        if ( !RetentionSettings.IsMonthlyWanted )
-        {
-            return false;
-        }
-
-        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
-        // going to optimize it all away anyway.
-        Logger.Trace( "Checking if monthly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
-        int lastMonthlySnapshotMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( LastMonthlySnapshotTimestamp.LocalDateTime );
-        int currentMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( timestamp.LocalDateTime );
-        int lastMonthlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastMonthlySnapshotTimestamp.LocalDateTime );
-        int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
-        // Check if the last monthly snapshot was in a different month or if same month but different year
-        bool lastMonthlySnapshotInDifferentMonth = lastMonthlySnapshotMonth != currentMonth;
-        bool lastMonthlySnapshotInDifferentYear = currentYear != lastMonthlySnapshotYear;
-        bool monthlySnapshotNeeded = lastMonthlySnapshotInDifferentMonth || lastMonthlySnapshotInDifferentYear;
-        Logger.Debug( "Monthly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, monthlySnapshotNeeded ? "" : "not " );
-        return monthlySnapshotNeeded;
-    }
-
-    /// <summary>
     ///     Gets whether a yearly snapshot is needed, according to the provided <see cref="SnapshotRetentionSettings" /> and
     ///     <paramref name="timestamp" />
     /// </summary>
@@ -479,34 +506,5 @@ public class Dataset : ZfsObjectBase
     public override string ToString( )
     {
         return JsonSerializer.Serialize( this );
-    }
-
-    public Snapshot AddSnapshot( Snapshot snap )
-    {
-        Logger.Trace( "Adding snapshot {0} to dataset object {1}", snap.Name, Name );
-        AllSnapshots[ snap.Name ] = snap;
-        switch ( snap.Period.Kind )
-        {
-            case SnapshotPeriodKind.Frequent:
-                FrequentSnapshots.Add( snap );
-                break;
-            case SnapshotPeriodKind.Hourly:
-                HourlySnapshots.Add( snap );
-                break;
-            case SnapshotPeriodKind.Daily:
-                DailySnapshots.Add( snap );
-                break;
-            case SnapshotPeriodKind.Weekly:
-                WeeklySnapshots.Add( snap );
-                break;
-            case SnapshotPeriodKind.Monthly:
-                MonthlySnapshots.Add( snap );
-                break;
-            case SnapshotPeriodKind.Yearly:
-                YearlySnapshots.Add( snap );
-                break;
-        }
-
-        return snap;
     }
 }

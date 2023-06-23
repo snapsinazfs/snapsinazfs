@@ -1,8 +1,6 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
@@ -14,12 +12,14 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public class ZfsProperty
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     public ZfsProperty( string propertyName, string propertyValue, string valueSource )
     {
         Name = propertyName;
         Value = propertyValue;
         Source = valueSource;
-        IsSanoidProperty = propertyName.StartsWith( "sanoid.net:" );
+        IsSnapsInAZfsProperty = propertyName.StartsWith( "snapsinazfs.com:" );
     }
 
     public static ImmutableDictionary<string, ZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
@@ -27,7 +27,7 @@ public class ZfsProperty
         { ZfsPropertyNames.EnabledPropertyName, new( ZfsPropertyNames.EnabledPropertyName, "false", ZfsPropertySourceConstants.Local ) },
         { ZfsPropertyNames.TakeSnapshotsPropertyName, new( ZfsPropertyNames.TakeSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
         { ZfsPropertyNames.PruneSnapshotsPropertyName, new( ZfsPropertyNames.PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local ) },
-        { ZfsPropertyNames.RecursionPropertyName, new( ZfsPropertyNames.RecursionPropertyName, "sanoid", ZfsPropertySourceConstants.Local ) },
+        { ZfsPropertyNames.RecursionPropertyName, new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ) },
         { ZfsPropertyNames.TemplatePropertyName, new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) },
         { ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
         { ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Local ) },
@@ -46,15 +46,15 @@ public class ZfsProperty
 
     public static ImmutableSortedDictionary<string, ZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, ZfsProperty>.Empty.AddRange( new Dictionary<string, ZfsProperty>
     {
-        { ZfsPropertyNames.SnapshotNamePropertyName, new( ZfsPropertyNames.SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
-        { ZfsPropertyNames.SnapshotPeriodPropertyName, new( ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.Sanoid ) },
-        { ZfsPropertyNames.SnapshotTimestampPropertyName, new( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.Sanoid ) }
+        { ZfsPropertyNames.SnapshotNamePropertyName, new( ZfsPropertyNames.SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.SnapsInAZfs ) },
+        { ZfsPropertyNames.SnapshotPeriodPropertyName, new( ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.SnapsInAZfs ) },
+        { ZfsPropertyNames.SnapshotTimestampPropertyName, new( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpoch, ZfsPropertySourceConstants.SnapsInAZfs ) }
     } );
 
-    public bool IsSanoidProperty { get; }
+    public bool IsSnapsInAZfsProperty { get; }
 
     [JsonIgnore]
-    public bool IsUndefined => IsSanoidProperty
+    public bool IsUndefined => IsSnapsInAZfsProperty
                                && ( Value == ZfsPropertyValueConstants.None || Source == ZfsPropertySourceConstants.None );
 
     public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
@@ -98,7 +98,6 @@ public class ZfsProperty
     public string Value { get; set; }
 
     private const string UnixEpoch = "1970-01-01T00:00:00.0000000+00:00";
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     public static (bool success, ZfsProperty? prop, string? parent) FromZfsGetLine( string zfsGetLine )
     {
@@ -126,17 +125,17 @@ public class ZfsProperty
 public readonly record struct ZfsProperty<T>( string Name, T Value, string Source ) : IZfsProperty where T : notnull
 {
     /// <summary>
-    ///     Gets whether this is a sanoid property or not
+    ///     Gets whether this is a SnapsInAZfs property or not
     /// </summary>
-    /// <remarks>Set by constructor, if property name begins with "sanoid.net:"</remarks>
+    /// <remarks>Set by constructor, if property name begins with "snapsinazfs.com:"</remarks>
     [JsonIgnore]
-    public bool IsSanoidProperty { get; } = Name.StartsWith( "sanoid.net:" );
+    public bool IsSnapsInAZfsProperty { get; } = Name.StartsWith( "snapsinazfs.com:" );
 
     /// <summary>
-    ///     Gets a boolean indicating if this property is a sanoid property, is a string, and is equal to "-"
+    ///     Gets a boolean indicating if this property is a SnapsInAZfs property, is a string, and is equal to "-"
     /// </summary>
     [JsonIgnore]
-    public bool IsUndefinedOrDefault => IsSanoidProperty && Value is "-";
+    public bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is "-";
 
     /// <summary>
     ///     Gets a string representation of the Value property, in an appropriate form for its type

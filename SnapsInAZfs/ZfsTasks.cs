@@ -15,7 +15,7 @@ namespace SnapsInAZfs;
 
 internal static class ZfsTasks
 {
-    private const string SnapshotMutexName = "Global\\Sanoid.net_Snapshots";
+    private const string SnapshotMutexName = "Global\\SnapsInAZfs_Snapshots";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
@@ -292,7 +292,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        if ( ds.Recursion == SnapshotRecursionMode.Zfs && ds[ ZfsPropertyNames.RecursionPropertyName ]?.Source != "local" )
+        if ( ds.Recursion == ZfsPropertyValueConstants.ZfsRecursion && ds[ ZfsPropertyNames.RecursionPropertyName ]?.Source != "local" )
         {
             Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
             return false;
@@ -481,14 +481,14 @@ internal static class ZfsTasks
     }
 
     /// <summary>
-    ///     Gets the pool roots with all sanoid.net properties and capacity properties
+    ///     Gets the pool roots with all SnapsInAZfs properties and capacity properties
     /// </summary>
     /// <param name="zfsCommandRunner"></param>
     /// <returns></returns>
     /// <remarks>Should only be called once schema validity has been checked, or else results are undefined and unsupported</remarks>
     public static async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootsWithPropertiesAndCapacities( IZfsCommandRunner zfsCommandRunner )
     {
-        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSanoidPropertiesAsync( ).ConfigureAwait( true );
+        ConcurrentDictionary<string, Dataset> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( true );
 
         if ( poolRoots.Any( ) )
         {

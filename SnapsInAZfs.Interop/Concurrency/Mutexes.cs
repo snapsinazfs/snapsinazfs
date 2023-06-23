@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license, as retrieved
-// from http://www.gnu.org/licenses/gpl-3.0.html on 2014-11-17.  A copy should also be available in this
-// project's Git repository at https://github.com/jimsalterjrs/sanoid/blob/master/LICENSE.
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -20,6 +18,11 @@ namespace SnapsInAZfs.Interop.Concurrency;
 /// </remarks>
 public sealed class Mutexes : IDisposable
 {
+    private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
+
+    // ReSharper disable once InconsistentNaming
+    private static Logger Logger;
+
     static Mutexes( )
     {
         Logger = LogManager.GetCurrentClassLogger( );
@@ -31,7 +34,6 @@ public sealed class Mutexes : IDisposable
         Logger.Trace( "Creating mutex manager" );
     }
 
-    private readonly ConcurrentDictionary<string, Mutex?> _allMutexes = new( );
     private bool _disposed;
 
     public static Mutexes Instance { get; } = new( );
@@ -50,9 +52,6 @@ public sealed class Mutexes : IDisposable
         }
     }
 
-    // ReSharper disable once InconsistentNaming
-    private static Logger Logger;
-
     /// <summary>
     ///     Disposes all remaining held mutexes, and logs warnings for them
     /// </summary>
@@ -61,92 +60,27 @@ public sealed class Mutexes : IDisposable
         DisposeMutexes( true );
     }
 
-    /// <summary>
-    ///     Gets the default mutex for Sanoid.net, named "Global\\Sanoid.net"
-    /// </summary>
-    /// <param name="caughtException">
-    ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
-    ///     to acquire the mutex.<br />
-    ///     The caller should treat the mutex as invalid and abort.
-    /// </param>
-    /// <returns>
-    ///     A <see cref="Mutex" /> named "Global\\Sanoid.net"
-    /// </returns>
-    /// <remarks>
-    ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
-    ///     Caller bears responsibility for handling results of this method call.
-    /// </remarks>
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumented", Justification = "The undocumented exceptions can't be thrown on Linux." )]
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
-    public static Mutex? GetSanoidMutex( out Exception? caughtException )
+    public static void DisposeMutexes( bool warnOnStillHeld = false )
     {
-        return GetMutex( out caughtException );
-    }
-
-    /// <summary>
-    ///     Gets a mutex named <paramref name="name" />
-    /// </summary>
-    /// <param name="caughtException">
-    ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
-    ///     to acquire the mutex.<br />
-    ///     The caller should treat the mutex as invalid and abort.
-    /// </param>
-    /// <param name="name">
-    ///     The name of the mutex. Must begin with "Global\\" to be valid for inter-process synchronization across all user
-    ///     sessions.<br />
-    ///     Otherwise, "Local\\" is automatically prefixed by the runtime, which provides a mutex that is only unique for the
-    ///     current user session.<br />
-    ///     If this parameter is null or omitted, a global Mutex named "Global\\Sanoid.net" will be acquired.
-    /// </param>
-    /// <returns>
-    ///     A <see cref="Mutex" /> with the given name or default name, if <paramref name="name" /> is omitted.
-    /// </returns>
-    /// <remarks>
-    ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
-    ///     Caller bears responsibility for handling results of this method call.
-    /// </remarks>
-    /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumented", Justification = "The undocumented exceptions can't be thrown on Linux." )]
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
-    public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\Sanoid.net" )
-    {
-        Logger.Debug( "Mutex {0} requested", name );
-        caughtException = null;
-        bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? sanoidMutex );
-        if ( exists && sanoidMutex != null )
+        if ( Instance._disposed )
         {
-            Logger.Trace( "Mutex {0} already exists. Returning it", name );
-            return sanoidMutex;
+            return;
         }
 
-        try
+        Logger.Debug( "Disposing all mutexes" );
+
+        foreach ( ( string? name, Mutex? mutex ) in Instance._allMutexes )
         {
-            Logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
-            sanoidMutex = new( true, name, out bool createdNew );
-            Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
-            // This exception is not possible. Setter creates the node.
-            // ReSharper disable once ExceptionNotDocumentedOptional
-            Instance._allMutexes[ name ] = sanoidMutex;
-            Instance._disposed = false;
-        }
-        catch ( IOException ioe )
-        {
-            Logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired", name );
-            caughtException = ioe;
-        }
-        catch ( WaitHandleCannotBeOpenedException whcboe )
-        {
-            Logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired", name );
-            caughtException = whcboe;
-        }
-        catch ( AbandonedMutexException ame )
-        {
-            Logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid", name );
-            caughtException = ame;
+            if ( warnOnStillHeld )
+            {
+                Logger.Warn( "Mutex {0} still held", name );
+            }
+
+            mutex?.Dispose( );
         }
 
-        Logger.Trace( "Returning from GetSanoidMutex({0}) with a {1} mutex", name, sanoidMutex is null ? "null" : "not-null" );
-        return sanoidMutex;
+        Instance._allMutexes.Clear( );
+        Instance._disposed = true;
     }
 
     /// <summary>
@@ -179,7 +113,7 @@ public sealed class Mutexes : IDisposable
             }
             case AbandonedMutexException ame:
             {
-                const string errorMessage = "Failed taking snapshots. A previous instance of Sanoid.net exited without properly releasing the snapshot mutex.";
+                const string errorMessage = "Failed taking snapshots. A previous instance of SnapsInAZfs exited without properly releasing the snapshot mutex.";
                 Logger.Error( ame, errorMessage );
                 return new( MutexAcquisitionErrno.AbandonedMutex, new( MutexAcquisitionErrno.AbandonedMutex, ame ) );
             }
@@ -220,11 +154,99 @@ public sealed class Mutexes : IDisposable
     }
 
     /// <summary>
+    ///     Gets a mutex named <paramref name="name" />
+    /// </summary>
+    /// <param name="caughtException">
+    ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
+    ///     to acquire the mutex.<br />
+    ///     The caller should treat the mutex as invalid and abort.
+    /// </param>
+    /// <param name="name">
+    ///     The name of the mutex. Must begin with "Global\\" to be valid for inter-process synchronization across all user
+    ///     sessions.<br />
+    ///     Otherwise, "Local\\" is automatically prefixed by the runtime, which provides a mutex that is only unique for the
+    ///     current user session.<br />
+    ///     If this parameter is null or omitted, a global Mutex named "Global\\SnapsInAZfs" will be acquired.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="Mutex" /> with the given name or default name, if <paramref name="name" /> is omitted.
+    /// </returns>
+    /// <remarks>
+    ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
+    ///     Caller bears responsibility for handling results of this method call.
+    /// </remarks>
+    /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumented", Justification = "The undocumented exceptions can't be thrown on Linux." )]
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
+    public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\SnapsInAZfs" )
+    {
+        Logger.Debug( "Mutex {0} requested", name );
+        caughtException = null;
+        bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? snapsInAZfsMutex );
+        if ( exists && snapsInAZfsMutex != null )
+        {
+            Logger.Trace( "Mutex {0} already exists. Returning it", name );
+            return snapsInAZfsMutex;
+        }
+
+        try
+        {
+            Logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
+            snapsInAZfsMutex = new( true, name, out bool createdNew );
+            Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
+            // This exception is not possible. Setter creates the node.
+            // ReSharper disable once ExceptionNotDocumentedOptional
+            Instance._allMutexes[ name ] = snapsInAZfsMutex;
+            Instance._disposed = false;
+        }
+        catch ( IOException ioe )
+        {
+            Logger.Error( ioe, "Mutex {0} name invalid. Mutex {0} not acquired", name );
+            caughtException = ioe;
+        }
+        catch ( WaitHandleCannotBeOpenedException whcboe )
+        {
+            Logger.Error( whcboe, "Mutex {0} could not be acquired. Another synchronizatio object of a different type with the same name exists. Mutex {0} not acquired", name );
+            caughtException = whcboe;
+        }
+        catch ( AbandonedMutexException ame )
+        {
+            Logger.Error( ame, "Mutex {0} exists but was abandoned. Returned mutex is invalid", name );
+            caughtException = ame;
+        }
+
+        Logger.Trace( "Returning from GetSnapsInAZfsMutex({0}) with a {1} mutex", name, snapsInAZfsMutex is null ? "null" : "not-null" );
+        return snapsInAZfsMutex;
+    }
+
+    /// <summary>
+    ///     Gets the default mutex for SnapsInAZfs, named "Global\\SnapsInAZfs"
+    /// </summary>
+    /// <param name="caughtException">
+    ///     A <see langword="bool" /> indicating whether this method had to catch a fatal exception while attempting
+    ///     to acquire the mutex.<br />
+    ///     The caller should treat the mutex as invalid and abort.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="Mutex" /> named "Global\\SnapsInAZfs"
+    /// </returns>
+    /// <remarks>
+    ///     It is possible for the returned <see cref="Mutex" /> to not be valid for use.<br />
+    ///     Caller bears responsibility for handling results of this method call.
+    /// </remarks>
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumented", Justification = "The undocumented exceptions can't be thrown on Linux." )]
+    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
+    public static Mutex? GetSnapsInAZfsMutex( out Exception? caughtException )
+    {
+        return GetMutex( out caughtException );
+    }
+
+    /// <summary>
     ///     Attempts to release the specified mutex.
     /// </summary>
     /// <param name="name">The name of the mutex to release.</param>
     /// <exception cref="ArgumentNullException"><paramref name="name" /> is  <see langword="null" />.</exception>
-    public static void ReleaseMutex( string name = "Global\\Sanoid.net" )
+    public static void ReleaseMutex( string name = "Global\\SnapsInAZfs" )
     {
         if ( string.IsNullOrWhiteSpace( name ) )
         {
@@ -258,28 +280,5 @@ public sealed class Mutexes : IDisposable
             // Log as an error, though, because this needs to be handled in code.
             Logger.Error( ex, "Attempted to release mutex that has already been disposed." );
         }
-    }
-
-    public static void DisposeMutexes( bool warnOnStillHeld = false )
-    {
-        if ( Instance._disposed )
-        {
-            return;
-        }
-
-        Logger.Debug( "Disposing all mutexes" );
-
-        foreach ( ( string? name, Mutex? mutex ) in Instance._allMutexes )
-        {
-            if ( warnOnStillHeld )
-            {
-                Logger.Warn( "Mutex {0} still held", name );
-            }
-
-            mutex?.Dispose( );
-        }
-
-        Instance._allMutexes.Clear( );
-        Instance._disposed = true;
     }
 }
