@@ -14,14 +14,14 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
-    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SanoidSettings sanoidSettings, TemplateSettings template, out Snapshot snapshot )
+    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot )
     {
         snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
         return true;
     }
 
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SanoidSettings settings )
+    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
         return await Task.FromResult( true ).ConfigureAwait( true );
     }

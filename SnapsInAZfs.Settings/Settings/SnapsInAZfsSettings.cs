@@ -12,7 +12,7 @@ namespace SnapsInAZfs.Settings.Settings;
 /// <summary>
 ///     Settings class for use with the .net <see cref="IConfiguration" /> binder
 /// </summary>
-public record SanoidSettings
+public record SnapsInAZfsSettings
 {
     /// <summary>
     ///     Gets or sets sanoid.net's directory for temporary files

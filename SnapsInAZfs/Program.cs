@@ -24,7 +24,7 @@ internal class Program
     // Note that logging will be at whatever level is defined in Sanoid.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in Sanoid.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    internal static SanoidSettings? Settings;
+    internal static SnapsInAZfsSettings? Settings;
 
     public static async Task<int> Main( string[] argv )
     {
@@ -119,7 +119,7 @@ internal class Program
         Logger.Trace( "Building settings objects from IConfiguration" );
         try
         {
-            Settings = rootConfiguration.Get<SanoidSettings>( ) ?? throw new InvalidOperationException( );
+            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
         }
         catch ( Exception ex )
         {

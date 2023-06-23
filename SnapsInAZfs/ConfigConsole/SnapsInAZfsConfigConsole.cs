@@ -96,7 +96,7 @@ namespace SnapsInAZfs.ConfigConsole
                         return;
                     }
 
-                    SanoidSettings copyOfCurrentSettings = Program.Settings! with { };
+                    SnapsInAZfsSettings copyOfCurrentSettings = Program.Settings! with { };
                     (bool status, string reasonOrFile) copyConfigResult = ContinueWithSave( copyOfCurrentSettings );
                     if ( copyConfigResult.status )
                     {
@@ -141,7 +141,7 @@ namespace SnapsInAZfs.ConfigConsole
                     TemplateConfigurationWindow.CommitModifiedTemplates( );
                 }
 
-                SanoidSettings newSettingsToSave = new( )
+                SnapsInAZfsSettings newSettingsToSave = new( )
                 {
                     DryRun = _globalConfigurationWindow!.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
                     TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
@@ -178,7 +178,7 @@ namespace SnapsInAZfs.ConfigConsole
                 EnableEventHandlers( );
             }
 
-            static (bool, string) ContinueWithSave( SanoidSettings settings )
+            static (bool, string) ContinueWithSave( SnapsInAZfsSettings settings )
             {
                 using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
                 {
