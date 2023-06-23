@@ -1,8 +1,8 @@
 ﻿{
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "Sanoid.monitoring.schema.json",
+    "$id": "SnapsInAZfs.monitoring.schema.json",
     "type": "object",
-    "description": "Configuration schema for Sanoid.net's monitoring capabilities",
+    "description": "Configuration schema for SnapsInAZfs' monitoring capabilities",
     "properties": {
         "$comments": {
             "type": "string",
@@ -10,12 +10,12 @@
         },
         "Health": {
             "type": "boolean",
-            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on. It only monitors filesystems that are configured in sanoid.net. Corresponds to the --monitor-health command line argument.",
+            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on. It only monitors filesystems that are configured in SnapsInAZfs. Corresponds to the --monitor-health command line argument.",
             "default": false
         },
         "Capacity": {
             "type": "boolean",
-            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in sanoid.net. Corresponds to the --monitor-capacity command line argument.",
+            "description": "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on. It only monitors pools that are configured in SnapsInAZfs. Corresponds to the --monitor-capacity command line argument.",
             "default": false
         },
         "Snapshots": {

@@ -1,12 +1,11 @@
 {
-  "$schema": "Sanoid.schema.json",
-  "$id": "Sanoid.json",
-  "$comments": "Default settings for sanoid.net. It is not recommended to modify this file. Customized settings should be specified in /etc/sanoid/Sanoid.local.json",
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "$id": "SnapsInAZfs.local.json",
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
+  "ZfsPath": "/usr/local/sbin/zfs", 
+  "ZpoolPath": "/usr/local/sbin/zpool", 
   "TakeSnapshots": false,
   "PruneSnapshots": false,
-  "CacheDirectory": "/var/cache/sanoid",
-  "ZfsPath": "/usr/local/sbin/zfs",
-  "ZpoolPath": "/usr/local/sbin/zpool",
   "DryRun": false,
   "Monitoring": {
     "Nagios": {
@@ -18,7 +17,7 @@
     }
   },
   "Templates": {
-    "default": {
+    "production": {
       "Formatting": {
         "ComponentSeparator": "_",
         "Prefix": "autosnap",

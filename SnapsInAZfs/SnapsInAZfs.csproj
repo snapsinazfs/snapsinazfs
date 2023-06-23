@@ -36,25 +36,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="Sanoid.local.json">
+    <Content Include="SnapsInAZfs.local.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.local.schema.json">
+    <Content Include="SnapsInAZfs.local.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.monitoring.schema.json">
+    <Content Include="SnapsInAZfs.monitoring.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.json">
+    <Content Include="SnapsInAZfs.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.nlog.json">
+    <Content Include="SnapsInAZfs.nlog.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.schema.json">
+    <Content Include="SnapsInAZfs.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Sanoid.template.schema.json">
+    <Content Include="SnapsInAZfs.template.schema.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

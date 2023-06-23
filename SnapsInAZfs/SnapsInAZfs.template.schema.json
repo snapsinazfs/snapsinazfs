@@ -1,8 +1,8 @@
 ﻿{
     "$schema": "https://json-schema.org/draft/2019-09/schema",
-    "$id": "Sanoid.template.schema.json",
+    "$id": "SnapsInAZfs.template.schema.json",
     "type": "object",
-    "description": "Configuration schema for Sanoid.net snapshot templates",
+    "description": "Configuration schema for SnapsInAZfs snapshot templates",
     "properties": {
         "$comments": {
             "type": "string",
@@ -32,8 +32,8 @@
                 },
                 "DailyTime": {
                     "type": "string",
-                    "description": "The time of day at which to take daily snapshots. Default is 23:59, since most people expect a daily snapshot to contain everything done DURING that day",
-                    "default": "23:59",
+                    "description": "The time of day at which to take daily snapshots. Default is 00:00",
+                    "default": "00:00",
                     "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$"
                 },
                 "WeeklyDay": {
@@ -47,24 +47,24 @@
                 "WeeklyTime": {
                     "type": "string",
                     "description": "The time of day at which to take weekly snapshots.",
-                    "default": "23:59",
+                    "default": "00:00",
                     "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$",
-                    "$comment": "Default is 23:59, which is different from perl sanoid's default of 23:30, so that weeklies contain all their dailies, as noted in the SnapshotTiming comment in this schema."
+                    "$comment": "Default is 00:00"
                 },
                 "MonthlyDay": {
                     "type": "integer",
                     "description": "The 1-indexed day of the month on which to take monthly snapshots.",
-                    "default": 31,
+                    "default": 1,
                     "maximum": 31,
                     "minimum": 1,
-                    "$comment": "If set to 30 or 31, and the current month does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 31, which is different from perl sanoid, which defaults to 1. This is so that Monthly snapshots contain everything from the named month."
+                    "$comment": "If set to 30 or 31, and the current month does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 1."
                 },
                 "MonthlyTime": {
                     "type": "string",
                     "description": "The time of day at which to take monthly snapshots. Must be parseable as a 24-hour time in the format HH:mm or HH:mm:ss. Ability to use seconds depends on your scheduling mechanism.",
-                    "default": "23:59",
+                    "default": "00:00",
                     "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$",
-                    "$comment": "Default is 23:59, which is different from perl sanoid's default of 23:30, so that monthlies contain all their weeklies and dailies, as noted in the SnapshotTiming comment in this schema."
+                    "$comment": "Default is 00:00"
                 },
                 "YearlyMonth": {
                     "type": "integer",
@@ -72,7 +72,7 @@
                     "default": 12,
                     "maximum": 12,
                     "minimum": 1,
-                    "$comment": "Default is 12, which is different from perl sanoid's default of 1, so that yearlies contain all their monthlies, as noted in the SnapshotTiming comment in this schema."
+                    "$comment": "Default is 1"
                 },
                 "YearlyDay": {
                     "type": "integer",
@@ -80,14 +80,14 @@
                     "default": 31,
                     "maximum": 31,
                     "minimum": 1,
-                    "$comment": "If set to 30 or 31, and the month specified in DailyMonth does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 31, which is different from perl sanoid, which defaults to 1."
+                    "$comment": "If set to 30 or 31, and the month specified in DailyMonth does not have 30 or 31 days, snapshot will be taken on the last day of the month (28 or 29 for February, for example). Default is 1"
                 },
                 "YearlyTime": {
                     "type": "string",
                     "description": "The time of day at which to take yearly snapshots.",
-                    "default": "23:59",
+                    "default": "00:00",
                     "pattern": "^[0-2]{1}[0-9]{1}:[0-5]{1}[0-9]{1}(:[0-5]{1}[0-9]{1})?$",
-                    "$comment": "Default is 23:59, which is different from perl sanoid's default of 00:00, so that yearlies contain all their monthlies, as noted in the SnapshotTiming comment in this schema."
+                    "$comment": "Default is 00:00"
                 }
             },
             "additionalProperties": false,

@@ -14,7 +14,7 @@
       { "assembly": "NLog.Extensions.Logging" }
     ],
     "variables": {
-      "var_logdir": "/var/log/sanoid.net"
+      "var_logdir": "/var/log/SnapsInAZfs"
     },
     "time": {
       "type": "AccurateUTC"

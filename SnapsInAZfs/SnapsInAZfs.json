@@ -1,12 +1,11 @@
 {
-  "$schema": "Sanoid.local.schema.json",
-  "$id": "Sanoid.local.json",
-  "$comments": "Values specified here supersede and extend the base configuration in Sanoid.json.",
-  "CacheDirectory": "var/cache/sanoid",
-  "ZfsPath": "/usr/local/sbin/zfs", 
-  "ZpoolPath": "/usr/local/sbin/zpool", 
+  "$schema": "SnapsInAZfs.schema.json",
+  "$id": "SnapsInAZfs.json",
+  "$comments": "Default settings for SnapsInAZfs. It is not recommended to modify this file. Customized settings should be specified in /etc/SnapsInAZfs/SnapsInAZfs.local.json",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool",
   "DryRun": false,
   "Monitoring": {
     "Nagios": {
@@ -18,7 +17,7 @@
     }
   },
   "Templates": {
-    "production": {
+    "default": {
       "Formatting": {
         "ComponentSeparator": "_",
         "Prefix": "autosnap",
