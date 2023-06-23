@@ -178,4 +178,6 @@ wipe-sanoid-zfs-properties:
 	$(info Run make restore-wiped-zfs-properties to restore configuration)
 
 restore-wiped-zfs-properties:
+	@test -s $(SANOID_DOTNET_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo No restore script. Did you forget to run make save-sanoid-zfs-properties\? ; false ; }
 	./propWipeUndoScript.sh
+	$(info Properties restored to the state they were in when you last ran make save-sanoid-zfs-properties)
