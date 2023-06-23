@@ -31,7 +31,7 @@ internal static class ZfsTasks
                 break;
             // All of the error cases can just fall through, here, because we really don't care WHY it failed,
             // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
-            case MutexAcquisitionErrno.InProgess:
+            case MutexAcquisitionErrno.InProgress:
             case MutexAcquisitionErrno.IoException:
             case MutexAcquisitionErrno.AbandonedMutex:
             case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
@@ -186,7 +186,7 @@ internal static class ZfsTasks
                 break;
             // All of the error cases can just fall through, here, because we really don't care WHY it failed,
             // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
-            case MutexAcquisitionErrno.InProgess:
+            case MutexAcquisitionErrno.InProgress:
             case MutexAcquisitionErrno.IoException:
             case MutexAcquisitionErrno.AbandonedMutex:
             case MutexAcquisitionErrno.WaitHandleCannotBeOpened:

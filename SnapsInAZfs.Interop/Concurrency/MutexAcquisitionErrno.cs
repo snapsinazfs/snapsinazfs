@@ -23,13 +23,13 @@ public enum MutexAcquisitionErrno
 
     /// <summary>The operation is still in progress.</summary>
     /// <value>Equivalent to <see cref="Errno.EINPROGRESS" /></value>
-    InProgess = Errno.EINPROGRESS,
+    InProgress = Errno.EINPROGRESS,
 
     /// <summary>An IOException was raised. Usually means the name was invalid.</summary>
     /// <value>Equivalent to <see cref="Errno.EINVAL" /></value>
     IoException = Errno.EINVAL,
 
-    /// <summary>An abandomed mutex was encountered. Caller may try again.</summary>
+    /// <summary>An abandoned mutex was encountered. Caller may try again.</summary>
     /// <value>Equivalent to <see cref="Errno.EAGAIN" /></value>
     AbandonedMutex = Errno.EAGAIN,
 
