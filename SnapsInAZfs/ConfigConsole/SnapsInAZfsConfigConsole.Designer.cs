@@ -60,7 +60,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.Border.Effect3DBrush = null;
             this.Border.DrawMarginFrame = true;
             this.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.Title = "Sanoid.net Configuration Console";
+            this.Title = "SnapsInAZfs Configuration Console";
             this.topMenuBar.Width = Dim.Fill(0);
             this.topMenuBar.Height = 1;
             this.topMenuBar.X = 0;

@@ -23,7 +23,7 @@ namespace SnapsInAZfs.Interop.Libc.Enums;
 ///         <listheader>
 ///             <description>
 ///                 Note that the following values are not defined in errno-base.h or errno.h and may be unwise
-///                 for general use outside of the context of their use in the Sanoid.net project:
+///                 for general use outside of the context of their use in the SnapsInAZfs project:
 ///             </description>
 ///         </listheader>
 ///         <item>
