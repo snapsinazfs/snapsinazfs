@@ -33,6 +33,12 @@
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Zfs\Structs\**" />
+    <EmbeddedResource Remove="Zfs\Structs\**" />
+    <None Remove="Zfs\Structs\**" />
+  </ItemGroup>
+
 
 
   <ItemGroup>
@@ -48,13 +54,6 @@
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\libzfs_handle.cs" />
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zfs_handle.cs" />
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zpool_handle.cs" />
-    <Compile Remove="Zfs\Native\libzfs_core\Libzfs_core.cs" />
-    <Compile Remove="Zfs\Native\sys\avl_impl\avl_node.cs" />
-    <Compile Remove="Zfs\Native\sys\avl_impl\avl_tree.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Zfs\Structs\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,9 +69,6 @@
     <None Include="Zfs\Native\libzfs\libzfs_impl\libzfs_handle.cs" />
     <None Include="Zfs\Native\libzfs\libzfs_impl\zfs_handle.cs" />
     <None Include="Zfs\Native\libzfs\libzfs_impl\zpool_handle.cs" />
-    <None Include="Zfs\Native\libzfs_core\Libzfs_core.cs" />
-    <None Include="Zfs\Native\sys\avl_impl\avl_node.cs" />
-    <None Include="Zfs\Native\sys\avl_impl\avl_tree.cs" />
   </ItemGroup>
 
   <ItemGroup>
