@@ -791,14 +791,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        List<string> setStrings = new( );
-
-        foreach ( string propName in properties )
-        {
-            setStrings.Add( ZfsProperty.DefaultDatasetProperties[ propName ].SetString );
-        }
-
-        string propertiesSetString = string.Join( ' ', setStrings );
+        string propertiesSetString = string.Join( ' ', properties.Select( propName => ZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ) );
         Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
         {

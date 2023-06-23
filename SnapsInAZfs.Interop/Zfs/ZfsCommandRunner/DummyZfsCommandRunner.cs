@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -79,7 +79,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
         //string fileName = "poolprops-bad-schemacheck.txt";
-        string fileName = "poolroots-withproperties.txt";
+        const string fileName = "poolroots-withproperties.txt";
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
         {
@@ -217,13 +217,15 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
 
-        if ( verb is "get" or "list" )
+        if ( verb is not ("get" or "list") )
         {
-            using StreamReader rdr = File.OpenText( args );
-            while ( !rdr.EndOfStream )
-            {
-                yield return await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
-            }
+            yield break;
+        }
+
+        using StreamReader rdr = File.OpenText( args );
+        while ( !rdr.EndOfStream )
+        {
+            yield return await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
         }
     }
 
