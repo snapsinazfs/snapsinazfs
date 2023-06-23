@@ -39,8 +39,9 @@ public static class LoggingSettings
             return;
         }
 
-        foreach ( LoggingRule? rule in LogManager.Configuration.LoggingRules )
+        for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration.LoggingRules.Count; ruleIndex++ )
         {
+            LoggingRule? rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
             rule?.SetLoggingLevels( level, LogLevel.Off );
         }
     }
