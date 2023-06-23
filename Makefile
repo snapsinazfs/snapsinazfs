@@ -102,25 +102,32 @@ install:	install-release	|	install-config	install-doc
 install-config:	install-config-local	|	install-config-base
 
 install-config-base:
-	install --backup=existing -D -C -v -m 444 -t $(LOCALSHAREDIR)/Sanoid.net/ $(PUBLISHBASECONFIGFILELIST)
+	install --backup=existing -D -C -v -m 664 -t $(LOCALSHAREDIR)/Sanoid.net/ $(PUBLISHBASECONFIGFILELIST)
 
-#This target installs a fresh copy of the built Sanoid.local.json to $(SANOIDETCDIR)/Sanoid.local.json
 install-config-local:
 	[ ! -d /etc/sanoid ] && [ -w /etc ] && mkdir -p /etc/sanoid || true
-	install --backup=existing -C -v -m 660 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
+	[ ! /etc/sanoid/Sanoid.local.json ] && install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
+
+install-config-local-force:
+	[ ! -d /etc/sanoid ] && [ -w /etc ] && mkdir -p /etc/sanoid || true
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/Sanoid.local.json $(SANOIDETCDIR)/Sanoid.local.json
 
 install-doc:
 	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.8 $(MANDIR)/man8/Sanoid.8
-	cp -l $(MANDIR)/man8/Sanoid.8 $(MANDIR)/man8/Sanoid.net.8
+	cp -fl $(MANDIR)/man8/Sanoid.8 $(MANDIR)/man8/Sanoid.net.8
 	install -C -v -m 644 $(SANOIDDOCDIR)/Sanoid.5 $(MANDIR)/man5/Sanoid.5
-	cp -l $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.net.5
-	mandb
+	cp -fl $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.net.5
+	cp -fl $(MANDIR)/man5/Sanoid.5 $(MANDIR)/man5/Sanoid.json.5
+	mandb -q
 
-install-release:
+install-release:	publish-release
+	install --backup=existing -C -v -m 750 $(RELEASEPUBLISHDIR)/Sanoid $(LOCALSBINDIR)/Sanoid
+	cp -fs -v $(LOCALSBINDIR)/Sanoid $(LOCALSBINDIR)/Sanoid.net
+
+publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -o $(RELEASEPUBLISHDIR) Sanoid/Sanoid.csproj
-	install -C -v -m 550 $(RELEASEPUBLISHDIR)/Sanoid $(LOCALSBINDIR)/Sanoid
-	cp -s -v $(LOCALSBINDIR)/Sanoid $(LOCALSBINDIR)/Sanoid.net
+	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) Sanoid/Sanoid.csproj
+
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
@@ -136,7 +143,7 @@ uninstall-doc:
 	rm -fv $(MANDIR)/man8/Sanoid.net.8 2>/dev/null
 	rm -fv $(MANDIR)/man5/Sanoid.5 2>/dev/null
 	rm -fv $(MANDIR)/man5/Sanoid.net.5 2>/dev/null
-	mandb
+	mandb -q
 
 uninstall-everything:	uninstall	uninstall-config-local
 
