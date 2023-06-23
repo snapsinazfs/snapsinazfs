@@ -15,9 +15,10 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
     <StartupObject>Sanoid.Program</StartupObject>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
     <Optimize>True</Optimize>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <PublishReadyToRun>True</PublishReadyToRun>
@@ -26,11 +27,11 @@
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
     <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
   </PropertyGroup>
 
@@ -83,7 +84,7 @@
     <ProjectReference Include="..\Sanoid.Interop\Sanoid.Interop.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
     <None Update="alldatasets-withproperties.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

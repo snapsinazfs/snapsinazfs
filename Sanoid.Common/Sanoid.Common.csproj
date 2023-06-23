@@ -12,23 +12,18 @@
 		<BaseOutputPath>bin\</BaseOutputPath>
 		<DebugType>embedded</DebugType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Platforms>x64</Platforms>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|AnyCPU'">
-		<Optimize>True</Optimize>
-		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<PublishReadyToRun>True</PublishReadyToRun>
-		<PublishSingleFile>True</PublishSingleFile>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
+	  <Optimize>True</Optimize>
+	  <GenerateDocumentationFile>False</GenerateDocumentationFile>
+	  <PublishReadyToRun>True</PublishReadyToRun>
+	  <PublishSingleFile>True</PublishSingleFile>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
 	  <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 	</PropertyGroup>
 
 	<ItemGroup>
