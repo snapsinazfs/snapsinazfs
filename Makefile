@@ -106,7 +106,7 @@ install-config-base:
 
 install-config-local:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
-	[ ! $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json ] && install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json
+	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json ; }
 
 install-config-local-force:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
@@ -114,15 +114,12 @@ install-config-local-force:
 
 install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
-	cp -fl $(MANDIR)/man8/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
-	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
 	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.json.5
 	mandb -q
 
 install-release:	publish-release
-	install --backup=existing -C -v -m 750 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
-	cp -fs -v $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
+	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
