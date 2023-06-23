@@ -192,6 +192,7 @@ public abstract class ZfsObjectBase
     }
 
     /// <exception cref="ArgumentNullException"><paramref name="propertyName" /> is <see langword="null" />.</exception>
+    /// <exception cref="OverflowException">The dictionary contains too many elements.</exception>
     public ZfsProperty AddOrUpdateProperty( string propertyName, string propertyValue, string propertyValueSource )
     {
         // Unfortunately, the AddOrUpdate method isn't atomic, so we need to enforce a lock ourselves
