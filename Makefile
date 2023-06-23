@@ -23,6 +23,8 @@ ETCDIR ?= /etc
 
 SANOIDETCDIR ?= $(ETCDIR)/sanoid
 
+all:	build-release
+
 clean:  clean-all
 
 clean-all:      clean-debug	clean-release
