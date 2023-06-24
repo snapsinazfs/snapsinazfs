@@ -77,7 +77,7 @@ public record ZfsRecord
     public string Name { get; }
 
     [JsonIgnore]
-    public ZfsRecord PoolRoot { get; }
+    public ZfsRecord PoolRoot { get; init; }
 
     public int PoolUsedCapacity { get; set; }
     public ZfsProperty<bool> PruneSnapshots { get; private set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );

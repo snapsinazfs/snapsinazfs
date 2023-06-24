@@ -150,10 +150,11 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             {
                 Logger.Trace( "{0} is not in dictionary. Creating a new {1}", dsName, propertyValue );
                 string parentName = dsName.GetZfsPathParent( );
+                bool isPoolRoot = dsName == parentName;
                 ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
                 ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-                ZfsRecord newDsBaseCopy = new( dsName, propertyValue );
-                ZfsRecord newDsTreeCopy = newDsBaseCopy with { };
+                ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy );
+                ZfsRecord newDsTreeCopy = newDsBaseCopy with { PoolRoot = parentDsTreeCopy };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
@@ -166,6 +167,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 ZfsRecord ds = baseDatasets[ dsName ];
                 if ( ds.IsPoolRoot )
                 {
+                    Logger.Trace( "{0} is a pool root - skipping", dsName );
                     continue;
                 }
 
