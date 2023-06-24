@@ -112,7 +112,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
-        Dictionary<string, TreeNode> allTreeNodes = new( );
+        ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
@@ -141,16 +141,18 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
         {
+            Logger.Trace( $"Read line {zfsGetLine}" );
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
             string dsName = lineTokens[ 0 ];
+            string propertyValue = lineTokens[ 2 ];
             if ( !baseDatasets.ContainsKey( dsName ) )
             {
-                int lastSlashIndex = dsName.LastIndexOf( '/' );
-                string parentName = dsName[ ..lastSlashIndex ];
+                Logger.Trace( "{0} is not in dictionary. Creating a new {1}", dsName, propertyValue );
+                string parentName = dsName.GetZfsPathParent( );
                 ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
                 ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-                ZfsRecord newDsBaseCopy = new( dsName, lineTokens[ 2 ] );
+                ZfsRecord newDsBaseCopy = new( dsName, propertyValue );
                 ZfsRecord newDsTreeCopy = newDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
@@ -168,7 +170,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 }
 
                 string propertyName = lineTokens[ 1 ];
-                string propertyValue = lineTokens[ 2 ];
                 string propertySource = lineTokens[ 3 ];
                 Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
                 ds.UpdateProperty( propertyName, propertyValue, propertySource );

@@ -350,6 +350,7 @@ public partial class SnapsInAZfsConfigConsole
 
     private void SnapsInAZfsConfigConsoleOnInitialized( object? sender, EventArgs e )
     {
+        Logger.Trace( "Configuration console main window initialized. Setting global quit hotkey" );
         AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
         quitMenuItem.Action = Application.Top.RequestStop;
         IsMdiContainer = true;
@@ -357,6 +358,7 @@ public partial class SnapsInAZfsConfigConsole
 
     private void SnapsInAZfsConfigConsoleOnReady( )
     {
+        Logger.Trace( "Configuration console main window ready" );
         EnableEventHandlers( );
     }
 }
