@@ -189,8 +189,8 @@ internal class Program
             return (int)Errno.EOK;
         }
 
-        ConcurrentDictionary<string, Dataset> datasets = new( );
-        ConcurrentDictionary<string, Snapshot> snapshots = new( );
+        ConcurrentDictionary<string, ZfsRecord> datasets = new( );
+        ConcurrentDictionary<string, SnapshotRecord> snapshots = new( );
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 

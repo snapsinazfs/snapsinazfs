@@ -62,7 +62,6 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
 
     private const string DailyString = "daily";
     private const string FrequentString = "frequently";
-
     private const string HourlyString = "hourly";
     private const string ManualString = "manual";
     private const string MonthlyString = "monthly";

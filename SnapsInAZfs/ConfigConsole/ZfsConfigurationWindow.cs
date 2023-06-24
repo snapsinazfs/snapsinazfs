@@ -25,7 +25,7 @@ public partial class ZfsConfigurationWindow
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSaveForCurrentItem = new( );
-    private readonly ConcurrentDictionary<string, SnapsInAZfsZfsDataset> _treeDatasets = new( );
+    private readonly ConcurrentDictionary<string, ZfsRecord> _treeDatasets = new( );
 
     public ZfsConfigurationWindow( )
     {

@@ -2,8 +2,6 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 /// <summary>
@@ -71,34 +69,12 @@ public static class TypeExtensions
     {
         return string.Join( ',', strings );
     }
-
-    /// <summary>
-    ///     Gets an array of <see langword="string" />s representing each of the flags specified
-    /// </summary>
-    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
-    /// <returns>
-    ///     A string array, containing one value per specified flag, converted to lower-case using the invariant culture
-    /// </returns>
-    public static string[] ToStringArray( this ZfsObjectKind value )
+    public static string ToSpaceSeparatedSingleLineString( this IEnumerable<string> strings )
     {
-        return value.ToString( ).ToLowerInvariant( ).Split( ",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+        return string.Join( ' ', strings );
     }
 
-    /// <summary>
-    ///     Gets a string, suitable for use at the command line, of all flags specified
-    /// </summary>
-    /// <param name="value">The <see cref="ZfsObjectKind" /> value to convert</param>
-    /// <returns>
-    ///     A string, on a single line, with comma-separated string representations of each specified flag,
-    ///     in lower case, and with no whitespace
-    /// </returns>
-    [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "Inputs are incapable of causing these exceptions" )]
-    public static string ToStringForCommandLine( this ZfsObjectKind value )
-    {
-        return value.ToString( ).Replace( " ", "" ).ToLower( );
-    }
-
-    public static string ToStringForZfsSet( this IEnumerable<ZfsProperty> properties )
+    public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
     {
         return string.Join( ' ', properties.Select( p => p.SetString ) );
     }
@@ -130,5 +106,14 @@ public static class TypeExtensions
         }
 
         return string.Join( ' ', properties.Select( p => p.SetString ) );
+    }
+
+    public static bool IsWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value != 0;
+    }
+    public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value == 0;
     }
 }

@@ -15,35 +15,32 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot );
+    public abstract bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot );
 
     /// <inheritdoc />
-    public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
+    public abstract Task<bool> DestroySnapshotAsync( SnapshotRecord snapshot, SnapsInAZfsSettings settings );
 
     /// <inheritdoc />
-    public abstract Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets );
+    public abstract Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
 
     /// <inheritdoc />
-    public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
+    public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );
 
     /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
     /// <inheritdoc />
-    public abstract Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
+    public abstract Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
 
     /// <inheritdoc />
-    public abstract Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
-
-    /// <inheritdoc />
-    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots );
 
     public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
 
     /// <inheritdoc />
     public abstract IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 
-    public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets );
+    public abstract Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets );
 
     /// <inheritdoc />
     public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
