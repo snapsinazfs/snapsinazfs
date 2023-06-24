@@ -30,6 +30,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
 		<DebugType>embedded</DebugType>
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

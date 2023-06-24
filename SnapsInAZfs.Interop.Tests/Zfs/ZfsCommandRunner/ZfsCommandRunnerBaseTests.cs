@@ -43,8 +43,8 @@ public class ZfsCommandRunnerBaseTests
         }
 
         string nameToTest = testCase.Name;
-        bool fsValidationResult = ZfsObjectBase.ValidateName( "filesystem", nameToTest ) == testCase.Valid;
-        bool volValidationResult = ZfsObjectBase.ValidateName( "volume", nameToTest ) == testCase.Valid;
+        bool fsValidationResult = ZfsRecord.ValidateName( "filesystem", nameToTest ) == testCase.Valid;
+        bool volValidationResult = ZfsRecord.ValidateName( "volume", nameToTest ) == testCase.Valid;
         Assert.Multiple( ( ) =>
         {
             Assert.That( fsValidationResult, Is.True );
@@ -64,7 +64,7 @@ public class ZfsCommandRunnerBaseTests
             path = $"{path}/{GetValidZfsPathComponent( pathLength / pathDepth )}";
         }
 
-        Assert.That( ( ) => { ZfsObjectBase.ValidateName( "filesystem", path ); }, Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+        Assert.That( ( ) => { ZfsRecord.ValidateName( "filesystem", path ); }, Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class ZfsCommandRunnerBaseTests
         }
 
         string nameToTest = testCase.Name;
-        bool snapshotValidationResult = ZfsObjectBase.ValidateName( "snapshot", nameToTest ) == testCase.Valid;
+        bool snapshotValidationResult = ZfsRecord.ValidateName( "snapshot", nameToTest ) == testCase.Valid;
         Assert.That( snapshotValidationResult, Is.True );
     }
 
@@ -134,7 +134,7 @@ public class ZfsCommandRunnerBaseTests
     [TestCase( "bad/PoolName/", ExpectedResult = false )]
     public bool CheckSnapshotNameValidation( string name )
     {
-        return ZfsObjectBase.ValidateName( "snapshot", name );
+        return ZfsRecord.ValidateName( "snapshot", name );
     }
 
     private static void ComposeDatasetPathsAtLevel( int currentPathDepth, int subPaths, int pathComponentLength, bool valid, ref NameValidationTestCase[] names )

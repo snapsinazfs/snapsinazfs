@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -12,20 +12,20 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
+    public override async Task<bool> DestroySnapshotAsync( SnapshotRecord snapshot, SnapsInAZfsSettings settings )
     {
         return await Task.FromResult( true ).ConfigureAwait( true );
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots )
     {
         await GetMockZfsDatasetsFromTextFileAsync( datasets, "alldatasets-withproperties.txt" ).ConfigureAwait( true );
         await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
     }
 
     /// <inheritdoc />
-    public override async Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets )
+    public override async Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets )
     {
         using StreamReader rdr = File.OpenText( "poolroots-capacities.txt" );
         bool errorsEncountered = false;
@@ -44,7 +44,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             string poolName = lineTokens[ 0 ];
             string poolCapacityString = lineTokens[ 1 ];
             Logger.Debug( "Pool {0} capacity is {1}", poolName, poolCapacityString );
-            if ( datasets.TryGetValue( poolName, out Dataset? poolRoot ) && poolRoot is { IsPoolRoot: true } )
+            if ( datasets.TryGetValue( poolName, out ZfsRecord? poolRoot ) && poolRoot is { IsPoolRoot: true } )
             {
                 if ( int.TryParse( poolCapacityString, out int usedCapacity ) )
                 {
@@ -68,9 +68,9 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( )
+    public override async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( )
     {
-        ConcurrentDictionary<string, Dataset> poolRoots = new( );
+        ConcurrentDictionary<string, ZfsRecord> poolRoots = new( );
         await GetMockZfsDatasetsFromTextFileAsync( poolRoots, "poolroots-withproperties.txt" ).ConfigureAwait( true );
         return poolRoots;
     }
@@ -109,13 +109,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" )
-    {
-        return new( );
-    }
-
-    /// <inheritdoc />
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets )
+    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
         Dictionary<string, TreeNode> allTreeNodes = new( );
@@ -126,8 +120,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             string propertyValue = lineTokens[ 2 ];
             baseDatasets.AddOrUpdate( dsName, k =>
             {
-                SnapsInAZfsZfsDataset newRootDsBaseCopy = new( k, propertyValue, true );
-                SnapsInAZfsZfsDataset newRootDsTreeCopy = newRootDsBaseCopy with { };
+                ZfsRecord newRootDsBaseCopy = new( k, propertyValue );
+                ZfsRecord newRootDsTreeCopy = newRootDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
                 Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
                 treeRootNodes.Add( node );
@@ -154,10 +148,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             {
                 int lastSlashIndex = dsName.LastIndexOf( '/' );
                 string parentName = dsName[ ..lastSlashIndex ];
-                SnapsInAZfsZfsDataset parentDsBaseCopy = baseDatasets[ parentName ];
-                SnapsInAZfsZfsDataset parentDsTreeCopy = treeDatasets[ parentName ];
-                SnapsInAZfsZfsDataset newDsBaseCopy = new( dsName, lineTokens[ 2 ], false );
-                SnapsInAZfsZfsDataset newDsTreeCopy = newDsBaseCopy with { };
+                ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
+                ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
+                ZfsRecord newDsBaseCopy = new( dsName, lineTokens[ 2 ] );
+                ZfsRecord newDsTreeCopy = newDsBaseCopy with { };
                 ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
                 allTreeNodes[ dsName ] = node;
                 allTreeNodes[ parentName ].Children.Add( node );
@@ -167,7 +161,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
             else
             {
-                SnapsInAZfsZfsDataset ds = baseDatasets[ dsName ];
+                ZfsRecord ds = baseDatasets[ dsName ];
                 if ( ds.IsPoolRoot )
                 {
                     continue;
@@ -192,21 +186,21 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties )
-    {
-        return !dryRun;
-    }
-
-    /// <inheritdoc />
     public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
     {
         return !dryRun;
     }
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot )
+    public override bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
-        snapshot = Snapshot.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
+        return !dryRun;
+    }
+
+    /// <inheritdoc />
+    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot )
+    {
+        snapshot = SnapshotRecord.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
         return true;
     }
 
@@ -234,13 +228,13 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         throw new NotImplementedException( );
     }
 
-    private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, string filePath )
+    private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, string filePath )
     {
         using StreamReader rdr = File.OpenText( filePath );
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
+            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
             if ( string.IsNullOrWhiteSpace( stringToParse ) )
             {
                 Logger.Error( "Error reading output from zfs. Null or empty line." );
@@ -248,41 +242,40 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             }
 
             Logger.Info( $"Parsing line {stringToParse}" );
-            (bool success, ZfsProperty? prop, string? parent) parseResult = ZfsProperty.FromZfsGetLine( stringToParse );
-            if ( parseResult is not { success: true, prop: not null, parent: not null } )
-            {
-                continue;
-            }
+            string[] lineTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+
+            string dsName = lineTokens[0];
+            string propertyName = lineTokens[1];
+            string propertyValue = lineTokens[2];
+            string propertySource = lineTokens[3];
 
             Logger.Info( "Parsing successful" );
-            ZfsProperty p = parseResult.prop;
-            if ( p.Name == "type" )
+            if ( propertyName == "type" )
             {
-                Logger.Info( "New dataset is a {0}", p.Value );
-                string rootPathString = parseResult.parent.GetZfsPathRoot( );
-                bool isNewRoot = !datasets.ContainsKey( rootPathString );
-                Dataset newDs = new( parseResult.parent, p.Value, isNewRoot ? null : datasets[ rootPathString ], isNewRoot );
-                datasets.TryAdd( parseResult.parent, newDs );
-                Logger.Info( "New {0} {1} created and added to result dictionary", p.Value, newDs.Name );
+                Logger.Info( "New dataset is a {0}", propertyValue );
+                string parentName = dsName.GetZfsPathParent( );
+                ZfsRecord newDs = new( dsName, propertyValue, parentName == dsName ? null : datasets[ parentName ] );
+                datasets.TryAdd( dsName, newDs );
+                Logger.Info( "New {0} {1} created and added to result dictionary", propertyValue, dsName );
             }
-            else if ( datasets.TryGetValue( parseResult.parent, out Dataset? ds ) )
+            else if ( datasets.TryGetValue( dsName, out ZfsRecord? ds ) )
             {
                 Logger.Info( "Line is a property of an existing object" );
-                ds.AddOrUpdateProperty( parseResult.prop );
+                ds.UpdateProperty( propertyName, propertyValue, propertySource );
             }
         }
     }
 
-    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
+    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots, string filePath )
     {
-        Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', ZfsProperty.KnownSnapshotProperties )} pool1" );
+        Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', IZfsProperty.KnownSnapshotProperties )} pool1" );
         using StreamReader rdr = File.OpenText( filePath );
 
         while ( !rdr.EndOfStream )
         {
             string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
             string[] zfsListTokens = stringToParse!.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            int propertyCount = ZfsProperty.KnownSnapshotProperties.Count + 1;
+            int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
             if ( zfsListTokens.Length != propertyCount )
             {
                 Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, stringToParse, propertyCount );
@@ -295,17 +288,18 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
                 continue;
             }
 
-            Snapshot snap = Snapshot.FromListSnapshots( zfsListTokens, datasets );
-            string snapDatasetName = snap.DatasetName;
-            if ( !datasets.ContainsKey( snapDatasetName ) )
+            string snapshotName = zfsListTokens[ 0 ];
+            string dsName = snapshotName.GetZfsPathParent( );
+            SnapshotRecord snap = SnapshotRecord.CreateInstance( snapshotName, datasets[ dsName ] );
+            if ( !datasets.ContainsKey( dsName ) )
             {
-                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snap.Name );
+                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", dsName, snap.Name );
                 continue;
             }
 
-            snapshots[ zfsListTokens[ 0 ] ] = datasets[ snapDatasetName ].AddSnapshot( snap );
+            snapshots[ snapshotName ] = datasets[ dsName ].AddSnapshot( snap );
 
-            Logger.Debug( "Added snapshot {0} to dataset {1}", zfsListTokens[ 0 ], snapDatasetName );
+            Logger.Debug( "Added snapshot {0} to dataset {1}", snapshotName, dsName );
         }
     }
 }

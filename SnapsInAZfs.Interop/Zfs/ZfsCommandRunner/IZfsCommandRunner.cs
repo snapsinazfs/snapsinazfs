@@ -26,7 +26,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
+    public Task<bool> DestroySnapshotAsync( SnapshotRecord snapshot, SnapsInAZfsSettings settings );
 
     /// <summary>
     ///     Gets everything SnapsInAZfs cares about from ZFS, via separate processes executing in parallel using the thread pool
@@ -34,24 +34,24 @@ public interface IZfsCommandRunner
     /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
     /// <param name="snapshots">A collection of snapshots for this method to populate</param>
     /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
-    public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, Dataset> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+    public Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots );
 
     /// <summary>
     ///     Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
     /// </summary>
     /// <param name="datasets"></param>
     /// <returns>A boolean indicating success or failure of the operation</returns>
-    public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, Dataset> datasets );
+    public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
 
     /// <summary>
     ///     Gets configuration defined at all pool roots
     /// </summary>
     /// <returns>
-    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of pool root
+    ///     A <see cref="ConcurrentDictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="ZfsRecord" /> of pool root
     ///     datasets in
     ///     zfs, with SnapsInAZfs properties populated
     /// </returns>
-    public Task<ConcurrentDictionary<string, Dataset>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
+    public Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
 
     /// <summary>
     ///     Gets a collection of datasets and their property validity
@@ -63,32 +63,23 @@ public interface IZfsCommandRunner
     /// </returns>
     Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
 
-    /// <summary>
-    ///     Gets all dataset configuration from zfs
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="Dictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="Dataset" /> of all datasets in
-    ///     zfs, with SnapsInAZfs properties populated
-    /// </returns>
-    public Dictionary<string, Dataset> GetZfsDatasetConfiguration( string args = " -r" );
-
-    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, SnapsInAZfsZfsDataset> baseDatasets, ConcurrentDictionary<string, SnapsInAZfsZfsDataset> treeDatasets );
+    public Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets );
 
     bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 
     /// <summary>
-    ///     Sets the provided <see cref="ZfsProperty" /> values for <paramref name="zfsPath" />
+    ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
     /// </summary>
     /// <param name="dryRun">
     ///     If true, instructs the method not to actually call the ZFS utility, but instead just report what
     ///     it <em>would</em> have done.
     /// </param>
     /// <param name="zfsPath">The fully-qualified path to operate on</param>
-    /// <param name="properties">A parameterized array of <see cref="ZfsProperty" /> objects to set</param>
+    /// <param name="properties">A parameterized array of <see cref="IZfsProperty" /> objects to set</param>
     /// <returns>
     ///     A <see langword="bool" /> indicating success or failure of the operation.
     /// </returns>
-    public bool SetZfsProperties( bool dryRun, string zfsPath, params ZfsProperty[] properties );
+    public bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );
 
     /// <summary>
     ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
@@ -114,7 +105,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public bool TakeSnapshot( Dataset ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot snapshot );
+    public bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot );
 
     public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 

@@ -10,6 +10,9 @@ public static class ZfsPropertyValueConstants
     public const string None = "-";
     public const string SnapsInAZfs = "siaz";
     public const string ZfsRecursion = "zfs";
+    public const string FileSystem = "filesystem";
+    public const string Volume = "volume";
+    public const string Snapshot = "snapshot";
 
     public static readonly Dictionary<string, (int Min, int Max)> IntPropertyRanges = new( )
     {
