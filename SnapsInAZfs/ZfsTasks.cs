@@ -150,11 +150,11 @@ internal static class ZfsTasks
             if ( snapshotTaken )
             {
                 Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
-                propsToSet.Add( ds.UpdateProperty( period, timestamp, ZfsPropertySourceConstants.Local ) );
+                propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
             }
             else if ( !snapshotTaken && settings.DryRun )
             {
-                propsToSet.Add( ds.UpdateProperty( period, timestamp, ZfsPropertySourceConstants.Local ) );
+                propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
             }
         }
     }
