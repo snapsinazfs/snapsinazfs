@@ -116,4 +116,29 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             treeDatasets[ ds.Name ].UpdateProperty( propertyName, propertyValue, propertySource );
         }
     }
+
+    public static void ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, string[] lineTokens, List<ITreeNode> treeRootNodes, ConcurrentDictionary<string, TreeNode> allTreeNodes )
+    {
+        string propertyValue = lineTokens[ 2 ];
+        string dsName = lineTokens[ 0 ];
+        baseDatasets.AddOrUpdate( dsName, k =>
+        {
+            ZfsRecord newRootDsBaseCopy = new( k, propertyValue );
+            ZfsRecord newRootDsTreeCopy = newRootDsBaseCopy with { };
+            ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
+            Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
+            treeRootNodes.Add( node );
+            allTreeNodes[ dsName ] = node;
+            treeDatasets.TryAdd( k, newRootDsTreeCopy );
+            return newRootDsBaseCopy;
+        }, ( _, ds ) =>
+        {
+            string propertyName = lineTokens[ 1 ];
+            string propertySource = lineTokens[ 3 ];
+            ds.UpdateProperty( propertyName, propertyValue, propertySource );
+            treeDatasets[ dsName ].UpdateProperty( propertyName, propertyValue, propertySource );
+            Logger.Debug( "Updating property {0} for {1} to {2}", propertyName, dsName, propertyValue );
+            return ds;
+        } );
+    }
 }

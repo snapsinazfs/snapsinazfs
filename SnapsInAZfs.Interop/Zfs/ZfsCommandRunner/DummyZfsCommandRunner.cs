@@ -116,27 +116,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            string dsName = lineTokens[ 0 ];
-            string propertyValue = lineTokens[ 2 ];
-            baseDatasets.AddOrUpdate( dsName, k =>
-            {
-                ZfsRecord newRootDsBaseCopy = new( k, propertyValue );
-                ZfsRecord newRootDsTreeCopy = newRootDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
-                Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
-                treeRootNodes.Add( node );
-                allTreeNodes[ dsName ] = node;
-                treeDatasets.TryAdd( k, newRootDsTreeCopy );
-                return newRootDsBaseCopy;
-            }, ( k, ds ) =>
-            {
-                string propertyName = lineTokens[ 1 ];
-                string propertySource = lineTokens[ 3 ];
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                treeDatasets[ dsName ].UpdateProperty( propertyName, propertyValue, propertySource );
-                Logger.Debug( "Updating property {0} for {1} to {2}", propertyName, dsName, propertyValue );
-                return ds;
-            } );
+
+            ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
         }
 
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
@@ -145,7 +126,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
             ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
-
         }
 
         return treeRootNodes;
