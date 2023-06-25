@@ -247,7 +247,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         ZfsRecord parentDataset = datasets[ snapDatasetName ];
         Logger.Trace( "Creating new snapshot instance {0} with parent {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
         Snapshot snap = new( snapName, bool.Parse(zfsListTokens[1]), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
-        allSnapshots[ snapName ] = parentDataset.AddSnapshot( snap );
+        allSnapshots[ snapName ] = snap.ParentDataset.AddSnapshot( snap );
 
         Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
     }

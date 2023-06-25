@@ -348,8 +348,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
 
         Logger.Debug( "Getting all snapshots from ZFS" );
-        Task[] zfsGetSnapshotTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetSnapshots( poolName, snapshots ) ) ).ToArray( );
-        await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
+        foreach ( string poolName in poolRootNames )
+        {
+            await GetSnapshots( poolName, snapshots ).ConfigureAwait( true );
+        }
 
         Logger.Trace("Checking all dataset last snapshot times");
         foreach ( ZfsRecord ds in datasets.Values )
@@ -440,7 +442,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
+        Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
         using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
         {
             Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );

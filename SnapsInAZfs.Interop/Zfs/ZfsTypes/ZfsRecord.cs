@@ -593,6 +593,7 @@ public record ZfsRecord
     {
         List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
+        Logger.Trace( "{0} retention is {1:D} for {2} {3}", snapshotPeriod, retentionValue, Kind, Name );
         if ( snapshotsSetForPruning.Count > retentionValue )
         {
             int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
