@@ -17,7 +17,7 @@
       "var_logdir": "/var/log/SnapsInAZfs"
     },
     "time": {
-      "type": "AccurateUTC"
+      "type": "FastLocal"
     },
     "default-wrapper": {
       "type": "AsyncWrapper",
