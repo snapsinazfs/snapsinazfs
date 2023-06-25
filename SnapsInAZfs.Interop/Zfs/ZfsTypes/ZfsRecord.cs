@@ -20,7 +20,7 @@ public record ZfsRecord
     {
         this.Name = Name;
         IsPoolRoot = parent is null;
-        ParentDataset ??= this;
+        ParentDataset = parent ?? this;
         this.Kind = Kind;
         NameValidatorRegex = Kind switch
         {

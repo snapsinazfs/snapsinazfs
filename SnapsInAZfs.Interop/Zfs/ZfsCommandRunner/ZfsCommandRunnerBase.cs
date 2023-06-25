@@ -168,8 +168,8 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
                 return;
             }
 
-            Logger.Debug( "{1} {0} not in dictionary. Attempting to add", dsName, dsKind );
-            if ( allDatasets.TryAdd( dsName, new( dsName, dsKind, allDatasets[ dsName.GetZfsPathRoot( ) ] ) ) )
+            Logger.Debug( "{1} {0} not in dictionary. Attempting to add as child of {2}", dsName, dsKind, parentDsName );
+            if ( allDatasets.TryAdd( dsName, new( dsName, dsKind, allDatasets[ parentDsName ] ) ) )
             {
                 Logger.Debug( "Added {1} {0} to dictionary", dsName, dsKind );
                 return;
