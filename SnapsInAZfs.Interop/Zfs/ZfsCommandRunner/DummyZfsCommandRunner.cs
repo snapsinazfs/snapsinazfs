@@ -83,26 +83,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            string poolName = lineTokens[ 0 ];
-            string propName = lineTokens[ 1 ];
-            string propValue = lineTokens[ 2 ];
-            string propSource = lineTokens[ 3 ];
-            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
-
-            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
-            {
-                ConcurrentDictionary<string, bool> newDs = new( )
-                {
-                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
-                };
-                return newDs;
-            }
-
-            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
-            {
-                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
-                return properties;
-            }
+            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
         }
 
         return rootsAndTheirProperties;
@@ -112,68 +93,20 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
-        Dictionary<string, TreeNode> allTreeNodes = new( );
+        ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            string dsName = lineTokens[ 0 ];
-            string propertyValue = lineTokens[ 2 ];
-            baseDatasets.AddOrUpdate( dsName, k =>
-            {
-                ZfsRecord newRootDsBaseCopy = new( k, propertyValue );
-                ZfsRecord newRootDsTreeCopy = newRootDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new( dsName, newRootDsBaseCopy, newRootDsTreeCopy );
-                Logger.Debug( "Adding new pool root object {0} to collections", newRootDsBaseCopy.Name );
-                treeRootNodes.Add( node );
-                allTreeNodes[ dsName ] = node;
-                treeDatasets.TryAdd( k, newRootDsTreeCopy );
-                return newRootDsBaseCopy;
-            }, ( k, ds ) =>
-            {
-                string propertyName = lineTokens[ 1 ];
-                string propertySource = lineTokens[ 3 ];
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                treeDatasets[ dsName ].UpdateProperty( propertyName, propertyValue, propertySource );
-                Logger.Debug( "Updating property {0} for {1} to {2}", propertyName, dsName, propertyValue );
-                return ds;
-            } );
+
+            ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
         }
 
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
         {
+            Logger.Trace( $"Read line {zfsGetLine}" );
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
-            string dsName = lineTokens[ 0 ];
-            if ( !baseDatasets.ContainsKey( dsName ) )
-            {
-                int lastSlashIndex = dsName.LastIndexOf( '/' );
-                string parentName = dsName[ ..lastSlashIndex ];
-                ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
-                ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-                ZfsRecord newDsBaseCopy = new( dsName, lineTokens[ 2 ] );
-                ZfsRecord newDsTreeCopy = newDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
-                allTreeNodes[ dsName ] = node;
-                allTreeNodes[ parentName ].Children.Add( node );
-                Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
-                baseDatasets.TryAdd( dsName, newDsBaseCopy );
-                treeDatasets.TryAdd( dsName, newDsTreeCopy );
-            }
-            else
-            {
-                ZfsRecord ds = baseDatasets[ dsName ];
-                if ( ds.IsPoolRoot )
-                {
-                    continue;
-                }
-
-                string propertyName = lineTokens[ 1 ];
-                string propertyValue = lineTokens[ 2 ];
-                string propertySource = lineTokens[ 3 ];
-                Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                treeDatasets[ ds.Name ].UpdateProperty( propertyName, propertyValue, propertySource );
-            }
+            ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
         }
 
         return treeRootNodes;
@@ -200,7 +133,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot )
     {
-        snapshot = SnapshotRecord.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
+        bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
+        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
+        string snapName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
+        snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
         return true;
     }
 
@@ -235,34 +171,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         while ( !rdr.EndOfStream )
         {
             string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            if ( string.IsNullOrWhiteSpace( stringToParse ) )
-            {
-                Logger.Error( "Error reading output from zfs. Null or empty line." );
-                continue;
-            }
-
-            Logger.Info( $"Parsing line {stringToParse}" );
-            string[] lineTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-
-            string dsName = lineTokens[0];
-            string propertyName = lineTokens[1];
-            string propertyValue = lineTokens[2];
-            string propertySource = lineTokens[3];
-
-            Logger.Info( "Parsing successful" );
-            if ( propertyName == "type" )
-            {
-                Logger.Info( "New dataset is a {0}", propertyValue );
-                string parentName = dsName.GetZfsPathParent( );
-                ZfsRecord newDs = new( dsName, propertyValue, parentName == dsName ? null : datasets[ parentName ] );
-                datasets.TryAdd( dsName, newDs );
-                Logger.Info( "New {0} {1} created and added to result dictionary", propertyValue, dsName );
-            }
-            else if ( datasets.TryGetValue( dsName, out ZfsRecord? ds ) )
-            {
-                Logger.Info( "Line is a property of an existing object" );
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-            }
+            ParseDatasetZfsGetLine( stringToParse, datasets );
         }
     }
 
@@ -273,33 +182,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
-            string[] zfsListTokens = stringToParse!.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
-            if ( zfsListTokens.Length != propertyCount )
-            {
-                Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, stringToParse, propertyCount );
-                continue;
-            }
-
-            if ( zfsListTokens[ 2 ] == "-" )
-            {
-                Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
-                continue;
-            }
-
-            string snapshotName = zfsListTokens[ 0 ];
-            string dsName = snapshotName.GetZfsPathParent( );
-            SnapshotRecord snap = SnapshotRecord.CreateInstance( snapshotName, datasets[ dsName ] );
-            if ( !datasets.ContainsKey( dsName ) )
-            {
-                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", dsName, snap.Name );
-                continue;
-            }
-
-            snapshots[ snapshotName ] = datasets[ dsName ].AddSnapshot( snap );
-
-            Logger.Debug( "Added snapshot {0} to dataset {1}", snapshotName, dsName );
+            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
+            ParseSnapshotZfsListLine( datasets, stringToParse, snapshots );
         }
     }
 }

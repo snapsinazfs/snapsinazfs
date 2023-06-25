@@ -17,7 +17,7 @@
       "var_logdir": "/var/log/SnapsInAZfs"
     },
     "time": {
-      "type": "AccurateUTC"
+      "type": "FastLocal"
     },
     "default-wrapper": {
       "type": "AsyncWrapper",
@@ -27,72 +27,12 @@
       "all-file": {
         "type": "File",
         "fileName": "${var_logdir}/nlog-all-${shortdate}.log",
-        "layout": {
-          "type": "JsonLayout",
-          "Attributes": [
-            {
-              "name": "timestamp",
-              "layout": "${date:format=o}"
-            },
-            {
-              "name": "level",
-              "layout": "${level}"
-            },
-            {
-              "name": "logger",
-              "layout": "${logger}"
-            },
-            {
-              "name": "message",
-              "layout": "${message}"
-            },
-            {
-              "name": "properties",
-              "encode": false,
-              "layout": {
-                "type": "JsonLayout",
-                "includeallproperties": "true"
-              }
-            }
-          ]
-        }
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=tostring}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
       },
       "error-file": {
         "type": "File",
         "fileName": "${var_logdir}/nlog-error-${shortdate}.log",
-        "layout": {
-          "type": "JsonLayout",
-          "Attributes": [
-            {
-              "name": "timestamp",
-              "layout": "${date:format=o}"
-            },
-            {
-              "name": "level",
-              "layout": "${level}"
-            },
-            {
-              "name": "logger",
-              "layout": "${logger}"
-            },
-            {
-              "name": "message",
-              "layout": "${message}"
-            },
-            {
-              "name": "exception",
-              "layout": "${exception}"
-            },
-            {
-              "name": "properties",
-              "encode": false,
-              "layout": {
-                "type": "JsonLayout",
-                "includeallproperties": "true"
-              }
-            }
-          ]
-        }
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=@}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
       },
       "own-console": {
         "type": "ColoredConsole",

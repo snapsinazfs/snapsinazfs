@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Text.Json.Serialization;
+using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
@@ -31,6 +32,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
         string value => value,
         bool boolValue => boolValue.ToString( ).ToLowerInvariant( ),
         DateTimeOffset dtoValue => dtoValue.ToString( "O" ),
+        SnapshotPeriod periodValue => periodValue.ToString( ),
         _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 

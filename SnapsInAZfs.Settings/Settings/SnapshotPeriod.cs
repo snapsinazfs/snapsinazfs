@@ -88,6 +88,28 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         return Kind.CompareTo( other );
     }
 
+    /// <inheritdoc />
+    public override bool Equals( object? obj )
+    {
+        if ( obj is not SnapshotPeriod other )
+            return false;
+        if ( ReferenceEquals( this, obj ) )
+            return true;
+
+        return Kind == other.Kind;
+    }
+
+    public bool Equals( SnapshotPeriod other )
+    {
+        return Kind == other.Kind;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode( )
+    {
+        return (int)Kind;
+    }
+
     /// <summary>
     ///     Explicit conversion from <see langword="string" /> to <see cref="SnapshotPeriod" />
     /// </summary>

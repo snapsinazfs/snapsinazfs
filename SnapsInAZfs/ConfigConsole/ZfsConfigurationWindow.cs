@@ -874,6 +874,7 @@ public partial class ZfsConfigurationWindow
 
     private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
     {
+        Logger.Trace( "Zfs Configuration Window initialized" );
         ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait( true );
         await templateListView.SetSourceAsync( ConfigConsole.TemplateListItems ).ConfigureAwait( true );
         SetCanFocusStates( );

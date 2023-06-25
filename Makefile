@@ -97,10 +97,12 @@ install-config-base:
 install-config-local:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
 	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json ; }
+	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json ; }
 
 install-config-local-force:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
 	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json
 
 install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
@@ -122,7 +124,8 @@ uninstall-config-base:
 	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
 
 uninstall-config-local:
-	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json* 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json* 2>/dev/null
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:

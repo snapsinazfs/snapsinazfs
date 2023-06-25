@@ -2,6 +2,8 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using SnapsInAZfs.Settings.Settings;
+
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 /// <summary>
@@ -116,4 +118,16 @@ public static class TypeExtensions
     {
         return retentionProperty.Value == 0;
     }
+
+    public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period ) =>
+        period.Kind switch
+        {
+            SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Hourly => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Daily => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+            _ => throw new ArgumentOutOfRangeException( nameof( period ) )
+        };
 }

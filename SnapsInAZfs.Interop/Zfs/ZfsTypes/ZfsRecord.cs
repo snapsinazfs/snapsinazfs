@@ -77,10 +77,10 @@ public record ZfsRecord
     public string Name { get; }
 
     [JsonIgnore]
-    public ZfsRecord PoolRoot { get; }
+    public ZfsRecord PoolRoot { get; init; }
 
     public int PoolUsedCapacity { get; set; }
-    public ZfsProperty<bool> PruneSnapshots { get; private set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Recursion { get; protected set; } = new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionDaily { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionFrequent { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1, ZfsPropertySourceConstants.Local );
@@ -99,6 +99,7 @@ public record ZfsRecord
 
     public SnapshotRecord AddSnapshot( SnapshotRecord snap )
     {
+        Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
         Snapshots[ snap.Name ] = snap;
         return snap;
     }
@@ -133,7 +134,7 @@ public record ZfsRecord
         }
 
         List<SnapshotRecord> snapshotsToPrune = new( );
-        List<SnapshotRecord> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Frequent ).Select( kvp => kvp.Value ).ToList( );
+        List<SnapshotRecord> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Frequent ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
         if ( snapshotsSetForPruning.Count > SnapshotRetentionFrequent.Value )
@@ -150,7 +151,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Hourly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Hourly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Hourly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionHourly.Value )
         {
@@ -166,7 +167,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Daily ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Daily ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Daily snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionDaily.Value )
         {
@@ -182,7 +183,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Weekly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Weekly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Weekly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionWeekly.Value )
         {
@@ -198,7 +199,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Monthly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Monthly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Monthly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionMonthly.Value )
         {
@@ -214,7 +215,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Yearly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Yearly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Yearly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         // Don't do this, so these all look the same
         // ReSharper disable once InvertIf
@@ -617,9 +618,22 @@ public record ZfsRecord
 
 public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
 {
-    private SnapshotRecord( string Name, ZfsRecord ParentDataset ) : base( Name, "snapshot", ParentDataset.PoolRoot )
+    public SnapshotRecord( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset.PoolRoot )
     {
-        this.ParentDataset = ParentDataset;
+        ParentDataset = parentDataset;
+        SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
+        Recursion = parentDataset.Recursion with { };
+    }
+
+    public SnapshotRecord( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
+    {
+        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
+    }
+
+    public SnapshotRecord( string name, bool pruneSnapshots, SnapshotPeriod period, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, timestamp, parentDataset )
+    {
+        PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshots, ZfsPropertySourceConstants.ZfsList );
+        Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local );
     }
 
     public ZfsRecord ParentDataset { get; }
@@ -702,34 +716,17 @@ public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
         }
 
         // If timestamps are different, sort on period
-        return Period.Value != other.Period.Value
+        return !Period.Value.Equals( other.Period.Value )
             ? Period.Value.CompareTo( other.Period.Value )
             :
             // If periods are the same, sort by name
             Name.CompareTo( other.Name );
     }
 
-    public static SnapshotRecord CreateInstance( string name, ZfsRecord parentDataset )
-    {
-        return new( name, parentDataset );
-    }
-
     public void Deconstruct( out string name, out ZfsRecord parentDataset )
     {
         name = Name;
         parentDataset = ParentDataset;
-    }
-
-    public static SnapshotRecord GetNewSnapshotObjectForCommandRunner( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, TemplateSettings template )
-    {
-        string snapshotName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        return new( snapshotName, ds )
-        {
-            SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ),
-            Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ),
-            Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local ),
-            Recursion = ds.Recursion with { Source = ZfsPropertySourceConstants.Local }
-        };
     }
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
