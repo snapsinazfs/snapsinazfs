@@ -478,14 +478,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         List<ITreeNode> treeRootNodes = new( );
         ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', IZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
             ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
         }
 
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', IZfsProperty.KnownDatasetProperties )} -Hprt filesystem,volume {string.Join( ' ', baseDatasets.Keys )}" ).ConfigureAwait( true ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hprt filesystem,volume {string.Join( ' ', baseDatasets.Keys )}" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
