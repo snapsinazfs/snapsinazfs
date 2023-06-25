@@ -230,13 +230,13 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             return;
         }
 
-        if ( zfsListTokens[ 2 ] == "-" )
+        string snapName = zfsListTokens[ 2 ];
+        if ( snapName == "-" )
         {
-            Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
+            Logger.Debug( "{0} is not a SnapsInAZfs snapshot. Skipping", zfsListTokens[ 0 ] );
             return;
         }
 
-        string snapName = zfsListTokens[ 0 ];
         string snapDatasetName = snapName.GetZfsPathParent( );
         if ( !datasets.ContainsKey( snapDatasetName ) )
         {
@@ -244,9 +244,11 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             return;
         }
 
-        SnapshotRecord snap = SnapshotRecord.CreateInstance( snapName, datasets[ snapDatasetName ] );
-        allSnapshots[ snapName ] = datasets[ snapDatasetName ].AddSnapshot( snap );
+        ZfsRecord parentDataset = datasets[ snapDatasetName ];
+        Logger.Trace( "Creating new snapshot instance {0} with parent {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
+        SnapshotRecord snap = new( snapName, bool.Parse(zfsListTokens[1]), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
+        allSnapshots[ snapName ] = parentDataset.AddSnapshot( snap );
 
-        Logger.Debug( "Added snapshot {0} to dataset {1}", snapName, snapDatasetName );
+        Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
     }
 }
