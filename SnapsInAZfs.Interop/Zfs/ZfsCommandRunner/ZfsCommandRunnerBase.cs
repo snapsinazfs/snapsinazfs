@@ -255,11 +255,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
             Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
         }
-        catch ( KeyNotFoundException ex )
-        {
-            Logger.Error( ex, "Error while creating snapshot instance from {0}", zfsListLine );
-        }
-        catch ( ArgumentNullException ex )
+        catch ( Exception ex )
         {
             Logger.Error( ex, "Error while creating snapshot instance from {0}", zfsListLine );
         }
