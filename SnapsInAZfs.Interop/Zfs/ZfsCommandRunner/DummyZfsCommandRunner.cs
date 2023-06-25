@@ -133,7 +133,10 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot )
     {
-        snapshot = SnapshotRecord.GetNewSnapshotObjectForCommandRunner( ds, period, timestamp, template );
+        bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
+        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
+        string snapName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
+        snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
         return true;
     }
 
