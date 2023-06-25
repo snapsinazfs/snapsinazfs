@@ -133,7 +133,7 @@ public record ZfsRecord
         }
 
         List<SnapshotRecord> snapshotsToPrune = new( );
-        List<SnapshotRecord> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Frequent ).Select( kvp => kvp.Value ).ToList( );
+        List<SnapshotRecord> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Frequent ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
         if ( snapshotsSetForPruning.Count > SnapshotRetentionFrequent.Value )
@@ -150,7 +150,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Hourly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Hourly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Hourly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionHourly.Value )
         {
@@ -166,7 +166,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Daily ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Daily ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Daily snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionDaily.Value )
         {
@@ -182,7 +182,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Weekly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Weekly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Weekly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionWeekly.Value )
         {
@@ -198,7 +198,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Monthly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Monthly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Monthly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > SnapshotRetentionMonthly.Value )
         {
@@ -214,7 +214,7 @@ public record ZfsRecord
         }
 
         snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value == SnapshotPeriod.Yearly ).Select( kvp => kvp.Value ).ToList( );
+        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Yearly ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Yearly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         // Don't do this, so these all look the same
         // ReSharper disable once InvertIf
