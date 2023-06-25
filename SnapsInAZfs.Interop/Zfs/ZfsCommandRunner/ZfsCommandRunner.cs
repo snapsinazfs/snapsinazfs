@@ -236,7 +236,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         if ( properties.Count == 0 )
         {
-            Logger.Warn( "Asked to set properties for {0} but no properties provided", zfsPath );
+            Logger.Debug( "Asked to set properties for {0} but no properties provided", zfsPath );
             return false;
         }
 
@@ -331,8 +331,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    /// <exception cref="OverflowException">The dictionary contains too many elements.</exception>
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         List<string> poolRootNames = new( );
         Logger.Debug( "Getting pool names for parallel property retrieval" );
@@ -345,12 +344,47 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Logger.Debug( "Getting all dataset configurations from ZFS" );
         Task[] zfsGetDatasetTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetDatasets( poolName, datasets ) ) ).ToArray( );
 
-        Logger.Debug( "Waiting for all zfs get processes to finish." );
+        Logger.Trace( "Waiting for all zfs get processes to finish." );
         await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
 
-        Logger.Debug( "Getting all snapshots" );
+        Logger.Debug( "Getting all snapshots from ZFS" );
         Task[] zfsGetSnapshotTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetSnapshots( poolName, snapshots ) ) ).ToArray( );
         await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
+
+        Logger.Trace("Checking all dataset last snapshot times");
+        foreach ( ZfsRecord ds in datasets.Values )
+        {
+            List<IZfsProperty> propertiesToSet = new( );
+            if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+            if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+            if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+            if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+            if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+            if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
+            {
+                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
+            }
+
+            if ( propertiesToSet.Count > 0 )
+            {
+                SetZfsProperties( settings.DryRun, ds.Name, propertiesToSet );
+            }
+        }
 
         // Local function to get datasets starting from the specified path
         async Task GetDatasets( string poolRootName, ConcurrentDictionary<string, ZfsRecord> allDatasets )
@@ -371,9 +405,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
             // The only caveat to using list here is that we don't know the source of the values.
             // That will only be an issue if we ever check the source of a Snapshot's properties
-            await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString( )} {poolRootName}" ).ConfigureAwait( true ) )
+            await foreach ( string zfsListLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString( )} {poolRootName}" ).ConfigureAwait( true ) )
             {
-                ParseSnapshotZfsListLine( datasets, zfsGetLine, allSnapshots );
+                ParseSnapshotZfsListLine( zfsListLine, settings, datasets, allSnapshots );
             }
 
             Logger.Debug( "Finished adding snapshot children of {0}", poolRootName );

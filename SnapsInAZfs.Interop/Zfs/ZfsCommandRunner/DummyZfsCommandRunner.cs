@@ -18,10 +18,42 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         await GetMockZfsDatasetsFromTextFileAsync( datasets, "alldatasets-withproperties.txt" ).ConfigureAwait( true );
-        await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
+        await GetMockZfsSnapshotsFromTextFileAsync( settings, datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
+        foreach ( ZfsRecord ds in datasets.Values )
+        {
+            if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+
+            if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+
+            if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+
+            if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+
+            if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+
+            if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
+            {
+                ds.UpdateProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp, ZfsPropertySourceConstants.Local );
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -175,7 +207,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         }
     }
 
-    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
+    private async Task GetMockZfsSnapshotsFromTextFileAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
     {
         Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', IZfsProperty.KnownSnapshotProperties )} pool1" );
         using StreamReader rdr = File.OpenText( filePath );
@@ -183,7 +215,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         while ( !rdr.EndOfStream )
         {
             string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            ParseSnapshotZfsListLine( datasets, stringToParse, snapshots );
+            ParseSnapshotZfsListLine( stringToParse, settings, datasets, snapshots );
         }
     }
 }

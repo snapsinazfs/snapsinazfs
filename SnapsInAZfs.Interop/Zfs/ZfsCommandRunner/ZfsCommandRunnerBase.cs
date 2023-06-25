@@ -33,7 +33,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
 
     /// <inheritdoc />
-    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
+    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
     public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
 
@@ -220,7 +220,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseSnapshotZfsListLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, Snapshot> allSnapshots )
+    protected void ParseSnapshotZfsListLine( string zfsGetLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
         string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;

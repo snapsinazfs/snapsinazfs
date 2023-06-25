@@ -275,7 +275,7 @@ internal static class ZfsTasks
                         Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
                     }
 
-                    ds.Snapshots.TryRemove( snapshot.Name, out _ );
+                    ds.Snapshots[ snapshot.Period.Value.Kind ].TryRemove( snapshot.Name, out _ );
 
                     continue;
                 }
@@ -510,8 +510,8 @@ internal static class ZfsTasks
     }
 
     [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
-    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public static async Task GetDatasetsAndSnapshotsFromZfsAsync(SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots ).ConfigureAwait( true );
+        await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots ).ConfigureAwait( true );
     }
 }

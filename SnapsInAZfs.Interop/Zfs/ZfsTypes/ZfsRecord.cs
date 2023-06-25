@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -73,6 +73,18 @@ public record ZfsRecord
     public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
     public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
     public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    [JsonIgnore]
+    public DateTimeOffset LastObservedDailySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+    [JsonIgnore]
+    public DateTimeOffset LastObservedFrequentSnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+    [JsonIgnore]
+    public DateTimeOffset LastObservedHourlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+    [JsonIgnore]
+    public DateTimeOffset LastObservedMonthlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+    [JsonIgnore]
+    public DateTimeOffset LastObservedWeeklySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+    [JsonIgnore]
+    public DateTimeOffset LastObservedYearlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
 
     public string Name { get; }
 
@@ -90,7 +102,16 @@ public record ZfsRecord
     public ZfsProperty<int> SnapshotRetentionWeekly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local );
 
-    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = new(
+        new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+        {
+            { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) },
+        } );
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
 
@@ -100,7 +121,48 @@ public record ZfsRecord
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
-        Snapshots[ snap.Name ] = snap;
+        Snapshots[ snap.Period.Value.Kind ][ snap.Name ] = snap;
+        switch ( snap.Period.Value.Kind )
+        {
+            case SnapshotPeriodKind.Frequent:
+                if ( LastObservedFrequentSnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedFrequentSnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            case SnapshotPeriodKind.Hourly:
+                if ( LastObservedHourlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedHourlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            case SnapshotPeriodKind.Daily:
+                if ( LastObservedDailySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedDailySnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            case SnapshotPeriodKind.Weekly:
+                if ( LastObservedWeeklySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedWeeklySnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            case SnapshotPeriodKind.Monthly:
+                if ( LastObservedMonthlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedMonthlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            case SnapshotPeriodKind.Yearly:
+                if ( LastObservedYearlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedYearlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException( );
+        }
         return snap;
     }
 
@@ -527,7 +589,7 @@ public record ZfsRecord
 
     private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
-        List<Snapshot> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( snapshotPeriod ) ).Select( kvp => kvp.Value ).ToList( );
+        List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
         if ( snapshotsSetForPruning.Count > retentionValue )
         {
