@@ -5,6 +5,5 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo( "SnapsInAZfs" )]
-[assembly: InternalsVisibleTo( "SnapsInAZfs.Common.Tests" )]
-[assembly: InternalsVisibleTo( "SnapsInAZfs.Common" )]
+[assembly: InternalsVisibleTo( "SnapsInAZfs.Settings" )]
 [assembly: InternalsVisibleTo( "SnapsInAZfs.Interop.Tests" )]
