@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -715,7 +715,7 @@ public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
         }
 
         // If timestamps are different, sort on period
-        return Period.Value != other.Period.Value
+        return !Period.Value.Equals( other.Period.Value )
             ? Period.Value.CompareTo( other.Period.Value )
             :
             // If periods are the same, sort by name
