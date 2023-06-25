@@ -15,8 +15,8 @@ namespace SnapsInAZfs;
 
 internal static class ZfsTasks
 {
-    private const string SnapshotMutexName = "Global\\SnapsInAZfs_Snapshots";
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private const string SnapshotMutexName = "Global\\SnapsInAZfs_Snapshots";
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
     internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
@@ -80,7 +80,7 @@ internal static class ZfsTasks
             if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -93,7 +93,7 @@ internal static class ZfsTasks
             if ( ds.IsHourlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -106,7 +106,7 @@ internal static class ZfsTasks
             if ( ds.IsDailySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -119,7 +119,7 @@ internal static class ZfsTasks
             if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -132,7 +132,7 @@ internal static class ZfsTasks
             if ( ds.IsMonthlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -145,7 +145,7 @@ internal static class ZfsTasks
             if ( ds.IsYearlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
-                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
+                ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -195,6 +195,7 @@ internal static class ZfsTasks
                 propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
                 return ( true, snapshot );
             }
+
             if ( !snapshotTaken && settings.DryRun )
             {
                 propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
@@ -317,7 +318,7 @@ internal static class ZfsTasks
         switch ( snapshotPeriod.Kind )
         {
             case SnapshotPeriodKind.Frequent:
-                if ( ds.SnapshotRetentionFrequent.IsNotWanted() )
+                if ( ds.SnapshotRetentionFrequent.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -325,7 +326,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Hourly:
-                if ( ds.SnapshotRetentionHourly.IsNotWanted() )
+                if ( ds.SnapshotRetentionHourly.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -333,7 +334,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Daily:
-                if ( ds.SnapshotRetentionDaily.IsNotWanted() )
+                if ( ds.SnapshotRetentionDaily.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -341,7 +342,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Weekly:
-                if ( ds.SnapshotRetentionWeekly.IsNotWanted() )
+                if ( ds.SnapshotRetentionWeekly.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -349,7 +350,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Monthly:
-                if ( ds.SnapshotRetentionMonthly.IsNotWanted() )
+                if ( ds.SnapshotRetentionMonthly.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;
@@ -357,7 +358,7 @@ internal static class ZfsTasks
 
                 break;
             case SnapshotPeriodKind.Yearly:
-                if ( ds.SnapshotRetentionYearly.IsNotWanted() )
+                if ( ds.SnapshotRetentionYearly.IsNotWanted( ) )
                 {
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
                     return false;

@@ -8,16 +8,16 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public record Snapshot : ZfsRecord, IComparable<Snapshot>
 {
+    public Snapshot( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
+    {
+        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
+    }
+
     public Snapshot( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset.PoolRoot )
     {
         ParentDataset = parentDataset;
         SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
         Recursion = parentDataset.Recursion with { };
-    }
-
-    public Snapshot( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
-    {
-        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
     }
 
     public Snapshot( string name, bool pruneSnapshots, SnapshotPeriod period, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, timestamp, parentDataset )
