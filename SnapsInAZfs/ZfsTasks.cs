@@ -324,7 +324,7 @@ internal static class ZfsTasks
 
         Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, snapshotPeriod, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
-        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, settings.Templates[ ds.Template.Value ], out snapshot ) )
+        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, template, out snapshot ) )
         {
             ds.AddSnapshot( snapshot! );
             Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
