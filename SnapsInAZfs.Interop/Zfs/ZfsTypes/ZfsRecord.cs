@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -622,6 +622,7 @@ public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
     {
         ParentDataset = parentDataset;
         SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
+        Recursion = parentDataset.Recursion with { };
     }
 
     public SnapshotRecord( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
