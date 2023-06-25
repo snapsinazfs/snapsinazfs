@@ -80,7 +80,7 @@ public record ZfsRecord
     public ZfsRecord PoolRoot { get; init; }
 
     public int PoolUsedCapacity { get; set; }
-    public ZfsProperty<bool> PruneSnapshots { get; private set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Recursion { get; protected set; } = new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionDaily { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionFrequent { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1, ZfsPropertySourceConstants.Local );
@@ -618,9 +618,21 @@ public record ZfsRecord
 
 public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
 {
-    private SnapshotRecord( string Name, ZfsRecord ParentDataset ) : base( Name, "snapshot", ParentDataset.PoolRoot )
+    public SnapshotRecord( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset.PoolRoot )
     {
-        this.ParentDataset = ParentDataset;
+        ParentDataset = parentDataset;
+        SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
+    }
+
+    public SnapshotRecord( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
+    {
+        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
+    }
+
+    public SnapshotRecord( string name, bool pruneSnapshots, SnapshotPeriod period, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, timestamp, parentDataset )
+    {
+        PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshots, ZfsPropertySourceConstants.ZfsList );
+        Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local );
     }
 
     public ZfsRecord ParentDataset { get; }
@@ -708,11 +720,6 @@ public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
             :
             // If periods are the same, sort by name
             Name.CompareTo( other.Name );
-    }
-
-    public static SnapshotRecord CreateInstance( string name, ZfsRecord parentDataset )
-    {
-        return new( name, parentDataset );
     }
 
     public void Deconstruct( out string name, out ZfsRecord parentDataset )
