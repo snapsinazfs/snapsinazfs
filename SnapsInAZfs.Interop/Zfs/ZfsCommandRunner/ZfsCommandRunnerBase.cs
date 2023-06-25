@@ -223,9 +223,9 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static void ParseSnapshotZfsListLine( string zfsListLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
         Logger.Trace( "Attempting to parse zfs list line {0}", zfsListLine );
-        string[] zfsListTokens = zfsListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         try
         {
+            string[] zfsListTokens = zfsListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
             int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
             if ( zfsListTokens.Length != propertyCount )
             {
@@ -257,11 +257,11 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
         catch ( KeyNotFoundException ex )
         {
-            Logger.Error( ex, "Error while creating snapshot instance for {0}", zfsListTokens[ 2 ] );
+            Logger.Error( ex, "Error while creating snapshot instance from {0}", zfsListLine );
         }
         catch ( ArgumentNullException ex )
         {
-            Logger.Error( ex, "Error while creating snapshot instance for {0}", zfsListTokens[ 2 ] );
+            Logger.Error( ex, "Error while creating snapshot instance from {0}", zfsListLine );
         }
     }
 }
