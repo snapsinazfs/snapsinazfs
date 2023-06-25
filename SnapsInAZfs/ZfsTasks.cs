@@ -279,10 +279,10 @@ internal static class ZfsTasks
                 Logger.Trace( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
                 return false;
             case { IsPoolRoot: false, Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion, ParentDataset.Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion }:
-                Logger.Trace( "Ancestor of dataset {0} is already configured for zfs native recursion. Skipping", ds.Name );
+                Logger.Trace( "Ancestor {1} of dataset {0} is already configured for zfs native recursion. Skipping", ds.Name, ds.ParentDataset.Name );
                 return false;
             case { IsPoolRoot: false, Recursion.Value: ZfsPropertyValueConstants.SnapsInAZfs, ParentDataset.Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion }:
-                Logger.Warn( "Ancestor of dataset {0} is configured for zfs native recursion and local recursion is set. No new snapshot will be taken of {0} to avoid name collision. Check ZFS configuration", ds.Name );
+                Logger.Warn( "Ancestor {1} of dataset {0} is configured for zfs native recursion and local recursion is set. No new snapshot will be taken of {0} to avoid name collision. Check ZFS configuration", ds.Name, ds.ParentDataset.Name );
                 return false;
         }
 
