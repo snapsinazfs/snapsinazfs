@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -145,25 +145,16 @@ internal static class ZfsTasks
 
         void TakeSnapshotKind( ZfsRecord ds, SnapshotPeriod period, List<IZfsProperty> propsToSet )
         {
-            string datasetSnapshotTimestampPropertyName = period.Kind switch
-            {
-                SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Hourly => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Daily => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
-                SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
-                _ => throw new ArgumentOutOfRangeException( nameof( period ) )
-            };
+            Logger.Trace( "Requested to take {0} snapshot of {1}", period, ds.Name );
             bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out SnapshotRecord? snapshot );
             if ( snapshotTaken )
             {
                 Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
-                propsToSet.Add( ds.UpdateProperty( datasetSnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local ) );
+                propsToSet.Add( ds.UpdateProperty( period, timestamp, ZfsPropertySourceConstants.Local ) );
             }
             else if ( !snapshotTaken && settings.DryRun )
             {
-                propsToSet.Add( ds.UpdateProperty( datasetSnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local ) );
+                propsToSet.Add( ds.UpdateProperty( period, timestamp, ZfsPropertySourceConstants.Local ) );
             }
         }
     }
