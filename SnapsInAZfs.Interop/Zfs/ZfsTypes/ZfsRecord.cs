@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -727,18 +727,6 @@ public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
     {
         name = Name;
         parentDataset = ParentDataset;
-    }
-
-    public static SnapshotRecord GetNewSnapshotObjectForCommandRunner( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, TemplateSettings template )
-    {
-        string snapshotName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        return new( snapshotName, ds )
-        {
-            SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, snapshotName, ZfsPropertySourceConstants.Local ),
-            Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local ),
-            Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local ),
-            Recursion = ds.Recursion with { Source = ZfsPropertySourceConstants.Local }
-        };
     }
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
