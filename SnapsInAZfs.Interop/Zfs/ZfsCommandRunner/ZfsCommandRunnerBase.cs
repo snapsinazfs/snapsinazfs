@@ -224,32 +224,44 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     {
         Logger.Trace( "Attempting to parse zfs list line {0}", zfsListLine );
         string[] zfsListTokens = zfsListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-        int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
-        if ( zfsListTokens.Length != propertyCount )
+        try
         {
-            Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsListLine, propertyCount );
-            return;
-        }
+            int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
+            if ( zfsListTokens.Length != propertyCount )
+            {
+                Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsListLine, propertyCount );
+                return;
+            }
 
-        string snapName = zfsListTokens[ 2 ];
-        if ( snapName == "-" )
+            string snapName = zfsListTokens[ 2 ];
+            if ( snapName == "-" )
+            {
+                Logger.Debug( "{0} is not a SnapsInAZfs snapshot. Skipping", zfsListTokens[ 0 ] );
+                return;
+            }
+
+            string snapDatasetName = snapName.GetZfsPathParent( );
+            if ( !datasets.ContainsKey( snapDatasetName ) )
+            {
+                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snapName );
+                return;
+            }
+
+            Logger.Trace( "Getting parent dataset {0} of snapshot {1}", snapDatasetName, snapName );
+            ZfsRecord parentDataset = datasets[ snapDatasetName ];
+            Logger.Trace( "Creating new snapshot instance {0} with parent {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
+            Snapshot snap = new( snapName, bool.Parse( zfsListTokens[ 1 ] ), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
+            allSnapshots[ snapName ] = snap.ParentDataset.AddSnapshot( snap );
+
+            Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
+        }
+        catch ( KeyNotFoundException ex )
         {
-            Logger.Debug( "{0} is not a SnapsInAZfs snapshot. Skipping", zfsListTokens[ 0 ] );
-            return;
+            Logger.Error( ex, "Error while creating snapshot instance for {0}", zfsListTokens[ 2 ] );
         }
-
-        string snapDatasetName = snapName.GetZfsPathParent( );
-        if ( !datasets.ContainsKey( snapDatasetName ) )
+        catch ( ArgumentNullException ex )
         {
-            Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snapName );
-            return;
+            Logger.Error( ex, "Error while creating snapshot instance for {0}", zfsListTokens[ 2 ] );
         }
-
-        ZfsRecord parentDataset = datasets[ snapDatasetName ];
-        Logger.Trace( "Creating new snapshot instance {0} with parent {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
-        Snapshot snap = new( snapName, bool.Parse(zfsListTokens[1]), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
-        allSnapshots[ snapName ] = snap.ParentDataset.AddSnapshot( snap );
-
-        Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
     }
 }
