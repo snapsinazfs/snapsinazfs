@@ -367,10 +367,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         async Task GetSnapshots( string poolRootName, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
         {
             Logger.Debug( "Getting and parsing snapshot descendents of {0}", poolRootName );
-            // This one can use a list operation, because we don't care about inheritance source for snapshots - just the values
+
+            // The only caveat to using list here is that we don't know the source of the values.
+            // That will only be an issue if we ever check the source of a SnapshotRecord's properties
             await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString( )} {poolRootName}" ).ConfigureAwait( true ) )
             {
-                ParseSnapshotZfsGetLine( datasets, zfsGetLine, allSnapshots );
+                ParseSnapshotZfsListLine( datasets, zfsGetLine, allSnapshots );
             }
 
             Logger.Debug( "Finished adding snapshot children of {0}", poolRootName );

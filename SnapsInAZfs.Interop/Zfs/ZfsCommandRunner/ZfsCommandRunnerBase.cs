@@ -220,7 +220,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseSnapshotZfsGetLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
+    protected static void ParseSnapshotZfsListLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
     {
         string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;

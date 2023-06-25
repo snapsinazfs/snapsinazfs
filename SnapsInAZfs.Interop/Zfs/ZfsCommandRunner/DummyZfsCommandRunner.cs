@@ -180,7 +180,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         while ( !rdr.EndOfStream )
         {
             string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            ParseSnapshotZfsGetLine( datasets, stringToParse, snapshots );
+            ParseSnapshotZfsListLine( datasets, stringToParse, snapshots );
         }
     }
 }
