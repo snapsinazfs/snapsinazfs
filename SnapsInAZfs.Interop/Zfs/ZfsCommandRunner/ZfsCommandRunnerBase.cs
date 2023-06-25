@@ -15,7 +15,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot? snapshot );
+    public abstract bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
 
     /// <inheritdoc />
     public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
@@ -194,8 +194,8 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             bool isPoolRoot = dsName == parentName;
             ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
             ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-            ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy.PoolRoot );
-            ZfsRecord newDsTreeCopy = newDsBaseCopy with { PoolRoot = parentDsTreeCopy };
+            ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy );
+            ZfsRecord newDsTreeCopy = newDsBaseCopy with { ParentDataset = parentDsTreeCopy };
             ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
             allTreeNodes[ dsName ] = node;
             allTreeNodes[ parentName ].Children.Add( node );
@@ -220,7 +220,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected void ParseSnapshotZfsListLine( string zfsGetLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
+    protected static void ParseSnapshotZfsListLine( string zfsGetLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
         string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;

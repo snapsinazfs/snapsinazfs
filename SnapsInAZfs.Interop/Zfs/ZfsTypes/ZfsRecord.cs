@@ -16,13 +16,12 @@ public record ZfsRecord
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public ZfsRecord( string Name, string Kind, ZfsRecord? PoolRoot = null )
+    public ZfsRecord( string Name, string Kind, ZfsRecord? parent = null )
     {
         this.Name = Name;
-        IsPoolRoot = PoolRoot is null;
-        PoolRoot ??= this;
+        IsPoolRoot = parent is null;
+        ParentDataset ??= this;
         this.Kind = Kind;
-        this.PoolRoot = PoolRoot;
         NameValidatorRegex = Kind switch
         {
             ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
@@ -89,7 +88,10 @@ public record ZfsRecord
     public string Name { get; }
 
     [JsonIgnore]
-    public ZfsRecord PoolRoot { get; init; }
+    public ZfsRecord ParentDataset { get; init; }
+
+    [JsonIgnore]
+    public ZfsRecord PoolRoot  => IsPoolRoot ? this : ParentDataset.PoolRoot;
 
     public int PoolUsedCapacity { get; set; }
     public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
@@ -161,7 +163,7 @@ public record ZfsRecord
                 }
                 break;
             default:
-                throw new ArgumentOutOfRangeException( );
+                throw new InvalidOperationException( "Invalid Snapshot Period specified" );
         }
         return snap;
     }

@@ -285,29 +285,28 @@ internal static class ZfsTasks
         }
     }
 
-    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ZfsRecord ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
+    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
-        Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
+        Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, period );
         snapshot = null;
-        if ( !ds.Enabled.Value )
+
+        switch ( ds )
         {
-            Logger.Trace( "Dataset {0} is not enabled. Skipping", ds.Name );
-            return false;
+            case { Enabled.Value: false }:
+                Logger.Trace( "Dataset {0} is not enabled. Skipping", ds.Name );
+                return false;
+            case { TakeSnapshots.Value: false }:
+                Logger.Trace( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
+                return false;
+            case { IsPoolRoot: false, Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion, ParentDataset.Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion }:
+                Logger.Trace( "Ancestor of dataset {0} is already configured for zfs native recursion. Skipping", ds.Name );
+                return false;
+            case { IsPoolRoot: false, Recursion.Value: ZfsPropertyValueConstants.SnapsInAZfs, ParentDataset.Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion }:
+                Logger.Warn( "Ancestor of dataset {0} is configured for zfs native recursion and local recursion is set. No new snapshot will be taken of {0} to avoid name collision. Check ZFS configuration", ds.Name );
+                return false;
         }
 
-        if ( !ds.TakeSnapshots.Value )
-        {
-            Logger.Trace( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
-            return false;
-        }
-
-        if ( ds.Recursion is { Value: ZfsPropertyValueConstants.ZfsRecursion, IsInherited: true } )
-        {
-            Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
-            return false;
-        }
-
-        Logger.Trace( "Looking up template {0} for {1} snapshot of {2}", ds.Template.Value, snapshotPeriod, ds.Name );
+        Logger.Trace( "Looking up template {0} for {1} snapshot of {2}", ds.Template.Value, period, ds.Name );
 
         if ( !settings.Templates.TryGetValue( ds.Template.Value, out TemplateSettings? template ) )
         {
@@ -315,12 +314,12 @@ internal static class ZfsTasks
             return false;
         }
 
-        switch ( snapshotPeriod.Kind )
+        switch ( period.Kind )
         {
             case SnapshotPeriodKind.Frequent:
                 if ( ds.SnapshotRetentionFrequent.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
@@ -328,7 +327,7 @@ internal static class ZfsTasks
             case SnapshotPeriodKind.Hourly:
                 if ( ds.SnapshotRetentionHourly.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
@@ -336,7 +335,7 @@ internal static class ZfsTasks
             case SnapshotPeriodKind.Daily:
                 if ( ds.SnapshotRetentionDaily.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
@@ -344,7 +343,7 @@ internal static class ZfsTasks
             case SnapshotPeriodKind.Weekly:
                 if ( ds.SnapshotRetentionWeekly.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
@@ -352,7 +351,7 @@ internal static class ZfsTasks
             case SnapshotPeriodKind.Monthly:
                 if ( ds.SnapshotRetentionMonthly.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
@@ -360,18 +359,18 @@ internal static class ZfsTasks
             case SnapshotPeriodKind.Yearly:
                 if ( ds.SnapshotRetentionYearly.IsNotWanted( ) )
                 {
-                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", snapshotPeriod, ds.Name );
+                    Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
                     return false;
                 }
 
                 break;
             default:
-                throw new ArgumentOutOfRangeException( nameof( snapshotPeriod ), snapshotPeriod, $"Unexpected value received for Period for dataset {ds.Name}. Snapshot not taken." );
+                throw new ArgumentOutOfRangeException( nameof( period ), period, $"Unexpected value received for Period for dataset {ds.Name}. Snapshot not taken." );
         }
 
-        Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, snapshotPeriod, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
+        Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, period, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
-        if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, template, out snapshot ) )
+        if ( commandRunner.TakeSnapshot( ds, period, timestamp, settings, template, out snapshot ) )
         {
             ds.AddSnapshot( snapshot! );
             Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
@@ -384,7 +383,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        Logger.Error( "{0} snapshot for {1} {2} not taken", snapshotPeriod, ds.Kind, ds.Name );
+        Logger.Error( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
         return false;
     }
 

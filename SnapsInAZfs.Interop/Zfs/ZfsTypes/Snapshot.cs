@@ -13,9 +13,8 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
     }
 
-    public Snapshot( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset.PoolRoot )
+    public Snapshot( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset )
     {
-        ParentDataset = parentDataset;
         SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
         Recursion = parentDataset.Recursion with { };
     }
@@ -25,8 +24,6 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshots, ZfsPropertySourceConstants.ZfsList );
         Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local );
     }
-
-    public ZfsRecord ParentDataset { get; }
 
     public ZfsProperty<SnapshotPeriod> Period { get; private set; } = new( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Frequent, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> SnapshotName { get; private set; }
