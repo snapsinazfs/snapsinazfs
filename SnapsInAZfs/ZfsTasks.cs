@@ -19,7 +19,7 @@ internal static class ZfsTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets )
+    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots )
     {
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
@@ -80,37 +80,79 @@ internal static class ZfsTasks
             if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( ds.IsHourlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( ds.IsDailySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( ds.IsMonthlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( ds.IsYearlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
-                TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
+                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
+                if ( success )
+                {
+                    if ( !settings.DryRun && snapshot is not null )
+                    {
+                        snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    }
+                }
             }
 
             if ( propsToSet.Any( ) )
@@ -143,7 +185,7 @@ internal static class ZfsTasks
 
         return;
 
-        void TakeSnapshotKind( ZfsRecord ds, SnapshotPeriod period, List<IZfsProperty> propsToSet )
+        (bool success, SnapshotRecord? snapshot) TakeSnapshotKind( ZfsRecord ds, SnapshotPeriod period, List<IZfsProperty> propsToSet )
         {
             Logger.Trace( "Requested to take {0} snapshot of {1}", period, ds.Name );
             bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out SnapshotRecord? snapshot );
@@ -151,11 +193,15 @@ internal static class ZfsTasks
             {
                 Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
                 propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                return ( true, snapshot );
             }
-            else if ( !snapshotTaken && settings.DryRun )
+            if ( !snapshotTaken && settings.DryRun )
             {
                 propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                return ( true, null );
             }
+
+            return ( false, null );
         }
     }
 

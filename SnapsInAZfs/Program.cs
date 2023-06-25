@@ -202,7 +202,7 @@ internal class Program
         if ( Settings is { TakeSnapshots: true } )
         {
             Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets, snapshots );
         }
         else
         {
