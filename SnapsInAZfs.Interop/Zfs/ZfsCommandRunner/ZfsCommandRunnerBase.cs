@@ -234,6 +234,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             }
 
             string snapName = zfsListTokens[ 2 ];
+            Logger.Trace( "Checking if {0} is a SnapsInAZfs snapshot", snapName );
             if ( snapName == "-" )
             {
                 Logger.Debug( "{0} is not a SnapsInAZfs snapshot. Skipping", zfsListTokens[ 0 ] );
@@ -241,6 +242,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             }
 
             string snapDatasetName = snapName.GetZfsPathParent( );
+            Logger.Trace( "Parent dataset of {0} is {1}", snapName, snapDatasetName );
             if ( !datasets.ContainsKey( snapDatasetName ) )
             {
                 Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snapName );

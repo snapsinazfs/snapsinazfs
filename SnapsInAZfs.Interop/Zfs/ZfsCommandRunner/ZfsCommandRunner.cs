@@ -445,7 +445,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
         using ( Process zfsProcess = new( ) { StartInfo = zfsProcessStartInfo } )
         {
-            Logger.Debug( "Calling {0} {1} {2}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
+            Logger.Debug( "Calling {0} {1}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
             try
             {
                 zfsProcess.Start( );
