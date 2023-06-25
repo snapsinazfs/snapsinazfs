@@ -144,39 +144,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             Logger.Trace( $"Read line {zfsGetLine}" );
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
-            string dsName = lineTokens[ 0 ];
-            string propertyValue = lineTokens[ 2 ];
-            if ( !baseDatasets.ContainsKey( dsName ) )
-            {
-                Logger.Trace( "{0} is not in dictionary. Creating a new {1}", dsName, propertyValue );
-                string parentName = dsName.GetZfsPathParent( );
-                bool isPoolRoot = dsName == parentName;
-                ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
-                ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-                ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy );
-                ZfsRecord newDsTreeCopy = newDsBaseCopy with { PoolRoot = parentDsTreeCopy };
-                ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
-                allTreeNodes[ dsName ] = node;
-                allTreeNodes[ parentName ].Children.Add( node );
-                Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
-                baseDatasets.TryAdd( dsName, newDsBaseCopy );
-                treeDatasets.TryAdd( dsName, newDsTreeCopy );
-            }
-            else
-            {
-                ZfsRecord ds = baseDatasets[ dsName ];
-                if ( ds.IsPoolRoot )
-                {
-                    Logger.Trace( "{0} is a pool root - skipping", dsName );
-                    continue;
-                }
+            ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
 
-                string propertyName = lineTokens[ 1 ];
-                string propertySource = lineTokens[ 3 ];
-                Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                treeDatasets[ ds.Name ].UpdateProperty( propertyName, propertyValue, propertySource );
-            }
         }
 
         return treeRootNodes;

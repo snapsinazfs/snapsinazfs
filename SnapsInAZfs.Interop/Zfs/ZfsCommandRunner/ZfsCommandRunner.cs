@@ -547,7 +547,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
     {
         List<ITreeNode> treeRootNodes = new( );
-        Dictionary<string, TreeNode> allTreeNodes = new( );
+        ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
         await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{string.Join( ',', IZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
@@ -578,37 +578,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
-            string dsName = lineTokens[ 0 ];
-            if ( !baseDatasets.ContainsKey( dsName ) )
-            {
-                int lastSlashIndex = dsName.LastIndexOf( '/' );
-                string parentName = dsName[ ..lastSlashIndex ];
-                ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
-                ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-                ZfsRecord newDsBaseCopy = new( dsName, lineTokens[ 2 ] );
-                ZfsRecord newDsTreeCopy = newDsBaseCopy with { };
-                ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
-                allTreeNodes[ dsName ] = node;
-                allTreeNodes[ parentName ].Children.Add( node );
-                Logger.Debug( "Adding new {0} {1} to {2}", newDsBaseCopy.Kind, newDsBaseCopy.Name, parentDsBaseCopy.Name );
-                baseDatasets.TryAdd( dsName, newDsBaseCopy );
-                treeDatasets.TryAdd( dsName, newDsTreeCopy );
-            }
-            else
-            {
-                ZfsRecord ds = baseDatasets[ dsName ];
-                if ( ds.IsPoolRoot )
-                {
-                    continue;
-                }
-
-                string propertyName = lineTokens[ 1 ];
-                string propertyValue = lineTokens[ 2 ];
-                string propertySource = lineTokens[ 3 ];
-                Logger.Debug( "Adding property {0} ({1}) - ({2}) to {3}", propertyName, propertyValue, propertySource, ds.Name );
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-                treeDatasets[ ds.Name ].UpdateProperty( propertyName, propertyValue, propertySource );
-            }
+            ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
         }
 
         return treeRootNodes;
