@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -450,7 +450,7 @@ internal static class ZfsTasks
     /// <param name="zfsCommandRunner"></param>
     /// <returns></returns>
     /// <remarks>Should only be called once schema validity has been checked, or else results are undefined and unsupported</remarks>
-    public static async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootsWithPropertiesAndCapacities( IZfsCommandRunner zfsCommandRunner )
+    public static async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootsWithPropertiesAndCapacitiesAsync( IZfsCommandRunner zfsCommandRunner )
     {
         ConcurrentDictionary<string, ZfsRecord> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( true );
 
