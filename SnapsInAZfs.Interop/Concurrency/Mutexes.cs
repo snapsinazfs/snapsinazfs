@@ -67,13 +67,13 @@ public sealed class Mutexes : IDisposable
             return;
         }
 
-        Logger.Debug( "Disposing all mutexes" );
+        Logger.Trace( "Disposing all mutexes" );
 
         foreach ( ( string? name, Mutex? mutex ) in Instance._allMutexes )
         {
             if ( warnOnStillHeld )
             {
-                Logger.Warn( "Mutex {0} still held", name );
+                Logger.Debug( "Mutex {0} still held", name );
             }
 
             mutex?.Dispose( );
@@ -143,7 +143,7 @@ public sealed class Mutexes : IDisposable
         // ReSharper disable ExceptionNotDocumentedOptional
         if ( possiblyNullMutex.WaitOne( timeout ) )
         {
-            Logger.Debug( "Mutex {0} successfully acquired", mutexName );
+            Logger.Trace( "Mutex {0} successfully acquired", mutexName );
             return new( mutexName, possiblyNullMutex );
         }
         // ReSharper restore ExceptionNotDocumentedOptional
@@ -267,12 +267,12 @@ public sealed class Mutexes : IDisposable
                 Instance._allMutexes.TryRemove( name, out _ );
             }
 
-            Logger.Debug( "Mutex {0} released", name );
+            Logger.Trace( "Mutex {0} released", name );
         }
         catch ( ApplicationException ex )
         {
             //This means we didn't own the mutex. We can discard this and carry on with life.
-            Logger.Warn( ex, "Attempted to release mutex when we didn't own it." );
+            Logger.Trace( ex, "Attempted to release mutex when we didn't own it." );
         }
         catch ( ObjectDisposedException ex )
         {
