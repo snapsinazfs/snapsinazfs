@@ -169,7 +169,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             }
 
             Logger.Debug( "{1} {0} not in dictionary. Attempting to add", dsName, dsKind );
-            if ( allDatasets.TryAdd( dsName, new( dsName, dsKind, allDatasets[ parentDsName ] ) ) )
+            if ( allDatasets.TryAdd( dsName, new( dsName, dsKind, allDatasets[ dsName.GetZfsPathRoot( ) ] ) ) )
             {
                 Logger.Debug( "Added {1} {0} to dictionary", dsName, dsKind );
                 return;
@@ -194,7 +194,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             bool isPoolRoot = dsName == parentName;
             ZfsRecord parentDsBaseCopy = baseDatasets[ parentName ];
             ZfsRecord parentDsTreeCopy = treeDatasets[ parentName ];
-            ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy );
+            ZfsRecord newDsBaseCopy = new( dsName, propertyValue, isPoolRoot ? null : parentDsBaseCopy.PoolRoot );
             ZfsRecord newDsTreeCopy = newDsBaseCopy with { PoolRoot = parentDsTreeCopy };
             ZfsObjectConfigurationTreeNode node = new( dsName, newDsBaseCopy, newDsTreeCopy, parentDsBaseCopy, parentDsTreeCopy );
             allTreeNodes[ dsName ] = node;
