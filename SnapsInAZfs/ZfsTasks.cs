@@ -240,7 +240,7 @@ internal static class ZfsTasks
 
     internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ZfsRecord ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out SnapshotRecord? snapshot )
     {
-        Logger.Debug( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
+        Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
         snapshot = null;
         if ( !ds.Enabled.Value )
         {
@@ -259,6 +259,8 @@ internal static class ZfsTasks
             Logger.Trace( "Ancestor of dataset {0} is configured for zfs native recursion and recursion not set locally. Skipping", ds.Name );
             return false;
         }
+
+        Logger.Trace( "Looking up template {0} for {1} snapshot of {2}", ds.Template.Value, snapshotPeriod, ds.Name );
 
         if ( !settings.Templates.TryGetValue( ds.Template.Value, out TemplateSettings? template ) )
         {
@@ -320,7 +322,7 @@ internal static class ZfsTasks
                 throw new ArgumentOutOfRangeException( nameof( snapshotPeriod ), snapshotPeriod, $"Unexpected value received for Period for dataset {ds.Name}. Snapshot not taken." );
         }
 
-        Logger.Trace( "Dataset {0} will have a snapshot taken with these settings: {1}", ds.Name, JsonSerializer.Serialize( new { ds, template } ) );
+        Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, snapshotPeriod, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
         if ( commandRunner.TakeSnapshot( ds, snapshotPeriod, timestamp, settings, settings.Templates[ ds.Template.Value ], out snapshot ) )
         {
@@ -335,7 +337,7 @@ internal static class ZfsTasks
             return false;
         }
 
-        Logger.Error( "Snapshot for dataset {0} not taken", ds.Name );
+        Logger.Error( "{0} snapshot for {1} {2} not taken", snapshotPeriod, ds.Kind, ds.Name );
         return false;
     }
 
