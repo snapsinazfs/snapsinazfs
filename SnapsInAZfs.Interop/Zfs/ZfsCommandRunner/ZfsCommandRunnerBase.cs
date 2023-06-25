@@ -220,13 +220,14 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseSnapshotZfsListLine( string zfsGetLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
+    protected static void ParseSnapshotZfsListLine( string zfsListLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
-        string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+        Logger.Trace( "Attempting to parse zfs list line {0}", zfsListLine );
+        string[] zfsListTokens = zfsListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
         if ( zfsListTokens.Length != propertyCount )
         {
-            Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine, propertyCount );
+            Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsListLine, propertyCount );
             return;
         }
 

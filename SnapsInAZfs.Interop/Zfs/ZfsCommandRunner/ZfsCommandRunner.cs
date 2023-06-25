@@ -342,10 +342,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         string datasetPropertiesString = IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( );
         Logger.Debug( "Getting all dataset configurations from ZFS" );
-        Task[] zfsGetDatasetTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetDatasets( poolName, datasets ) ) ).ToArray( );
-
-        Logger.Trace( "Waiting for all zfs get processes to finish." );
-        await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
+        foreach ( string poolName in poolRootNames )
+        {
+            await GetDatasets( poolName, datasets ).ConfigureAwait( true );
+        }
 
         Logger.Debug( "Getting all snapshots from ZFS" );
         foreach ( string poolName in poolRootNames )
@@ -437,18 +437,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentOutOfRangeException( nameof( verb ), "Only get and list verbs are permitted for zfs enumerator operations" );
         }
 
-        ProcessStartInfo zfsGetStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
+        ProcessStartInfo zfsProcessStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
         Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        using ( Process zfsProcess = new( ) { StartInfo = zfsProcessStartInfo } )
         {
-            Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
+            Logger.Debug( "Calling {0} {1} {2}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
             try
             {
-                zfsGetProcess.Start( );
+                zfsProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
@@ -457,9 +457,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 throw;
             }
 
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            while ( !zfsProcess.StandardOutput.EndOfStream )
             {
-                yield return await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
+                yield return await zfsProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
             }
         }
     }
