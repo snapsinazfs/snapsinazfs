@@ -134,103 +134,13 @@ public record ZfsRecord
         }
 
         List<Snapshot> snapshotsToPrune = new( );
-        List<Snapshot> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Frequent ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
-        int numberToPrune;
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionFrequent.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionFrequent.Value;
-            Logger.Debug( "Need to prune oldest {0} frequent snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot frequentSnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", frequentSnapshot.Name );
-                snapshotsToPrune.Add( frequentSnapshot );
-            }
-        }
 
-        snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Hourly ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Hourly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionHourly.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionHourly.Value;
-            Logger.Debug( "Need to prune oldest {0} hourly snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot hourlySnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", hourlySnapshot.Name );
-                snapshotsToPrune.Add( hourlySnapshot );
-            }
-        }
-
-        snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Daily ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Daily snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionDaily.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionDaily.Value;
-            Logger.Debug( "Need to prune oldest {0} daily snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot dailySnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", dailySnapshot.Name );
-                snapshotsToPrune.Add( dailySnapshot );
-            }
-        }
-
-        snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Weekly ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Weekly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionWeekly.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionWeekly.Value;
-            Logger.Debug( "Need to prune oldest {0} weekly snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot weeklySnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", weeklySnapshot.Name );
-                snapshotsToPrune.Add( weeklySnapshot );
-            }
-        }
-
-        snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Monthly ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Monthly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionMonthly.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionMonthly.Value;
-            Logger.Debug( "Need to prune oldest {0} monthly snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot monthlySnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", monthlySnapshot.Name );
-                snapshotsToPrune.Add( monthlySnapshot );
-            }
-        }
-
-        snapshotsSetForPruning.Clear( );
-        snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Yearly ) ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "Yearly snapshots of {0} available for pruning: {1}", Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        // Don't do this, so these all look the same
-        // ReSharper disable once InvertIf
-        if ( snapshotsSetForPruning.Count > SnapshotRetentionYearly.Value )
-        {
-            numberToPrune = snapshotsSetForPruning.Count - SnapshotRetentionYearly.Value;
-            Logger.Debug( "Need to prune oldest {0} yearly snapshots from dataset {1}", numberToPrune, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot yearlySnapshot = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", yearlySnapshot.Name );
-                snapshotsToPrune.Add( yearlySnapshot );
-            }
-        }
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Frequent, SnapshotRetentionFrequent.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Hourly, SnapshotRetentionHourly.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Daily, SnapshotRetentionDaily.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Weekly, SnapshotRetentionWeekly.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Monthly, SnapshotRetentionMonthly.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod( SnapshotPeriod.Yearly, SnapshotRetentionYearly.Value, snapshotsToPrune );
 
         return snapshotsToPrune;
     }
@@ -613,5 +523,23 @@ public record ZfsRecord
     protected internal bool ValidateName( )
     {
         return ValidateName( Name );
+    }
+
+    private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
+    {
+        List<Snapshot> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( snapshotPeriod ) ).Select( kvp => kvp.Value ).ToList( );
+        Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
+        if ( snapshotsSetForPruning.Count > retentionValue )
+        {
+            int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
+            Logger.Debug( "Need to prune oldest {0} {1} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
+            snapshotsSetForPruning.Sort( );
+            for ( int i = 0; i < numberToPrune; i++ )
+            {
+                Snapshot snap = snapshotsSetForPruning[ i ];
+                Logger.Debug( "Adding snapshot {0} to prune list", snap.Name );
+                snapshotsToPrune.Add( snap );
+            }
+        }
     }
 }
