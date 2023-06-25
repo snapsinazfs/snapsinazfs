@@ -83,26 +83,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            string poolName = lineTokens[ 0 ];
-            string propName = lineTokens[ 1 ];
-            string propValue = lineTokens[ 2 ];
-            string propSource = lineTokens[ 3 ];
-            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
-
-            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
-            {
-                ConcurrentDictionary<string, bool> newDs = new( )
-                {
-                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
-                };
-                return newDs;
-            }
-
-            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
-            {
-                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
-                return properties;
-            }
+            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
         }
 
         return rootsAndTheirProperties;
@@ -187,34 +168,7 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         while ( !rdr.EndOfStream )
         {
             string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            if ( string.IsNullOrWhiteSpace( stringToParse ) )
-            {
-                Logger.Error( "Error reading output from zfs. Null or empty line." );
-                continue;
-            }
-
-            Logger.Info( $"Parsing line {stringToParse}" );
-            string[] lineTokens = stringToParse.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-
-            string dsName = lineTokens[0];
-            string propertyName = lineTokens[1];
-            string propertyValue = lineTokens[2];
-            string propertySource = lineTokens[3];
-
-            Logger.Info( "Parsing successful" );
-            if ( propertyName == "type" )
-            {
-                Logger.Info( "New dataset is a {0}", propertyValue );
-                string parentName = dsName.GetZfsPathParent( );
-                ZfsRecord newDs = new( dsName, propertyValue, parentName == dsName ? null : datasets[ parentName ] );
-                datasets.TryAdd( dsName, newDs );
-                Logger.Info( "New {0} {1} created and added to result dictionary", propertyValue, dsName );
-            }
-            else if ( datasets.TryGetValue( dsName, out ZfsRecord? ds ) )
-            {
-                Logger.Info( "Line is a property of an existing object" );
-                ds.UpdateProperty( propertyName, propertyValue, propertySource );
-            }
+            ParseDatasetZfsGetLine( stringToParse, datasets );
         }
     }
 
@@ -225,33 +179,8 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
 
         while ( !rdr.EndOfStream )
         {
-            string? stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true );
-            string[] zfsListTokens = stringToParse!.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
-            if ( zfsListTokens.Length != propertyCount )
-            {
-                Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, stringToParse, propertyCount );
-                continue;
-            }
-
-            if ( zfsListTokens[ 2 ] == "-" )
-            {
-                Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
-                continue;
-            }
-
-            string snapshotName = zfsListTokens[ 0 ];
-            string dsName = snapshotName.GetZfsPathParent( );
-            SnapshotRecord snap = SnapshotRecord.CreateInstance( snapshotName, datasets[ dsName ] );
-            if ( !datasets.ContainsKey( dsName ) )
-            {
-                Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", dsName, snap.Name );
-                continue;
-            }
-
-            snapshots[ snapshotName ] = datasets[ dsName ].AddSnapshot( snap );
-
-            Logger.Debug( "Added snapshot {0} to dataset {1}", snapshotName, dsName );
+            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
+            ParseSnapshotZfsGetLine( datasets, stringToParse, snapshots );
         }
     }
 }

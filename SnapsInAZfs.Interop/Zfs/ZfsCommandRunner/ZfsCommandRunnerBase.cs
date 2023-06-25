@@ -141,4 +141,113 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             return ds;
         } );
     }
+
+    protected static void ParseAndValidatePoolRootZfsGetLine( string[] lineTokens, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
+    {
+        string poolName = lineTokens[ 0 ];
+        string propName = lineTokens[ 1 ];
+        string propValue = lineTokens[ 2 ];
+        string propSource = lineTokens[ 3 ];
+        rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
+
+        ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
+        {
+            ConcurrentDictionary<string, bool> newDs = new( )
+            {
+                [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
+            };
+            return newDs;
+        }
+
+        ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
+        {
+            properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
+            return properties;
+        }
+    }
+
+        protected static void ParseSnapshotZfsGetLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
+    {
+        string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+        int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
+        if ( zfsListTokens.Length != propertyCount )
+        {
+            Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine, propertyCount );
+            return;
+        }
+
+        if ( zfsListTokens[ 2 ] == "-" )
+        {
+            Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
+            return;
+        }
+
+        string snapName = zfsListTokens[ 0 ];
+        string snapDatasetName = snapName.GetZfsPathParent( );
+        if ( !datasets.ContainsKey( snapDatasetName ) )
+        {
+            Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snapName );
+            return;
+        }
+
+        SnapshotRecord snap = SnapshotRecord.CreateInstance( snapName, datasets[ snapDatasetName ] );
+        allSnapshots[ snapName ] = datasets[ snapDatasetName ].AddSnapshot( snap );
+
+        Logger.Debug( "Added snapshot {0} to dataset {1}", snapName, snapDatasetName );
+    }
+
+    protected static void ParseDatasetZfsGetLine( string zfsGetLine, ConcurrentDictionary<string, ZfsRecord> allDatasets )
+    {
+        Logger.Debug( "Attempting to parse line {0} from zfs", zfsGetLine );
+        if ( string.IsNullOrWhiteSpace( zfsGetLine ) )
+        {
+            Logger.Error( "Error reading output from zfs. Null or empty line." );
+            return;
+        }
+
+        string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+        // zfs get operations without an -o argument return 4 values per line
+        if ( lineTokens.Length != 4 )
+        {
+            Logger.Error( "Line not understood. Expected 4 tab-separated tokens. Got {0}: '{1}'", lineTokens.Length, zfsGetLine );
+            return;
+        }
+
+        string dsName = lineTokens[0];
+        string propertyName = lineTokens[1];
+        string propertyValue = lineTokens[2];
+        string propertySource = lineTokens[3];
+        Logger.Debug( "Checking for existence of dataset {0} in collection", dsName );
+        if ( !allDatasets.ContainsKey( dsName ) )
+        {
+            string dsKind = lineTokens[ 2 ];
+            string parentDsName = dsName.GetZfsPathParent( );
+            if ( dsName == parentDsName )
+            {
+                Logger.Debug( "Dataset {0} is a pool root filesystem", dsName );
+                if ( allDatasets.TryAdd( dsName, new( dsName, dsKind ) ) )
+                {
+                    Logger.Debug( "Added pool root filesystem {0} to collection", dsName );
+                    return;
+                }
+
+                Logger.Error( "Failed adding pool root filesystem {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName );
+                return;
+            }
+
+            Logger.Debug( "{1} {0} not in dictionary. Attempting to add", dsName, dsKind );
+            if ( allDatasets.TryAdd( dsName, new( dsName, dsKind, allDatasets[ parentDsName ] ) ) )
+            {
+                Logger.Debug( "Added {1} {0} to dictionary", dsName, dsKind );
+                return;
+            }
+
+            Logger.Error( "Failed adding {1} {0} to dictionary. Taking and pruning of snapshots for this {1} and descendents may not be performed", dsName, dsKind );
+            return;
+        }
+
+        Logger.Debug( "Adding property {0}({1}) to {2}", propertyName, propertyValue, dsName );
+        allDatasets[ dsName ].UpdateProperty( propertyName, propertyValue, propertySource );
+    }
+
 }

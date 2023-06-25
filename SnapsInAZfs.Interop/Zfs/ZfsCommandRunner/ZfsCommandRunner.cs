@@ -342,19 +342,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
         string datasetPropertiesString = IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( );
         Logger.Debug( "Getting all dataset configurations from ZFS" );
-        Task[] zfsGetDatasetTasks =
-            ( from poolName
-                  in poolRootNames
-              select Task.Run( ( ) => GetDatasets( poolName, datasets ) ) ).ToArray( );
+        Task[] zfsGetDatasetTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetDatasets( poolName, datasets ) ) ).ToArray( );
 
         Logger.Debug( "Waiting for all zfs get processes to finish." );
         await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
 
         Logger.Debug( "Getting all snapshots" );
-        Task[] zfsGetSnapshotTasks =
-            ( from poolName
-                  in poolRootNames
-              select Task.Run( ( ) => GetSnapshots( poolName, snapshots ) ) ).ToArray( );
+        Task[] zfsGetSnapshotTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetSnapshots( poolName, snapshots ) ) ).ToArray( );
         await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
 
         // Local function to get datasets starting from the specified path
@@ -363,49 +357,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", poolRootName );
             await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ).ConfigureAwait( true ) )
             {
-                Logger.Debug( "Attempting to parse line {0} from zfs", zfsGetLine );
-                string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-                // zfs get operations without an -o argument return 4 values per line
-                if ( zfsListTokens.Length != 4 )
-                {
-                    Logger.Error( "Line not understood. Expected 4 tab-separated tokens. Got {0}: '{1}'", zfsListTokens.Length, zfsGetLine );
-                    continue;
-                }
-
-                string dsName = zfsListTokens[ 0 ];
-                string propertyName = zfsListTokens[ 1 ];
-                Logger.Debug( "Checking for existence of dataset {0} in collection", dsName );
-                if ( !allDatasets.ContainsKey( dsName ) )
-                {
-                    string dsKind = zfsListTokens[ 2 ];
-                    if ( dsName.GetZfsPathParent( ) == dsName )
-                    {
-                        Logger.Debug( "Dataset {0} is a pool root filesystem", dsName );
-                        if ( allDatasets.TryAdd( dsName, new( dsName, dsKind ) ) )
-                        {
-                            Logger.Debug( "Added pool root filesystem {0} to collection", dsName );
-                            continue;
-                        }
-
-                        Logger.Error( "Failed adding pool root filesystem {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName );
-                        continue;
-                    }
-
-                    Logger.Debug( "{1} {0} not in dictionary. Attempting to add", dsName, dsKind );
-                    if ( allDatasets.TryAdd( dsName, new( dsName, dsKind ) ) )
-                    {
-                        Logger.Debug( "Added {1} {0} to dictionary", dsName, dsKind );
-                        continue;
-                    }
-
-                    Logger.Error( "Failed adding {1} {0} to dictionary. Taking and pruning of snapshots for this Dataset and descendents may not be performed", dsName, dsKind );
-                    continue;
-                }
-
-                string propertyValue = zfsListTokens[ 2 ];
-                string propertySource = zfsListTokens[ 3 ];
-                Logger.Debug( "Adding property {0}({1}) to {2}", propertyName, propertyValue, dsName );
-                allDatasets[ dsName ].UpdateProperty( propertyName, propertyValue, propertySource );
+                ParseDatasetZfsGetLine( zfsGetLine, allDatasets );
             }
 
             Logger.Debug( "Finished adding dataset children of {0}", poolRootName );
@@ -418,32 +370,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             // This one can use a list operation, because we don't care about inheritance source for snapshots - just the values
             await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString()} {poolRootName}" ).ConfigureAwait( true ) )
             {
-                string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-                int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
-                if ( zfsListTokens.Length != propertyCount )
-                {
-                    Logger.Error( "Line not understood. Expected {2} tab-separated tokens. Got {0}: {1}", zfsListTokens.Length, zfsGetLine, propertyCount );
-                    continue;
-                }
-
-                if ( zfsListTokens[ 2 ] == "-" )
-                {
-                    Logger.Debug( "Line was not a SnapsInAZfs snapshot. Skipping" );
-                    continue;
-                }
-
-                string snapName = zfsListTokens[ 0 ];
-                string snapDatasetName = snapName.GetZfsPathParent();
-                if ( !datasets.ContainsKey( snapDatasetName ) )
-                {
-                    Logger.Error( "Parent dataset {0} of snapshot {1} does not exist in the collection. Skipping", snapDatasetName, snapName );
-                    continue;
-                }
-
-                SnapshotRecord snap = SnapshotRecord.CreateInstance(snapName, datasets[ snapDatasetName ] );
-                allSnapshots[ snapName ] = datasets[ snapDatasetName ].AddSnapshot( snap );
-
-                Logger.Debug( "Added snapshot {0} to dataset {1}", snapName, snapDatasetName );
+                ParseSnapshotZfsGetLine( datasets, zfsGetLine, allSnapshots );
             }
 
             Logger.Debug( "Finished adding snapshot children of {0}", poolRootName );
@@ -568,31 +495,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <inheritdoc />
     public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
-        string zfsGetArgs = $"{string.Join( ',', IZfsProperty.KnownDatasetProperties )} -Hpt filesystem -d 0";
+        string zfsGetArgs = $"{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString()} -Hpt filesystem -d 0";
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            string poolName = lineTokens[ 0 ];
-            string propName = lineTokens[ 1 ];
-            string propValue = lineTokens[ 2 ];
-            string propSource = lineTokens[ 3 ];
-            rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
-
-            ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
-            {
-                ConcurrentDictionary<string, bool> newDs = new( )
-                {
-                    [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
-                };
-                return newDs;
-            }
-
-            ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
-            {
-                properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
-                return properties;
-            }
+            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
         }
 
         return rootsAndTheirProperties;
