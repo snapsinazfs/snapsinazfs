@@ -29,7 +29,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
     public ZfsRecord ParentDataset { get; }
 
     public ZfsProperty<SnapshotPeriod> Period { get; private set; } = new( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Frequent, ZfsPropertySourceConstants.Local );
-    public ZfsProperty<string> SnapshotName { get; private set; } = new( ZfsPropertyNames.SnapshotNamePropertyName, "", ZfsPropertySourceConstants.Local );
+    public ZfsProperty<string> SnapshotName { get; private set; }
     public ZfsProperty<DateTimeOffset> Timestamp { get; private set; } = new( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
 
     /// <summary>
