@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -99,6 +99,7 @@ public record ZfsRecord
 
     public SnapshotRecord AddSnapshot( SnapshotRecord snap )
     {
+        Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
         Snapshots[ snap.Name ] = snap;
         return snap;
     }
