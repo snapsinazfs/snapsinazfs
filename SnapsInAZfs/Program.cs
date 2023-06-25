@@ -190,7 +190,7 @@ internal class Program
         }
 
         ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-        ConcurrentDictionary<string, SnapshotRecord> snapshots = new( );
+        ConcurrentDictionary<string, Snapshot> snapshots = new( );
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 

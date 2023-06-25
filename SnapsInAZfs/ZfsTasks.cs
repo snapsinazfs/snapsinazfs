@@ -19,7 +19,7 @@ internal static class ZfsTasks
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots )
+    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
         switch ( mutexAcquisitionResult.ErrorCode )
@@ -80,7 +80,7 @@ internal static class ZfsTasks
             if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -93,7 +93,7 @@ internal static class ZfsTasks
             if ( ds.IsHourlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -106,7 +106,7 @@ internal static class ZfsTasks
             if ( ds.IsDailySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -119,7 +119,7 @@ internal static class ZfsTasks
             if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, timestamp ) )
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -132,7 +132,7 @@ internal static class ZfsTasks
             if ( ds.IsMonthlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -145,7 +145,7 @@ internal static class ZfsTasks
             if ( ds.IsYearlySnapshotNeeded( timestamp ) )
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
-                (bool success, SnapshotRecord? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
+                (bool success, Snapshot? snapshot) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
                 if ( success )
                 {
                     if ( !settings.DryRun && snapshot is not null )
@@ -185,10 +185,10 @@ internal static class ZfsTasks
 
         return;
 
-        (bool success, SnapshotRecord? snapshot) TakeSnapshotKind( ZfsRecord ds, SnapshotPeriod period, List<IZfsProperty> propsToSet )
+        (bool success, Snapshot? snapshot) TakeSnapshotKind( ZfsRecord ds, SnapshotPeriod period, List<IZfsProperty> propsToSet )
         {
             Logger.Trace( "Requested to take {0} snapshot of {1}", period, ds.Name );
-            bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out SnapshotRecord? snapshot );
+            bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out Snapshot? snapshot );
             if ( snapshotTaken )
             {
                 Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
@@ -256,11 +256,11 @@ internal static class ZfsTasks
                 return;
             }
 
-            List<SnapshotRecord> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
+            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
             Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, snapshotsToPruneForDataset.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
 
-            foreach ( SnapshotRecord snapshot in snapshotsToPruneForDataset )
+            foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
                 bool destroySuccessful = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( true );
                 if ( destroySuccessful || settings.DryRun )
@@ -284,7 +284,7 @@ internal static class ZfsTasks
         }
     }
 
-    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ZfsRecord ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out SnapshotRecord? snapshot )
+    internal static bool TakeSnapshot( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ZfsRecord ds, SnapshotPeriod snapshotPeriod, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
         Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, snapshotPeriod );
         snapshot = null;
@@ -509,7 +509,7 @@ internal static class ZfsTasks
     }
 
     [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
-    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots )
+    public static async Task GetDatasetsAndSnapshotsFromZfsAsync( IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( datasets, snapshots ).ConfigureAwait( true );
     }

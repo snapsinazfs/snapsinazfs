@@ -18,7 +18,7 @@ internal static class ZfsTasks
         return commandRunner.SetZfsProperties( dryRun, zfsPath, modifiedProperties );
     }
 
-    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, ConcurrentDictionary<string, SnapshotRecord> snapshots, IZfsCommandRunner commandRunner )
+    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
     {
         Logger.Debug( "Getting zfs objects for tree view" );
         try

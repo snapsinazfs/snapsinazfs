@@ -90,14 +90,14 @@ public record ZfsRecord
     public ZfsProperty<int> SnapshotRetentionWeekly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local );
 
-    public ConcurrentDictionary<string, SnapshotRecord> Snapshots { get; } = new( );
+    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
 
     [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
-    public SnapshotRecord AddSnapshot( SnapshotRecord snap )
+    public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
         Snapshots[ snap.Name ] = snap;
@@ -112,7 +112,7 @@ public record ZfsRecord
         poolRoot = PoolRoot;
     }
 
-    public List<SnapshotRecord> GetSnapshotsToPrune( )
+    public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
         if ( !Enabled.Value )
@@ -133,8 +133,8 @@ public record ZfsRecord
             Logger.Debug( "Prune deferral not enabled for {0}", Name );
         }
 
-        List<SnapshotRecord> snapshotsToPrune = new( );
-        List<SnapshotRecord> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Frequent ) ).Select( kvp => kvp.Value ).ToList( );
+        List<Snapshot> snapshotsToPrune = new( );
+        List<Snapshot> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( SnapshotPeriod.Frequent ) ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "Frequent snapshots of {0} available for pruning: {1}", Name, string.Join( ',', snapshotsSetForPruning.Select( s => s.Name ) ) );
         int numberToPrune;
         if ( snapshotsSetForPruning.Count > SnapshotRetentionFrequent.Value )
@@ -144,7 +144,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord frequentSnapshot = snapshotsSetForPruning[ i ];
+                Snapshot frequentSnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", frequentSnapshot.Name );
                 snapshotsToPrune.Add( frequentSnapshot );
             }
@@ -160,7 +160,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord hourlySnapshot = snapshotsSetForPruning[ i ];
+                Snapshot hourlySnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", hourlySnapshot.Name );
                 snapshotsToPrune.Add( hourlySnapshot );
             }
@@ -176,7 +176,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord dailySnapshot = snapshotsSetForPruning[ i ];
+                Snapshot dailySnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", dailySnapshot.Name );
                 snapshotsToPrune.Add( dailySnapshot );
             }
@@ -192,7 +192,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord weeklySnapshot = snapshotsSetForPruning[ i ];
+                Snapshot weeklySnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", weeklySnapshot.Name );
                 snapshotsToPrune.Add( weeklySnapshot );
             }
@@ -208,7 +208,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord monthlySnapshot = snapshotsSetForPruning[ i ];
+                Snapshot monthlySnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", monthlySnapshot.Name );
                 snapshotsToPrune.Add( monthlySnapshot );
             }
@@ -226,7 +226,7 @@ public record ZfsRecord
             snapshotsSetForPruning.Sort( );
             for ( int i = 0; i < numberToPrune; i++ )
             {
-                SnapshotRecord yearlySnapshot = snapshotsSetForPruning[ i ];
+                Snapshot yearlySnapshot = snapshotsSetForPruning[ i ];
                 Logger.Debug( "Adding snapshot {0} to prune list", yearlySnapshot.Name );
                 snapshotsToPrune.Add( yearlySnapshot );
             }
@@ -613,153 +613,5 @@ public record ZfsRecord
     protected internal bool ValidateName( )
     {
         return ValidateName( Name );
-    }
-}
-
-public record SnapshotRecord : ZfsRecord, IComparable<SnapshotRecord>
-{
-    public SnapshotRecord( string name, ZfsRecord parentDataset ) : base( name, "snapshot", parentDataset.PoolRoot )
-    {
-        ParentDataset = parentDataset;
-        SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
-        Recursion = parentDataset.Recursion with { };
-    }
-
-    public SnapshotRecord( string name, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, parentDataset )
-    {
-        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
-    }
-
-    public SnapshotRecord( string name, bool pruneSnapshots, SnapshotPeriod period, DateTimeOffset timestamp, ZfsRecord parentDataset ) : this( name, timestamp, parentDataset )
-    {
-        PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshots, ZfsPropertySourceConstants.ZfsList );
-        Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local );
-    }
-
-    public ZfsRecord ParentDataset { get; }
-
-    public ZfsProperty<SnapshotPeriod> Period { get; private set; } = new( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Frequent, ZfsPropertySourceConstants.Local );
-    public ZfsProperty<string> SnapshotName { get; private set; } = new( ZfsPropertyNames.SnapshotNamePropertyName, "", ZfsPropertySourceConstants.Local );
-    public ZfsProperty<DateTimeOffset> Timestamp { get; private set; } = new( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-
-    /// <summary>
-    ///     Compares the current instance with another <see cref="SnapshotRecord" /> and returns an integer that indicates
-    ///     whether the current instance precedes, follows, or occurs in the same position in the sort order as the other
-    ///     <see cref="SnapshotRecord" />.
-    /// </summary>
-    /// <param name="other">Another <see cref="SnapshotRecord" /> to compare with this instance.</param>
-    /// <returns>
-    ///     A value that indicates the relative order of the <see cref="SnapshotRecord" />s being compared. The return value
-    ///     has
-    ///     these meanings:
-    ///     <list type="table">
-    ///         <listheader>
-    ///             <term> Value</term><description> Meaning</description>
-    ///         </listheader>
-    ///         <item>
-    ///             <term> Less than zero</term>
-    ///             <description> This instance precedes <paramref name="other" /> in the sort order.</description>
-    ///         </item>
-    ///         <item>
-    ///             <term> Zero</term>
-    ///             <description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description>
-    ///         </item>
-    ///         <item>
-    ///             <term> Greater than zero</term>
-    ///             <description> This instance follows <paramref name="other" /> in the sort order.</description>
-    ///         </item>
-    ///     </list>
-    /// </returns>
-    /// <remarks>
-    ///     Sort order is as follows:
-    ///     <list type="number">
-    ///         <listheader>
-    ///             <term>Condition</term><description>Result</description>
-    ///         </listheader>
-    ///         <item>
-    ///             <term>Other <see cref="SnapshotRecord" /> is null or has a null <see cref="Timestamp" /></term>
-    ///             <description>This <see cref="SnapshotRecord" /> precedes <paramref name="other" /> in the sort order.</description>
-    ///         </item>
-    ///         <item>
-    ///             <term><see cref="Timestamp" /> of this <see cref="SnapshotRecord" /> is null</term>
-    ///             <description>This <see cref="SnapshotRecord" /> follows <paramref name="other" /> in the sort order.</description>
-    ///         </item>
-    ///         <item>
-    ///             <term><see cref="Timestamp" /> of each <see cref="SnapshotRecord" /> is different</term>
-    ///             <description>
-    ///                 Sort by <see cref="Timestamp" />, using system rules for the <see cref="DateTimeOffset" />
-    ///                 type
-    ///             </description>
-    ///         </item>
-    ///         <item>
-    ///             <term><see cref="Period" /> of each <see cref="SnapshotRecord" /> is different</term>
-    ///             <description>Delegate sort order to <see cref="SnapshotPeriod" />, using <see cref="Period" /> of each</description>
-    ///         </item>
-    ///         <item>
-    ///             <term><see cref="Period" />s of both <see cref="SnapshotRecord" />s are equal</term>
-    ///             <description>Sort by <see cref="ZfsRecord.Name" /></description>
-    ///         </item>
-    ///     </list>
-    /// </remarks>
-    public int CompareTo( SnapshotRecord? other )
-    {
-        // If the other snapshot is null, consider this snapshot earlier rank
-        if ( other?.Timestamp is null )
-        {
-            return -1;
-        }
-
-        // If timestamps are different, sort on timestamps
-        if ( other.Timestamp.Value != Timestamp.Value )
-        {
-            return Timestamp.Value.CompareTo( other.Timestamp.Value );
-        }
-
-        // If timestamps are different, sort on period
-        return !Period.Value.Equals( other.Period.Value )
-            ? Period.Value.CompareTo( other.Period.Value )
-            :
-            // If periods are the same, sort by name
-            Name.CompareTo( other.Name );
-    }
-
-    public void Deconstruct( out string name, out ZfsRecord parentDataset )
-    {
-        name = Name;
-        parentDataset = ParentDataset;
-    }
-
-    public string GetSnapshotOptionsStringForZfsSnapshot( )
-    {
-        return $"-o {SnapshotName.SetString} -o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
-    }
-
-    public new IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotNamePropertyName => SnapshotName = SnapshotName with { Value = propertyValue, Source = propertySource },
-            ZfsPropertyNames.SnapshotPeriodPropertyName => UpdateProperty( propertyName, (SnapshotPeriod)propertyValue, propertySource ),
-            ZfsPropertyNames.SnapshotTimestampPropertyName => UpdateProperty( propertyName, DateTimeOffset.Parse( propertyValue ), propertySource ),
-            _ => base.UpdateProperty( propertyName, propertyValue, propertySource )
-        };
-    }
-
-    public ZfsProperty<SnapshotPeriod> UpdateProperty( string propertyName, SnapshotPeriod propertyValue, string propertySource )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotPeriodPropertyName => Period = Period with { Value = propertyValue, Source = propertySource },
-            _ => throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported SnapshotKind property" )
-        };
-    }
-
-    public new ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotTimestampPropertyName => Timestamp = Timestamp with { Value = propertyValue, Source = propertySource },
-            _ => base.UpdateProperty( propertyName, propertyValue, propertySource )
-        };
     }
 }

@@ -15,10 +15,10 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot );
+    public abstract bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot? snapshot );
 
     /// <inheritdoc />
-    public abstract Task<bool> DestroySnapshotAsync( SnapshotRecord snapshot, SnapsInAZfsSettings settings );
+    public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <inheritdoc />
     public abstract Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
@@ -33,7 +33,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
 
     /// <inheritdoc />
-    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots );
+    public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
     public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
 
@@ -220,7 +220,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseSnapshotZfsListLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
+    protected static void ParseSnapshotZfsListLine( ConcurrentDictionary<string, ZfsRecord> datasets, string zfsGetLine, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
         string[] zfsListTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
         int propertyCount = IZfsProperty.KnownSnapshotProperties.Count + 1;
@@ -246,7 +246,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
         ZfsRecord parentDataset = datasets[ snapDatasetName ];
         Logger.Trace( "Creating new snapshot instance {0} with parent {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );
-        SnapshotRecord snap = new( snapName, bool.Parse(zfsListTokens[1]), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
+        Snapshot snap = new( snapName, bool.Parse(zfsListTokens[1]), (SnapshotPeriod)zfsListTokens[ 3 ], DateTimeOffset.Parse( zfsListTokens[ 4 ] ), parentDataset );
         allSnapshots[ snapName ] = parentDataset.AddSnapshot( snap );
 
         Logger.Debug( "Added snapshot {0} to {1} {2}", snapName, parentDataset.Kind, parentDataset.Name );

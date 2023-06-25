@@ -66,7 +66,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private string PathToZpoolUtility { get; }
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out SnapshotRecord? snapshot )
+    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
@@ -125,7 +125,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync( SnapshotRecord snapshot, SnapsInAZfsSettings settings )
+    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
         Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
         try
@@ -332,7 +332,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     /// <inheritdoc />
     /// <exception cref="OverflowException">The dictionary contains too many elements.</exception>
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, SnapshotRecord> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         List<string> poolRootNames = new( );
         Logger.Debug( "Getting pool names for parallel property retrieval" );
@@ -365,12 +365,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         // Local function to get snapshots, starting from the specified path
-        async Task GetSnapshots( string poolRootName, ConcurrentDictionary<string, SnapshotRecord> allSnapshots )
+        async Task GetSnapshots( string poolRootName, ConcurrentDictionary<string, Snapshot> allSnapshots )
         {
             Logger.Debug( "Getting and parsing snapshot descendents of {0}", poolRootName );
 
             // The only caveat to using list here is that we don't know the source of the values.
-            // That will only be an issue if we ever check the source of a SnapshotRecord's properties
+            // That will only be an issue if we ever check the source of a Snapshot's properties
             await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString( )} {poolRootName}" ).ConfigureAwait( true ) )
             {
                 ParseSnapshotZfsListLine( datasets, zfsGetLine, allSnapshots );
