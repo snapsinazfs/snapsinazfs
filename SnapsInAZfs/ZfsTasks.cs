@@ -189,20 +189,18 @@ internal static class ZfsTasks
         {
             Logger.Trace( "Requested to take {0} snapshot of {1}", period, ds.Name );
             bool snapshotTaken = TakeSnapshot( commandRunner, settings, ds, period, timestamp, out Snapshot? snapshot );
-            if ( snapshotTaken )
+            switch ( snapshotTaken )
             {
-                Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
-                propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
-                return ( true, snapshot );
+                case true:
+                    Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                    return ( true, snapshot );
+                case false when settings.DryRun:
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                    return ( true, null );
+                default:
+                    return ( false, null );
             }
-
-            if ( !snapshotTaken && settings.DryRun )
-            {
-                propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
-                return ( true, null );
-            }
-
-            return ( false, null );
         }
     }
 
