@@ -331,14 +331,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    /// <exception cref="OverflowException">rawObjects contains too many elements.</exception>
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        string propertiesString = IZfsProperty.KnownDatasetProperties.Union(IZfsProperty.KnownSnapshotProperties).ToCommaSeparatedSingleLineString( );
+        string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
         ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait( true );
-        ConcurrentDictionary<string, RawZfsObject> rawObjects = new( );
+        SortedDictionary<string, RawZfsObject> rawObjects = new( );
         await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
-        ProcessRawObjects( rawObjects, datasets, snapshots);
+        ProcessRawObjects( rawObjects, datasets, snapshots );
         CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
     }
 

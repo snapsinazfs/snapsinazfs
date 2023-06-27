@@ -134,27 +134,23 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     ///     format as <c>zfs get all -Hpr</c>
     /// </param>
     /// <param name="rawObjects">
-    ///     The collection of <see cref="RawZfsObject" />s, indexed by string, this method will build from the output provided by
+    ///     The collection of <see cref="RawZfsObject" />s, indexed and sorted by name, this method will build from the output provided
+    ///     by
     ///     <paramref name="lineProvider" />
     /// </param>
-    /// <exception cref="OverflowException"><paramref name="rawObjects" /> contains too many elements.</exception>
-    protected static async Task GetRawZfsObjectsAsync( ConfiguredCancelableAsyncEnumerable<string> lineProvider, ConcurrentDictionary<string, RawZfsObject> rawObjects )
+    protected static async Task GetRawZfsObjectsAsync( ConfiguredCancelableAsyncEnumerable<string> lineProvider, SortedDictionary<string, RawZfsObject> rawObjects )
     {
         await foreach ( string zfsGetLine in lineProvider )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-            rawObjects.AddOrUpdate( lineTokens[ 0 ], AddValueFactory, UpdateValueFactory );
 
-            RawZfsObject AddValueFactory( string name )
+            if ( !rawObjects.TryGetValue( lineTokens[ 0 ], out RawZfsObject? obj ) )
             {
-                return new( name, lineTokens[ 2 ] );
+                rawObjects.Add( lineTokens[ 0 ], new( lineTokens[ 0 ], lineTokens[ 2 ] ) );
+                continue;
             }
 
-            RawZfsObject UpdateValueFactory( string _, RawZfsObject obj )
-            {
-                obj.Properties.Add( lineTokens[ 1 ], new( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] ) );
-                return obj;
-            }
+            obj.Properties.Add( lineTokens[ 1 ], new( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] ) );
         }
     }
 
@@ -342,7 +338,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ProcessRawObjects( ConcurrentDictionary<string, RawZfsObject> rawObjects, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    protected static void ProcessRawObjects( SortedDictionary<string, RawZfsObject> rawObjects, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         foreach ( ( string objName, RawZfsObject obj ) in rawObjects )
         {
