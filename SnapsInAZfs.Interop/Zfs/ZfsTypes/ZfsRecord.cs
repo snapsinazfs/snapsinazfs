@@ -16,13 +16,12 @@ public record ZfsRecord
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public ZfsRecord( string Name, string Kind, ZfsRecord? PoolRoot = null )
+    public ZfsRecord( string Name, string Kind, ZfsRecord? parent = null )
     {
         this.Name = Name;
-        IsPoolRoot = PoolRoot is null;
-        PoolRoot ??= this;
+        IsPoolRoot = parent is null;
+        ParentDataset = parent ?? this;
         this.Kind = Kind;
-        this.PoolRoot = PoolRoot;
         NameValidatorRegex = Kind switch
         {
             ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
@@ -30,6 +29,53 @@ public record ZfsRecord
             ZfsPropertyValueConstants.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
         };
+    }
+
+    public ZfsRecord( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, ZfsRecord? parent = null )
+        : this( name, kind, parent )
+    {
+        Enabled = enabled;
+        TakeSnapshots = takeSnapshots;
+        PruneSnapshots = pruneSnapshots;
+        if ( lastFrequentSnapshotTimestamp.IsLocal )
+        {
+            LastFrequentSnapshotTimestamp = lastFrequentSnapshotTimestamp;
+        }
+
+        if ( lastHourlySnapshotTimestamp.IsLocal )
+        {
+            LastHourlySnapshotTimestamp = lastHourlySnapshotTimestamp;
+        }
+
+        if ( lastDailySnapshotTimestamp.IsLocal )
+        {
+            LastDailySnapshotTimestamp = lastDailySnapshotTimestamp;
+        }
+
+        if ( lastWeeklySnapshotTimestamp.IsLocal )
+        {
+            LastWeeklySnapshotTimestamp = lastWeeklySnapshotTimestamp;
+        }
+
+        if ( lastMonthlySnapshotTimestamp.IsLocal )
+        {
+            LastMonthlySnapshotTimestamp = lastMonthlySnapshotTimestamp;
+        }
+
+        if ( lastYearlySnapshotTimestamp.IsLocal )
+        {
+            LastYearlySnapshotTimestamp = lastYearlySnapshotTimestamp;
+        }
+
+        Recursion = recursion;
+        Template = template;
+        SnapshotRetentionFrequent = retentionFrequent;
+        SnapshotRetentionHourly = retentionHourly;
+        SnapshotRetentionDaily = retentionDaily;
+        SnapshotRetentionWeekly = retentionWeekly;
+        SnapshotRetentionMonthly = retentionMonthly;
+        SnapshotRetentionYearly = retentionYearly;
+        SnapshotRetentionPruneDeferral = retentionPruneDeferral;
     }
 
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
@@ -67,17 +113,39 @@ public record ZfsRecord
 
     public string Kind { get; }
 
-    public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
-    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, "local" );
+    public ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedDailySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedFrequentSnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedHourlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedMonthlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedWeeklySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    [JsonIgnore]
+    public DateTimeOffset LastObservedYearlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
 
     public string Name { get; }
 
     [JsonIgnore]
-    public ZfsRecord PoolRoot { get; init; }
+    public ZfsRecord ParentDataset { get; init; }
+
+    [JsonIgnore]
+    public ZfsRecord PoolRoot => IsPoolRoot ? this : ParentDataset.PoolRoot;
 
     public int PoolUsedCapacity { get; set; }
     public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
@@ -90,7 +158,17 @@ public record ZfsRecord
     public ZfsProperty<int> SnapshotRetentionWeekly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local );
 
-    public ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = new(
+        new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+        {
+            { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
+        } );
+
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
 
@@ -100,7 +178,55 @@ public record ZfsRecord
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
-        Snapshots[ snap.Name ] = snap;
+        Snapshots[ snap.Period.Value.Kind ][ snap.Name ] = snap;
+        switch ( snap.Period.Value.Kind )
+        {
+            case SnapshotPeriodKind.Frequent:
+                if ( LastObservedFrequentSnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedFrequentSnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            case SnapshotPeriodKind.Hourly:
+                if ( LastObservedHourlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedHourlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            case SnapshotPeriodKind.Daily:
+                if ( LastObservedDailySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedDailySnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            case SnapshotPeriodKind.Weekly:
+                if ( LastObservedWeeklySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedWeeklySnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            case SnapshotPeriodKind.Monthly:
+                if ( LastObservedMonthlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedMonthlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            case SnapshotPeriodKind.Yearly:
+                if ( LastObservedYearlySnapshotTimestamp < snap.Timestamp.Value )
+                {
+                    LastObservedYearlySnapshotTimestamp = snap.Timestamp.Value;
+                }
+
+                break;
+            default:
+                throw new InvalidOperationException( "Invalid Snapshot Period specified" );
+        }
+
         return snap;
     }
 
@@ -149,7 +275,9 @@ public record ZfsRecord
     ///     Gets whether a daily snapshot is needed, according to the <paramref name="timestamp" /> and the properties defined
     ///     on the object
     /// </summary>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
@@ -191,7 +319,9 @@ public record ZfsRecord
     /// <param name="template">
     ///     The <see cref="SnapshotTimingSettings" /> object to check status against.
     /// </param>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
@@ -229,7 +359,9 @@ public record ZfsRecord
     /// <summary>
     ///     Gets whether an hourly snapshot is needed, according to the provided <paramref name="timestamp" />
     /// </summary>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
@@ -267,7 +399,9 @@ public record ZfsRecord
     /// <summary>
     ///     Gets whether a monthly snapshot is needed
     /// </summary>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
@@ -315,7 +449,9 @@ public record ZfsRecord
     /// <param name="template">
     ///     The <see cref="SnapshotTimingSettings" /> object to check status against.
     /// </param>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
@@ -359,7 +495,9 @@ public record ZfsRecord
     ///     Gets whether a yearly snapshot is needed, according to the <paramref name="timestamp" /> and properties defined on
     ///     the <see cref="ZfsRecord" />
     /// </summary>
-    /// <param name="timestamp">The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type</param>
+    /// <param name="timestamp">
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
+    /// </param>
     /// <returns>
     ///     A <see langword="bool" /> indicating whether the last yearly snapshot is in the same year as
     ///     <paramref name="timestamp" />
@@ -386,6 +524,19 @@ public record ZfsRecord
         return yearlySnapshotNeeded;
     }
 
+    /// <summary>
+    ///     Updates a property for this <see cref="ZfsRecord" /> object and returns the new property boxed as an
+    ///     <see cref="IZfsProperty" /> instance
+    /// </summary>
+    /// <param name="propertyName">The name of the property to update</param>
+    /// <param name="propertyValue">The new value for the property</param>
+    /// <param name="propertySource">The source of the property</param>
+    /// <returns>
+    ///     The new property created by this method, boxed as an <see cref="IZfsProperty" /> instance
+    /// </returns>
+    /// <remarks>
+    ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
+    /// </remarks>
     /// <exception cref="FormatException">
     ///     <paramref name="propertyValue" /> is not a valid string representation of the target
     ///     property value type.
@@ -398,6 +549,101 @@ public record ZfsRecord
     /// <exception cref="OverflowException">
     ///     For <see langword="int" /> properties, <paramref name="propertyValue" /> represents
     ///     a number less than <see cref="int.MinValue" /> or greater than <see cref="int.MaxValue" />.
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If <paramref name="propertyName" /> is not one of the following values:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.EnabledPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.TakeSnapshotsPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.PruneSnapshotsPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.RecursionPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.TemplatePropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionFrequentPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionHourlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionDailyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionYearlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///     </list>
     /// </exception>
     public IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
     {
@@ -425,6 +671,36 @@ public record ZfsRecord
         };
     }
 
+    /// <summary>
+    ///     Updates a <see cref="bool" /> property for this <see cref="ZfsRecord" /> object and returns the new property
+    /// </summary>
+    /// <param name="propertyName">The name of the property to update</param>
+    /// <param name="propertyValue">The new value for the property</param>
+    /// <param name="propertySource">The source of the property</param>
+    /// <returns>The new property created by this method</returns>
+    /// <remarks>
+    ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If <paramref name="propertyName" /> is not one of the following values:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.EnabledPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.TakeSnapshotsPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.PruneSnapshotsPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </exception>
     public ZfsProperty<bool> UpdateProperty( string propertyName, bool propertyValue, string propertySource )
     {
         return propertyName switch
@@ -436,6 +712,51 @@ public record ZfsRecord
         };
     }
 
+    /// <summary>
+    ///     Updates a <see cref="DateTimeOffset" /> property for this <see cref="ZfsRecord" /> object and returns the new property
+    /// </summary>
+    /// <param name="propertyName">The name of the property to update</param>
+    /// <param name="propertyValue">The new value for the property</param>
+    /// <param name="propertySource">The source of the property</param>
+    /// <returns>The new property created by this method</returns>
+    /// <remarks>
+    ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If <paramref name="propertyName" /> is not one of the following values:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </exception>
     public ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
     {
         return propertyName switch
@@ -450,6 +771,56 @@ public record ZfsRecord
         };
     }
 
+    /// <summary>
+    ///     Updates an <see cref="int" /> property for this <see cref="ZfsRecord" /> object and returns the new property
+    /// </summary>
+    /// <param name="propertyName">The name of the property to update</param>
+    /// <param name="propertyValue">The new value for the property</param>
+    /// <param name="propertySource">The source of the property</param>
+    /// <returns>The new property created by this method</returns>
+    /// <remarks>
+    ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     If <paramref name="propertyName" /> is not one of the following values:
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionFrequentPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionHourlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionDailyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionYearlyPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///         <item>
+    ///             <description>
+    ///                 <see cref="ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName" />
+    ///             </description>
+    ///         </item>
+    ///     </list>
+    /// </exception>
     public ZfsProperty<int> UpdateProperty( string propertyName, int propertyValue, string propertySource )
     {
         return propertyName switch
@@ -527,8 +898,9 @@ public record ZfsRecord
 
     private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
-        List<Snapshot> snapshotsSetForPruning = Snapshots.Where( kvp => kvp.Value.PruneSnapshots.Value && kvp.Value.Period.Value.Equals( snapshotPeriod ) ).Select( kvp => kvp.Value ).ToList( );
+        List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
+        Logger.Trace( "{0} retention is {1:D} for {2} {3}", snapshotPeriod, retentionValue, Kind, Name );
         if ( snapshotsSetForPruning.Count > retentionValue )
         {
             int numberToPrune = snapshotsSetForPruning.Count - retentionValue;

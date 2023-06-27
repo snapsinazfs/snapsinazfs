@@ -4,6 +4,7 @@
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -61,16 +62,15 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         PathToZpoolUtility = pathToZpool;
     }
 
-    private string PathToZfsUtility { get; }
-
-    private string PathToZpoolUtility { get; }
+    private static string PathToZfsUtility { get; set; } = "/usr/sbin/zfs";
+    private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot? snapshot )
+    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
-        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
-        string snapName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
+        Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
+        string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
         snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
         try
         {
@@ -236,7 +236,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     {
         if ( properties.Count == 0 )
         {
-            Logger.Warn( "Asked to set properties for {0} but no properties provided", zfsPath );
+            Logger.Debug( "Asked to set properties for {0} but no properties provided", zfsPath );
             return false;
         }
 
@@ -269,7 +269,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !zfsSetProcess.HasExited )
             {
                 Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 3000 );
+                zfsSetProcess.WaitForExit( 5000 );
             }
 
             Logger.Trace( "zfs set process finished" );
@@ -331,53 +331,14 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    /// <exception cref="OverflowException">The dictionary contains too many elements.</exception>
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        List<string> poolRootNames = new( );
-        Logger.Debug( "Getting pool names for parallel property retrieval" );
-        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", "-Ho name" ).ConfigureAwait( true ) )
-        {
-            poolRootNames.Add( zpoolListLine.Trim( ) );
-        }
-
-        string datasetPropertiesString = IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( );
-        Logger.Debug( "Getting all dataset configurations from ZFS" );
-        Task[] zfsGetDatasetTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetDatasets( poolName, datasets ) ) ).ToArray( );
-
-        Logger.Debug( "Waiting for all zfs get processes to finish." );
-        await Task.WhenAll( zfsGetDatasetTasks ).ConfigureAwait( true );
-
-        Logger.Debug( "Getting all snapshots" );
-        Task[] zfsGetSnapshotTasks = poolRootNames.Select( poolName => Task.Run( ( ) => GetSnapshots( poolName, snapshots ) ) ).ToArray( );
-        await Task.WhenAll( zfsGetSnapshotTasks ).ConfigureAwait( true );
-
-        // Local function to get datasets starting from the specified path
-        async Task GetDatasets( string poolRootName, ConcurrentDictionary<string, ZfsRecord> allDatasets )
-        {
-            Logger.Debug( "Getting and parsing filesystem and volume descendents of {0}", poolRootName );
-            await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", $"type,{datasetPropertiesString} -H -p -r -t filesystem,volume {poolRootName}" ).ConfigureAwait( true ) )
-            {
-                ParseDatasetZfsGetLine( zfsGetLine, allDatasets );
-            }
-
-            Logger.Debug( "Finished adding dataset children of {0}", poolRootName );
-        }
-
-        // Local function to get snapshots, starting from the specified path
-        async Task GetSnapshots( string poolRootName, ConcurrentDictionary<string, Snapshot> allSnapshots )
-        {
-            Logger.Debug( "Getting and parsing snapshot descendents of {0}", poolRootName );
-
-            // The only caveat to using list here is that we don't know the source of the values.
-            // That will only be an issue if we ever check the source of a Snapshot's properties
-            await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "list", $"-t snapshot -H -p -r -o name,{IZfsProperty.KnownSnapshotProperties.ToCommaSeparatedSingleLineString( )} {poolRootName}" ).ConfigureAwait( true ) )
-            {
-                ParseSnapshotZfsListLine( datasets, zfsGetLine, allSnapshots );
-            }
-
-            Logger.Debug( "Finished adding snapshot children of {0}", poolRootName );
-        }
+        string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
+        ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait( true );
+        SortedDictionary<string, RawZfsObject> rawObjects = new( );
+        await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
+        ProcessRawObjects( rawObjects, datasets, snapshots );
+        CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
     }
 
     /// <summary>
@@ -401,18 +362,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             throw new ArgumentOutOfRangeException( nameof( verb ), "Only get and list verbs are permitted for zfs enumerator operations" );
         }
 
-        ProcessStartInfo zfsGetStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
+        ProcessStartInfo zfsProcessStartInfo = new( PathToZfsUtility, $"{verb} {args}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
-        using ( Process zfsGetProcess = new( ) { StartInfo = zfsGetStartInfo } )
+        Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
+        using ( Process zfsProcess = new( ) { StartInfo = zfsProcessStartInfo } )
         {
-            Logger.Debug( "Calling {0} {1} {2}", zfsGetStartInfo.FileName, verb, args );
+            Logger.Debug( "Calling {0} {1}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
             try
             {
-                zfsGetProcess.Start( );
+                zfsProcess.Start( );
             }
             catch ( InvalidOperationException ioex )
             {
@@ -421,9 +382,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 throw;
             }
 
-            while ( !zfsGetProcess.StandardOutput.EndOfStream )
+            while ( !zfsProcess.StandardOutput.EndOfStream )
             {
-                yield return await zfsGetProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
+                yield return await zfsProcess.StandardOutput.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
             }
         }
     }

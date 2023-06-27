@@ -3,19 +3,52 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Immutable;
+
 using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public interface IZfsProperty
 {
-    string InheritedFrom { get; }
-    bool IsInherited { get; }
-    bool IsLocal { get; }
-    string Name { get; }
-    string SetString { get; }
-    string Source { get; }
-    string ValueString { get; }
+    /// <summary>
+    ///     Gets the union of <see cref="KnownDatasetProperties" /> and <see cref="KnownSnapshotProperties" />
+    /// </summary>
+    public static ImmutableSortedSet<string> AllKnownProperties { get; }
+
+    static IZfsProperty( )
+    {
+        KnownDatasetProperties = ImmutableSortedSet<string>.Empty.Union( new[]
+        {
+            ZfsPropertyNames.EnabledPropertyName,
+            ZfsPropertyNames.TakeSnapshotsPropertyName,
+            ZfsPropertyNames.PruneSnapshotsPropertyName,
+            ZfsPropertyNames.RecursionPropertyName,
+            ZfsPropertyNames.TemplatePropertyName,
+            ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+            ZfsPropertyNames.SnapshotRetentionFrequentPropertyName,
+            ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionDailyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName
+        } );
+
+        KnownSnapshotProperties = ImmutableSortedSet<string>.Empty.Union( new[]
+        {
+            ZfsPropertyNames.SnapshotNamePropertyName,
+            ZfsPropertyNames.SnapshotPeriodPropertyName,
+            ZfsPropertyNames.SnapshotTimestampPropertyName,
+            ZfsPropertyNames.PruneSnapshotsPropertyName
+        } );
+
+        AllKnownProperties = KnownDatasetProperties.Union( KnownSnapshotProperties );
+    }
 
     public static ImmutableDictionary<string, IZfsProperty> DefaultDatasetProperties { get; } = ImmutableDictionary<string, IZfsProperty>.Empty.AddRange( new Dictionary<string, IZfsProperty>
     {
@@ -46,33 +79,16 @@ public interface IZfsProperty
         { ZfsPropertyNames.SnapshotTimestampPropertyName, new ZfsProperty<DateTimeOffset>( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.SnapsInAZfs ) }
     } );
 
-    public static ImmutableSortedSet<string> KnownDatasetProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
-    {
-        ZfsPropertyNames.EnabledPropertyName,
-        ZfsPropertyNames.TakeSnapshotsPropertyName,
-        ZfsPropertyNames.PruneSnapshotsPropertyName,
-        ZfsPropertyNames.RecursionPropertyName,
-        ZfsPropertyNames.TemplatePropertyName,
-        ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
-        ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-        ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
-        ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-        ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
-        ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
-        ZfsPropertyNames.SnapshotRetentionFrequentPropertyName,
-        ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionDailyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,
-        ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName
-    } );
+    string InheritedFrom { get; }
+    bool IsInherited { get; }
+    bool IsLocal { get; }
 
-    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; } = ImmutableSortedSet<string>.Empty.Union( new[]
-    {
-        ZfsPropertyNames.SnapshotNamePropertyName,
-        ZfsPropertyNames.SnapshotPeriodPropertyName,
-        ZfsPropertyNames.SnapshotTimestampPropertyName,
-        ZfsPropertyNames.PruneSnapshotsPropertyName
-    } );
+    public static ImmutableSortedSet<string> KnownDatasetProperties { get; }
+
+    public static ImmutableSortedSet<string> KnownSnapshotProperties { get; }
+
+    string Name { get; }
+    string SetString { get; }
+    string Source { get; }
+    string ValueString { get; }
 }

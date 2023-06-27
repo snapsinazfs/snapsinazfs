@@ -73,14 +73,11 @@ public partial class TemplateConfigurationWindow
     internal static void CommitModifiedTemplates( )
     {
         Logger.Debug( "Committing modified templates to base collections" );
-        foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems )
+        foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems.Where( currentTemplate => currentTemplate.IsModified ) )
         {
-            if ( currentTemplate.IsModified )
-            {
-                templatesAddedRemovedOrModified = true;
-                currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
-                _templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
-            }
+            templatesAddedRemovedOrModified = true;
+            currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
+            _templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
         }
 
         Program.Settings!.Templates = _templates.ToDictionary( pair => pair.Key, pair => pair.Value );
@@ -90,7 +87,7 @@ public partial class TemplateConfigurationWindow
     {
         if ( !_templates.TryGetValue( "default", out _ ) )
         {
-            string errorMessage = "'default' template does not exist. Not creating new template.";
+            const string errorMessage = "'default' template does not exist. Not creating new template.";
             Logger.Error( errorMessage );
             MessageBox.ErrorQuery( "Error Adding Template", errorMessage, 0, "OK" );
             return;
@@ -98,7 +95,7 @@ public partial class TemplateConfigurationWindow
 
         if ( !newTemplateNameTextValidateField.IsValid )
         {
-            string errorMessage = "New template name not valid. Not creating new template.";
+            const string errorMessage = "New template name not valid. Not creating new template.";
             Logger.Error( errorMessage );
             MessageBox.ErrorQuery( "Error Adding Template", errorMessage, 0, "OK" );
             return;
@@ -345,10 +342,10 @@ public partial class TemplateConfigurationWindow
         _templateConfigurationEventsEnabled = false;
     }
 
-    private void EatKeyPresses( KeyEventEventArgs e )
+    private static void EatKeyPresses( KeyEventEventArgs e )
     {
         // Disallow editing this combobox text
-        // If the key press event is any control sequence, just return (to allow hotkeys to work).
+        // If the key press event is any control sequence, just return (to allow hot keys to work).
         // If it's a character, set Handled=true to swallow the event and not change the text.
         // The Key enum is an unsigned int, so we can mask and check for greater than zero
         if ( e.KeyEvent.IsCtrl )
@@ -708,7 +705,7 @@ public partial class TemplateConfigurationWindow
         exampleTextField.TabStop = false;
     }
 
-    private void SetTabStops( )
+    private static void SetTabStops( )
     {
         //TODO: Set up tab order
     }
@@ -719,19 +716,18 @@ public partial class TemplateConfigurationWindow
         ( (TextRegexProvider)newTemplateNameTextValidateField.Provider ).ValidateOnInput = false;
     }
 
-    private void ShowCommitConfirmationDialog( )
+    private static void ShowCommitConfirmationDialog( )
     {
         int dialogResult = MessageBox.Query( "Commit Templates?", "This will commit all currently applied changes to templates to memory.\n\nNOTE: THIS WILL NOT SAVE YOUR CHANGES TO DISK!\n\nYou must use the Save option in the File menu to save changes to disk.\n\nChanges to templates that have not been applied will not be committed.", 0, "Cancel", "Commit" );
-        if ( dialogResult == 0 )
+        switch ( dialogResult )
         {
-            Logger.Debug( "User canceled template commit dialog" );
-            return;
-        }
-
-        if ( dialogResult == 1 )
-        {
-            Logger.Debug( "User confirmed commit dialog" );
-            CommitModifiedTemplates( );
+            case 0:
+                Logger.Debug( "User canceled template commit dialog" );
+                return;
+            case 1:
+                Logger.Debug( "User confirmed commit dialog" );
+                CommitModifiedTemplates( );
+                break;
         }
     }
 

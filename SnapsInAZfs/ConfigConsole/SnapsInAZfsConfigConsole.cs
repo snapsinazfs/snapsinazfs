@@ -49,23 +49,25 @@ public partial class SnapsInAZfsConfigConsole
 
     private bool ApplicationRootKeyEvent( KeyEvent e )
     {
-        if ( e.IsCtrl )
+        if ( !e.IsCtrl )
         {
-            switch ( e.Key & Key.CharMask )
-            {
-                case Key.g:
-                case Key.G:
-                    globalConfigMenuItem.Action( );
-                    return true;
-                case Key.t:
-                case Key.T:
-                    templateConfigMenuItem.Action( );
-                    return true;
-                case Key.z:
-                case Key.Z:
-                    zfsConfigMenuItem.Action( );
-                    return true;
-            }
+            return false;
+        }
+
+        switch ( e.Key & Key.CharMask )
+        {
+            case Key.g:
+            case Key.G:
+                globalConfigMenuItem.Action( );
+                return true;
+            case Key.t:
+            case Key.T:
+                templateConfigMenuItem.Action( );
+                return true;
+            case Key.z:
+            case Key.Z:
+                zfsConfigMenuItem.Action( );
+                return true;
         }
 
         return false;
@@ -171,7 +173,7 @@ public partial class SnapsInAZfsConfigConsole
                 (bool status, string reasonOrFile) copyConfigResult = ContinueWithSave( copyOfCurrentSettings );
                 if ( copyConfigResult.status )
                 {
-                    Logger.Info( "Copy of existing configuration saved to {0}", copyConfigResult.Item2 );
+                    Logger.Info( "Copy of existing configuration saved to {0}", copyConfigResult.reasonOrFile );
                     return;
                 }
 

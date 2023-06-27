@@ -15,7 +15,6 @@ namespace SnapsInAZfs.ConfigConsole;
 
 public partial class GlobalConfigurationWindow
 {
-    [NotNull]
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     public GlobalConfigurationWindow( )
@@ -42,12 +41,8 @@ public partial class GlobalConfigurationWindow
             return false;
         }
 
-        if ( Environment.OSVersion.Platform == PlatformID.Unix && ( !File.Exists( pathToZfsTextField.Text.ToString( ) ) || !File.Exists( pathToZpoolTextField.Text.ToString( ) ) ) )
-        {
-            return false;
-        }
-
-        return true;
+        return Environment.OSVersion.Platform != PlatformID.Unix
+               || ( File.Exists( pathToZfsTextField.Text.ToString( ) ) && File.Exists( pathToZpoolTextField.Text.ToString( ) ) );
     }
 
     private void DisableEventHandlers( )

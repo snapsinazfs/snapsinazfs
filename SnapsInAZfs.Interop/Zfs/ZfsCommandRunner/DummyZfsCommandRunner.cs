@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
@@ -18,10 +19,15 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        await GetMockZfsDatasetsFromTextFileAsync( datasets, "alldatasets-withproperties.txt" ).ConfigureAwait( true );
-        await GetMockZfsSnapshotsFromTextFileAsync( datasets, snapshots, "allsnapshots-withproperties-needspruning.txt" ).ConfigureAwait( true );
+        string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
+        Logger.Debug( "Pretending to run zfs get type,{0},available,used -H -p -r -t filesystem,volume,snapshot", propertiesString );
+        ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", "fullZfsGet.txt" ).ConfigureAwait( true );
+        SortedDictionary<string, RawZfsObject> rawObjects = new( );
+        await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
+        ProcessRawObjects( rawObjects, datasets, snapshots );
+        CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
     }
 
     /// <inheritdoc />
@@ -131,17 +137,18 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings template, out Snapshot? snapshot )
+    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
-        string snapName = template.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
+        string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
         snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
         return true;
     }
 
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
+    /// <exception cref="IOException">Invalid attempt to read when no data present</exception>
     public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
     {
         ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
@@ -151,10 +158,13 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
             yield break;
         }
 
-        using StreamReader rdr = File.OpenText( args );
-        while ( !rdr.EndOfStream )
+        Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", "zfs", verb, args );
+        Logger.Debug( "Calling zfs {0} {1}", verb, args );
+        using StreamReader zfsProcess = File.OpenText( args );
+
+        while ( !zfsProcess.EndOfStream )
         {
-            yield return await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
+            yield return await zfsProcess.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
         }
     }
 
@@ -172,18 +182,6 @@ internal class DummyZfsCommandRunner : ZfsCommandRunnerBase
         {
             string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
             ParseDatasetZfsGetLine( stringToParse, datasets );
-        }
-    }
-
-    private static async Task GetMockZfsSnapshotsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots, string filePath )
-    {
-        Logger.Info( $"Pretending we ran `zfs list `-t snapshot -H -p -r -o name,{string.Join( ',', IZfsProperty.KnownSnapshotProperties )} pool1" );
-        using StreamReader rdr = File.OpenText( filePath );
-
-        while ( !rdr.EndOfStream )
-        {
-            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            ParseSnapshotZfsListLine( datasets, stringToParse, snapshots );
         }
     }
 }
