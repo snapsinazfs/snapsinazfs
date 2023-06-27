@@ -117,20 +117,27 @@ public record ZfsRecord
     public ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
     public ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
     public ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+
     [JsonIgnore]
     public DateTimeOffset LastObservedDailySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
     [JsonIgnore]
     public DateTimeOffset LastObservedFrequentSnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
     [JsonIgnore]
     public DateTimeOffset LastObservedHourlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
     [JsonIgnore]
     public DateTimeOffset LastObservedMonthlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
     [JsonIgnore]
     public DateTimeOffset LastObservedWeeklySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
     [JsonIgnore]
     public DateTimeOffset LastObservedYearlySnapshotTimestamp { get; private set; } = DateTimeOffset.UnixEpoch;
+
+    public ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+    public ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp { get; private set; } = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
 
     public string Name { get; }
 
@@ -138,7 +145,7 @@ public record ZfsRecord
     public ZfsRecord ParentDataset { get; init; }
 
     [JsonIgnore]
-    public ZfsRecord PoolRoot  => IsPoolRoot ? this : ParentDataset.PoolRoot;
+    public ZfsRecord PoolRoot => IsPoolRoot ? this : ParentDataset.PoolRoot;
 
     public int PoolUsedCapacity { get; set; }
     public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
@@ -159,8 +166,9 @@ public record ZfsRecord
             { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
             { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
             { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) },
+            { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
         } );
+
     public ZfsProperty<bool> TakeSnapshots { get; private set; } = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Template { get; private set; } = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
 
@@ -178,40 +186,47 @@ public record ZfsRecord
                 {
                     LastObservedFrequentSnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             case SnapshotPeriodKind.Hourly:
                 if ( LastObservedHourlySnapshotTimestamp < snap.Timestamp.Value )
                 {
                     LastObservedHourlySnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             case SnapshotPeriodKind.Daily:
                 if ( LastObservedDailySnapshotTimestamp < snap.Timestamp.Value )
                 {
                     LastObservedDailySnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             case SnapshotPeriodKind.Weekly:
                 if ( LastObservedWeeklySnapshotTimestamp < snap.Timestamp.Value )
                 {
                     LastObservedWeeklySnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             case SnapshotPeriodKind.Monthly:
                 if ( LastObservedMonthlySnapshotTimestamp < snap.Timestamp.Value )
                 {
                     LastObservedMonthlySnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             case SnapshotPeriodKind.Yearly:
                 if ( LastObservedYearlySnapshotTimestamp < snap.Timestamp.Value )
                 {
                     LastObservedYearlySnapshotTimestamp = snap.Timestamp.Value;
                 }
+
                 break;
             default:
                 throw new InvalidOperationException( "Invalid Snapshot Period specified" );
         }
+
         return snap;
     }
 
