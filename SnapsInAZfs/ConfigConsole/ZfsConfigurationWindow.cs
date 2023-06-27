@@ -13,7 +13,6 @@
 
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using NStack;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
@@ -176,9 +175,9 @@ public partial class ZfsConfigurationWindow
         UpdateButtonState( );
     }
 
-    private async void RefreshZfsTreeViewFromZfs( )
+    private void RefreshZfsTreeViewFromZfs( )
     {
-        await RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait( true );
+        RefreshZfsTreeViewFromZfsAsync( ).RunSynchronously( );
     }
 
     private async Task RefreshZfsTreeViewFromZfsAsync( )
@@ -632,14 +631,7 @@ public partial class ZfsConfigurationWindow
         takeSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.TakeSnapshotsPropertyName, takeSnapshotsRadioGroup, takeSnapshotsSourceTextField );
         pruneSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshotsRadioGroup, pruneSnapshotsSourceTextField );
         recursionRadioGroup.Data = new RadioGroupWithSourceViewData( ZfsPropertyNames.RecursionPropertyName, recursionRadioGroup, recursionSourceTextField );
-        templateListView.Data = new ListViewWithSourceViewData( ZfsPropertyNames.TemplatePropertyName, templateListView, templateSourceTextField );
-        retentionFrequentTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, retentionFrequentTextField, 0, int.MaxValue );
-        retentionHourlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, retentionHourlyTextField, 0, int.MaxValue );
-        retentionDailyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, retentionDailyTextField, 0, int.MaxValue );
-        retentionWeeklyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, retentionWeeklyTextField, 0, int.MaxValue );
-        retentionMonthlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, retentionMonthlyTextField, 0, int.MaxValue );
-        retentionYearlyTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, retentionYearlyTextField, 0, int.MaxValue );
-        retentionPruneDeferralTextField.Data = new RetentionTextValidateFieldViewData( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField, 0, 100 );
+        templateListView.Data = new ListViewWithSourceViewData( ZfsPropertyNames.TemplatePropertyName, templateSourceTextField );
     }
 
     private void StringRadioGroupOnMouseClick( MouseEventArgs args )
@@ -876,7 +868,7 @@ public partial class ZfsConfigurationWindow
     {
         Logger.Trace( "Zfs Configuration Window initialized" );
         ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait( true );
-        await templateListView.SetSourceAsync( ConfigConsole.TemplateListItems ).ConfigureAwait( true );
+        templateListView.SetSource( ConfigConsole.TemplateListItems );
         SetCanFocusStates( );
         SetTagsForPropertyFields( );
         SetTabStops( );
@@ -907,7 +899,5 @@ public partial class ZfsConfigurationWindow
 
     private record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
 
-    private record ListViewWithSourceViewData( string PropertyName, ListView ValueListView, TextField SourceTextField );
-
-    private record RetentionTextValidateFieldViewData( string PropertyName, TextValidateField ValueTextField, int MinValue, int MaxValue );
+    private record ListViewWithSourceViewData( string PropertyName, TextField SourceTextField );
 }
