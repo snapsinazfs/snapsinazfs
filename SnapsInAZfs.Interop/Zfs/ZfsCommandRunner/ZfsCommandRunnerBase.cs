@@ -255,7 +255,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseSnapshotZfsListLine( string zfsListLine, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
+    protected static void ParseSnapshotZfsListLine( string zfsListLine, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> allSnapshots )
     {
         Logger.Trace( "Attempting to parse zfs list line {0}", zfsListLine );
         try
