@@ -88,7 +88,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
             if ( propertiesToSet.Count > 0 )
             {
-                Logger.Debug( "Timestamps are out of sync for {0} - updating properties" );
+                Logger.Debug( "Timestamps are out of sync for {0} - updating properties", ds.Name );
                 SetZfsProperties( settings.DryRun, ds.Name, propertiesToSet );
             }
         } );
