@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using SnapsInAZfs.Interop.Concurrency;
@@ -48,7 +49,9 @@ internal static class ZfsTasks
 
         Logger.Info( "Begin taking snapshots for all configured datasets" );
 
-        foreach ( ( string _, ZfsRecord ds ) in datasets )
+        //Need to operate on a sorted collection
+        ImmutableSortedDictionary<string, ZfsRecord> sortedDatasets = datasets.ToImmutableSortedDictionary( );
+        foreach ( ( string _, ZfsRecord ds ) in sortedDatasets )
         {
             //OK to disable this warning here. We don't use it if the result is false, and we don't put null in the collection in the first place
 #pragma warning disable CS8600
