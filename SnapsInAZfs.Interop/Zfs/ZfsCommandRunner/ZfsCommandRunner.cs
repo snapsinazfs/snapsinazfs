@@ -62,9 +62,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         PathToZpoolUtility = pathToZpool;
     }
 
-    private string PathToZfsUtility { get; }
-
-    private string PathToZpoolUtility { get; }
+    private static string PathToZfsUtility { get; set; } = "/usr/sbin/zfs";
+    private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
     public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
@@ -270,7 +269,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !zfsSetProcess.HasExited )
             {
                 Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 3000 );
+                zfsSetProcess.WaitForExit( 5000 );
             }
 
             Logger.Trace( "zfs set process finished" );
