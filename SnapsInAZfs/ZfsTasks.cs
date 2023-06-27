@@ -4,9 +4,7 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using SnapsInAZfs.Interop.Concurrency;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -17,34 +15,15 @@ namespace SnapsInAZfs;
 internal static class ZfsTasks
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private const string SnapshotMutexName = "Global\\SnapsInAZfs_Snapshots";
+    private static readonly AutoResetEvent SnapshotAutoResetEvent = new( true );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
     internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
-        switch ( mutexAcquisitionResult.ErrorCode )
+        if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
         {
-            case MutexAcquisitionErrno.Success:
-            {
-                Logger.Trace( "Successfully acquired mutex {0}", SnapshotMutexName );
-            }
-                break;
-            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
-            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
-            case MutexAcquisitionErrno.InProgress:
-            case MutexAcquisitionErrno.IoException:
-            case MutexAcquisitionErrno.AbandonedMutex:
-            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
-            case MutexAcquisitionErrno.PossiblyNullMutex:
-            case MutexAcquisitionErrno.AnotherProcessIsBusy:
-            case MutexAcquisitionErrno.InvalidMutexNameRequested:
-            {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", SnapshotMutexName, mutexAcquisitionResult.ErrorCode );
-                return;
-            }
-            default:
-                throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
+            Logger.Error( "Timed out waiting to take snapshots. Another operation is in progress" );
+            return;
         }
 
         Logger.Info( "Begin taking snapshots for all configured datasets" );
@@ -164,9 +143,7 @@ internal static class ZfsTasks
 
         Logger.Debug( "Finished taking snapshots" );
 
-        // snapshotName is a defined string. Thus, this NullReferenceException is not possible.
-        // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( SnapshotMutexName );
+        SnapshotAutoResetEvent.Set( );
 
         return;
 
@@ -191,38 +168,18 @@ internal static class ZfsTasks
 
     internal static async Task<Errno> PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
-        using MutexAcquisitionResult mutexAcquisitionResult = Mutexes.GetAndWaitMutex( SnapshotMutexName );
-        switch ( mutexAcquisitionResult.ErrorCode )
+        if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
         {
-            case MutexAcquisitionErrno.Success:
-            {
-                Logger.Trace( "Successfully acquired mutex {0}", SnapshotMutexName );
-            }
-                break;
-            // All of the error cases can just fall through, here, because we really don't care WHY it failed,
-            // for the purposes of taking snapshots. We'll just let the user know and then not take snapshots.
-            case MutexAcquisitionErrno.InProgress:
-            case MutexAcquisitionErrno.IoException:
-            case MutexAcquisitionErrno.AbandonedMutex:
-            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
-            case MutexAcquisitionErrno.PossiblyNullMutex:
-            case MutexAcquisitionErrno.AnotherProcessIsBusy:
-            case MutexAcquisitionErrno.InvalidMutexNameRequested:
-            {
-                Logger.Error( mutexAcquisitionResult.Exception, "Failed to acquire mutex {0}. Error code {1}", SnapshotMutexName, mutexAcquisitionResult.ErrorCode );
-                return mutexAcquisitionResult;
-            }
-            default:
-                throw new InvalidOperationException( "An invalid value was returned from GetMutex", mutexAcquisitionResult.Exception );
+            Logger.Error( "Timed out waiting to prune snapshots. Another operation is in progress." );
+            return Errno.EBUSY;
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        ParallelOptions options = new( ) { MaxDegreeOfParallelism = 4, TaskScheduler = null };
-        await Parallel.ForEachAsync( datasets.Values, options, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( true ) ).ConfigureAwait( true );
+        await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
-        Mutexes.ReleaseMutex( SnapshotMutexName );
+        SnapshotAutoResetEvent.Set( );
 
         return Errno.EOK;
 
@@ -246,7 +203,7 @@ internal static class ZfsTasks
 
             foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
-                bool destroySuccessful = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( true );
+                bool destroySuccessful = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( false );
                 if ( destroySuccessful || settings.DryRun )
                 {
                     if ( settings.DryRun )
@@ -417,7 +374,7 @@ internal static class ZfsTasks
     {
         Logger.Debug( "Checking zfs properties schema" );
 
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( true );
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( false );
         bool missingPropertiesFound = false;
         foreach ( ( string poolName, ConcurrentDictionary<string, bool>? propertyValidities ) in poolRootsWithPropertyValidities )
         {
@@ -478,22 +435,23 @@ internal static class ZfsTasks
     /// </summary>
     /// <param name="zfsCommandRunner"></param>
     /// <returns></returns>
-    /// <remarks>Should only be called once schema validity has been checked, or else results are undefined and unsupported</remarks>
+    /// <remarks>
+    ///     Should only be called once schema validity has been checked, or else results are undefined and unsupported
+    /// </remarks>
     public static async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootsWithPropertiesAndCapacitiesAsync( IZfsCommandRunner zfsCommandRunner )
     {
-        ConcurrentDictionary<string, ZfsRecord> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( true );
+        ConcurrentDictionary<string, ZfsRecord> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( false );
 
         if ( poolRoots.Any( ) )
         {
-            await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( true );
+            await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( false );
         }
 
         return poolRoots;
     }
 
-    [SuppressMessage( "ReSharper", "AsyncConverter.AsyncAwaitMayBeElidedHighlighting", Justification = "Without using this all the way down, the application won't actually work properly" )]
-    public static async Task GetDatasetsAndSnapshotsFromZfsAsync(SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots ).ConfigureAwait( true );
+        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 }
