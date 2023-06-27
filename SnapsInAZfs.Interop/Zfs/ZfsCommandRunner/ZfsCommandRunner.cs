@@ -343,50 +343,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
     }
 
-    private void CheckAndUpdateLastSnapshotTimesForDatasets( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
-    {
-        Logger.Trace( "Checking all dataset last snapshot times" );
-        Parallel.ForEach( datasets.Values, new( ) { MaxDegreeOfParallelism = 4 }, ( ds ) =>
-        {
-            List<IZfsProperty> propertiesToSet = new( );
-            if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
-            {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp, ZfsPropertySourceConstants.Local ) );
-            }
-
-            if ( propertiesToSet.Count > 0 )
-            {
-                Logger.Debug( "Timestamps are out of sync for {0} - updating properties" );
-                SetZfsProperties( settings.DryRun, ds.Name, propertiesToSet );
-            }
-        } );
-    }
-
     /// <summary>
     ///     Raw call to the zfs utility with any supplied verb and parameters that yields a string enumerator, which provides a
     ///     line-by-line
