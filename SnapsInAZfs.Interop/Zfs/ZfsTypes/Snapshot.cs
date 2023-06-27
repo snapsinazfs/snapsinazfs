@@ -25,6 +25,34 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, period, ZfsPropertySourceConstants.Local );
     }
 
+    public Snapshot( string snapName, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, ZfsProperty<string> snapshotName, ZfsProperty<SnapshotPeriod> snapshotPeriod, ZfsProperty<DateTimeOffset> snapshotTimestamp, ZfsRecord parent )
+        : base( snapName,
+                "snapshot",
+                enabled,
+                takeSnapshots,
+                pruneSnapshots,
+                lastFrequentSnapshotTimestamp,
+                lastHourlySnapshotTimestamp,
+                lastDailySnapshotTimestamp,
+                lastWeeklySnapshotTimestamp,
+                lastMonthlySnapshotTimestamp,
+                lastYearlySnapshotTimestamp,
+                recursion,
+                template,
+                retentionFrequent,
+                retentionHourly,
+                retentionDaily,
+                retentionWeekly,
+                retentionMonthly,
+                retentionYearly,
+                retentionPruneDeferral,
+                parent )
+    {
+        SnapshotName = snapshotName;
+        Period = snapshotPeriod;
+        Timestamp = snapshotTimestamp;
+    }
+
     public ZfsProperty<SnapshotPeriod> Period { get; private set; } = new( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Frequent, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> SnapshotName { get; private set; }
     public ZfsProperty<DateTimeOffset> Timestamp { get; private set; } = new( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
@@ -49,7 +77,9 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
     ///         </item>
     ///         <item>
     ///             <term> Zero</term>
-    ///             <description> This instance occurs in the same position in the sort order as <paramref name="other" />.</description>
+    ///             <description>
+    ///                 This instance occurs in the same position in the sort order as <paramref name="other" />.
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term> Greater than zero</term>
@@ -65,11 +95,15 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
     ///         </listheader>
     ///         <item>
     ///             <term>Other <see cref="Snapshot" /> is null or has a null <see cref="Timestamp" /></term>
-    ///             <description>This <see cref="Snapshot" /> precedes <paramref name="other" /> in the sort order.</description>
+    ///             <description>
+    ///                 This <see cref="Snapshot" /> precedes <paramref name="other" /> in the sort order.
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term><see cref="Timestamp" /> of this <see cref="Snapshot" /> is null</term>
-    ///             <description>This <see cref="Snapshot" /> follows <paramref name="other" /> in the sort order.</description>
+    ///             <description>
+    ///                 This <see cref="Snapshot" /> follows <paramref name="other" /> in the sort order.
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term><see cref="Timestamp" /> of each <see cref="Snapshot" /> is different</term>
@@ -80,7 +114,9 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
     ///         </item>
     ///         <item>
     ///             <term><see cref="Period" /> of each <see cref="Snapshot" /> is different</term>
-    ///             <description>Delegate sort order to <see cref="SnapshotPeriod" />, using <see cref="Period" /> of each</description>
+    ///             <description>
+    ///                 Delegate sort order to <see cref="SnapshotPeriod" />, using <see cref="Period" /> of each
+    ///             </description>
     ///         </item>
     ///         <item>
     ///             <term><see cref="Period" />s of both <see cref="Snapshot" />s are equal</term>
