@@ -3,6 +3,8 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -105,6 +107,38 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         };
     }
 
+    /// <summary>
+    ///     Iterates over <paramref name="lineProvider" /> and builds a collection of raw objects from the provided values
+    /// </summary>
+    /// <param name="lineProvider">
+    ///     A <see cref="ConfiguredCancelableAsyncEnumerable{T}" /> (<see langword="string" />) that provides text output in the same
+    ///     format as <c>zfs get all -Hpr</c>
+    /// </param>
+    /// <param name="rawObjects">
+    ///     The collection of <see cref="RawZfsObject" />s, indexed by string, this method will build from the output provided by
+    ///     <paramref name="lineProvider" />
+    /// </param>
+    /// <exception cref="OverflowException"><paramref name="rawObjects" /> contains too many elements.</exception>
+    protected static async Task GetRawZfsObjectsAsync( ConfiguredCancelableAsyncEnumerable<string> lineProvider, ConcurrentDictionary<string, RawZfsObject> rawObjects )
+    {
+        await foreach ( string zfsGetLine in lineProvider )
+        {
+            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            rawObjects.AddOrUpdate( lineTokens[ 0 ], AddValueFactory, UpdateValueFactory );
+
+            RawZfsObject AddValueFactory( string name )
+            {
+                return new( name, lineTokens[ 2 ] );
+            }
+
+            RawZfsObject UpdateValueFactory( string _, RawZfsObject obj )
+            {
+                obj.Properties.Add( lineTokens[ 1 ], new( lineTokens[ 1 ], lineTokens[ 2 ], lineTokens[ 3 ] ) );
+                return obj;
+            }
+        }
+    }
+
     protected static void ParseAndValidatePoolRootZfsGetLine( string[] lineTokens, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
     {
         string poolName = lineTokens[ 0 ];
@@ -185,6 +219,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     protected static void ParseDatasetZfsGetLineForConfigConsoleTree( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, string[] lineTokens, ConcurrentDictionary<string, TreeNode> allTreeNodes )
     {
+        //TODO: This can likely be reduced to the config console-specific parts, to make use of the new zfs output parsing logic
         string dsName = lineTokens[ 0 ];
         string propertyValue = lineTokens[ 2 ];
         if ( !baseDatasets.ContainsKey( dsName ) )
