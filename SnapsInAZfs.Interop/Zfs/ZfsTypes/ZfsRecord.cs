@@ -78,6 +78,9 @@ public record ZfsRecord
         SnapshotRetentionPruneDeferral = retentionPruneDeferral;
     }
 
+    public long BytesAvailable { get; set; }
+    public long BytesUsed { get; set; }
+
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public bool IsPoolRoot { get; }
 
