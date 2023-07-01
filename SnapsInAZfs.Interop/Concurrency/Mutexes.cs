@@ -137,7 +137,7 @@ public sealed class Mutexes : IDisposable
         }
 
         // The exceptions this could throw will have already happened in the call to GetMutex above,
-        // so we can silence Resharper's warnings about them here.
+        // so we can silence ReSharper's warnings about them here.
         // If one somehow happens at run-time, it will be addressed, but it should theoretically not be possible.
         // ReSharper disable ExceptionNotDocumented
         // ReSharper disable ExceptionNotDocumentedOptional
@@ -180,7 +180,7 @@ public sealed class Mutexes : IDisposable
     [SuppressMessage( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The undocumented exceptions can't be thrown on Linux." )]
     public static Mutex? GetMutex( out Exception? caughtException, string name = "Global\\SnapsInAZfs" )
     {
-        Logger.Debug( "Mutex {0} requested", name );
+        Logger.Trace( "Mutex {0} requested", name );
         caughtException = null;
         bool exists = Instance._allMutexes.TryGetValue( name, out Mutex? snapsInAZfsMutex );
         if ( exists && snapsInAZfsMutex != null )
@@ -191,7 +191,7 @@ public sealed class Mutexes : IDisposable
 
         try
         {
-            Logger.Debug( "Attempting to acquire new or existing mutex {0}", name );
+            Logger.Trace( "Attempting to acquire new or existing mutex {0}", name );
             snapsInAZfsMutex = new( true, name, out bool createdNew );
             Logger.Trace( "Mutex {0} {1}", name, createdNew ? "created" : "already existed" );
             // This exception is not possible. Setter creates the node.
@@ -253,7 +253,7 @@ public sealed class Mutexes : IDisposable
             throw new ArgumentNullException( nameof( name ), "Mutex name cannot be null or an empty string." );
         }
 
-        Logger.Debug( "Requested to release mutex {0}", name );
+        Logger.Trace( "Requested to release mutex {0}", name );
         if ( Instance._disposed )
         {
             return;
