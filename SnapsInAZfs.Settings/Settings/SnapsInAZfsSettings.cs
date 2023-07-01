@@ -24,6 +24,9 @@ public record SnapsInAZfsSettings
     [JsonPropertyOrder( 3 )]
     public bool PruneSnapshots { get; set; }
 
+    [JsonPropertyOrder( 4 )]
+    public bool RunAsDaemon { get; set; } = false;
+
     /// <summary>
     ///     Gets or sets the global TakeSnapshots setting
     /// </summary>
@@ -34,18 +37,18 @@ public record SnapsInAZfsSettings
     ///     Gets or sets the templates sub-section
     /// </summary>
     // ReSharper disable once CollectionNeverUpdated.Global
-    [JsonPropertyOrder( 6 )]
+    [JsonPropertyOrder( 7 )]
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>
     ///     Gets or sets the path to the zfs utility
     /// </summary>
-    [JsonPropertyOrder( 4 )]
+    [JsonPropertyOrder( 5 )]
     public string ZfsPath { get; set; } = "/usr/local/sbin/zfs";
 
     /// <summary>
     ///     Gets or sets the path to the zpool utility
     /// </summary>
-    [JsonPropertyOrder( 5 )]
+    [JsonPropertyOrder( 6 )]
     public string ZpoolPath { get; set; } = "/usr/local/sbin/zpool";
 }
