@@ -24,7 +24,7 @@ SnapsInAZfs - Snapshot manager for ZFS on Linux
 \f[B]SnapsInAZfs\f[R] [options]
 .SH Description
 .PP
-SnapsInAZfs is a snapshot manager for ZFS on Linux.
+SnapsInAZfs (SIAZ) is a snapshot manager for ZFS on Linux.
 .SH Options
 .TP
 \f[B]--check-zfs-properties\f[R], \f[B]-CheckZfsProperties\f[R]
@@ -127,6 +127,118 @@ no effect on output.
 \f[B]-V\f[R], \f[B]--version\f[R], \f[B]-Version\f[R]
 Outputs SnapsInAZfs version to configured logging targets and exits,
 performing no other operations.
+.SH Examples
+.PP
+These are potential common usage scenarios.
+.PD 0
+.P
+.PD
+These scenarios assume your SnapsInAZfs.local.json file has
+TakeSnapshots and PruneSnapshots set to true and DryRun set to false,
+unless otherwise noted.
+.PP
+\f[B]Note:\f[R] for \f[B]\f[BI]ALL\f[B]\f[R] invocations of SIAZ,
+including when \f[V]-\[rs]-\[rs]dry-run\f[R] or
+\f[V]-\[rs]-config-console\f[R] are specified, SIAZ will
+\f[B]\f[BI]ALWAYS\f[B]\f[R] check for existence of and very basic
+validity of the ZFS user properties it needs to operate.
+.PD 0
+.P
+.PD
+If missing or invalid properties are detected on any pool roots, SIAZ
+will terminate with an exit code and with log output indicating
+what\[cq]s wrong.
+.PP
+SIAZ does not currently support configurations having only some pools
+with SIAZ properties defined.
+.SS General Usage
+.PP
+Normal Use:
+.IP
+.nf
+\f[C]
+$ SnapsInAZfs
+\f[R]
+.fi
+.PP
+If invoked with no command line options, SIAZ will first check for
+expected ZFS property schema on all pool roots, and, if valid, will
+first take snapshots and then prune snapshots, as configured.
+.PP
+Dry Run - Test/Simulation Mode:
+.IP
+.nf
+\f[C]
+$ SnapsInAZfs \[rs]-\[rs]-dry-run
+\f[R]
+.fi
+.PP
+Useful for testing configuration changes without making any changes to
+ZFS.
+Has the same effect as setting DryRun to true in the JSON configuration
+files.
+All other arguments behave as normal, with the exception that, no matter
+which other arguments are specified, no changes will be made to ZFS (ie
+no snapshots will be taken or pruned, and no properties will be
+altered).
+.SS Backup/Replication
+.PP
+Skip taking new snapshots and only prune expired snapshots:
+.IP
+.nf
+\f[C]
+$ SnapsInAZfs \[rs]-\[rs]-no-take-snapshots
+\f[R]
+.fi
+.PP
+Useful on systems that receive snapshots from another system, such as in
+a backup/replication setup, and the system does not need to take new
+snapshots, but should prune old snapshots.
+While it is recommended that you do this via configuration, rather than
+via command-line arguments, this may provide a helpful guarantee, even
+if accidental changes are made or new datasets are received, no new
+snapshots will be taken.
+.PD 0
+.P
+.PD
+Also useful if you have just made a configuration change that would
+result in more snapshots being pruned, and you wish to manually run SIAZ
+to observe the results, possibly with a more verbose logging argument or
+dry run, as well.
+.SH Exit Status
+.PP
+0 Exit code indicates success
+.PD 0
+.P
+.PD
+Non-zero exit codes indicate an error or some other condition that
+should result in termination of or allow specific handling in scripts.
+.IP \[bu] 2
+0: Normal exit status - Requested operations completed successfully or
+with no fatal errors.
+.IP \[bu] 2
+11: EAGAIN - The SIAZ mutex was abandoned by a previous invocation.
+Try again
+.IP \[bu] 2
+16: EBUSY - The SIAZ mutex could not be acquired because another
+instance is already running.
+.IP \[bu] 2
+17: EEXIST - The SIAZ mutex could not be acquired
+.IP \[bu] 2
+22: EINVAL - An IO exception occurred while trying to acquire the mutex
+that ensures only one instance of SIAZ can run at a time.
+.IP \[bu] 2
+37: ENOLCK - The SIAZ mutex was null.
+Execution is not safe to continue.
+.IP \[bu] 2
+127: ECANCELED - Help or Version CLI argument was specified.
+Used to prevent inadvertent inclusion of those arguments in scripts.
+.IP \[bu] 2
+1079: EFTYPE - One or more JSON configuration files were missing or
+invalid
+.IP \[bu] 2
+1093: ENOATTR - The ZFS property schema is not valid or an attempt to
+update the ZFS property schema failed.
 .SH Copyright
 .PP
 SnapsInAZfs is created by Brandon Thetford and is inspired by sanoid,
