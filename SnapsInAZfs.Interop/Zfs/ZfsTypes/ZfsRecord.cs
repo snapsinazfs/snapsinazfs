@@ -80,8 +80,8 @@ public record ZfsRecord
         BytesUsed = bytesUsed;
     }
 
-    public long BytesAvailable { get; set; }
-    public long BytesUsed { get; set; }
+    public long BytesAvailable { get; }
+    public long BytesUsed { get; }
 
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public bool IsPoolRoot { get; }
@@ -183,6 +183,48 @@ public record ZfsRecord
     [JsonIgnore]
     private long PercentBytesUsed => BytesUsed * 100 / BytesAvailable;
 
+    /// <inheritdoc />
+    /// <remarks>
+    ///     The default generated record equality causes stack overflow due to the self-reference in root datasets,
+    ///     so it is excluded from equality comparison.<br />
+    ///     This equality method ONLY checks value properties and does not check collections.
+    /// </remarks>
+    public virtual bool Equals( ZfsRecord? other )
+    {
+        // Returning equality of value properties alphabetically
+        return
+            other is not null
+            && BytesAvailable == other.BytesAvailable
+            && BytesUsed == other.BytesUsed
+            && Enabled == other.Enabled
+            && IsPoolRoot == other.IsPoolRoot
+            && Kind == other.Kind
+            && LastDailySnapshotTimestamp == other.LastDailySnapshotTimestamp
+            && LastFrequentSnapshotTimestamp == other.LastFrequentSnapshotTimestamp
+            && LastHourlySnapshotTimestamp == other.LastHourlySnapshotTimestamp
+            && LastMonthlySnapshotTimestamp == other.LastMonthlySnapshotTimestamp
+            && LastObservedDailySnapshotTimestamp == other.LastObservedDailySnapshotTimestamp
+            && LastObservedFrequentSnapshotTimestamp == other.LastObservedFrequentSnapshotTimestamp
+            && LastObservedHourlySnapshotTimestamp == other.LastObservedHourlySnapshotTimestamp
+            && LastObservedMonthlySnapshotTimestamp == other.LastObservedMonthlySnapshotTimestamp
+            && LastObservedWeeklySnapshotTimestamp == other.LastObservedMonthlySnapshotTimestamp
+            && LastObservedYearlySnapshotTimestamp == other.LastObservedYearlySnapshotTimestamp
+            && LastWeeklySnapshotTimestamp == other.LastWeeklySnapshotTimestamp
+            && LastYearlySnapshotTimestamp == other.LastYearlySnapshotTimestamp
+            && Name == other.Name
+            && PruneSnapshots == other.PruneSnapshots
+            && Recursion == other.Recursion
+            && SnapshotRetentionDaily == other.SnapshotRetentionDaily
+            && SnapshotRetentionFrequent == other.SnapshotRetentionFrequent
+            && SnapshotRetentionHourly == other.SnapshotRetentionHourly
+            && SnapshotRetentionMonthly == other.SnapshotRetentionMonthly
+            && SnapshotRetentionPruneDeferral == other.SnapshotRetentionPruneDeferral
+            && SnapshotRetentionWeekly == other.SnapshotRetentionWeekly
+            && SnapshotRetentionYearly == other.SnapshotRetentionYearly
+            && TakeSnapshots == other.TakeSnapshots
+            && Template == other.Template;
+    }
+
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
@@ -238,13 +280,25 @@ public record ZfsRecord
         return snap;
     }
 
-    public void Deconstruct( out string name, out string kind, out bool isPoolRoot, out ZfsRecord poolRoot )
+    /// <inheritdoc />
+    /// <remarks>
+    ///     Uses name and kind only, since they are the only truly immutable properties relevant to this function
+    /// </remarks>
+    public override int GetHashCode( )
     {
-        name = Name;
-        kind = Kind;
-        isPoolRoot = IsPoolRoot;
-        poolRoot = PoolRoot;
+        HashCode hashCode = new( );
+        hashCode.Add( Kind, StringComparer.CurrentCulture );
+        hashCode.Add( Name, StringComparer.CurrentCulture );
+        return hashCode.ToHashCode( );
     }
+
+    //public void Deconstruct( out string name, out string kind, out bool isPoolRoot, out ZfsRecord poolRoot )
+    //{
+    //    name = Name;
+    //    kind = Kind;
+    //    isPoolRoot = IsPoolRoot;
+    //    poolRoot = PoolRoot;
+    //}
 
     public List<Snapshot> GetSnapshotsToPrune( )
     {
