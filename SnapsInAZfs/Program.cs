@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using PowerArgs;
@@ -62,6 +63,7 @@ internal class Program
 
         if ( args.Version )
         {
+            Logger.Info( Assembly.GetExecutingAssembly( ).GetName( ).Version.ToString );
             Logger.Trace( "Version argument provided. Exiting." );
             return (int)Errno.ECANCELED;
         }
