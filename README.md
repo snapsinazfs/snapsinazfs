@@ -1,10 +1,10 @@
- # SnapsInAZfs
+ # SnapsInAZfs (SIAZ)
 
  A policy-based snapshot management utility inspired by sanoid
 
  ## Status
 
- As of today (2023-06-23), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
+ As of today (2023-06-30), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
 
@@ -31,12 +31,12 @@
 
  ## Dependencies
 
- My intention is for this project to have no external dependencies other than the required version of the dotnet
- runtime that have to be manually installed by the end user. All compile-time
+ My intention is for this project to have no external run-time dependencies other than the required version of the dotnet
+ runtime that have to be manually installed by the end user. Compile-time
  dependencies of these applications will either be included in published releases or included as project
  references in the dotnet projects, so that they can be automatically restored by the dotnet SDK, from the public
  NuGet repository.\
- Runtime dependencies, such as mbuffer, ssh, and others that are invoked by SnapsInAZfs are, of course, still required
+ Runtime dependencies, such as mbuffer, ssh, and others that may be invoked by SnapsInAZfs are, of course, still required
  to be installed and available, if they are used by your configuration, though I intend to implement some of that
  functionality in these applications, themselves, eventually.
  
@@ -58,7 +58,7 @@
 
   Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. SnapsInAZfs itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all SnapsInAZfs needs to run properly (binaries only - header files are not needed). The goal is for SnapsInAZfs to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
- ## Installing From Source
+ ## Building/Installing From Source
  
  After cloning this repository, execute the following commands to build and install SnapsInAZfs using make:
 
@@ -67,17 +67,22 @@
 
  This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any replaced configuration files along the way.
 
- ## Uninstalling From Source
+ To clean build artifacts, run `make clean`, which removes the release build files and intermediates,
+ or `make extraclean`, which removes build artifacts and intermediates for all defined project
+ configurations and removes the `build` and `publish` folders, as well. The `clean` and `extraclean` recipes do
+ not touch anything outside the repository folder, such as installed binaries, documentation, or configuration.
 
- To uninstall, run `make uninstall`\
- This will delete the executable file from `/usr/local/bin` and delete the base configuration files from 
- `/usr/local/share/SnapsInAZfs`.\
+ ## Uninstalling
+
+ To uninstall, run `make uninstall` from the repository root directory.\
+ This will delete the executable file from `/usr/local/sbin`, delete the base configuration files from 
+ `/usr/local/share/SnapsInAZfs`, delete installed man pages, and update the mandb accordingly.\
  This will not remove any local configuration files in `/etc/SnapsInAZfs`.\
  This will also not remove the last build artifacts created by `make install`.
 
  To clean all build artifacts, run `make clean`.\
  To clean specific build target target artifacts, run `make clean-release` or `make clean-debug`.\
- To clean everything, including empty build directories, run `make extraclean`.
+ To clean everything, including build directories, run `make extraclean`.
 
  ## Running
 
@@ -89,8 +94,8 @@
  
  ## Configuration
 
- **NB: SnapsInAZfs is an early alpha project, and its configuration is not to be considered stable until SnapsInAZfs reaches beta, at which time significant changes to configuration method and schema will be avoided as much as possible.**
- 
+ Configuration for SIAZ is in JSON-formatted files, for global program options and template definitions,
+ and in ZFS user properties, for options that apply to how SIAZ interacts with your datasets.
 
  ### ZFS Properties
 
@@ -98,7 +103,7 @@
 
  When SnapsInAZfs runs, it will get all properties for all pool root datasets and use those values to inform its operation.
 
- ##### Missing Properties
+ #### Missing Properties
 
  If SnapsInAZfs does not find values for all expected settings on each pool root dataset, it will let you know and then exit without making any changes to the system.
 
@@ -126,6 +131,25 @@
  - /etc/SnapsInAZfs/SnapsInAZfs.local.json
  - Command line arguments
 
+ ## Getting Help
+
+ SIAZ comes with man pages that are installed when you run `make install`. Just type `man SnapsInAZfs` at the
+ command line for general program help or `man SnapsInAZfs.5` for configuration help.
+
+ The code itself is also heavily documented and quite verbose, so you may be able to find what you're looking for
+ in the code. I have intentionally left some constructs which could be simplified in code as separate or more
+ verbose operations, specifically to make it easier to read and understand. The compiler can easily optimize those
+ situations away, so there is no performance concern. Even debug builds of SIAZ run quite fast with thousands of
+ ZFS objects on modest hardware.
+
+ If you find a bug or odd behavior in SIAZ, issues can be filed here. Note, however, that this is not a technical
+ support board and SIAZ is not a commercial product, and there are no warranties, implied or otherwise. This
+ includes support. While I will do my best to help out, if an issue is filed and is more than just asking for
+ configuration help or similar, there is no guarantee your issue will ever be fixed, addressed, or even seen.\
+ Unless, of course, you want to sponsor me with a fat check. Then I might consider giving you priority. ;)
+
+ Constructive criticism, suggestions, and feature requests are always welcome, though they are at my or other
+ contributors' discretion to address, implement, etc.
 
  ## Contributing
 
@@ -142,9 +166,23 @@
  
  If you happen to _really_ want to contribute to this project in a major way, I'm happy to collaborate. For now,
  though, I would prefer for such collaboration to occur via pull requests from a fork of this repository, branched
- from the dotnet-port-master branch (I will not accept pull requests to master, as that's just intended to be
- a local reference to the original PERL-based sanoid repository, which this repository was forked from).
+ from the master branch or a branch specifically created for a reported issue.
 
  ## License
 
  This project is licensed under the GNU General Public License, version 3.0
+
+ ## Acknowledgements
+
+ While this project is a "clean room"/from-scratch implementation, it was inspired by and follows many of the core
+ principles of "Sanoid," created by Jim Salter. Sanoid is also licensed under the GPL version 3.0, though the name
+ belongs to Jim. He graciously offered to allow this project to use a name that had "sanoid" in it, so long as
+ it was unique enough not to be easily confused with sanoid (very understandable!), but I decided to just go
+ ahead and pick a new name.
+
+ My personal thanks go to Jim Salter and anyone who contributed to Sanoid, over the years, as it has been an
+ indespensible tool in my professional life and my nerdy home tech life.
+
+ The original Sanoid project, written in PERL, is located at https://github.com/jimsalterjrs/sanoid/
+
+ Jim also is a very helpful resource for all things ZFS and is a moderator in the [reddit zfs community](https://www.reddit.com/r/zfs/).
