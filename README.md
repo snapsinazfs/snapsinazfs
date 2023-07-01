@@ -134,7 +134,10 @@
  ## Getting Help
 
  SIAZ comes with man pages that are installed when you run `make install`. Just type `man SnapsInAZfs` at the
- command line for general program help or `man SnapsInAZfs.5` for configuration help.
+ command line for general program help or `man SnapsInAZfs.5` for configuration help. The source documents for
+ the man pages are markdown files which can also be viewed in any markdown-compatible viewer, such as github.com
+ itself. The files are located in the `/Documentation` folder, in the repository. `.md` files are the markdown
+ source files, and `.#` files are files formatted for man, translated from markdown by `pandoc`.
 
  The code itself is also heavily documented and quite verbose, so you may be able to find what you're looking for
  in the code. I have intentionally left some constructs which could be simplified in code as separate or more
