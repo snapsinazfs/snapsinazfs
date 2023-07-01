@@ -22,7 +22,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     ///     Gets a boolean indicating if this property is a SnapsInAZfs property, is a string, and is equal to "-"
     /// </summary>
     [JsonIgnore]
-    public bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is "-";
+    public bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is ZfsPropertyValueConstants.None;
 
     /// <summary>
     ///     Gets a string representation of the Value property, in an appropriate form for its type
@@ -45,7 +45,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     public string InheritedFrom => IsInherited ? Source[ 15.. ] : Source;
 
     [JsonIgnore]
-    public bool IsLocal => Source == "local";
+    public bool IsLocal => Source == ZfsPropertySourceConstants.Local;
 
     [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";
