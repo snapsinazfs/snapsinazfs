@@ -566,7 +566,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
         if ( !ZfsProperty<SnapshotPeriod>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotPeriodPropertyName ], out ZfsProperty<SnapshotPeriod>? snapshotPeriod ) )
         {
-            Logger.Debug( "{0} value {1} not valid for snapshot {2} - skipping object", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ].Value, snapName );
+            Logger.Debug( "{0} value {1} not valid for snapshot {2} - skipping object", ZfsPropertyNames.SnapshotPeriodPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value, snapName );
             return;
         }
 
