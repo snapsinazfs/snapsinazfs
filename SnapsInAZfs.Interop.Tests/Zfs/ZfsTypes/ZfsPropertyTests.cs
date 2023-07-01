@@ -57,25 +57,40 @@ public class ZfsPropertyTests
     }
 
     [Test]
-    public void ReferenceEqualityOfInterfaceFalse( )
+    [TestCase( ZfsPropertySourceConstants.Local, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.SnapsInAZfs, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.Default, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.None, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.Received, ExpectedResult = false )]
+    [TestCase( "inherited from somewhere", ExpectedResult = true )]
+    [TestCase( "bogus source", ExpectedResult = false )]
+    public bool IsInherited_AsExpected( string propertySource )
     {
-        ZfsProperty<DateTimeOffset> propertyA = new( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-        ZfsProperty<DateTimeOffset> propertyB = propertyA with { Name = "sameDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch };
-        IZfsProperty propertyABoxed = propertyA;
-        // Another boxed instance of the SAME object. Should not have the same reference.
-        IZfsProperty propertyABoxedCopy = propertyA;
-        IZfsProperty propertyBBoxed = propertyB;
-        Assert.That( propertyABoxed, Is.Not.SameAs( propertyBBoxed ) );
-        Assert.That( propertyABoxed, Is.Not.SameAs( propertyABoxedCopy ) );
+        ZfsProperty<string> property = new( "unimportantName", "unimportantValue", propertySource );
+        return property.IsInherited;
     }
 
     [Test]
-    public void IsSnapsInAZfsProperty_CanDifferentiateProperties( )
+    [TestCase( ZfsPropertySourceConstants.Local, ExpectedResult = true )]
+    [TestCase( ZfsPropertySourceConstants.SnapsInAZfs, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.Default, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.None, ExpectedResult = false )]
+    [TestCase( ZfsPropertySourceConstants.Received, ExpectedResult = false )]
+    [TestCase( "inherited from somewhere", ExpectedResult = false )]
+    [TestCase( "bogus source", ExpectedResult = false )]
+    public bool IsLocal_AsExpected( string propertySource )
     {
-        ZfsProperty<string> siazProperty = new( "snapsinazfs.com:enabled", "test value", "local" );
-        Assert.That( siazProperty.IsSnapsInAZfsProperty, Is.True );
-        ZfsProperty<string> nonSiazProperty = new( "available", "test value", "local" );
-        Assert.That( nonSiazProperty.IsSnapsInAZfsProperty, Is.False );
+        ZfsProperty<string> property = new( "unimportantName", "unimportantValue", propertySource );
+        return property.IsLocal;
+    }
+
+    [Test]
+    [TestCase( ZfsPropertyNames.EnabledPropertyName, ExpectedResult = true )]
+    [TestCase( ZfsNativePropertyNames.Available, ExpectedResult = false )]
+    public bool IsSnapsInAZfsProperty_CanDifferentiateProperties( string propertyName )
+    {
+        ZfsProperty<string> property = new( propertyName, "test value", ZfsPropertySourceConstants.Local );
+        return property.IsSnapsInAZfsProperty;
     }
 
     [Test]
@@ -102,7 +117,20 @@ public class ZfsPropertyTests
     [TestCase( ZfsPropertyNames.TemplatePropertyName )]
     public void IsSnapsInAZfsProperty_CanIdentifyKnownSiazProperties( string propertyName )
     {
-        ZfsProperty<string> siazProperty = new( propertyName, "test value", "local" );
+        ZfsProperty<string> siazProperty = new( propertyName, "test value", ZfsPropertySourceConstants.Local );
         Assert.That( siazProperty.IsSnapsInAZfsProperty, Is.True );
+    }
+
+    [Test]
+    public void ReferenceEqualityOfInterfaceFalse( )
+    {
+        ZfsProperty<DateTimeOffset> propertyA = new( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+        ZfsProperty<DateTimeOffset> propertyB = propertyA with { Name = "sameDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch };
+        IZfsProperty propertyABoxed = propertyA;
+        // Another boxed instance of the SAME object. Should not have the same reference.
+        IZfsProperty propertyABoxedCopy = propertyA;
+        IZfsProperty propertyBBoxed = propertyB;
+        Assert.That( propertyABoxed, Is.Not.SameAs( propertyBBoxed ) );
+        Assert.That( propertyABoxed, Is.Not.SameAs( propertyABoxedCopy ) );
     }
 }
