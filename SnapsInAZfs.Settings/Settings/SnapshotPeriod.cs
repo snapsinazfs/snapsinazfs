@@ -149,7 +149,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         };
     }
 
-    public static implicit operator SnapshotPeriodKind( SnapshotPeriod self )
+    public static explicit operator SnapshotPeriodKind( SnapshotPeriod self )
     {
         return self.Kind;
     }
