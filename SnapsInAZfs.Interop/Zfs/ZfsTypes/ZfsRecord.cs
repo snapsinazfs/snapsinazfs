@@ -180,6 +180,9 @@ public record ZfsRecord
     [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
+    [JsonIgnore]
+    private long PercentBytesUsed => BytesUsed * 100 / BytesAvailable;
+
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
@@ -253,7 +256,7 @@ public record ZfsRecord
         }
 
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
-        if ( SnapshotRetentionPruneDeferral.Value != 0 && PoolUsedCapacity < SnapshotRetentionPruneDeferral.Value )
+        if ( SnapshotRetentionPruneDeferral.Value != 0 && PercentBytesUsed < SnapshotRetentionPruneDeferral.Value )
         {
             Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, SnapshotRetentionPruneDeferral.Value );
             return new( );
