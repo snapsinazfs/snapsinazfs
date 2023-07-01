@@ -30,6 +30,11 @@ public class CommandLineArguments
     [ArgShortcut( "--cron" )]
     public bool Cron { get; set; }
 
+    [ArgDescription( "Run SnapsInAZfs as a daemon" )]
+    [ArgShortcut( "--daemonize" )]
+    [ArgShortcut( "-D" )]
+    public bool Daemonize { get; set; }
+
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]
     [ArgShortcut( "vv" )]

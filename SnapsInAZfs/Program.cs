@@ -6,6 +6,8 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PowerArgs;
 using SnapsInAZfs.Interop.Concurrency;
 using SnapsInAZfs.Interop.Libc.Enums;
@@ -36,6 +38,7 @@ internal class Program
         Settings!.DryRun |= args.DryRun;
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
+        Settings.Daemonize |= args.Daemonize;
     }
 
     public static async Task<int> Main( string[] argv )
@@ -109,10 +112,34 @@ internal class Program
 
         ApplyCommandLineArgumentOverrides( in args );
 
-        return await ExecuteSiaz( args, currentTimestamp ).ConfigureAwait( true );
+        IHost serviceHost = Host.CreateDefaultBuilder( )
+                                .UseSystemd( )
+                                .ConfigureServices( ( hostContext, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
+                                .Build( );
+
+        SiazDaemon.timestamp = currentTimestamp;
+
+        await serviceHost.RunAsync( ).ConfigureAwait( true );
+
+        serviceHost.Dispose( );
+
+        return SiazDaemon.ExitStatus;
     }
 
-    private static async Task<int> ExecuteSiaz( CommandLineArguments args, DateTimeOffset currentTimestamp )
+    private static SiazDaemon ServiceInstanceProvider( IServiceProvider arg )
+    {
+        Logger.Trace( "Getting ZFS command runner for the current environment" );
+        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
+            _ => new DummyZfsCommandRunner( )
+        };
+
+        SiazDaemon daemon = new( Settings!, zfsCommandRunner );
+        return daemon;
+    }
+
+    public static async Task<int> ExecuteSiaz(IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
     {
         using Mutexes mutexes = Mutexes.Instance;
         using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\SnapsInAZfs" );
@@ -143,14 +170,6 @@ internal class Program
                 Logger.Fatal( mutexResult.Exception, "Failed to get mutex. Exiting." );
                 return (int)mutexResult.ErrorCode;
         }
-
-
-        Logger.Trace( "Getting ZFS command runner for the current environment" );
-        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
-        {
-            PlatformID.Unix => new ZfsCommandRunner( Settings.ZfsPath, Settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( )
-        };
 
         Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
 
