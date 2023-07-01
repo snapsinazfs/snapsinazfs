@@ -63,13 +63,57 @@ internal class Program
 
         if ( args.Version )
         {
-            Logger.Info( Assembly.GetExecutingAssembly( ).GetName( ).Version.ToString );
+            Logger.Info( Assembly.GetExecutingAssembly( ).GetName( ).Version!.ToString );
             Logger.Trace( "Version argument provided. Exiting." );
             return (int)Errno.ECANCELED;
         }
 
         SetCommandLineLoggingOverride( args );
 
+        // Configuration is built in the following order from various sources.
+        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
+        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
+        // override earlier values.
+        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
+        // and is loaded/parsed FIRST, before any configuration specified below.
+        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
+        // See documentation for a more detailed explanation with examples.
+        // Configuration order:
+        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
+        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
+        // 6. Command-line arguments passed on invocation of SnapsInAZfs
+        Logger.Debug( "Getting base configuration from files" );
+        IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
+                                           #if WINDOWS
+                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
+                                           #else
+                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, true )
+                                           #endif
+                                           #if ALLOW_ADJACENT_CONFIG_FILE
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
+                                           #endif
+                                               .Build( );
+
+        Logger.Trace( "Building settings objects from IConfiguration" );
+        try
+        {
+            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Fatal( ex, "Unable to parse settings from JSON" );
+            return (int)Errno.EFTYPE;
+        }
+
+        ApplyCommandLineArgumentOverrides( in args );
+
+        return await ExecuteSiaz( args, currentTimestamp ).ConfigureAwait( true );
+    }
+
+    private static async Task<int> ExecuteSiaz( CommandLineArguments args, DateTimeOffset currentTimestamp )
+    {
         using Mutexes mutexes = Mutexes.Instance;
         using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\SnapsInAZfs" );
 
@@ -100,44 +144,6 @@ internal class Program
                 return (int)mutexResult.ErrorCode;
         }
 
-        // Configuration is built in the following order from various sources.
-        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
-        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
-        // override earlier values.
-        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
-        // and is loaded/parsed FIRST, before any configuration specified below.
-        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-        // See documentation for a more detailed explanation with examples.
-        // Configuration order:
-        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
-        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
-        // 6. Command-line arguments passed on invocation of SnapsInAZfs
-        Logger.Debug( "Getting base configuration from files" );
-        IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
-                                           #if WINDOWS
-                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #else
-                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                           #if ALLOW_ADJACENT_CONFIG_FILE
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                               .Build( );
-
-        Logger.Trace( "Building settings objects from IConfiguration" );
-        try
-        {
-            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-        }
-        catch ( Exception ex )
-        {
-            Logger.Fatal( ex, "Unable to parse settings from JSON" );
-            return (int)Errno.EFTYPE;
-        }
-
-        ApplyCommandLineArgumentOverrides( in args );
 
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
