@@ -149,6 +149,16 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         };
     }
 
+    public static implicit operator SnapshotPeriodKind( SnapshotPeriod self )
+    {
+        return self.Kind;
+    }
+
+    public static implicit operator SnapshotPeriod( SnapshotPeriodKind kind )
+    {
+        return new ( kind );
+    }
+
     /// <inheritdoc />
     public override string ToString( )
     {
