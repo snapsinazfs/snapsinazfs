@@ -31,7 +31,7 @@ public record ZfsRecord
         };
     }
 
-    public ZfsRecord( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, ZfsRecord? parent = null )
+    public ZfsRecord( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null )
         : this( name, kind, parent )
     {
         Enabled = enabled;
@@ -76,7 +76,12 @@ public record ZfsRecord
         SnapshotRetentionMonthly = retentionMonthly;
         SnapshotRetentionYearly = retentionYearly;
         SnapshotRetentionPruneDeferral = retentionPruneDeferral;
+        BytesAvailable = bytesAvailable;
+        BytesUsed = bytesUsed;
     }
+
+    public long BytesAvailable { get; set; }
+    public long BytesUsed { get; set; }
 
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
     public bool IsPoolRoot { get; }
@@ -175,6 +180,9 @@ public record ZfsRecord
     [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
+    [JsonIgnore]
+    private long PercentBytesUsed => BytesUsed * 100 / BytesAvailable;
+
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
@@ -248,7 +256,7 @@ public record ZfsRecord
         }
 
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
-        if ( SnapshotRetentionPruneDeferral.Value != 0 && PoolUsedCapacity < SnapshotRetentionPruneDeferral.Value )
+        if ( SnapshotRetentionPruneDeferral.Value != 0 && PercentBytesUsed < SnapshotRetentionPruneDeferral.Value )
         {
             Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, SnapshotRetentionPruneDeferral.Value );
             return new( );

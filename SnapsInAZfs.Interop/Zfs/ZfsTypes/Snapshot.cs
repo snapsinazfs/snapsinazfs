@@ -45,7 +45,9 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
                 retentionWeekly,
                 retentionMonthly,
                 retentionYearly,
-                retentionPruneDeferral,
+                retentionPruneDeferral, 
+                0,
+                0,
                 parent )
     {
         SnapshotName = snapshotName;
