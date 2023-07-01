@@ -357,6 +357,8 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     protected static bool TryParseDatasetProperties( string dsName, RawZfsObject rawZfsObject, [NotNullWhen( true )] out ZfsProperty<bool>? enabled, [NotNullWhen( true )] out ZfsProperty<bool>? takeSnapshots, [NotNullWhen( true )] out ZfsProperty<bool>? pruneSnapshots, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string> recursion, out ZfsProperty<string> template, [NotNullWhen( true )] out ZfsProperty<int>? retentionFrequent, [NotNullWhen( true )] out ZfsProperty<int>? retentionHourly, [NotNullWhen( true )] out ZfsProperty<int>? retentionDaily, [NotNullWhen( true )] out ZfsProperty<int>? retentionWeekly, [NotNullWhen( true )] out ZfsProperty<int>? retentionMonthly, [NotNullWhen( true )] out ZfsProperty<int>? retentionYearly, [NotNullWhen( true )] out ZfsProperty<int>? retentionPruneDeferral, out long bytesAvailable, out long bytesUsed )
     {
+        bytesAvailable = 0;
+        bytesUsed = 0;
         if ( !ZfsProperty<bool>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.EnabledPropertyName ], out enabled ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.EnabledPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.EnabledPropertyName ].Value, rawZfsObject.Kind, dsName );
@@ -472,17 +474,19 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             return false;
         }
 
-        if ( !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, out bytesAvailable ) && rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot )
+        if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, out bytesAvailable ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Available, rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, rawZfsObject.Kind, dsName );
             SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out bytesAvailable, out bytesUsed );
+            bytesAvailable = 0;
             return false;
         }
 
-        if ( !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, out bytesUsed ) && rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot )
+        if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, out bytesUsed ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Used, rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, rawZfsObject.Kind, dsName );
             SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out bytesAvailable, out bytesUsed );
+            bytesUsed = 0;
             return false;
         }
 
