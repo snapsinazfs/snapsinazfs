@@ -69,7 +69,7 @@ public sealed class MutexAcquisitionResult : IDisposable
 
     public static implicit operator Errno( MutexAcquisitionResult errno )
     {
-        return errno.ErrorCode.ToErrno( );
+        return (Errno)errno.ErrorCode;
     }
 
     public static implicit operator MutexAcquisitionResult( Errno errno )
