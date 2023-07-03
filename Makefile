@@ -149,10 +149,10 @@ uninstall-service:
 	rm -rf /usr/lib/systemd/system/snapsinazfs.service
 	systemctl daemon-reload
 
-#	dotnet test --settings=SnapsInAZfs.Common.Tests/everything-dangerous.runsettings
-#
-#test-dangerous:
-#	dotnet test --settings=SnapsInAZfs.Common.Tests/dangerous.runsettings
+test:	test-everything
+
+test-everything:
+	dotnet test --configuration=Release-R2R --verbosity=normal
 
 save-snapsinazfs-zfs-properties:
 	@test ! -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
