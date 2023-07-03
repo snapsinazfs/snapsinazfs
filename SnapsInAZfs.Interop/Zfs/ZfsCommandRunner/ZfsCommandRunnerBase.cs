@@ -32,9 +32,6 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
     /// <inheritdoc />
-    public abstract Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
-
-    /// <inheritdoc />
     public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
     public abstract IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args );
