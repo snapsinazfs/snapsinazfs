@@ -40,20 +40,6 @@ internal class Program
         Settings.Daemonize |= args.Daemonize;
     }
 
-    /// <exception cref="UnauthorizedAccessException">
-    ///     The named mutex exists and has access control security, but the user does not have permission.
-    /// </exception>
-    /// <exception cref="IOException">
-    ///     SIAZ mutex is invalid. This can be for various reasons, including some restrictions that may be placed by the operating
-    ///     system, such as an unknown prefix or invalid characters. Note that the name and common prefixes "Global" and "Local" are
-    ///     case-sensitive.
-    ///     -or-
-    ///     There was some other error. The HResult property may provide more information.
-    /// </exception>
-    /// <exception cref="WaitHandleCannotBeOpenedException">
-    ///     A synchronization object with the provided name cannot be created. A synchronization object of a different type might have
-    ///     the same name.
-    /// </exception>
     public static async Task<int> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
     {
         if ( cancellationToken.IsCancellationRequested )
@@ -61,156 +47,108 @@ internal class Program
             return (int)Errno.ECANCELED;
         }
 
-        Mutex globalSiazMutex = new( false, "Global\\SnapsInAZfs", out bool createdNew );
+        Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
 
-        try
+        if ( cancellationToken.IsCancellationRequested )
         {
-            if ( !createdNew )
-            {
-                globalSiazMutex.Dispose( );
-                Logger.Error( "Global mutex already owned by another SIAZ process. Operation canceled" );
-                return (int)Errno.EAGAIN;
-            }
-
-            if ( !globalSiazMutex.WaitOne( 15000 ) )
-            {
-                globalSiazMutex.Dispose( );
-                Logger.Error( "Timed out waiting for release of global mutex. Operation canceled" );
-                return (int)Errno.EAGAIN;
-            }
-        }
-        catch ( WaitHandleCannotBeOpenedException ex )
-        {
-            Logger.Error( ex, "Mutex could not be acquired. Another synchronization object of a different type with the same name exists. Mutex not acquired" );
-            globalSiazMutex.Dispose( );
-            return (int)Errno.EEXIST;
-        }
-        catch ( AbandonedMutexException ex )
-        {
-            Logger.Error( ex, "Mutex exists but was abandoned. Returned mutex is invalid" );
-            globalSiazMutex.Dispose( );
-            return (int)Errno.EAGAIN;
+            return (int)Errno.ECANCELED;
         }
 
-        try
+        ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
+
+        Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
+
+        if ( cancellationToken.IsCancellationRequested )
         {
-            Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
+            return (int)Errno.ECANCELED;
+        }
 
-            if ( cancellationToken.IsCancellationRequested )
+        // Check
+        switch ( args )
+        {
+            case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
             {
-                globalSiazMutex.ReleaseMutex( );
-                return (int)Errno.ECANCELED;
-            }
-
-            ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
-
-            Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                globalSiazMutex.ReleaseMutex( );
-                return (int)Errno.ECANCELED;
-            }
-
-            // Check
-            switch ( args )
-            {
-                case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Requested check and no properties were missing.
-                    // Return 0
-                    globalSiazMutex.ReleaseMutex( );
-                    return (int)Errno.EOK;
-                }
-                case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Requested check and some properties were missing.
-                    // Return ENOATTR (1093)
-                    globalSiazMutex.ReleaseMutex( );
-                    return (int)Errno.ENOATTR;
-                }
-                case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Did not request check or update (normal run) but properties were missing.
-                    // Cannot safely do anything useful
-                    // Log a fatal error and exit with ENOATTR
-                    Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
-                    globalSiazMutex.ReleaseMutex( );
-                    return (int)Errno.ENOATTR;
-                }
-                case { PrepareZfsProperties: true }:
-                {
-                    // Requested schema update
-                    // Run the update and return EOK or ENOATTR based on success of the updates
-                    globalSiazMutex.ReleaseMutex( );
-                    return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
-                        ? (int)Errno.EOK
-                        : (int)Errno.ENOATTR;
-                }
-            }
-
-            if ( args.ConfigConsole )
-            {
-                ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
-                globalSiazMutex.ReleaseMutex( );
+                // Requested check and no properties were missing.
+                // Return 0
                 return (int)Errno.EOK;
             }
-
-            ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-            ConcurrentDictionary<string, Snapshot> snapshots = new( );
-
-            if ( cancellationToken.IsCancellationRequested )
+            case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
             {
-                globalSiazMutex.ReleaseMutex( );
-                return (int)Errno.ECANCELED;
+                // Requested check and some properties were missing.
+                // Return ENOATTR (1093)
+                return (int)Errno.ENOATTR;
             }
-
-            Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
-
-            await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings!, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
-
-            Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
-
-            if ( cancellationToken.IsCancellationRequested )
+            case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
             {
-                globalSiazMutex.ReleaseMutex( );
-                return (int)Errno.ECANCELED;
+                // Did not request check or update (normal run) but properties were missing.
+                // Cannot safely do anything useful
+                // Log a fatal error and exit with ENOATTR
+                Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
+                return (int)Errno.ENOATTR;
             }
+            case { PrepareZfsProperties: true }:
+            {
+                // Requested schema update
+                // Run the update and return EOK or ENOATTR based on success of the updates
+                return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
+                    ? (int)Errno.EOK
+                    : (int)Errno.ENOATTR;
+            }
+        }
 
-            // Handle taking new snapshots, if requested
-            if ( Settings is { TakeSnapshots: true } )
-            {
-                Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-                ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets, snapshots );
-            }
-            else
-            {
-                Logger.Info( "Not taking snapshots" );
-            }
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                globalSiazMutex.ReleaseMutex( );
-                return (int)Errno.ECANCELED;
-            }
-
-            // Handle pruning old snapshots, if requested
-            if ( Settings is { PruneSnapshots: true } )
-            {
-                Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
-                await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, Settings, datasets ).ConfigureAwait( true );
-            }
-            else
-            {
-                Logger.Info( "Not pruning snapshots" );
-            }
-            globalSiazMutex.ReleaseMutex( );
+        if ( args.ConfigConsole )
+        {
+            ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
             return (int)Errno.EOK;
         }
-        finally
+
+        ConcurrentDictionary<string, ZfsRecord> datasets = new( );
+        ConcurrentDictionary<string, Snapshot> snapshots = new( );
+
+        if ( cancellationToken.IsCancellationRequested )
         {
-            globalSiazMutex.Dispose( );
+            return (int)Errno.ECANCELED;
         }
+
+        Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
+
+        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings!, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
+
+        Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
+
+        // Handle taking new snapshots, if requested
+        if ( Settings is { TakeSnapshots: true } )
+        {
+            Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
+            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets, snapshots );
+        }
+        else
+        {
+            Logger.Info( "Not taking snapshots" );
+        }
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
+
+        // Handle pruning old snapshots, if requested
+        if ( Settings is { PruneSnapshots: true } )
+        {
+            Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
+            await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, Settings, datasets ).ConfigureAwait( true );
+        }
+        else
+        {
+            Logger.Info( "Not pruning snapshots" );
+        }
+
+        return (int)Errno.EOK;
     }
 
     public static async Task<int> Main( string[] argv )
