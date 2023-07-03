@@ -1,10 +1,8 @@
-name: Build and Test Release-R2R
+name: "Latest 'release' Tag Status"
 
 on:
   push:
-    tags: [ "build-*", "release-*" ]
-  pull_request:
-    tags: [ "build-*", "release-*" ]
+    tags: [ "release-*" ]
 
 jobs:
   build-and-test:
