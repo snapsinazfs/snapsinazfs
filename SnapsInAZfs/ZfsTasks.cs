@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -428,26 +428,6 @@ internal static class ZfsTasks
         }
 
         return new( poolRootsWithPropertyValidities, missingPropertiesFound );
-    }
-
-    /// <summary>
-    ///     Gets the pool roots with all SnapsInAZfs properties and capacity properties
-    /// </summary>
-    /// <param name="zfsCommandRunner"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     Should only be called once schema validity has been checked, or else results are undefined and unsupported
-    /// </remarks>
-    public static async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootsWithPropertiesAndCapacitiesAsync( IZfsCommandRunner zfsCommandRunner )
-    {
-        ConcurrentDictionary<string, ZfsRecord> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( false );
-
-        if ( poolRoots.Any( ) )
-        {
-            await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( false );
-        }
-
-        return poolRoots;
     }
 
     public static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
