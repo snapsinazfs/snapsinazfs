@@ -150,6 +150,23 @@ result in more snapshots being pruned, and you wish to manually run SIAZ to
 observe the results, possibly with a more verbose logging argument or dry run,
 as well.
 
+## Viewing SIAZ Logs
+
+View log entries logged to the system journal when running as a service:
+```
+$ journalctl -xe --namespace snapsinazfs
+```
+SnapsInAZfs writes its system journal entries to the snapsinazfs namespace,
+when it is running as a service under systemd, by default.\
+This means it will not show up without specifying `\-\-namespace snapsinazfs`,
+which is intentional, to keep it from cluttering up your system journal.
+
+View text log files created by default logging rules:
+```
+$ less /var/log/SnapsInAZfs/nlog-all-\{yyyy-MM-dd\}.log
+```
+
+
 # Exit Status
 0 Exit code indicates success\
 Non-zero exit codes indicate an error or some other condition that should
