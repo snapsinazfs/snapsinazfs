@@ -114,7 +114,7 @@ internal class Program
 
         IHost serviceHost = Host.CreateDefaultBuilder( )
                                 .UseSystemd( )
-                                .ConfigureServices( ( hostContext, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
+                                .ConfigureServices( ( _, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
                                 .Build( );
 
         SiazService.timestamp = currentTimestamp;
