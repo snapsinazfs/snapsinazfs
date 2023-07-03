@@ -98,6 +98,7 @@ internal class Program
 
             if ( cancellationToken.IsCancellationRequested )
             {
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.ECANCELED;
             }
 
@@ -107,6 +108,7 @@ internal class Program
 
             if ( cancellationToken.IsCancellationRequested )
             {
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.ECANCELED;
             }
 
@@ -117,12 +119,14 @@ internal class Program
                 {
                     // Requested check and no properties were missing.
                     // Return 0
+                    globalSiazMutex.ReleaseMutex( );
                     return (int)Errno.EOK;
                 }
                 case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
                 {
                     // Requested check and some properties were missing.
                     // Return ENOATTR (1093)
+                    globalSiazMutex.ReleaseMutex( );
                     return (int)Errno.ENOATTR;
                 }
                 case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
@@ -131,12 +135,14 @@ internal class Program
                     // Cannot safely do anything useful
                     // Log a fatal error and exit with ENOATTR
                     Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
+                    globalSiazMutex.ReleaseMutex( );
                     return (int)Errno.ENOATTR;
                 }
                 case { PrepareZfsProperties: true }:
                 {
                     // Requested schema update
                     // Run the update and return EOK or ENOATTR based on success of the updates
+                    globalSiazMutex.ReleaseMutex( );
                     return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
                         ? (int)Errno.EOK
                         : (int)Errno.ENOATTR;
@@ -146,6 +152,7 @@ internal class Program
             if ( args.ConfigConsole )
             {
                 ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.EOK;
             }
 
@@ -154,6 +161,7 @@ internal class Program
 
             if ( cancellationToken.IsCancellationRequested )
             {
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.ECANCELED;
             }
 
@@ -165,6 +173,7 @@ internal class Program
 
             if ( cancellationToken.IsCancellationRequested )
             {
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.ECANCELED;
             }
 
@@ -181,6 +190,7 @@ internal class Program
 
             if ( cancellationToken.IsCancellationRequested )
             {
+                globalSiazMutex.ReleaseMutex( );
                 return (int)Errno.ECANCELED;
             }
 
@@ -194,12 +204,11 @@ internal class Program
             {
                 Logger.Info( "Not pruning snapshots" );
             }
-
+            globalSiazMutex.ReleaseMutex( );
             return (int)Errno.EOK;
         }
         finally
         {
-            globalSiazMutex.ReleaseMutex( );
             globalSiazMutex.Dispose( );
         }
     }
