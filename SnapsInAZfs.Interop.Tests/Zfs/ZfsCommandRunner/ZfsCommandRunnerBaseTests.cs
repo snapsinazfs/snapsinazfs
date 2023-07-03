@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -72,7 +72,6 @@ public class ZfsCommandRunnerBaseTests
     [TestCaseSource( nameof( GetIllegalSnapshotCases ), new object?[] { 8, 12, 5 } )]
     [Category( "General" )]
     [Category( "ZFS" )]
-    [Platform( "Unix,Linux" )]
     public void CheckSnapshotNameValidation( NameValidationTestCase testCase )
     {
         if ( testCase.Name.Length >= 255 )
