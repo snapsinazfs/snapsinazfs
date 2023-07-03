@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -43,8 +43,8 @@ public class ZfsCommandRunnerBaseTests
         }
 
         string nameToTest = testCase.Name;
-        bool fsValidationResult = ZfsRecord.ValidateName( "filesystem", nameToTest ) == testCase.Valid;
-        bool volValidationResult = ZfsRecord.ValidateName( "volume", nameToTest ) == testCase.Valid;
+        bool fsValidationResult = ZfsRecord.ValidateName( ZfsPropertyValueConstants.FileSystem, nameToTest ) == testCase.Valid;
+        bool volValidationResult = ZfsRecord.ValidateName( ZfsPropertyValueConstants.Volume, nameToTest ) == testCase.Valid;
         Assert.Multiple( ( ) =>
         {
             Assert.That( fsValidationResult, Is.True );
@@ -64,7 +64,7 @@ public class ZfsCommandRunnerBaseTests
             path = $"{path}/{GetValidZfsPathComponent( pathLength / pathDepth )}";
         }
 
-        Assert.That( ( ) => { ZfsRecord.ValidateName( "filesystem", path ); }, Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+        Assert.That( ( ) => { ZfsRecord.ValidateName( ZfsPropertyValueConstants.FileSystem, path ); }, Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
     [Test]
@@ -81,7 +81,7 @@ public class ZfsCommandRunnerBaseTests
         }
 
         string nameToTest = testCase.Name;
-        bool snapshotValidationResult = ZfsRecord.ValidateName( "snapshot", nameToTest ) == testCase.Valid;
+        bool snapshotValidationResult = ZfsRecord.ValidateName( ZfsPropertyValueConstants.Snapshot, nameToTest ) == testCase.Valid;
         Assert.That( snapshotValidationResult, Is.True );
     }
 
