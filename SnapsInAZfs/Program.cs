@@ -204,7 +204,7 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( Settings.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
@@ -221,7 +221,7 @@ internal class Program
 
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 
-        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
+        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings!, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
 
         Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
 
