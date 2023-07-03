@@ -139,7 +139,7 @@ public class SiazService : BackgroundService
     {
         DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         DateTimeOffset truncatedTimePlusInterval = currentTimeTruncatedToTopOfCurrentHour + _daemonTimerInterval;
-        while ( truncatedTimePlusInterval < timestamp )
+        while ( truncatedTimePlusInterval < timestamp.AddMilliseconds( 1 ) )
         {
             truncatedTimePlusInterval += _daemonTimerInterval;
         }
