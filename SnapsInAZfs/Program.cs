@@ -247,6 +247,7 @@ internal class Program
             Logger.Info( "Not pruning snapshots" );
         }
 
+        Mutexes.ReleaseMutex( );
         Mutexes.DisposeMutexes( );
 
         return (int)Errno.EOK;
