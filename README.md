@@ -44,23 +44,9 @@
  to be installed and available, if they are used by your configuration, though I intend to implement some of that
  functionality in these applications, themselves, eventually.
  
- That said, here are the nuget package dependencies as of right now (automatically retrieved during build):
- 
-  - PowerArgs
-  - JsonSchema.Net
-  - Microsoft.Extensions.Configuration.Binder
-  - Microsoft.Extensions.Configuration.Json
-  - Microsoft.Extensions.Configuration.Ini
-  - Microsoft.Extensions.Configuration.EnvironmentVariables
-  - NLog
-  - NLog.Extensions.Logging
-  - NLog.Targets.Journald
-  - JetBrains.Annotations
-  - Teminal.Gui
+ Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils and zfs 2.1 or higher are installed.
 
-  Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils and zfs 2.1 or higher are installed.
-
-  Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. SnapsInAZfs itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all SnapsInAZfs needs to run properly (binaries only - header files are not needed). The goal is for SnapsInAZfs to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
+ Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. SnapsInAZfs itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all SnapsInAZfs needs to run properly (binaries only - header files are not needed). The goal is for SnapsInAZfs to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
  ## Building/Installing From Source
  
