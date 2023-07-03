@@ -116,12 +116,13 @@ install-release:	publish-release
 install-service:
 	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/snapsinazfs.service /usr/lib/systemd/system/snapsinazfs.service
 	systemctl daemon-reload
+	systemctl enable snapsinazfs.service
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
 	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
 
-uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
+uninstall:	uninstall-service	uninstall-release	uninstall-config-base	uninstall-doc
 
 uninstall-config-base:
 	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
@@ -142,12 +143,12 @@ uninstall-release:
 	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
 	rm -fv $(LOCALSBINDIR)/SnapsInAZfs 2>/dev/null
 
-#test:	test-everything
-#
-#test-everything:
-#	dotnet test --settings=SnapsInAZfs.Common.Tests/everything.runsettings
-#
-#test-everything-dangerous:
+uninstall-service:
+	systemctl stop snapsinazfs.service
+	systemctl disable snapsinazfs.service
+	rm -rf /usr/lib/systemd/system/snapsinazfs.service
+	systemctl daemon-reload
+
 #	dotnet test --settings=SnapsInAZfs.Common.Tests/everything-dangerous.runsettings
 #
 #test-dangerous:
