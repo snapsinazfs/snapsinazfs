@@ -85,9 +85,17 @@ public class SiazService : BackgroundService
                     if ( timestamp.Millisecond > maxDriftMilliseconds )
                     {
                         timerInterval = GetNewTimerInterval( );
-                        daemonRunTimer.Dispose( );
-                        daemonRunTimer = new( timerInterval );
                         Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
+                        daemonRunTimer.Dispose( );
+                        try
+                        {
+                            daemonRunTimer = new( timerInterval );
+                        }
+                        catch ( ArgumentOutOfRangeException ex )
+                        {
+                            Logger.Error( ex, "Invalid timer period ({0:G}). Initializing timer with default period", timerInterval );
+                            daemonRunTimer = new( _daemonTimerInterval );
+                        }
                     }
 
                     // Get this on every tick, in case config has been updated since last run.
