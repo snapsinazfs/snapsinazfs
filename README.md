@@ -61,6 +61,10 @@
  or `make extraclean`, which removes build artifacts and intermediates for all defined project
  configurations and removes the `build` and `publish` folders, as well. The `clean` and `extraclean` recipes do
  not touch anything outside the repository folder, such as installed binaries, documentation, or configuration.
+ 
+ To install the systemd service unit for SIAZ, run `make install-service`, which ONLY installs the service unit
+ to /usr/lib/systemd/system/snapsinazfs.service, enables it, and runs `systemctl daemon-reload`.\
+ The `install-service` recipe will not build SIAZ or perform any other actions.
 
  ## Uninstalling
 
@@ -68,7 +72,12 @@
  This will delete the executable file from `/usr/local/sbin`, delete the base configuration files from 
  `/usr/local/share/SnapsInAZfs`, delete installed man pages, and update the mandb accordingly.\
  This will not remove any local configuration files in `/etc/SnapsInAZfs`.\
- This will also not remove the last build artifacts created by `make install`.
+ This will also not remove the last build artifacts created by `make install`, nor will it uninstall the service,
+ if it has been installed. To do so, either run `make uninstall-service` or `make uninstall-everything`.
+ 
+ To uninstall the systemd service unit for SIAZ, run `make uninstall-service`, which stops the service unit,
+ disables it (to remove alias symlinks), removes the service unit file from /usr/lib/systemd/system/snapsinazfs.service,
+ and runs `systemctl daemon-reload`.
 
  To clean all build artifacts, run `make clean`.\
  To clean specific build target target artifacts, run `make clean-release` or `make clean-debug`.\
