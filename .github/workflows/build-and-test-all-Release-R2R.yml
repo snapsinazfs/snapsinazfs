@@ -2,10 +2,8 @@ name: Build and Test Release-R2R
 
 on:
   push:
-    branches: [ "master" ]
     tags: [ "build-*", "release-*" ]
   pull_request:
-    branches: [ "master" ]
     tags: [ "build-*", "release-*" ]
 
 jobs:
