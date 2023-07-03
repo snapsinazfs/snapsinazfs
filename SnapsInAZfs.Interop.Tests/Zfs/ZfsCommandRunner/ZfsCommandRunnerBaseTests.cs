@@ -85,42 +85,6 @@ public class ZfsCommandRunnerBaseTests
         Assert.That( snapshotValidationResult, Is.True );
     }
 
-    //private static string[] GetBadDatasetNames( )
-    //{
-    //    string[] values = new string[50];
-    //    for ( int i = 0; i < 50; i++ )
-    //    {
-    //        values[ i ] = TestContext.CurrentContext.Random.GetString( );
-    //    }
-    //    List<char> badBytes = new List<char>( );
-    //    for ( byte c = 0; c < 255; c++ )
-    //    {
-    //    }
-    //    string[] badCharacters = {
-    //        "",
-    //        " ",
-    //        "!",
-    //        "@",
-    //        "#",
-    //        "$",
-    //        "%",
-    //        "^",
-    //        "&",
-    //        "*",
-    //        "(",
-    //        ")",
-    //        "=",
-    //        "+",
-    //        "~",
-    //        "`",
-    //        "'",
-    //        "\"",
-    //        ";",
-    //        ",",
-    //        "?"
-    //    };
-    //}
-
     [Test]
     [TestCase( "validPoolName", ExpectedResult = false )]
     [TestCase( "valid-Pool Name", ExpectedResult = false )]
