@@ -4,9 +4,7 @@ Documentation=man:SnapsInAZfs(8) man:SnapsInAZfs(5)
 Requisite=zfs.target
 After=zfs.target
 ConditionFileNotEmpty=/etc/SnapsInAZfs/SnapsInAZfs.local.json
-ConditionFileNotEmpty=/usr/local/share/SnapsInAZfs/SnapsInAZfs.local.json
-ConditionPathIsReadWrite=/var/log/SnapsInAZfs
-ConditionFileIsExecutable=|/usr/sbin/zfs /usr/local/sbin/zfs
+ConditionFileNotEmpty=/usr/local/share/SnapsInAZfs/SnapsInAZfs.json
 Conflicts=rescue.target rescue.service emergency.target emergency.service friendly-recovery.target friendly-recovery.service
 
 [Service]
