@@ -136,7 +136,7 @@ public class SiazService : BackgroundService
             truncatedTimePlusInterval += _daemonTimerInterval;
         }
 
-        return truncatedTimePlusInterval.Subtract( DateTimeOffset.Now );
+        return truncatedTimePlusInterval.Subtract( timestamp );
     }
 
     private static void SetNextRunTime( int greatestCommonFrequentIntervalMinutes )
