@@ -3,10 +3,14 @@
  A policy-based snapshot management utility inspired by sanoid
 
  ## Status
-
- As of today (2023-06-30), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
+ 
+[![Build and Test Release-R2R](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-all-Release-R2R.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-all-Release-R2R.yml)
+ 
+ As of today (2023-07-03), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
+ 
+ SnapsInAZfs is also capable of running as a systemd service.
 
  I may make an alpha or beta release tag soon and possibly provide a pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an alpha/beta-stage project and you should not trust important systems with it.
  
