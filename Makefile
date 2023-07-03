@@ -122,7 +122,7 @@ publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
 	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
 
-uninstall:	uninstall-service	uninstall-release	uninstall-config-base	uninstall-doc
+uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
 uninstall-config-base:
 	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
@@ -137,7 +137,7 @@ uninstall-doc:
 	rm -fv $(MANDIR)/man5/SnapsInAZfs.5 2>/dev/null
 	mandb -q
 
-uninstall-everything:	uninstall	uninstall-config-local
+uninstall-everything:	uninstall-service	uninstall	uninstall-config-local
 
 uninstall-release:
 	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
