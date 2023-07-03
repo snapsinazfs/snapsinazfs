@@ -10,7 +10,7 @@ Conflicts=rescue.target rescue.service emergency.target emergency.service friend
 [Service]
 Type=notify
 ExecStart=/usr/local/sbin/SnapsInAZfs --daemonize
-TimeoutStopUSec=30s
+TimeoutStopSec=30s
 Restart=on-failure
 RestartPreventExitStatus=127
 #Set this to the path configured in SnapsInAZfs.nlog.json
