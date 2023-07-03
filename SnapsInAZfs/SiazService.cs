@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -57,6 +57,7 @@ public class SiazService : BackgroundService
         SetNextRunTime( greatestCommonFrequentIntervalMinutes );
         if ( !_settings.Daemonize )
         {
+            Environment.Exit( ExitStatus );
             return;
         }
 
