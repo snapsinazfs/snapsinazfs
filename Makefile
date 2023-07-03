@@ -113,10 +113,13 @@ install-doc:
 install-release:	publish-release
 	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
 
+install-service:
+	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/snapsinazfs.service /usr/lib/systemd/system/snapsinazfs.service
+	systemctl daemon-reload
+
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
 	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
-
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
