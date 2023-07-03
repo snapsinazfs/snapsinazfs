@@ -141,7 +141,7 @@ internal static class ZfsTasks
             Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );
         }
 
-        Logger.Debug( "Finished taking snapshots" );
+        Logger.Info( "Finished taking snapshots" );
 
         SnapshotAutoResetEvent.Set( );
 
@@ -179,6 +179,7 @@ internal static class ZfsTasks
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
+        Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 
         return Errno.EOK;
@@ -428,26 +429,6 @@ internal static class ZfsTasks
         }
 
         return new( poolRootsWithPropertyValidities, missingPropertiesFound );
-    }
-
-    /// <summary>
-    ///     Gets the pool roots with all SnapsInAZfs properties and capacity properties
-    /// </summary>
-    /// <param name="zfsCommandRunner"></param>
-    /// <returns></returns>
-    /// <remarks>
-    ///     Should only be called once schema validity has been checked, or else results are undefined and unsupported
-    /// </remarks>
-    public static async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootsWithPropertiesAndCapacitiesAsync( IZfsCommandRunner zfsCommandRunner )
-    {
-        ConcurrentDictionary<string, ZfsRecord> poolRoots = await zfsCommandRunner.GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( ).ConfigureAwait( false );
-
-        if ( poolRoots.Any( ) )
-        {
-            await zfsCommandRunner.GetPoolCapacitiesAsync( poolRoots ).ConfigureAwait( false );
-        }
-
-        return poolRoots;
     }
 
     public static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )

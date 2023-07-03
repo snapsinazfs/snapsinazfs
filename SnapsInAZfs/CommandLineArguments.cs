@@ -12,7 +12,6 @@ namespace SnapsInAZfs;
 ///     The command line arguments that SnapsInAZfs can accept
 /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
-[ArgProductVersion("1.0.0-Beta1")]
 // ReSharper disable once ClassNeverInstantiated.Global
 public class CommandLineArguments
 {
@@ -29,6 +28,12 @@ public class CommandLineArguments
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]
     public bool Cron { get; set; }
+
+    [ArgDescription( "Run SnapsInAZfs as a daemon" )]
+    [ArgShortcut( "--daemonize" )]
+    [ArgShortcut( "-D" )]
+    [ArgCantBeCombinedWith( "CheckZfsProperties|PrepareZfsProperties|ConfigConsole|Version|Help" )]
+    public bool Daemonize { get; set; }
 
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]

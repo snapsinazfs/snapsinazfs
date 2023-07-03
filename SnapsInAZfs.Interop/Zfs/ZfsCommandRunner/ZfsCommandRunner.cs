@@ -278,59 +278,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( )
-    {
-        ConcurrentDictionary<string, ZfsRecord> result = new( );
-        Logger.Debug( "Requested pool root configuration" );
-        // ZFS is interesting here... If a property doesn't exist, it'll return it in the output anyway, but just
-        // show its value and source as none, denoted by "-"
-        // We can just use that behavior to tell us which properties are defined and which aren't, by whether
-        // they have a source of "local" or not.
-        // Format of line output from zfs get, without -o argument, is:
-        // {datasetName}\t{propertyName}\t{propertyValue}\t{propertySource}\n
-        // The line feed is swallowed by the ReadLine method in the iterator, so we don't need to worry about it.
-        // Pool roots are the schema root, and must have all required properties defined locally.
-        // ZFS User Properties are always inherited, so this guarantees the minimum required schema will be there
-        // for SnapsInAZfs to depend on.
-        // The user can, of course, break things, if they want to, but that's their own fault.
-        // That's why SnapsInAZfs will do at least this check on every startup.
-        // The run-time cost is minimal, so it's better to be safe, even if a cached configuration is likely to
-        // be correct the majority of the time.
-        // Comments, corrections, rude commentary, etc. are welcome (but not too rude - this is a labor of love😅).
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", $"{string.Join( ',', IZfsProperty.DefaultDatasetProperties.Keys )} -t filesystem -s local,default,none -Hpd 0" ).ConfigureAwait( true ) )
-        {
-            string[] elements = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            if ( elements.Length != 4 )
-            {
-                Logger.Error( "Expected exactly 4 elements from zfs get command. Got {0}. Line from ZFS: {1}", elements.Length, zfsGetLine );
-                continue;
-            }
-
-            // Root datasets are always filesystems, so we can just charge right on ahead
-            // Also, just grabbing these strings with names for readability.
-            // The compiler will optimize this away, in release builds, so it's nothing to worry about
-            string dsName = elements[ 0 ];
-            string propertyName = elements[ 1 ];
-            string propertyValue = elements[ 2 ];
-            string propertyValueSource = elements[ 3 ];
-
-            // Get or add the dataset. If it's already in the dictionary, the existing Dataset will we returned.
-            // IF it isn't the new one will be constructed.
-            if ( !result.ContainsKey( dsName ) )
-            {
-                Logger.Debug( "Key not in result. Creating new dataset {0}", dsName );
-                result[ dsName ] = new( dsName, ZfsPropertyValueConstants.FileSystem );
-            }
-
-            Logger.Debug( "Adding property {0}({1} , {2}) to {3}", propertyName, propertyValue, propertyValueSource, dsName );
-            result[ dsName ].UpdateProperty( propertyName, propertyValue, propertyValueSource );
-        }
-
-        Logger.Debug( "Pool root configuration retrieved" );
-        return result;
-    }
-
-    /// <inheritdoc />
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );

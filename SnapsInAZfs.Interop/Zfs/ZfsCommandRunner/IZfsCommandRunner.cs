@@ -45,16 +45,6 @@ public interface IZfsCommandRunner
     public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
 
     /// <summary>
-    ///     Gets configuration defined at all pool roots
-    /// </summary>
-    /// <returns>
-    ///     A <see cref="ConcurrentDictionary{TKey,TValue}" /> of <see langword="string" /> to <see cref="ZfsRecord" /> of pool root
-    ///     datasets in
-    ///     zfs, with SnapsInAZfs properties populated
-    /// </returns>
-    public Task<ConcurrentDictionary<string, ZfsRecord>> GetPoolRootDatasetsWithAllRequiredSnapsInAZfsPropertiesAsync( );
-
-    /// <summary>
     ///     Gets a collection of datasets and their property validity
     /// </summary>
     /// <returns>

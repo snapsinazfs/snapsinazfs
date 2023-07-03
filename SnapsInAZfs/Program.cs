@@ -6,8 +6,9 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using PowerArgs;
-using SnapsInAZfs.Interop.Concurrency;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -36,121 +37,31 @@ internal class Program
         Settings!.DryRun |= args.DryRun;
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
+        Settings.Daemonize |= args.Daemonize;
     }
 
-    public static async Task<int> Main( string[] argv )
+    public static async Task<int> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
     {
-        LoggingSettings.ConfigureLogger( );
-
-        DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-
-        Logger.Trace( "Parsing command-line arguments" );
-        CommandLineArguments? args = Args.Parse<CommandLineArguments>( argv );
-
-        // The nullability context in PowerArgs is wrong, so this absolutely can be null
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if ( args is null )
+        if ( cancellationToken.IsCancellationRequested )
         {
-            Logger.Trace( "Help argument provided. Exiting." );
             return (int)Errno.ECANCELED;
         }
-
-        if ( args.Help )
-        {
-            Logger.Trace( "Help argument provided. Exiting." );
-            return (int)Errno.ECANCELED;
-        }
-
-        if ( args.Version )
-        {
-            Logger.Info( Assembly.GetExecutingAssembly( ).GetName( ).Version.ToString );
-            Logger.Trace( "Version argument provided. Exiting." );
-            return (int)Errno.ECANCELED;
-        }
-
-        SetCommandLineLoggingOverride( args );
-
-        using Mutexes mutexes = Mutexes.Instance;
-        using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\SnapsInAZfs" );
-
-        switch ( mutexResult.ErrorCode )
-        {
-            case MutexAcquisitionErrno.Success:
-                Logger.Debug( "Succesfully acquired global mutex." );
-                break;
-            case MutexAcquisitionErrno.IoException:
-                Logger.Fatal( mutexResult.Exception, "Exiting due to IOException: {0}", mutexResult.Exception.Message );
-                return (int)mutexResult.ErrorCode;
-            case MutexAcquisitionErrno.AbandonedMutex:
-                Logger.Fatal( mutexResult.Exception, "A previous instance of SnapsInAZfs exited without properly releasing the mutex. SnapsInAZfs will now exit after releasing the abandoned mutex. Try running again." );
-                return (int)mutexResult.ErrorCode;
-            case MutexAcquisitionErrno.WaitHandleCannotBeOpened:
-                Logger.Fatal( mutexResult.Exception, "Unable to acquire mutex. SnapsInAZfs will exit." );
-                return (int)mutexResult.ErrorCode;
-            case MutexAcquisitionErrno.PossiblyNullMutex:
-                Logger.Fatal( "Unable to acquire mutex. SnapsInAZfs will exit." );
-                return (int)mutexResult.ErrorCode;
-            case MutexAcquisitionErrno.AnotherProcessIsBusy:
-                Logger.Fatal( "Another SnapsInAZfs process is running. This process will terminate." );
-                return (int)mutexResult.ErrorCode;
-            case MutexAcquisitionErrno.InvalidMutexNameRequested:
-                return (int)mutexResult.ErrorCode;
-            default:
-                Logger.Fatal( mutexResult.Exception, "Failed to get mutex. Exiting." );
-                return (int)mutexResult.ErrorCode;
-        }
-
-        // Configuration is built in the following order from various sources.
-        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
-        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
-        // override earlier values.
-        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
-        // and is loaded/parsed FIRST, before any configuration specified below.
-        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-        // See documentation for a more detailed explanation with examples.
-        // Configuration order:
-        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
-        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
-        // 6. Command-line arguments passed on invocation of SnapsInAZfs
-        Logger.Debug( "Getting base configuration from files" );
-        IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
-                                           #if WINDOWS
-                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #else
-                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                           #if ALLOW_ADJACENT_CONFIG_FILE
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                               .Build( );
-
-        Logger.Trace( "Building settings objects from IConfiguration" );
-        try
-        {
-            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-        }
-        catch ( Exception ex )
-        {
-            Logger.Fatal( ex, "Unable to parse settings from JSON" );
-            return (int)Errno.EFTYPE;
-        }
-
-        ApplyCommandLineArgumentOverrides( in args );
-
-        Logger.Trace( "Getting ZFS command runner for the current environment" );
-        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
-        {
-            PlatformID.Unix => new ZfsCommandRunner( Settings.ZfsPath, Settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( )
-        };
 
         Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
 
         ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
 
         Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
 
         // Check
         switch ( args )
@@ -179,7 +90,7 @@ internal class Program
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( Settings.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
                     ? (int)Errno.EOK
                     : (int)Errno.ENOATTR;
             }
@@ -194,11 +105,21 @@ internal class Program
         ConcurrentDictionary<string, ZfsRecord> datasets = new( );
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
 
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
+
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 
-        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
+        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings!, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
 
         Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
+        }
 
         // Handle taking new snapshots, if requested
         if ( Settings is { TakeSnapshots: true } )
@@ -209,6 +130,11 @@ internal class Program
         else
         {
             Logger.Info( "Not taking snapshots" );
+        }
+
+        if ( cancellationToken.IsCancellationRequested )
+        {
+            return (int)Errno.ECANCELED;
         }
 
         // Handle pruning old snapshots, if requested
@@ -222,9 +148,105 @@ internal class Program
             Logger.Info( "Not pruning snapshots" );
         }
 
-        Mutexes.DisposeMutexes( );
-
         return (int)Errno.EOK;
+    }
+
+    public static async Task<int> Main( string[] argv )
+    {
+        LoggingSettings.ConfigureLogger( );
+
+        DateTimeOffset currentTimestamp = DateTimeOffset.Now;
+
+        Logger.Trace( "Parsing command-line arguments" );
+        CommandLineArguments? args = Args.Parse<CommandLineArguments>( argv );
+
+        // The nullability context in PowerArgs is wrong, so this absolutely can be null
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if ( args is null )
+        {
+            Logger.Trace( "Help argument provided. Exiting." );
+            return (int)Errno.ECANCELED;
+        }
+
+        if ( args.Help )
+        {
+            Logger.Trace( "Help argument provided. Exiting." );
+            return (int)Errno.ECANCELED;
+        }
+
+        if ( args.Version )
+        {
+            Logger.Info( Assembly.GetExecutingAssembly( ).GetName( ).Version!.ToString );
+            Logger.Trace( "Version argument provided. Exiting." );
+            return (int)Errno.ECANCELED;
+        }
+
+        SetCommandLineLoggingOverride( args );
+
+        // Configuration is built in the following order from various sources.
+        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
+        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
+        // override earlier values.
+        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
+        // and is loaded/parsed FIRST, before any configuration specified below.
+        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
+        // See documentation for a more detailed explanation with examples.
+        // Configuration order:
+        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
+        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
+        // 6. Command-line arguments passed on invocation of SnapsInAZfs
+        Logger.Debug( "Getting base configuration from files" );
+        IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
+                                           #if WINDOWS
+                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, true )
+                                           #else
+                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
+                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, true )
+                                           #endif
+                                           #if ALLOW_ADJACENT_CONFIG_FILE
+                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
+                                           #endif
+                                               .Build( );
+
+        Logger.Trace( "Building settings objects from IConfiguration" );
+        try
+        {
+            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Fatal( ex, "Unable to parse settings from JSON" );
+            return (int)Errno.EFTYPE;
+        }
+
+        ApplyCommandLineArgumentOverrides( in args );
+
+        IHost serviceHost = Host.CreateDefaultBuilder( )
+                                .UseSystemd( )
+                                .ConfigureServices( ( _, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
+                                .Build( );
+
+        SiazService.timestamp = currentTimestamp;
+
+        await serviceHost.RunAsync( ).ConfigureAwait( true );
+
+        serviceHost.Dispose( );
+
+        return SiazService.ExitStatus;
+    }
+
+    private static SiazService ServiceInstanceProvider( IServiceProvider arg )
+    {
+        Logger.Trace( "Getting ZFS command runner for the current environment" );
+        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
+            _ => new DummyZfsCommandRunner( )
+        };
+
+        SiazService service = new( Settings!, zfsCommandRunner );
+        return service;
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
