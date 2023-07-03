@@ -14,7 +14,7 @@ namespace SnapsInAZfs;
 /// <summary>
 ///     The service class for running everything but the configuration console
 /// </summary>
-public class SiazDaemon : BackgroundService
+public class SiazService : BackgroundService
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private readonly CommandLineArguments _commandLineArguments;
@@ -30,7 +30,7 @@ public class SiazDaemon : BackgroundService
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="zfsCommandRunner"></param>
-    public SiazDaemon( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner )
+    public SiazService( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner )
     {
         _settings = settings;
         _zfsCommandRunner = zfsCommandRunner;

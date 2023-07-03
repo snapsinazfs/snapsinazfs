@@ -117,16 +117,16 @@ internal class Program
                                 .ConfigureServices( ( hostContext, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
                                 .Build( );
 
-        SiazDaemon.timestamp = currentTimestamp;
+        SiazService.timestamp = currentTimestamp;
 
         await serviceHost.RunAsync( ).ConfigureAwait( true );
 
         serviceHost.Dispose( );
 
-        return SiazDaemon.ExitStatus;
+        return SiazService.ExitStatus;
     }
 
-    private static SiazDaemon ServiceInstanceProvider( IServiceProvider arg )
+    private static SiazService ServiceInstanceProvider( IServiceProvider arg )
     {
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
@@ -135,8 +135,8 @@ internal class Program
             _ => new DummyZfsCommandRunner( )
         };
 
-        SiazDaemon daemon = new( Settings!, zfsCommandRunner );
-        return daemon;
+        SiazService service = new( Settings!, zfsCommandRunner );
+        return service;
     }
 
     public static async Task<int> ExecuteSiaz(IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
