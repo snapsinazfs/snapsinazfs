@@ -25,8 +25,7 @@ public static class LoggingSettings
                                                 .AddJsonFile("SnapsInAZfs.nlog.json", true, false)
                                             #else
                                                 .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", false, false )
-                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, false )
-                                                .AddJsonFile( "SnapsInAZfs.nlog.json", true, false )
+                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, true )
                                             #endif
                                                 .Build( );
 #pragma warning restore CA2000
