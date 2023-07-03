@@ -51,7 +51,7 @@ public class SiazService : BackgroundService
         // As soon as the application has started, execute the main method
         // If we weren't asked to daemonize, return immediately after that
         // Otherwise, set a timer and start ticking
-        ExitStatus = await Program.ExecuteSiaz( _zfsCommandRunner, _commandLineArguments, timestamp, stoppingToken ).ConfigureAwait( true );
+        ExitStatus = await Program.ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, timestamp, stoppingToken ).ConfigureAwait( true );
         _lastRunTime = DateTimeOffset.Now;
         int greatestCommonFrequentIntervalMinutes = GetGreatestCommonFrequentIntervalFactor( );
         SetNextRunTime( greatestCommonFrequentIntervalMinutes );
@@ -109,7 +109,7 @@ public class SiazService : BackgroundService
                         SetNextRunTime( greatestCommonFrequentIntervalMinutes );
 
                         // Fire this off asynchronously
-                        ExitStatus = await Program.ExecuteSiaz( _zfsCommandRunner, _commandLineArguments, timestamp, stoppingToken ).ConfigureAwait( true );
+                        ExitStatus = await Program.ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, timestamp, stoppingToken ).ConfigureAwait( true );
                         if ( ExitStatus != 0 )
                         {
                             await StopAsync( stoppingToken ).ConfigureAwait( true );

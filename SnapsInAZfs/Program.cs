@@ -139,7 +139,12 @@ internal class Program
         return service;
     }
 
-    public static async Task<int> ExecuteSiaz(IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
+    /// <exception cref="UnauthorizedAccessException">The named mutex exists and has access control security, but the user does not have permission.</exception>
+    /// <exception cref="IOException">SIAZ mutex is invalid. This can be for various reasons, including some restrictions that may be placed by the operating system, such as an unknown prefix or invalid characters. Note that the name and common prefixes "Global" and "Local" are case-sensitive.
+    /// -or-
+    /// There was some other error. The HResult property may provide more information.</exception>
+    /// <exception cref="WaitHandleCannotBeOpenedException">A synchronization object with the provided name cannot be created. A synchronization object of a different type might have the same name.</exception>
+    public static async Task<int> ExecuteSiazAsync(IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
     {
         using Mutexes mutexes = Mutexes.Instance;
         using MutexAcquisitionResult mutexResult = Mutexes.GetAndWaitMutex( "Global\\SnapsInAZfs" );
