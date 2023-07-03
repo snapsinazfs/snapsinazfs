@@ -141,14 +141,12 @@ public class ZfsCommandRunnerBaseTests
 
         for ( int currentIndex = pathStartIndex; currentIndex <= pathEndIndex; currentIndex++ )
         {
-            names[ currentIndex ] = currentPathDepth switch
+            names[ currentIndex ].Name += valid switch
             {
-                > 1 when valid => new( $"{Path.GetDirectoryName( $"{names[ currentIndex - subPaths ].Name}/{GetValidZfsPathComponent( pathComponentLength )}" )}{GetValidZfsSnapshotNameComponent( pathComponentLength )}", valid ),
-                > 1 => new( $"{Path.GetDirectoryName( $"{names[ currentIndex - subPaths ].Name}/{GetValidZfsPathComponent( pathComponentLength )}" )}{GetIllegalZfsSnapshotNameComponent( pathComponentLength )}", valid ),
-                1 when valid => new( $"{GetValidZfsSnapshotNameComponent( pathComponentLength )}{GetValidZfsSnapshotNameComponent( pathComponentLength )}", valid ),
-                1 => new( $"{GetValidZfsPathComponent( pathComponentLength )}{GetIllegalZfsSnapshotNameComponent( pathComponentLength )}", valid ),
-                _ => throw new ArgumentOutOfRangeException( nameof( currentPathDepth ), currentPathDepth, "Unexpected value for currentPathDepth passed to ComposeDatasetPathsAtLevel. Must be > 0" )
+                true => GetValidZfsSnapshotNameComponent( pathComponentLength ),
+                _ => GetIllegalZfsSnapshotNameComponent( pathComponentLength )
             };
+            names[currentIndex].Valid = valid;
         }
     }
 
@@ -225,6 +223,11 @@ public class ZfsCommandRunnerBaseTests
 
         for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
         {
+            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
             ComposeSnapshotPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, false, ref cases );
         }
 
@@ -241,7 +244,10 @@ public class ZfsCommandRunnerBaseTests
 
     private static string GetIllegalZfsSnapshotNameComponent( int snapshotNameComponentLength )
     {
-        return $"@{TestContext.CurrentContext.Random.GetString( snapshotNameComponentLength - 1, IllegalIdentifierComponentCharacters )}";
+        string goodComponent = GetValidZfsSnapshotNameComponent( snapshotNameComponentLength - 1 );
+        int randomIndexToAlter = TestContext.CurrentContext.Random.Next( 0, snapshotNameComponentLength - 2 );
+        string badComponent = goodComponent.Insert( randomIndexToAlter, TestContext.CurrentContext.Random.GetString( 1, IllegalSnapshotIdentifierComponentCharacters ) );
+        return $"@{badComponent}";
     }
 
     /// <summary>
@@ -299,6 +305,11 @@ public class ZfsCommandRunnerBaseTests
     private static NameValidationTestCase[] GetValidSnapshotCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
     {
         NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
 
         for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
         {
