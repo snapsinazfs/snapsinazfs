@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -141,7 +141,7 @@ internal static class ZfsTasks
             Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );
         }
 
-        Logger.Debug( "Finished taking snapshots" );
+        Logger.Info( "Finished taking snapshots" );
 
         SnapshotAutoResetEvent.Set( );
 
@@ -179,6 +179,7 @@ internal static class ZfsTasks
 
         // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
         // ReSharper disable once ExceptionNotDocumentedOptional
+        Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 
         return Errno.EOK;
