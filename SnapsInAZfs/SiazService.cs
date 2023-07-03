@@ -110,7 +110,7 @@ public class SiazService : BackgroundService
 
                         // Fire this off asynchronously
                         ExitStatus = await Program.ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, timestamp, stoppingToken ).ConfigureAwait( true );
-                        if ( ExitStatus != 0 )
+                        if ( ExitStatus is not 0 and not 16 )
                         {
                             await StopAsync( stoppingToken ).ConfigureAwait( true );
                         }
