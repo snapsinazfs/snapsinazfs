@@ -27,7 +27,7 @@ public class ZfsRecordTests
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind period )
     {
         ZfsRecord dataset = new( "dsName", ZfsPropertyValueConstants.FileSystem );
-        Snapshot snapshot = new( "frequent", true, period, DateTimeOffset.UnixEpoch, dataset );
+        Snapshot snapshot = new( period.ToString("G"), true, period, DateTimeOffset.UnixEpoch, dataset );
         dataset.AddSnapshot( snapshot );
         Assert.That( dataset.Snapshots, Contains.Key( period ) );
         Assert.That( dataset.Snapshots[ period ], Contains.Key( snapshot.Name ) );
