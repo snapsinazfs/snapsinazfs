@@ -262,16 +262,8 @@ public class ZfsRecordTestData
     public static async Task SetUpTestData( )
     {
         IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
-                                           #if WINDOWS
                                                .AddJsonFile( "SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #else
-                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, true )
-                                           #endif
-                                           #if ALLOW_ADJACENT_CONFIG_FILE
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #endif
                                                .Build( );
         Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
         IZfsCommandRunner commandRunner = new TestCommandRunner( );
