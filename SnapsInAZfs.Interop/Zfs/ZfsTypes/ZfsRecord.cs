@@ -83,7 +83,7 @@ public record ZfsRecord
     public long BytesAvailable { get; }
     public long BytesUsed { get; }
 
-    public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
+    public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, ZfsPropertySourceConstants.Local );
     [JsonIgnore]
     public bool IsPoolRoot { get; }
 
