@@ -1,8 +1,8 @@
-name: "Latest 'release' Tag Status"
+name: "Latest 'build' Tag Status"
 
 on:
   push:
-    tags: [ "release-*" ]
+    tags: [ "build-*" ]
 
 jobs:
   build-and-test:
