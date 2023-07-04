@@ -118,7 +118,7 @@ public class ZfsRecordTests
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsSnapshotNeededTestCases ) )]
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsFrequentSnapshotNeededTestCases ) )]
     public void IsFrequentSnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
         ZfsRecord dataset = testCase.Dataset;
@@ -127,9 +127,12 @@ public class ZfsRecordTests
     }
 
     [Test]
-    public void IsHourlySnapshotNeeded( )
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsHourlySnapshotNeededTestCases ) )]
+    public void IsHourlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord dataset = testCase.Dataset;
+        bool isFrequentSnapshotNeeded = dataset.IsHourlySnapshotNeeded( testCase.Timestamp );
+        Assert.That( isFrequentSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]

@@ -348,7 +348,7 @@ public class ZfsRecordTestData
         return $"@{TestContext.CurrentContext.Random.GetString( snapshotNameComponentLength - 1, AllowedIdentifierComponentCharacters )}";
     }
 
-    public static IEnumerable<IsSnapshotNeededTestCase> IsSnapshotNeededTestCases
+    public static IEnumerable<IsSnapshotNeededTestCase> IsFrequentSnapshotNeededTestCases
     {
         get
         {
@@ -362,7 +362,30 @@ public class ZfsRecordTestData
             DateTimeOffset sameAsLatest = new( 2023, 7, 3, 1, 15, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
             DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 3, 1, 20, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
             DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 3, 1, 30, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 3, 1, 30, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 3, 1, 31, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = significantlyBeforeLatest, IsSnapshotNeededExpected = false };
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = slightlyBeforeLatest, IsSnapshotNeededExpected = false };
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = sameAsLatest, IsSnapshotNeededExpected = false };
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = afterLatestWithinPeriod, IsSnapshotNeededExpected = false };
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = afterLatestExactlyAtPeriod, IsSnapshotNeededExpected = true };
+            yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = afterLatestBeyondPeriod, IsSnapshotNeededExpected = true };
+        }
+    }
+    public static IEnumerable<IsSnapshotNeededTestCase> IsHourlySnapshotNeededTestCases
+    {
+        get
+        {
+            if ( OriginalValidDatasets.IsEmpty )
+            {
+                // ReSharper disable once AsyncConverter.AsyncWait
+                SetUpTestData( ).Wait(5000);
+            }
+            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset slightlyBeforeLatest = new( 2023, 7, 3, 0, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset sameAsLatest = new( 2023, 7, 3, 1, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 3, 1, 30, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 3, 2, 00, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
+            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 3, 3, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
             yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = significantlyBeforeLatest, IsSnapshotNeededExpected = false };
             yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = slightlyBeforeLatest, IsSnapshotNeededExpected = false };
             yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = sameAsLatest, IsSnapshotNeededExpected = false };
