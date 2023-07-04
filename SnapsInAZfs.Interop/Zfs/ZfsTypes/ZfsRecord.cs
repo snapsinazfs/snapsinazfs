@@ -358,6 +358,10 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastDailySnapshotTimestamp.Value )
+        {
+            return false;
+        }
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp.Value;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
@@ -494,6 +498,10 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if monthly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastMonthlySnapshotTimestamp.Value )
+        {
+            return false;
+        }
         int lastMonthlySnapshotMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( LastMonthlySnapshotTimestamp.Value.LocalDateTime );
         int currentMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( timestamp.LocalDateTime );
         int lastMonthlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastMonthlySnapshotTimestamp.Value.LocalDateTime );
@@ -545,6 +553,10 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastWeeklySnapshotTimestamp.Value )
+        {
+            return false;
+        }
         TimeSpan timeSinceLastWeeklySnapshot = timestamp - LastWeeklySnapshotTimestamp.Value;
         bool atLeastOneWeekSinceLastWeeklySnapshot = timeSinceLastWeeklySnapshot.TotalDays >= 7d;
         // Check if more than a week ago or if the week number is different by local rules, using the chosen day as the first day of the week
@@ -580,6 +592,10 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if yearly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastYearlySnapshotTimestamp.Value )
+        {
+            return false;
+        }
         int lastYearlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastYearlySnapshotTimestamp.Value.LocalDateTime );
         int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
         // Check if the last yearly snapshot was in a different year
