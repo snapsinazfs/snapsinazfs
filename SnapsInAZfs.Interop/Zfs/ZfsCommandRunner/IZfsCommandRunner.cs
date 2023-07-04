@@ -38,13 +38,6 @@ public interface IZfsCommandRunner
     public Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
     /// <summary>
-    ///     Gets the capacity property from zfs for the pool roots specified and sets it on the corresponding Dataset objects
-    /// </summary>
-    /// <param name="datasets"></param>
-    /// <returns>A boolean indicating success or failure of the operation</returns>
-    public Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
-
-    /// <summary>
     ///     Gets a collection of datasets and their property validity
     /// </summary>
     /// <returns>

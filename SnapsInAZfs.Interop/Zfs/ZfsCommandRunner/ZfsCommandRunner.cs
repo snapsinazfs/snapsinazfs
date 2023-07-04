@@ -184,40 +184,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets )
-    {
-        Logger.Debug( "Requested pool root capacities" );
-        bool errorsEncountered = false;
-        await foreach ( string zpoolListLine in ZpoolExecEnumerator( "list", $"-Hpo name,{ZpoolProperty.ZfsPoolCapacityPropertyName} {string.Join( ' ', datasets.Keys )}" ) )
-        {
-            string[] lineTokens = zpoolListLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            string poolName = lineTokens[ 0 ];
-            string poolCapacityString = lineTokens[ 1 ];
-            Logger.Debug( "Pool {0} capacity is {1}", poolName, poolCapacityString );
-            if ( datasets.TryGetValue( poolName, out ZfsRecord? poolRoot ) && poolRoot is { IsPoolRoot: true } )
-            {
-                if ( int.TryParse( poolCapacityString, out int usedCapacity ) )
-                {
-                    Logger.Debug( "Setting dataset object {0} pool used capacity to {1}", poolName, usedCapacity );
-                    poolRoot.PoolUsedCapacity = usedCapacity;
-                }
-                else
-                {
-                    Logger.Error( "Failed to parse capacity for pool {0}. Prune deferral setting may be incorrect", poolName );
-                    errorsEncountered = true;
-                }
-            }
-            else if ( !datasets.ContainsKey( poolName ) )
-            {
-                Logger.Error( "Pool root {0} does not exist in current program state. Prune deferral setting may be incorrect", poolName );
-                errorsEncountered = true;
-            }
-        }
-
-        return errorsEncountered;
-    }
-
-    /// <inheritdoc />
     /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
     public override bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {

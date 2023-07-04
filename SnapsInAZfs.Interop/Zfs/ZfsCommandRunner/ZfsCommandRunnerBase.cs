@@ -23,9 +23,6 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <inheritdoc />
-    public abstract Task<bool> GetPoolCapacitiesAsync( ConcurrentDictionary<string, ZfsRecord> datasets );
-
-    /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );
 
     /// <inheritdoc />
