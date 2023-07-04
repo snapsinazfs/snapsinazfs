@@ -205,6 +205,32 @@ Also useful if you have just made a configuration change that would
 result in more snapshots being pruned, and you wish to manually run SIAZ
 to observe the results, possibly with a more verbose logging argument or
 dry run, as well.
+.SS Viewing SIAZ Logs
+.PP
+View log entries logged to the system journal when running as a service:
+.IP
+.nf
+\f[C]
+$ journalctl -xe --namespace snapsinazfs
+\f[R]
+.fi
+.PP
+SnapsInAZfs writes its system journal entries to the snapsinazfs
+namespace, when it is running as a service under systemd, by default.
+.PD 0
+.P
+.PD
+This means it will not show up without specifying
+\f[V]\[rs]-\[rs]-namespace snapsinazfs\f[R], which is intentional, to
+keep it from cluttering up your system journal.
+.PP
+View text log files created by default logging rules:
+.IP
+.nf
+\f[C]
+$ less /var/log/SnapsInAZfs/nlog-all-\[rs]{yyyy-MM-dd\[rs]}.log
+\f[R]
+.fi
 .SH Exit Status
 .PP
 0 Exit code indicates success
