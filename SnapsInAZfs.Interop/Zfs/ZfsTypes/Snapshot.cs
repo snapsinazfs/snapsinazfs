@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -27,7 +27,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
 
     public Snapshot( string snapName, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, ZfsProperty<string> snapshotName, ZfsProperty<SnapshotPeriod> snapshotPeriod, ZfsProperty<DateTimeOffset> snapshotTimestamp, ZfsRecord parent )
         : base( snapName,
-                "snapshot",
+                ZfsPropertyValueConstants.Snapshot,
                 enabled,
                 takeSnapshots,
                 pruneSnapshots,
@@ -45,7 +45,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
                 retentionWeekly,
                 retentionMonthly,
                 retentionYearly,
-                retentionPruneDeferral, 
+                retentionPruneDeferral,
                 0,
                 0,
                 parent )
