@@ -11,6 +11,66 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes;
 [Category( "General" )]
 public class ZfsRecordTests
 {
+    static ZfsRecordTests( )
+    {
+        UpdatePropertyTestCases = UpdatePropertyTestCases_Bool.Concat( UpdatePropertyTestCases_DateTimeOffset ).Concat( UpdatePropertyTestCases_Int ).Concat( UpdatePropertyTestCases_String );
+    }
+
+    private static readonly ZfsRecord StandardValidTestFileSystem = new(
+        "validTestFileSystem",
+        ZfsPropertyValueConstants.FileSystem,
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.EnabledPropertyName ],
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TakeSnapshotsPropertyName ],
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.PruneSnapshotsPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ],
+        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.RecursionPropertyName ],
+        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TemplatePropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ],
+        107374182400L, // 100 GiB
+        10737418240L   // 10 GiB
+    );
+
+    private static readonly ZfsRecord StandardValidTestVolume = new(
+        "validTestVolume",
+        ZfsPropertyValueConstants.Volume,
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.EnabledPropertyName ],
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TakeSnapshotsPropertyName ],
+        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.PruneSnapshotsPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ],
+        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ],
+        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.RecursionPropertyName ],
+        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TemplatePropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ],
+        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ],
+        107374182400L, // 100 GiB
+        10737418240L   // 10 GiB
+    );
+
+    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_Bool { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<bool>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = !p.Value } ) );
+    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_DateTimeOffset { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<DateTimeOffset>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = p.Value.AddMinutes( 15 ) } ) );
+    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_Int { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<int>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = p.Value + 100 } ) );
+    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_String { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<string>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = $"{p.Value} MODIFIED" } ) );
+    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases { get; }
     /// <summary>All valid characters in a ZFS dataset identifier component</summary>
     private const string AllowedIdentifierComponentCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-:.";
 
@@ -161,38 +221,6 @@ public class ZfsRecordTests
         Assert.Ignore( "Test not implemented" );
     }
 
-    /// <summary>
-    ///     This gets an array of dataset names that are guaranteed valid
-    /// </summary>
-    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
-    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
-    /// <param name="pathDepth">How many levels should be generated</param>
-    /// <returns>
-    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
-    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
-    ///     <paramref name="pathDepth" />
-    /// </returns>
-    /// <remarks>
-    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
-    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
-    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">
-    ///     If the total length of the longest possible string generated with the
-    ///     supplied parameters would exceed ZFS maximum identifier length (255)
-    /// </exception>
-    public static NameValidationTestCase[] GetValidDatasetCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
-    {
-        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
-        }
-
-        return cases;
-    }
-
     [Test]
     public void IsDailySnapshotNeeded( )
     {
@@ -230,9 +258,99 @@ public class ZfsRecordTests
     }
 
     [Test]
-    public void UpdateProperty( )
+    [TestCaseSource( nameof( UpdatePropertyTestCases ) )]
+    public void UpdateProperty_FileSystems( UpdatePropertyTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord originalRecord = StandardValidTestFileSystem with { };
+        ZfsRecord updatedRecord = StandardValidTestFileSystem with { };
+        Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
+        IZfsProperty updatedProperty = updatedRecord.UpdateProperty( testCase.PropertyToChange.Name, testCase.PropertyToChange.ValueString, testCase.PropertyToChange.Source );
+        Assert.Multiple( ( ) =>
+        {
+            switch ( testCase.PropertyToChange )
+            {
+                case ZfsProperty<int>:
+                    ZfsProperty<int> originalIntProperty = (ZfsProperty<int>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<int> updatedIntProperty = (ZfsProperty<int>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<int> testCaseIntProperty = (ZfsProperty<int>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedIntProperty.Value, Is.Not.EqualTo( originalIntProperty.Value ) );
+                    Assert.That( updatedIntProperty.Value, Is.EqualTo( testCaseIntProperty.Value ) );
+                    goto default;
+                case ZfsProperty<string>:
+                    ZfsProperty<string> originalStringProperty = (ZfsProperty<string>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<string> updatedStringProperty = (ZfsProperty<string>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<string> testCaseStringProperty = (ZfsProperty<string>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedStringProperty.Value, Is.Not.EqualTo( originalStringProperty.Value ) );
+                    Assert.That( updatedStringProperty.Value, Is.EqualTo( testCaseStringProperty.Value ) );
+                    goto default;
+                case ZfsProperty<bool>:
+                    ZfsProperty<bool> originalBoolProperty = (ZfsProperty<bool>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<bool> updatedBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<bool> testCaseBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedBoolProperty.Value, Is.Not.EqualTo( originalBoolProperty.Value ) );
+                    Assert.That( updatedBoolProperty.Value, Is.EqualTo( testCaseBoolProperty.Value ) );
+                    goto default;
+                case ZfsProperty<DateTimeOffset>:
+                    ZfsProperty<DateTimeOffset> originalDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<DateTimeOffset> updatedDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<DateTimeOffset> testCaseDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedDateTimeOffsetProperty.Value, Is.Not.EqualTo( originalDateTimeOffsetProperty.Value ) );
+                    Assert.That( updatedDateTimeOffsetProperty.Value, Is.EqualTo( testCaseDateTimeOffsetProperty.Value ) );
+                    goto default;
+                default:
+                    Assert.That( updatedProperty, Is.EqualTo( testCase.PropertyToChange ) );
+                    Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
+                    break;
+            }
+        } );
+    }
+
+    [Test]
+    [TestCaseSource( nameof( UpdatePropertyTestCases ) )]
+    public void UpdateProperty_Volumes( UpdatePropertyTestCase testCase )
+    {
+        ZfsRecord originalRecord = StandardValidTestVolume with { };
+        ZfsRecord updatedRecord = StandardValidTestVolume with { };
+        Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
+        IZfsProperty updatedProperty = updatedRecord.UpdateProperty( testCase.PropertyToChange.Name, testCase.PropertyToChange.ValueString, testCase.PropertyToChange.Source );
+        Assert.Multiple( ( ) =>
+        {
+            switch ( testCase.PropertyToChange )
+            {
+                case ZfsProperty<int>:
+                    ZfsProperty<int> originalIntProperty = (ZfsProperty<int>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<int> updatedIntProperty = (ZfsProperty<int>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<int> testCaseIntProperty = (ZfsProperty<int>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedIntProperty.Value, Is.Not.EqualTo( originalIntProperty.Value ) );
+                    Assert.That( updatedIntProperty.Value, Is.EqualTo( testCaseIntProperty.Value ) );
+                    goto default;
+                case ZfsProperty<string>:
+                    ZfsProperty<string> originalStringProperty = (ZfsProperty<string>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<string> updatedStringProperty = (ZfsProperty<string>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<string> testCaseStringProperty = (ZfsProperty<string>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedStringProperty.Value, Is.Not.EqualTo( originalStringProperty.Value ) );
+                    Assert.That( updatedStringProperty.Value, Is.EqualTo( testCaseStringProperty.Value ) );
+                    goto default;
+                case ZfsProperty<bool>:
+                    ZfsProperty<bool> originalBoolProperty = (ZfsProperty<bool>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<bool> updatedBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<bool> testCaseBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedBoolProperty.Value, Is.Not.EqualTo( originalBoolProperty.Value ) );
+                    Assert.That( updatedBoolProperty.Value, Is.EqualTo( testCaseBoolProperty.Value ) );
+                    goto default;
+                case ZfsProperty<DateTimeOffset>:
+                    ZfsProperty<DateTimeOffset> originalDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)originalRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<DateTimeOffset> updatedDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<DateTimeOffset> testCaseDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    Assert.That( updatedDateTimeOffsetProperty.Value, Is.Not.EqualTo( originalDateTimeOffsetProperty.Value ) );
+                    Assert.That( updatedDateTimeOffsetProperty.Value, Is.EqualTo( testCaseDateTimeOffsetProperty.Value ) );
+                    goto default;
+                default:
+                    Assert.That( updatedProperty, Is.EqualTo( testCase.PropertyToChange ) );
+                    Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
+                    break;
+            }
+        } );
     }
 
     private static void ComposeDatasetPathsAtLevel( int currentPathDepth, int subPaths, int pathComponentLength, bool valid, ref NameValidationTestCase[] names )
@@ -333,6 +451,38 @@ public class ZfsRecordTests
     }
 
     /// <summary>
+    ///     This gets an array of dataset names that are guaranteed valid
+    /// </summary>
+    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
+    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
+    /// <param name="pathDepth">How many levels should be generated</param>
+    /// <returns>
+    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
+    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
+    ///     <paramref name="pathDepth" />
+    /// </returns>
+    /// <remarks>
+    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
+    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
+    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    ///     If the total length of the longest possible string generated with the
+    ///     supplied parameters would exceed ZFS maximum identifier length (255)
+    /// </exception>
+    private static NameValidationTestCase[] GetValidDatasetCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
+    {
+        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
+
+        return cases;
+    }
+
+    /// <summary>
     ///     This gets an array of fully-qualified snapshot names that are guaranteed valid
     /// </summary>
     /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
@@ -378,6 +528,8 @@ public class ZfsRecordTests
     {
         return $"@{TestContext.CurrentContext.Random.GetString( snapshotNameComponentLength - 1, AllowedIdentifierComponentCharacters )}";
     }
+
+    public record struct UpdatePropertyTestCase( string TestName, IZfsProperty PropertyToChange );
 
     public record struct NameValidationTestCase( string Name, bool Valid );
 }

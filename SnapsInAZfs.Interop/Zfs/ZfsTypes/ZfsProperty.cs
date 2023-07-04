@@ -38,6 +38,9 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
         _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 
+    /// <inheritdoc />
+    public Type ValueType => typeof( T );
+
     [JsonIgnore]
     public bool IsInherited => Source.StartsWith( "inherited" );
 
