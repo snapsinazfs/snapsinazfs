@@ -9,6 +9,9 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes;
 [TestFixture]
 [Category( "General" )]
 [Category( "TypeChecks" )]
+[FixtureLifeCycle( LifeCycle.SingleInstance )]
+[Order( 10 )]
+[TestOf( typeof( ZfsProperty<> ) )]
 public class ZfsPropertyTests
 {
     [Test]

@@ -1,0 +1,48 @@
+{
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "$id": "SnapsInAZfs.local.json",
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
+  "ZfsPath": "/usr/local/sbin/zfs", 
+  "ZpoolPath": "/usr/local/sbin/zpool", 
+  "TakeSnapshots": true,
+  "PruneSnapshots": true,
+  "DryRun": false,
+  "RunAsDaemon": false,
+  "Monitoring": {
+    "Nagios": {
+      "$comments": "Nagios-specific monitoring options",
+      "MonitorType": "Nagios",
+      "Capacity": false,
+      "Health": false,
+      "Snapshots": false
+    }
+  },
+  "Templates": {
+    "production": {
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "DailySuffix": "daily",
+        "WeeklySuffix": "weekly",
+        "MonthlySuffix": "monthly",
+        "YearlySuffix": "yearly"
+      },
+      "SnapshotTiming": {
+        "UseLocalTime": true,
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "DailyTime": "00:00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00:00",
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "YearlyMonth": 1,
+        "YearlyDay": 1,
+        "YearlyTime": "00:00:00"
+      }
+    }
+  }
+}
