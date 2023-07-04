@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -84,6 +84,7 @@ public record ZfsRecord
     public long BytesUsed { get; }
 
     public ZfsProperty<bool> Enabled { get; private set; } = new( ZfsPropertyNames.EnabledPropertyName, false, "local" );
+    [JsonIgnore]
     public bool IsPoolRoot { get; }
 
     public IZfsProperty this[ string propName ]
@@ -152,7 +153,7 @@ public record ZfsRecord
     [JsonIgnore]
     public ZfsRecord PoolRoot => IsPoolRoot ? this : ParentDataset.PoolRoot;
 
-    public int PoolUsedCapacity { get; set; }
+    [JsonIgnore]
     public ZfsProperty<bool> PruneSnapshots { get; protected set; } = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
     public ZfsProperty<string> Recursion { get; protected set; } = new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     public ZfsProperty<int> SnapshotRetentionDaily { get; private set; } = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, ZfsPropertySourceConstants.Local );
@@ -304,7 +305,7 @@ public record ZfsRecord
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
         if ( SnapshotRetentionPruneDeferral.Value != 0 && PercentBytesUsed < SnapshotRetentionPruneDeferral.Value )
         {
-            Logger.Info( "Pool used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PoolUsedCapacity, SnapshotRetentionPruneDeferral.Value );
+            Logger.Info( "Used capacity for {0} ({1}%) is below prune deferral threshold of {2}%. Skipping pruning of {0}", Name, PercentBytesUsed, SnapshotRetentionPruneDeferral.Value );
             return new( );
         }
 
