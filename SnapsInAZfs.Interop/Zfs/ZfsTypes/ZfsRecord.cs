@@ -599,7 +599,7 @@ public record ZfsRecord
         int lastYearlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastYearlySnapshotTimestamp.Value.LocalDateTime );
         int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
         // Check if the last yearly snapshot was in a different year
-        bool yearlySnapshotNeeded = lastYearlySnapshotYear != currentYear;
+        bool yearlySnapshotNeeded = lastYearlySnapshotYear < currentYear;
         Logger.Debug( "Yearly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, yearlySnapshotNeeded ? "" : "not " );
         return yearlySnapshotNeeded;
     }
