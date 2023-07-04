@@ -8,7 +8,16 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes;
 
 public class IsSnapshotNeededTestCase
 {
+    public IsSnapshotNeededTestCase( string testName, ZfsRecord dataset, DateTimeOffset timestamp, bool isSnapshotNeededExpected )
+    {
+        TestName = testName;
+        Dataset = dataset;
+        Timestamp = timestamp;
+        IsSnapshotNeededExpected = isSnapshotNeededExpected;
+    }
+
+    public string TestName { get; set; }
     public ZfsRecord Dataset { get; set; }
-    public bool IsSnapshotNeededExpected { get; set; }
     public DateTimeOffset Timestamp { get; set; }
+    public bool IsSnapshotNeededExpected { get; set; }
 }

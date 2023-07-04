@@ -38,8 +38,8 @@ public class ZfsRecordTests
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.GetValidDatasetCases ), new object?[] { 8, 12, 5 } )]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.GetIllegalDatasetCases ), new object?[] { 8, 12, 5 } )]
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.GetValidDatasetCases ), new object?[] { 6, 8, 5 } )]
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.GetIllegalDatasetCases ), new object?[] { 6, 8, 5 } )]
     [Category( "General" )]
     [Category( "ZFS" )]
     public void CheckDatasetNameValidation( NameValidationTestCase testCase )
@@ -112,9 +112,12 @@ public class ZfsRecordTests
     }
 
     [Test]
-    public void IsDailySnapshotNeeded( )
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsDailySnapshotNeededTestCases ) )]
+    public void IsDailySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord dataset = testCase.Dataset;
+        bool isSnapshotNeeded = dataset.IsDailySnapshotNeeded( testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
@@ -122,8 +125,8 @@ public class ZfsRecordTests
     public void IsFrequentSnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
         ZfsRecord dataset = testCase.Dataset;
-        bool isFrequentSnapshotNeeded = dataset.IsFrequentSnapshotNeeded( ZfsRecordTestData.Settings.Templates[ dataset.Template.Value ].SnapshotTiming, testCase.Timestamp );
-        Assert.That( isFrequentSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        bool isSnapshotNeeded = dataset.IsFrequentSnapshotNeeded( ZfsRecordTestData.Settings.Templates[ dataset.Template.Value ].SnapshotTiming, testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
@@ -131,26 +134,35 @@ public class ZfsRecordTests
     public void IsHourlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
         ZfsRecord dataset = testCase.Dataset;
-        bool isFrequentSnapshotNeeded = dataset.IsHourlySnapshotNeeded( testCase.Timestamp );
-        Assert.That( isFrequentSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        bool isSnapshotNeeded = dataset.IsHourlySnapshotNeeded( testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
-    public void IsMonthlySnapshotNeeded( )
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsMonthlySnapshotNeededTestCases ) )]
+    public void IsMonthlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord dataset = testCase.Dataset;
+        bool isSnapshotNeeded = dataset.IsMonthlySnapshotNeeded( testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
-    public void IsWeeklySnapshotNeeded( )
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsWeeklySnapshotNeededTestCases ) )]
+    public void IsWeeklySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord dataset = testCase.Dataset;
+        bool isSnapshotNeeded = dataset.IsWeeklySnapshotNeeded( ZfsRecordTestData.Settings.Templates[ dataset.Template.Value ].SnapshotTiming, testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
-    public void IsYearlySnapshotNeeded( )
+    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsYearlySnapshotNeededTestCases ) )]
+    public void IsYearlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
     {
-        Assert.Ignore( "Test not implemented" );
+        ZfsRecord dataset = testCase.Dataset;
+        bool isSnapshotNeeded = dataset.IsYearlySnapshotNeeded( testCase.Timestamp );
+        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
     }
 
     [Test]
@@ -251,5 +263,3 @@ public class ZfsRecordTests
 }
 
 public record struct UpdatePropertyTestCase( string TestName, IZfsProperty PropertyToChange );
-
-public record struct NameValidationTestCase( string Name, bool Valid );
