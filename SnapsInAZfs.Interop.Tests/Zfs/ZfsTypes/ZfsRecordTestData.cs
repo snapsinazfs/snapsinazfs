@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -386,11 +386,5 @@ public class ZfsRecordTestData
             yield return new (){ Dataset = OriginalValidDatasets[ "testpool/fs1" ], Timestamp = afterLatestBeyondPeriod, IsSnapshotNeededExpected = true };
         }
     }
-}
 
-public class IsSnapshotNeededTestCase
-{
-    public ZfsRecord Dataset { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public bool IsSnapshotNeededExpected { get; set; }
 }
