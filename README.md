@@ -13,7 +13,10 @@
  
  SnapsInAZfs is also capable of running as a systemd service.
 
- I may make an alpha or beta release tag soon and possibly provide a pre-built release, here on github. This comes with what should be the obvious disclaimer that this is an alpha/beta-stage project and you should not trust important systems with it.
+ Version 1.0.0-Beta-2 has been tagged as a release on github, for testing. This comes with what should be the
+ obvious disclaimer that this is a beta-stage project and you should not trust important systems with it.\
+ That said, I'm running it on my home lab as well as a non-critical production system at work, and it's
+ behaving as expected for my use cases, so far. 
  
  ## Project Organization
  
@@ -56,7 +59,11 @@
      make
      make install
 
- This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any replaced configuration files along the way.
+ This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a
+ combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to
+ `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`,
+ and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any
+ replaced configuration files along the way.
 
  To clean build artifacts, run `make clean`, which removes the release build files and intermediates,
  or `make extraclean`, which removes build artifacts and intermediates for all defined project
