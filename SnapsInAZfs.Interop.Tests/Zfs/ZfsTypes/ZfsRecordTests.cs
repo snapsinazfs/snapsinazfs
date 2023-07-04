@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -32,12 +32,6 @@ public class ZfsRecordTests
         Assert.That( dataset.Snapshots, Contains.Key( period ) );
         Assert.That( dataset.Snapshots[ period ], Contains.Key( snapshot.Name ) );
         Assert.That( dataset.Snapshots[ period ], Contains.Value( snapshot ) );
-    }
-
-    [Test]
-    public void Deconstruct( )
-    {
-        Assert.Ignore( "Test not implemented" );
     }
 
     [Test]

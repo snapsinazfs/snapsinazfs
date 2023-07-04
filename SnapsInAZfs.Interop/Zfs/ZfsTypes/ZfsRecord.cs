@@ -292,14 +292,6 @@ public record ZfsRecord
         return hashCode.ToHashCode( );
     }
 
-    //public void Deconstruct( out string name, out string kind, out bool isPoolRoot, out ZfsRecord poolRoot )
-    //{
-    //    name = Name;
-    //    kind = Kind;
-    //    isPoolRoot = IsPoolRoot;
-    //    poolRoot = PoolRoot;
-    //}
-
     public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
