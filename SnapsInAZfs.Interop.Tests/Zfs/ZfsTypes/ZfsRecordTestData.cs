@@ -4,6 +4,7 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -18,158 +19,8 @@ public class ZfsRecordTestData
 {
     private static readonly List<UpdatePropertyTestCase> UpdatePropertyTestCasesField = new( );
 
-    public static IEnumerable<IsSnapshotNeededTestCase> IsDailySnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2023, 7, 2, 23, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 7, 3, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 3, 23, 59, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 4, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 5, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsDailySnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsDailySnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsDailySnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsDailySnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsDailySnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsDailySnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static IEnumerable<IsSnapshotNeededTestCase> IsFrequentSnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2023, 7, 3, 1, 14, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 7, 3, 1, 15, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 3, 1, 20, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 3, 1, 30, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 3, 1, 31, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsFrequentSnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsFrequentSnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsFrequentSnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsFrequentSnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsFrequentSnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsFrequentSnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static IEnumerable<IsSnapshotNeededTestCase> IsHourlySnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2023, 7, 3, 0, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 7, 3, 1, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 3, 1, 30, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 3, 2, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 3, 3, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsHourlySnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsHourlySnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsHourlySnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsHourlySnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsHourlySnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsHourlySnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static IEnumerable<IsSnapshotNeededTestCase> IsMonthlySnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2023, 6, 30, 23, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 7, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 31, 23, 59, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 8, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 9, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsMonthlySnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsMonthlySnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsMonthlySnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsMonthlySnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsMonthlySnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsMonthlySnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static IEnumerable<IsSnapshotNeededTestCase> IsWeeklySnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2023, 7, 2, 23, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 7, 3, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 7, 9, 23, 59, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2023, 7, 10, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2023, 7, 11, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsWeeklySnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsWeeklySnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsWeeklySnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsWeeklySnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsWeeklySnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsWeeklySnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static IEnumerable<IsSnapshotNeededTestCase> IsYearlySnapshotNeededTestCases
-    {
-        get
-        {
-            if ( OriginalValidDatasets.IsEmpty )
-            {
-                // ReSharper disable once AsyncConverter.AsyncWait
-                SetUpTestDataAsync( ).Wait( 5000 );
-            }
-
-            DateTimeOffset significantlyBeforeLatest = new( 2020, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset slightlyBeforeLatest = new( 2022, 12, 31, 23, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset sameAsLatest = new( 2023, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestWithinPeriod = new( 2023, 12, 31, 23, 59, 59, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestExactlyAtPeriod = new( 2024, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            DateTimeOffset afterLatestBeyondPeriod = new( 2025, 1, 1, 0, 0, 0, 0, 0, CultureInfo.CurrentCulture.Calendar, TimeSpan.FromHours( -7 ) );
-            yield return new( "IsDailySnapshotNeeded_significantlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], significantlyBeforeLatest, false );
-            yield return new( "IsDailySnapshotNeeded_slightlyBeforeLatest", OriginalValidDatasets[ "testpool/fs1" ], slightlyBeforeLatest, false );
-            yield return new( "IsDailySnapshotNeeded_sameAsLatest", OriginalValidDatasets[ "testpool/fs1" ], sameAsLatest, false );
-            yield return new( "IsDailySnapshotNeeded_afterLatestWithinPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestWithinPeriod, false );
-            yield return new( "IsDailySnapshotNeeded_afterLatestExactlyAtPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestExactlyAtPeriod, true );
-            yield return new( "IsDailySnapshotNeeded_afterLatestBeyondPeriod", OriginalValidDatasets[ "testpool/fs1" ], afterLatestBeyondPeriod, true );
-        }
-    }
-
-    public static ConcurrentDictionary<string, ZfsRecord> OriginalValidDatasets { get; } = new( );
-    public static ConcurrentDictionary<string, Snapshot> OriginalValidSnapshots { get; } = new( );
+    public static Dictionary<string, ZfsRecord> OriginalValidDatasets { get; } = new( );
+    public static Dictionary<string, Snapshot> OriginalValidSnapshots { get; } = new( );
 
     public static SnapsInAZfsSettings Settings { get; set; }
 
@@ -196,30 +47,57 @@ public class ZfsRecordTestData
     private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_Int { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<int>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = p.Value + 100 } ) );
     private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_String { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<string>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = $"{p.Value} MODIFIED" } ) );
 
-    public static readonly ZfsRecord StandardValidTestFileSystem = new(
-        "validTestFileSystem",
-        ZfsPropertyValueConstants.FileSystem,
-        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.EnabledPropertyName ],
-        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TakeSnapshotsPropertyName ],
-        (ZfsProperty<bool>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.PruneSnapshotsPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ],
-        (ZfsProperty<DateTimeOffset>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ],
-        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.RecursionPropertyName ],
-        (ZfsProperty<string>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.TemplatePropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ],
-        (ZfsProperty<int>)IZfsProperty.DefaultDatasetProperties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ],
-        107374182400L, // 100 GiB
-        10737418240L   // 10 GiB
-    );
+    public static ZfsRecord StandardValidTestFileSystem { get; } =
+        new(
+            "testroot",
+            ZfsPropertyValueConstants.FileSystem,
+            new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
+            107374182400L, // 100 GiB
+            10737418240L   // 10 GiB
+        );
+
+    public static ZfsRecord TestFileSystem { get; } =
+        new(
+            "testroot",
+            ZfsPropertyValueConstants.FileSystem,
+            new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
+            107374182400L, // 100 GiB
+            10737418240L   // 10 GiB
+        );
 
     public static readonly ZfsRecord StandardValidTestVolume = new(
         "validTestVolume",
@@ -406,15 +284,13 @@ public class ZfsRecordTestData
     }
 
     [OneTimeSetUp]
-    public static async Task SetUpTestDataAsync( )
+    public static void SetUpTestData( )
     {
         IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
                                                .AddJsonFile( "SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "SnapsInAZfs.local.json", true, false )
                                                .Build( );
         Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-        IZfsCommandRunner commandRunner = new TestCommandRunner( );
-        await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( Settings, OriginalValidDatasets, OriginalValidSnapshots );
     }
 
     private static void ComposeDatasetPathsAtLevel( int currentPathDepth, int subPaths, int pathComponentLength, bool valid, ref NameValidationTestCase[] names )

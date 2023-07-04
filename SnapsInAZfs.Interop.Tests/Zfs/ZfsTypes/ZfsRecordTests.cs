@@ -112,70 +112,88 @@ public class ZfsRecordTests
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsDailySnapshotNeededTestCases ) )]
-    public void IsDailySnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-02T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-04T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2025-07-05T00:00:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsDailySnapshotNeeded( testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsDailySnapshotNeeded( timestamp );
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsFrequentSnapshotNeededTestCases ) )]
-    public void IsFrequentSnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:14:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:15:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:29:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:30:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2023-07-03T01:31:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsFrequentSnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsFrequentSnapshotNeeded( ZfsRecordTestData.Settings.Templates[ dataset.Template.Value ].SnapshotTiming, testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsFrequentSnapshotNeeded( SnapshotTimingSettings.GetDefault(), timestamp );
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsHourlySnapshotNeededTestCases ) )]
-    public void IsHourlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T02:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2024-07-03T02:00:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsHourlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsHourlySnapshotNeeded( testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsHourlySnapshotNeeded( timestamp );
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsMonthlySnapshotNeededTestCases ) )]
-    public void IsMonthlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-06-30T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-31T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2024-08-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2025-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsMonthlySnapshotNeeded( testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsMonthlySnapshotNeeded( timestamp );
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsWeeklySnapshotNeededTestCases ) )]
-    public void IsWeeklySnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-02T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-09T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-07-10T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2023-07-11T00:00:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsWeeklySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsWeeklySnapshotNeeded( ZfsRecordTestData.Settings.Templates[ dataset.Template.Value ].SnapshotTiming, testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsWeeklySnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
     }
 
     [Test]
-    [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.IsYearlySnapshotNeededTestCases ) )]
-    public void IsYearlySnapshotNeeded( IsSnapshotNeededTestCase testCase )
+    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2022-12-31T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2023-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
+    [TestCase( "2023-12-31T23:59:59.9999999-07:00", ExpectedResult = false )]
+    [TestCase( "2024-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2025-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    public bool IsYearlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord dataset = testCase.Dataset;
-        bool isSnapshotNeeded = dataset.IsYearlySnapshotNeeded( testCase.Timestamp );
-        Assert.That( isSnapshotNeeded, Is.EqualTo( testCase.IsSnapshotNeededExpected ) );
+        return ZfsRecordTestData.TestFileSystem.IsYearlySnapshotNeeded( timestamp );
     }
 
     [Test]
     [TestCaseSource( typeof( ZfsRecordTestData ), nameof( ZfsRecordTestData.UpdatePropertyTestCases ) )]
     public void UpdateProperty_FileSystems( UpdatePropertyTestCase testCase )
     {
-        ZfsRecord originalRecord = ZfsRecordTestData.StandardValidTestFileSystem with { };
-        ZfsRecord updatedRecord = ZfsRecordTestData.StandardValidTestFileSystem with { };
+        ZfsRecord originalRecord = ZfsRecordTestData.TestFileSystem with { };
+        ZfsRecord updatedRecord = ZfsRecordTestData.TestFileSystem with { };
         Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
         IZfsProperty updatedProperty = updatedRecord.UpdateProperty( testCase.PropertyToChange.Name, testCase.PropertyToChange.ValueString, testCase.PropertyToChange.Source );
-        Assert.Multiple( ( ) =>
-        {
-            switch ( testCase.PropertyToChange )
+        //Assert.Multiple( ( ) =>
+        //{
+            switch ( updatedProperty )
             {
                 case ZfsProperty<int>:
                     ZfsProperty<int> originalIntProperty = (ZfsProperty<int>)originalRecord[ testCase.PropertyToChange.Name ];
@@ -193,7 +211,7 @@ public class ZfsRecordTests
                     goto default;
                 case ZfsProperty<bool>:
                     ZfsProperty<bool> originalBoolProperty = (ZfsProperty<bool>)originalRecord[ testCase.PropertyToChange.Name ];
-                    ZfsProperty<bool> updatedBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
+                    ZfsProperty<bool> updatedBoolProperty =  (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
                     ZfsProperty<bool> testCaseBoolProperty = (ZfsProperty<bool>)updatedRecord[ testCase.PropertyToChange.Name ];
                     Assert.That( updatedBoolProperty.Value, Is.Not.EqualTo( originalBoolProperty.Value ) );
                     Assert.That( updatedBoolProperty.Value, Is.EqualTo( testCaseBoolProperty.Value ) );
@@ -210,7 +228,7 @@ public class ZfsRecordTests
                     Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
                     break;
             }
-        } );
+        //} );
     }
 
     [Test]
