@@ -91,5 +91,4 @@ public interface IZfsProperty
     string SetString { get; }
     string Source { get; }
     string ValueString { get; }
-    Type ValueType { get; }
 }
