@@ -402,6 +402,11 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastFrequentSnapshotTimestamp.Value )
+        {
+            return false;
+        }
+
         int currentFrequentPeriodOfHour = template.GetPeriodOfHour( timestamp );
         int lastFrequentSnapshotPeriodOfHour = template.GetPeriodOfHour( LastFrequentSnapshotTimestamp.Value );
         double minutesSinceLastFrequentSnapshot = ( timestamp - LastFrequentSnapshotTimestamp.Value ).TotalMinutes;
@@ -442,6 +447,10 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if hourly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
+        if ( timestamp < LastHourlySnapshotTimestamp.Value )
+        {
+            return false;
+        }
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp.Value;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
