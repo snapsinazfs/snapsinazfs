@@ -1,8 +1,7 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
-using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 
@@ -10,7 +9,8 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
 [TestFixture]
 [TestOf( typeof( ZfsRecord ) )]
-[Order( 100 )]
+[Category( "General" )]
+[Parallelizable( ParallelScope.Self )]
 public class ZfsRecordTests_Constructors
 {
     [Test]
@@ -23,9 +23,6 @@ public class ZfsRecordTests_Constructors
     public void Constructor_ZfsRecord_Name_Kind_ExpectedPropertiesSet( string name, string kind )
     {
         ZfsRecord dataset = new( name, kind );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Is.Not.Null );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Is.InstanceOf<ConcurrentDictionary<string, ZfsRecord>>( ) );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Does.Not.ContainKey( name ) );
         Assert.That( dataset, Is.Not.Null );
         Assert.That( dataset, Is.InstanceOf<ZfsRecord>( ) );
         Assert.Multiple( ( ) =>
@@ -60,9 +57,8 @@ public class ZfsRecordTests_Constructors
             Assert.That( dataset.SnapshotRetentionWeekly, Is.EqualTo( new ZfsProperty<int>( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local ) ) );
             Assert.That( dataset.SnapshotRetentionYearly, Is.EqualTo( new ZfsProperty<int>( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local ) ) );
             Assert.That( dataset.TakeSnapshots, Is.EqualTo( new ZfsProperty<bool>( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local ) ) );
-            Assert.That( dataset.Template, Is.EqualTo( new ZfsProperty<string>( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) ) );
+            Assert.That( dataset.Template, Is.EqualTo( new ZfsProperty<string>( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, ZfsPropertySourceConstants.Local ) ) );
         } );
-        ZfsRecordTestHelpers.TestDatasets[ dataset.Name ] = dataset;
     }
 
     [Test]
@@ -75,15 +71,10 @@ public class ZfsRecordTests_Constructors
     [TestCase( "testRootZfsRecord2/ChildVol1", ZfsPropertyValueConstants.Volume, "testRootZfsRecord2" )]
     public void Constructor_ZfsRecord_Name_Kind_Parent_ExpectedPropertiesSet( string name, string kind, string parentName )
     {
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Is.Not.Null );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Is.InstanceOf<ConcurrentDictionary<string, ZfsRecord>>( ) );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Is.Not.Empty );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Does.ContainKey( parentName ) );
-        Assume.That( ZfsRecordTestHelpers.TestDatasets, Does.Not.ContainKey( name ) );
-        ZfsRecord parentDataset = ZfsRecordTestHelpers.TestDatasets[ parentName ];
+        ZfsRecord parentDataset = new( parentName, ZfsPropertyValueConstants.FileSystem );
         Assume.That( parentDataset, Is.Not.Null );
         Assume.That( parentDataset, Is.TypeOf<ZfsRecord>( ) );
-        ZfsRecord dataset = new( name, kind, ZfsRecordTestHelpers.TestDatasets[ parentName ] );
+        ZfsRecord dataset = new( name, kind, parentDataset );
         Assert.Multiple( ( ) =>
         {
             Assert.That( dataset, Is.Not.Null );
@@ -121,8 +112,7 @@ public class ZfsRecordTests_Constructors
             Assert.That( dataset.SnapshotRetentionWeekly, Is.EqualTo( new ZfsProperty<int>( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local ) ) );
             Assert.That( dataset.SnapshotRetentionYearly, Is.EqualTo( new ZfsProperty<int>( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local ) ) );
             Assert.That( dataset.TakeSnapshots, Is.EqualTo( new ZfsProperty<bool>( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local ) ) );
-            Assert.That( dataset.Template, Is.EqualTo( new ZfsProperty<string>( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ) ) );
+            Assert.That( dataset.Template, Is.EqualTo( new ZfsProperty<string>( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, ZfsPropertySourceConstants.Local ) ) );
         } );
-        ZfsRecordTestHelpers.TestDatasets[ dataset.Name ] = dataset;
     }
 }

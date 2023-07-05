@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -8,11 +8,8 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
 [TestFixture]
-[Order( 40 )]
 [Category( "General" )]
-[FixtureLifeCycle( LifeCycle.SingleInstance )]
-[NonParallelizable]
-[Parallelizable( ParallelScope.Children )]
+[Parallelizable]
 [TestOf( typeof( ZfsRecord ) )]
 public class ZfsRecordTests
 {
@@ -36,12 +33,13 @@ public class ZfsRecordTests
     [Combinatorial]
     public void UpdateProperty_Bool( [Values( ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName )] string propertyName, [Values] bool propertyValue, [Values( ZfsPropertySourceConstants.Local, "inherited from testRoot" )] string propertySource )
     {
-        ZfsRecord originalRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
-        ZfsRecord updatedRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
+        ZfsRecord originalRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord updatedRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         ZfsProperty<bool> newTestCaseProperty = new( propertyName, propertyValue, propertySource );
         ZfsProperty<bool> originalBoolProperty = (ZfsProperty<bool>)originalRecord[ propertyName ];
 
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
+        Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
 
         ZfsProperty<bool> updatedBoolProperty = updatedRecord.UpdateProperty( propertyName, propertyValue, propertySource );
 
@@ -88,12 +86,13 @@ public class ZfsRecordTests
     public void UpdateProperty_DateTimeOffset( [Values( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName )] string propertyName, [ValueSource( nameof( UpdateProperty_DateTimeOffset_Values ) )] string propertyValueString, [Values( ZfsPropertySourceConstants.Local, "inherited from testRoot" )] string propertySource )
     {
         DateTimeOffset propertyValue = DateTimeOffset.ParseExact( propertyValueString, "O", DateTimeFormatInfo.CurrentInfo );
-        ZfsRecord originalRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
-        ZfsRecord updatedRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
+        ZfsRecord originalRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord updatedRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         ZfsProperty<DateTimeOffset> newTestCaseProperty = new( propertyName, propertyValue, propertySource );
         ZfsProperty<DateTimeOffset> originalDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)originalRecord[ propertyName ];
 
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
+        Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
 
         ZfsProperty<DateTimeOffset> updatedDateTimeOffsetProperty = updatedRecord.UpdateProperty( propertyName, propertyValue, propertySource );
 
@@ -139,12 +138,13 @@ public class ZfsRecordTests
     [Combinatorial]
     public void UpdateProperty_Int( [Values( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName )] string propertyName, [Values( 0, 1, 2, 10, 100 )] int propertyValue, [Values( ZfsPropertySourceConstants.Local, "inherited from testRoot" )] string propertySource )
     {
-        ZfsRecord originalRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
-        ZfsRecord updatedRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
+        ZfsRecord originalRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord updatedRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         ZfsProperty<int> newTestCaseProperty = new( propertyName, propertyValue, propertySource );
         ZfsProperty<int> originalIntProperty = (ZfsProperty<int>)originalRecord[ propertyName ];
 
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
+        Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
 
         ZfsProperty<int> updatedIntProperty = updatedRecord.UpdateProperty( propertyName, propertyValue, propertySource );
 
@@ -190,12 +190,13 @@ public class ZfsRecordTests
     [Combinatorial]
     public void UpdateProperty_String( [Values( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyNames.TemplatePropertyName )] string propertyName, [Values( "default", "testTemplate", "template with spaces" )] string propertyValue, [Values( ZfsPropertySourceConstants.Local, "inherited from testRoot" )] string propertySource )
     {
-        ZfsRecord originalRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
-        ZfsRecord updatedRecord = ZfsRecordTestHelpers.TestRootFileSystemFs1 with { };
+        ZfsRecord originalRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord updatedRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         ZfsProperty<string> newTestCaseProperty = new( propertyName, propertyValue, propertySource );
         ZfsProperty<string> originalStringProperty = (ZfsProperty<string>)originalRecord[ propertyName ];
 
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
+        Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
 
         ZfsProperty<string> updatedStringProperty = (ZfsProperty<string>)updatedRecord.UpdateProperty( propertyName, propertyValue, propertySource );
 

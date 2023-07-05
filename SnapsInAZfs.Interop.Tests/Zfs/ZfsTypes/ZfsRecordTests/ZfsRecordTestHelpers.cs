@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -16,30 +16,20 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 [Order( 1 )]
 public class ZfsRecordTestHelpers
 {
-    private static ZfsRecord? _testRootFileSystem;
-
-    private static ZfsRecord? _testRootFileSystemFs1;
-
-    private static ZfsRecord? _testRootFileSystemVol1;
-
-    public static Dictionary<string, ZfsRecord> OriginalValidDatasets { get; } = new( );
-    public static Dictionary<string, Snapshot> OriginalValidSnapshots { get; } = new( );
-
     public static SnapsInAZfsSettings Settings { get; set; }
-
-    public static ZfsRecord StandardValidTestFileSystem { get; } =
+    public static ZfsRecord GetNewTestRootFileSystem( ) =>
         new(
             "testRoot",
             ZfsPropertyValueConstants.FileSystem,
             new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
-            new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
@@ -53,33 +43,9 @@ public class ZfsRecordTestHelpers
             10737418240L   // 10 GiB
         );
 
-    public static ZfsRecord TestRootFileSystem => _testRootFileSystem ??= new(
-        "testRoot",
-        ZfsPropertyValueConstants.FileSystem,
-        new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-        new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
-        107374182400L, // 100 GiB
-        10737418240L   // 10 GiB
-    );
-
-    public static ZfsRecord TestRootFileSystemFs1 =>
-        _testRootFileSystemFs1 ??= new(
+    public static ZfsRecord GetNewTestRootFileSystemFs1( )
+    {
+        return new(
             "testRoot/fs1",
             ZfsPropertyValueConstants.FileSystem,
             new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
@@ -102,11 +68,12 @@ public class ZfsRecordTestHelpers
             new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
             107374182400L, // 100 GiB
             10737418240L,  // 10 GiB
-            TestRootFileSystem
+            GetNewTestRootFileSystem( )
         );
+    }
 
-    public static ZfsRecord TestRootFileSystemVol1 =>
-        _testRootFileSystemVol1 ??= new(
+    public static ZfsRecord GetNewTestRootFileSystemVol1( ) =>
+        new(
             "testRoot/vol1",
             ZfsPropertyValueConstants.Volume,
             new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
@@ -129,7 +96,7 @@ public class ZfsRecordTestHelpers
             new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
             107374182400L, // 100 GiB
             10737418240L,  // 10 GiB
-            TestRootFileSystem
+            GetNewTestRootFileSystem( )
         );
 
     public static readonly ZfsRecord StandardValidTestVolume = new(
@@ -156,8 +123,6 @@ public class ZfsRecordTestHelpers
         107374182400L, // 100 GiB
         10737418240L   // 10 GiB
     );
-
-    public static readonly ConcurrentDictionary<string, ZfsRecord> TestDatasets = new( );
 
     /// <summary>All valid characters in a ZFS dataset identifier component</summary>
     private const string AllowedIdentifierComponentCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-:.";
