@@ -152,7 +152,7 @@ uninstall-service:
 test:	test-everything
 
 test-everything:
-	dotnet test --configuration=Release-R2R --verbosity=normal
+	dotnet test --configuration=Release-R2R --verbosity=normal --nologo
 
 save-snapsinazfs-zfs-properties:
 	@test ! -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
