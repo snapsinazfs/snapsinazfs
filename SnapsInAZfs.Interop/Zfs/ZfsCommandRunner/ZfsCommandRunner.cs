@@ -433,7 +433,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
-    private bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    private static bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
         if ( properties.Length == 0 )
         {

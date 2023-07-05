@@ -4,7 +4,7 @@
 
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes;
+namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsPropertyTests;
 
 [TestFixture]
 [Category( "General" )]

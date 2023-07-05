@@ -66,6 +66,7 @@ dotnet_diagnostic.CA1001.severity = warning
 dotnet_diagnostic.CA1805.severity = warning
 dotnet_diagnostic.IDE0004.severity = suggestion
 dotnet_diagnostic.IDE0008.severity = warning
+csharp_style_prefer_readonly_struct_member = true:suggestion
 
 [*.{cs,vb}]
 #### Naming styles ####
@@ -76,7 +77,7 @@ dotnet_naming_rule.interface_should_be_begins_with_i.severity = suggestion
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
 dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
 
-dotnet_naming_rule.types_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.types_should_be_pascal_case.severity = silent
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
 dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
 

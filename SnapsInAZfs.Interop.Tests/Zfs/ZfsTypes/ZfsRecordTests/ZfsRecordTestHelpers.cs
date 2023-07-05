@@ -4,52 +4,32 @@
 
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Configuration;
-using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 
-namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes;
+namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
 [SetUpFixture]
 [FixtureLifeCycle( LifeCycle.SingleInstance )]
+[NonParallelizable]
 [Order( 1 )]
-public class ZfsRecordTestData
+public class ZfsRecordTestHelpers
 {
-    private static readonly List<UpdatePropertyTestCase> UpdatePropertyTestCasesField = new( );
+    private static ZfsRecord? _testRootFileSystem;
+
+    private static ZfsRecord? _testRootFileSystemFs1;
+
+    private static ZfsRecord? _testRootFileSystemVol1;
 
     public static Dictionary<string, ZfsRecord> OriginalValidDatasets { get; } = new( );
     public static Dictionary<string, Snapshot> OriginalValidSnapshots { get; } = new( );
 
     public static SnapsInAZfsSettings Settings { get; set; }
 
-    public static List<UpdatePropertyTestCase> UpdatePropertyTestCases
-    {
-        get
-        {
-            if ( UpdatePropertyTestCasesField.Count != 0 )
-            {
-                return UpdatePropertyTestCasesField;
-            }
-
-            // ReSharper disable once AsyncConverter.AsyncWait
-            UpdatePropertyTestCasesField.AddRange( UpdatePropertyTestCases_Bool );
-            UpdatePropertyTestCasesField.AddRange( UpdatePropertyTestCases_DateTimeOffset );
-            UpdatePropertyTestCasesField.AddRange( UpdatePropertyTestCases_Int );
-            UpdatePropertyTestCasesField.AddRange( UpdatePropertyTestCases_String );
-            return UpdatePropertyTestCasesField;
-        }
-    }
-
-    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_Bool { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<bool>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = !p.Value } ) );
-    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_DateTimeOffset { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<DateTimeOffset>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = p.Value.AddMinutes( 15 ) } ) );
-    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_Int { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<int>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = p.Value + 100 } ) );
-    private static IEnumerable<UpdatePropertyTestCase> UpdatePropertyTestCases_String { get; } = IZfsProperty.DefaultDatasetProperties.Values.OfType<ZfsProperty<string>>( ).Select( p => new UpdatePropertyTestCase( p.Name, p with { Value = $"{p.Value} MODIFIED" } ) );
-
     public static ZfsRecord StandardValidTestFileSystem { get; } =
         new(
-            "testroot",
+            "testRoot",
             ZfsPropertyValueConstants.FileSystem,
             new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
@@ -73,9 +53,34 @@ public class ZfsRecordTestData
             10737418240L   // 10 GiB
         );
 
-    public static ZfsRecord TestFileSystem { get; } =
-        new(
-            "testroot",
+    public static ZfsRecord TestRootFileSystem => _testRootFileSystem ??= new(
+        "testRoot",
+        ZfsPropertyValueConstants.FileSystem,
+        new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+        new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
+        107374182400L, // 100 GiB
+        10737418240L   // 10 GiB
+    );
+
+    public static ZfsRecord TestRootFileSystemFs1 =>
+        _testRootFileSystemFs1 ??= new(
+            "testRoot/fs1",
             ZfsPropertyValueConstants.FileSystem,
             new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
@@ -96,7 +101,35 @@ public class ZfsRecordTestData
             new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
             new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
             107374182400L, // 100 GiB
-            10737418240L   // 10 GiB
+            10737418240L,  // 10 GiB
+            TestRootFileSystem
+        );
+
+    public static ZfsRecord TestRootFileSystemVol1 =>
+        _testRootFileSystemVol1 ??= new(
+            "testRoot/vol1",
+            ZfsPropertyValueConstants.Volume,
+            new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000-07:00", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
+            107374182400L, // 100 GiB
+            10737418240L,  // 10 GiB
+            TestRootFileSystem
         );
 
     public static readonly ZfsRecord StandardValidTestVolume = new(
@@ -124,6 +157,8 @@ public class ZfsRecordTestData
         10737418240L   // 10 GiB
     );
 
+    public static readonly ConcurrentDictionary<string, ZfsRecord> TestDatasets = new( );
+
     /// <summary>All valid characters in a ZFS dataset identifier component</summary>
     private const string AllowedIdentifierComponentCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-:.";
 
@@ -131,7 +166,10 @@ public class ZfsRecordTestData
     ///     All valid characters in a ZFS snapshot identifier component (same as
     ///     <see cref="AllowedIdentifierComponentCharacters" /> plus '@')
     /// </summary>
+#pragma warning disable IDE0052 //I'm keeping this here for reference
+    // ReSharper disable once UnusedMember.Local
     private const string AllowedSnapshotIdentifierComponentCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-:.@";
+#pragma warning restore IDE0052
 
     /// <summary>
     ///     All illegal characters in a ZFS dataset identifier (values from 0 to 255, except those in
@@ -144,144 +182,6 @@ public class ZfsRecordTestData
     ///     <see cref="AllowedSnapshotIdentifierComponentCharacters" />)
     /// </summary>
     private const string IllegalSnapshotIdentifierComponentCharacters = "\x0\x1\x2\x3\x4\x5\x6\x7\x8\x9\xA\xB\xC\xD\xE\xF\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1A\x1B\x1C\x1D\x1E\x1F\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2A\x2B\x2C\x2F\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3B\x3C\x3D\x3E\x3F\x5B\x5C\x5D\x5E\x60\x7B\x7C\x7D\x7E\x7F\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8A\x8B\x8C\x8D\x8E\x8F\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9A\x9B\x9C\x9D\x9E\x9F\xA0\xA1\xA2\xA3\xA4\xA5\xA6\xA7\xA8\xA9\xAA\xAB\xAC\xAD\xAE\xAF\xB0\xB1\xB2\xB3\xB4\xB5\xB6\xB7\xB8\xB9\xBA\xBB\xBC\xBD\xBE\xBF\xC0\xC1\xC2\xC3\xC4\xC5\xC6\xC7\xC8\xC9\xCA\xCB\xCC\xCD\xCE\xCF\xD0\xD1\xD2\xD3\xD4\xD5\xD6\xD7\xD8\xD9\xDA\xDB\xDC\xDD\xDE\xDF\xE0\xE1\xE2\xE3\xE4\xE5\xE6\xE7\xE8\xE9\xEA\xEB\xEC\xED\xEE\xEF\xF0\xF1\xF2\xF3\xF4\xF5\xF6\xF7\xF8\xF9\xFA\xFB\xFC\xFD\xFE\xFF";
-
-    /// <summary>
-    ///     This gets an array of dataset names that are guaranteed valid
-    /// </summary>
-    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
-    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
-    /// <param name="pathDepth">How many levels should be generated</param>
-    /// <returns>
-    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
-    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
-    ///     <paramref name="pathDepth" />
-    /// </returns>
-    /// <remarks>
-    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
-    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
-    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">
-    ///     If the total length of the longest possible string generated with the
-    ///     supplied parameters would exceed ZFS maximum identifier length (255)
-    /// </exception>
-    public static NameValidationTestCase[] GetIllegalDatasetCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
-    {
-        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, false, ref cases );
-        }
-
-        return cases;
-    }
-
-    /// <summary>
-    ///     This gets an array of fully-qualified snapshot names that are guaranteed invalid
-    /// </summary>
-    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
-    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
-    /// <param name="pathDepth">How many levels should be generated</param>
-    /// <returns>
-    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing an invalid
-    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
-    ///     <paramref name="pathDepth" />
-    /// </returns>
-    /// <exception cref="InvalidOperationException">
-    ///     If the total length of the longest possible string generated with the
-    ///     supplied parameters would exceed ZFS maximum identifier length (255)
-    /// </exception>
-    public static NameValidationTestCase[] GetIllegalSnapshotCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
-    {
-        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
-        }
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeSnapshotPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, false, ref cases );
-        }
-
-        return cases;
-    }
-
-    /// <summary>
-    ///     This gets an array of dataset names that are guaranteed valid
-    /// </summary>
-    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
-    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
-    /// <param name="pathDepth">How many levels should be generated</param>
-    /// <returns>
-    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
-    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
-    ///     <paramref name="pathDepth" />
-    /// </returns>
-    /// <remarks>
-    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
-    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
-    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">
-    ///     If the total length of the longest possible string generated with the
-    ///     supplied parameters would exceed ZFS maximum identifier length (255)
-    /// </exception>
-    public static NameValidationTestCase[] GetValidDatasetCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
-    {
-        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
-        }
-
-        return cases;
-    }
-
-    /// <summary>
-    ///     This gets an array of fully-qualified snapshot names that are guaranteed valid
-    /// </summary>
-    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
-    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
-    /// <param name="pathDepth">How many levels should be generated</param>
-    /// <returns>
-    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
-    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
-    ///     <paramref name="pathDepth" />
-    /// </returns>
-    /// <remarks>
-    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
-    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
-    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
-    /// </remarks>
-    /// <exception cref="InvalidOperationException">
-    ///     If the total length of the longest possible string generated with the
-    ///     supplied parameters would exceed ZFS maximum identifier length (255)
-    /// </exception>
-    public static NameValidationTestCase[] GetValidSnapshotCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
-    {
-        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
-        }
-
-        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
-        {
-            ComposeSnapshotPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
-        }
-
-        return cases;
-    }
-
-    public static string GetValidZfsPathComponent( int pathComponentLength )
-    {
-        return TestContext.CurrentContext.Random.GetString( pathComponentLength, AllowedIdentifierComponentCharacters );
-    }
 
     [OneTimeSetUp]
     public static void SetUpTestData( )
@@ -362,4 +262,79 @@ public class ZfsRecordTestData
     {
         return $"@{TestContext.CurrentContext.Random.GetString( snapshotNameComponentLength - 1, AllowedIdentifierComponentCharacters )}";
     }
+
+    /// <summary>
+    ///     This gets an array of fully-qualified snapshot names that are guaranteed invalid
+    /// </summary>
+    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
+    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
+    /// <param name="pathDepth">How many levels should be generated</param>
+    /// <returns>
+    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing an invalid
+    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
+    ///     <paramref name="pathDepth" />
+    /// </returns>
+    /// <exception cref="InvalidOperationException">
+    ///     If the total length of the longest possible string generated with the
+    ///     supplied parameters would exceed ZFS maximum identifier length (255)
+    /// </exception>
+    public static NameValidationTestCase[] GetIllegalSnapshotCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
+    {
+        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeSnapshotPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, false, ref cases );
+        }
+
+        return cases;
+    }
+
+    /// <summary>
+    ///     This gets an array of fully-qualified snapshot names that are guaranteed valid
+    /// </summary>
+    /// <param name="pathsPerLevel">The number of strings to generate for each path level</param>
+    /// <param name="pathComponentLength">The pathComponentLength of each path component</param>
+    /// <param name="pathDepth">How many levels should be generated</param>
+    /// <returns>
+    ///     An array of <paramref name="pathsPerLevel" /> * <paramref name="pathDepth" /> strings, each representing a valid
+    ///     ZFS dataset identifier, with <paramref name="pathsPerLevel" /> datasets at each level, up to
+    ///     <paramref name="pathDepth" />
+    /// </returns>
+    /// <remarks>
+    ///     This is non-exhaustive, because it does not include names that have spaces in them, but it is guaranteed to ALWAYS
+    ///     return valid identifiers. Any failures indicate a problem with validation. Test cases that violate a path length
+    ///     check will be ignored, instead of fail, since that indicates an invalid test case - not a failure.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    ///     If the total length of the longest possible string generated with the
+    ///     supplied parameters would exceed ZFS maximum identifier length (255)
+    /// </exception>
+    public static NameValidationTestCase[] GetValidSnapshotCases( int pathsPerLevel = 3, int pathComponentLength = 8, int pathDepth = 3 )
+    {
+        NameValidationTestCase[] cases = new NameValidationTestCase[pathsPerLevel * pathDepth];
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeDatasetPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
+
+        for ( int currentPathDepth = 1; currentPathDepth <= pathDepth; currentPathDepth++ )
+        {
+            ComposeSnapshotPathsAtLevel( currentPathDepth, pathsPerLevel, pathComponentLength, true, ref cases );
+        }
+
+        return cases;
+    }
+
+    public static string GetValidZfsPathComponent( int pathComponentLength )
+    {
+        return TestContext.CurrentContext.Random.GetString( pathComponentLength, AllowedIdentifierComponentCharacters );
+    }
+#pragma warning restore NUnit1028
 }
