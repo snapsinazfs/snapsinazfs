@@ -784,7 +784,7 @@ public record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    public IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
+    public IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
@@ -840,7 +840,7 @@ public record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    public ZfsProperty<bool> UpdateProperty( string propertyName, bool propertyValue, string propertySource )
+    public ZfsProperty<bool> UpdateProperty( string propertyName, bool propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
@@ -896,7 +896,7 @@ public record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    public ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
+    public ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
@@ -960,7 +960,7 @@ public record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    public ZfsProperty<int> UpdateProperty( string propertyName, int propertyValue, string propertySource )
+    public ZfsProperty<int> UpdateProperty( string propertyName, int propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
