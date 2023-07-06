@@ -2,6 +2,7 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsPropertyTests;
@@ -135,5 +136,19 @@ public class ZfsPropertyTests
         IZfsProperty propertyBBoxed = propertyB;
         Assert.That( propertyABoxed, Is.Not.SameAs( propertyBBoxed ) );
         Assert.That( propertyABoxed, Is.Not.SameAs( propertyABoxedCopy ) );
+    }
+
+    [Test]
+    [TestCase( "true", ExpectedResult = true )]
+    [TestCase( "false", ExpectedResult = false )]
+    public bool TryParseBool( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
+        Assert.That( success, Is.True );
+        Assert.That( property, Is.Not.Null );
+        Assert.That( property, Is.InstanceOf<ZfsProperty<bool>>( ) );
+        Assert.That( property.HasValue, Is.True );
+        return property!.Value.Value;
     }
 }
