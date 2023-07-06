@@ -126,8 +126,11 @@ public class ZfsRecordTests_Snapshots
                 break;
         }
 
-        Assert.That( lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot, Is.EqualTo( timestamp ) );
-        Assert.That( otherLastObservedSnapshotTimestampsAfterAddSnapshot, Has.All.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot, Is.EqualTo( timestamp ) );
+            Assert.That( otherLastObservedSnapshotTimestampsAfterAddSnapshot, Has.All.EqualTo( DateTimeOffset.UnixEpoch ) );
+        } );
     }
 
     [Test]

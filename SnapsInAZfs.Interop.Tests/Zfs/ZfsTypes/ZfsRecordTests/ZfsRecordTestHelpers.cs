@@ -2,22 +2,22 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
-using System.Collections.Concurrent;
 using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 
+// These necessarily have non-private accessibility because this is a helper class..
+#pragma warning disable NUnit1028
+
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
 [SetUpFixture]
-[FixtureLifeCycle( LifeCycle.SingleInstance )]
-[NonParallelizable]
 [Order( 1 )]
 public class ZfsRecordTestHelpers
 {
     public static SnapsInAZfsSettings Settings { get; set; }
-    public static ZfsRecord GetNewTestRootFileSystem( ) =>
+    internal static ZfsRecord GetNewTestRootFileSystem( ) =>
         new(
             "testRoot",
             ZfsPropertyValueConstants.FileSystem,
@@ -72,7 +72,7 @@ public class ZfsRecordTestHelpers
         );
     }
 
-    public static ZfsRecord GetNewTestRootFileSystemVol1( ) =>
+    internal static ZfsRecord GetNewTestRootFileSystemVol1( ) =>
         new(
             "testRoot/vol1",
             ZfsPropertyValueConstants.Volume,

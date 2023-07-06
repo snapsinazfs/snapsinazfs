@@ -122,15 +122,4 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         throw new NotImplementedException( );
     }
-
-    private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, string filePath )
-    {
-        using StreamReader rdr = File.OpenText( filePath );
-
-        while ( !rdr.EndOfStream )
-        {
-            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            ParseDatasetZfsGetLine( stringToParse, datasets );
-        }
-    }
 }
