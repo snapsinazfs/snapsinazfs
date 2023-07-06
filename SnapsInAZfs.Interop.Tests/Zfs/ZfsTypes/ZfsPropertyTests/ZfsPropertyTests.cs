@@ -4,6 +4,7 @@
 
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsPropertyTests;
 
@@ -174,6 +175,43 @@ public class ZfsPropertyTests
     }
 
     [Test]
+    public void TryParse_DateTimeOffset_OutputsExpectedValue( )
+    {
+        const string valueString = "2023-01-01T12:34:56.7891234";
+        DateTimeOffset value = DateTimeOffset.Parse( valueString );
+        RawProperty input = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, valueString, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.True );
+            Assert.That( property, Is.Not.Null );
+            Assert.That( property, Is.InstanceOf<ZfsProperty<DateTimeOffset>>( ) );
+            Assert.That( property.HasValue, Is.True );
+            Assert.That( property!.Value.Value, Is.EqualTo( value ) );
+        } );
+    }
+
+    [Test]
+    [TestCase( "true" )]
+    [TestCase( "abcdefg" )]
+    [TestCase( "1" )]
+    [TestCase( "!" )]
+    [TestCase( " " )]
+    [TestCase( "" )]
+    [TestCase( null )]
+    public void TryParse_DateTimeOffset_ReturnsFalseOnBadInput( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.False );
+            Assert.That( property, Is.Null );
+            Assert.That( property.HasValue, Is.False );
+        } );
+    }
+
+    [Test]
     [TestCase( "-100", ExpectedResult = -100 )]
     [TestCase( "-1", ExpectedResult = -1 )]
     [TestCase( "0", ExpectedResult = 0 )]
@@ -181,7 +219,7 @@ public class ZfsPropertyTests
     [TestCase( "100", ExpectedResult = 100 )]
     public int TryParse_Int_OutputsExpectedValue( string value )
     {
-        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
         Assert.Multiple( ( ) =>
         {
@@ -202,8 +240,51 @@ public class ZfsPropertyTests
     [TestCase( null )]
     public void TryParse_Int_ReturnsFalseOnBadInput( string value )
     {
-        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.False );
+            Assert.That( property, Is.Null );
+            Assert.That( property.HasValue, Is.False );
+        } );
+    }
+
+    [Test]
+    [TestCase( "-", ExpectedResult = SnapshotPeriodKind.NotSet )]
+    [TestCase( "frequently", ExpectedResult = SnapshotPeriodKind.Frequent )]
+    [TestCase( "hourly", ExpectedResult = SnapshotPeriodKind.Hourly )]
+    [TestCase( "daily", ExpectedResult = SnapshotPeriodKind.Daily )]
+    [TestCase( "weekly", ExpectedResult = SnapshotPeriodKind.Weekly )]
+    [TestCase( "monthly", ExpectedResult = SnapshotPeriodKind.Monthly )]
+    [TestCase( "yearly", ExpectedResult = SnapshotPeriodKind.Yearly )]
+    public SnapshotPeriodKind TryParse_SnapshotPeriod_OutputsExpectedValue( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.SnapshotPeriodPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<SnapshotPeriod>.TryParse( input, out ZfsProperty<SnapshotPeriod>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.True );
+            Assert.That( property, Is.Not.Null );
+            Assert.That( property, Is.InstanceOf<ZfsProperty<SnapshotPeriod>>( ) );
+            Assert.That( property.HasValue, Is.True );
+        } );
+        return property!.Value.Value.Kind;
+    }
+
+    [Test]
+    [TestCase( "true" )]
+    [TestCase( "Daily" )]
+    [TestCase( "abcdefg" )]
+    [TestCase( "!" )]
+    [TestCase( " " )]
+    [TestCase( "" )]
+    [TestCase( "NotSet" )]
+    [TestCase( null )]
+    public void TryParse_SnapshotPeriod_ReturnsFalseOnBadInput( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<SnapshotPeriod>.TryParse( input, out ZfsProperty<SnapshotPeriod>? property );
         Assert.Multiple( ( ) =>
         {
             Assert.That( success, Is.False );
