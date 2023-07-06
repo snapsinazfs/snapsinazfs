@@ -359,7 +359,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
         }
 
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hprt filesystem,volume {string.Join( ' ', baseDatasets.Keys )}" ).ConfigureAwait( true ) )
+        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hprt filesystem,volume {baseDatasets.Keys.ToSpaceSeparatedSingleLineString( )}" ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 

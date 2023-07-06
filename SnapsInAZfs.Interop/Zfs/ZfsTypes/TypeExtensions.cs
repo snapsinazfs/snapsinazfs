@@ -31,30 +31,20 @@ public static class TypeExtensions
     {
         int endIndex = value.LastIndexOfAny( new[] { '/', '@', '#' } );
 
-        if ( endIndex == -1 )
-        {
+        return endIndex == -1 ?
             // This is a pool root.
             // Returned value is the same as input
-            return value;
-        }
-
-        // This is a non-root dataset, snapshot, or bookmark
-        // Return its parent dataset name
-        string rootPath = value[ ..endIndex ];
-        return rootPath;
+            value :
+            // This is a non-root dataset, snapshot, or bookmark
+            // Return its parent dataset name
+            value[ ..endIndex ];
     }
 
     public static string GetZfsPathRoot( this string value )
     {
         int endIndex = value.IndexOfAny( new[] { '/', '@', '#' }, 1 );
 
-        if ( endIndex == -1 )
-        {
-            return value;
-        }
-
-        string rootPath = value[ ..endIndex ];
-        return rootPath;
+        return endIndex == -1 ? value : value[ ..endIndex ];
     }
 
     public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
