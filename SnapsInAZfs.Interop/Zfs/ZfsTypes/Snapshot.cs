@@ -148,12 +148,6 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
             Name.CompareTo( other.Name );
     }
 
-    public void Deconstruct( out string name, out ZfsRecord parentDataset )
-    {
-        name = Name;
-        parentDataset = ParentDataset;
-    }
-
     public string GetSnapshotOptionsStringForZfsSnapshot( )
     {
         return $"-o {SnapshotName.SetString} -o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
