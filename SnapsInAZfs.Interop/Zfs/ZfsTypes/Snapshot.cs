@@ -9,11 +9,31 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 public record Snapshot : ZfsRecord, IComparable<Snapshot>
 {
     public Snapshot( string name, SnapshotPeriodKind periodKind, DateTimeOffset timestamp, ZfsRecord parentDataset )
-        : base( name, ZfsPropertyValueConstants.Snapshot, parentDataset )
+        : this(
+            name,
+            parentDataset.Enabled,
+            parentDataset.TakeSnapshots,
+            parentDataset.PruneSnapshots,
+            parentDataset.LastFrequentSnapshotTimestamp,
+            parentDataset.LastHourlySnapshotTimestamp,
+            parentDataset.LastDailySnapshotTimestamp,
+            parentDataset.LastWeeklySnapshotTimestamp,
+            parentDataset.LastMonthlySnapshotTimestamp,
+            parentDataset.LastYearlySnapshotTimestamp,
+            parentDataset.Recursion,
+            parentDataset.Template,
+            parentDataset.SnapshotRetentionFrequent,
+            parentDataset.SnapshotRetentionHourly,
+            parentDataset.SnapshotRetentionDaily,
+            parentDataset.SnapshotRetentionWeekly,
+            parentDataset.SnapshotRetentionMonthly,
+            parentDataset.SnapshotRetentionYearly,
+            parentDataset.SnapshotRetentionPruneDeferral,
+            new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotPeriodPropertyName, periodKind, ZfsPropertySourceConstants.Local ),
+            new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local ),
+            parentDataset )
     {
-        SnapshotName = new( ZfsPropertyNames.SnapshotNamePropertyName, name, ZfsPropertySourceConstants.Local );
-        Period = new( ZfsPropertyNames.SnapshotPeriodPropertyName, periodKind, ZfsPropertySourceConstants.Local );
-        Timestamp = new( ZfsPropertyNames.SnapshotTimestampPropertyName, timestamp, ZfsPropertySourceConstants.Local );
     }
 
     public Snapshot( string snapName, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, ZfsProperty<string> snapshotName, ZfsProperty<SnapshotPeriod> snapshotPeriod, ZfsProperty<DateTimeOffset> snapshotTimestamp, ZfsRecord parent )
