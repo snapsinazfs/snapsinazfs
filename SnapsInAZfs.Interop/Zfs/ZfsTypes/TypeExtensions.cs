@@ -46,7 +46,7 @@ public static class TypeExtensions
 
     public static string GetZfsPathRoot( this string value )
     {
-        int endIndex = value.IndexOfAny(new[] { '/', '@', '#' });
+        int endIndex = value.IndexOfAny( new[] { '/', '@', '#' }, 1 );
 
         if ( endIndex == -1 )
         {
