@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 
@@ -49,7 +50,7 @@ public class ZfsRecordTests_Snapshots
         Assume.That( dataset.LastObservedMonthlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
         Assume.That( dataset.LastObservedYearlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
 
-        Snapshot snapshot = new( periodKind.ToString( "G" ), true, periodKind, timestamp, dataset );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, timestamp, dataset );
         dataset.AddSnapshot( snapshot );
 
         // Disable this because the filter it with an assumption in the test itself, above
@@ -144,7 +145,7 @@ public class ZfsRecordTests_Snapshots
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind periodKind )
     {
         ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
-        Snapshot snapshot = new( periodKind.ToString( "G" ), true, periodKind, DateTimeOffset.UnixEpoch, dataset );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, dataset );
         dataset.AddSnapshot( snapshot );
         Assert.Multiple( ( ) =>
         {
