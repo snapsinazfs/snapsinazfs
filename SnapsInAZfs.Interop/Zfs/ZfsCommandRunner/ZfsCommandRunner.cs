@@ -71,7 +71,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
+        snapshot = new( snapName, period.Kind, timestamp, ds );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
