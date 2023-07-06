@@ -170,7 +170,9 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         return $"{SnapshotName.Value}";
     }
 
-    public new IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource )
+    /// <exception cref="OverflowException">For <see langword="int" /> properties, <paramref name="propertyValue" /> represents
+    ///     a number less than <see cref="int.MinValue" /> or greater than <see cref="int.MaxValue" />.</exception>
+    public new IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
@@ -181,7 +183,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         };
     }
 
-    public ZfsProperty<SnapshotPeriod> UpdateProperty( string propertyName, SnapshotPeriod propertyValue, string propertySource )
+    public ZfsProperty<SnapshotPeriod> UpdateProperty( string propertyName, SnapshotPeriod propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
@@ -190,7 +192,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
         };
     }
 
-    public new ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource )
+    public new ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
     {
         return propertyName switch
         {
