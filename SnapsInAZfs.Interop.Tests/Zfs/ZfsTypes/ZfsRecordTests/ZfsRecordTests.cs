@@ -13,7 +13,7 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 [TestOf( typeof( ZfsRecord ) )]
 public class ZfsRecordTests
 {
-    private static readonly IReadOnlyList<string> UpdateProperty_DateTimeOffset_Values = new[] { "2022-01-01T00:00:00.0000000-07:00", "2023-01-01T00:00:00.0000000-07:00", "2023-07-01T00:00:00.0000000-07:00", "2023-07-03T00:00:00.0000000-07:00", "2023-07-03T00:00:00.0000000-07:00", "2023-07-03T00:00:00.0000000-07:00", "2023-07-03T01:00:00.0000000-07:00", "2023-07-03T01:15:00.0000000-07:00", "2023-12-31T23:59:59.9999999-07:00", "2024-01-01T00:00:00.0000000-07:00" };
+    private static readonly IReadOnlyList<string> UpdateProperty_DateTimeOffset_Values = new[] { "2022-01-01T00:00:00.0000000", "2023-01-01T00:00:00.0000000", "2023-07-01T00:00:00.0000000", "2023-07-03T00:00:00.0000000", "2023-07-03T00:00:00.0000000", "2023-07-03T00:00:00.0000000", "2023-07-03T01:00:00.0000000", "2023-07-03T01:15:00.0000000", "2023-12-31T23:59:59.9999999", "2024-01-01T00:00:00.0000000" };
 
     [Test]
     [TestCase( "sameName", ZfsPropertyValueConstants.FileSystem, "sameName", ZfsPropertyValueConstants.FileSystem, ExpectedResult = true )]

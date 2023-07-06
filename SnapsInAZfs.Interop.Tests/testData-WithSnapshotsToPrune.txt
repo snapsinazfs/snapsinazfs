@@ -24,12 +24,12 @@ testpool	available	9842880512	-
 testpool	used	38899712	-
 testpool/fs1	type	filesystem	-
 testpool/fs1	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	local
-testpool/fs1	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	local
-testpool/fs1	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	local
-testpool/fs1	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	local
-testpool/fs1	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	local
-testpool/fs1	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	local
+testpool/fs1	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	local
+testpool/fs1	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	local
+testpool/fs1	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	local
+testpool/fs1	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-03T00:00:00.0000000	local
+testpool/fs1	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	local
+testpool/fs1	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	local
 testpool/fs1	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1	snapsinazfs.com:recursion	siaz	local
 testpool/fs1	snapsinazfs.com:retention:daily	2	local
@@ -48,12 +48,12 @@ testpool/fs1	available	9842880512	-
 testpool/fs1	used	155648	-
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	type	snapshot	-
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -67,17 +67,17 @@ testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	local
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:period	yearly	local
-testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:timestamp	2022-01-01T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:timestamp	2022-01-01T00:00:00.0000000	local
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	available	-	-
 testpool/fs1@autosnap_2022-01-01_00:00:00_yearly	used	0	-
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	type	snapshot	-
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -91,17 +91,17 @@ testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	local
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:period	yearly	local
-testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:timestamp	2023-01-01T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	snapsinazfs.com:snapshot:timestamp	2023-01-01T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	available	-	-
 testpool/fs1@autosnap_2023-01-01_00:00:00_yearly	used	0	-
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	type	snapshot	-
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -115,17 +115,17 @@ testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:takesnapshots	
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	local
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:snapshot:period	monthly	local
-testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:snapshot:timestamp	2023-06-01T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	snapsinazfs.com:snapshot:timestamp	2023-06-01T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	available	-	-
 testpool/fs1@autosnap_2023-06-01_00:00:00_monthly	used	0	-
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	type	snapshot	-
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -139,17 +139,17 @@ testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	local
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:snapshot:period	weekly	local
-testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:snapshot:timestamp	2023-06-26T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	snapsinazfs.com:snapshot:timestamp	2023-06-26T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	available	-	-
 testpool/fs1@autosnap_2023-06-26_00:00:00_weekly	used	0	-
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	type	snapshot	-
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -163,17 +163,17 @@ testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:takesnapshots	
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	local
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:snapshot:period	monthly	local
-testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:snapshot:timestamp	2023-07-01T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	snapsinazfs.com:snapshot:timestamp	2023-07-01T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	available	-	-
 testpool/fs1@autosnap_2023-07-01_00:00:00_monthly	used	0	-
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	type	snapshot	-
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -187,17 +187,17 @@ testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:takesnapshots	tr
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-02_00:00:00_daily	local
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:snapshot:period	daily	local
-testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:snapshot:timestamp	2023-07-02T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-02_00:00:00_daily	snapsinazfs.com:snapshot:timestamp	2023-07-02T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	available	-	-
 testpool/fs1@autosnap_2023-07-02_00:00:00_daily	used	0	-
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	type	snapshot	-
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -211,17 +211,17 @@ testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	local
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:snapshot:period	hourly	local
-testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-02T23:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-02T23:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	available	-	-
 testpool/fs1@autosnap_2023-07-02_23:00:00_hourly	used	0	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -235,17 +235,17 @@ testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:snapshot:period	hourly	local
-testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	available	-	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_hourly	used	0	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -259,17 +259,17 @@ testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:takesnapshots	tr
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_00:00:00_daily	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:snapshot:period	daily	local
-testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_00:00:00_daily	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	available	-	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_daily	used	0	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -283,17 +283,17 @@ testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:snapshot:period	weekly	local
-testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	available	-	-
 testpool/fs1@autosnap_2023-07-03_00:00:00_weekly	used	0	-
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -307,17 +307,17 @@ testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:takesnapsho
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	local
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:snapshot:period	frequently	local
-testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:45:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	snapsinazfs.com:snapshot:timestamp	2023-07-03T00:45:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	available	-	-
 testpool/fs1@autosnap_2023-07-03_00:45:00_frequently	used	0	-
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -331,17 +331,17 @@ testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:takesnapshots	t
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	local
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:snapshot:period	hourly	local
-testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-03T01:00:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	snapsinazfs.com:snapshot:timestamp	2023-07-03T01:00:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	available	-	-
 testpool/fs1@autosnap_2023-07-03_01:00:00_hourly	used	0	-
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	type	snapshot	-
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:enabled	true	inherited from testpool
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000-07:00	inherited from testpool/fs1
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000-07:00	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastdailysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastfrequentsnapshottimestamp	2023-07-03T01:15:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lasthourlysnapshottimestamp	2023-07-03T01:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastmonthlysnapshottimestamp	2023-07-01T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastweeklysnapshottimestamp	2023-07-03T00:00:00.0000000	inherited from testpool/fs1
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:lastyearlysnapshottimestamp	2023-01-01T00:00:00.0000000	inherited from testpool/fs1
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:prunesnapshots	true	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:recursion	siaz	local
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:retention:daily	2	inherited from testpool/fs1
@@ -355,6 +355,6 @@ testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:takesnapsho
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:template	default	inherited from testpool
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:snapshot:name	testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	local
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:snapshot:period	frequently	local
-testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:snapshot:timestamp	2023-07-03T01:15:00.0000000-07:00	local
+testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	snapsinazfs.com:snapshot:timestamp	2023-07-03T01:15:00.0000000	local
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	available	-	-
 testpool/fs1@autosnap_2023-07-03_01:15:00_frequently	used	0	-

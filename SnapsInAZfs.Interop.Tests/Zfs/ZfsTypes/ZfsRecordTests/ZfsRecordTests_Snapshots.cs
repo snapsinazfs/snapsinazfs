@@ -15,12 +15,12 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 public class ZfsRecordTests_Snapshots
 {
     [Test]
-    [TestCase( SnapshotPeriodKind.Frequent, "2023-01-01T00:00:00.0000000-07:00" )]
-    [TestCase( SnapshotPeriodKind.Hourly, "2023-01-01T00:01:00.0000000-07:00" )]
-    [TestCase( SnapshotPeriodKind.Daily, "2023-01-02T00:00:00.0000000-07:00" )]
-    [TestCase( SnapshotPeriodKind.Weekly, "2023-01-08T00:00:00.0000000-07:00" )]
-    [TestCase( SnapshotPeriodKind.Monthly, "2023-02-01T00:00:00.0000000-07:00" )]
-    [TestCase( SnapshotPeriodKind.Yearly, "2024-01-01T00:00:00.0000000-07:00" )]
+    [TestCase( SnapshotPeriodKind.Frequent, "2023-01-01T00:00:00.0000000" )]
+    [TestCase( SnapshotPeriodKind.Hourly, "2023-01-01T00:01:00.0000000" )]
+    [TestCase( SnapshotPeriodKind.Daily, "2023-01-02T00:00:00.0000000" )]
+    [TestCase( SnapshotPeriodKind.Weekly, "2023-01-08T00:00:00.0000000" )]
+    [TestCase( SnapshotPeriodKind.Monthly, "2023-02-01T00:00:00.0000000" )]
+    [TestCase( SnapshotPeriodKind.Yearly, "2024-01-01T00:00:00.0000000" )]
     public void AddSnapshot_LastObservedTimestampsUpdated( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
     {
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
@@ -187,36 +187,25 @@ public class ZfsRecordTests_Snapshots
 
     [Test]
     [NonParallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-02T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-04T00:00:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2025-07-05T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-02T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-03T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-04T00:00:00.0000000", ExpectedResult = true )]
+    [TestCase( "2025-07-05T00:00:00.0000000", ExpectedResult = true )]
     public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
-        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
-        bool isDailySnapshotNeeded = newTestRootFileSystem.IsDailySnapshotNeeded( timestamp );
-
-        DateTimeOffset timestampInDataset = newTestRootFileSystem.LastDailySnapshotTimestamp.Value;
-        Console.WriteLine( $"Last Daily Snapshot Timestamp: {timestampInDataset:O}" );
-        Console.WriteLine( $"Test Daily Snapshot Timestamp: {timestamp:O}" );
-        Console.WriteLine( $"Daily snapshot needed at {timestamp:O}: {isDailySnapshotNeeded}" );
-        Console.WriteLine($"Test timestamp equal to timestamp in dataset: {timestamp == timestampInDataset}");
-        Console.WriteLine($"Test timestamp greater than timestamp in dataset: {timestamp > timestampInDataset}");
-        Console.WriteLine($"Test timestamp less than timestamp in dataset: {timestamp < timestampInDataset}");
-
-        return isDailySnapshotNeeded;
+        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsDailySnapshotNeeded( timestamp );
     }
 
     [Test]
     [Parallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:14:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:15:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:29:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:30:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2023-07-03T01:31:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:14:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:15:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:29:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:30:00.0000000", ExpectedResult = true )]
+    [TestCase( "2023-07-03T01:31:00.0000000", ExpectedResult = true )]
     public bool IsFrequentSnapshotNeeded( DateTimeOffset timestamp )
     {
         return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsFrequentSnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
@@ -224,12 +213,12 @@ public class ZfsRecordTests_Snapshots
 
     [Test]
     [Parallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T00:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T01:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T02:00:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2024-07-03T02:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-03T01:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T02:00:00.0000000", ExpectedResult = true )]
+    [TestCase( "2024-07-03T02:00:00.0000000", ExpectedResult = true )]
     public bool IsHourlySnapshotNeeded( DateTimeOffset timestamp )
     {
         return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsHourlySnapshotNeeded( timestamp );
@@ -237,12 +226,12 @@ public class ZfsRecordTests_Snapshots
 
     [Test]
     [Parallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-06-30T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-31T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2024-08-01T00:00:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2025-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-06-30T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-31T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2024-08-01T00:00:00.0000000", ExpectedResult = true )]
+    [TestCase( "2025-01-01T00:00:00.0000000", ExpectedResult = true )]
     public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
     {
         return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsMonthlySnapshotNeeded( timestamp );
@@ -250,12 +239,12 @@ public class ZfsRecordTests_Snapshots
 
     [Test]
     [Parallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-02T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-03T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-09T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-07-10T00:00:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2023-07-11T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-02T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-03T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-07-09T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-07-10T00:00:00.0000000", ExpectedResult = true )]
+    [TestCase( "2023-07-11T00:00:00.0000000", ExpectedResult = true )]
     public bool IsWeeklySnapshotNeeded( DateTimeOffset timestamp )
     {
         return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsWeeklySnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
@@ -263,15 +252,16 @@ public class ZfsRecordTests_Snapshots
 
     [Test]
     [Parallelizable]
-    [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2022-12-31T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2023-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
-    [TestCase( "2023-12-31T23:59:59.9999999-07:00", ExpectedResult = false )]
-    [TestCase( "2024-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
-    [TestCase( "2025-01-01T00:00:00.0000000-07:00", ExpectedResult = true )]
+    [TestCase( "2020-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2022-12-31T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2023-01-01T00:00:00.0000000", ExpectedResult = false )]
+    [TestCase( "2023-12-31T23:59:59.9999999", ExpectedResult = false )]
+    [TestCase( "2024-01-01T00:00:00.0000000", ExpectedResult = true )]
+    [TestCase( "2025-01-01T00:00:00.0000000", ExpectedResult = true )]
     public bool IsYearlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsYearlySnapshotNeeded( timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsYearlySnapshotNeeded( timestamp );
     }
 
     [Test]
