@@ -91,7 +91,7 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        snapshot = new( snapName, ds.PruneSnapshots.Value, period, timestamp, ds );
+        snapshot = new( snapName, period.Kind, timestamp, ds );
         return true;
     }
 
@@ -121,16 +121,5 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
     {
         throw new NotImplementedException( );
-    }
-
-    private static async Task GetMockZfsDatasetsFromTextFileAsync( ConcurrentDictionary<string, ZfsRecord> datasets, string filePath )
-    {
-        using StreamReader rdr = File.OpenText( filePath );
-
-        while ( !rdr.EndOfStream )
-        {
-            string stringToParse = await rdr.ReadLineAsync( ).ConfigureAwait( true ) ?? string.Empty;
-            ParseDatasetZfsGetLine( stringToParse, datasets );
-        }
     }
 }

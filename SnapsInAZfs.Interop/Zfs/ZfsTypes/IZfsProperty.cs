@@ -75,7 +75,7 @@ public interface IZfsProperty
     public static ImmutableSortedDictionary<string, IZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, IZfsProperty>.Empty.AddRange( new Dictionary<string, IZfsProperty>
     {
         { ZfsPropertyNames.SnapshotNamePropertyName, new ZfsProperty<string>( ZfsPropertyNames.SnapshotNamePropertyName, ZfsPropertyValueConstants.None, ZfsPropertySourceConstants.SnapsInAZfs ) },
-        { ZfsPropertyNames.SnapshotPeriodPropertyName, new ZfsProperty<SnapshotPeriod>( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Temporary, ZfsPropertySourceConstants.SnapsInAZfs ) },
+        { ZfsPropertyNames.SnapshotPeriodPropertyName, new ZfsProperty<SnapshotPeriod>( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet, ZfsPropertySourceConstants.SnapsInAZfs ) },
         { ZfsPropertyNames.SnapshotTimestampPropertyName, new ZfsProperty<DateTimeOffset>( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.SnapsInAZfs ) }
     } );
 

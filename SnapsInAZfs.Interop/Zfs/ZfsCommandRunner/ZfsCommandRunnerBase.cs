@@ -428,7 +428,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, out bytesAvailable ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Available, rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out _, out bytesUsed );
             bytesAvailable = 0;
             return false;
         }
@@ -436,7 +436,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, out bytesUsed ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Used, rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out bytesAvailable, out _ );
             bytesUsed = 0;
             return false;
         }
@@ -478,29 +478,29 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
         string parentName = dsName.GetZfsPathParent( );
         bool isRootDs = dsName == parentName;
-        ZfsRecord newDs = new( dsName,
-                               rawZfsObject.Kind,
-                               enabled.Value,
-                               takeSnapshots.Value,
-                               pruneSnapshots.Value,
-                               lastFrequentSnapshotTimestamp.Value,
-                               lastHourlySnapshotTimestamp.Value,
-                               lastDailySnapshotTimestamp.Value,
-                               lastWeeklySnapshotTimestamp.Value,
-                               lastMonthlySnapshotTimestamp.Value,
-                               lastYearlySnapshotTimestamp.Value,
-                               recursion,
-                               template,
-                               retentionFrequent.Value,
-                               retentionHourly.Value,
-                               retentionDaily.Value,
-                               retentionWeekly.Value,
-                               retentionMonthly.Value,
-                               retentionYearly.Value,
-                               retentionPruneDeferral.Value,
-                               bytesAvailable,
-                               bytesUsed,
-                               isRootDs ? null : datasets[ parentName ] );
+        ZfsRecord newDs = ZfsRecord.CreateInstanceFromAllProperties(dsName,
+                                                                    rawZfsObject.Kind,
+                                                                    enabled.Value,
+                                                                    takeSnapshots.Value,
+                                                                    pruneSnapshots.Value,
+                                                                    lastFrequentSnapshotTimestamp.Value,
+                                                                    lastHourlySnapshotTimestamp.Value,
+                                                                    lastDailySnapshotTimestamp.Value,
+                                                                    lastWeeklySnapshotTimestamp.Value,
+                                                                    lastMonthlySnapshotTimestamp.Value,
+                                                                    lastYearlySnapshotTimestamp.Value,
+                                                                    recursion,
+                                                                    template,
+                                                                    retentionFrequent.Value,
+                                                                    retentionHourly.Value,
+                                                                    retentionDaily.Value,
+                                                                    retentionWeekly.Value,
+                                                                    retentionMonthly.Value,
+                                                                    retentionYearly.Value,
+                                                                    retentionPruneDeferral.Value,
+                                                                    bytesAvailable,
+                                                                    bytesUsed,
+                                                                    isRootDs ? null : datasets[ parentName ] );
         datasets[ dsName ] = newDs;
     }
 

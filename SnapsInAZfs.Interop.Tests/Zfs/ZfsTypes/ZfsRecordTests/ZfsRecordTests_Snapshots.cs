@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 
@@ -24,8 +25,7 @@ public class ZfsRecordTests_Snapshots
     public void AddSnapshot_LastObservedTimestampsUpdated( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
     {
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
-        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.Manual ) );
-        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.Temporary ) );
+        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ) );
         ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         Assume.That( dataset, Is.Not.Null );
         Assume.That( dataset.Snapshots, Is.Not.Null );
@@ -49,7 +49,7 @@ public class ZfsRecordTests_Snapshots
         Assume.That( dataset.LastObservedMonthlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
         Assume.That( dataset.LastObservedYearlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
 
-        Snapshot snapshot = new( periodKind.ToString( "G" ), true, periodKind, timestamp, dataset );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, timestamp, dataset );
         dataset.AddSnapshot( snapshot );
 
         // Disable this because the filter it with an assumption in the test itself, above
@@ -126,8 +126,11 @@ public class ZfsRecordTests_Snapshots
                 break;
         }
 
-        Assert.That( lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot, Is.EqualTo( timestamp ) );
-        Assert.That( otherLastObservedSnapshotTimestampsAfterAddSnapshot, Has.All.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot, Is.EqualTo( timestamp ) );
+            Assert.That( otherLastObservedSnapshotTimestampsAfterAddSnapshot, Has.All.EqualTo( DateTimeOffset.UnixEpoch ) );
+        } );
     }
 
     [Test]
@@ -141,7 +144,7 @@ public class ZfsRecordTests_Snapshots
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind periodKind )
     {
         ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
-        Snapshot snapshot = new( periodKind.ToString( "G" ), true, periodKind, DateTimeOffset.UnixEpoch, dataset );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, dataset );
         dataset.AddSnapshot( snapshot );
         Assert.Multiple( ( ) =>
         {
