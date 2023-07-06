@@ -196,6 +196,8 @@ public class ZfsRecordTests_Snapshots
     public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
         ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        Console.WriteLine( $"Last Daily Snapshot Timestamp: {newTestRootFileSystem.LastDailySnapshotTimestamp.Value:O}" );
+        Console.WriteLine( $"Test Daily Snapshot Timestamp: {timestamp:O}" );
         return newTestRootFileSystem.IsDailySnapshotNeeded( timestamp );
     }
 
