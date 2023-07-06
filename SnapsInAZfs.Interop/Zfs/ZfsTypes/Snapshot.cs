@@ -187,4 +187,11 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
             _ => base.UpdateProperty( propertyName, propertyValue, propertySource )
         };
     }
+
+
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return $"{SnapshotName}";
+    }
 }
