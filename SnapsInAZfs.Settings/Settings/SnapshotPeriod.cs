@@ -116,7 +116,8 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             WeeklyString => Weekly,
             MonthlyString => Monthly,
             YearlyString => Yearly,
-            _ => NotSet
+            NotSetString => NotSet,
+            _ => throw new FormatException( $"{value} is not a valid SnapshotPeriod value" )
         };
     }
 
@@ -146,7 +147,17 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
 
     public static implicit operator SnapshotPeriod( SnapshotPeriodKind kind )
     {
-        return new ( kind );
+        return kind switch
+        {
+            SnapshotPeriodKind.Frequent => Frequent,
+            SnapshotPeriodKind.Hourly => Hourly,
+            SnapshotPeriodKind.Daily => Daily,
+            SnapshotPeriodKind.Weekly => Weekly,
+            SnapshotPeriodKind.Monthly => Monthly,
+            SnapshotPeriodKind.Yearly => Yearly,
+            SnapshotPeriodKind.NotSet => NotSet,
+            _ => NotSet
+        };
     }
 
     /// <inheritdoc />
