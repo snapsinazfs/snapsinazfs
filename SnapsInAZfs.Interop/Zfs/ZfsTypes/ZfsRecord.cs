@@ -358,14 +358,18 @@ public record ZfsRecord
         // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
         // going to optimize it all away anyway.
         Logger.Trace( "Checking if daily snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
-        if ( timestamp < LastDailySnapshotTimestamp.Value )
+        if ( timestamp <= LastDailySnapshotTimestamp.Value )
         {
             return false;
         }
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp.Value;
+        Console.WriteLine( $"Time between Last Daily ({LastDailySnapshotTimestamp.Value}) and timestamp ({timestamp}): {timeSinceLastDailySnapshot:G}" );
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
+        Console.WriteLine( $"TotalDays between ({LastDailySnapshotTimestamp.Value}) and timestamp ({timestamp}): {timeSinceLastDailySnapshot.TotalDays:R}" );
         // Check if more than a day ago or if a different day of the year
         bool lastDailyOnDifferentDayOfYear = LastDailySnapshotTimestamp.Value.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
+        Console.WriteLine( $"Last Daily ({LastDailySnapshotTimestamp.Value}) and timestamp ({timestamp}) on different day of year: {lastDailyOnDifferentDayOfYear}" );
+        Console.WriteLine( $"At least 1 day between ({LastDailySnapshotTimestamp.Value}) and timestamp ({timestamp}): {atLeastOneDaySinceLastDailySnapshot}" );
         bool dailySnapshotNeeded = atLeastOneDaySinceLastDailySnapshot || lastDailyOnDifferentDayOfYear;
         Logger.Debug( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
         return dailySnapshotNeeded;
