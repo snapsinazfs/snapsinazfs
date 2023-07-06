@@ -268,10 +268,7 @@ public class ZfsRecordTests_Snapshots
     [Parallelizable]
     public void Snapshots_CollectionInitializedProperly( )
     {
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( ) with
-        {
-            Snapshots = new(ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( ).Snapshots)
-        };
+        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         Assume.That( dataset, Is.Not.Null );
 
         Assert.Multiple( ( ) =>
