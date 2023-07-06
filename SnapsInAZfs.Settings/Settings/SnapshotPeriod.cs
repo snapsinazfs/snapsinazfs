@@ -35,20 +35,14 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     public SnapshotPeriodKind Kind { get; }
 
     /// <summary>
-    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Manual" />
-    /// </summary>
-    public static SnapshotPeriod Manual { get; } = new( SnapshotPeriodKind.Manual );
-
-    /// <summary>
     ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Monthly" />
     /// </summary>
     public static SnapshotPeriod Monthly { get; } = new( SnapshotPeriodKind.Monthly );
 
     /// <summary>
-    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to
-    ///     <see cref="SnapshotPeriodKind.Temporary" />
+    ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.NotSet" />
     /// </summary>
-    public static SnapshotPeriod Temporary { get; } = new( SnapshotPeriodKind.Temporary );
+    public static SnapshotPeriod NotSet { get; } = new( SnapshotPeriodKind.NotSet );
 
     /// <summary>
     ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Weekly" />
@@ -63,10 +57,8 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     private const string DailyString = "daily";
     private const string FrequentString = "frequently";
     private const string HourlyString = "hourly";
-    private const string ManualString = "manual";
     private const string MonthlyString = "monthly";
-    private const string TemporaryString = "temporary";
-    private const string UnsetString = "-";
+    private const string NotSetString = "-";
     private const string WeeklyString = "weekly";
     private const string YearlyString = "yearly";
 
@@ -124,8 +116,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             WeeklyString => Weekly,
             MonthlyString => Monthly,
             YearlyString => Yearly,
-            ManualString => Manual,
-            _ => Temporary
+            _ => NotSet
         };
     }
 
@@ -137,15 +128,14 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     {
         return self.Kind switch
         {
-            SnapshotPeriodKind.Temporary => TemporaryString,
             SnapshotPeriodKind.Frequent => FrequentString,
             SnapshotPeriodKind.Hourly => HourlyString,
             SnapshotPeriodKind.Daily => DailyString,
             SnapshotPeriodKind.Weekly => WeeklyString,
             SnapshotPeriodKind.Monthly => MonthlyString,
             SnapshotPeriodKind.Yearly => YearlyString,
-            SnapshotPeriodKind.Manual => ManualString,
-            _ => UnsetString
+            SnapshotPeriodKind.NotSet => NotSetString,
+            _ => NotSetString
         };
     }
 

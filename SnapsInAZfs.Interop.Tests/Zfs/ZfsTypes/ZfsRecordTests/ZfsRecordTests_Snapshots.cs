@@ -25,8 +25,7 @@ public class ZfsRecordTests_Snapshots
     public void AddSnapshot_LastObservedTimestampsUpdated( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
     {
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
-        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.Manual ) );
-        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.Temporary ) );
+        Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ) );
         ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
         Assume.That( dataset, Is.Not.Null );
         Assume.That( dataset.Snapshots, Is.Not.Null );

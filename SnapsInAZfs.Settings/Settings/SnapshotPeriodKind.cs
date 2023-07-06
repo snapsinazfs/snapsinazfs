@@ -12,59 +12,51 @@ namespace SnapsInAZfs.Settings.Settings;
 public enum SnapshotPeriodKind
 {
     /// <summary>
-    ///     Temporary snapshots taken by SnapsInAZfs.
+    ///     An un-set value. Should be treated as invalid.
     /// </summary>
-    /// <remarks>Not intended to be used by an end-user.</remarks>
     /// <value>0</value>
-    [JsonPropertyName( "temporary" )]
-    Temporary,
+    [JsonPropertyName( "NotSet" )]
+    NotSet = 0,
 
     /// <summary>
     ///     Snapshots that are taken according to the "frequently" setting
     /// </summary>
     /// <value>1</value>
     [JsonPropertyName( "frequent" )]
-    Frequent,
+    Frequent = 1,
 
     /// <summary>
     ///     Snapshots that are taken according to the "hourly" setting
     /// </summary>
     /// <value>2</value>
     [JsonPropertyName( "hourly" )]
-    Hourly,
+    Hourly = 2,
 
     /// <summary>
     ///     Snapshots that are taken according to the "daily" setting
     /// </summary>
     /// <value>3</value>
     [JsonPropertyName( "daily" )]
-    Daily,
+    Daily = 3,
 
     /// <summary>
     ///     Snapshots that are taken according to the "weekly" setting
     /// </summary>
     /// <value>4</value>
     [JsonPropertyName( "weekly" )]
-    Weekly,
+    Weekly = 4,
 
     /// <summary>
     ///     Snapshots that are taken according to the "monthly" setting
     /// </summary>
     /// <value>5</value>
     [JsonPropertyName( "monthly" )]
-    Monthly,
+    Monthly = 5,
 
     /// <summary>
     ///     Snapshots that are taken according to the "yearly" setting
     /// </summary>
     /// <value>6</value>
     [JsonPropertyName( "yearly" )]
-    Yearly,
-
-    /// <summary>
-    ///     Snapshots that are taken manually by the user.
-    /// </summary>
-    /// <value>100</value>
-    [JsonPropertyName( "manual" )]
-    Manual = 100
+    Yearly = 6
 }

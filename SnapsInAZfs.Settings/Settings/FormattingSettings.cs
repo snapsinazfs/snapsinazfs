@@ -87,14 +87,12 @@ public record FormattingSettings
     {
         return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{periodKind switch
         {
-            SnapshotPeriodKind.Temporary => "temporary",
             SnapshotPeriodKind.Frequent => FrequentSuffix,
             SnapshotPeriodKind.Hourly => HourlySuffix,
             SnapshotPeriodKind.Daily => DailySuffix,
             SnapshotPeriodKind.Weekly => WeeklySuffix,
             SnapshotPeriodKind.Monthly => MonthlySuffix,
             SnapshotPeriodKind.Yearly => YearlySuffix,
-            SnapshotPeriodKind.Manual => "manual",
             _ => throw new ArgumentOutOfRangeException( nameof( periodKind ), periodKind, null )
         }}";
     }

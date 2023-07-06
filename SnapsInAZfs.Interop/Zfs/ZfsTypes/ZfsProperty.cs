@@ -148,7 +148,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<SnapshotPeriod>? property )
     {
         SnapshotPeriod period = (SnapshotPeriod)input.Value;
-        if ( period.Kind is not SnapshotPeriodKind.Manual and not SnapshotPeriodKind.Temporary )
+        if ( period.Kind is not SnapshotPeriodKind.NotSet )
         {
             property = new ZfsProperty<SnapshotPeriod>( input.Name, period, input.Source );
             return true;
