@@ -186,7 +186,7 @@ public class ZfsRecordTests_Snapshots
     }
 
     [Test]
-    [Parallelizable]
+    [NonParallelizable]
     [TestCase( "2020-01-01T00:00:00.0000000-07:00", ExpectedResult = false )]
     [TestCase( "2023-07-02T23:59:59.9999999-07:00", ExpectedResult = false )]
     [TestCase( "2023-07-03T00:00:00.0000000-07:00", ExpectedResult = false )]
@@ -196,9 +196,17 @@ public class ZfsRecordTests_Snapshots
     public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
         ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
-        Console.WriteLine( $"Last Daily Snapshot Timestamp: {newTestRootFileSystem.LastDailySnapshotTimestamp.Value:O}" );
+        bool isDailySnapshotNeeded = newTestRootFileSystem.IsDailySnapshotNeeded( timestamp );
+
+        DateTimeOffset timestampInDataset = newTestRootFileSystem.LastDailySnapshotTimestamp.Value;
+        Console.WriteLine( $"Last Daily Snapshot Timestamp: {timestampInDataset:O}" );
         Console.WriteLine( $"Test Daily Snapshot Timestamp: {timestamp:O}" );
-        return newTestRootFileSystem.IsDailySnapshotNeeded( timestamp );
+        Console.WriteLine( $"Daily snapshot needed at {timestamp:O}: {isDailySnapshotNeeded}" );
+        Console.WriteLine($"Test timestamp equal to timestamp in dataset: {timestamp == timestampInDataset}");
+        Console.WriteLine($"Test timestamp greater than timestamp in dataset: {timestamp > timestampInDataset}");
+        Console.WriteLine($"Test timestamp less than timestamp in dataset: {timestamp < timestampInDataset}");
+
+        return isDailySnapshotNeeded;
     }
 
     [Test]
