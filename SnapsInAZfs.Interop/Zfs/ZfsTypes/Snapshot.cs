@@ -145,7 +145,7 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
             ? Period.Value.CompareTo( other.Period.Value )
             :
             // If periods are the same, sort by name
-            Name.CompareTo( other.Name );
+            String.Compare( Name, other.Name, StringComparison.Ordinal );
     }
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
