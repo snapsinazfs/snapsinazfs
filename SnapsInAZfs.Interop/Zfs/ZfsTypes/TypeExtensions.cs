@@ -7,7 +7,7 @@ using SnapsInAZfs.Settings.Settings;
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 /// <summary>
-///     Extension methods to simplify common operations of the <see cref="ZfsObjectKind" /> <see langword="enum" />
+///     Extension methods for various types
 /// </summary>
 public static class TypeExtensions
 {
@@ -29,13 +29,7 @@ public static class TypeExtensions
 
     public static string GetZfsPathParent( this string value )
     {
-        int endIndex = value.IndexOf( '@' );
-        if ( endIndex == -1 )
-        {
-            // This means it's not a snapshot.
-            // Check for the last '/' character
-            endIndex = value.LastIndexOf( '/' );
-        }
+        int endIndex = value.LastIndexOfAny( new[] { '/', '@', '#' } );
 
         if ( endIndex == -1 )
         {
@@ -44,7 +38,7 @@ public static class TypeExtensions
             return value;
         }
 
-        // This is a non-root dataset or is a snapshot
+        // This is a non-root dataset, snapshot, or bookmark
         // Return its parent dataset name
         string rootPath = value[ ..endIndex ];
         return rootPath;
@@ -52,11 +46,7 @@ public static class TypeExtensions
 
     public static string GetZfsPathRoot( this string value )
     {
-        int endIndex = value.IndexOf( '/' );
-        if ( endIndex == -1 )
-        {
-            endIndex = value.IndexOf( '@' );
-        }
+        int endIndex = value.IndexOfAny(new[] { '/', '@', '#' });
 
         if ( endIndex == -1 )
         {
@@ -78,12 +68,12 @@ public static class TypeExtensions
 
     public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
     {
-        return string.Join( ' ', properties.Select( p => p.SetString ) );
+        return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 
     public static string ToStringForZfsSet( this IDictionary<string, IZfsProperty> properties )
     {
-        return string.Join( ' ', properties.Select( kvp => kvp.Value.SetString ) );
+        return properties.Select( kvp => kvp.Value.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 
     /// <summary>
@@ -97,17 +87,14 @@ public static class TypeExtensions
     /// <returns></returns>
     public static string ToStringForZfsSet( this List<IZfsProperty> properties )
     {
-        if ( properties is null )
-        {
-            throw new ArgumentNullException( nameof( properties ), "Null collection provided" );
-        }
+        ArgumentNullException.ThrowIfNull( properties, nameof( properties ) );
 
         if ( !properties.Any( ) )
         {
             throw new ArgumentException( "Empty collection provided", nameof( properties ) );
         }
 
-        return string.Join( ' ', properties.Select( p => p.SetString ) );
+        return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 
     public static bool IsWanted( this ZfsProperty<int> retentionProperty )
@@ -128,6 +115,7 @@ public static class TypeExtensions
             SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
             SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
             SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
-            _ => throw new ArgumentOutOfRangeException( nameof( period ) )
+            SnapshotPeriodKind.NotSet => throw new ArgumentOutOfRangeException( nameof( period ) ),
+            _ => throw new FormatException( "Unrecognized SnapshotPeriod value" )
         };
 }
