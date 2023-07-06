@@ -4,6 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Settings.Settings;
 
@@ -11,6 +12,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public readonly record struct ZfsProperty<T>( string Name, T Value, string Source ) : IZfsProperty where T : notnull
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
     /// <summary>
     ///     Gets whether this is a SnapsInAZfs property or not
     /// </summary>
@@ -147,11 +149,15 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     /// </remarks>
     public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<SnapshotPeriod>? property )
     {
-        SnapshotPeriod period = (SnapshotPeriod)input.Value;
-        if ( period.Kind is not SnapshotPeriodKind.NotSet )
+        try
         {
+            SnapshotPeriod period = (SnapshotPeriod)input.Value;
             property = new ZfsProperty<SnapshotPeriod>( input.Name, period, input.Source );
             return true;
+        }
+        catch ( FormatException ex )
+        {
+            Logger.Debug( ex, "Uncrecognized value for snapshot period ({0})", input.Value );
         }
 
         property = null;
