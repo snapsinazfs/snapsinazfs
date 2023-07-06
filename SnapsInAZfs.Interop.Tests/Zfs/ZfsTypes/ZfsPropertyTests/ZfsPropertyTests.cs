@@ -141,14 +141,74 @@ public class ZfsPropertyTests
     [Test]
     [TestCase( "true", ExpectedResult = true )]
     [TestCase( "false", ExpectedResult = false )]
-    public bool TryParseBool( string value )
+    public bool TryParse_Bool_OutputsExpectedValue( string value )
     {
         RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
-        Assert.That( success, Is.True );
-        Assert.That( property, Is.Not.Null );
-        Assert.That( property, Is.InstanceOf<ZfsProperty<bool>>( ) );
-        Assert.That( property.HasValue, Is.True );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.True );
+            Assert.That( property, Is.Not.Null );
+            Assert.That( property, Is.InstanceOf<ZfsProperty<bool>>( ) );
+            Assert.That( property.HasValue, Is.True );
+        } );
         return property!.Value.Value;
+    }
+
+    [Test]
+    [TestCase( "5" )]
+    [TestCase( "a" )]
+    [TestCase( "" )]
+    [TestCase( " " )]
+    [TestCase( null )]
+    public void TryParse_Bool_ReturnsFalseOnBadInput( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.False );
+            Assert.That( property, Is.Null );
+            Assert.That( property.HasValue, Is.False );
+        } );
+    }
+
+    [Test]
+    [TestCase( "-100", ExpectedResult = -100 )]
+    [TestCase( "-1", ExpectedResult = -1 )]
+    [TestCase( "0", ExpectedResult = 0 )]
+    [TestCase( "1", ExpectedResult = 1 )]
+    [TestCase( "100", ExpectedResult = 100 )]
+    public int TryParse_Int_OutputsExpectedValue( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.True );
+            Assert.That( property, Is.Not.Null );
+            Assert.That( property, Is.InstanceOf<ZfsProperty<int>>( ) );
+            Assert.That( property.HasValue, Is.True );
+        } );
+        return property!.Value.Value;
+    }
+
+    [Test]
+    [TestCase( "true" )]
+    [TestCase( "abcdefg" )]
+    [TestCase( "!" )]
+    [TestCase( " " )]
+    [TestCase( "" )]
+    [TestCase( null )]
+    public void TryParse_Int_ReturnsFalseOnBadInput( string value )
+    {
+        RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+        bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( success, Is.False );
+            Assert.That( property, Is.Null );
+            Assert.That( property.HasValue, Is.False );
+        } );
     }
 }
