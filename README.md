@@ -7,13 +7,14 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- As of today (2023-07-03), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
+ As of today (2023-07-05), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
  
- SnapsInAZfs is also capable of running as a systemd service.
+ SnapsInAZfs is also capable of running as a systemd service. A unit file and `make` recipe for installing and
+ uninstalling the service are included.
 
- Version 1.0.0-Beta-2 has been tagged as a release on github, for testing. This comes with what should be the
+ Version 1.0.0-Beta-3 has been tagged as a release on github, for testing. This comes with what should be the
  obvious disclaimer that this is a beta-stage project and you should not trust important systems with it.\
  That said, I'm running it on my home lab as well as a non-critical production system at work, and it's
  behaving as expected for my use cases, so far. 
@@ -26,9 +27,9 @@
   - SnapsInAZfs.Settings: Contains formal definitions of settings in code. The .net configuration binder is used to
   populate an instance of this class, in SnapsInAZfs, and command line arguments are used to override individual
   values, as appropriate.
-  - Test projects: Each class library project will have a test project defined, for unit tests. I'm not doing this
-  by TDD, so these are likely to not be well-defined until later in the project development cycle, when things
-  stabilize a bit.
+  - Test projects: Each class library project will have a test project defined, for unit tests. I didn't initially
+  write this using TDD, so these are not yet well-defined. I am working on adding tests right now. I won't tag a
+  non-beta release until I've gotten significant coverage from the unit tests and fixed anything they reveal.
 
  My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as
  vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in
@@ -39,16 +40,19 @@
 
  ## Dependencies
 
- My intention is for this project to have no external run-time dependencies other than the required version of the dotnet
- runtime that have to be manually installed by the end user. Compile-time
- dependencies of these applications will either be included in published releases or included as project
+ SIAZ has no external run-time dependencies for core functionality other than the required version of the dotnet runtime
+ and ZFS itself that have to be manually installed by the end user.
+ 
+ Compile-time dependencies will either be included in pre-packaged releases or included as project
  references in the dotnet projects, so that they can be automatically restored by the dotnet SDK, from the public
  NuGet repository.\
- Runtime dependencies, such as mbuffer, ssh, and others that may be invoked by SnapsInAZfs are, of course, still required
- to be installed and available, if they are used by your configuration, though I intend to implement some of that
- functionality in these applications, themselves, eventually.
  
- Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils and zfs 2.1 or higher are installed.
+ Other runtime dependencies, such as mbuffer, ssh, and others that may be invoked by SnapsInAZfs are, of course, still required
+ to be installed and available, if they are used by your configuration, though I intend to implement some of that
+ functionality natively, eventually.
+ 
+ Additionally, `make` is ideal to be installed, as I've provided a Makefile with several useful build and test targets, to make things easier. Otherwise, you can manually run the commands in the Makefile to 
+ build. All build targets in the Makefile are bash-compatible scripts that assume standard coreutils and zfs 2.1 or higher are installed.
 
  Platform utilities should only be required for installation, and are mostly included in core-utils, so should be available on pretty much every standard linux distro. SnapsInAZfs itself uses native platform calls from libc, for the functionality that would otherwise be provided by those utilities, so the standard shared libraries included in most basic distro installs are all SnapsInAZfs needs to run properly (binaries only - header files are not needed). The goal is for SnapsInAZfs to only require you to have the dotnet7.0 runtime and zfs installed, for pre-built packages, or the dotnet7.0 SDK, in addition, to build from source.
 
