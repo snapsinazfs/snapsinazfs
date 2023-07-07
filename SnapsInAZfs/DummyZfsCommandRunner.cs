@@ -4,12 +4,16 @@
 
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
 
-namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+namespace SnapsInAZfs;
 
+/// <summary>
+/// Dummy command runner used for testing when running on windows or wherever zfs isn't installed
+/// </summary>
 public class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     /// <inheritdoc />
