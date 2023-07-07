@@ -54,13 +54,13 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     /// </summary>
     public static SnapshotPeriod Yearly { get; } = new( SnapshotPeriodKind.Yearly );
 
-    private const string DailyString = "daily";
-    private const string FrequentString = "frequently";
-    private const string HourlyString = "hourly";
-    private const string MonthlyString = "monthly";
-    private const string NotSetString = "-";
-    private const string WeeklyString = "weekly";
-    private const string YearlyString = "yearly";
+    internal const string DailyString = "daily";
+    internal const string FrequentString = "frequently";
+    internal const string HourlyString = "hourly";
+    internal const string MonthlyString = "monthly";
+    internal const string NotSetString = "-";
+    internal const string WeeklyString = "weekly";
+    internal const string YearlyString = "yearly";
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException"><paramref name="other" /> and this instance are not the same type.</exception>
@@ -125,6 +125,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     ///     Implicit or explicit conversion to <see langword="string" />, for the given <see cref="SnapshotPeriod" /> object
     /// </summary>
     /// <param name="self"></param>
+#pragma warning disable CS8524
     public static implicit operator string( SnapshotPeriod self )
     {
         return self.Kind switch
@@ -136,7 +137,6 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             SnapshotPeriodKind.Monthly => MonthlyString,
             SnapshotPeriodKind.Yearly => YearlyString,
             SnapshotPeriodKind.NotSet => NotSetString,
-            _ => NotSetString
         };
     }
 
@@ -156,9 +156,9 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             SnapshotPeriodKind.Monthly => Monthly,
             SnapshotPeriodKind.Yearly => Yearly,
             SnapshotPeriodKind.NotSet => NotSet,
-            _ => NotSet
         };
     }
+#pragma warning restore CS8524
 
     /// <inheritdoc />
     public override string ToString( )
