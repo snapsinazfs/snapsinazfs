@@ -223,16 +223,19 @@ public record ZfsRecord
     public ZfsProperty<int> SnapshotRetentionWeekly { get; private set; }
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; }
 
-    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = new(
-        new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
-        {
-            { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
-            { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
-        } );
+    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; init; } = GetNewSnapshotCollection( );
+
+    public static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( ) =>
+        new(
+            new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+            {
+                { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
+            } );
 
     public ZfsProperty<bool> TakeSnapshots { get; private set; }
     public ZfsProperty<string> Template { get; private set; }
