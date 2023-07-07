@@ -239,11 +239,15 @@ internal class Program
     private static SiazService ServiceInstanceProvider( IServiceProvider arg )
     {
         Logger.Trace( "Getting ZFS command runner for the current environment" );
+        #if DEBUG_WINDOWS
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
         {
             PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
             _ => new DummyZfsCommandRunner( )
         };
+        #else
+        IZfsCommandRunner zfsCommandRunner =new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
+        #endif
 
         SiazService service = new( Settings!, zfsCommandRunner );
         return service;
