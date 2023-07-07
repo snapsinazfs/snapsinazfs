@@ -5,6 +5,7 @@
 using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.ConfigConsole;
@@ -18,12 +19,24 @@ internal static class ZfsTasks
         return commandRunner.SetZfsProperties( dryRun, zfsPath, modifiedProperties );
     }
 
-    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
+    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, ConcurrentDictionary<string, Snapshot> snapshots, IZfsCommandRunner commandRunner )
     {
         Logger.Debug( "Getting zfs objects for tree view" );
         try
         {
-            return await commandRunner.GetZfsObjectsForConfigConsoleTreeAsync( baseDatasets, treeDatasets ).ConfigureAwait( true );
+            List<ITreeNode> treeRootNodes = new( );
+            ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
+            await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, snapshots ).ConfigureAwait( true );
+            foreach ( (string dsName, ZfsRecord baseDataset) in baseDatasets )
+            {
+                ZfsRecord treeDataset = baseDataset with { };
+                treeDatasets[ dsName ] = treeDataset;
+                ZfsObjectConfigurationTreeNode node = new( dsName, baseDataset, treeDataset );
+                treeRootNodes.Add( node );
+                allTreeNodes[ dsName ] = node;
+            }
+
+            return treeRootNodes;
         }
         catch ( Exception ex )
         {
