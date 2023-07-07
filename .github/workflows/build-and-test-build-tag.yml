@@ -21,4 +21,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release-R2R
     - name: Test
-      run: dotnet test --no-restore --configuration Release-R2R --verbosity normal
+      run: dotnet test --no-restore --configuration Release-R2R --verbosity minimal
