@@ -225,6 +225,14 @@ public record ZfsRecord
 
     public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; init; } = GetNewSnapshotCollection( );
 
+    /// <summary>
+    /// Gets the collection of <see cref="Snapshot"/>s, groups by <see cref="SnapshotPeriodKind"/>
+    /// </summary>
+    /// <remarks>
+    /// Note that this is a reference type, as are the values of this collection.<br/>
+    /// Thus, when cloning a <see cref="ZfsRecord"/> using the <see langword="with"/> operator, this collection
+    /// needs to be re-created and all of its values deep-copied manually, if unique references are needed.
+    /// </remarks>
     public static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( ) =>
         new(
             new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
