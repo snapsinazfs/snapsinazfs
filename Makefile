@@ -152,6 +152,9 @@ uninstall-service:
 test:	test-everything
 
 test-everything:
+	dotnet test --configuration=Release-R2R --verbosity=minimal --nologo
+
+test-everything-verbose:
 	dotnet test --configuration=Release-R2R --verbosity=normal --nologo
 
 save-snapsinazfs-zfs-properties:
