@@ -4,6 +4,7 @@
 
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,117 +39,6 @@ internal class Program
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
         Settings.Daemonize |= args.Daemonize;
-    }
-
-    public static async Task<int> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
-    {
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( Settings ) );
-
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        ZfsTasks.CheckZfsPropertiesSchemaResult schemaCheckResult = await ZfsTasks.CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
-
-        Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
-
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        // Check
-        switch ( args )
-        {
-            case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
-            {
-                // Requested check and no properties were missing.
-                // Return 0
-                return (int)Errno.EOK;
-            }
-            case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
-            {
-                // Requested check and some properties were missing.
-                // Return ENOATTR (1093)
-                return (int)Errno.ENOATTR;
-            }
-            case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
-            {
-                // Did not request check or update (normal run) but properties were missing.
-                // Cannot safely do anything useful
-                // Log a fatal error and exit with ENOATTR
-                Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
-                return (int)Errno.ENOATTR;
-            }
-            case { PrepareZfsProperties: true }:
-            {
-                // Requested schema update
-                // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( Settings!.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
-                    ? (int)Errno.EOK
-                    : (int)Errno.ENOATTR;
-            }
-        }
-
-        if ( args.ConfigConsole )
-        {
-            ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
-            return (int)Errno.EOK;
-        }
-
-        ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-        ConcurrentDictionary<string, Snapshot> snapshots = new( );
-
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
-
-        await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( Settings!, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
-
-        Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
-
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        // Handle taking new snapshots, if requested
-        if ( Settings is { TakeSnapshots: true } )
-        {
-            Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, Settings, currentTimestamp, datasets, snapshots );
-        }
-        else
-        {
-            Logger.Info( "Not taking snapshots" );
-        }
-
-        if ( cancellationToken.IsCancellationRequested )
-        {
-            return (int)Errno.ECANCELED;
-        }
-
-        // Handle pruning old snapshots, if requested
-        if ( Settings is { PruneSnapshots: true } )
-        {
-            Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
-            await ZfsTasks.PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, Settings, datasets ).ConfigureAwait( true );
-        }
-        else
-        {
-            Logger.Info( "Not pruning snapshots" );
-        }
-
-        return (int)Errno.EOK;
     }
 
     public static async Task<int> Main( string[] argv )
@@ -222,16 +112,16 @@ internal class Program
 
         ApplyCommandLineArgumentOverrides( in args );
 
-        IHost serviceHost = Host.CreateDefaultBuilder( )
+        using IHost serviceHost = Host.CreateDefaultBuilder( )
                                 .UseSystemd( )
                                 .ConfigureServices( ( _, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
                                 .Build( );
 
-        SiazService.timestamp = currentTimestamp;
+        SiazService.Timestamp = currentTimestamp;
+        using CancellationTokenSource tokenSource = new( );
+        CancellationToken masterToken = tokenSource.Token;
 
-        await serviceHost.RunAsync( ).ConfigureAwait( true );
-
-        serviceHost.Dispose( );
+        await serviceHost.RunAsync( masterToken ).ConfigureAwait( true );
 
         return SiazService.ExitStatus;
     }
@@ -246,7 +136,7 @@ internal class Program
             _ => new DummyZfsCommandRunner( )
         };
         #else
-        IZfsCommandRunner zfsCommandRunner =new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
+        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
         #endif
 
         SiazService service = new( Settings!, zfsCommandRunner );

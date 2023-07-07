@@ -7,7 +7,7 @@
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
-  "RunAsDaemon": false, 
+  "Daemonize": true, 
   "Monitoring": {
     "Nagios": {
       "$comments": "Nagios-specific monitoring options",

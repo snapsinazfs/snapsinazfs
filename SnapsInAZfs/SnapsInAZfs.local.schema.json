@@ -28,7 +28,7 @@
             "description": "If SnapsInAZfs will perform a dry run and make no changes to ZFS.",
             "default": false
         },
-        "RunAsDaemon": {
+        "Daemonize": {
             "type": "boolean",
             "description": "If SnapsInAZfs will run as a service",
             "default": false 

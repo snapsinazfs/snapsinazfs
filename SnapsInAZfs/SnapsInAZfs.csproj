@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -40,7 +40,7 @@
     <Compile Remove="DummyZfsCommandRunner.cs" />
     <None Include="DummyZfsCommandRunner.cs" />
   </ItemGroup>
-  <ItemGroup  Condition="$(DefineConstants.Contains('DEBUG'))">
+  <ItemGroup Condition="$(DefineConstants.Contains('DEBUG'))">
     <None Remove="DummyZfsCommandRunner.cs" />
     <Compile Include="DummyZfsCommandRunner.cs" />
   </ItemGroup>
