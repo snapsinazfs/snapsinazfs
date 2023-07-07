@@ -16,64 +16,6 @@ public record ZfsRecord
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public ZfsRecord( string Name, string Kind, ZfsRecord? parent = null )
-    {
-        this.Name = Name;
-        IsPoolRoot = parent is null;
-        ParentDataset = parent ?? this;
-        this.Kind = Kind;
-        NameValidatorRegex = Kind switch
-        {
-            ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsPropertyValueConstants.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
-            ZfsPropertyValueConstants.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
-            _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
-        };
-
-        if ( parent is not null )
-        {
-            Enabled = parent.Enabled.IsLocal ? parent.Enabled with { Source = $"inherited from {parent.Name}" } : parent.Enabled;
-            LastDailySnapshotTimestamp = parent.LastDailySnapshotTimestamp.IsLocal ? parent.LastDailySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastDailySnapshotTimestamp;
-            LastFrequentSnapshotTimestamp = parent.LastFrequentSnapshotTimestamp.IsLocal ? parent.LastFrequentSnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastFrequentSnapshotTimestamp;
-            LastHourlySnapshotTimestamp = parent.LastHourlySnapshotTimestamp.IsLocal ? parent.LastHourlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastHourlySnapshotTimestamp;
-            LastMonthlySnapshotTimestamp = parent.LastMonthlySnapshotTimestamp.IsLocal ? parent.LastMonthlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastMonthlySnapshotTimestamp;
-            LastWeeklySnapshotTimestamp = parent.LastWeeklySnapshotTimestamp.IsLocal ? parent.LastWeeklySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastWeeklySnapshotTimestamp;
-            LastYearlySnapshotTimestamp = parent.LastYearlySnapshotTimestamp.IsLocal ? parent.LastYearlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastYearlySnapshotTimestamp;
-            PruneSnapshots = parent.PruneSnapshots.IsLocal ? parent.PruneSnapshots with { Source = $"inherited from {parent.Name}" } : parent.PruneSnapshots;
-            Recursion = parent.Recursion.IsLocal ? parent.Recursion with { Source = $"inherited from {parent.Name}" } : parent.Recursion;
-            SnapshotRetentionDaily = parent.SnapshotRetentionDaily.IsLocal ? parent.SnapshotRetentionDaily with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionDaily;
-            SnapshotRetentionFrequent = parent.SnapshotRetentionFrequent.IsLocal ? parent.SnapshotRetentionFrequent with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionFrequent;
-            SnapshotRetentionHourly = parent.SnapshotRetentionHourly.IsLocal ? parent.SnapshotRetentionHourly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionHourly;
-            SnapshotRetentionMonthly = parent.SnapshotRetentionMonthly.IsLocal ? parent.SnapshotRetentionMonthly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionMonthly;
-            SnapshotRetentionPruneDeferral = parent.SnapshotRetentionPruneDeferral.IsLocal ? parent.SnapshotRetentionPruneDeferral with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionPruneDeferral;
-            SnapshotRetentionWeekly = parent.SnapshotRetentionWeekly.IsLocal ? parent.SnapshotRetentionWeekly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionWeekly;
-            SnapshotRetentionYearly = parent.SnapshotRetentionYearly.IsLocal ? parent.SnapshotRetentionYearly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionYearly;
-            TakeSnapshots = parent.TakeSnapshots.IsLocal ? parent.TakeSnapshots with { Source = $"inherited from {parent.Name}" } : parent.TakeSnapshots;
-            Template = parent.Template.IsLocal ? parent.Template with { Source = $"inherited from {parent.Name}" } : parent.Template;
-        }
-        else
-        {
-            Enabled = new( ZfsPropertyNames.EnabledPropertyName, false, ZfsPropertySourceConstants.Local );
-            LastDailySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            LastFrequentSnapshotTimestamp = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            LastHourlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            LastMonthlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            LastWeeklySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            LastYearlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
-            PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
-            Recursion = new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionDaily = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionFrequent = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionHourly = new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, -1, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionMonthly = new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, -1, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionPruneDeferral = new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionWeekly = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local );
-            SnapshotRetentionYearly = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local );
-            TakeSnapshots = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
-            Template = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
-        }
-    }
-
     protected ZfsRecord( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null )
     {
         Name = name;
@@ -134,15 +76,69 @@ public record ZfsRecord
         BytesUsed = bytesUsed;
     }
 
-    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null )
+    public ZfsRecord( string Name, string Kind, ZfsRecord? parent = null )
     {
-        return new ( name, kind, enabled, takeSnapshots, pruneSnapshots, lastFrequentSnapshotTimestamp, lastHourlySnapshotTimestamp, lastDailySnapshotTimestamp, lastWeeklySnapshotTimestamp, lastMonthlySnapshotTimestamp, lastYearlySnapshotTimestamp, recursion, template, retentionFrequent, retentionHourly, retentionDaily, retentionWeekly, retentionMonthly, retentionYearly, retentionPruneDeferral, bytesAvailable, bytesUsed, parent );
+        this.Name = Name;
+        IsPoolRoot = parent is null;
+        ParentDataset = parent ?? this;
+        this.Kind = Kind;
+        NameValidatorRegex = Kind switch
+        {
+            ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            ZfsPropertyValueConstants.Volume => ZfsIdentifierRegexes.DatasetNameRegex( ),
+            ZfsPropertyValueConstants.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
+            _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
+        };
+
+        if ( parent is not null )
+        {
+            Enabled = parent.Enabled.IsLocal ? parent.Enabled with { Source = $"inherited from {parent.Name}" } : parent.Enabled;
+            LastDailySnapshotTimestamp = parent.LastDailySnapshotTimestamp.IsLocal ? parent.LastDailySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastDailySnapshotTimestamp;
+            LastFrequentSnapshotTimestamp = parent.LastFrequentSnapshotTimestamp.IsLocal ? parent.LastFrequentSnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastFrequentSnapshotTimestamp;
+            LastHourlySnapshotTimestamp = parent.LastHourlySnapshotTimestamp.IsLocal ? parent.LastHourlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastHourlySnapshotTimestamp;
+            LastMonthlySnapshotTimestamp = parent.LastMonthlySnapshotTimestamp.IsLocal ? parent.LastMonthlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastMonthlySnapshotTimestamp;
+            LastWeeklySnapshotTimestamp = parent.LastWeeklySnapshotTimestamp.IsLocal ? parent.LastWeeklySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastWeeklySnapshotTimestamp;
+            LastYearlySnapshotTimestamp = parent.LastYearlySnapshotTimestamp.IsLocal ? parent.LastYearlySnapshotTimestamp with { Source = $"inherited from {parent.Name}" } : parent.LastYearlySnapshotTimestamp;
+            PruneSnapshots = parent.PruneSnapshots.IsLocal ? parent.PruneSnapshots with { Source = $"inherited from {parent.Name}" } : parent.PruneSnapshots;
+            Recursion = parent.Recursion.IsLocal ? parent.Recursion with { Source = $"inherited from {parent.Name}" } : parent.Recursion;
+            SnapshotRetentionDaily = parent.SnapshotRetentionDaily.IsLocal ? parent.SnapshotRetentionDaily with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionDaily;
+            SnapshotRetentionFrequent = parent.SnapshotRetentionFrequent.IsLocal ? parent.SnapshotRetentionFrequent with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionFrequent;
+            SnapshotRetentionHourly = parent.SnapshotRetentionHourly.IsLocal ? parent.SnapshotRetentionHourly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionHourly;
+            SnapshotRetentionMonthly = parent.SnapshotRetentionMonthly.IsLocal ? parent.SnapshotRetentionMonthly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionMonthly;
+            SnapshotRetentionPruneDeferral = parent.SnapshotRetentionPruneDeferral.IsLocal ? parent.SnapshotRetentionPruneDeferral with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionPruneDeferral;
+            SnapshotRetentionWeekly = parent.SnapshotRetentionWeekly.IsLocal ? parent.SnapshotRetentionWeekly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionWeekly;
+            SnapshotRetentionYearly = parent.SnapshotRetentionYearly.IsLocal ? parent.SnapshotRetentionYearly with { Source = $"inherited from {parent.Name}" } : parent.SnapshotRetentionYearly;
+            TakeSnapshots = parent.TakeSnapshots.IsLocal ? parent.TakeSnapshots with { Source = $"inherited from {parent.Name}" } : parent.TakeSnapshots;
+            Template = parent.Template.IsLocal ? parent.Template with { Source = $"inherited from {parent.Name}" } : parent.Template;
+        }
+        else
+        {
+            Enabled = new( ZfsPropertyNames.EnabledPropertyName, false, ZfsPropertySourceConstants.Local );
+            LastDailySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            LastFrequentSnapshotTimestamp = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            LastHourlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            LastMonthlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            LastWeeklySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            LastYearlySnapshotTimestamp = new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+            PruneSnapshots = new( ZfsPropertyNames.PruneSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
+            Recursion = new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionDaily = new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionFrequent = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionHourly = new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, -1, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionMonthly = new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, -1, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionPruneDeferral = new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionWeekly = new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1, ZfsPropertySourceConstants.Local );
+            SnapshotRetentionYearly = new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1, ZfsPropertySourceConstants.Local );
+            TakeSnapshots = new( ZfsPropertyNames.TakeSnapshotsPropertyName, false, ZfsPropertySourceConstants.Local );
+            Template = new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local );
+        }
     }
 
     public long BytesAvailable { get; }
     public long BytesUsed { get; }
 
     public ZfsProperty<bool> Enabled { get; private set; }
+
     [JsonIgnore]
     public bool IsPoolRoot { get; }
 
@@ -214,6 +210,7 @@ public record ZfsRecord
 
     [JsonIgnore]
     public ZfsProperty<bool> PruneSnapshots { get; private set; }
+
     public ZfsProperty<string> Recursion { get; private set; }
     public ZfsProperty<int> SnapshotRetentionDaily { get; private set; }
     public ZfsProperty<int> SnapshotRetentionFrequent { get; private set; }
@@ -224,26 +221,6 @@ public record ZfsRecord
     public ZfsProperty<int> SnapshotRetentionYearly { get; private set; }
 
     public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; init; } = GetNewSnapshotCollection( );
-
-    /// <summary>
-    /// Gets the collection of <see cref="Snapshot"/>s, groups by <see cref="SnapshotPeriodKind"/>
-    /// </summary>
-    /// <remarks>
-    /// Note that this is a reference type, as are the values of this collection.<br/>
-    /// Thus, when cloning a <see cref="ZfsRecord"/> using the <see langword="with"/> operator, this collection
-    /// needs to be re-created and all of its values deep-copied manually, if unique references are needed.
-    /// </remarks>
-    public static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( ) =>
-        new(
-            new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
-            {
-                { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
-            } );
 
     public ZfsProperty<bool> TakeSnapshots { get; private set; }
     public ZfsProperty<string> Template { get; private set; }
@@ -351,6 +328,11 @@ public record ZfsRecord
         return snap;
     }
 
+    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null )
+    {
+        return new( name, kind, enabled, takeSnapshots, pruneSnapshots, lastFrequentSnapshotTimestamp, lastHourlySnapshotTimestamp, lastDailySnapshotTimestamp, lastWeeklySnapshotTimestamp, lastMonthlySnapshotTimestamp, lastYearlySnapshotTimestamp, recursion, template, retentionFrequent, retentionHourly, retentionDaily, retentionWeekly, retentionMonthly, retentionYearly, retentionPruneDeferral, bytesAvailable, bytesUsed, parent );
+    }
+
     /// <inheritdoc />
     /// <remarks>
     ///     Uses name and kind only, since they are the only truly immutable properties relevant to this function
@@ -361,6 +343,28 @@ public record ZfsRecord
         hashCode.Add( Kind, StringComparer.CurrentCulture );
         hashCode.Add( Name, StringComparer.CurrentCulture );
         return hashCode.ToHashCode( );
+    }
+
+    /// <summary>
+    ///     Gets the collection of <see cref="Snapshot" />s, groups by <see cref="SnapshotPeriodKind" />
+    /// </summary>
+    /// <remarks>
+    ///     Note that this is a reference type, as are the values of this collection.<br />
+    ///     Thus, when cloning a <see cref="ZfsRecord" /> using the <see langword="with" /> operator, this collection
+    ///     needs to be re-created and all of its values deep-copied manually, if unique references are needed.
+    /// </remarks>
+    public static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( )
+    {
+        return new(
+            new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+            {
+                { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
+            } );
     }
 
     public List<Snapshot> GetSnapshotsToPrune( )
@@ -432,6 +436,7 @@ public record ZfsRecord
         {
             return false;
         }
+
         TimeSpan timeSinceLastDailySnapshot = timestamp - LastDailySnapshotTimestamp.Value;
         bool atLeastOneDaySinceLastDailySnapshot = timeSinceLastDailySnapshot.TotalDays >= 1d;
         // Check if more than a day ago or if a different day of the year
@@ -525,6 +530,7 @@ public record ZfsRecord
         {
             return false;
         }
+
         TimeSpan timeSinceLastHourlySnapshot = timestamp - LastHourlySnapshotTimestamp.Value;
         bool atLeastOneHourSinceLastHourlySnapshot = timeSinceLastHourlySnapshot.TotalHours >= 1d;
         // Check if more than an hour ago or if hour is different
@@ -572,6 +578,7 @@ public record ZfsRecord
         {
             return false;
         }
+
         int lastMonthlySnapshotMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( LastMonthlySnapshotTimestamp.Value.LocalDateTime );
         int currentMonth = CultureInfo.CurrentCulture.Calendar.GetMonth( timestamp.LocalDateTime );
         int lastMonthlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastMonthlySnapshotTimestamp.Value.LocalDateTime );
@@ -627,6 +634,7 @@ public record ZfsRecord
         {
             return false;
         }
+
         TimeSpan timeSinceLastWeeklySnapshot = timestamp - LastWeeklySnapshotTimestamp.Value;
         bool atLeastOneWeekSinceLastWeeklySnapshot = timeSinceLastWeeklySnapshot.TotalDays >= 7d;
         // Check if more than a week ago or if the week number is different by local rules, using the chosen day as the first day of the week
@@ -666,6 +674,7 @@ public record ZfsRecord
         {
             return false;
         }
+
         int lastYearlySnapshotYear = CultureInfo.CurrentCulture.Calendar.GetYear( LastYearlySnapshotTimestamp.Value.LocalDateTime );
         int currentYear = CultureInfo.CurrentCulture.Calendar.GetYear( timestamp.LocalDateTime );
         // Check if the last yearly snapshot was in a different year
