@@ -38,7 +38,7 @@ public partial class ZfsConfigurationWindow
     private void BooleanRadioGroupOnMouseClick( MouseEventArgs args )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ), "local" );
+        ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
         UpdateFieldsForSelectedTreeNode( );
@@ -637,7 +637,7 @@ public partial class ZfsConfigurationWindow
     private void StringRadioGroupOnMouseClick( MouseEventArgs args )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ), "local" );
+        IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ) );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
         UpdateFieldsForSelectedTreeNode( );
@@ -657,7 +657,7 @@ public partial class ZfsConfigurationWindow
 
         ListViewWithSourceViewData viewData = (ListViewWithSourceViewData)templateListView.Data;
 
-        ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName, "local" );
+        ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = "local";
         UpdateFieldsForSelectedTreeNode( );
