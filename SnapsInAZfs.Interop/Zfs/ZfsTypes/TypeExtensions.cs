@@ -12,29 +12,64 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 public static class TypeExtensions
 {
     /// <summary>
-    ///     Gets an integer index for radio button groups assuming the order of true,false,inherited from this
+    ///     Gets an integer index for radio button groups assuming the order of true, false from this
     ///     <see cref="ZfsProperty{T}" />
     /// </summary>
-    /// <param name="property">The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups</param>
+    /// <param name="property">
+    ///     The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups
+    /// </param>
     /// <returns>
     ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
     ///     0: true<br />
     ///     1: false<br />
-    ///     2: inherited
     /// </returns>
     public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
     {
         return property.Value ? 0 : 1;
     }
 
+    /// <summary>
+    ///     Gets an integer index for radio button groups assuming the order of true,false from this
+    ///     <see langword="bool" /> value
+    /// </summary>
+    /// <param name="value">
+    ///     The <see langword="bool" /> to convert to an integer index for radio button groups
+    /// </param>
+    /// <returns>
+    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
+    ///     0: true<br />
+    ///     1: false<br />
+    /// </returns>
+    public static int AsTrueFalseRadioIndex( this bool value )
+    {
+        return value ? 0 : 1;
+    }
+
+    public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period )
+    {
+        return period.Kind switch
+        {
+            SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Hourly => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Daily => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+            SnapshotPeriodKind.NotSet => throw new ArgumentOutOfRangeException( nameof( period ) ),
+            _ => throw new FormatException( "Unrecognized SnapshotPeriod value" )
+        };
+    }
+
     public static string GetZfsPathParent( this string value )
     {
         int endIndex = value.LastIndexOfAny( new[] { '/', '@', '#' } );
 
-        return endIndex == -1 ?
+        return endIndex == -1
+            ?
             // This is a pool root.
             // Returned value is the same as input
-            value :
+            value
+            :
             // This is a non-root dataset, snapshot, or bookmark
             // Return its parent dataset name
             value[ ..endIndex ];
@@ -47,10 +82,21 @@ public static class TypeExtensions
         return endIndex == -1 ? value : value[ ..endIndex ];
     }
 
+    public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value == 0;
+    }
+
+    public static bool IsWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value != 0;
+    }
+
     public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
     {
         return string.Join( ',', strings );
     }
+
     public static string ToSpaceSeparatedSingleLineString( this IEnumerable<string> strings )
     {
         return string.Join( ' ', strings );
@@ -86,26 +132,4 @@ public static class TypeExtensions
 
         return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
-
-    public static bool IsWanted( this ZfsProperty<int> retentionProperty )
-    {
-        return retentionProperty.Value != 0;
-    }
-    public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
-    {
-        return retentionProperty.Value == 0;
-    }
-
-    public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period ) =>
-        period.Kind switch
-        {
-            SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
-            SnapshotPeriodKind.Hourly => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-            SnapshotPeriodKind.Daily => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
-            SnapshotPeriodKind.Weekly => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-            SnapshotPeriodKind.Monthly => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
-            SnapshotPeriodKind.Yearly => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
-            SnapshotPeriodKind.NotSet => throw new ArgumentOutOfRangeException( nameof( period ) ),
-            _ => throw new FormatException( "Unrecognized SnapshotPeriod value" )
-        };
 }
