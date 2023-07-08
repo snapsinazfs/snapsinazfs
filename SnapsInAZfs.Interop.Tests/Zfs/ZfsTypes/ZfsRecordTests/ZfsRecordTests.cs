@@ -4,6 +4,7 @@
 
 using System.Globalization;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
@@ -236,5 +237,27 @@ public class ZfsRecordTests
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "InheritedFrom" ).EqualTo( propertySource[ 15.. ] ) );
             } );
         }
+    }
+
+    [Test]
+    public void DeepCopyClone_NewObjectEqual( )
+    {
+        ZfsRecord sourceRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        sourceRecord.AddSnapshot( SnapshotTests.SnapshotTestHelpers.GetStandardTestSnapshotForParent( SnapshotPeriod.Daily, DateTimeOffset.Now, sourceRecord ) );
+
+        ZfsRecord clonedRecord = sourceRecord.DeepCopyClone( );
+
+        Assert.That( clonedRecord.Equals(sourceRecord), Is.True );
+    }
+
+    [Test]
+    public void DeepCopyClone_NewObjectNotReferenceToOriginal( )
+    {
+        ZfsRecord sourceRecord = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        sourceRecord.AddSnapshot( SnapshotTests.SnapshotTestHelpers.GetStandardTestSnapshotForParent( SnapshotPeriod.Daily, DateTimeOffset.Now, sourceRecord ) );
+
+        ZfsRecord clonedRecord = sourceRecord.DeepCopyClone( );
+
+        Assert.That( ReferenceEquals(clonedRecord,sourceRecord), Is.False );
     }
 }
