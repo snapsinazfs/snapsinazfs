@@ -6,7 +6,7 @@ using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-public record Snapshot : ZfsRecord, IComparable<Snapshot>
+public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
 {
     public Snapshot( string name, SnapshotPeriodKind periodKind, DateTimeOffset timestamp, ZfsRecord parentDataset )
         : this(
@@ -61,14 +61,10 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
                 0,
                 parent )
     {
-        SnapshotName = snapshotName;
-        Period = snapshotPeriod;
-        Timestamp = snapshotTimestamp;
+        _snapshotName = snapshotName;
+        _period = snapshotPeriod;
+        _timestamp = snapshotTimestamp;
     }
-
-    public ZfsProperty<SnapshotPeriod> Period { get; private set; } = new( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Frequent, ZfsPropertySourceConstants.Local );
-    public ZfsProperty<string> SnapshotName { get; private set; }
-    public ZfsProperty<DateTimeOffset> Timestamp { get; private set; } = new( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
 
     /// <summary>
     ///     Compares the current instance with another <see cref="Snapshot" /> and returns an integer that indicates
@@ -159,6 +155,36 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
             string.Compare( SnapshotName.Value, other.SnapshotName.Value, StringComparison.Ordinal );
     }
 
+    /// <inheritdoc />
+    public override Snapshot DeepCopyClone( ZfsRecord? newParent = null )
+    {
+        ArgumentNullException.ThrowIfNull( newParent );
+        Snapshot newSnapshot = new( new( Name ),
+                                    Enabled with { },
+                                    TakeSnapshots with { },
+                                    PruneSnapshots with { },
+                                    LastFrequentSnapshotTimestamp with { },
+                                    LastHourlySnapshotTimestamp with { },
+                                    LastDailySnapshotTimestamp with { },
+                                    LastWeeklySnapshotTimestamp with { },
+                                    LastMonthlySnapshotTimestamp with { },
+                                    LastYearlySnapshotTimestamp with { },
+                                    Recursion with { },
+                                    Template with { },
+                                    SnapshotRetentionFrequent with { },
+                                    SnapshotRetentionHourly with { },
+                                    SnapshotRetentionDaily with { },
+                                    SnapshotRetentionWeekly with { },
+                                    SnapshotRetentionMonthly with { },
+                                    SnapshotRetentionYearly with { },
+                                    SnapshotRetentionPruneDeferral with { },
+                                    SnapshotName with { },
+                                    Period with { },
+                                    Timestamp with { },
+                                    newParent );
+        return newSnapshot;
+    }
+
     public string GetSnapshotOptionsStringForZfsSnapshot( )
     {
         return $"-o {SnapshotName.SetString} -o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
@@ -168,36 +194,5 @@ public record Snapshot : ZfsRecord, IComparable<Snapshot>
     public override string ToString( )
     {
         return $"{SnapshotName.Value}";
-    }
-
-    /// <exception cref="OverflowException">For <see langword="int" /> properties, <paramref name="propertyValue" /> represents
-    ///     a number less than <see cref="int.MinValue" /> or greater than <see cref="int.MaxValue" />.</exception>
-    public new IZfsProperty UpdateProperty( string propertyName, string propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotNamePropertyName => SnapshotName = SnapshotName with { Value = propertyValue, Source = propertySource },
-            ZfsPropertyNames.SnapshotPeriodPropertyName => UpdateProperty( propertyName, (SnapshotPeriod)propertyValue, propertySource ),
-            ZfsPropertyNames.SnapshotTimestampPropertyName => UpdateProperty( propertyName, DateTimeOffset.Parse( propertyValue ), propertySource ),
-            _ => base.UpdateProperty( propertyName, propertyValue, propertySource )
-        };
-    }
-
-    public ZfsProperty<SnapshotPeriod> UpdateProperty( string propertyName, SnapshotPeriod propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotPeriodPropertyName => Period = Period with { Value = propertyValue, Source = propertySource },
-            _ => throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported SnapshotKind property" )
-        };
-    }
-
-    public new ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, string propertySource = ZfsPropertySourceConstants.Local )
-    {
-        return propertyName switch
-        {
-            ZfsPropertyNames.SnapshotTimestampPropertyName => Timestamp = Timestamp with { Value = propertyValue, Source = propertySource },
-            _ => base.UpdateProperty( propertyName, propertyValue, propertySource )
-        };
     }
 }
