@@ -220,7 +220,26 @@ public partial class ZfsConfigurationWindow
 
     private void RestorePreviousSelectedZfsTreeNode( )
     {
-        SelectedTreeNode.TreeDataset = SelectedTreeNode.BaseDataset with { };
+        foreach ( string propName in _modifiedPropertiesSinceLastSaveForCurrentItem.Keys )
+        {
+            switch ( SelectedTreeNode.BaseDataset[propName] )
+            {
+                case ZfsProperty<bool> prop:
+                    SelectedTreeNode.TreeDataset.UpdateProperty( propName, prop.Value, prop.Source );
+                    continue;
+                case ZfsProperty<int> prop:
+                    SelectedTreeNode.TreeDataset.UpdateProperty( propName, prop.Value, prop.Source );
+                    continue;
+                case ZfsProperty<DateTimeOffset> prop:
+                    SelectedTreeNode.TreeDataset.UpdateProperty( propName, prop.Value, prop.Source );
+                    continue;
+                case ZfsProperty<string> prop:
+                    SelectedTreeNode.TreeDataset.UpdateProperty( propName, prop.Value, prop.Source );
+                    continue;
+            }
+        }
+
+        _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
     }
 
     private void RetentionDailyTextFieldOnLeave( FocusEventArgs e )
