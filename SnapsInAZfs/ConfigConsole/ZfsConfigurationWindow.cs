@@ -41,7 +41,7 @@ public partial class ZfsConfigurationWindow
         ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
 
@@ -120,7 +120,7 @@ public partial class ZfsConfigurationWindow
     {
         UpdateSelectedItemBooleanRadioGroupProperty( enabledRadioGroup, "local" );
         UpdateButtonState( );
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void EnableEventHandlers( )
@@ -160,7 +160,7 @@ public partial class ZfsConfigurationWindow
     {
         UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup, "local" );
         UpdateButtonState( );
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void RecursionRadioGroupSelectedItemChanged( SelectedItemChangedArgs e )
@@ -171,7 +171,7 @@ public partial class ZfsConfigurationWindow
             UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
         }
 
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
 
@@ -193,7 +193,6 @@ public partial class ZfsConfigurationWindow
             _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
             Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
             List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( Program.Settings, ConfigConsole.BaseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
-
             zfsTreeView.AddObjects( treeRootNodes );
             UpdateButtonState( );
             zfsTreeView.SetFocus( );
@@ -211,14 +210,13 @@ public partial class ZfsConfigurationWindow
     {
         DisableEventHandlers( );
         ClearAllPropertyFields( );
-        _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-        RestorePreviousSelectedItem( );
-        UpdateFieldsForSelectedTreeNode( false );
+        RestorePreviousSelectedZfsTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( false );
         UpdateButtonState( );
         EnableEventHandlers( );
     }
 
-    private void RestorePreviousSelectedItem( )
+    private void RestorePreviousSelectedZfsTreeNode( )
     {
         SelectedTreeNode.TreeDataset = SelectedTreeNode.BaseDataset with { };
     }
@@ -245,7 +243,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -273,7 +271,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -301,7 +299,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -329,7 +327,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -357,7 +355,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -385,7 +383,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -413,7 +411,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -487,7 +485,7 @@ public partial class ZfsConfigurationWindow
         }
         finally
         {
-            UpdateFieldsForSelectedTreeNode( false );
+            UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
         }
@@ -640,7 +638,7 @@ public partial class ZfsConfigurationWindow
         IZfsProperty newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ) );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = newProperty.Source;
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
 
@@ -648,7 +646,7 @@ public partial class ZfsConfigurationWindow
     {
         UpdateSelectedItemBooleanRadioGroupProperty( takeSnapshotsRadioGroup, "local" );
         UpdateButtonState( );
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
@@ -660,7 +658,7 @@ public partial class ZfsConfigurationWindow
         ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
         _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
         viewData.SourceTextField.Text = "local";
-        UpdateFieldsForSelectedTreeNode( );
+        UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
 
@@ -752,7 +750,7 @@ public partial class ZfsConfigurationWindow
         currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
     }
 
-    private void UpdateFieldsForSelectedTreeNode( bool manageEventHandlers = true )
+    private void UpdateFieldsForSelectedZfsTreeNode( bool manageEventHandlers = true )
     {
         if ( manageEventHandlers )
         {
@@ -892,7 +890,7 @@ public partial class ZfsConfigurationWindow
             old.TreeDataset = old.BaseDataset with { };
         }
 
-        UpdateFieldsForSelectedTreeNode( false );
+        UpdateFieldsForSelectedZfsTreeNode( false );
         UpdateButtonState( );
         EnableEventHandlers( );
     }
