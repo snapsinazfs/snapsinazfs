@@ -8,19 +8,18 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public class ZfsObjectConfigurationTreeNode : TreeNode
 {
-    public ZfsObjectConfigurationTreeNode( string name, ZfsRecord baseDataset, ZfsRecord treeDataset, ZfsRecord? baseParentDataset = null, ZfsRecord? treeParentDataset = null )
+    public ZfsObjectConfigurationTreeNode( string name, ZfsRecord baseObject, ZfsRecord treeObject )
         : base( name )
     {
-        TreeDataset = treeDataset;
-        BaseDataset = baseDataset;
-        TreeParentDataset = treeParentDataset ?? treeDataset;
-        BaseParentDataset = baseParentDataset ?? baseDataset;
+        TreeObject = treeObject;
+        BaseObject = baseObject;
+        TreeSnapshots = TreeObject.Snapshots.Values.SelectMany( periodCollection => periodCollection.Values, ( _, snap ) => new SnapshotListViewEntry( snap.Name, snap, snap with { } ) ).ToList( );
+        BaseSnapshots = BaseObject.Snapshots.Values.SelectMany( periodCollection => periodCollection.Values, ( _, snap ) => new SnapshotListViewEntry( snap.Name, snap, snap with { } ) ).ToList( );
     }
 
-    public ZfsRecord BaseDataset { get; set; }
-    public ZfsRecord BaseParentDataset { get; set; }
-
-    public bool IsModified => TreeDataset != BaseDataset;
-    public ZfsRecord TreeDataset { get; set; }
-    public ZfsRecord TreeParentDataset { get; set; }
+    public ZfsRecord BaseObject { get; set; }
+    public List<SnapshotListViewEntry> BaseSnapshots { get; set; }
+    public bool IsModified => TreeObject != BaseObject;
+    public ZfsRecord TreeObject { get; set; }
+    public List<SnapshotListViewEntry> TreeSnapshots { get; set; }
 }
