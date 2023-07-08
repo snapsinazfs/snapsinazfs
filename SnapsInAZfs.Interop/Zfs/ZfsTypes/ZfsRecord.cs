@@ -12,7 +12,7 @@ using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-public partial record ZfsRecord
+public partial record ZfsRecord : IComparable<ZfsRecord>
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -326,6 +326,18 @@ public partial record ZfsRecord
         }
 
         return newRecord;
+    }
+
+    /// <inheritdoc />
+    public int CompareTo( ZfsRecord? other )
+    {
+        // If the other snapshot is null, consider this record earlier rank
+        if ( other is null )
+        {
+            return -1;
+        }
+
+        return string.Compare( Name, other.Name, StringComparison.Ordinal );
     }
 
     /// <inheritdoc />
