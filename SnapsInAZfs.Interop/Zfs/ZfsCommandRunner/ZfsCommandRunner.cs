@@ -348,27 +348,6 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
-    {
-        List<ITreeNode> treeRootNodes = new( );
-        ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hpt filesystem -d 0" ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
-        }
-
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", $"type,{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hprt filesystem,volume {baseDatasets.Keys.ToSpaceSeparatedSingleLineString( )}" ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
-        }
-
-        return treeRootNodes;
-    }
-
     /// <inheritdoc />
     public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {

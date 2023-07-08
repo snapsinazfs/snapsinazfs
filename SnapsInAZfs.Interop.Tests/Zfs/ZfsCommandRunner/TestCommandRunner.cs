@@ -40,12 +40,6 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync(ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc />
     public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync(bool dryRun, string poolName, string[] propertyArray)
     {
         throw new NotImplementedException();

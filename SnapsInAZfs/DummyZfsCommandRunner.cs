@@ -49,29 +49,6 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<List<ITreeNode>> GetZfsObjectsForConfigConsoleTreeAsync( ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets )
-    {
-        List<ITreeNode> treeRootNodes = new( );
-        ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
-        await foreach ( string zfsLine in ZfsExecEnumeratorAsync( "get", "poolroots-withproperties.txt" ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            ParsePoolRootDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, treeRootNodes, allTreeNodes );
-        }
-
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", "alldatasets-withproperties.txt" ).ConfigureAwait( true ) )
-        {
-            Logger.Trace( $"Read line {zfsGetLine}" );
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
-
-            ParseDatasetZfsGetLineForConfigConsoleTree( baseDatasets, treeDatasets, lineTokens, allTreeNodes );
-        }
-
-        return treeRootNodes;
-    }
-
-    /// <inheritdoc />
     public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray )
     {
         return !dryRun;
