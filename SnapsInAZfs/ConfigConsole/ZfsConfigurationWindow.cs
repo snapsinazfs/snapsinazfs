@@ -177,7 +177,9 @@ public partial class ZfsConfigurationWindow
 
     private void RefreshZfsTreeViewFromZfs( )
     {
-        RefreshZfsTreeViewFromZfsAsync( ).RunSynchronously( );
+        using AutoResetEvent blocker = new( false );
+        RefreshZfsTreeViewFromZfsAsync( ).ContinueWith( ( _, autoResetEvent ) => ( (AutoResetEvent)autoResetEvent! ).Set( ), blocker );
+        blocker.WaitOne( 15000 );
     }
 
     private async Task RefreshZfsTreeViewFromZfsAsync( )
