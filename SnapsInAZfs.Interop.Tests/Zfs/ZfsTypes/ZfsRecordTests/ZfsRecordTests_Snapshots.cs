@@ -26,31 +26,32 @@ public class ZfsRecordTests_Snapshots
     {
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
         Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ) );
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
-        Assume.That( dataset, Is.Not.Null );
-        Assume.That( dataset.Snapshots, Is.Not.Null );
-        Assume.That( dataset.Snapshots, Is.Not.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Daily ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Daily ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Empty );
-        Assume.That( dataset.LastObservedFrequentSnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
-        Assume.That( dataset.LastObservedHourlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
-        Assume.That( dataset.LastObservedDailySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
-        Assume.That( dataset.LastObservedWeeklySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
-        Assume.That( dataset.LastObservedMonthlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
-        Assume.That( dataset.LastObservedYearlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        Assume.That( childDs, Is.Not.Null );
+        Assume.That( childDs.Snapshots, Is.Not.Null );
+        Assume.That( childDs.Snapshots, Is.Not.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Daily ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Daily ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Empty );
+        Assume.That( childDs.LastObservedFrequentSnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assume.That( childDs.LastObservedHourlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assume.That( childDs.LastObservedDailySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assume.That( childDs.LastObservedWeeklySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assume.That( childDs.LastObservedMonthlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
+        Assume.That( childDs.LastObservedYearlySnapshotTimestamp, Is.EqualTo( DateTimeOffset.UnixEpoch ) );
 
-        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, timestamp, dataset );
-        dataset.AddSnapshot( snapshot );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, timestamp, childDs );
+        childDs.AddSnapshot( snapshot );
 
         // Disable this because the filter it with an assumption in the test itself, above
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
@@ -59,69 +60,69 @@ public class ZfsRecordTests_Snapshots
         switch ( periodKind )
         {
             case SnapshotPeriodKind.Frequent:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedFrequentSnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedFrequentSnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedHourlySnapshotTimestamp,
-                    dataset.LastObservedDailySnapshotTimestamp,
-                    dataset.LastObservedWeeklySnapshotTimestamp,
-                    dataset.LastObservedMonthlySnapshotTimestamp,
-                    dataset.LastObservedYearlySnapshotTimestamp
+                    childDs.LastObservedHourlySnapshotTimestamp,
+                    childDs.LastObservedDailySnapshotTimestamp,
+                    childDs.LastObservedWeeklySnapshotTimestamp,
+                    childDs.LastObservedMonthlySnapshotTimestamp,
+                    childDs.LastObservedYearlySnapshotTimestamp
                 };
                 break;
             case SnapshotPeriodKind.Hourly:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedHourlySnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedHourlySnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedFrequentSnapshotTimestamp,
-                    dataset.LastObservedDailySnapshotTimestamp,
-                    dataset.LastObservedWeeklySnapshotTimestamp,
-                    dataset.LastObservedMonthlySnapshotTimestamp,
-                    dataset.LastObservedYearlySnapshotTimestamp
+                    childDs.LastObservedFrequentSnapshotTimestamp,
+                    childDs.LastObservedDailySnapshotTimestamp,
+                    childDs.LastObservedWeeklySnapshotTimestamp,
+                    childDs.LastObservedMonthlySnapshotTimestamp,
+                    childDs.LastObservedYearlySnapshotTimestamp
                 };
                 break;
             case SnapshotPeriodKind.Daily:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedDailySnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedDailySnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedFrequentSnapshotTimestamp,
-                    dataset.LastObservedHourlySnapshotTimestamp,
-                    dataset.LastObservedWeeklySnapshotTimestamp,
-                    dataset.LastObservedMonthlySnapshotTimestamp,
-                    dataset.LastObservedYearlySnapshotTimestamp
+                    childDs.LastObservedFrequentSnapshotTimestamp,
+                    childDs.LastObservedHourlySnapshotTimestamp,
+                    childDs.LastObservedWeeklySnapshotTimestamp,
+                    childDs.LastObservedMonthlySnapshotTimestamp,
+                    childDs.LastObservedYearlySnapshotTimestamp
                 };
                 break;
             case SnapshotPeriodKind.Weekly:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedWeeklySnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedWeeklySnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedFrequentSnapshotTimestamp,
-                    dataset.LastObservedHourlySnapshotTimestamp,
-                    dataset.LastObservedDailySnapshotTimestamp,
-                    dataset.LastObservedMonthlySnapshotTimestamp,
-                    dataset.LastObservedYearlySnapshotTimestamp
+                    childDs.LastObservedFrequentSnapshotTimestamp,
+                    childDs.LastObservedHourlySnapshotTimestamp,
+                    childDs.LastObservedDailySnapshotTimestamp,
+                    childDs.LastObservedMonthlySnapshotTimestamp,
+                    childDs.LastObservedYearlySnapshotTimestamp
                 };
                 break;
             case SnapshotPeriodKind.Monthly:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedMonthlySnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedMonthlySnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedFrequentSnapshotTimestamp,
-                    dataset.LastObservedHourlySnapshotTimestamp,
-                    dataset.LastObservedDailySnapshotTimestamp,
-                    dataset.LastObservedWeeklySnapshotTimestamp,
-                    dataset.LastObservedYearlySnapshotTimestamp
+                    childDs.LastObservedFrequentSnapshotTimestamp,
+                    childDs.LastObservedHourlySnapshotTimestamp,
+                    childDs.LastObservedDailySnapshotTimestamp,
+                    childDs.LastObservedWeeklySnapshotTimestamp,
+                    childDs.LastObservedYearlySnapshotTimestamp
                 };
                 break;
             case SnapshotPeriodKind.Yearly:
-                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = dataset.LastObservedYearlySnapshotTimestamp;
+                lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedYearlySnapshotTimestamp;
                 otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
                 {
-                    dataset.LastObservedFrequentSnapshotTimestamp,
-                    dataset.LastObservedHourlySnapshotTimestamp,
-                    dataset.LastObservedDailySnapshotTimestamp,
-                    dataset.LastObservedWeeklySnapshotTimestamp,
-                    dataset.LastObservedMonthlySnapshotTimestamp
+                    childDs.LastObservedFrequentSnapshotTimestamp,
+                    childDs.LastObservedHourlySnapshotTimestamp,
+                    childDs.LastObservedDailySnapshotTimestamp,
+                    childDs.LastObservedWeeklySnapshotTimestamp,
+                    childDs.LastObservedMonthlySnapshotTimestamp
                 };
                 break;
         }
@@ -143,17 +144,18 @@ public class ZfsRecordTests_Snapshots
     [TestCase( SnapshotPeriodKind.Yearly )]
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind periodKind )
     {
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
-        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, dataset );
-        dataset.AddSnapshot( snapshot );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, childDs );
+        childDs.AddSnapshot( snapshot );
         Assert.Multiple( ( ) =>
         {
-            foreach ( (SnapshotPeriodKind period, ConcurrentDictionary<string, Snapshot>? snapsInPeriod ) in dataset.Snapshots )
+            foreach ( (SnapshotPeriodKind period, ConcurrentDictionary<string, Snapshot>? snapsInPeriod ) in childDs.Snapshots )
             {
                 if ( period != periodKind )
                 {
-                    Assert.That( dataset.Snapshots[ period ], Does.Not.ContainKey( snapshot.Name ) );
-                    Assert.That( dataset.Snapshots[ period ], Does.Not.ContainValue( snapshot ) );
+                    Assert.That( childDs.Snapshots[ period ], Does.Not.ContainKey( snapshot.Name ) );
+                    Assert.That( childDs.Snapshots[ period ], Does.Not.ContainValue( snapshot ) );
                 }
                 else
                 {
@@ -168,23 +170,24 @@ public class ZfsRecordTests_Snapshots
     [Parallelizable]
     public void GetSnapshotsToPrune_NoSnapshotsInDataset( )
     {
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
-        Assume.That( dataset, Is.Not.Null );
-        Assume.That( dataset.Snapshots, Is.Not.Null );
-        Assume.That( dataset.Snapshots, Is.Not.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Daily ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Daily ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Empty );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Not.Null );
-        Assume.That( dataset.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Empty );
-        List<Snapshot> snapshotsToPrune = dataset.GetSnapshotsToPrune( );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        Assume.That( childDs, Is.Not.Null );
+        Assume.That( childDs.Snapshots, Is.Not.Null );
+        Assume.That( childDs.Snapshots, Is.Not.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Frequent ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Hourly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Daily ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Daily ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Weekly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Monthly ], Is.Empty );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Not.Null );
+        Assume.That( childDs.Snapshots[ SnapshotPeriodKind.Yearly ], Is.Empty );
+        List<Snapshot> snapshotsToPrune = childDs.GetSnapshotsToPrune( );
         Assert.That( snapshotsToPrune, Is.Empty );
     }
 
@@ -198,7 +201,8 @@ public class ZfsRecordTests_Snapshots
     [TestCase( "2025-07-05T00:00:00.0000000", ExpectedResult = true )]
     public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsDailySnapshotNeeded( timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsDailySnapshotNeeded( timestamp );
     }
 
     [Test]
@@ -211,7 +215,8 @@ public class ZfsRecordTests_Snapshots
     [TestCase( "2023-07-03T01:31:00.0000000", ExpectedResult = true )]
     public bool IsFrequentSnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsFrequentSnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsFrequentSnapshotNeeded(SnapshotTimingSettings.GetDefault(),  timestamp );
     }
 
     [Test]
@@ -224,7 +229,8 @@ public class ZfsRecordTests_Snapshots
     [TestCase( "2024-07-03T02:00:00.0000000", ExpectedResult = true )]
     public bool IsHourlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsHourlySnapshotNeeded( timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsHourlySnapshotNeeded( timestamp );
     }
 
     [Test]
@@ -237,7 +243,8 @@ public class ZfsRecordTests_Snapshots
     [TestCase( "2025-01-01T00:00:00.0000000", ExpectedResult = true )]
     public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsMonthlySnapshotNeeded( timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsMonthlySnapshotNeeded( timestamp );
     }
 
     [Test]
@@ -250,7 +257,8 @@ public class ZfsRecordTests_Snapshots
     [TestCase( "2023-07-11T00:00:00.0000000", ExpectedResult = true )]
     public bool IsWeeklySnapshotNeeded( DateTimeOffset timestamp )
     {
-        return ZfsRecordTestHelpers.GetNewTestRootFileSystem( ).IsWeeklySnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
+        ZfsRecord newTestRootFileSystem = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        return newTestRootFileSystem.IsWeeklySnapshotNeeded( SnapshotTimingSettings.GetDefault( ), timestamp );
     }
 
     [Test]
@@ -271,7 +279,7 @@ public class ZfsRecordTests_Snapshots
     [Parallelizable]
     public void Snapshots_CollectionInitializedProperly( )
     {
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         Assume.That( dataset, Is.Not.Null );
 
         Assert.Multiple( ( ) =>
@@ -298,7 +306,7 @@ public class ZfsRecordTests_Snapshots
     [TestCase( SnapshotPeriodKind.Yearly )]
     public void Snapshots_SubCollectionsInitializedCorrectly( SnapshotPeriodKind periodKind )
     {
-        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystemFs1( );
+        ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
 
         Assume.That( dataset, Is.Not.Null );
         Assume.That( dataset.Snapshots, Is.Not.Null );

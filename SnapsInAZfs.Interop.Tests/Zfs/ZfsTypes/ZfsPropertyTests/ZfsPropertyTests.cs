@@ -35,7 +35,7 @@ public class ZfsPropertyTests
     [TestCase( "differentBoolNameA", true, "differentBoolNameB", false, ExpectedResult = false )]
     public bool EqualityIsByRecordValue<T>( string propertyAName, T propertyAValue, string propertyBName, T propertyBValue ) where T : notnull
     {
-        ZfsProperty<T> propertyA = new( propertyAName, propertyAValue, ZfsPropertySourceConstants.Local );
+        ZfsProperty<T> propertyA =ZfsProperty<T>.CreateWithoutParent( propertyAName, propertyAValue );
         ZfsProperty<T> propertyB = propertyA with { Name = propertyBName, Value = propertyBValue };
         return propertyA == propertyB;
     }
@@ -45,7 +45,7 @@ public class ZfsPropertyTests
     {
         // The same 4 equality tests as the generic version, but DateTimeOffset can't be constant, so we have to set them up individually
         // Also check that a straight copy of propertyA is equal to propertyA by value
-        ZfsProperty<DateTimeOffset> propertyA = new( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+        ZfsProperty<DateTimeOffset> propertyA = ZfsProperty<DateTimeOffset>.CreateWithoutParent( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch );
         ZfsProperty<DateTimeOffset> propertyB = propertyA with { Name = "sameDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch };
         ZfsProperty<DateTimeOffset> propertyC = propertyA with { Name = "differentDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch };
         ZfsProperty<DateTimeOffset> propertyD = propertyA with { Name = "sameDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch.AddHours( -1 ) };
@@ -62,39 +62,30 @@ public class ZfsPropertyTests
     }
 
     [Test]
-    [TestCase( ZfsPropertySourceConstants.Local, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.SnapsInAZfs, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.Default, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.None, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.Received, ExpectedResult = false )]
-    [TestCase( "inherited from somewhere", ExpectedResult = true )]
-    [TestCase( "bogus source", ExpectedResult = false )]
-    public bool IsInherited_AsExpected( string propertySource )
+    [TestCase( true, ExpectedResult = false )]
+    [TestCase( false, ExpectedResult = true )]
+    public bool IsInherited_AsExpected( bool isLocal )
     {
-        ZfsProperty<string> property = new( "unimportantName", "unimportantValue", propertySource );
+        ZfsProperty<string> property = ZfsProperty<string>.CreateWithoutParent( "unimportantName", "unimportantValue", isLocal );
         return property.IsInherited;
     }
 
     [Test]
-    [TestCase( ZfsPropertySourceConstants.Local, ExpectedResult = true )]
-    [TestCase( ZfsPropertySourceConstants.SnapsInAZfs, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.Default, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.None, ExpectedResult = false )]
-    [TestCase( ZfsPropertySourceConstants.Received, ExpectedResult = false )]
-    [TestCase( "inherited from somewhere", ExpectedResult = false )]
-    [TestCase( "bogus source", ExpectedResult = false )]
-    public bool IsLocal_AsExpected( string propertySource )
+    [TestCase( true, ExpectedResult = true )]
+    [TestCase( false, ExpectedResult = false )]
+    public bool IsLocal_AsExpected( bool isLocal )
     {
-        ZfsProperty<string> property = new( "unimportantName", "unimportantValue", propertySource );
+        ZfsProperty<string> property = ZfsProperty<string>.CreateWithoutParent( "unimportantName", "unimportantValue", isLocal );
         return property.IsLocal;
     }
+    //todo: Need to test proper resolution of the source property
 
     [Test]
     [TestCase( ZfsPropertyNames.EnabledPropertyName, ExpectedResult = true )]
     [TestCase( ZfsNativePropertyNames.Available, ExpectedResult = false )]
     public bool IsSnapsInAZfsProperty_CanDifferentiateProperties( string propertyName )
     {
-        ZfsProperty<string> property = new( propertyName, "test value", ZfsPropertySourceConstants.Local );
+        ZfsProperty<string> property = ZfsProperty<string>.CreateWithoutParent( propertyName, "test value" );
         return property.IsSnapsInAZfsProperty;
     }
 
@@ -122,14 +113,14 @@ public class ZfsPropertyTests
     [TestCase( ZfsPropertyNames.TemplatePropertyName )]
     public void IsSnapsInAZfsProperty_CanIdentifyKnownSiazProperties( string propertyName )
     {
-        ZfsProperty<string> siazProperty = new( propertyName, "test value", ZfsPropertySourceConstants.Local );
+        ZfsProperty<string> siazProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, "test value" );
         Assert.That( siazProperty.IsSnapsInAZfsProperty, Is.True );
     }
 
     [Test]
     public void ReferenceEqualityOfInterfaceFalse( )
     {
-        ZfsProperty<DateTimeOffset> propertyA = new( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch, ZfsPropertySourceConstants.Local );
+        ZfsProperty<DateTimeOffset> propertyA = ZfsProperty<DateTimeOffset>.CreateWithoutParent( "sameDateTimeOffsetName", DateTimeOffset.UnixEpoch );
         ZfsProperty<DateTimeOffset> propertyB = propertyA with { Name = "sameDateTimeOffsetName", Value = DateTimeOffset.UnixEpoch };
         IZfsProperty propertyABoxed = propertyA;
         // Another boxed instance of the SAME object. Should not have the same reference.

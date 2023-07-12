@@ -1,8 +1,6 @@
 ﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
-
-using NUnit.Framework.Internal;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -69,8 +67,10 @@ public class SnapshotTests
         Assume.That( rightPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for right snapshot" );
         DateTimeOffset leftTimestamp = DateTimeOffset.Now;
         DateTimeOffset rightTimestamp = leftTimestamp;
-        Snapshot leftSnapshot = SnapshotTestHelpers.GetStandardTestSnapshot( leftPeriod, leftTimestamp );
-        Snapshot rightSnapshot = SnapshotTestHelpers.GetStandardTestSnapshot( rightPeriod, rightTimestamp );
+        ZfsRecord leftParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        ZfsRecord rightParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        Snapshot leftSnapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( leftPeriod, leftTimestamp, leftParent );
+        Snapshot rightSnapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( rightPeriod, rightTimestamp, rightParent );
 
         if ( leftPeriod < rightPeriod )
         {
@@ -128,11 +128,11 @@ public class SnapshotTests
         Assume.That(originalPeriod, Is.Not.EqualTo(newPeriod),"Skipping change to same period"  );
 
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshot( originalPeriod, DateTimeOffset.Now );
-        ZfsProperty<SnapshotPeriod> original = snapshot.Period with { };
+        ZfsProperty<string> original = snapshot.Period with { };
 
         Assume.That( snapshot.Period, Is.EqualTo( original ) );
 
-        snapshot.UpdateProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, newPeriod );
+        snapshot.UpdateProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, (SnapshotPeriod)newPeriod );
 
         Assert.That( snapshot.Period, Is.Not.EqualTo( original ) );
     }

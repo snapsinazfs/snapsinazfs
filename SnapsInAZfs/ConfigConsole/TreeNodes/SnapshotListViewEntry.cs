@@ -2,7 +2,9 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
-namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+
+namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 
 public record SnapshotListViewEntry( string ListViewText, Snapshot BaseSnapshot, Snapshot ListViewSnapshot )
 {

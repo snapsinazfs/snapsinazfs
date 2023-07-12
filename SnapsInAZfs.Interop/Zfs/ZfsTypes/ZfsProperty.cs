@@ -10,27 +10,82 @@ using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-public readonly record struct ZfsProperty<T>( string Name, T Value, string Source ) : IZfsProperty where T : notnull
+public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notnull
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+    // ReSharper disable once StaticMemberInGenericType
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    private ZfsProperty( string Name, T Value, bool IsLocal = true )
+    {
+        this.Name = Name;
+        this.Value = Value;
+        this.IsLocal = IsLocal;
+        IsSnapsInAZfsProperty = Name.StartsWith( "snapsinazfs.com:" );
+    }
+
+    public ZfsProperty( ZfsRecord Owner, string Name, T Value, bool IsLocal = true )
+    {
+        this.Owner = Owner;
+        this.Name = Name;
+        this.Value = Value;
+        this.IsLocal = IsLocal;
+        IsSnapsInAZfsProperty = Name.StartsWith( "snapsinazfs.com:" );
+    }
+
     /// <summary>
     ///     Gets whether this is a SnapsInAZfs property or not
     /// </summary>
     /// <remarks>Set by constructor, if property name begins with "snapsinazfs.com:"</remarks>
     [JsonIgnore]
-    public bool IsSnapsInAZfsProperty { get; } = Name.StartsWith( "snapsinazfs.com:" );
+    public bool IsSnapsInAZfsProperty { get; }
 
     /// <summary>
     ///     Gets a boolean indicating if this property is a SnapsInAZfs property, is a string, and is equal to "-"
     /// </summary>
     [JsonIgnore]
-    public bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is ZfsPropertyValueConstants.None;
+    public readonly bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is ZfsPropertyValueConstants.None;
+
+    [JsonIgnore]
+    public string Source =>
+        IsLocal switch
+        {
+            true => ZfsPropertySourceConstants.Local,
+            false when Owner is null => ZfsPropertySourceConstants.None,
+            false when Owner.ParentDataset[ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
+            false => Owner.ParentDataset[ Name ].Source
+        };
+
+    public T Value { get; init; }
+
+    /// <summary>
+    ///     Compares equality of the <see cref="Value" /> property of this <see cref="ZfsProperty{T}" /> and <paramref name="other" />
+    ///     using the default <see cref="EqualityComparer{T}" /> for <typeparamref name="T" />
+    /// </summary>
+    public readonly bool Equals( T? other )
+    {
+        return EqualityComparer<T>.Default.Equals( Value, other );
+    }
+
+    /// <summary>
+    ///     Compares equality of this <see cref="ZfsProperty{T}" /> and <paramref name="other" />, using the <see cref="Name" /> and
+    ///     <see cref="Value" /> properties ONLY.
+    /// </summary>
+    /// <remarks>
+    ///     Type <typeparamref name="T" /> of <paramref name="other" /> must be the same as this <see cref="ZfsProperty{T}" />
+    /// </remarks>
+    public readonly bool Equals( ZfsProperty<T> other )
+    {
+        return Name == other.Name && EqualityComparer<T>.Default.Equals( Value, other.Value );
+    }
+
+    [JsonIgnore]
+    public ZfsRecord? Owner { get; set; }
 
     /// <summary>
     ///     Gets a string representation of the Value property, in an appropriate form for its type
     /// </summary>
     [JsonIgnore]
-    public string ValueString => Value switch
+    public readonly string ValueString => Value switch
     {
         int intValue => intValue.ToString( ),
         string value => value,
@@ -40,17 +95,63 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
         _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 
-    [JsonIgnore]
-    public bool IsInherited => Source.StartsWith( "inherited" );
+    string IZfsProperty.Source =>
+        IsLocal switch
+        {
+            true => ZfsPropertySourceConstants.Local,
+            false when Owner is null => ZfsPropertySourceConstants.None,
+            false when Owner.ParentDataset[ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
+            false => Owner.ParentDataset[ Name ].Source
+        };
 
     [JsonIgnore]
-    public string InheritedFrom => IsInherited ? Source[ 15.. ] : Source;
-
-    [JsonIgnore]
-    public bool IsLocal => Source == ZfsPropertySourceConstants.Local;
+    public readonly bool IsInherited => !IsLocal;
 
     [JsonIgnore]
     public string SetString => $"{Name}={ValueString}";
+
+    public string Name { get; init; }
+    public bool IsLocal { get; init; }
+
+    public ZfsRecord ChangeParentReference( ZfsRecord newParent )
+    {
+        return Owner = newParent;
+    }
+
+    public static ZfsProperty<bool> CreateWithoutParent( string name, bool value, bool isLocal = true )
+    {
+        return new( name, value, isLocal );
+    }
+
+    public static ZfsProperty<int> CreateWithoutParent( string name, int value, bool isLocal = true )
+    {
+        return new( name, value, isLocal );
+    }
+
+    public static ZfsProperty<T> CreateWithoutParent( string name, T value, bool isLocal = true )
+    {
+        return new( name, value, isLocal );
+    }
+
+    public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, DateTimeOffset value, bool isLocal = true )
+    {
+        return new( name, value, isLocal );
+    }
+
+    // ReSharper disable once InconsistentNaming
+    public readonly void Deconstruct( out ZfsRecord? Parent, out string Name, out T Value, out bool IsLocal )
+    {
+        Parent = Owner;
+        Name = this.Name;
+        Value = this.Value;
+        IsLocal = this.IsLocal;
+    }
+
+    /// <inheritdoc />
+    public readonly override int GetHashCode( )
+    {
+        return HashCode.Combine( Value, Name, IsLocal );
+    }
 
     /// <summary>
     ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see langword="bool" />) equivalent
@@ -72,7 +173,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
 
         if ( bool.TryParse( input.Value, out bool result ) )
         {
-            property = new( input.Name, result, input.Source );
+            property = new( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
 
@@ -97,7 +198,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     {
         if ( int.TryParse( input.Value, out int result ) )
         {
-            property = new ZfsProperty<int>( input.Name, result, input.Source );
+            property = new ZfsProperty<int>( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
 
@@ -124,7 +225,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
     {
         if ( DateTimeOffset.TryParse( input.Value, out DateTimeOffset result ) )
         {
-            property = new ZfsProperty<DateTimeOffset>( input.Name, result, input.Source );
+            property = new ZfsProperty<DateTimeOffset>( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
 
@@ -152,7 +253,7 @@ public readonly record struct ZfsProperty<T>( string Name, T Value, string Sourc
         try
         {
             SnapshotPeriod period = (SnapshotPeriod)input.Value;
-            property = new ZfsProperty<SnapshotPeriod>( input.Name, period, input.Source );
+            property = new ZfsProperty<SnapshotPeriod>( input.Name, period, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
         catch ( FormatException ex )

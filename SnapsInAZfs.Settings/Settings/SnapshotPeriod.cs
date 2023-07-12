@@ -2,6 +2,8 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using NLog.LayoutRenderers.Wrappers;
+
 namespace SnapsInAZfs.Settings.Settings;
 
 /// <summary>
@@ -80,6 +82,16 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         return Kind.CompareTo( other );
     }
 
+    public static int Compare( SnapshotPeriod? x, SnapshotPeriod? y )
+    {
+        return x switch
+        {
+            null when y is null => 0,
+            null => -1,
+            _ => x.CompareTo( y )
+        };
+    }
+
     /// <inheritdoc />
     public override bool Equals( object? obj )
     {
@@ -118,6 +130,21 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             YearlyString => Yearly,
             NotSetString => NotSet,
             _ => throw new FormatException( $"{value} is not a valid SnapshotPeriod value" )
+        };
+    }
+
+    public static SnapshotPeriodKind StringToSnapshotPeriodKind( string value )
+    {
+        return value switch
+        {
+            FrequentString => SnapshotPeriodKind.Frequent,
+            HourlyString => SnapshotPeriodKind.Hourly,
+            DailyString => SnapshotPeriodKind.Daily,
+            WeeklyString => SnapshotPeriodKind.Weekly,
+            MonthlyString => SnapshotPeriodKind.Monthly,
+            YearlyString => SnapshotPeriodKind.Yearly,
+            NotSetString => SnapshotPeriodKind.NotSet,
+            _ => throw new FormatException( $"{value} is not a valid SnapshotPeriodKind value" )
         };
     }
 

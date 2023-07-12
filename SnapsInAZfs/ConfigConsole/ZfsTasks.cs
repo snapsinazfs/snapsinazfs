@@ -8,6 +8,7 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
+using ZfsObjectConfigurationTreeNode = SnapsInAZfs.ConfigConsole.TreeNodes.ZfsObjectConfigurationTreeNode;
 
 namespace SnapsInAZfs.ConfigConsole;
 

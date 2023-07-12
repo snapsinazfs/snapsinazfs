@@ -132,4 +132,10 @@ public static class TypeExtensions
 
         return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
+
+    public static SnapshotPeriod ToSnapshotPeriod( this string input ) => (SnapshotPeriod)input;
+    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
+    {
+        return SnapshotPeriod.StringToSnapshotPeriodKind( input );
+    }
 }

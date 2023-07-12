@@ -8,10 +8,11 @@
 //      the code is regenerated.
 //  </auto-generated>
 // -----------------------------------------------------------------------------
-
-using Terminal.Gui;
-
 namespace SnapsInAZfs.ConfigConsole {
+    using System;
+    using Terminal.Gui;
+    
+    
     public partial class ZfsConfigurationWindow : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme whiteOnRed;
@@ -35,8 +36,12 @@ namespace SnapsInAZfs.ConfigConsole {
         private Terminal.Gui.ColorScheme treeAndListViewColorScheme;
         
         private Terminal.Gui.FrameView zfsConfigurationTreeFrame;
-        
+
         internal Terminal.Gui.TreeView zfsTreeView;
+        
+        private Terminal.Gui.FrameView snapshotsFrame;
+        
+        private Terminal.Gui.ListView snapshotsListView;
         
         private Terminal.Gui.FrameView generalFrame;
         
@@ -213,6 +218,8 @@ namespace SnapsInAZfs.ConfigConsole {
             this.nameTextField = new Terminal.Gui.TextField();
             this.nameLabel = new Terminal.Gui.Label();
             this.generalFrame = new Terminal.Gui.FrameView();
+            this.snapshotsListView = new Terminal.Gui.ListView();
+            this.snapshotsFrame = new Terminal.Gui.FrameView();
             this.zfsTreeView = new Terminal.Gui.TreeView();
             this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
             this.whiteOnRed = new Terminal.Gui.ColorScheme();
@@ -303,7 +310,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.zfsConfigurationTreeFrame.Title = "ZFS Objects";
             this.Add(this.zfsConfigurationTreeFrame);
             this.zfsTreeView.Width = Dim.Fill(0);
-            this.zfsTreeView.Height = Dim.Fill(1);
+            this.zfsTreeView.Height = Dim.Fill(9);
             this.zfsTreeView.X = 0;
             this.zfsTreeView.Y = 0;
             this.zfsTreeView.ColorScheme = this.treeAndListViewColorScheme;
@@ -316,6 +323,30 @@ namespace SnapsInAZfs.ConfigConsole {
             this.zfsTreeView.Style.LeaveLastRow = false;
             this.zfsTreeView.Style.ShowBranchLines = true;
             this.zfsConfigurationTreeFrame.Add(this.zfsTreeView);
+            this.snapshotsFrame.Width = Dim.Fill(0);
+            this.snapshotsFrame.Height = Dim.Fill(0);
+            this.snapshotsFrame.X = 0;
+            this.snapshotsFrame.Y = 13;
+            this.snapshotsFrame.Data = "snapshotsFrame";
+            this.snapshotsFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
+            this.snapshotsFrame.Border.BorderBrush = Terminal.Gui.Color.White;
+            this.snapshotsFrame.Border.Effect3D = false;
+            this.snapshotsFrame.Border.Effect3DBrush = null;
+            this.snapshotsFrame.Border.DrawMarginFrame = true;
+            this.snapshotsFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.snapshotsFrame.Title = "Snapshots";
+            this.zfsConfigurationTreeFrame.Add(this.snapshotsFrame);
+            this.snapshotsListView.Width = Dim.Fill(0);
+            this.snapshotsListView.Height = Dim.Fill(0);
+            this.snapshotsListView.ColorScheme = treeAndListViewColorScheme;
+            this.snapshotsListView.X = 0;
+            this.snapshotsListView.Y = 0;
+            this.snapshotsListView.Data = "snapshotsListView";
+            this.snapshotsListView.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.snapshotsListView.Source = new Terminal.Gui.ListWrapper(new string[] {});
+            this.snapshotsListView.AllowsMarking = false;
+            this.snapshotsListView.AllowsMultipleSelection = false;
+            this.snapshotsFrame.Add(this.snapshotsListView);
             this.generalFrame.Width = 73;
             this.generalFrame.Height = 10;
             this.generalFrame.X = 80;

@@ -17,6 +17,7 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;
+using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.TemplateConfigurationListItem;
 
 namespace SnapsInAZfs.ConfigConsole;
 

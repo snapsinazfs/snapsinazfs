@@ -22,80 +22,26 @@ public class ZfsRecordTestHelpers
     {
         return ZfsRecord.CreateInstanceFromAllProperties( name,
                                                           ZfsPropertyValueConstants.FileSystem,
-                                                          new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
+                                                          ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.EnabledPropertyName, true ),
+                                                          ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.TakeSnapshotsPropertyName, true ),
+                                                          ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.PruneSnapshotsPropertyName, true ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ) ),
+                                                          ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs ),
+                                                          ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1 ),
+                                                          ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ),
                                                           107374182400L, // 100 GiB
                                                           10737418240L );
-    }
-
-    internal static ZfsRecord GetNewTestRootFileSystemFs1( string name = "testRoot/fs1" )
-    {
-        return ZfsRecord.CreateInstanceFromAllProperties( name,
-                                                          ZfsPropertyValueConstants.FileSystem,
-                                                          new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
-                                                          107374182400L, // 100 GiB
-                                                          10737418240L,  // 10 GiB
-                                                          GetNewTestRootFileSystem( name.GetZfsPathParent( ) ) );
-    }
-
-    internal static ZfsRecord GetNewTestRootFileSystemVol1( string name = "testRoot/vol1" )
-    {
-        return ZfsRecord.CreateInstanceFromAllProperties( name,
-                                                          ZfsPropertyValueConstants.Volume,
-                                                          new( ZfsPropertyNames.EnabledPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TakeSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.PruneSnapshotsPropertyName, true, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:15:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T01:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-07-03T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.ParseExact( "2023-01-01T00:00:00.0000000", "O", DateTimeFormatInfo.CurrentInfo ), ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.TemplatePropertyName, "default", ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 2, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1, ZfsPropertySourceConstants.Local ),
-                                                          new( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0, ZfsPropertySourceConstants.Local ),
-                                                          107374182400L, // 100 GiB
-                                                          10737418240L,  // 10 GiB
-                                                          GetNewTestRootFileSystem( name.GetZfsPathParent( ) ) );
     }
 
     /// <summary>All valid characters in a ZFS dataset identifier component</summary>
