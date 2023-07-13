@@ -16,7 +16,6 @@ using System.Runtime.CompilerServices;
 using SnapsInAZfs.ConfigConsole.TreeNodes;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
-using ZfsObjectConfigurationTreeNode = SnapsInAZfs.ConfigConsole.TreeNodes.ZfsObjectConfigurationTreeNode;
 
 namespace SnapsInAZfs.ConfigConsole;
 
@@ -108,8 +107,9 @@ public partial class ZfsConfigurationWindow
         pruneSnapshotsRadioGroup.SelectedItemChanged -= PruneSnapshotsRadioGroupSelectedItemChanged;
         pruneSnapshotsInheritButton.Clicked -= PruneSnapshotsInheritButtonClick;
         recursionRadioGroup.SelectedItemChanged -= RecursionRadioGroupSelectedItemChanged;
-        recursionRadioGroup.MouseClick -= StringRadioGroupOnMouseClick;
+        recursionInheritButton.Clicked -= RecursionInheritButtonClick;
         templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
+        templateInheritButton.Clicked += TemplateInheritButtonClick;
         retentionFrequentTextField.Leave -= RetentionFrequentTextFieldOnLeave;
         retentionHourlyTextField.Leave -= RetentionHourlyTextFieldOnLeave;
         retentionDailyTextField.Leave -= RetentionDailyTextFieldOnLeave;
@@ -133,6 +133,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.EnabledPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -163,8 +164,9 @@ public partial class ZfsConfigurationWindow
         pruneSnapshotsRadioGroup.SelectedItemChanged += PruneSnapshotsRadioGroupSelectedItemChanged;
         pruneSnapshotsInheritButton.Clicked += PruneSnapshotsInheritButtonClick;
         recursionRadioGroup.SelectedItemChanged += RecursionRadioGroupSelectedItemChanged;
-        recursionRadioGroup.MouseClick += StringRadioGroupOnMouseClick;
+        recursionInheritButton.Clicked += RecursionInheritButtonClick;
         templateListView.SelectedItemChanged += TemplateListViewOnSelectedItemChanged;
+        templateInheritButton.Clicked += TemplateInheritButtonClick;
         retentionFrequentTextField.Leave += RetentionFrequentTextFieldOnLeave;
         retentionHourlyTextField.Leave += RetentionHourlyTextFieldOnLeave;
         retentionDailyTextField.Leave += RetentionDailyTextFieldOnLeave;
@@ -187,6 +189,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.PruneSnapshotsPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState();
                 return;
         }
     }
@@ -196,6 +199,20 @@ public partial class ZfsConfigurationWindow
         UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup );
         UpdateButtonState( );
         UpdateFieldsForSelectedZfsTreeNode( );
+    }
+
+    private void RecursionInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Recursion Setting", $"Inherit Recursion setting {SelectedTreeNode.TreeDataset.ParentDataset.Recursion.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.RecursionPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
     }
 
     private void RecursionRadioGroupSelectedItemChanged( SelectedItemChangedArgs e )
@@ -451,7 +468,7 @@ public partial class ZfsConfigurationWindow
         }
     }
 
-    private void SaveCurrentButtonOnClicked( )
+    private async void SaveCurrentButtonOnClicked( )
     {
         try
         {
@@ -469,8 +486,20 @@ public partial class ZfsConfigurationWindow
             }
 
             string zfsObjectPath = SelectedTreeNode.TreeDataset.Name;
-            string pendingCommand = $"zfs set {SelectedTreeNode.GetModifiedZfsProperties( ).ToStringForZfsSet( )} {zfsObjectPath}";
-            int dialogResult = MessageBox.ErrorQuery( "Confirm Saving ZFS Object Configuration", $"The following command will be executed:\n{pendingCommand}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
+            bool areAnyPropertiesModified = SelectedTreeNode.GetModifiedZfsProperties( out List<IZfsProperty>? modifiedZfsProperties );
+            bool areAnyPropertiesInherited = SelectedTreeNode.GetInheritedZfsProperties( out List<IZfsProperty>? inheritedZfsProperties );
+            List<string> pendingCommands = new( );
+            if ( areAnyPropertiesModified )
+            {
+                pendingCommands.Add( $"zfs set {modifiedZfsProperties!.ToStringForZfsSet( )} {zfsObjectPath}" );
+            }
+
+            if ( areAnyPropertiesInherited )
+            {
+                pendingCommands.AddRange( inheritedZfsProperties!.Select( inheritedProperty => $"zfs inherit {inheritedProperty.Name} {zfsObjectPath}" ) );
+            }
+
+            int dialogResult = MessageBox.ErrorQuery( "Confirm Saving ZFS Object Configuration", $"The following commands will be executed:\n{pendingCommands.ToNewlineSeparatedString( )}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
 
             switch ( dialogResult )
             {
@@ -478,20 +507,33 @@ public partial class ZfsConfigurationWindow
                     Logger.Debug( "User canceled save confirmation for ZFS object {0}", zfsObjectPath );
                     return;
                 case 1:
-                    Logger.Debug( "User confirmed the pending zfs set operation {0}", pendingCommand );
+                    Logger.Debug( "User confirmed the pending zfs set operation {0}", pendingCommands.ToNewlineSeparatedString( ) );
                     break;
             }
 
-            Logger.Info( "Saving {0}", zfsObjectPath );
-            if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, SelectedTreeNode.GetModifiedZfsProperties( ), ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
+            Logger.Info( "Saving changes to {0}", zfsObjectPath );
+            if ( areAnyPropertiesModified )
             {
-                Logger.Trace( "Result from SetPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.SetPropertiesForDataset" );
-                if ( !Program.Settings.DryRun )
+                if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, modifiedZfsProperties!, ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
                 {
-                    Logger.Error( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                    Logger.Trace( "Result from SetPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.SetPropertiesForDataset" );
+                    if ( !Program.Settings.DryRun )
+                    {
+                        Logger.Error( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                    }
                 }
+            }
 
-                return;
+            if ( areAnyPropertiesInherited )
+            {
+                if ( !await ZfsTasks.InheritPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner ).ConfigureAwait( true ) && !Program.Settings.DryRun )
+                {
+                    Logger.Trace( "Result from InheritPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.InheritPropertiesForDataset" );
+                    if ( !Program.Settings.DryRun )
+                    {
+                        Logger.Error( "Inheriting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                    }
+                }
             }
 
             Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
@@ -677,6 +719,20 @@ public partial class ZfsConfigurationWindow
         UpdateFieldsForSelectedZfsTreeNode( );
     }
 
+    private void TemplateInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Template Setting", $"Inherit Template setting {SelectedTreeNode.TreeDataset.ParentDataset.Template.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TemplatePropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
     {
         ArgumentNullException.ThrowIfNull( args, nameof( args ) );
@@ -858,17 +914,6 @@ public partial class ZfsConfigurationWindow
         await zfsRefreshTask;
         UpdateButtonState( );
         EnableEventHandlers( );
-    }
-
-    private void ZfsTreeViewOnMouseClick( MouseEventArgs e )
-    {
-        if ( _alreadyHandledSelectedItemChanged )
-        {
-            _alreadyHandledSelectedItemChanged = false;
-            return;
-        }
-
-        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void zfsTreeViewOnSelectionChanged( object? sender, SelectionChangedEventArgs<ITreeNode> e )
