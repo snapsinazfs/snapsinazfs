@@ -27,22 +27,16 @@ internal static class ZfsTasks
         try
         {
             List<ITreeNode> treeRootNodes = new( );
-            ConcurrentDictionary<string, TreeNode> allTreeNodes = new( );
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, baseSnapshots ).ConfigureAwait( true );
             ImmutableSortedDictionary<string, ZfsRecord> sortedDatasetDictionary = baseDatasets.ToImmutableSortedDictionary( );
+
             foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedDatasetDictionary )
             {
-                ZfsRecord treeDataset = baseDataset.DeepCopyClone( baseDataset.IsPoolRoot ? null : treeDatasets[ baseDataset.ParentDataset.Name ] );
-                treeDatasets[ dsName ] = treeDataset;
-                ZfsObjectConfigurationTreeNode node = new( dsName, baseDataset, treeDataset );
-                allTreeNodes[ dsName ] = node;
                 if ( baseDataset.IsPoolRoot )
                 {
-                    treeRootNodes.Add( node );
-                }
-                else
-                {
-                    allTreeNodes[ baseDataset.ParentDataset.Name ].Children.Add( node );
+                    ZfsObjectConfigurationTreeNode rootNode = new ( dsName, baseDataset, baseDataset.DeepCopyClone( ) );
+                    treeRootNodes.Add( rootNode );
+                    treeDatasets[ dsName ] = rootNode.TreeDataset;
                 }
             }
 
