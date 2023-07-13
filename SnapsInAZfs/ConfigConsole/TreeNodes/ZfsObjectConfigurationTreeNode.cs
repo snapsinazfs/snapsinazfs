@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -246,8 +246,13 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="bool" />, referring to the newly-updated
     ///     property
     /// </returns>
+    /// <remarks>
+    ///     If the specified property has already been inherited, this method first reverts the change to that property before making
+    ///     this change
+    /// </remarks>
     public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue )
     {
+        RevertBooleanPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
         _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
@@ -262,8 +267,13 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="int" />, referring to the newly-updated
     ///     property
     /// </returns>
+    /// <remarks>
+    ///     If the specified property has already been inherited, this method first reverts the change to that property before making
+    ///     this change
+    /// </remarks>
     public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue )
     {
+        RevertIntPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
         _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
@@ -278,8 +288,13 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="string" />, referring to the newly-updated
     ///     property
     /// </returns>
+    /// <remarks>
+    ///     If the specified property has already been inherited, this method first reverts the change to that property before making
+    ///     this change
+    /// </remarks>
     public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
     {
+        RevertStringPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
         _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
@@ -338,6 +353,33 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         else
         {
             Logger.Error( "Unexpected property type encountered when updating {0} on {1}. Expected boolean type. Got {2}", propertyName, TreeDataset.Name, changedProperty.GetType( ).GenericTypeArguments[ 0 ].FullName );
+        }
+    }
+
+    /// <summary>
+    ///     Reverts an int property back to its base state, if it existed in the specified
+    ///     <paramref name="changedPropertyCollection" />
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="changedPropertyCollection"></param>
+    private void RevertIntPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    {
+        if ( !changedPropertyCollection.TryRemove( propertyName, out IZfsProperty? changedProperty ) )
+        {
+            return;
+        }
+
+        if ( changedProperty is ZfsProperty<int> )
+        {
+            if ( BaseDataset[ changedProperty.Name ] is ZfsProperty<int> baseProperty )
+            {
+                Logger.Trace( "Reverting previously-modified property {0} on {1} to original value", propertyName, TreeDataset.Name );
+                TreeDataset.UpdateProperty( propertyName, baseProperty.Value, baseProperty.IsLocal );
+            }
+        }
+        else
+        {
+            Logger.Error( "Unexpected property type encountered when updating {0} on {1}. Expected int type. Got {2}", propertyName, TreeDataset.Name, changedProperty.GetType( ).GenericTypeArguments[ 0 ].FullName );
         }
     }
 
