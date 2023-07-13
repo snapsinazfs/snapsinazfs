@@ -64,8 +64,7 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
 
     /// <summary>
     ///     Gets a boolean value indicating if any properties have been changed or explicitly inherited in the UI for this specific node,
-    ///     and not just due to
-    ///     inheritance from a modified parent.
+    ///     and not just due to inheritance from a modified parent.
     /// </summary>
     public bool IsLocallyModified => !_modifiedPropertiesSinceLastSave.IsEmpty || !_inheritedPropertiesSinceLastSave.IsEmpty;
 
@@ -75,10 +74,16 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     public bool IsModified => !TreeDataset.Equals( BaseDataset );
 
     /// <inheritdoc />
+    /// <remarks>
+    ///     Attempts to set are ignored. Getter returns the last element of <see cref="TreeDataset" />'s Name property.
+    /// </remarks>
     public override string Text
     {
         get => TreeDataset.Name.GetLastPathElement( );
-        set => Logger.Warn( "Illegal attempt to set text of a tree node to {0}", value );
+        set
+        {
+            // Just eat this
+        }
     }
 
     /// <summary>
@@ -174,6 +179,11 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     /// <param name="propertyName"></param>
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not handled by this method</exception>
     /// <exception cref="ArgumentException">If <paramref name="propertyName" /> is a non-inheritable property</exception>
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    /// <remarks>
+    ///     If the specified property has already been modified, this method first reverts the change to that property before inheriting
+    ///     from parent.
+    /// </remarks>
     public void InheritPropertyFromParent( string propertyName )
     {
         if ( TreeDataset.IsPoolRoot )
