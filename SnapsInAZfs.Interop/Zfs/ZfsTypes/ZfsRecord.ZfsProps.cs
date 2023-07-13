@@ -88,8 +88,6 @@ public partial record ZfsRecord
     /// </summary>
     public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
 
-    public event DateTimeOffsetPropertyChangedEventHandler? DateTimeOffsetPropertyChanged;
-
     /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
     /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
     public ref readonly ZfsProperty<bool> InheritBoolPropertyFromParent( string propertyName )
@@ -265,34 +263,27 @@ public partial record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     public virtual ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, bool isLocal = true )
     {
         switch ( propertyName )
         {
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
                 _lastFrequentSnapshotTimestamp = LastFrequentSnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastFrequentSnapshotTimestamp );
                 return ref _lastFrequentSnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
                 _lastHourlySnapshotTimestamp = LastHourlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastHourlySnapshotTimestamp );
                 return ref _lastHourlySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
                 _lastDailySnapshotTimestamp = LastDailySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastDailySnapshotTimestamp );
                 return ref _lastDailySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
                 _lastWeeklySnapshotTimestamp = LastWeeklySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastWeeklySnapshotTimestamp );
                 return ref _lastWeeklySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
                 _lastMonthlySnapshotTimestamp = LastMonthlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastMonthlySnapshotTimestamp );
                 return ref _lastMonthlySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
                 _lastYearlySnapshotTimestamp = LastYearlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _lastYearlySnapshotTimestamp );
                 return ref _lastYearlySnapshotTimestamp;
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported DateTimeOffset property" );
@@ -424,15 +415,6 @@ public partial record ZfsRecord
         }
     }
 
-    private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> updatedProperty )
-    {
-        Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, updatedProperty.Name, sender.Kind, sender.Name );
-        if ( this[ updatedProperty.Name ].IsInherited )
-        {
-            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
-        }
-    }
-
     private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> property )
     {
         Logger.Trace( "{2} received int property change event for {0} from {1}", property.Name, sender.Name, Name );
@@ -482,8 +464,6 @@ public partial record ZfsRecord
     }
 
     public delegate void BoolPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<bool> property );
-
-    public delegate void DateTimeOffsetPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property );
 
     public delegate void IntPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<int> property );
 
