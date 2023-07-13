@@ -92,11 +92,38 @@ public static class TypeExtensions
         return retentionProperty.Value != 0;
     }
 
+    /// <exception cref="OutOfMemoryException">
+    ///     The length of the resulting string overflows the maximum allowed length (
+    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
     public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
     {
         return string.Join( ',', strings );
     }
 
+    /// <exception cref="OutOfMemoryException">
+    ///     The length of the resulting string overflows the maximum allowed length (
+    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
+    public static string ToNewlineSeparatedString( this IEnumerable<string> strings )
+    {
+        return string.Join( '\n', strings );
+    }
+
+    public static SnapshotPeriod ToSnapshotPeriod( this string input )
+    {
+        return (SnapshotPeriod)input;
+    }
+
+    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
+    {
+        return SnapshotPeriod.StringToSnapshotPeriodKind( input );
+    }
+
+    /// <exception cref="OutOfMemoryException">
+    ///     The length of the resulting string overflows the maximum allowed length (
+    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
     public static string ToSpaceSeparatedSingleLineString( this IEnumerable<string> strings )
     {
         return string.Join( ' ', strings );
@@ -131,11 +158,5 @@ public static class TypeExtensions
         }
 
         return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
-    }
-
-    public static SnapshotPeriod ToSnapshotPeriod( this string input ) => (SnapshotPeriod)input;
-    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
-    {
-        return SnapshotPeriod.StringToSnapshotPeriodKind( input );
     }
 }
