@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -8,12 +8,27 @@ using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 
+/// <summary>
+///     Represents a node in the tree of datasets in <see cref="ZfsConfigurationWindow" />
+/// </summary>
 public class ZfsObjectConfigurationTreeNode : TreeNode
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSave = new( );
 
+    /// <summary>
+    ///     Creates a new instance of a <see cref="ZfsObjectConfigurationTreeNode" /> having the specified <paramref name="name" /> (used
+    ///     for display text), <paramref name="baseDataset" />, and <paramref name="treeDataset" />
+    /// </summary>
+    /// <param name="name">The name of this tree node. Used for display text in the UI only</param>
+    /// <param name="baseDataset">
+    ///     A reference to the base copy of the <see cref="ZfsRecord" /> this tree node will point to
+    /// </param>
+    /// <param name="treeDataset">
+    ///     A reference to the tree copy of the <see cref="ZfsRecord" /> this tree node will point to. This is the object used for
+    ///     display.
+    /// </param>
     public ZfsObjectConfigurationTreeNode( string name, ZfsRecord baseDataset, ZfsRecord treeDataset )
         : base( name )
     {
