@@ -355,9 +355,9 @@ namespace SnapsInAZfs.ConfigConsole {
             this.nameLabel.Text = "Name";
             this.nameLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.generalFrame.Add(this.nameLabel);
-            this.nameTextField.Width = 48;
+            this.nameTextField.Width = Dim.Fill(1);
             this.nameTextField.Height = 1;
-            this.nameTextField.X = 22;
+            this.nameTextField.X = 19;
             this.nameTextField.Y = 0;
             this.nameTextField.ColorScheme = this.inheritedPropertyTextFieldColorScheme;
             this.nameTextField.Secret = false;
@@ -375,7 +375,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.typeLabel);
             this.typeTextField.Width = 12;
             this.typeTextField.Height = 1;
-            this.typeTextField.X = 22;
+            this.typeTextField.X = 19;
             this.typeTextField.Y = 1;
             this.typeTextField.ColorScheme = this.inheritedPropertyTextFieldColorScheme;
             this.typeTextField.Secret = false;
@@ -393,7 +393,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.enabledLabel);
             this.enabledRadioGroup.Width = 15;
             this.enabledRadioGroup.Height = 1;
-            this.enabledRadioGroup.X = 22;
+            this.enabledRadioGroup.X = 19;
             this.enabledRadioGroup.Y = 3;
             this.enabledRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.enabledRadioGroup.Data = "enabledRadioGroup";
@@ -432,7 +432,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.takeSnapshotsLabel);
             this.takeSnapshotsRadioGroup.Width = 15;
             this.takeSnapshotsRadioGroup.Height = 1;
-            this.takeSnapshotsRadioGroup.X = 22;
+            this.takeSnapshotsRadioGroup.X = 19;
             this.takeSnapshotsRadioGroup.Y = 4;
             this.takeSnapshotsRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.takeSnapshotsRadioGroup.Data = "takeSnapshotsRadioGroup";
@@ -471,7 +471,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.pruneSnapshotsLabel);
             this.pruneSnapshotsRadioGroup.Width = 15;
             this.pruneSnapshotsRadioGroup.Height = 1;
-            this.pruneSnapshotsRadioGroup.X = 22;
+            this.pruneSnapshotsRadioGroup.X = 19;
             this.pruneSnapshotsRadioGroup.Y = 5;
             this.pruneSnapshotsRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.pruneSnapshotsRadioGroup.Data = "pruneSnapshotsRadioGroup";
@@ -510,7 +510,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.recursionLabel);
             this.recursionRadioGroup.Width = 15;
             this.recursionRadioGroup.Height = 1;
-            this.recursionRadioGroup.X = 22;
+            this.recursionRadioGroup.X = 19;
             this.recursionRadioGroup.Y = 6;
             this.recursionRadioGroup.ColorScheme = this.localPropertyRadioGroupColorScheme;
             this.recursionRadioGroup.Data = "recursionRadioGroup";
@@ -549,7 +549,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.generalFrame.Add(this.templateLabel);
             this.templateListView.Width = 16;
             this.templateListView.Height = 1;
-            this.templateListView.X = 22;
+            this.templateListView.X = 19;
             this.templateListView.Y = 7;
             this.templateListView.ColorScheme = this.localPropertyTextFieldColorScheme;
             this.templateListView.Data = "templateListView";
