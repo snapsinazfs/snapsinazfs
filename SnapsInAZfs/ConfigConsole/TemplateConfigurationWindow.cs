@@ -23,7 +23,7 @@ namespace SnapsInAZfs.ConfigConsole;
 
 public partial class TemplateConfigurationWindow
 {
-    internal static bool templatesAddedRemovedOrModified;
+    internal static bool TemplatesAddedRemovedOrModified;
     private static readonly ustring InvalidFieldValueDialogTitle = ustring.Make( InvalidFieldValueDialogTitleString );
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
@@ -76,7 +76,7 @@ public partial class TemplateConfigurationWindow
         Logger.Debug( "Committing modified templates to base collections" );
         foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems.Where( currentTemplate => currentTemplate.IsModified ) )
         {
-            templatesAddedRemovedOrModified = true;
+            TemplatesAddedRemovedOrModified = true;
             currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
             _templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
         }
@@ -113,7 +113,7 @@ public partial class TemplateConfigurationWindow
 
         _templates[ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
         ConfigConsole.TemplateListItems.Add( new( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
-        templatesAddedRemovedOrModified = true;
+        TemplatesAddedRemovedOrModified = true;
         UpdateTemplateListButtonStates( );
         UpdateTemplatePropertiesButtonStates( );
     }
@@ -287,7 +287,7 @@ public partial class TemplateConfigurationWindow
                 throw ex;
             }
 
-            templatesAddedRemovedOrModified = true;
+            TemplatesAddedRemovedOrModified = true;
         }
         catch ( ApplicationException )
         {
