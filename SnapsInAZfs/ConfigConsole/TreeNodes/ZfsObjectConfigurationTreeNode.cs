@@ -212,16 +212,13 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="propertyValue"></param>
-    /// <param name="isLocal">
-    ///     If this property is set locally on this node, <see langword="true" /> (default); Otherwise, false
-    /// </param>
     /// <returns>
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="bool" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue, bool isLocal = true )
+    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue, isLocal );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -235,9 +232,9 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="int" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue, bool isLocal = true )
+    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue, isLocal );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -251,9 +248,9 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="string" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue, bool isLocal = true )
+    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue, isLocal );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
