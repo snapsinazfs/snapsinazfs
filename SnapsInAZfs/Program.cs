@@ -34,7 +34,7 @@ internal class Program
         Settings!.DryRun |= args.DryRun;
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
-        Settings.Daemonize = ( Settings.Daemonize | args.Daemonize ) & !args.NoDaemonize;
+        Settings.Daemonize = ( Settings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
     }
 
     public static async Task<int> Main( string[] argv )
