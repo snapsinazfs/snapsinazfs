@@ -62,10 +62,11 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     }
 
     /// <summary>
-    ///     Gets a boolean value indicating if any properties have been changed in the UI for this specific node, and not just due to
+    ///     Gets a boolean value indicating if any properties have been changed or explicitly inherited in the UI for this specific node,
+    ///     and not just due to
     ///     inheritance from a modified parent.
     /// </summary>
-    public bool IsLocallyModified => _modifiedPropertiesSinceLastSave.Count > 0;
+    public bool IsLocallyModified => !_modifiedPropertiesSinceLastSave.IsEmpty || !_inheritedPropertiesSinceLastSave.IsEmpty;
 
     /// <summary>
     ///     Gets a boolean value indicating if <see cref="TreeDataset" /> is not equal to <see cref="BaseDataset" />
