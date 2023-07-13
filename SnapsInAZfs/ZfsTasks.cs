@@ -155,10 +155,10 @@ internal static class ZfsTasks
             {
                 case true:
                     Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
-                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp ) );
                     return ( true, snapshot );
                 case false when settings.DryRun:
-                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp, ZfsPropertySourceConstants.Local ) );
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp ) );
                     return ( true, null );
                 default:
                     return ( false, null );
@@ -216,7 +216,7 @@ internal static class ZfsTasks
                         Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
                     }
 
-                    ds.Snapshots[ snapshot.Period.Value.Kind ].TryRemove( snapshot.Name, out _ );
+                    ds.RemoveSnapshot( snapshot );
 
                     continue;
                 }
