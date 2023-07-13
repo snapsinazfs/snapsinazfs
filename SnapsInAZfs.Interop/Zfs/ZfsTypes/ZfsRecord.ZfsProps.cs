@@ -104,15 +104,15 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.EnabledPropertyName:
                 _enabled = _enabled with { Value = propertyValue, IsLocal = isLocal };
-                _boolPropertyChanged?.Invoke(this, ref _enabled );
+                BoolPropertyChanged?.Invoke(this, ref _enabled );
                 return ref _enabled;
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 _takeSnapshots = _takeSnapshots with { Value = propertyValue, IsLocal = isLocal };
-                _boolPropertyChanged?.Invoke(this, ref _takeSnapshots );
+                BoolPropertyChanged?.Invoke(this, ref _takeSnapshots );
                 return ref _takeSnapshots;
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 _pruneSnapshotsField = _pruneSnapshotsField with { Value = propertyValue, IsLocal = isLocal };
-                _boolPropertyChanged?.Invoke(this, ref _pruneSnapshotsField );
+                BoolPropertyChanged?.Invoke(this, ref _pruneSnapshotsField );
                 return ref _pruneSnapshotsField;
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported boolean property" );
@@ -336,7 +336,7 @@ public partial record ZfsRecord
         }
     }
 
-    private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> property )
+    protected virtual void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> property )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
         if ( property.Name switch
@@ -351,7 +351,7 @@ public partial record ZfsRecord
         }
     }
 
-    private void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> property )
+    protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> property )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
         if ( this[ property.Name ].IsInherited )
@@ -361,12 +361,19 @@ public partial record ZfsRecord
     }
     private void SubscribeChildToPropertyEvents( ZfsRecord child )
     {
+        if ( child.SubscribedToParentPropertyChangeEvents )
+            UnsubscribeChildFromPropertyEvents( child );
         IntPropertyChanged += child.OnParentUpdatedIntProperty;
         BoolPropertyChanged += child.OnParentUpdatedBoolProperty;
         StringPropertyChanged += child.OnParentUpdatedStringProperty;
-        DateTimeOffsetPropertyChanged += child.OnParentUpdatedDateTimeOffsetProperty;
+        child.SubscribedToParentPropertyChangeEvents = true;
     }
 
+    private void SubscribeSnapshotToPropertyEvents( Snapshot snap )
+    {
+        BoolPropertyChanged += snap.OnParentUpdatedBoolProperty;
+        StringPropertyChanged += snap.OnParentUpdatedStringProperty;
+    }
     private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property )
     {
         Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, property.Name, sender.Kind, sender.Name );
@@ -378,27 +385,25 @@ public partial record ZfsRecord
 
     private void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
     {
+        if ( !child.SubscribedToParentPropertyChangeEvents )
+            return;
         IntPropertyChanged -= child.OnParentUpdatedIntProperty;
         BoolPropertyChanged -= child.OnParentUpdatedBoolProperty;
         StringPropertyChanged -= child.OnParentUpdatedStringProperty;
-        DateTimeOffsetPropertyChanged -= child.OnParentUpdatedDateTimeOffsetProperty;
+        child.SubscribedToParentPropertyChangeEvents = false;
     }
 
-    protected event BoolPropertyChangedEventHandler? _boolPropertyChanged;
+    private void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
+    {
+        IntPropertyChanged -= snap.OnParentUpdatedIntProperty;
+        BoolPropertyChanged -= snap.OnParentUpdatedBoolProperty;
+        StringPropertyChanged -= snap.OnParentUpdatedStringProperty;
+    }
+
     /// <summary>
     /// An <see langword="event"/> fired when any <see cref="ZfsProperty{T}"/> <see langword="bool"/> properties are updated on this object
     /// </summary>
-    public event BoolPropertyChangedEventHandler? BoolPropertyChanged
-    {
-        add
-        {
-            _boolPropertyChanged += value;
-        }
-        remove
-        {
-            _boolPropertyChanged -= value;
-        }
-    }
+    public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
 
     /// <summary>
     /// An <see langword="event"/> fired when any <see cref="ZfsProperty{T}"/> <see langword="int"/> properties are updated on this object

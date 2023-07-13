@@ -215,6 +215,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
     public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = GetNewSnapshotCollection( );
 
+    public bool SubscribedToParentPropertyChangeEvents { get; private set; }
+
     [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
@@ -350,7 +352,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                 throw new InvalidOperationException( "Invalid Snapshot Period specified" );
         }
 
-        SubscribeChildToPropertyEvents( snap );
+        SubscribeSnapshotToPropertyEvents( snap );
         return snap;
     }
 
@@ -861,6 +863,13 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return yearlySnapshotNeeded;
     }
 
+    public bool RemoveSnapshot( Snapshot snapshot )
+    {
+        Logger.Debug( "Removing snapshot {0} from {1}", snapshot.Name, Name );
+        UnsubscribeSnapshotFromPropertyEvents( snapshot );
+        return Snapshots[ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove( snapshot.Name, out _ );
+    }
+
     public static bool ValidateName( string kind, string name, Regex? validatorRegex = null )
     {
         Logger.Debug( "Validating name \"{0}\"", name );
@@ -938,12 +947,5 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                 snapshotsToPrune.Add( snap );
             }
         }
-    }
-
-    public bool RemoveSnapshot( Snapshot snapshot )
-    {
-        Logger.Debug( "Removing snapshot {0} from {1}", snapshot.Name, Name );
-        UnsubscribeChildFromPropertyEvents( snapshot );
-        return Snapshots[ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove( snapshot.Name, out _ );
     }
 }

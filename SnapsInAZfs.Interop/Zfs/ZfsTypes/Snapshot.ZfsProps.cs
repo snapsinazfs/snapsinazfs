@@ -2,12 +2,14 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using NLog;
 using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public sealed partial record Snapshot
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private ZfsProperty<string> _period;
 
     private ZfsProperty<string> _snapshotName;
@@ -27,11 +29,9 @@ public sealed partial record Snapshot
         {
             case ZfsPropertyNames.SnapshotNamePropertyName:
                 _snapshotName = _snapshotName with { Value = propertyValue, IsLocal = isLocal };
-                StringPropertyChanged?.Invoke( this, ref _snapshotName );
                 return ref _snapshotName;
             case ZfsPropertyNames.SnapshotPeriodPropertyName:
                 _period = _period with { Value = propertyValue, IsLocal = isLocal };
-                StringPropertyChanged?.Invoke( this, ref _period );
                 return ref _period;
             default:
                 return ref base.UpdateProperty( propertyName, propertyValue, isLocal );
@@ -45,16 +45,19 @@ public sealed partial record Snapshot
         {
             case ZfsPropertyNames.SnapshotTimestampPropertyName:
                 _timestamp = _timestamp with { Value = propertyValue, IsLocal = isLocal };
-                DateTimeOffsetPropertyChanged?.Invoke( this, ref _timestamp );
                 return ref _timestamp;
             default:
                 return ref base.UpdateProperty( propertyName, propertyValue, isLocal );
         }
     }
 
-    /// <inheritdoc cref="ZfsRecord.StringPropertyChanged" />
-    public new event StringPropertyChangedEventHandler? StringPropertyChanged;
-    public new event DateTimeOffsetPropertyChangedEventHandler? DateTimeOffsetPropertyChanged;
-    public new delegate void StringPropertyChangedEventHandler(Snapshot sender,ref ZfsProperty<string> property );
-    public new delegate void DateTimeOffsetPropertyChangedEventHandler(Snapshot sender,ref ZfsProperty<DateTimeOffset> property );
+    /// <inheritdoc />
+    protected override void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> property )
+    {
+        Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
+        if ( this[ property.Name ].IsInherited )
+        {
+            UpdateProperty( property.Name, property.Value, false );
+        }
+    }
 }
