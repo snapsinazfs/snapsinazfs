@@ -43,7 +43,7 @@ public partial class ZfsConfigurationWindow
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
         ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty(viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
-        viewData.SourceTextField.Text = newProperty.Source;
+        viewData.SourceTextField.Text = newProperty.InheritedFrom;
         UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
