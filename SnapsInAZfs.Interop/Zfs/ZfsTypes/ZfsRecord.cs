@@ -922,4 +922,11 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             }
         }
     }
+
+    public bool RemoveSnapshot( Snapshot snapshot )
+    {
+        Logger.Debug( "Removing snapshot {0} from {1}", snapshot.Name, Name );
+        UnsubscribeChildFromPropertyEvents( snapshot );
+        return Snapshots[ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove( snapshot.Name, out _ );
+    }
 }
