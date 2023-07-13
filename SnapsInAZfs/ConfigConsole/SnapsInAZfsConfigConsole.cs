@@ -54,6 +54,7 @@ public partial class SnapsInAZfsConfigConsole
             return false;
         }
 
+        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
         switch ( e.Key & Key.CharMask )
         {
             case Key.g:
@@ -157,7 +158,7 @@ public partial class SnapsInAZfsConfigConsole
             bool globalConfigurationIsChanged = !globalWindowNull && _globalConfigurationWindow!.IsConfigurationChanged;
             bool onlyGlobalWindowNotNullAndNoChanges = !globalWindowNull && !globalConfigurationIsChanged && templateWindowNull;
             bool isAnyTemplateModified = TemplateConfigurationWindow.IsAnyTemplateModified;
-            bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.templatesAddedRemovedOrModified;
+            bool templatesAddedRemovedOrModified = TemplateConfigurationWindow.TemplatesAddedRemovedOrModified;
             bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
             bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
             if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
