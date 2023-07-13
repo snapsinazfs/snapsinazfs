@@ -198,12 +198,6 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
-    public ref readonly ZfsProperty<DateTimeOffset> UpdateTreeNodeProperty( string propertyName, DateTimeOffset propertyValue )
-    {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<DateTimeOffset>( TreeDataset, propertyName, propertyValue );
-        return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
-    }
-
     public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
     {
         _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
