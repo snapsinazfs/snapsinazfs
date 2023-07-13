@@ -472,9 +472,15 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             LastObservedYearlySnapshotTimestamp = LastObservedYearlySnapshotTimestamp
         };
 
+        foreach ( ( string _, ZfsRecord childDs ) in _childDatasets )
+        {
+            ZfsRecord clonedChild = childDs.DeepCopyClone( newRecord );
+            newRecord.AddDataset( clonedChild );
+        }
+
         foreach ( ( SnapshotPeriodKind period, ConcurrentDictionary<string, Snapshot> periodCollection ) in Snapshots )
         {
-            foreach ( ( string snapName, Snapshot sourceSnap ) in periodCollection )
+            foreach ( ( string _, Snapshot sourceSnap ) in periodCollection )
             {
                 newRecord.AddSnapshot( sourceSnap.DeepCopyClone( newRecord ) );
             }
