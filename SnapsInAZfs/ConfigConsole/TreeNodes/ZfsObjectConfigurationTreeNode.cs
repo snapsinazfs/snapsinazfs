@@ -198,12 +198,25 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
+    /// <summary>
+    ///     Updates a string property of the <see cref="TreeDataset" />, tracks the modified property, and returns a reference to the
+    ///     newly-updated property.
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="propertyValue"></param>
+    /// <returns>
+    ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="string" />, referring to the newly-updated
+    ///     property
+    /// </returns>
     public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
     {
         _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
+    /// <summary>
+    ///     Gets a list of the properties that have been changed for this node
+    /// </summary>
     internal List<IZfsProperty> GetModifiedZfsProperties( )
     {
         return _modifiedPropertiesSinceLastSave.Values.ToList( );
