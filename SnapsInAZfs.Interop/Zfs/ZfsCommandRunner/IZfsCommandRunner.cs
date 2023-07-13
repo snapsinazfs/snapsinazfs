@@ -29,12 +29,11 @@ public interface IZfsCommandRunner
     public Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <summary>
-    ///     Gets everything SnapsInAZfs cares about from ZFS, via separate processes executing in parallel using the thread pool
+    ///     Gets everything SnapsInAZfs cares about from ZFS
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
     /// <param name="snapshots">A collection of snapshots for this method to populate</param>
-    /// <remarks>Up to one additional thread per existing item in <paramref name="datasets" /> will be spawned</remarks>
     public Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
     /// <summary>
