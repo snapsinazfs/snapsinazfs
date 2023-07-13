@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 
@@ -259,16 +260,30 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     /// <summary>
     ///     Gets a list of the properties that have been changed from local to inherited from the parent for this node
     /// </summary>
-    internal List<IZfsProperty> GetInheritedZfsProperties( )
+    internal bool GetInheritedZfsProperties( [NotNullWhen( true )] out List<IZfsProperty>? inheritedProperties )
     {
-        return _inheritedPropertiesSinceLastSave.Values.ToList( );
+        inheritedProperties = null;
+        if ( _inheritedPropertiesSinceLastSave.IsEmpty )
+        {
+            return false;
+        }
+
+        inheritedProperties = _inheritedPropertiesSinceLastSave.Values.ToList( );
+        return true;
     }
 
     /// <summary>
     ///     Gets a list of the properties that have been changed for this node
     /// </summary>
-    internal List<IZfsProperty> GetModifiedZfsProperties( )
+    internal bool GetModifiedZfsProperties( [NotNullWhen( true )] out List<IZfsProperty>? modifiedProperties )
     {
-        return _modifiedPropertiesSinceLastSave.Values.ToList( );
+        modifiedProperties = null;
+        if ( _modifiedPropertiesSinceLastSave.IsEmpty )
+        {
+            return false;
+        }
+
+        modifiedProperties = _modifiedPropertiesSinceLastSave.Values.ToList( );
+        return true;
     }
 }
