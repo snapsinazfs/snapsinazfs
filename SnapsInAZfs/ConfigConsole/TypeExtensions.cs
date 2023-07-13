@@ -29,6 +29,7 @@ public static class TypeExtensions
     public static string GetLastPathElement( this string path )
     {
         int startIndex = 1 + path.LastIndexOfAny( new[] { '/', '@', '#' } );
+        // ReSharper disable once HeapView.ObjectAllocation
         return startIndex == 0 ? path : path[ startIndex.. ];
     }
 

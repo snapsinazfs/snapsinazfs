@@ -18,7 +18,9 @@ internal static class ConfigConsole
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
+    // ReSharper disable HeapView.ObjectAllocation
     internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
+    // ReSharper restore HeapView.ObjectAllocation
     internal static readonly ConcurrentDictionary<string, ZfsRecord> BaseDatasets = new( );
 
     /// <summary>

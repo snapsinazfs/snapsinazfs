@@ -103,6 +103,7 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     state.
     /// </summary>
     /// <param name="clearModifiedPropertiesCollection"></param>
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     public void CopyBaseDatasetPropertiesToTreeDataset( bool clearModifiedPropertiesCollection = true )
     {
         foreach ( string propName in _modifiedPropertiesSinceLastSave.Keys )

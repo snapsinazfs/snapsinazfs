@@ -15,11 +15,15 @@ namespace SnapsInAZfs;
 /// </summary>
 public class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
+    // ReSharper disable RedundantAwait
+    // ReSharper disable AsyncConverter.AsyncAwaitMayBeElidedHighlighting
     /// <inheritdoc />
     public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
         return await Task.FromResult( true ).ConfigureAwait( true );
     }
+    // ReSharper restore AsyncConverter.AsyncAwaitMayBeElidedHighlighting
+    // ReSharper restore RedundantAwait
 
     /// <inheritdoc />
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )

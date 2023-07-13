@@ -76,6 +76,7 @@ public partial class TemplateConfigurationWindow
         foreach ( TemplateConfigurationListItem currentTemplate in ConfigConsole.TemplateListItems.Where( currentTemplate => currentTemplate.IsModified ) )
         {
             TemplatesAddedRemovedOrModified = true;
+            // ReSharper disable once HeapView.ObjectAllocation
             currentTemplate.BaseSettings = currentTemplate.ViewSettings with { };
             _templates[ currentTemplate.TemplateName ] = currentTemplate.BaseSettings;
         }

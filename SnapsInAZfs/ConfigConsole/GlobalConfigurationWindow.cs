@@ -19,6 +19,8 @@ public partial class GlobalConfigurationWindow
 
     public GlobalConfigurationWindow( )
     {
+        // ReSharper disable once HeapView.ObjectAllocation.Possible
+        // ReSharper disable once HeapView.DelegateAllocation
         Initialized += GlobalConfigurationWindowOnInitialized;
         InitializeComponent( );
         EnableEventHandlers( );

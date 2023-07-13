@@ -24,6 +24,8 @@ public partial class SnapsInAZfsConfigConsole
 
     public SnapsInAZfsConfigConsole( )
     {
+        // ReSharper disable HeapView.ObjectAllocation.Possible
+        // ReSharper disable HeapView.DelegateAllocation
         Initialized += SnapsInAZfsConfigConsoleOnInitialized;
         Ready += SnapsInAZfsConfigConsoleOnReady;
         InitializeComponent( );
@@ -35,6 +37,8 @@ public partial class SnapsInAZfsConfigConsole
         zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.z;
         saveMenuItem.Action = ShowSaveDialog;
         Application.RootKeyEvent += ApplicationRootKeyEvent;
+        // ReSharper restore HeapView.ObjectAllocation.Possible
+        // ReSharper restore HeapView.DelegateAllocation
     }
 
     private bool _eventsEnabled;

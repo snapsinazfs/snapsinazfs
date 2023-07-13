@@ -29,6 +29,8 @@ public partial class ZfsConfigurationWindow
 
     public ZfsConfigurationWindow( )
     {
+        // ReSharper disable once HeapView.DelegateAllocation
+        // ReSharper disable once HeapView.ObjectAllocation.Possible
         Initialized += ZfsConfigurationWindowOnInitialized;
         InitializeComponent( );
     }
@@ -93,6 +95,7 @@ public partial class ZfsConfigurationWindow
 
         Logger.Debug( "Disabling event handlers for zfs configuration fields" );
 
+        // ReSharper disable HeapView.ObjectAllocation.Possible
         refreshButton.Clicked -= RefreshZfsTreeViewFromZfs;
         resetCurrentButton.Clicked -= ResetCurrentButtonOnClicked;
         zfsTreeView.SelectionChanged -= zfsTreeViewOnSelectionChanged;
@@ -113,6 +116,7 @@ public partial class ZfsConfigurationWindow
         retentionYearlyTextField.Leave -= RetentionYearlyTextFieldOnLeave;
         retentionPruneDeferralTextField.Leave -= RetentionPruneDeferralTextFieldOnLeave;
         saveCurrentButton.Clicked -= SaveCurrentButtonOnClicked;
+        // ReSharper restore HeapView.ObjectAllocation.Possible
         _eventsEnabled = false;
         Logger.Debug( "Event handlers for zfs configuration fields disabled" );
     }
