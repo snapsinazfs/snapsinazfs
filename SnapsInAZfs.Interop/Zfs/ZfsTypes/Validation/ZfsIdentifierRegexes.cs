@@ -12,9 +12,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 /// </summary>
 public static partial class ZfsIdentifierRegexes
 {
-    [GeneratedRegex( @"^(?<Pool>[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})(?<Dataset>/[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})*#(?<Bookmark>[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})$", RegexOptions.Compiled )]
-    public static partial Regex BookmarkNameRegex( );
-
+    [GeneratedRegex( @"^(?<Pool>[A-Za-z]+[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})(?<Dataset>/[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})*$", RegexOptions.Compiled )]
     [GeneratedRegex( @"^(?<Pool>[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})(?<Dataset>/[A-Za-z0-9_.:-]?[A-Za-z0-9_.: -]*[A-Za-z0-9_.:-]{1})*$", RegexOptions.Compiled )]
     public static partial Regex DatasetNameRegex( );
 
