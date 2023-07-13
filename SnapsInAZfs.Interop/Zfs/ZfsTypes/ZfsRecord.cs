@@ -454,8 +454,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
         foreach ( ( string _, ZfsRecord childDs ) in _childDatasets )
         {
-            ZfsRecord clonedChild = childDs.DeepCopyClone( newRecord );
-            newRecord.AddDataset( clonedChild );
+            newRecord.AddDataset( childDs.DeepCopyClone( newRecord ) );
         }
 
         foreach ( ( SnapshotPeriodKind period, ConcurrentDictionary<string, Snapshot> periodCollection ) in Snapshots )
