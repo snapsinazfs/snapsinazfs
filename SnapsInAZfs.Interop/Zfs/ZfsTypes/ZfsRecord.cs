@@ -348,6 +348,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                 throw new InvalidOperationException( "Invalid Snapshot Period specified" );
         }
 
+        SubscribeChildToPropertyEvents( snap );
         return snap;
     }
 
