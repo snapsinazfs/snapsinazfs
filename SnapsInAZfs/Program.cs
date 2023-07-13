@@ -27,14 +27,14 @@ internal class Program
     ///     the CLI
     /// </summary>
     /// <param name="args"></param>
-    public static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args )
+    private static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args )
     {
         Logger.Debug( "Overriding settings using arguments from command line." );
 
         Settings!.DryRun |= args.DryRun;
         Settings.TakeSnapshots = ( Settings.TakeSnapshots | args.TakeSnapshots ) & !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots | args.PruneSnapshots ) & !args.NoPruneSnapshots;
-        Settings.Daemonize |= args.Daemonize;
+        Settings.Daemonize = ( Settings.Daemonize | args.Daemonize ) & !args.NoDaemonize;
     }
 
     public static async Task<int> Main( string[] argv )

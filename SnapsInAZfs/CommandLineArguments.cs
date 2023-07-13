@@ -32,7 +32,7 @@ public class CommandLineArguments
     [ArgDescription( "Run SnapsInAZfs as a daemon" )]
     [ArgShortcut( "--daemonize" )]
     [ArgShortcut( "-D" )]
-    [ArgCantBeCombinedWith( "CheckZfsProperties|PrepareZfsProperties|ConfigConsole|Version|Help" )]
+    [ArgCantBeCombinedWith( "NoDaemonize|CheckZfsProperties|PrepareZfsProperties|ConfigConsole|Version|Help" )]
     public bool Daemonize { get; set; }
 
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
@@ -74,6 +74,11 @@ public class CommandLineArguments
     [ArgShortcut( "--monitor-snapshots" )]
     [ArgShortcut( "--monitor-snapshots-nagios" )]
     public bool MonitorSnapshots { get; set; }
+
+    [ArgDescription( "Force SnapsInAZfs to NOT run as a daemon" )]
+    [ArgShortcut( "--no-daemonize" )]
+    [ArgCantBeCombinedWith( "Daemonize|Version|Help" )]
+    public bool NoDaemonize { get; set; }
 
     [ArgDescription( "Disables snapshot pruning." )]
     [ArgShortcut( "--no-prune-snapshots" )]
