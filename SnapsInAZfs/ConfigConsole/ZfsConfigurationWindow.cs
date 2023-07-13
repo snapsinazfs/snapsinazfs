@@ -657,7 +657,7 @@ public partial class ZfsConfigurationWindow
 
         ListViewWithSourceViewData viewData = (ListViewWithSourceViewData)templateListView.Data;
 
-        ZfsProperty<string> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
+        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
         UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
@@ -783,20 +783,20 @@ public partial class ZfsConfigurationWindow
     private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
+        ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
     private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue )
     {
-        ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( propertyName, propertyValue );
+        ZfsProperty<int> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( propertyName, propertyValue );
         field.ColorScheme = newProperty.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
     private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<string> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
+        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
