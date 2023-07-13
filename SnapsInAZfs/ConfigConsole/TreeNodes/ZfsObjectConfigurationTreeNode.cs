@@ -198,15 +198,17 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
             {
-                ZfsProperty<bool> newProperty = TreeDataset.InheritBoolPropertyFromParent( propertyName );
-                _inheritedPropertiesSinceLastSave[ propertyName ] = newProperty;
+                RevertBooleanPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
+
+                _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritBoolPropertyFromParent( propertyName );
             }
                 break;
             case ZfsPropertyNames.RecursionPropertyName:
             case ZfsPropertyNames.TemplatePropertyName:
             {
-                ZfsProperty<string> newProperty = TreeDataset.InheritStringPropertyFromParent( propertyName );
-                _inheritedPropertiesSinceLastSave[ propertyName ] = newProperty;
+                RevertStringPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
+
+                _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritStringPropertyFromParent( propertyName );
             }
                 break;
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
@@ -310,5 +312,59 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
 
         modifiedProperties = _modifiedPropertiesSinceLastSave.Values.ToList( );
         return true;
+    }
+
+    /// <summary>
+    ///     Reverts a boolean property back to its base state, if it existed in the specified
+    ///     <paramref name="changedPropertyCollection" />
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="changedPropertyCollection"></param>
+    private void RevertBooleanPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    {
+        if ( !changedPropertyCollection.TryRemove( propertyName, out IZfsProperty? changedProperty ) )
+        {
+            return;
+        }
+
+        if ( changedProperty is ZfsProperty<bool> )
+        {
+            if ( BaseDataset[ changedProperty.Name ] is ZfsProperty<bool> baseProperty )
+            {
+                Logger.Trace( "Reverting previously-modified property {0} on {1} to original value", propertyName, TreeDataset.Name );
+                TreeDataset.UpdateProperty( propertyName, baseProperty.Value, baseProperty.IsLocal );
+            }
+        }
+        else
+        {
+            Logger.Error( "Unexpected property type encountered when updating {0} on {1}. Expected boolean type. Got {2}", propertyName, TreeDataset.Name, changedProperty.GetType( ).GenericTypeArguments[ 0 ].FullName );
+        }
+    }
+
+    /// <summary>
+    ///     Reverts a string property back to its base state, if it existed in the specified
+    ///     <paramref name="changedPropertyCollection" />
+    /// </summary>
+    /// <param name="propertyName"></param>
+    /// <param name="changedPropertyCollection"></param>
+    private void RevertStringPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    {
+        if ( !changedPropertyCollection.TryRemove( propertyName, out IZfsProperty? changedProperty ) )
+        {
+            return;
+        }
+
+        if ( changedProperty is ZfsProperty<string> )
+        {
+            if ( BaseDataset[ changedProperty.Name ] is ZfsProperty<string> baseProperty )
+            {
+                Logger.Trace( "Reverting previously-modified property {0} on {1} to original value", propertyName, TreeDataset.Name );
+                TreeDataset.UpdateProperty( propertyName, baseProperty.Value, baseProperty.IsLocal );
+            }
+        }
+        else
+        {
+            Logger.Error( "Unexpected property type encountered when updating {0} on {1}. Expected string type. Got {2}", propertyName, TreeDataset.Name, changedProperty.GetType( ).GenericTypeArguments[ 0 ].FullName );
+        }
     }
 }
