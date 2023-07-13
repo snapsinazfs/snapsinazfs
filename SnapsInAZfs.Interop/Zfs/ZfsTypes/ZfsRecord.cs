@@ -4,6 +4,7 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
@@ -475,10 +476,15 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///     child exists.
     /// </summary>
     /// <param name="childName">The fully-qualified name of the <see cref="ZfsRecord" /> to retrieve</param>
-    public ZfsRecord? GetChild( string childName )
+    /// <param name="child">
+    ///     An <see langword="out" /> reference to the child <see cref="ZfsRecord" />, if found
+    /// </param>
+    /// <returns>
+    ///     If <paramref name="childName" /> is found, <see langword="true" />; Otherwise, <see langword="false" />
+    /// </returns>
+    public bool GetChild( string childName, [NotNullWhen( true )] out ZfsRecord? child )
     {
-        _childDatasets.TryGetValue( childName, out ZfsRecord? child );
-        return child;
+        return _childDatasets.TryGetValue( childName, out child );
     }
 
     /// <inheritdoc />

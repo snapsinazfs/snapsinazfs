@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -38,10 +38,13 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         get
         {
             List<ITreeNode> list = new( );
-            foreach ( ( string? childName, ZfsRecord? child ) in TreeDataset.GetSortedChildDatasets( ) )
+            foreach ( ( string? childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
             {
-                ITreeNode node = new ZfsObjectConfigurationTreeNode( childName.GetLastPathElement( ), BaseDataset.GetChild( childName ), child );
-                list.Add( node );
+                if ( BaseDataset.GetChild( childName, out ZfsRecord? baseDataset ) )
+                {
+                    ITreeNode node = new ZfsObjectConfigurationTreeNode( childName.GetLastPathElement( ), baseDataset, child );
+                    list.Add( node );
+                }
             }
 
             return _children ??= list;
