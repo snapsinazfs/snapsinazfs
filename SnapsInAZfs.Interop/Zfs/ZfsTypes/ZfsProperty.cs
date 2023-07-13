@@ -75,7 +75,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     /// </remarks>
     public readonly bool Equals( ZfsProperty<T> other )
     {
-        return Name == other.Name && EqualityComparer<T>.Default.Equals( Value, other.Value );
+        return Name == other.Name && EqualityComparer<T>.Default.Equals( Value, other.Value ) && IsLocal == other.IsLocal;
     }
 
     [JsonIgnore]
