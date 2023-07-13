@@ -168,61 +168,6 @@ public partial class ZfsConfigurationWindow
         UpdateFieldsForSelectedZfsTreeNode( );
     }
 
-    //private void UpdateFieldsForSelectedSnapshot( bool manageEventHandlers = true )
-    //{
-    //    if ( manageEventHandlers )
-    //    {
-    //        DisableEventHandlers( );
-    //    }
-
-    //    snapshotsListView.EnsureSelectedItemVisible( );
-
-    //    nameTextField.Text = SelectedSnapshotEntry.ListViewSnapshot.Name;
-    //    typeTextField.Text = SelectedSnapshotEntry.ListViewSnapshot.Kind;
-    //    enabledRadioGroup.ColorScheme = inheritedPropertyRadioGroupColorScheme;
-    //    enabledRadioGroup.Enabled = false;
-    //    takeSnapshotsRadioGroup.ColorScheme = inheritedPropertyRadioGroupColorScheme;
-    //    takeSnapshotsRadioGroup.Enabled = false;
-    //    pruneSnapshotsRadioGroup.SelectedItem = (!SelectedSnapshotEntry.ListViewSnapshot.PruneSnapshots.Value).AsTrueFalseRadioIndex( );
-    //    pruneSnapshotsRadioGroup.ColorScheme = SelectedSnapshotEntry.ListViewSnapshot.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-    //    pruneSnapshotsSourceTextField.Text = SelectedSnapshotEntry.ListViewSnapshot.PruneSnapshots.InheritedFrom;
-    //    pruneSnapshotsLabel.Text = "Allow Pruning";
-    //    recursionRadioGroup.ColorScheme = inheritedPropertyRadioGroupColorScheme;
-    //    recursionRadioGroup.Enabled = false;
-    //    recursionSourceTextField.Text = SelectedSnapshotEntry.ListViewSnapshot.Recursion.InheritedFrom;
-
-    //    templateListView.ColorScheme = inheritedPropertyListViewColorScheme;
-    //    templateListView.Enabled = false;
-    //    templateSourceTextField.Text = SelectedSnapshotEntry.ListViewSnapshot.Template.InheritedFrom;
-
-    //    retentionFrequentTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionFrequentTextField.Enabled = false;
-    //    retentionHourlyTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionHourlyTextField.Enabled = false;
-    //    retentionDailyTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionDailyTextField.Enabled = false;
-    //    retentionWeeklyTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionWeeklyTextField.Enabled = false;
-    //    retentionMonthlyTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionMonthlyTextField.Enabled = false;
-    //    retentionYearlyTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionYearlyTextField.Enabled = false;
-    //    retentionPruneDeferralTextField.ColorScheme = inheritedPropertyTextFieldColorScheme;
-    //    retentionPruneDeferralTextField.Enabled = false;
-
-    //    recentFrequentTextField.Text = SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.IsLocal ? SelectedSnapshotEntry.ListViewSnapshot.LastFrequentSnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastFrequentSnapshotTimestamp.ValueString;
-    //    recentHourlyTextField.Text = SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastHourlySnapshotTimestamp.ValueString;
-    //    recentDailyTextField.Text = SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastDailySnapshotTimestamp.ValueString;
-    //    recentWeeklyTextField.Text = SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastWeeklySnapshotTimestamp.ValueString;
-    //    recentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastMonthlySnapshotTimestamp.ValueString;
-    //    recentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.ValueString : SelectedSnapshotEntry.ListViewSnapshot.ParentDataset.LastYearlySnapshotTimestamp.ValueString;
-
-    //    if ( manageEventHandlers )
-    //    {
-    //        EnableEventHandlers( );
-    //    }
-    //}
-
     private void PruneSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup );
