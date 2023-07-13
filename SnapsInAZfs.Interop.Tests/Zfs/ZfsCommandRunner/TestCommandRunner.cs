@@ -40,6 +40,12 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
+    public override Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    {
+        throw new NotImplementedException( );
+    }
+
+    /// <inheritdoc />
     public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync(bool dryRun, string poolName, string[] propertyArray)
     {
         throw new NotImplementedException();

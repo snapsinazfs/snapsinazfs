@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
-using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
@@ -360,6 +359,52 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
 
         return rootsAndTheirProperties;
+    }
+
+    /// <inheritdoc />
+    public override async Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    {
+        if ( propertyToInherit.Owner is null )
+        {
+            Logger.Error( "Property has no reference to the dataset it belongs to. Cannot inherit." );
+            return false;
+        }
+        Logger.Trace( "Attempting to inherit property {0} on {1} from {2}", propertyToInherit.Name, zfsPath, propertyToInherit.Owner.ParentDataset.Name );
+        ProcessStartInfo zfsInheritStartInfo = new( PathToZfsUtility, $"inherit {propertyToInherit.Name} {zfsPath}" )
+        {
+            CreateNoWindow = true,
+            RedirectStandardOutput = true
+        };
+        if ( dryRun )
+        {
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsInheritStartInfo.FileName, zfsInheritStartInfo.Arguments );
+            return false;
+        }
+
+        using ( Process zfsInheritProcess = new( ) { StartInfo = zfsInheritStartInfo } )
+        {
+            Logger.Debug( "Calling {0} {1}", zfsInheritStartInfo.FileName, zfsInheritStartInfo.Arguments );
+            try
+            {
+                zfsInheritProcess.Start( );
+            }
+            catch ( InvalidOperationException ioex )
+            {
+                Logger.Error( ioex, "Error running zfs inherit operation for {0} on {1}", propertyToInherit.Name, propertyToInherit.Owner.Name );
+                return false;
+            }
+
+            if ( !zfsInheritProcess.HasExited )
+            {
+                using CancellationTokenSource tokenSource = new( 5000 );
+                ConfiguredTaskAwaitable waitForExitAsync = zfsInheritProcess.WaitForExitAsync( tokenSource.Token ).ConfigureAwait( false );
+                Logger.Trace( "Waiting for zfs inherit process to exit" );
+                await waitForExitAsync;
+            }
+
+            Logger.Trace( "zfs inherit process finished" );
+            return true;
+        }
     }
 
     /// <inheritdoc />

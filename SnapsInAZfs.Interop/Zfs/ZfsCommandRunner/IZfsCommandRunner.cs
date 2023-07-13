@@ -8,7 +8,6 @@ using System.Text.Json;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
-using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
@@ -45,6 +44,23 @@ public interface IZfsCommandRunner
     ///     TValue=<see langword="bool" />s indicating whether that property is defined and has a valid value for its type
     /// </returns>
     Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
+
+    /// <summary>
+    ///     Inherits the provided <see cref="IZfsProperty" /> for <paramref name="zfsPath" />
+    /// </summary>
+    /// <param name="dryRun">
+    ///     If true, instructs the method not to actually call the ZFS utility, but instead just report what
+    ///     it <em>would</em> have done.
+    /// </param>
+    /// <param name="zfsPath">The fully-qualified path to operate on</param>
+    /// <param name="propertyToInherit">
+    ///     An <see cref="IZfsProperty" /> objects to inherit from the parent of <paramref name="zfsPath" />
+    /// </param>
+    /// <returns>
+    ///     If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
+    ///     Otherwise, a <see langword="bool" /> indicating success or failure of the operation
+    /// </returns>
+    public Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
     bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 

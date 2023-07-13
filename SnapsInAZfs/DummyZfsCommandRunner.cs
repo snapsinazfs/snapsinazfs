@@ -52,6 +52,12 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
+    public override Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    {
+        return Task.FromResult( !dryRun );
+    }
+
+    /// <inheritdoc />
     public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray )
     {
         return !dryRun;
