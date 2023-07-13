@@ -14,9 +14,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
-using SnapshotListViewEntry = SnapsInAZfs.ConfigConsole.TreeNodes.SnapshotListViewEntry;
 using ZfsObjectConfigurationTreeNode = SnapsInAZfs.ConfigConsole.TreeNodes.ZfsObjectConfigurationTreeNode;
 
 namespace SnapsInAZfs.ConfigConsole;
@@ -121,7 +119,7 @@ public partial class ZfsConfigurationWindow
 
     private void EnabledRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
     {
-        UpdateSelectedItemBooleanRadioGroupProperty( enabledRadioGroup, "local" );
+        UpdateSelectedItemBooleanRadioGroupProperty( enabledRadioGroup );
         UpdateButtonState( );
         UpdateFieldsForSelectedZfsTreeNode( );
     }
@@ -227,7 +225,7 @@ public partial class ZfsConfigurationWindow
 
     private void PruneSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
     {
-        UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup, ZfsPropertySourceConstants.Local );
+        UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup );
         UpdateButtonState( );
         UpdateFieldsForSelectedZfsTreeNode( );
     }
@@ -237,7 +235,7 @@ public partial class ZfsConfigurationWindow
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)recursionRadioGroup.Data;
         if ( viewData.RadioGroup.GetSelectedLabelString( ) != SelectedTreeNode.TreeDataset.Recursion.Value )
         {
-            UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, ZfsPropertySourceConstants.Local );
+            UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup );
         }
 
         UpdateFieldsForSelectedZfsTreeNode( );
@@ -703,7 +701,7 @@ public partial class ZfsConfigurationWindow
 
     private void TakeSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
     {
-        UpdateSelectedItemBooleanRadioGroupProperty( takeSnapshotsRadioGroup, "local" );
+        UpdateSelectedItemBooleanRadioGroupProperty( takeSnapshotsRadioGroup );
         UpdateButtonState( );
         UpdateFieldsForSelectedZfsTreeNode( );
     }
@@ -770,7 +768,7 @@ public partial class ZfsConfigurationWindow
                     case 0:
                     case 1:
                         recursionRadioGroup.SelectedItem = dialogResult;
-                        UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
+                        UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup );
                         recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
                         recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
                         UpdateButtonState( );
@@ -837,7 +835,7 @@ public partial class ZfsConfigurationWindow
         }
     }
 
-    private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
+    private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
         ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
@@ -850,7 +848,7 @@ public partial class ZfsConfigurationWindow
         field.ColorScheme = SelectedTreeNode.TreeDataset[ propertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
-    private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
+    private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
         ZfsProperty<string> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
