@@ -258,8 +258,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             && LastObservedDailySnapshotTimestamp == other.LastObservedDailySnapshotTimestamp
             && LastObservedFrequentSnapshotTimestamp == other.LastObservedFrequentSnapshotTimestamp
             && LastObservedHourlySnapshotTimestamp == other.LastObservedHourlySnapshotTimestamp
+            && LastObservedWeeklySnapshotTimestamp == other.LastObservedWeeklySnapshotTimestamp
             && LastObservedMonthlySnapshotTimestamp == other.LastObservedMonthlySnapshotTimestamp
-            && LastObservedWeeklySnapshotTimestamp == other.LastObservedMonthlySnapshotTimestamp
             && LastObservedYearlySnapshotTimestamp == other.LastObservedYearlySnapshotTimestamp
             && LastWeeklySnapshotTimestamp == other.LastWeeklySnapshotTimestamp
             && LastYearlySnapshotTimestamp == other.LastYearlySnapshotTimestamp
