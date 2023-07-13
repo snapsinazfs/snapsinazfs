@@ -42,7 +42,7 @@ public partial class ZfsConfigurationWindow
     private void BooleanRadioGroupOnMouseClick( MouseEventArgs args )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty(viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
+        ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
         UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
@@ -169,6 +169,7 @@ public partial class ZfsConfigurationWindow
             _alreadyHandledSelectedItemChanged = false;
             return;
         }
+
         UpdateFieldsForSelectedZfsTreeNode( );
     }
 
@@ -230,7 +231,7 @@ public partial class ZfsConfigurationWindow
     {
         DisableEventHandlers( );
         ClearAllPropertyFields( );
-        SelectedTreeNode.CopyBaseDatasetPropertiesToTreeDataset();
+        SelectedTreeNode.CopyBaseDatasetPropertiesToTreeDataset( );
         UpdateFieldsForSelectedZfsTreeNode( false );
         UpdateButtonState( );
         EnableEventHandlers( );
@@ -443,14 +444,14 @@ public partial class ZfsConfigurationWindow
                 Logger.Error( "ZFS Command runner is null. Cannot continue with save operation" );
             }
 
-            if ( !SelectedTreeNode.IsModified |! SelectedTreeNode.IsLocallyModified )
+            if ( !SelectedTreeNode.IsModified | !SelectedTreeNode.IsLocallyModified )
             {
                 Logger.Info( "Selected ZFS object was not modified when save was requested. This should not happen" );
                 return;
             }
 
             string zfsObjectPath = SelectedTreeNode.TreeDataset.Name;
-            string pendingCommand = $"zfs set {SelectedTreeNode.GetModifiedZfsProperties().ToStringForZfsSet( )} {zfsObjectPath}";
+            string pendingCommand = $"zfs set {SelectedTreeNode.GetModifiedZfsProperties( ).ToStringForZfsSet( )} {zfsObjectPath}";
             int dialogResult = MessageBox.ErrorQuery( "Confirm Saving ZFS Object Configuration", $"The following command will be executed:\n{pendingCommand}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
 
             switch ( dialogResult )
@@ -464,7 +465,7 @@ public partial class ZfsConfigurationWindow
             }
 
             Logger.Info( "Saving {0}", zfsObjectPath );
-            if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, SelectedTreeNode.GetModifiedZfsProperties(), ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
+            if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, SelectedTreeNode.GetModifiedZfsProperties( ), ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
             {
                 Logger.Trace( "Result from SetPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.SetPropertiesForDataset" );
                 if ( !Program.Settings.DryRun )
@@ -476,7 +477,7 @@ public partial class ZfsConfigurationWindow
             }
 
             Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
-            SelectedTreeNode.CopyTreeDatasetPropertiesToBaseDataset();
+            SelectedTreeNode.CopyTreeDatasetPropertiesToBaseDataset( );
         }
         finally
         {
