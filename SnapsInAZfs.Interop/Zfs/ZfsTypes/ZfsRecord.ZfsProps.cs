@@ -391,7 +391,7 @@ public partial record ZfsRecord
         }
     }
 
-    protected virtual void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
+    private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
