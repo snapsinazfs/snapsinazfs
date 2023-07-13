@@ -182,7 +182,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     public string Name { get; }
 
     [JsonIgnore]
-    public ZfsRecord ParentDataset { get; init; }
+    public ZfsRecord ParentDataset { get; }
 
     [JsonIgnore]
     public ZfsRecord PoolRoot => IsPoolRoot ? this : ParentDataset.PoolRoot;
