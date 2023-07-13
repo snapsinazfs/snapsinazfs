@@ -12,7 +12,6 @@
 #nullable enable
 
 using System.Collections.Concurrent;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -37,14 +36,8 @@ public partial class ZfsConfigurationWindow
     }
 
     private bool _eventsEnabled;
-    private SnapshotListViewEntry? _lastSelectedSnapshot;
     private bool _alreadyHandledSelectedItemChanged;
     private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
-
-    private SnapshotListViewEntry? SelectedSnapshotEntry =>
-        SelectedTreeNode.TreeSnapshots.Count > 0 && SelectedTreeNode.TreeSnapshots.Count > snapshotsListView.SelectedItem
-            ? SelectedTreeNode.TreeSnapshots[ snapshotsListView.SelectedItem ]
-            : null;
 
     private void BooleanRadioGroupOnMouseClick( MouseEventArgs args )
     {
@@ -903,13 +896,6 @@ public partial class ZfsConfigurationWindow
         recentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.ValueString : "None";
         recentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.ValueString : "None";
 
-        snapshotsListView.Clear( );
-
-        _lastSelectedSnapshot = null;
-
-        if ( SelectedTreeNode.TreeDataset.SnapshotCount > 0 )
-        {
-            snapshotsListView.SetSource( SelectedTreeNode.TreeSnapshots );
         }
 
         if ( manageEventHandlers )
