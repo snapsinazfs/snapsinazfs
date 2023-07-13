@@ -5,6 +5,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
+using SnapsInAZfs.ConfigConsole;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -216,7 +217,10 @@ internal static class ZfsTasks
                         Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
                     }
 
-                    ds.RemoveSnapshot( snapshot );
+                    if ( !ds.RemoveSnapshot( snapshot ) )
+                    {
+                        Logger.Debug( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
+                    }
 
                     continue;
                 }
