@@ -420,8 +420,13 @@ public partial record ZfsRecord
 
     protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
-        if ( this[ updatedProperty.Name ].IsInherited )
+        Logger.Trace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( updatedProperty.Name switch
+            {
+                ZfsPropertyNames.RecursionPropertyName => _recursion.IsInherited,
+                ZfsPropertyNames.TemplatePropertyName => _template.IsInherited,
+                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating string property", updatedProperty.Name )
+            } )
         {
             UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
         }
@@ -435,7 +440,7 @@ public partial record ZfsRecord
                 ZfsPropertyNames.EnabledPropertyName => _enabled.IsInherited,
                 ZfsPropertyNames.TakeSnapshotsPropertyName => _takeSnapshots.IsInherited,
                 ZfsPropertyNames.PruneSnapshotsPropertyName => _pruneSnapshotsField.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name when updating boolean property" )
+                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating boolean property",updatedProperty.Name )
             } )
         {
             UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
