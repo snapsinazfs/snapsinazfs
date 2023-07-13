@@ -13,6 +13,7 @@
 
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using SnapsInAZfs.ConfigConsole.TreeNodes;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 using ZfsObjectConfigurationTreeNode = SnapsInAZfs.ConfigConsole.TreeNodes.ZfsObjectConfigurationTreeNode;
@@ -35,8 +36,9 @@ public partial class ZfsConfigurationWindow
         InitializeComponent( );
     }
 
-    private bool _eventsEnabled;
     private bool _alreadyHandledSelectedItemChanged;
+
+    private bool _eventsEnabled;
     private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
 
     private void BooleanRadioGroupOnMouseClick( MouseEventArgs args )
@@ -101,10 +103,13 @@ public partial class ZfsConfigurationWindow
         zfsTreeView.SelectionChanged -= zfsTreeViewOnSelectionChanged;
         enabledRadioGroup.SelectedItemChanged -= EnabledRadioGroupSelectedItemChanged;
         enabledRadioGroup.MouseClick -= BooleanRadioGroupOnMouseClick;
+        enabledInheritButton.Clicked -= EnabledInheritButtonClick;
         takeSnapshotsRadioGroup.SelectedItemChanged -= TakeSnapshotsRadioGroupSelectedItemChanged;
         takeSnapshotsRadioGroup.MouseClick -= BooleanRadioGroupOnMouseClick;
+        takeSnapshotsInheritButton.Clicked -= TakeSnapshotsInheritButtonClick;
         pruneSnapshotsRadioGroup.SelectedItemChanged -= PruneSnapshotsRadioGroupSelectedItemChanged;
         pruneSnapshotsRadioGroup.MouseClick -= BooleanRadioGroupOnMouseClick;
+        pruneSnapshotsInheritButton.Clicked -= PruneSnapshotsInheritButtonClick;
         recursionRadioGroup.SelectedItemChanged -= RecursionRadioGroupSelectedItemChanged;
         recursionRadioGroup.MouseClick -= StringRadioGroupOnMouseClick;
         templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
@@ -119,6 +124,20 @@ public partial class ZfsConfigurationWindow
         // ReSharper restore HeapView.ObjectAllocation.Possible
         _eventsEnabled = false;
         Logger.Debug( "Event handlers for zfs configuration fields disabled" );
+    }
+
+    private void EnabledInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Enabled Setting", $"Inherit Enabled setting {SelectedTreeNode.TreeDataset.ParentDataset.Enabled.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.EnabledPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
     }
 
     private void EnabledRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
@@ -143,10 +162,13 @@ public partial class ZfsConfigurationWindow
         zfsTreeView.MouseClick += ZfsTreeViewOnMouseClick;
         enabledRadioGroup.SelectedItemChanged += EnabledRadioGroupSelectedItemChanged;
         enabledRadioGroup.MouseClick += BooleanRadioGroupOnMouseClick;
+        enabledInheritButton.Clicked += EnabledInheritButtonClick;
         takeSnapshotsRadioGroup.SelectedItemChanged += TakeSnapshotsRadioGroupSelectedItemChanged;
         takeSnapshotsRadioGroup.MouseClick += BooleanRadioGroupOnMouseClick;
+        takeSnapshotsInheritButton.Clicked += TakeSnapshotsInheritButtonClick;
         pruneSnapshotsRadioGroup.SelectedItemChanged += PruneSnapshotsRadioGroupSelectedItemChanged;
         pruneSnapshotsRadioGroup.MouseClick += BooleanRadioGroupOnMouseClick;
+        pruneSnapshotsInheritButton.Clicked += PruneSnapshotsInheritButtonClick;
         recursionRadioGroup.SelectedItemChanged += RecursionRadioGroupSelectedItemChanged;
         recursionRadioGroup.MouseClick += StringRadioGroupOnMouseClick;
         templateListView.SelectedItemChanged += TemplateListViewOnSelectedItemChanged;
@@ -162,15 +184,18 @@ public partial class ZfsConfigurationWindow
         Logger.Debug( "Event handlers for zfs configuration fields enabled" );
     }
 
-    private void ZfsTreeViewOnMouseClick( MouseEventArgs e )
+    private void PruneSnapshotsInheritButtonClick( )
     {
-        if ( _alreadyHandledSelectedItemChanged )
+        int queryResult = MessageBox.Query( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {SelectedTreeNode.TreeDataset.ParentDataset.PruneSnapshots.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
         {
-            _alreadyHandledSelectedItemChanged = false;
-            return;
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.PruneSnapshotsPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
         }
-
-        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void PruneSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
@@ -638,6 +663,20 @@ public partial class ZfsConfigurationWindow
         UpdateButtonState( );
     }
 
+    private void TakeSnapshotsInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Take Snapshots Setting", $"Inherit Take Snapshots setting {SelectedTreeNode.TreeDataset.ParentDataset.TakeSnapshots.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TakeSnapshotsPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void TakeSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty( takeSnapshotsRadioGroup );
@@ -670,6 +709,15 @@ public partial class ZfsConfigurationWindow
         }
     }
 
+    private void UpdateEnabledPropertyFields( ZfsRecord treeDataset )
+    {
+        enabledRadioGroup.SelectedItem = treeDataset.Enabled.AsTrueFalseRadioIndex( );
+        enabledRadioGroup.ColorScheme = treeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+        enabledRadioGroup.Enabled = true;
+        enabledSourceTextField.Text = treeDataset.Enabled.InheritedFrom;
+        enabledInheritButton.Enabled = treeDataset is { IsPoolRoot: false, Enabled.IsLocal: true };
+    }
+
     private void UpdateFieldsForSelectedZfsTreeNode( bool manageEventHandlers = true )
     {
         if ( manageEventHandlers )
@@ -682,17 +730,9 @@ public partial class ZfsConfigurationWindow
             ZfsRecord treeDataset = SelectedTreeNode.TreeDataset;
             nameTextField.Text = treeDataset.Name;
             typeTextField.Text = treeDataset.Kind;
-            enabledRadioGroup.SelectedItem = treeDataset.Enabled.AsTrueFalseRadioIndex( );
-            enabledRadioGroup.ColorScheme = treeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            enabledRadioGroup.Enabled = true;
-            enabledSourceTextField.Text = treeDataset.Enabled.InheritedFrom;
-            takeSnapshotsRadioGroup.SelectedItem = treeDataset.TakeSnapshots.AsTrueFalseRadioIndex( );
-            takeSnapshotsRadioGroup.ColorScheme = treeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            enabledRadioGroup.Enabled = true;
-            takeSnapshotsSourceTextField.Text = treeDataset.TakeSnapshots.InheritedFrom;
-            pruneSnapshotsRadioGroup.SelectedItem = treeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
-            pruneSnapshotsRadioGroup.ColorScheme = treeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            pruneSnapshotsSourceTextField.Text = treeDataset.PruneSnapshots.InheritedFrom;
+            UpdateEnabledPropertyFields( treeDataset );
+            UpdateTakeSnapshotFields( treeDataset );
+            UpdatePruneSnapshotsFields( treeDataset );
             recursionRadioGroup.Enabled = true;
             try
             {
@@ -775,6 +815,15 @@ public partial class ZfsConfigurationWindow
         }
     }
 
+    private void UpdatePruneSnapshotsFields( ZfsRecord treeDataset )
+    {
+        pruneSnapshotsRadioGroup.SelectedItem = treeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
+        pruneSnapshotsRadioGroup.ColorScheme = treeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+        pruneSnapshotsRadioGroup.Enabled = true;
+        pruneSnapshotsSourceTextField.Text = treeDataset.PruneSnapshots.InheritedFrom;
+        pruneSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, PruneSnapshots.IsLocal: true };
+    }
+
     private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
@@ -795,6 +844,15 @@ public partial class ZfsConfigurationWindow
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
+    private void UpdateTakeSnapshotFields( ZfsRecord treeDataset )
+    {
+        takeSnapshotsRadioGroup.SelectedItem = treeDataset.TakeSnapshots.AsTrueFalseRadioIndex( );
+        takeSnapshotsRadioGroup.ColorScheme = treeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+        takeSnapshotsRadioGroup.Enabled = true;
+        takeSnapshotsSourceTextField.Text = treeDataset.TakeSnapshots.InheritedFrom;
+        takeSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, TakeSnapshots.IsLocal: true };
+    }
+
     private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
     {
         Logger.Trace( "Zfs Configuration Window initialized" );
@@ -807,6 +865,17 @@ public partial class ZfsConfigurationWindow
         await zfsRefreshTask;
         UpdateButtonState( );
         EnableEventHandlers( );
+    }
+
+    private void ZfsTreeViewOnMouseClick( MouseEventArgs e )
+    {
+        if ( _alreadyHandledSelectedItemChanged )
+        {
+            _alreadyHandledSelectedItemChanged = false;
+            return;
+        }
+
+        UpdateFieldsForSelectedZfsTreeNode( );
     }
 
     private void zfsTreeViewOnSelectionChanged( object? sender, SelectionChangedEventArgs<ITreeNode> e )

@@ -14,6 +14,7 @@ namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 public class ZfsObjectConfigurationTreeNode : TreeNode
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private readonly ConcurrentDictionary<string, IZfsProperty> _inheritedPropertiesSinceLastSave = new( );
 
     private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSave = new( );
 
@@ -165,6 +166,38 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         }
     }
 
+    /// <summary>
+    ///     Inherits the given property for <see cref="TreeDataset" /> from its parent
+    /// </summary>
+    /// <param name="propertyName"></param>
+    public void InheritPropertyFromParent( string propertyName )
+    {
+        if ( TreeDataset.IsPoolRoot )
+        {
+            Logger.Warn( "Invalid attempt to inherit a property on pool root {0}", TreeDataset.Name );
+            return;
+        }
+
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.EnabledPropertyName:
+            case ZfsPropertyNames.TakeSnapshotsPropertyName:
+            case ZfsPropertyNames.PruneSnapshotsPropertyName:
+            {
+                ZfsProperty<bool> newProperty = TreeDataset.InheritBoolPropertyFromParent( propertyName );
+                _inheritedPropertiesSinceLastSave[ propertyName ] = newProperty;
+            }
+                break;
+            case ZfsPropertyNames.RecursionPropertyName:
+            case ZfsPropertyNames.TemplatePropertyName:
+            {
+                ZfsProperty<string> newProperty = TreeDataset.InheritStringPropertyFromParent( propertyName );
+                _inheritedPropertiesSinceLastSave[ propertyName ] = newProperty;
+            }
+                break;
+        }
+    }
+
     /// <inheritdoc />
     public override string ToString( )
     {
@@ -177,13 +210,16 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="propertyValue"></param>
+    /// <param name="isLocal">
+    ///     If this property is set locally on this node, <see langword="true" /> (default); Otherwise, false
+    /// </param>
     /// <returns>
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="bool" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue )
+    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue, bool isLocal = true )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue, isLocal );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -197,9 +233,9 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="int" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue )
+    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue, bool isLocal = true )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue, isLocal );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -213,10 +249,18 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A <see langword="ref" /> <see cref="ZfsProperty{T}" /> where T is <see langword="string" />, referring to the newly-updated
     ///     property
     /// </returns>
-    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
+    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue, isLocal );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
+    }
+
+    /// <summary>
+    ///     Gets a list of the properties that have been changed from local to inherited from the parent for this node
+    /// </summary>
+    internal List<IZfsProperty> GetInheritedZfsProperties( )
+    {
+        return _inheritedPropertiesSinceLastSave.Values.ToList( );
     }
 
     /// <summary>

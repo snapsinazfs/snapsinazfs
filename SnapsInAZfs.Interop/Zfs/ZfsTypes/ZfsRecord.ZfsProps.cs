@@ -8,16 +8,21 @@ public partial record ZfsRecord
 {
     // ReSharper disable once InconsistentNaming
     protected ZfsProperty<bool> _enabled;
+
+    // ReSharper disable once InconsistentNaming
+    protected ZfsProperty<bool> _pruneSnapshotsField;
+
+    // ReSharper disable once InconsistentNaming
+    protected ZfsProperty<string> _recursion;
+
+    // ReSharper disable once InconsistentNaming
+    protected ZfsProperty<string> _template;
     private ZfsProperty<DateTimeOffset> _lastDailySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastFrequentSnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastHourlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastMonthlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastWeeklySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastYearlySnapshotTimestamp;
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<bool> _pruneSnapshotsField;
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<string> _recursion;
     private ZfsProperty<int> _snapshotRetentionDaily;
     private ZfsProperty<int> _snapshotRetentionFrequent;
     private ZfsProperty<int> _snapshotRetentionHourly;
@@ -26,10 +31,39 @@ public partial record ZfsRecord
     private ZfsProperty<int> _snapshotRetentionWeekly;
     private ZfsProperty<int> _snapshotRetentionYearly;
     private ZfsProperty<bool> _takeSnapshots;
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<string> _template;
 
     public ref readonly ZfsProperty<bool> Enabled => ref _enabled;
+
+    public IZfsProperty this[ string propName ]
+    {
+        get
+        {
+            ArgumentException.ThrowIfNullOrEmpty( propName );
+            return propName switch
+            {
+                ZfsPropertyNames.EnabledPropertyName => Enabled,
+                ZfsPropertyNames.TakeSnapshotsPropertyName => TakeSnapshots,
+                ZfsPropertyNames.PruneSnapshotsPropertyName => PruneSnapshots,
+                ZfsPropertyNames.RecursionPropertyName => Recursion,
+                ZfsPropertyNames.TemplatePropertyName => Template,
+                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => SnapshotRetentionFrequent,
+                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => SnapshotRetentionHourly,
+                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => SnapshotRetentionDaily,
+                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => SnapshotRetentionWeekly,
+                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => SnapshotRetentionMonthly,
+                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => SnapshotRetentionYearly,
+                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral,
+                ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => LastHourlySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => LastDailySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
+                ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
+                _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
+            };
+        }
+    }
+
     public ref readonly ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp => ref _lastDailySnapshotTimestamp;
     public ref readonly ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp => ref _lastFrequentSnapshotTimestamp;
     public ref readonly ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp => ref _lastHourlySnapshotTimestamp;
@@ -48,8 +82,71 @@ public partial record ZfsRecord
     public ref readonly ZfsProperty<bool> TakeSnapshots => ref _takeSnapshots;
     public ref readonly ZfsProperty<string> Template => ref _template;
 
+    /// <summary>
+    ///     An <see langword="event" /> fired when any <see cref="ZfsProperty{T}" /> <see langword="bool" /> properties are updated on
+    ///     this object
+    /// </summary>
+    public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
+
+    public event DateTimeOffsetPropertyChangedEventHandler? DateTimeOffsetPropertyChanged;
+
+    /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
+    /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
+    public ref readonly ZfsProperty<bool> InheritBoolPropertyFromParent( string propertyName )
+    {
+        if ( IsPoolRoot )
+        {
+            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+        }
+
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.EnabledPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.Enabled.Value, false );
+            case ZfsPropertyNames.TakeSnapshotsPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.TakeSnapshots.Value, false );
+            case ZfsPropertyNames.PruneSnapshotsPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.PruneSnapshots.Value, false );
+            default:
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+        }
+    }
+
+    /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
+    /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
     /// <exception cref="Exception">A delegate callback throws an exception</exception>
-    /// <exception cref="ArgumentOutOfRangeException">An unsupported <paramref name="propertyName"/> was supplied</exception>
+    public ref readonly ZfsProperty<string> InheritStringPropertyFromParent( string propertyName )
+    {
+        if ( IsPoolRoot )
+        {
+            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+        }
+
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.RecursionPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.Recursion.Value, false );
+            case ZfsPropertyNames.TemplatePropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.Template.Value, false );
+            default:
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+        }
+    }
+
+    /// <summary>
+    ///     An <see langword="event" /> fired when any <see cref="ZfsProperty{T}" /> <see langword="int" /> properties are updated on
+    ///     this object
+    /// </summary>
+    public event IntPropertyChangedEventHandler? IntPropertyChanged;
+
+    /// <summary>
+    ///     An <see langword="event" /> fired when any <see cref="ZfsProperty{T}" /> <see langword="string" /> properties are updated on
+    ///     this object
+    /// </summary>
+    public event StringPropertyChangedEventHandler? StringPropertyChanged;
+
+    /// <exception cref="Exception">A delegate callback throws an exception</exception>
+    /// <exception cref="ArgumentOutOfRangeException">An unsupported <paramref name="propertyName" /> was supplied</exception>
     public virtual ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
         switch ( propertyName )
@@ -72,7 +169,9 @@ public partial record ZfsRecord
     /// </summary>
     /// <param name="propertyName">The name of the property to update</param>
     /// <param name="propertyValue">The new value for the property</param>
-    /// <param name="isLocal">Whether this property is defined locally on this <see cref="ZfsRecord"/> or not. Default: <see langword="true" /></param>
+    /// <param name="isLocal">
+    ///     Whether this property is defined locally on this <see cref="ZfsRecord" /> or not. Default: <see langword="true" />
+    /// </param>
     /// <returns>The new property created by this method</returns>
     /// <remarks>
     ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
@@ -104,15 +203,15 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.EnabledPropertyName:
                 _enabled = _enabled with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke(this, ref _enabled );
+                BoolPropertyChanged?.Invoke( this, ref _enabled );
                 return ref _enabled;
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 _takeSnapshots = _takeSnapshots with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke(this, ref _takeSnapshots );
+                BoolPropertyChanged?.Invoke( this, ref _takeSnapshots );
                 return ref _takeSnapshots;
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 _pruneSnapshotsField = _pruneSnapshotsField with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke(this, ref _pruneSnapshotsField );
+                BoolPropertyChanged?.Invoke( this, ref _pruneSnapshotsField );
                 return ref _pruneSnapshotsField;
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported boolean property" );
@@ -124,7 +223,9 @@ public partial record ZfsRecord
     /// </summary>
     /// <param name="propertyName">The name of the property to update</param>
     /// <param name="propertyValue">The new value for the property</param>
-    /// <param name="isLocal">Whether this property is defined locally on this <see cref="ZfsRecord"/> or not. Default: <see langword="true" /></param>
+    /// <param name="isLocal">
+    ///     Whether this property is defined locally on this <see cref="ZfsRecord" /> or not. Default: <see langword="true" />
+    /// </param>
     /// <returns>The new property created by this method</returns>
     /// <remarks>
     ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
@@ -203,7 +304,9 @@ public partial record ZfsRecord
     /// </summary>
     /// <param name="propertyName">The name of the property to update</param>
     /// <param name="propertyValue">The new value for the property</param>
-    /// <param name="isLocal">Whether this property is defined locally on this <see cref="ZfsRecord"/> or not. Default: <see langword="true" /></param>
+    /// <param name="isLocal">
+    ///     Whether this property is defined locally on this <see cref="ZfsRecord" /> or not. Default: <see langword="true" />
+    /// </param>
     /// <returns>The new property created by this method</returns>
     /// <remarks>
     ///     <see cref="ZfsProperty{T}" /> is immutable. This method calls the copy constructor using "<see langword="with" />"
@@ -297,45 +400,6 @@ public partial record ZfsRecord
         }
     }
 
-    public IZfsProperty this[ string propName ]
-    {
-        get
-        {
-            ArgumentException.ThrowIfNullOrEmpty( propName );
-            return propName switch
-            {
-                ZfsPropertyNames.EnabledPropertyName => Enabled,
-                ZfsPropertyNames.TakeSnapshotsPropertyName => TakeSnapshots,
-                ZfsPropertyNames.PruneSnapshotsPropertyName => PruneSnapshots,
-                ZfsPropertyNames.RecursionPropertyName => Recursion,
-                ZfsPropertyNames.TemplatePropertyName => Template,
-                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => SnapshotRetentionFrequent,
-                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => SnapshotRetentionHourly,
-                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => SnapshotRetentionDaily,
-                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => SnapshotRetentionWeekly,
-                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => SnapshotRetentionMonthly,
-                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => SnapshotRetentionYearly,
-                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral,
-                ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => LastHourlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => LastDailySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
-                _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
-            };
-        }
-    }
-
-    private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> property )
-    {
-        Logger.Trace( "{2} received int property change event for {0} from {1}", property.Name, sender.Name, Name );
-        if ( this[ property.Name ].IsInherited )
-        {
-            UpdateProperty( property.Name, property.Value, false );
-        }
-    }
-
     protected virtual void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> property )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
@@ -359,10 +423,32 @@ public partial record ZfsRecord
             UpdateProperty( property.Name, property.Value, false );
         }
     }
+
+    private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property )
+    {
+        Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, property.Name, sender.Kind, sender.Name );
+        if ( this[ property.Name ].IsInherited )
+        {
+            UpdateProperty( property.Name, property.Value, false );
+        }
+    }
+
+    private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> property )
+    {
+        Logger.Trace( "{2} received int property change event for {0} from {1}", property.Name, sender.Name, Name );
+        if ( this[ property.Name ].IsInherited )
+        {
+            UpdateProperty( property.Name, property.Value, false );
+        }
+    }
+
     private void SubscribeChildToPropertyEvents( ZfsRecord child )
     {
         if ( child.SubscribedToParentPropertyChangeEvents )
+        {
             UnsubscribeChildFromPropertyEvents( child );
+        }
+
         IntPropertyChanged += child.OnParentUpdatedIntProperty;
         BoolPropertyChanged += child.OnParentUpdatedBoolProperty;
         StringPropertyChanged += child.OnParentUpdatedStringProperty;
@@ -374,19 +460,14 @@ public partial record ZfsRecord
         BoolPropertyChanged += snap.OnParentUpdatedBoolProperty;
         StringPropertyChanged += snap.OnParentUpdatedStringProperty;
     }
-    private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property )
-    {
-        Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, property.Name, sender.Kind, sender.Name );
-        if ( this[ property.Name ].IsInherited )
-        {
-            UpdateProperty( property.Name, property.Value, false );
-        }
-    }
 
     private void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
     {
         if ( !child.SubscribedToParentPropertyChangeEvents )
+        {
             return;
+        }
+
         IntPropertyChanged -= child.OnParentUpdatedIntProperty;
         BoolPropertyChanged -= child.OnParentUpdatedBoolProperty;
         StringPropertyChanged -= child.OnParentUpdatedStringProperty;
@@ -400,23 +481,11 @@ public partial record ZfsRecord
         StringPropertyChanged -= snap.OnParentUpdatedStringProperty;
     }
 
-    /// <summary>
-    /// An <see langword="event"/> fired when any <see cref="ZfsProperty{T}"/> <see langword="bool"/> properties are updated on this object
-    /// </summary>
-    public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
+    public delegate void BoolPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<bool> property );
 
-    /// <summary>
-    /// An <see langword="event"/> fired when any <see cref="ZfsProperty{T}"/> <see langword="int"/> properties are updated on this object
-    /// </summary>
-    public event IntPropertyChangedEventHandler? IntPropertyChanged;
-    /// <summary>
-    /// An <see langword="event"/> fired when any <see cref="ZfsProperty{T}"/> <see langword="string"/> properties are updated on this object
-    /// </summary>
-    public event StringPropertyChangedEventHandler? StringPropertyChanged;
-    public event DateTimeOffsetPropertyChangedEventHandler? DateTimeOffsetPropertyChanged;
+    public delegate void DateTimeOffsetPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property );
 
-    public delegate void IntPropertyChangedEventHandler(ZfsRecord sender, ref ZfsProperty<int> property);
-    public delegate void BoolPropertyChangedEventHandler(ZfsRecord sender, ref ZfsProperty<bool> property);
-    public delegate void StringPropertyChangedEventHandler(ZfsRecord sender, ref ZfsProperty<string> property);
-    public delegate void DateTimeOffsetPropertyChangedEventHandler(ZfsRecord sender,ref ZfsProperty<DateTimeOffset> property );
+    public delegate void IntPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<int> property );
+
+    public delegate void StringPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<string> property );
 }
