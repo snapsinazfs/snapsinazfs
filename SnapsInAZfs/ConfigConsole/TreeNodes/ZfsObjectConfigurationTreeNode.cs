@@ -110,9 +110,9 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     <see cref="BaseDataset" /> to <see cref="TreeDataset" />, effectively resetting <see cref="TreeDataset" /> to its original
     ///     state.
     /// </summary>
-    /// <param name="clearModifiedPropertiesCollection"></param>
+    /// <param name="clearChangedPropertiesCollections"></param>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    public void CopyBaseDatasetPropertiesToTreeDataset( bool clearModifiedPropertiesCollection = true )
+    public void CopyBaseDatasetPropertiesToTreeDataset( bool clearChangedPropertiesCollections = true )
     {
         foreach ( string propName in _modifiedPropertiesSinceLastSave.Keys )
         {
@@ -133,9 +133,29 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
             }
         }
 
-        if ( clearModifiedPropertiesCollection )
+        foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
+        {
+            switch ( BaseDataset[ propName ] )
+            {
+                case ZfsProperty<bool> prop:
+                    TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<int> prop:
+                    TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<DateTimeOffset> prop:
+                    TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<string> prop:
+                    TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+            }
+        }
+
+        if ( clearChangedPropertiesCollections )
         {
             _modifiedPropertiesSinceLastSave.Clear( );
+            _inheritedPropertiesSinceLastSave.Clear( );
         }
     }
 
@@ -144,9 +164,9 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     <see cref="TreeDataset" /> to <see cref="BaseDataset" />.<br />
     ///     This method should be called after saving an object, to avoid needing a refresh from ZFS.
     /// </summary>
-    /// <param name="clearModifiedPropertiesCollection"></param>
+    /// <param name="clearChangedPropertiesCollections"></param>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    public void CopyTreeDatasetPropertiesToBaseDataset( bool clearModifiedPropertiesCollection = true )
+    public void CopyTreeDatasetPropertiesToBaseDataset( bool clearChangedPropertiesCollections = true )
     {
         foreach ( string propName in _modifiedPropertiesSinceLastSave.Keys )
         {
@@ -167,9 +187,29 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
             }
         }
 
-        if ( clearModifiedPropertiesCollection )
+        foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
+        {
+            switch ( TreeDataset[ propName ] )
+            {
+                case ZfsProperty<bool> prop:
+                    BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<int> prop:
+                    BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<DateTimeOffset> prop:
+                    BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+                case ZfsProperty<string> prop:
+                    BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
+                    continue;
+            }
+        }
+
+        if ( clearChangedPropertiesCollections )
         {
             _modifiedPropertiesSinceLastSave.Clear( );
+            _inheritedPropertiesSinceLastSave.Clear( );
         }
     }
 
