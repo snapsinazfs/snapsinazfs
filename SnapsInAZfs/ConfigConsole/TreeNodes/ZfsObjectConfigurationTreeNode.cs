@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -172,6 +172,8 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     Inherits the given property for <see cref="TreeDataset" /> from its parent
     /// </summary>
     /// <param name="propertyName"></param>
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not handled by this method</exception>
+    /// <exception cref="ArgumentException">If <paramref name="propertyName" /> is a non-inheritable property</exception>
     public void InheritPropertyFromParent( string propertyName )
     {
         if ( TreeDataset.IsPoolRoot )
@@ -197,6 +199,22 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                 _inheritedPropertiesSinceLastSave[ propertyName ] = newProperty;
             }
                 break;
+            case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
+            case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
+                throw new ArgumentException( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof( propertyName ) );
+            default:
+            {
+                if ( IZfsProperty.AllKnownProperties.Contains( propertyName ) )
+                {
+                    throw new ArgumentOutOfRangeException( $"Property {propertyName} cannot be inherited", new NotImplementedException( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) );
+                }
+
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"Property {propertyName} cannot be inherited - unsupported property" );
+            }
         }
     }
 
