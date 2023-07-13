@@ -189,6 +189,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         }
     }
 
+    private ImmutableSortedDictionary<string, ZfsRecord>? _sortedChildDatasets;
+
     public long BytesAvailable { get; }
     public long BytesUsed { get; }
 
@@ -489,9 +491,15 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return newRecord;
     }
 
-    public ImmutableSortedDictionary<string, ZfsRecord> GetChildDatasets( )
+    /// <summary>
+    ///     Gets a child <see cref="ZfsRecord" /> from this <see cref="ZfsRecord" />, by name, or <see langword="null" />, if no such
+    ///     child exists.
+    /// </summary>
+    /// <param name="childName">The fully-qualified name of the <see cref="ZfsRecord" /> to retrieve</param>
+    public ZfsRecord? GetChild( string childName )
     {
-        return _childDatasets.ToImmutableSortedDictionary( );
+        _childDatasets.TryGetValue( childName, out ZfsRecord? child );
+        return child;
     }
 
     /// <inheritdoc />
@@ -559,6 +567,15 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         GetSnapshotsToPruneForPeriod( SnapshotPeriod.Yearly, SnapshotRetentionYearly.Value, snapshotsToPrune );
 
         return snapshotsToPrune;
+    }
+
+    /// <summary>
+    ///     Gets and caches a sorted dictionary of the child datasets of this <see cref="ZfsRecord" />
+    /// </summary>
+    /// <returns></returns>
+    public ImmutableSortedDictionary<string, ZfsRecord> GetSortedChildDatasets( )
+    {
+        return _sortedChildDatasets ??= _childDatasets.ToImmutableSortedDictionary( );
     }
 
     /// <summary>
