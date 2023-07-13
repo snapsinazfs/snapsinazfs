@@ -25,6 +25,7 @@ public sealed partial record Snapshot
     /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the SnapshotName property</exception>
     public override ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotNamePropertyName:
@@ -36,7 +37,6 @@ public sealed partial record Snapshot
         }
     }
 
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     public override ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, bool isLocal = true )
     {
         switch ( propertyName )

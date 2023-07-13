@@ -43,6 +43,7 @@
 
   <ItemGroup>
     <Compile Remove="Libc\bits\PthreadTypes.cs" />
+    <Compile Remove="Libc\bits\Types.cs" />
     <Compile Remove="Libc\bits\Typesizes.cs" />
     <Compile Remove="Libc\Enums\PthreadEnums.cs" />
     <Compile Remove="Libc\Structs\StatFs64.cs" />
@@ -59,6 +60,7 @@
 
   <ItemGroup>
     <None Include="Libc\bits\PthreadTypes.cs" />
+    <None Include="Libc\bits\Types.cs" />
     <None Include="Libc\bits\Typesizes.cs" />
     <None Include="Libc\Enums\PthreadEnums.cs" />
     <None Include="Libc\Structs\StatFs64.cs" />

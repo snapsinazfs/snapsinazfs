@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
-using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
@@ -81,6 +80,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
                 propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp ) );
             }
 
+            // ReSharper disable once InvertIf
             if ( propertiesToSet.Count > 0 )
             {
                 Logger.Debug( "Timestamps are out of sync for {0} - updating properties", ds.Name );

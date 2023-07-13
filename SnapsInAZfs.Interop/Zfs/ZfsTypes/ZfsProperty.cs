@@ -39,12 +39,6 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     [JsonIgnore]
     public bool IsSnapsInAZfsProperty { get; }
 
-    /// <summary>
-    ///     Gets a boolean indicating if this property is a SnapsInAZfs property, is a string, and is equal to "-"
-    /// </summary>
-    [JsonIgnore]
-    public readonly bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is ZfsPropertyValueConstants.None;
-
     [JsonIgnore]
     public readonly string Source =>
         IsLocal switch
@@ -182,6 +176,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     {
         property = null;
 
+        // ReSharper disable once InvertIf
         if ( bool.TryParse( input.Value, out bool result ) )
         {
             property = ZfsProperty<bool>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );

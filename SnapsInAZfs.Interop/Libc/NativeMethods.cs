@@ -4,6 +4,8 @@
 
 using System.Runtime.InteropServices;
 using SnapsInAZfs.Interop.Libc.Enums;
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 namespace SnapsInAZfs.Interop.Libc;
 

@@ -4,6 +4,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+// ReSharper disable CommentTypo
 
 namespace SnapsInAZfs.Interop.Libc.Enums;
 
