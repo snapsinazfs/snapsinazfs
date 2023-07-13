@@ -23,15 +23,6 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
 
     private List<ITreeNode>? _children;
 
-    /// <summary>
-    ///     The base instance of the <see cref="ZfsRecord" />.
-    /// </summary>
-    /// <remarks>
-    ///     This object remains unmodified until the user saves an object.<br />
-    ///     At that point, <see cref="CopyTreeDatasetPropertiesToBaseDataset" /> is called to copy the changes to this object.
-    /// </remarks>
-    public ZfsRecord BaseDataset { get; }
-
     /// <inheritdoc />
     public override IList<ITreeNode> Children
     {
@@ -77,6 +68,16 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     When an object is saved, the changes are copied to <see cref="BaseDataset" />
     /// </remarks>
     public ZfsRecord TreeDataset { get; }
+
+    /// <summary>
+    ///     The base instance of the <see cref="ZfsRecord" />.
+    /// </summary>
+    /// <remarks>
+    ///     This object remains unmodified until the user saves an object.<br />
+    ///     At that point, <see cref="CopyTreeDatasetPropertiesToBaseDataset" /> is called to copy the changes to this object.<br />
+    ///     This object should not be directly accessed by user code.
+    /// </remarks>
+    private ZfsRecord BaseDataset { get; }
 
     /// <summary>
     ///     Copies the values and <see cref="IZfsProperty.IsLocal" /> property of all fields changed for the current object from
