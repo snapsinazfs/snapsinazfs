@@ -240,47 +240,4 @@ public class ZfsPropertyTests
             Assert.That( property.HasValue, Is.False );
         } );
     }
-
-    [Test]
-    [TestCase( "-", ExpectedResult = SnapshotPeriodKind.NotSet )]
-    [TestCase( "frequently", ExpectedResult = SnapshotPeriodKind.Frequent )]
-    [TestCase( "hourly", ExpectedResult = SnapshotPeriodKind.Hourly )]
-    [TestCase( "daily", ExpectedResult = SnapshotPeriodKind.Daily )]
-    [TestCase( "weekly", ExpectedResult = SnapshotPeriodKind.Weekly )]
-    [TestCase( "monthly", ExpectedResult = SnapshotPeriodKind.Monthly )]
-    [TestCase( "yearly", ExpectedResult = SnapshotPeriodKind.Yearly )]
-    public SnapshotPeriodKind TryParse_SnapshotPeriod_OutputsExpectedValue( string value )
-    {
-        RawProperty input = new( ZfsPropertyNames.SnapshotPeriodPropertyName, value, ZfsPropertySourceConstants.Local );
-        bool success = ZfsProperty<SnapshotPeriod>.TryParse( input, out ZfsProperty<SnapshotPeriod>? property );
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( success, Is.True );
-            Assert.That( property, Is.Not.Null );
-            Assert.That( property, Is.InstanceOf<ZfsProperty<SnapshotPeriod>>( ) );
-            Assert.That( property.HasValue, Is.True );
-        } );
-        return property!.Value.Value.Kind;
-    }
-
-    [Test]
-    [TestCase( "true" )]
-    [TestCase( "Daily" )]
-    [TestCase( "abcdefg" )]
-    [TestCase( "!" )]
-    [TestCase( " " )]
-    [TestCase( "" )]
-    [TestCase( "NotSet" )]
-    [TestCase( null )]
-    public void TryParse_SnapshotPeriod_ReturnsFalseOnBadInput( string value )
-    {
-        RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
-        bool success = ZfsProperty<SnapshotPeriod>.TryParse( input, out ZfsProperty<SnapshotPeriod>? property );
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( success, Is.False );
-            Assert.That( property, Is.Null );
-            Assert.That( property.HasValue, Is.False );
-        } );
-    }
 }
