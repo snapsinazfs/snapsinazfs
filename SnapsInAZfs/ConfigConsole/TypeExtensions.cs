@@ -15,6 +15,24 @@ namespace SnapsInAZfs.ConfigConsole;
 public static class TypeExtensions
 {
     /// <summary>
+    ///     Gets the last path component of a ZFS path name, starting from the last instance of '/','@',or '#'
+    /// </summary>
+    /// <param name="path">A path to operate on</param>
+    /// <returns>
+    ///     The last component of the given ZFS path, as a new <see langword="string" /> instance, with a value equal to the substring of
+    ///     <paramref name="path" />, starting from the first character after the last instance of '/','@',or '#', up to the end of the
+    ///     string, or the <b>original string reference</b>, if none of those characters are found.
+    /// </returns>
+    /// <remarks>
+    ///     If the given path does not contain '/','@',or '#', the original string reference will be returned.
+    /// </remarks>
+    public static string GetLastPathElement( this string path )
+    {
+        int startIndex = 1 + path.LastIndexOfAny( new[] { '/', '@', '#' } );
+        return startIndex == 0 ? path : path[ startIndex.. ];
+    }
+
+    /// <summary>
     ///     Gets a list of strings containing day names
     /// </summary>
     /// <param name="value">A <see cref="DateTimeFormatInfo" /> object to get day names for</param>
@@ -137,7 +155,9 @@ public static class TypeExtensions
     ///     If the <paramref name="value" /> is a valid integer, the <see langword="int" /> representation of
     ///     <paramref name="value" /><br />For all other cases, <paramref name="fallbackValue" />
     /// </returns>
-    /// <remarks>Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue" /></remarks>
+    /// <remarks>
+    ///     Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue" />
+    /// </remarks>
     [Pure]
     [SuppressMessage( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
     public static int ToInt32( this ustring value, int fallbackValue )
