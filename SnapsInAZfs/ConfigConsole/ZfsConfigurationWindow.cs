@@ -261,6 +261,7 @@ public partial class ZfsConfigurationWindow
             zfsTreeView.ClearObjects( );
             _treeDatasets.Clear( );
             ConfigConsole.BaseDatasets.Clear( );
+            ConfigConsole.Snapshots.Clear( );
             Logger.Debug( "Getting zfs objects from zfs and populating configuration tree view" );
             List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync( Program.Settings, ConfigConsole.BaseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
             zfsTreeView.AddObjects( treeRootNodes );
