@@ -400,36 +400,36 @@ public partial record ZfsRecord
         }
     }
 
-    protected virtual void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> property )
+    protected virtual void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
-        if ( property.Name switch
+        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( updatedProperty.Name switch
             {
                 ZfsPropertyNames.EnabledPropertyName => _enabled.IsInherited,
                 ZfsPropertyNames.TakeSnapshotsPropertyName => _takeSnapshots.IsInherited,
                 ZfsPropertyNames.PruneSnapshotsPropertyName => _pruneSnapshotsField.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( )
+                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name when updating boolean property" )
             } )
         {
-            UpdateProperty( property.Name, property.Value, false );
+            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 
-    protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> property )
+    protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
-        if ( this[ property.Name ].IsInherited )
+        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( this[ updatedProperty.Name ].IsInherited )
         {
-            UpdateProperty( property.Name, property.Value, false );
+            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 
-    private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> property )
+    private void OnParentUpdatedDateTimeOffsetProperty( ZfsRecord sender, ref ZfsProperty<DateTimeOffset> updatedProperty )
     {
-        Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, property.Name, sender.Kind, sender.Name );
-        if ( this[ property.Name ].IsInherited )
+        Logger.Trace( "{0} received DateTimeOffset property change event for {1} from {2} {3}", Name, updatedProperty.Name, sender.Kind, sender.Name );
+        if ( this[ updatedProperty.Name ].IsInherited )
         {
-            UpdateProperty( property.Name, property.Value, false );
+            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 

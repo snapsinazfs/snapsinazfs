@@ -46,7 +46,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     public readonly bool IsUndefinedOrDefault => IsSnapsInAZfsProperty && Value is ZfsPropertyValueConstants.None;
 
     [JsonIgnore]
-    public string Source =>
+    public readonly string Source =>
         IsLocal switch
         {
             true => ZfsPropertySourceConstants.Local,
@@ -95,7 +95,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 
-    string IZfsProperty.Source =>
+    readonly string IZfsProperty.Source =>
         IsLocal switch
         {
             true => ZfsPropertySourceConstants.Local,
@@ -108,11 +108,11 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     public readonly bool IsInherited => !IsLocal;
 
     [JsonIgnore]
-    public string SetString => $"{Name}={ValueString}";
+    public readonly string SetString => $"{Name}={ValueString}";
 
     public string Name { get; init; }
     public bool IsLocal { get; init; }
-    public string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
+    public readonly string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
 
     public ZfsRecord ChangeParentReference( ZfsRecord newParent )
     {
@@ -121,26 +121,31 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
 
     public static ZfsProperty<bool> CreateWithoutParent( string name, bool value, bool isLocal = true )
     {
+        Logger.Trace("Creating ZfsProperty<bool> {0} without parent dataset", name  );
         return new( name, value, isLocal );
     }
 
     public static ZfsProperty<int> CreateWithoutParent( string name, int value, bool isLocal = true )
     {
+        Logger.Trace("Creating ZfsProperty<int> {0} without parent dataset", name  );
         return new( name, value, isLocal );
     }
 
     public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
     {
+        Logger.Trace("Creating ZfsProperty<string> {0} without parent dataset", name  );
         return new( name, value, isLocal );
     }
 
     public static ZfsProperty<T> CreateWithoutParent( string name, T value, bool isLocal = true )
     {
+        Logger.Trace("Creating ZfsProperty<T> {0} without parent dataset", name  );
         return new( name, value, isLocal );
     }
 
     public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, DateTimeOffset value, bool isLocal = true )
     {
+        Logger.Trace("Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name  );
         return new( name, value, isLocal );
     }
 

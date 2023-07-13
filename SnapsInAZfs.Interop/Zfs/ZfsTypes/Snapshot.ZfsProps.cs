@@ -52,12 +52,12 @@ public sealed partial record Snapshot
     }
 
     /// <inheritdoc />
-    protected override void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> property )
+    protected override void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", property.Name, sender.Name, Name );
-        if ( this[ property.Name ].IsInherited )
+        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( this[ updatedProperty.Name ].IsInherited )
         {
-            UpdateProperty( property.Name, property.Value, false );
+            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 }

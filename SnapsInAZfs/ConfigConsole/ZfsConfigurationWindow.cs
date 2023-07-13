@@ -35,19 +35,8 @@ public partial class ZfsConfigurationWindow
         InitializeComponent( );
     }
 
-    private bool _alreadyHandledSelectedItemChanged;
-
     private bool _eventsEnabled;
     private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
-
-    private void BooleanRadioGroupOnMouseClick( MouseEventArgs args )
-    {
-        RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedBooleanFromLabel( ) );
-        viewData.SourceTextField.Text = newProperty.InheritedFrom;
-        UpdateFieldsForSelectedZfsTreeNode( );
-        UpdateButtonState( );
-    }
 
     private void ClearAllPropertyFields( bool manageEventHandlers = false )
     {
@@ -526,7 +515,7 @@ public partial class ZfsConfigurationWindow
 
             if ( areAnyPropertiesInherited )
             {
-                if ( !await ZfsTasks.InheritPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner ).ConfigureAwait( true ) && !Program.Settings.DryRun )
+                if ( !await ZfsTasks.InheritPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait( true ) && !Program.Settings.DryRun )
                 {
                     Logger.Trace( "Result from InheritPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.InheritPropertiesForDataset" );
                     if ( !Program.Settings.DryRun )
@@ -688,16 +677,6 @@ public partial class ZfsConfigurationWindow
         templateListView.Data = new ListViewWithSourceViewData( ZfsPropertyNames.TemplatePropertyName, templateSourceTextField );
     }
 
-    private void StringRadioGroupOnMouseClick( MouseEventArgs args )
-    {
-        RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ) );
-
-        viewData.SourceTextField.Text = newProperty.InheritedFrom;
-        UpdateFieldsForSelectedZfsTreeNode( );
-        UpdateButtonState( );
-    }
-
     private void TakeSnapshotsInheritButtonClick( )
     {
         int queryResult = MessageBox.Query( "Inherit Take Snapshots Setting", $"Inherit Take Snapshots setting {SelectedTreeNode.TreeDataset.ParentDataset.TakeSnapshots.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
@@ -857,7 +836,6 @@ public partial class ZfsConfigurationWindow
             recentYearlyTextField.Text = treeDataset.LastYearlySnapshotTimestamp.IsLocal ? treeDataset.LastYearlySnapshotTimestamp.ValueString : "None";
         }
 
-        _alreadyHandledSelectedItemChanged = true;
         if ( manageEventHandlers )
         {
             EnableEventHandlers( );
@@ -924,7 +902,6 @@ public partial class ZfsConfigurationWindow
         ClearAllPropertyFields( );
 
         UpdateFieldsForSelectedZfsTreeNode( false );
-        _alreadyHandledSelectedItemChanged = true;
         UpdateButtonState( );
         EnableEventHandlers( );
     }

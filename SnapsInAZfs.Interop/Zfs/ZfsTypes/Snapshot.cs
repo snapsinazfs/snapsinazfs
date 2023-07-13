@@ -229,7 +229,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
     /// <inheritdoc />
     bool IEquatable<Snapshot?>.Equals( Snapshot? other )
     {
-        if ( ReferenceEquals( null, other ) )
+        if ( other is null )
         {
             return false;
         }

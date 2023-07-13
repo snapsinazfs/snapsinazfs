@@ -208,7 +208,7 @@ public class ZfsRecordTests
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
         Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
 
-        ZfsProperty<string> updatedStringProperty = (ZfsProperty<string>)updatedRecord.UpdateProperty( propertyName, propertyValue, isLocal );
+        ZfsProperty<string> updatedStringProperty = updatedRecord.UpdateProperty( propertyName, propertyValue, isLocal );
 
         if ( newTestCaseProperty == originalStringProperty )
         {
@@ -289,27 +289,36 @@ public class ZfsRecordTests
         ZfsProperty<bool> updatedChildEnabledProperty_AfterUpdate = updatedParent.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, false );
         Assert.That( updatedChildEnabledProperty_AfterUpdate, Is.Not.EqualTo( updatedChildEnabledProperty_BeforeUpdate ) );
         updatedChildEnabledProperty_BeforeUpdate = updatedChildEnabledProperty_AfterUpdate;
-        Assert.That( updatedChild.Equals( originalChild ), Is.False );
-        Assert.That( updatedChild.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
-        Assert.That( updatedChildEnabledProperty_BeforeUpdate, Is.Not.EqualTo( originalEnabledProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedChild.Equals( originalChild ), Is.False );
+            Assert.That( updatedChild.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
+            Assert.That( updatedChildEnabledProperty_BeforeUpdate, Is.Not.EqualTo( originalEnabledProperty ) );
+        } );
 
         ZfsProperty<bool> originalTakeSnapshotsProperty = originalChild.TakeSnapshots;
         ZfsProperty<bool> updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChild.TakeSnapshots;
         ZfsProperty<bool> updatedChildTakeSnapshotsProperty_AfterUpdate = updatedParent.UpdateProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, false );
         Assert.That( updatedChildTakeSnapshotsProperty_AfterUpdate, Is.Not.EqualTo( updatedChildTakeSnapshotsProperty_BeforeUpdate ) );
         updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChildTakeSnapshotsProperty_AfterUpdate;
-        Assert.That( updatedChild.Equals( originalChild ), Is.False );
-        Assert.That( updatedChild.TakeSnapshots.Value, Is.EqualTo( updatedParent.TakeSnapshots.Value ) );
-        Assert.That( updatedChildTakeSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo( originalTakeSnapshotsProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedChild.Equals( originalChild ), Is.False );
+            Assert.That( updatedChild.TakeSnapshots.Value, Is.EqualTo( updatedParent.TakeSnapshots.Value ) );
+            Assert.That( updatedChildTakeSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo( originalTakeSnapshotsProperty ) );
+        } );
 
         ZfsProperty<bool> originalPruneSnapshotsProperty = originalChild.PruneSnapshots;
         ZfsProperty<bool> updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChild.PruneSnapshots;
         ZfsProperty<bool> updatedChildPruneSnapshotsProperty_AfterUpdate = updatedParent.UpdateProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, false );
         Assert.That( updatedChildPruneSnapshotsProperty_AfterUpdate, Is.Not.EqualTo( updatedChildPruneSnapshotsProperty_BeforeUpdate ) );
         updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChildPruneSnapshotsProperty_AfterUpdate;
-        Assert.That( updatedChild.Equals( originalChild ), Is.False );
-        Assert.That( updatedChild.PruneSnapshots.Value, Is.EqualTo( updatedParent.PruneSnapshots.Value ) );
-        Assert.That( updatedChildPruneSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo( originalPruneSnapshotsProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedChild.Equals( originalChild ), Is.False );
+            Assert.That( updatedChild.PruneSnapshots.Value, Is.EqualTo( updatedParent.PruneSnapshots.Value ) );
+            Assert.That( updatedChildPruneSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo( originalPruneSnapshotsProperty ) );
+        } );
     }
 
     [Test]
@@ -402,18 +411,27 @@ public class ZfsRecordTests
         Assume.That( updatedRecord.Equals(originalRecord), Is.True );
         ZfsProperty<bool> originalEnabledProperty = originalRecord.Enabled;
         ZfsProperty<bool> updatedEnabledProperty = updatedParent.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, false );
-        Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
-        Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
-        Assert.That( updatedEnabledProperty, Is.Not.EqualTo( originalEnabledProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
+            Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
+            Assert.That( updatedEnabledProperty, Is.Not.EqualTo( originalEnabledProperty ) );
+        } );
         ZfsProperty<bool> originalTakeSnapshotsProperty = originalRecord.TakeSnapshots;
         ZfsProperty<bool> updatedTakeSnapshotsProperty = updatedParent.UpdateProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, false );
-        Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
-        Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
-        Assert.That( updatedTakeSnapshotsProperty, Is.Not.EqualTo( originalTakeSnapshotsProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
+            Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
+            Assert.That( updatedTakeSnapshotsProperty, Is.Not.EqualTo( originalTakeSnapshotsProperty ) );
+        } );
         ZfsProperty<bool> originalPruneSnapshotsProperty = originalRecord.TakeSnapshots;
         ZfsProperty<bool> updatedPruneSnapshotsProperty = updatedParent.UpdateProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, false );
-        Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
-        Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
-        Assert.That( updatedPruneSnapshotsProperty, Is.Not.EqualTo( originalPruneSnapshotsProperty ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( updatedRecord.Equals( originalRecord ), Is.False );
+            Assert.That( updatedRecord.Enabled.Value, Is.EqualTo( updatedParent.Enabled.Value ) );
+            Assert.That( updatedPruneSnapshotsProperty, Is.Not.EqualTo( originalPruneSnapshotsProperty ) );
+        } );
     }
 }
