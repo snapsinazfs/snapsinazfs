@@ -13,7 +13,6 @@
 
 using System.Collections.Concurrent;
 using NStack;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui;
 using Terminal.Gui.TextValidateProviders;

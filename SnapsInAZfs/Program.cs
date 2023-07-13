@@ -2,17 +2,13 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
-using System.Collections.Concurrent;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
 

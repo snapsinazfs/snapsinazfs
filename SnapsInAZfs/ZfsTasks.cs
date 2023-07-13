@@ -5,7 +5,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
-using SnapsInAZfs.ConfigConsole;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;

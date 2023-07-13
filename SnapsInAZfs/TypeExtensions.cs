@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// LICENSE:
+// 
+// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 namespace SnapsInAZfs;
+
 internal static class TypeExtensions
 {
     /// <summary>
-    /// Gets the greatest common factor of all integers in the set
+    ///     Gets the greatest common factor of all integers in the set
     /// </summary>
     /// <param name="frequentPeriods"></param>
     /// <returns></returns>
-    internal static int GreatestCommonFactor(this IEnumerable<int> frequentPeriods)
+    internal static int GreatestCommonFactor( this IEnumerable<int> frequentPeriods )
     {
-        return frequentPeriods.Aggregate(( left, right ) =>
+        return frequentPeriods.Aggregate( ( left, right ) =>
         {
             while ( true )
             {
@@ -28,5 +27,4 @@ internal static class TypeExtensions
             }
         } );
     }
-
 }

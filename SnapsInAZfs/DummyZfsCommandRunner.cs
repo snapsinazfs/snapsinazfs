@@ -7,7 +7,6 @@ using System.Runtime.CompilerServices;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
-using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs;
 
