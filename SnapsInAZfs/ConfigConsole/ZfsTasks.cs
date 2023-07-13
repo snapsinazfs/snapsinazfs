@@ -4,11 +4,11 @@
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using SnapsInAZfs.ConfigConsole.TreeNodes;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
-using ZfsObjectConfigurationTreeNode = SnapsInAZfs.ConfigConsole.TreeNodes.ZfsObjectConfigurationTreeNode;
 
 namespace SnapsInAZfs.ConfigConsole;
 
@@ -28,16 +28,13 @@ internal static class ZfsTasks
         {
             List<ITreeNode> treeRootNodes = new( );
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, baseSnapshots ).ConfigureAwait( true );
-            ImmutableSortedDictionary<string, ZfsRecord> sortedDatasetDictionary = baseDatasets.ToImmutableSortedDictionary( );
+            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
 
-            foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedDatasetDictionary )
+            foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedSetOfPoolRoots )
             {
-                if ( baseDataset.IsPoolRoot )
-                {
-                    ZfsObjectConfigurationTreeNode rootNode = new ( dsName, baseDataset, baseDataset.DeepCopyClone( ) );
-                    treeRootNodes.Add( rootNode );
-                    treeDatasets[ dsName ] = rootNode.TreeDataset;
-                }
+                ZfsObjectConfigurationTreeNode rootNode = new( dsName, baseDataset, baseDataset.DeepCopyClone( ) );
+                treeRootNodes.Add( rootNode );
+                treeDatasets[ dsName ] = rootNode.TreeDataset;
             }
 
             return treeRootNodes;
