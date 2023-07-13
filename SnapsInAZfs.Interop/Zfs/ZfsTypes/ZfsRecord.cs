@@ -917,18 +917,19 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     {
         List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
         Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
-        Logger.Trace( "{0} retention is {1:D} for {2} {3}", snapshotPeriod, retentionValue, Kind, Name );
-        if ( snapshotsSetForPruning.Count > retentionValue )
+        if ( snapshotsSetForPruning.Count <= retentionValue )
         {
-            int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
-            Logger.Debug( "Need to prune oldest {0} {1} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
-            snapshotsSetForPruning.Sort( );
-            for ( int i = 0; i < numberToPrune; i++ )
-            {
-                Snapshot snap = snapshotsSetForPruning[ i ];
-                Logger.Debug( "Adding snapshot {0} to prune list", snap.Name );
-                snapshotsToPrune.Add( snap );
-            }
+            return;
+        }
+
+        int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
+        Logger.Debug( "Need to prune oldest {0} {1} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
+        snapshotsSetForPruning.Sort( );
+        for ( int i = 0; i < numberToPrune; i++ )
+        {
+            Snapshot snap = snapshotsSetForPruning[ i ];
+            Logger.Debug( "Adding snapshot {0} to prune list", snap.Name );
+            snapshotsToPrune.Add( snap );
         }
     }
 }
