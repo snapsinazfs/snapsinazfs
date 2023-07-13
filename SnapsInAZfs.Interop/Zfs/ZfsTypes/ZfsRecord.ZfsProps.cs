@@ -2,6 +2,8 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public partial record ZfsRecord
@@ -87,6 +89,31 @@ public partial record ZfsRecord
     ///     this object
     /// </summary>
     public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
+
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not a supported int property</exception>
+    [SuppressMessage( "ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Switch expressions cannot be ref return" )]
+    public ref readonly ZfsProperty<int> GetIntProperty( string propertyName )
+    {
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
+                return ref _snapshotRetentionFrequent;
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
+                return ref _snapshotRetentionHourly;
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
+                return ref _snapshotRetentionDaily;
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
+                return ref _snapshotRetentionWeekly;
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
+                return ref _snapshotRetentionMonthly;
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
+                return ref _snapshotRetentionYearly;
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
+                return ref _snapshotRetentionPruneDeferral;
+            default:
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" );
+        }
+    }
 
     /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
     /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
@@ -391,6 +418,15 @@ public partial record ZfsRecord
         }
     }
 
+    protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
+    {
+        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( this[ updatedProperty.Name ].IsInherited )
+        {
+            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
+        }
+    }
+
     private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
@@ -406,21 +442,22 @@ public partial record ZfsRecord
         }
     }
 
-    protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
+    private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
-        if ( this[ updatedProperty.Name ].IsInherited )
+        Logger.Trace( "{2} received int property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        if ( updatedProperty.Name switch
+            {
+                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => _snapshotRetentionFrequent.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => _snapshotRetentionHourly.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => _snapshotRetentionDaily.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => _snapshotRetentionWeekly.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => _snapshotRetentionMonthly.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => _snapshotRetentionYearly.IsInherited,
+                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => _snapshotRetentionPruneDeferral.IsInherited,
+                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating int property", updatedProperty.Name )
+            } )
         {
             UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
-        }
-    }
-
-    private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> property )
-    {
-        Logger.Trace( "{2} received int property change event for {0} from {1}", property.Name, sender.Name, Name );
-        if ( this[ property.Name ].IsInherited )
-        {
-            UpdateProperty( property.Name, property.Value, false );
         }
     }
 

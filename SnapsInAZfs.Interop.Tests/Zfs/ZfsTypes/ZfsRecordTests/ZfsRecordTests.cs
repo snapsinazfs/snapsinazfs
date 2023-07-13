@@ -149,7 +149,7 @@ public class ZfsRecordTests
         ZfsRecord updatedParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         ZfsRecord updatedRecord = updatedParent.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
         ZfsProperty<int> newTestCaseProperty = ZfsProperty<int>.CreateWithoutParent( propertyName, propertyValue, isLocal );
-        ZfsProperty<int> originalIntProperty = (ZfsProperty<int>)originalRecord[ propertyName ];
+        ZfsProperty<int> originalIntProperty = originalRecord.GetIntProperty( propertyName );
 
         Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
         Assume.That( updatedRecord, Is.Not.SameAs(originalRecord));
