@@ -46,7 +46,7 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
         get
         {
             List<ITreeNode> list = new( );
-            foreach ( ( string? childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
+            foreach ( ( string childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
             {
                 if ( !BaseDataset.GetChild( childName, out ZfsRecord? baseDataset ) )
                 {
