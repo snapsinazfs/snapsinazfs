@@ -116,9 +116,11 @@ public class SnapshotTests
         Assume.That( original.Source, Is.EqualTo( ZfsPropertySourceConstants.Local ) );
         Assume.That( snapshot.SnapshotName, Is.EqualTo( original ) );
 
-        snapshot.UpdateProperty( ZfsPropertyNames.SnapshotNamePropertyName, "newName" );
-
-        Assert.That( snapshot.SnapshotName, Is.Not.EqualTo( original ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotNamePropertyName, "newName" ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+            Assert.That( snapshot.SnapshotName, Is.EqualTo( original ) );
+        } );
     }
 
     [Test]

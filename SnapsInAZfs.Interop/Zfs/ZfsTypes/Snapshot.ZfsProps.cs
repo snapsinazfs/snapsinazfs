@@ -3,7 +3,6 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using NLog;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
@@ -12,7 +11,7 @@ public sealed partial record Snapshot
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private ZfsProperty<string> _period;
 
-    private ZfsProperty<string> _snapshotName;
+    private readonly ZfsProperty<string> _snapshotName;
 
     private ZfsProperty<DateTimeOffset> _timestamp;
 
@@ -23,13 +22,13 @@ public sealed partial record Snapshot
     public ref readonly ZfsProperty<DateTimeOffset> Timestamp => ref _timestamp;
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the SnapshotName property</exception>
     public override ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotNamePropertyName:
-                _snapshotName = _snapshotName with { Value = propertyValue, IsLocal = isLocal };
-                return ref _snapshotName;
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot name cannot be changed." );
             case ZfsPropertyNames.SnapshotPeriodPropertyName:
                 _period = _period with { Value = propertyValue, IsLocal = isLocal };
                 return ref _period;
