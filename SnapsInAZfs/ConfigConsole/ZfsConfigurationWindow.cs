@@ -845,7 +845,7 @@ public partial class ZfsConfigurationWindow
     private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue )
     {
         ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( propertyName, propertyValue );
-        field.ColorScheme = SelectedTreeNode.TreeDataset[ propertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+        field.ColorScheme = newProperty.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
     private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup )
