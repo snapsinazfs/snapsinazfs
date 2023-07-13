@@ -127,16 +127,16 @@ public class SnapshotTests
     [Combinatorial]
     public void UpdateProperty_SnapshotPeriod([Values(SnapshotPeriodKind.Frequent,SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily,SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly)]SnapshotPeriodKind originalPeriod, [Values(SnapshotPeriodKind.Frequent,SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily,SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly)]SnapshotPeriodKind newPeriod )
     {
-        Assume.That(originalPeriod, Is.Not.EqualTo(newPeriod),"Skipping change to same period"  );
-
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshot( originalPeriod, DateTimeOffset.Now );
         ZfsProperty<string> original = snapshot.Period with { };
 
         Assume.That( snapshot.Period, Is.EqualTo( original ) );
 
-        snapshot.UpdateProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, (SnapshotPeriod)newPeriod );
-
-        Assert.That( snapshot.Period, Is.Not.EqualTo( original ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, (SnapshotPeriod)newPeriod ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+            Assert.That( snapshot.Period, Is.EqualTo( original ) );
+        } );
     }
 
     [Test]

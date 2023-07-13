@@ -9,7 +9,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 public sealed partial record Snapshot
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private ZfsProperty<string> _period;
+    private readonly ZfsProperty<string> _period;
 
     private readonly ZfsProperty<string> _snapshotName;
 
@@ -30,8 +30,7 @@ public sealed partial record Snapshot
             case ZfsPropertyNames.SnapshotNamePropertyName:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot name cannot be changed." );
             case ZfsPropertyNames.SnapshotPeriodPropertyName:
-                _period = _period with { Value = propertyValue, IsLocal = isLocal };
-                return ref _period;
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot period cannot be changed." );
             default:
                 return ref base.UpdateProperty( propertyName, propertyValue, isLocal );
         }
