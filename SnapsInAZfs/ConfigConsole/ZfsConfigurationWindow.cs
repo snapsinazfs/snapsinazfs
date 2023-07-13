@@ -469,7 +469,7 @@ public partial class ZfsConfigurationWindow
                 Logger.Error( "ZFS Command runner is null. Cannot continue with save operation" );
             }
 
-            if ( !SelectedTreeNode.IsModified | !SelectedTreeNode.IsLocallyModified )
+            if ( !SelectedTreeNode.IsModified || !SelectedTreeNode.IsLocallyModified )
             {
                 Logger.Info( "Selected ZFS object was not modified when save was requested. This should not happen" );
                 return;
