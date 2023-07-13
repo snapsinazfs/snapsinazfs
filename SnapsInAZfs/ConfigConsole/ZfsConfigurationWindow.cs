@@ -490,8 +490,6 @@ public partial class ZfsConfigurationWindow
     {
         zfsTreeView.Enabled = true;
         zfsTreeView.CanFocus = true;
-        snapshotsListView.Enabled = true;
-        snapshotsListView.CanFocus = true;
         enabledRadioGroup.Enabled = true;
         enabledRadioGroup.CanFocus = true;
         takeSnapshotsRadioGroup.Enabled = true;
@@ -532,11 +530,10 @@ public partial class ZfsConfigurationWindow
     private void SetTabStops( )
     {
         SetTabStopsForTreeFrame( 0 );
-        SetTabStopsForSnapshotsFrame( 1 );
-        SetTabStopsForGeneralPropertiesFrame( 2 );
-        SetPropertiesForRetentionPropertiesFrame( 3 );
-        SetTabStopsForSnapshotPropertiesFrame( 4 );
-        SetTabStopsForActionsFrame( 5 );
+        SetTabStopsForGeneralPropertiesFrame( 1 );
+        SetPropertiesForRetentionPropertiesFrame( 2 );
+        SetTabStopsForSnapshotPropertiesFrame( 3 );
+        SetTabStopsForActionsFrame( 4 );
 
         void SetTabStopsForGeneralPropertiesFrame( int generalFrameIndex )
         {
@@ -612,14 +609,6 @@ public partial class ZfsConfigurationWindow
             zfsConfigurationTreeFrame.TabIndex = treeFrameIndex;
             zfsTreeView.TabStop = true;
             zfsTreeView.TabIndex = 0;
-        }
-
-        void SetTabStopsForSnapshotsFrame( int snapshotsFrameIndex )
-        {
-            snapshotsFrame.TabStop = true;
-            snapshotsFrame.TabIndex = snapshotsFrameIndex;
-            snapshotsListView.TabStop = true;
-            snapshotsListView.TabIndex = 0;
         }
 
         void SetTabStopsForActionsFrame( int actionsFrameIndex )

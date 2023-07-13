@@ -41,8 +41,6 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.FrameView snapshotsFrame;
         
-        private Terminal.Gui.ListView snapshotsListView;
-        
         private Terminal.Gui.FrameView generalFrame;
         
         private Terminal.Gui.Label nameLabel;
@@ -211,6 +209,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.takeSnapshotsLabel = new Terminal.Gui.Label();
             this.enabledSourceTextField = new Terminal.Gui.TextField();
             this.enabledSourceLabel = new Terminal.Gui.Label();
+            this.enabledInheritButton = new Terminal.Gui.Button();
             this.enabledRadioGroup = new Terminal.Gui.RadioGroup();
             this.enabledLabel = new Terminal.Gui.Label();
             this.typeTextField = new Terminal.Gui.TextField();
@@ -218,7 +217,6 @@ namespace SnapsInAZfs.ConfigConsole {
             this.nameTextField = new Terminal.Gui.TextField();
             this.nameLabel = new Terminal.Gui.Label();
             this.generalFrame = new Terminal.Gui.FrameView();
-            this.snapshotsListView = new Terminal.Gui.ListView();
             this.snapshotsFrame = new Terminal.Gui.FrameView();
             this.zfsTreeView = new Terminal.Gui.TreeView();
             this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
@@ -336,17 +334,6 @@ namespace SnapsInAZfs.ConfigConsole {
             this.snapshotsFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.snapshotsFrame.Title = "Snapshots";
             this.zfsConfigurationTreeFrame.Add(this.snapshotsFrame);
-            this.snapshotsListView.Width = Dim.Fill(0);
-            this.snapshotsListView.Height = Dim.Fill(0);
-            this.snapshotsListView.ColorScheme = treeAndListViewColorScheme;
-            this.snapshotsListView.X = 0;
-            this.snapshotsListView.Y = 0;
-            this.snapshotsListView.Data = "snapshotsListView";
-            this.snapshotsListView.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotsListView.Source = new Terminal.Gui.ListWrapper(new string[] {});
-            this.snapshotsListView.AllowsMarking = false;
-            this.snapshotsListView.AllowsMultipleSelection = false;
-            this.snapshotsFrame.Add(this.snapshotsListView);
             this.generalFrame.Width = 73;
             this.generalFrame.Height = 10;
             this.generalFrame.X = 80;
