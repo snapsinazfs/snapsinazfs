@@ -55,6 +55,8 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.RadioGroup enabledRadioGroup;
         
+        private Terminal.Gui.Button enabledInheritButton;
+        
         private Terminal.Gui.Label enabledSourceLabel;
         
         private Terminal.Gui.TextField enabledSourceTextField;
@@ -62,6 +64,8 @@ namespace SnapsInAZfs.ConfigConsole {
         private Terminal.Gui.Label takeSnapshotsLabel;
         
         private Terminal.Gui.RadioGroup takeSnapshotsRadioGroup;
+        
+        private Terminal.Gui.Button takeSnapshotsInheritButton;
         
         private Terminal.Gui.Label takeSnapshotsSourceLabel;
         
@@ -71,6 +75,8 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.RadioGroup pruneSnapshotsRadioGroup;
         
+        private Terminal.Gui.Button pruneSnapshotsInheritButton;
+        
         private Terminal.Gui.Label pruneSnapshotsSourceLabel;
         
         private Terminal.Gui.TextField pruneSnapshotsSourceTextField;
@@ -79,6 +85,8 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.RadioGroup recursionRadioGroup;
         
+        private Terminal.Gui.Button recursionInheritButton;
+        
         private Terminal.Gui.Label recursionSourceLabel;
         
         private Terminal.Gui.TextField recursionSourceTextField;
@@ -86,6 +94,8 @@ namespace SnapsInAZfs.ConfigConsole {
         private Terminal.Gui.Label templateLabel;
         
         private Terminal.Gui.ListView templateListView;
+        
+        private Terminal.Gui.Button templateInheritButton;
         
         private Terminal.Gui.Label templateSourceLabel;
         
@@ -193,18 +203,22 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionFrame = new Terminal.Gui.FrameView();
             this.templateSourceTextField = new Terminal.Gui.TextField();
             this.templateSourceLabel = new Terminal.Gui.Label();
+            this.templateInheritButton = new Terminal.Gui.Button();
             this.templateListView = new Terminal.Gui.ListView();
             this.templateLabel = new Terminal.Gui.Label();
             this.recursionSourceTextField = new Terminal.Gui.TextField();
             this.recursionSourceLabel = new Terminal.Gui.Label();
+            this.recursionInheritButton = new Terminal.Gui.Button();
             this.recursionRadioGroup = new Terminal.Gui.RadioGroup();
             this.recursionLabel = new Terminal.Gui.Label();
             this.pruneSnapshotsSourceTextField = new Terminal.Gui.TextField();
             this.pruneSnapshotsSourceLabel = new Terminal.Gui.Label();
+            this.pruneSnapshotsInheritButton = new Terminal.Gui.Button();
             this.pruneSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
             this.pruneSnapshotsLabel = new Terminal.Gui.Label();
             this.takeSnapshotsSourceTextField = new Terminal.Gui.TextField();
             this.takeSnapshotsSourceLabel = new Terminal.Gui.Label();
+            this.takeSnapshotsInheritButton = new Terminal.Gui.Button();
             this.takeSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
             this.takeSnapshotsLabel = new Terminal.Gui.Label();
             this.enabledSourceTextField = new Terminal.Gui.TextField();
@@ -404,6 +418,15 @@ namespace SnapsInAZfs.ConfigConsole {
                     "false"};
             this.enabledRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.generalFrame.Add(this.enabledRadioGroup);
+            this.enabledInheritButton.Width = 4;
+            this.enabledInheritButton.Height = 1;
+            this.enabledInheritButton.X = 36;
+            this.enabledInheritButton.Y = 3;
+            this.enabledInheritButton.Data = "enabledInheritButton";
+            this.enabledInheritButton.Text = "⬆";
+            this.enabledInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.enabledInheritButton.IsDefault = false;
+            this.generalFrame.Add(this.enabledInheritButton);
             this.enabledSourceLabel.Width = 15;
             this.enabledSourceLabel.Height = 1;
             this.enabledSourceLabel.X = 42;
@@ -443,6 +466,15 @@ namespace SnapsInAZfs.ConfigConsole {
                     "false"};
             this.takeSnapshotsRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.generalFrame.Add(this.takeSnapshotsRadioGroup);
+            this.takeSnapshotsInheritButton.Width = 4;
+            this.takeSnapshotsInheritButton.Height = 1;
+            this.takeSnapshotsInheritButton.X = 36;
+            this.takeSnapshotsInheritButton.Y = 4;
+            this.takeSnapshotsInheritButton.Data = "takeSnapshotsInheritButton";
+            this.takeSnapshotsInheritButton.Text = "⬆";
+            this.takeSnapshotsInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.takeSnapshotsInheritButton.IsDefault = false;
+            this.generalFrame.Add(this.takeSnapshotsInheritButton);
             this.takeSnapshotsSourceLabel.Width = 4;
             this.takeSnapshotsSourceLabel.Height = 1;
             this.takeSnapshotsSourceLabel.X = 42;
@@ -482,6 +514,15 @@ namespace SnapsInAZfs.ConfigConsole {
                     "false"};
             this.pruneSnapshotsRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.generalFrame.Add(this.pruneSnapshotsRadioGroup);
+            this.pruneSnapshotsInheritButton.Width = 4;
+            this.pruneSnapshotsInheritButton.Height = 1;
+            this.pruneSnapshotsInheritButton.X = 36;
+            this.pruneSnapshotsInheritButton.Y = 5;
+            this.pruneSnapshotsInheritButton.Data = "pruneSnapshotsInheritButton";
+            this.pruneSnapshotsInheritButton.Text = "⬆";
+            this.pruneSnapshotsInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.pruneSnapshotsInheritButton.IsDefault = false;
+            this.generalFrame.Add(this.pruneSnapshotsInheritButton);
             this.pruneSnapshotsSourceLabel.Width = 4;
             this.pruneSnapshotsSourceLabel.Height = 1;
             this.pruneSnapshotsSourceLabel.X = 42;
@@ -521,6 +562,15 @@ namespace SnapsInAZfs.ConfigConsole {
                     "zfs"};
             this.recursionRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.generalFrame.Add(this.recursionRadioGroup);
+            this.recursionInheritButton.Width = 4;
+            this.recursionInheritButton.Height = 1;
+            this.recursionInheritButton.X = 36;
+            this.recursionInheritButton.Y = 6;
+            this.recursionInheritButton.Data = "recursionInheritButton";
+            this.recursionInheritButton.Text = "⬆";
+            this.recursionInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.recursionInheritButton.IsDefault = false;
+            this.generalFrame.Add(this.recursionInheritButton);
             this.recursionSourceLabel.Width = 4;
             this.recursionSourceLabel.Height = 1;
             this.recursionSourceLabel.X = 42;
@@ -558,6 +608,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.templateListView.AllowsMarking = false;
             this.templateListView.AllowsMultipleSelection = false;
             this.generalFrame.Add(this.templateListView);
+            this.templateInheritButton.Width = 4;
+            this.templateInheritButton.Height = 1;
+            this.templateInheritButton.X = 36;
+            this.templateInheritButton.Y = 7;
+            this.templateInheritButton.Data = "templateInheritButton";
+            this.templateInheritButton.Text = "⬆";
+            this.templateInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.templateInheritButton.IsDefault = false;
+            this.generalFrame.Add(this.templateInheritButton);
             this.templateSourceLabel.Width = 4;
             this.templateSourceLabel.Height = 1;
             this.templateSourceLabel.X = 42;
