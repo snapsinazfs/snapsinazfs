@@ -309,6 +309,7 @@ internal static class ZfsTasks
                 }
 
                 break;
+            case SnapshotPeriodKind.NotSet:
             default:
                 throw new ArgumentOutOfRangeException( nameof( period ), period, $"Unexpected value received for Period for dataset {ds.Name}. Snapshot not taken." );
         }
