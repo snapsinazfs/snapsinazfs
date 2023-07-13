@@ -112,6 +112,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
 
     public string Name { get; init; }
     public bool IsLocal { get; init; }
+    public string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
 
     public ZfsRecord ChangeParentReference( ZfsRecord newParent )
     {
@@ -124,6 +125,11 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     }
 
     public static ZfsProperty<int> CreateWithoutParent( string name, int value, bool isLocal = true )
+    {
+        return new( name, value, isLocal );
+    }
+
+    public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
     {
         return new( name, value, isLocal );
     }
@@ -173,7 +179,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
 
         if ( bool.TryParse( input.Value, out bool result ) )
         {
-            property = new( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<bool>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
 
@@ -198,7 +204,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     {
         if ( int.TryParse( input.Value, out int result ) )
         {
-            property = new ZfsProperty<int>( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<int>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
         }
 
@@ -225,40 +231,8 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     {
         if ( DateTimeOffset.TryParse( input.Value, out DateTimeOffset result ) )
         {
-            property = new ZfsProperty<DateTimeOffset>( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<DateTimeOffset>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
             return true;
-        }
-
-        property = null;
-        return false;
-    }
-
-    /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see cref="SnapshotPeriod" />)
-    ///     equivalent
-    /// </summary>
-    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
-    /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}" /> (<see cref="SnapshotPeriod" />), if successful
-    /// </param>
-    /// <returns>
-    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
-    /// </returns>
-    /// <remarks>
-    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
-    ///     <paramref name="property" /> is always <see langword="null" />
-    /// </remarks>
-    public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<SnapshotPeriod>? property )
-    {
-        try
-        {
-            SnapshotPeriod period = (SnapshotPeriod)input.Value;
-            property = new ZfsProperty<SnapshotPeriod>( input.Name, period, input.Source == ZfsPropertySourceConstants.Local );
-            return true;
-        }
-        catch ( FormatException ex )
-        {
-            Logger.Debug( ex, "Uncrecognized value for snapshot period ({0})", input.Value );
         }
 
         property = null;

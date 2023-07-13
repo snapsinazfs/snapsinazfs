@@ -280,7 +280,7 @@ public partial class ZfsConfigurationWindow
     {
         DisableEventHandlers( );
         ClearAllPropertyFields( );
-        SelectedTreeNode.ResetTreeDataset();
+        SelectedTreeNode.CopyBaseDatasetPropertiesToTreeDataset();
         UpdateFieldsForSelectedZfsTreeNode( false );
         UpdateButtonState( );
         EnableEventHandlers( );
@@ -303,7 +303,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.Value )
             {
-                UpdateSelectedItemIntProperty( retentionDailyTextField, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionDailyTextField, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, fieldIntValue );
             }
         }
         finally
@@ -331,7 +331,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.Value )
             {
-                UpdateSelectedItemIntProperty( retentionFrequentTextField, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionFrequentTextField, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, fieldIntValue );
             }
         }
         finally
@@ -359,7 +359,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value )
             {
-                UpdateSelectedItemIntProperty( retentionHourlyTextField, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionHourlyTextField, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, fieldIntValue );
             }
         }
         finally
@@ -387,7 +387,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value )
             {
-                UpdateSelectedItemIntProperty( retentionMonthlyTextField, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionMonthlyTextField, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, fieldIntValue );
             }
         }
         finally
@@ -415,7 +415,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value )
             {
-                UpdateSelectedItemIntProperty( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, fieldIntValue );
             }
         }
         finally
@@ -443,7 +443,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value )
             {
-                UpdateSelectedItemIntProperty( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, fieldIntValue );
             }
         }
         finally
@@ -471,7 +471,7 @@ public partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value )
             {
-                UpdateSelectedItemIntProperty( retentionYearlyTextField, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, fieldIntValue, "local" );
+                UpdateSelectedItemIntProperty( retentionYearlyTextField, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, fieldIntValue );
             }
         }
         finally
@@ -493,13 +493,13 @@ public partial class ZfsConfigurationWindow
                 Logger.Error( "ZFS Command runner is null. Cannot continue with save operation" );
             }
 
-            if ( !SelectedTreeNode.IsModified )
+            if ( !SelectedTreeNode.IsModified |! SelectedTreeNode.IsLocallyModified )
             {
                 Logger.Info( "Selected ZFS object was not modified when save was requested. This should not happen" );
                 return;
             }
 
-            string zfsObjectPath = SelectedTreeNode.Text;
+            string zfsObjectPath = SelectedTreeNode.TreeDataset.Name;
             string pendingCommand = $"zfs set {SelectedTreeNode.GetModifiedZfsProperties().ToStringForZfsSet( )} {zfsObjectPath}";
             int dialogResult = MessageBox.ErrorQuery( "Confirm Saving ZFS Object Configuration", $"The following command will be executed:\n{pendingCommand}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
 
@@ -526,27 +526,7 @@ public partial class ZfsConfigurationWindow
             }
 
             Logger.Debug( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
-            //foreach ( KeyValuePair<string, IZfsProperty> kvp in _modifiedPropertiesSinceLastSaveForCurrentItem )
-            //{
-            //    switch ( kvp.Value )
-            //    {
-            //        case ZfsProperty<bool> boolProp:
-            //            UpdateDescendentsBooleanPropertyInheritance( SelectedTreeNode, boolProp, $"inherited from {SelectedTreeNode.Text}" );
-            //            break;
-            //        case ZfsProperty<int> intProp:
-            //            UpdateDescendentsIntPropertyInheritance( SelectedTreeNode, intProp, $"inherited from {SelectedTreeNode.Text}" );
-            //            break;
-            //        case ZfsProperty<string> stringProp:
-            //            UpdateDescendentsStringPropertyInheritance( SelectedTreeNode, stringProp, $"inherited from {SelectedTreeNode.Text}" );
-            //            break;
-            //        case ZfsProperty<DateTimeOffset> dtoProp:
-            //            UpdateDescendentsDateTimeOffsetPropertyInheritance( SelectedTreeNode, dtoProp, $"inherited from {SelectedTreeNode.Text}" );
-            //            break;
-            //    }
-            //}
-
-            //_modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-            SelectedTreeNode.CopyTreeDatasetToBaseDataset();
+            SelectedTreeNode.CopyTreeDatasetPropertiesToBaseDataset();
         }
         finally
         {
@@ -711,9 +691,9 @@ public partial class ZfsConfigurationWindow
     private void StringRadioGroupOnMouseClick( MouseEventArgs args )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)args.MouseEvent.View.Data;
-        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeStringProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ) );
+        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, viewData.RadioGroup.GetSelectedLabelString( ) );
 
-        viewData.SourceTextField.Text = newProperty.Source;
+        viewData.SourceTextField.Text = newProperty.InheritedFrom;
         UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
@@ -731,9 +711,8 @@ public partial class ZfsConfigurationWindow
 
         ListViewWithSourceViewData viewData = (ListViewWithSourceViewData)templateListView.Data;
 
-        ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
-        _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
-        viewData.SourceTextField.Text = "local";
+        ZfsProperty<string> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
+        viewData.SourceTextField.Text = newProperty.InheritedFrom;
         UpdateFieldsForSelectedZfsTreeNode( );
         UpdateButtonState( );
     }
@@ -742,64 +721,13 @@ public partial class ZfsConfigurationWindow
     {
         if ( zfsTreeView.Objects.Any( ) && zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
         {
-            resetCurrentButton.Enabled = saveCurrentButton.Enabled = node.BaseDataset != node.TreeDataset;
+            resetCurrentButton.Enabled = saveCurrentButton.Enabled = node is { IsModified: true, IsLocallyModified: true };
         }
         else
         {
             resetCurrentButton.Enabled = false;
             saveCurrentButton.Enabled = false;
         }
-    }
-
-    private static void UpdateDescendentsDateTimeOffsetPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<DateTimeOffset> prop, string source )
-    {
-        foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
-        {
-            UpdateDescendentsDateTimeOffsetPropertyInheritance( child, prop, source );
-        }
-
-        // If this node already has the property defined locally, we can stop at this level
-        if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
-        {
-            return;
-        }
-
-        currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
-        currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
-    }
-
-    private static void UpdateDescendentsIntPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<int> prop, string source )
-    {
-        foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
-        {
-            UpdateDescendentsIntPropertyInheritance( child, prop, source );
-        }
-
-        // If this node already has the property defined locally, we can stop at this level
-        if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
-        {
-            return;
-        }
-
-        currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
-        currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
-    }
-
-    private static void UpdateDescendentsStringPropertyInheritance( ZfsObjectConfigurationTreeNode currentNode, ZfsProperty<string> prop, string source )
-    {
-        foreach ( ZfsObjectConfigurationTreeNode child in currentNode.Children.Cast<ZfsObjectConfigurationTreeNode>( ) )
-        {
-            UpdateDescendentsStringPropertyInheritance( child, prop, source );
-        }
-
-        // If this node already has the property defined locally, we can stop at this level
-        if ( currentNode.TreeDataset[ prop.Name ].IsLocal )
-        {
-            return;
-        }
-
-        currentNode.TreeDataset.UpdateProperty( prop.Name, prop.Value, source );
-        currentNode.BaseDataset.UpdateProperty( prop.Name, prop.Value, source );
     }
 
     private void UpdateFieldsForSelectedZfsTreeNode( bool manageEventHandlers = true )
@@ -809,95 +737,97 @@ public partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        nameTextField.Text = SelectedTreeNode.TreeDataset.Name;
-        typeTextField.Text = SelectedTreeNode.TreeDataset.Kind;
-        enabledRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Enabled.AsTrueFalseRadioIndex( );
-        enabledRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-        enabledRadioGroup.Enabled = true;
-        enabledSourceTextField.Text = SelectedTreeNode.TreeDataset.Enabled.InheritedFrom;
-        takeSnapshotsRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.TakeSnapshots.AsTrueFalseRadioIndex( );
-        takeSnapshotsRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-        enabledRadioGroup.Enabled = true;
-        takeSnapshotsSourceTextField.Text = SelectedTreeNode.TreeDataset.TakeSnapshots.InheritedFrom;
-        pruneSnapshotsRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
-        pruneSnapshotsRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-        pruneSnapshotsSourceTextField.Text = SelectedTreeNode.TreeDataset.PruneSnapshots.InheritedFrom;
-        recursionRadioGroup.Enabled = true;
-        try
+        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is not null )
         {
-            recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { ZfsPropertyValueConstants.SnapsInAZfs => 0, ZfsPropertyValueConstants.ZfsRecursion => 1, _ => throw new InvalidOperationException( $"Invalid recursion value {SelectedTreeNode.TreeDataset.Recursion.Value}" ) };
-            recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-            recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
-        }
-        catch ( InvalidOperationException e )
-        {
-            int dialogResult = MessageBox.ErrorQuery( "Invalid ZFS Property Value", e.Message, 2, $"Set to '{ZfsPropertyValueConstants.SnapsInAZfs}'", $"Set to '{ZfsPropertyValueConstants.ZfsRecursion}'", "Do Nothing", "Exit" );
-            switch ( dialogResult )
+            nameTextField.Text = SelectedTreeNode.TreeDataset.Name;
+            typeTextField.Text = SelectedTreeNode.TreeDataset.Kind;
+            enabledRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Enabled.AsTrueFalseRadioIndex( );
+            enabledRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+            enabledRadioGroup.Enabled = true;
+            enabledSourceTextField.Text = SelectedTreeNode.TreeDataset.Enabled.InheritedFrom;
+            takeSnapshotsRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.TakeSnapshots.AsTrueFalseRadioIndex( );
+            takeSnapshotsRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+            enabledRadioGroup.Enabled = true;
+            takeSnapshotsSourceTextField.Text = SelectedTreeNode.TreeDataset.TakeSnapshots.InheritedFrom;
+            pruneSnapshotsRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
+            pruneSnapshotsRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+            pruneSnapshotsSourceTextField.Text = SelectedTreeNode.TreeDataset.PruneSnapshots.InheritedFrom;
+            recursionRadioGroup.Enabled = true;
+            try
             {
-                case 0:
-                case 1:
-                    recursionRadioGroup.SelectedItem = dialogResult;
-                    UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
-                    recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-                    recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
-                    UpdateButtonState( );
-                    break;
-                case 2:
-                    break;
-                case 3:
-                    Application.RequestStop( );
-                    return;
-                default:
-                    throw new InvalidOperationException( $"Unexpected dialogResult received: {dialogResult}", e );
+                recursionRadioGroup.SelectedItem = SelectedTreeNode.TreeDataset.Recursion.Value switch { ZfsPropertyValueConstants.SnapsInAZfs => 0, ZfsPropertyValueConstants.ZfsRecursion => 1, _ => throw new InvalidOperationException( $"Invalid recursion value {SelectedTreeNode.TreeDataset.Recursion.Value}" ) };
+                recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
             }
+            catch ( InvalidOperationException e )
+            {
+                int dialogResult = MessageBox.ErrorQuery( "Invalid ZFS Property Value", e.Message, 2, $"Set to '{ZfsPropertyValueConstants.SnapsInAZfs}'", $"Set to '{ZfsPropertyValueConstants.ZfsRecursion}'", "Do Nothing", "Exit" );
+                switch ( dialogResult )
+                {
+                    case 0:
+                    case 1:
+                        recursionRadioGroup.SelectedItem = dialogResult;
+                        UpdateSelectedItemStringRadioGroupProperty( recursionRadioGroup, "local" );
+                        recursionRadioGroup.ColorScheme = SelectedTreeNode.TreeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                        recursionSourceTextField.Text = SelectedTreeNode.TreeDataset.Recursion.InheritedFrom;
+                        UpdateButtonState( );
+                        break;
+                    case 2:
+                        break;
+                    case 3:
+                        Application.RequestStop( );
+                        return;
+                    default:
+                        throw new InvalidOperationException( $"Unexpected dialogResult received: {dialogResult}", e );
+                }
+            }
+
+            int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
+            if ( templateIndex == -1 )
+            {
+                MessageBox.ErrorQuery( "Template Not Found", $"The template \"{SelectedTreeNode.TreeDataset.Template.Value}\", for {SelectedTreeNode.TreeDataset.Kind} \"{SelectedTreeNode.TreeDataset.Name}\", was not found in SnapsInAZfs' configuration.\nIs the template defined in one of the expected SnapsInAZfs[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.", "OK - ZFS Configuration Window will be disabled for this session" );
+                SnapsInAZfsConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
+                SuperView.Remove( this );
+                return;
+            }
+
+            templateListView.SelectedItem = templateIndex;
+            templateListView.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
+            templateListView.EnsureSelectedItemVisible( );
+            templateListView.Enabled = true;
+            templateSourceTextField.Text = SelectedTreeNode.TreeDataset.Template.InheritedFrom;
+
+            retentionFrequentTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.ValueString;
+            retentionFrequentTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionFrequentTextField.Enabled = true;
+            retentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.ValueString;
+            retentionHourlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionHourlyTextField.Enabled = true;
+            retentionDailyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.ValueString;
+            retentionDailyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionDailyTextField.Enabled = true;
+            retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.ValueString;
+            retentionWeeklyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionWeeklyTextField.Enabled = true;
+            retentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.ValueString;
+            retentionMonthlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionMonthlyTextField.Enabled = true;
+            retentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.ValueString;
+            retentionYearlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionYearlyTextField.Enabled = true;
+            retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.ValueString;
+            retentionPruneDeferralTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionPruneDeferralTextField.Enabled = true;
+
+            recentFrequentTextField.Text = SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.ValueString : "None";
+            recentHourlyTextField.Text = SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.ValueString : "None";
+            recentDailyTextField.Text = SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.ValueString : "None";
+            recentWeeklyTextField.Text = SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.ValueString : "None";
+            recentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.ValueString : "None";
+            recentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.ValueString : "None";
         }
 
-        int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == SelectedTreeNode.TreeDataset.Template.Value );
-        if ( templateIndex == -1 )
-        {
-            MessageBox.ErrorQuery( "Template Not Found", $"The template \"{SelectedTreeNode.TreeDataset.Template.Value}\", for {SelectedTreeNode.TreeDataset.Kind} \"{SelectedTreeNode.TreeDataset.Name}\", was not found in SnapsInAZfs' configuration.\nIs the template defined in one of the expected SnapsInAZfs[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.", "OK - ZFS Configuration Window will be disabled for this session" );
-            SnapsInAZfsConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
-            SuperView.Remove( this );
-            return;
-        }
-
-        templateListView.SelectedItem = templateIndex;
-        templateListView.ColorScheme = SelectedTreeNode.TreeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
-        templateListView.EnsureSelectedItemVisible( );
-        templateListView.Enabled = true;
-        templateSourceTextField.Text = SelectedTreeNode.TreeDataset.Template.InheritedFrom;
-
-        retentionFrequentTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.ValueString;
-        retentionFrequentTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionFrequentTextField.Enabled = true;
-        retentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.ValueString;
-        retentionHourlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionHourlyTextField.Enabled = true;
-        retentionDailyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.ValueString;
-        retentionDailyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionDailyTextField.Enabled = true;
-        retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.ValueString;
-        retentionWeeklyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionWeeklyTextField.Enabled = true;
-        retentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.ValueString;
-        retentionMonthlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionMonthlyTextField.Enabled = true;
-        retentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.ValueString;
-        retentionYearlyTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionYearlyTextField.Enabled = true;
-        retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.ValueString;
-        retentionPruneDeferralTextField.ColorScheme = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-        retentionPruneDeferralTextField.Enabled = true;
-
-        recentFrequentTextField.Text = SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastFrequentSnapshotTimestamp.ValueString : "None";
-        recentHourlyTextField.Text = SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastHourlySnapshotTimestamp.ValueString : "None";
-        recentDailyTextField.Text = SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastDailySnapshotTimestamp.ValueString : "None";
-        recentWeeklyTextField.Text = SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastWeeklySnapshotTimestamp.ValueString : "None";
-        recentMonthlyTextField.Text = SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastMonthlySnapshotTimestamp.ValueString : "None";
-        recentYearlyTextField.Text = SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.IsLocal ? SelectedTreeNode.TreeDataset.LastYearlySnapshotTimestamp.ValueString : "None";
-
-        }
-
+        _alreadyHandledSelectedItemChanged = true;
         if ( manageEventHandlers )
         {
             EnableEventHandlers( );
@@ -907,24 +837,21 @@ public partial class ZfsConfigurationWindow
     private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
-        _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
-        viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
+        ZfsProperty<bool> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
+        viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
-    private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue, string? propertySource = null )
+    private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue )
     {
-        ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( propertyName, propertyValue, propertySource ?? SelectedTreeNode.TreeDataset[ propertyName ].Source );
-        _modifiedPropertiesSinceLastSaveForCurrentItem[ propertyName ] = newProperty;
+        ZfsProperty<int> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( propertyName, propertyValue );
         field.ColorScheme = SelectedTreeNode.TreeDataset[ propertyName ].IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
     private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup, string? propertySource = null )
     {
         RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<string> newProperty = (ZfsProperty<string>)SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ), propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source );
-        _modifiedPropertiesSinceLastSaveForCurrentItem[ viewData.PropertyName ] = newProperty;
-        viewData.SourceTextField.Text = propertySource ?? SelectedTreeNode.TreeDataset[ viewData.PropertyName ].Source;
+        ZfsProperty<string> newProperty = SelectedTreeNode.TreeDataset.UpdateProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
+        viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
     private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
@@ -946,23 +873,7 @@ public partial class ZfsConfigurationWindow
         ArgumentNullException.ThrowIfNull( sender );
         DisableEventHandlers( );
 
-        if ( _lastSelectedSnapshot is not null )
-        {
-            if ( _lastSelectedSnapshot.IsModified )
-            {
-                _lastSelectedSnapshot.ResetSnapshot( );
-            }
-
-            _lastSelectedSnapshot = null;
-        }
         ClearAllPropertyFields( );
-        _modifiedPropertiesSinceLastSaveForCurrentItem.Clear( );
-
-        // Be sure to set the previously-selected object back to its previous state if it wasn't saved
-        if ( e.OldValue is ZfsObjectConfigurationTreeNode { IsModified: true } old )
-        {
-            old.TreeDataset = old.BaseDataset with { };
-        }
 
         UpdateFieldsForSelectedZfsTreeNode( false );
         _alreadyHandledSelectedItemChanged = true;
