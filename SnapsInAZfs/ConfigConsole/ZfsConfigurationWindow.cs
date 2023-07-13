@@ -246,9 +246,11 @@ public partial class ZfsConfigurationWindow
 
     private void RefreshZfsTreeViewFromZfs( )
     {
-        using AutoResetEvent blocker = new( false );
-        RefreshZfsTreeViewFromZfsAsync( ).ContinueWith( ( _, autoResetEvent ) => ( (AutoResetEvent)autoResetEvent! ).Set( ), blocker );
-        blocker.WaitOne( 15000 );
+        // Disabling this warning because we are intentionally firing this off asynchronously.
+        // The callee will handle button state.
+#pragma warning disable CS4014
+        RefreshZfsTreeViewFromZfsAsync( );
+#pragma warning restore CS4014
     }
 
     private async Task RefreshZfsTreeViewFromZfsAsync( )
