@@ -46,11 +46,14 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
             List<ITreeNode> list = new( );
             foreach ( ( string? childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
             {
-                if ( BaseDataset.GetChild( childName, out ZfsRecord? baseDataset ) )
+                if ( !BaseDataset.GetChild( childName, out ZfsRecord? baseDataset ) )
                 {
-                    ITreeNode node = new ZfsObjectConfigurationTreeNode( childName.GetLastPathElement( ), baseDataset, child );
-                    list.Add( node );
+                    Logger.Warn( "Dataset {0} not found in parent {1}", childName, BaseDataset.Name );
+                    continue;
                 }
+
+                ITreeNode node = new ZfsObjectConfigurationTreeNode( childName.GetLastPathElement( ), baseDataset, child );
+                list.Add( node );
             }
 
             return _children ??= list;
