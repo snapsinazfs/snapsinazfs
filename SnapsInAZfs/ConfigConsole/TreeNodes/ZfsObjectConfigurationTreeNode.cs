@@ -137,6 +137,7 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     This method should be called after saving an object, to avoid needing a refresh from ZFS.
     /// </summary>
     /// <param name="clearModifiedPropertiesCollection"></param>
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     public void CopyTreeDatasetPropertiesToBaseDataset( bool clearModifiedPropertiesCollection = true )
     {
         foreach ( string propName in _modifiedPropertiesSinceLastSave.Keys )
