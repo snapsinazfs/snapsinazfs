@@ -13,12 +13,12 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 [TestOf( typeof( Snapshot ) )]
 public class SnapshotTests
 {
+    private static SnapshotPeriodKind[] GetRelevantSnapshotPeriodKinds( ) => new[] { SnapshotPeriodKind.Frequent, SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily, SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly };
+
     [Test]
     [Combinatorial]
-    public void CompareTo_LeftEarlierThanRight( [Values] SnapshotPeriodKind leftPeriod, [Values] SnapshotPeriodKind rightPeriod )
+    public void CompareTo_LeftEarlierThanRight( [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind leftPeriod, [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind rightPeriod )
     {
-        Assume.That( leftPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for left snapshot" );
-        Assume.That( rightPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for right snapshot" );
         DateTimeOffset leftTimestamp = DateTimeOffset.Now;
         DateTimeOffset rightTimestamp = leftTimestamp.AddDays( 1 );
         Snapshot leftSnapshot = SnapshotTestHelpers.GetStandardTestSnapshot( leftPeriod, leftTimestamp );
@@ -29,10 +29,8 @@ public class SnapshotTests
 
     [Test]
     [Combinatorial]
-    public void CompareTo_LeftLaterThanRight( [Values] SnapshotPeriodKind leftPeriod, [Values] SnapshotPeriodKind rightPeriod )
+    public void CompareTo_LeftLaterThanRight( [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind leftPeriod, [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind rightPeriod )
     {
-        Assume.That( leftPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for left snapshot" );
-        Assume.That( rightPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for right snapshot" );
         DateTimeOffset leftTimestamp = DateTimeOffset.Now;
         DateTimeOffset rightTimestamp = leftTimestamp.AddDays( -1 );
         Snapshot leftSnapshot = SnapshotTestHelpers.GetStandardTestSnapshot( leftPeriod, leftTimestamp );
@@ -61,10 +59,8 @@ public class SnapshotTests
 
     [Test]
     [Combinatorial]
-    public void CompareTo_SameTimestamps( [Values] SnapshotPeriodKind leftPeriod, [Values] SnapshotPeriodKind rightPeriod )
+    public void CompareTo_SameTimestamps( [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind leftPeriod, [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind rightPeriod )
     {
-        Assume.That( leftPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for left snapshot" );
-        Assume.That( rightPeriod, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skipping NotSet period for right snapshot" );
         DateTimeOffset leftTimestamp = DateTimeOffset.Now;
         DateTimeOffset rightTimestamp = leftTimestamp;
         ZfsRecord leftParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
@@ -88,9 +84,8 @@ public class SnapshotTests
 
     [Test]
     [Combinatorial]
-    public void GetSnapshotOptionsStringForZfsSnapshot_IsCorrect( [Values] SnapshotPeriodKind period, [Values( "2023-01-01T00:00:00.0000000", "2024-01-01T00:00:00.0000000" )] DateTimeOffset timestamp, [Values( ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.ZfsRecursion )] string recursion )
+    public void GetSnapshotOptionsStringForZfsSnapshot_IsCorrect( [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind period, [Values( "2023-01-01T00:00:00.0000000", "2024-01-01T00:00:00.0000000" )] DateTimeOffset timestamp, [Values( ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.ZfsRecursion )] string recursion )
     {
-        Assume.That( period, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ), "Skippig NotSet period" );
         ZfsRecord parent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         parent.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, recursion );
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( period, timestamp, parent );
@@ -125,7 +120,7 @@ public class SnapshotTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_SnapshotPeriod([Values(SnapshotPeriodKind.Frequent,SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily,SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly)]SnapshotPeriodKind originalPeriod, [Values(SnapshotPeriodKind.Frequent,SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily,SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly)]SnapshotPeriodKind newPeriod )
+    public void UpdateProperty_SnapshotPeriod([ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )]SnapshotPeriodKind originalPeriod, [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )]SnapshotPeriodKind newPeriod )
     {
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshot( originalPeriod, DateTimeOffset.Now );
         ZfsProperty<string> original = snapshot.Period with { };
