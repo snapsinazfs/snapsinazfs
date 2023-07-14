@@ -13,7 +13,7 @@ public sealed partial record Snapshot
 
     private readonly ZfsProperty<string> _snapshotName;
 
-    private ZfsProperty<DateTimeOffset> _timestamp;
+    private readonly ZfsProperty<DateTimeOffset> _timestamp;
 
     public ref readonly ZfsProperty<string> Period => ref _period;
 
@@ -22,7 +22,7 @@ public sealed partial record Snapshot
     public ref readonly ZfsProperty<DateTimeOffset> Timestamp => ref _timestamp;
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the SnapshotName property</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the SnapshotName or Period properties</exception>
     public override ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
@@ -37,19 +37,21 @@ public sealed partial record Snapshot
         }
     }
 
-    public override ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, bool isLocal = true )
+    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the Timestamp property</exception>
+    public override ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, in DateTimeOffset propertyValue, bool isLocal = true )
     {
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotTimestampPropertyName:
-                _timestamp = _timestamp with { Value = propertyValue, IsLocal = isLocal };
-                return ref _timestamp;
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot timestamp cannot be changed." );
             default:
                 return ref base.UpdateProperty( propertyName, propertyValue, isLocal );
         }
     }
 
     /// <inheritdoc />
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     protected override void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
         Logger.Trace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );

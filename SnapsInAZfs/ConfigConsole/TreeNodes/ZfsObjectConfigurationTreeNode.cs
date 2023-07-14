@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -290,10 +290,10 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, bool propertyValue )
+    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, in bool propertyValue )
     {
         RevertBooleanPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<bool>( TreeDataset, propertyName, in propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -311,10 +311,10 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, int propertyValue )
+    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, in int propertyValue )
     {
         RevertIntPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<int>( TreeDataset, propertyName, in propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -332,10 +332,10 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, string propertyValue )
+    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, in string propertyValue )
     {
         RevertStringPropertyToBase( propertyName, _inheritedPropertiesSinceLastSave );
-        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, propertyValue );
+        _modifiedPropertiesSinceLastSave[ propertyName ] = new ZfsProperty<string>( TreeDataset, propertyName, in propertyValue );
         return ref TreeDataset.UpdateProperty( propertyName, propertyValue );
     }
 
@@ -431,22 +431,29 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     /// <param name="changedPropertyCollection"></param>
     private void RevertStringPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
     {
-        if ( !changedPropertyCollection.TryRemove( propertyName, out IZfsProperty? changedProperty ) )
+        if ( !changedPropertyCollection.TryRemove( propertyName, out IZfsProperty? _ ) )
         {
             return;
         }
 
-        if ( changedProperty is ZfsProperty<string> )
+        Logger.Trace( "Reverting previously-modified property {0} on {1} to original value", propertyName, TreeDataset.Name );
+        switch ( propertyName )
         {
-            if ( BaseDataset[ changedProperty.Name ] is ZfsProperty<string> baseProperty )
+            case ZfsPropertyNames.RecursionPropertyName:
             {
-                Logger.Trace( "Reverting previously-modified property {0} on {1} to original value", propertyName, TreeDataset.Name );
-                TreeDataset.UpdateProperty( propertyName, baseProperty.Value, baseProperty.IsLocal );
+                TreeDataset.UpdateProperty( propertyName, BaseDataset.Recursion.Value, BaseDataset.Recursion.IsLocal );
             }
-        }
-        else
-        {
-            Logger.Error( "Unexpected property type encountered when updating {0} on {1}. Expected string type. Got {2}", propertyName, TreeDataset.Name, changedProperty.GetType( ).GenericTypeArguments[ 0 ].FullName );
+                return;
+            case ZfsPropertyNames.TemplatePropertyName:
+            {
+                TreeDataset.UpdateProperty( propertyName, BaseDataset.Template.Value, BaseDataset.Template.IsLocal );
+            }
+                return;
+            default:
+            {
+                Logger.Error( "Unsupported string property when updating {0} on {1}", propertyName, TreeDataset.Name );
+            }
+                return;
         }
     }
 }

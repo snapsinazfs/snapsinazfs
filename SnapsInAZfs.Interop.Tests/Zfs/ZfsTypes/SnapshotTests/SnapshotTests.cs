@@ -149,8 +149,10 @@ public class SnapshotTests
 
         Assume.That( snapshot.Timestamp, Is.EqualTo( original ) );
 
-        snapshot.UpdateProperty( ZfsPropertyNames.SnapshotTimestampPropertyName, newTimestamp );
-
-        Assert.That( snapshot.Timestamp, Is.Not.EqualTo( original ) );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotTimestampPropertyName, in newTimestamp ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+            Assert.That( snapshot.Timestamp, Is.EqualTo( original ) );
+        } );
     }
 }

@@ -59,7 +59,7 @@ internal static class ZfsTasks
 
             Logger.Debug( "Checking for and taking needed snapshots for dataset {0}", ds.Name );
 
-            if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, timestamp ) )
+            if ( ds.IsFrequentSnapshotNeeded( template.SnapshotTiming, in timestamp ) )
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
@@ -69,7 +69,7 @@ internal static class ZfsTasks
                 }
             }
 
-            if ( ds.IsHourlySnapshotNeeded( timestamp ) )
+            if ( ds.IsHourlySnapshotNeeded( in timestamp ) )
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
@@ -79,7 +79,7 @@ internal static class ZfsTasks
                 }
             }
 
-            if ( ds.IsDailySnapshotNeeded( timestamp ) )
+            if ( ds.IsDailySnapshotNeeded( in timestamp ) )
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
@@ -89,7 +89,7 @@ internal static class ZfsTasks
                 }
             }
 
-            if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, timestamp ) )
+            if ( ds.IsWeeklySnapshotNeeded( template.SnapshotTiming, in timestamp ) )
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
@@ -99,7 +99,7 @@ internal static class ZfsTasks
                 }
             }
 
-            if ( ds.IsMonthlySnapshotNeeded( timestamp ) )
+            if ( ds.IsMonthlySnapshotNeeded( in timestamp ) )
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
@@ -109,7 +109,7 @@ internal static class ZfsTasks
                 }
             }
 
-            if ( ds.IsYearlySnapshotNeeded( timestamp ) )
+            if ( ds.IsYearlySnapshotNeeded( in timestamp ) )
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
@@ -155,10 +155,10 @@ internal static class ZfsTasks
             {
                 case true:
                     Logger.Trace( "{0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
-                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp ) );
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), in timestamp ) );
                     return ( true, snapshot );
                 case false when settings.DryRun:
-                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), timestamp ) );
+                    propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), in timestamp ) );
                     return ( true, null );
                 default:
                     return ( false, null );

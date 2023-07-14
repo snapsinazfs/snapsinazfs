@@ -76,7 +76,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         }
     }
 
-    protected ZfsRecord( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null, bool forcePropertyOwnership = false )
+    protected ZfsRecord( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null, bool forcePropertyOwnership = false )
     {
         Name = name;
         IsPoolRoot = parent is null;
@@ -396,7 +396,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return newDs;
     }
 
-    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, ZfsProperty<bool> enabled, ZfsProperty<bool> takeSnapshots, ZfsProperty<bool> pruneSnapshots, ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, ZfsProperty<string> recursion, ZfsProperty<string> template, ZfsProperty<int> retentionFrequent, ZfsProperty<int> retentionHourly, ZfsProperty<int> retentionDaily, ZfsProperty<int> retentionWeekly, ZfsProperty<int> retentionMonthly, ZfsProperty<int> retentionYearly, ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null )
+    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in long bytesAvailable, in long bytesUsed, ZfsRecord? parent = null )
     {
         return new( name, kind, enabled, takeSnapshots, pruneSnapshots, lastFrequentSnapshotTimestamp, lastHourlySnapshotTimestamp, lastDailySnapshotTimestamp, lastWeeklySnapshotTimestamp, lastMonthlySnapshotTimestamp, lastYearlySnapshotTimestamp, recursion, template, retentionFrequent, retentionHourly, retentionDaily, retentionWeekly, retentionMonthly, retentionYearly, retentionPruneDeferral, bytesAvailable, bytesUsed, parent, true );
     }
@@ -507,7 +507,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///     Thus, when cloning a <see cref="ZfsRecord" /> using the <see langword="with" /> operator, this collection
     ///     needs to be re-created and all of its values deep-copied manually, if unique references are needed.
     /// </remarks>
-    public static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( )
+    private static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( )
     {
         return new(
             new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
@@ -584,7 +584,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsDailySnapshotNeeded( DateTimeOffset timestamp )
+    public bool IsDailySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no dailies
         if ( !SnapshotRetentionDaily.IsWanted( ) )
@@ -633,7 +633,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsFrequentSnapshotNeeded( SnapshotTimingSettings template, DateTimeOffset timestamp )
+    public bool IsFrequentSnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no frequent
         if ( !SnapshotRetentionFrequent.IsWanted( ) )
@@ -678,7 +678,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsHourlySnapshotNeeded( DateTimeOffset timestamp )
+    public bool IsHourlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no hourlies
         if ( !SnapshotRetentionHourly.IsWanted( ) )
@@ -726,7 +726,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     /// <remarks>
     ///     Uses culture-aware definitions of months, using the executing user's culture.
     /// </remarks>
-    public bool IsMonthlySnapshotNeeded( DateTimeOffset timestamp )
+    public bool IsMonthlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
         if ( !SnapshotRetentionMonthly.IsWanted( ) )
@@ -782,7 +782,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     ///     Uses culture-aware definitions of week numbers, using the executing user's culture, and treating the day of the
     ///     week specified in settings for weekly snapshots as the "first" day of the week, for week numbering purposes
     /// </remarks>
-    public bool IsWeeklySnapshotNeeded( SnapshotTimingSettings template, DateTimeOffset timestamp )
+    public bool IsWeeklySnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no weeklies
         if ( !SnapshotRetentionWeekly.IsWanted( ) )
@@ -822,7 +822,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     /// <remarks>
     ///     Uses culture-aware definitions of years, using the executing user's culture.
     /// </remarks>
-    public bool IsYearlySnapshotNeeded( DateTimeOffset timestamp )
+    public bool IsYearlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
         if ( !SnapshotRetentionYearly.IsWanted( ) )
@@ -853,6 +853,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return Snapshots[ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove( snapshot.Name, out _ );
     }
 
+    /// <exception cref="ArgumentNullException">name must be a non-null, non-empty, non-whitespace string <paramref name="name"/></exception>
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="name"/> is longer than 255 characters (ZFS limit)</exception>
     public static bool ValidateName( string kind, string name, Regex? validatorRegex = null )
     {
         Logger.Debug( "Validating name \"{0}\"", name );

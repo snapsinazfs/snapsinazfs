@@ -290,7 +290,7 @@ public partial record ZfsRecord
     ///         </item>
     ///     </list>
     /// </exception>
-    public virtual ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, DateTimeOffset propertyValue, bool isLocal = true )
+    public virtual ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, in DateTimeOffset propertyValue, bool isLocal = true )
     {
         switch ( propertyName )
         {

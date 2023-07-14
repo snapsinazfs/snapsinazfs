@@ -15,7 +15,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    private ZfsProperty( string Name, T Value, bool IsLocal = true )
+    private ZfsProperty( string Name, in T Value, bool IsLocal = true )
     {
         this.Name = Name;
         this.Value = Value;
@@ -23,7 +23,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         IsSnapsInAZfsProperty = Name.StartsWith( "snapsinazfs.com:" );
     }
 
-    public ZfsProperty( ZfsRecord Owner, string Name, T Value, bool IsLocal = true )
+    public ZfsProperty( ZfsRecord Owner, string Name, in T Value, bool IsLocal = true )
     {
         this.Owner = Owner;
         this.Name = Name;
@@ -113,37 +113,38 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         return Owner = newParent;
     }
 
-    public static ZfsProperty<bool> CreateWithoutParent( string name, bool value, bool isLocal = true )
+    public static ZfsProperty<bool> CreateWithoutParent( string name, in bool value, bool isLocal = true )
     {
         Logger.Trace("Creating ZfsProperty<bool> {0} without parent dataset", name  );
-        return new( name, value, isLocal );
+        return new( name, in value, isLocal );
     }
 
-    public static ZfsProperty<int> CreateWithoutParent( string name, int value, bool isLocal = true )
+    public static ZfsProperty<int> CreateWithoutParent( string name, in int value, bool isLocal = true )
     {
         Logger.Trace("Creating ZfsProperty<int> {0} without parent dataset", name  );
-        return new( name, value, isLocal );
+        return new( name, in value, isLocal );
     }
 
     public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
     {
         Logger.Trace("Creating ZfsProperty<string> {0} without parent dataset", name  );
-        return new( name, value, isLocal );
+        return new( name, in value, isLocal );
     }
 
-    public static ZfsProperty<T> CreateWithoutParent( string name, T value, bool isLocal = true )
+    public static ZfsProperty<T> CreateWithoutParent( string name, T value, in bool isLocal = true )
     {
         Logger.Trace("Creating ZfsProperty<T> {0} without parent dataset", name  );
-        return new( name, value, isLocal );
+        return new( name, in value, isLocal );
     }
 
-    public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, DateTimeOffset value, bool isLocal = true )
+    public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, in DateTimeOffset value, bool isLocal = true )
     {
         Logger.Trace("Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name  );
-        return new( name, value, isLocal );
+        return new( name, in value, isLocal );
     }
 
-    // ReSharper disable once InconsistentNaming
+    // ReSharper disable InconsistentNaming
+    // ReSharper disable ParameterHidesMember
     public readonly void Deconstruct( out ZfsRecord? Parent, out string Name, out T Value, out bool IsLocal )
     {
         Parent = Owner;
@@ -151,6 +152,8 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         Value = this.Value;
         IsLocal = this.IsLocal;
     }
+    // ReSharper enable InconsistentNaming
+    // ReSharper enable ParameterHidesMember
 
     /// <inheritdoc />
     public readonly override int GetHashCode( )
