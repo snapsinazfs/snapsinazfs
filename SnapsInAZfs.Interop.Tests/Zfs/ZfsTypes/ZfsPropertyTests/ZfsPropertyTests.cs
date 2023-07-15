@@ -124,7 +124,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty == tv,
             DateTimeOffset tv => zfsProperty == tv,
             ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
-            _ => zfsProperty == testValue
+            _ => false
         };
     }
 
@@ -143,7 +143,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty == tv,
             DateTimeOffset tv => zfsProperty == tv,
             ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
-            _ => zfsProperty == testValue
+            _ => false
         };
     }
 
@@ -162,7 +162,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty == tv,
             DateTimeOffset tv => zfsProperty == tv,
             ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
-            _ => zfsProperty == testValue
+            _ => false
         };
     }
 
@@ -181,7 +181,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty == tv,
             DateTimeOffset tv => zfsProperty == tv,
             ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
-            _ => zfsProperty == testValue
+            _ => false
         };
     }
 
@@ -194,13 +194,13 @@ public class ZfsPropertyTests
         {
             int tv => !(zfsProperty != tv),
             ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => zfsProperty == tv,
+            bool tv => !(zfsProperty != tv),
             ZfsProperty<bool> tv => !(zfsProperty != tv),
             string tv => !(zfsProperty != tv),
             ZfsProperty<string> tv => !(zfsProperty != tv),
             DateTimeOffset tv => !(zfsProperty != tv),
             ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
-            _ => !(zfsProperty != testValue)
+            _ => false
         };
     }
 
@@ -213,13 +213,13 @@ public class ZfsPropertyTests
         {
             int tv => !(zfsProperty != tv),
             ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => zfsProperty == tv,
+            bool tv => !(zfsProperty != tv),
             ZfsProperty<bool> tv => !(zfsProperty != tv),
             string tv => !(zfsProperty != tv),
             ZfsProperty<string> tv => !(zfsProperty != tv),
             DateTimeOffset tv => !(zfsProperty != tv),
             ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
-            _ => !(zfsProperty != testValue)
+            _ => false
         };
     }
 
@@ -232,13 +232,13 @@ public class ZfsPropertyTests
         {
             int tv => !(zfsProperty != tv),
             ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => zfsProperty == tv,
+            bool tv => !(zfsProperty != tv),
             ZfsProperty<bool> tv => !(zfsProperty != tv),
             string tv => !(zfsProperty != tv),
             ZfsProperty<string> tv => !(zfsProperty != tv),
             DateTimeOffset tv => !(zfsProperty != tv),
             ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
-            _ => !(zfsProperty != testValue)
+            _ => false
         };
     }
 
@@ -251,13 +251,13 @@ public class ZfsPropertyTests
         {
             int tv => !(zfsProperty != tv),
             ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => zfsProperty == tv,
+            bool tv => !(zfsProperty != tv),
             ZfsProperty<bool> tv => !(zfsProperty != tv),
             string tv => !(zfsProperty != tv),
             ZfsProperty<string> tv => !(zfsProperty != tv),
             DateTimeOffset tv => !(zfsProperty != tv),
             ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
-            _ => !(zfsProperty != testValue)
+            _ => false
         };
     }
     //todo: Need to test proper resolution of the source property
