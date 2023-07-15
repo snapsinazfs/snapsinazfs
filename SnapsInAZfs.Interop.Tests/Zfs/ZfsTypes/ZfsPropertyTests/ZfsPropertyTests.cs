@@ -20,7 +20,18 @@ public class ZfsPropertyTests
     public bool Equals_BoolProperty_OtherObjectTypeT<T>( string propertyName, bool propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<bool> zfsProperty = ZfsProperty<bool>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty.Equals( testValue );
+        return testValue switch
+        {
+            int tv => zfsProperty.Equals( tv ),
+            ZfsProperty<int> tv => zfsProperty.Equals( tv ),
+            bool tv => zfsProperty.Equals( tv ),
+            ZfsProperty<bool> tv => zfsProperty.Equals( tv ),
+            string tv => zfsProperty.Equals( tv ),
+            ZfsProperty<string> tv => zfsProperty.Equals( tv ),
+            DateTimeOffset tv => zfsProperty.Equals( tv ),
+            ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
+            _ => zfsProperty.Equals( testValue )
+        };
     }
 
     [Test]
@@ -28,7 +39,18 @@ public class ZfsPropertyTests
     public bool Equals_DateTimeOffsetProperty_OtherObjectTypeT<T>( string propertyName, DateTimeOffset propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<DateTimeOffset> zfsProperty = ZfsProperty<DateTimeOffset>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty.Equals( testValue );
+        return testValue switch
+        {
+            int tv => zfsProperty.Equals( tv ),
+            ZfsProperty<int> tv => zfsProperty.Equals( tv ),
+            bool tv => zfsProperty.Equals( tv ),
+            ZfsProperty<bool> tv => zfsProperty.Equals( tv ),
+            string tv => zfsProperty.Equals( tv ),
+            ZfsProperty<string> tv => zfsProperty.Equals( tv ),
+            DateTimeOffset tv => zfsProperty.Equals( tv ),
+            ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
+            _ => zfsProperty.Equals( testValue )
+        };
     }
 
     [Test]
@@ -36,7 +58,18 @@ public class ZfsPropertyTests
     public bool Equals_IntProperty_OtherObjectTypeT<T>( string propertyName, int propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<int> zfsProperty = ZfsProperty<int>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty.Equals( testValue );
+        return testValue switch
+        {
+            int tv => zfsProperty.Equals( tv ),
+            ZfsProperty<int> tv => zfsProperty.Equals( tv ),
+            bool tv => zfsProperty.Equals( tv ),
+            ZfsProperty<bool> tv => zfsProperty.Equals( tv ),
+            string tv => zfsProperty.Equals( tv ),
+            ZfsProperty<string> tv => zfsProperty.Equals( tv ),
+            DateTimeOffset tv => zfsProperty.Equals( tv ),
+            ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
+            _ => zfsProperty.Equals( testValue )
+        };
     }
 
     [Test]
@@ -44,7 +77,18 @@ public class ZfsPropertyTests
     public bool Equals_StringProperty_OtherObjectTypeT<T>( string propertyName, string propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<string> zfsProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty.Equals( testValue );
+        return testValue switch
+        {
+            int tv => zfsProperty.Equals( tv ),
+            ZfsProperty<int> tv => zfsProperty.Equals( tv ),
+            bool tv => zfsProperty.Equals( tv ),
+            ZfsProperty<bool> tv => zfsProperty.Equals( tv ),
+            string tv => zfsProperty.Equals( tv ),
+            ZfsProperty<string> tv => zfsProperty.Equals( tv ),
+            DateTimeOffset tv => zfsProperty.Equals( tv ),
+            ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
+            _ => zfsProperty.Equals( testValue )
+        };
     }
 
     [Test]
@@ -70,7 +114,18 @@ public class ZfsPropertyTests
     public bool OperatorEquals_BoolProperty_OtherObjectTypeT<T>( string propertyName, bool propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<bool> zfsProperty = ZfsProperty<bool>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty == testValue;
+        return testValue switch
+        {
+            int tv => zfsProperty == tv,
+            ZfsProperty<int> tv => zfsProperty == tv,
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => zfsProperty == tv,
+            string tv => zfsProperty == tv,
+            ZfsProperty<string> tv => zfsProperty == tv,
+            DateTimeOffset tv => zfsProperty == tv,
+            ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
+            _ => zfsProperty == testValue
+        };
     }
 
     [Test]
@@ -78,7 +133,18 @@ public class ZfsPropertyTests
     public bool OperatorEquals_DateTimeOffsetProperty_OtherObjectTypeT<T>( string propertyName, DateTimeOffset propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<DateTimeOffset> zfsProperty = ZfsProperty<DateTimeOffset>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty == testValue;
+        return testValue switch
+        {
+            int tv => zfsProperty == tv,
+            ZfsProperty<int> tv => zfsProperty == tv,
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => zfsProperty == tv,
+            string tv => zfsProperty == tv,
+            ZfsProperty<string> tv => zfsProperty == tv,
+            DateTimeOffset tv => zfsProperty == tv,
+            ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
+            _ => zfsProperty == testValue
+        };
     }
 
     [Test]
@@ -86,7 +152,18 @@ public class ZfsPropertyTests
     public bool OperatorEquals_IntProperty_OtherObjectTypeT<T>( string propertyName, int propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<int> zfsProperty = ZfsProperty<int>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty == testValue;
+        return testValue switch
+        {
+            int tv => zfsProperty == tv,
+            ZfsProperty<int> tv => zfsProperty == tv,
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => zfsProperty == tv,
+            string tv => zfsProperty == tv,
+            ZfsProperty<string> tv => zfsProperty == tv,
+            DateTimeOffset tv => zfsProperty == tv,
+            ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
+            _ => zfsProperty == testValue
+        };
     }
 
     [Test]
@@ -94,7 +171,18 @@ public class ZfsPropertyTests
     public bool OperatorEquals_StringProperty_OtherObjectTypeT<T>( string propertyName, string propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<string> zfsProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, propertyValue );
-        return zfsProperty == testValue;
+        return testValue switch
+        {
+            int tv => zfsProperty == tv,
+            ZfsProperty<int> tv => zfsProperty == tv,
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => zfsProperty == tv,
+            string tv => zfsProperty == tv,
+            ZfsProperty<string> tv => zfsProperty == tv,
+            DateTimeOffset tv => zfsProperty == tv,
+            ZfsProperty<DateTimeOffset> tv => zfsProperty == tv,
+            _ => zfsProperty == testValue
+        };
     }
 
     [Test]
@@ -102,7 +190,18 @@ public class ZfsPropertyTests
     public bool OperatorNotEquals_BoolProperty_OtherObjectTypeT<T>( string propertyName, bool propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<bool> zfsProperty = ZfsProperty<bool>.CreateWithoutParent( propertyName, propertyValue );
-        return !( zfsProperty != testValue );
+        return testValue switch
+        {
+            int tv => !(zfsProperty != tv),
+            ZfsProperty<int> tv => !(zfsProperty != tv),
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => !(zfsProperty != tv),
+            string tv => !(zfsProperty != tv),
+            ZfsProperty<string> tv => !(zfsProperty != tv),
+            DateTimeOffset tv => !(zfsProperty != tv),
+            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            _ => !(zfsProperty != testValue)
+        };
     }
 
     [Test]
@@ -110,7 +209,18 @@ public class ZfsPropertyTests
     public bool OperatorNotEquals_DateTimeOffsetProperty_OtherObjectTypeT<T>( string propertyName, DateTimeOffset propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<DateTimeOffset> zfsProperty = ZfsProperty<DateTimeOffset>.CreateWithoutParent( propertyName, propertyValue );
-        return !( zfsProperty != testValue );
+        return testValue switch
+        {
+            int tv => !(zfsProperty != tv),
+            ZfsProperty<int> tv => !(zfsProperty != tv),
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => !(zfsProperty != tv),
+            string tv => !(zfsProperty != tv),
+            ZfsProperty<string> tv => !(zfsProperty != tv),
+            DateTimeOffset tv => !(zfsProperty != tv),
+            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            _ => !(zfsProperty != testValue)
+        };
     }
 
     [Test]
@@ -118,7 +228,18 @@ public class ZfsPropertyTests
     public bool OperatorNotEquals_IntProperty_OtherObjectTypeT<T>( string propertyName, int propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<int> zfsProperty = ZfsProperty<int>.CreateWithoutParent( propertyName, propertyValue );
-        return !( zfsProperty != testValue );
+        return testValue switch
+        {
+            int tv => !(zfsProperty != tv),
+            ZfsProperty<int> tv => !(zfsProperty != tv),
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => !(zfsProperty != tv),
+            string tv => !(zfsProperty != tv),
+            ZfsProperty<string> tv => !(zfsProperty != tv),
+            DateTimeOffset tv => !(zfsProperty != tv),
+            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            _ => !(zfsProperty != testValue)
+        };
     }
 
     [Test]
@@ -126,7 +247,18 @@ public class ZfsPropertyTests
     public bool OperatorNotEquals_StringProperty_OtherObjectTypeT<T>( string propertyName, string propertyValue, T testValue ) where T : notnull
     {
         ZfsProperty<string> zfsProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, propertyValue );
-        return !( zfsProperty != testValue );
+        return testValue switch
+        {
+            int tv => !(zfsProperty != tv),
+            ZfsProperty<int> tv => !(zfsProperty != tv),
+            bool tv => zfsProperty == tv,
+            ZfsProperty<bool> tv => !(zfsProperty != tv),
+            string tv => !(zfsProperty != tv),
+            ZfsProperty<string> tv => !(zfsProperty != tv),
+            DateTimeOffset tv => !(zfsProperty != tv),
+            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            _ => !(zfsProperty != testValue)
+        };
     }
     //todo: Need to test proper resolution of the source property
 
