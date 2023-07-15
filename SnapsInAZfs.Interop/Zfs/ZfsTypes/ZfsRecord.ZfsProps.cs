@@ -485,7 +485,7 @@ public partial record ZfsRecord
         StringPropertyChanged += snap.OnParentUpdatedStringProperty;
     }
 
-    private void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
+    internal void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
     {
         if ( !child.SubscribedToParentPropertyChangeEvents )
         {
@@ -498,7 +498,7 @@ public partial record ZfsRecord
         child.SubscribedToParentPropertyChangeEvents = false;
     }
 
-    private void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
+    internal void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
     {
         IntPropertyChanged -= snap.OnParentUpdatedIntProperty;
         BoolPropertyChanged -= snap.OnParentUpdatedBoolProperty;

@@ -274,6 +274,37 @@ public class SiazService : BackgroundService
             Logger.Info( "Not pruning snapshots" );
         }
 
+        // As a final step, if we are executing as a daemon, unsubscribe all datasets from their parents' events,
+        // to reduce how many generations old objects will live before the GC cleans them up
+        // ReSharper disable once InvertIf
+        if ( _settings is { Daemonize: true } )
+        {
+            foreach ( (string _,ZfsRecord ds) in datasets )
+            {
+                if ( ds.IsPoolRoot )
+                {
+                    UnsubscribeChildRecordsFromEvents( ds );
+                }
+            }
+
+            static void UnsubscribeChildRecordsFromEvents( ZfsRecord node )
+            {
+                foreach ( ( string _, ZfsRecord child ) in node.GetSortedChildDatasets( ) )
+                {
+                    UnsubscribeChildRecordsFromEvents( child );
+                    node.UnsubscribeChildFromPropertyEvents( child );
+                }
+
+                foreach ( ( SnapshotPeriodKind _, ConcurrentDictionary<string, Snapshot> dict ) in node.Snapshots )
+                {
+                    foreach ( ( string _, Snapshot snap ) in dict )
+                    {
+                        node.UnsubscribeSnapshotFromPropertyEvents( snap );
+                    }
+                }
+            }
+        }
+
         return SiazExecutionResultCode.Completed;
     }
 }
