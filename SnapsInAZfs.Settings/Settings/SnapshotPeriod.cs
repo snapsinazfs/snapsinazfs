@@ -56,13 +56,13 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     /// </summary>
     public static SnapshotPeriod Yearly { get; } = new( SnapshotPeriodKind.Yearly );
 
-    internal const string DailyString = "daily";
-    internal const string FrequentString = "frequently";
-    internal const string HourlyString = "hourly";
-    internal const string MonthlyString = "monthly";
-    internal const string NotSetString = "-";
-    internal const string WeeklyString = "weekly";
-    internal const string YearlyString = "yearly";
+    public const string DailyString = "daily";
+    public const string FrequentString = "frequently";
+    public const string HourlyString = "hourly";
+    public const string MonthlyString = "monthly";
+    public const string NotSetString = "-";
+    public const string WeeklyString = "weekly";
+    public const string YearlyString = "yearly";
 
     /// <inheritdoc />
     /// <exception cref="ArgumentException"><paramref name="other" /> and this instance are not the same type.</exception>
