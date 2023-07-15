@@ -2,6 +2,7 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
@@ -32,12 +33,6 @@ public class ZfsPropertyTests
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
             _ => WarnOnBadTypeAndReturnFalse( )
         };
-    }
-
-    private bool WarnOnBadTypeAndReturnFalse( )
-    {
-        Assert.Warn( "Bad test - type would throw a compile error" );
-        return false;
     }
 
     [Test]
@@ -95,6 +90,57 @@ public class ZfsPropertyTests
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
             _ => WarnOnBadTypeAndReturnFalse( )
         };
+    }
+
+    [Test]
+    public void InheritedFrom_Correct_WhenIsLocalFalseInheritingOneGeneration( )
+    {
+        ZfsRecord gen1Record = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+        ZfsRecord gen2Record = gen1Record.CreateChildDataset( $"{gen1Record.Name}/gen2", ZfsPropertyValueConstants.FileSystem );
+        ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
+        ZfsProperty<bool> gen2Enabled = gen2Record.Enabled;
+        Assume.That( gen1Enabled.IsLocal, Is.True );
+        Assume.That( gen2Enabled.IsLocal, Is.False );
+        Assert.That( gen2Enabled.InheritedFrom, Is.EqualTo( "gen1" ) );
+    }
+
+    [Test]
+    public void InheritedFrom_Correct_WhenIsLocalFalseInheritingTwoGenerations( )
+    {
+        ZfsRecord gen1Record = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+        ZfsRecord gen2Record = gen1Record.CreateChildDataset( $"{gen1Record.Name}/gen2", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord gen3Record = gen2Record.CreateChildDataset( $"{gen2Record.Name}/gen3", ZfsPropertyValueConstants.FileSystem );
+        ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
+        ZfsProperty<bool> gen2Enabled = gen2Record.Enabled;
+        ZfsProperty<bool> gen3Enabled = gen3Record.Enabled;
+        Assume.That( gen1Enabled.IsLocal, Is.True );
+        Assume.That( gen2Enabled.IsLocal, Is.False );
+        Assume.That( gen3Enabled.IsLocal, Is.False );
+        Assert.That( gen3Enabled.InheritedFrom, Is.EqualTo( "gen1" ) );
+    }
+
+    [Test]
+    public void InheritedFrom_Correct_WhenIsLocalTrue( )
+    {
+        ZfsRecord gen1Record = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+        ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
+        Assert.That( gen1Enabled.InheritedFrom, Is.EqualTo( ZfsPropertySourceConstants.Local ) );
+    }
+
+    [Test]
+    public void InheritedFrom_Correct_WhenIsLocalTrueAndParentInheriting( )
+    {
+        ZfsRecord gen1Record = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+        ZfsRecord gen2Record = gen1Record.CreateChildDataset( $"{gen1Record.Name}/gen2", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord gen3Record = gen2Record.CreateChildDataset( $"{gen2Record.Name}/gen3", ZfsPropertyValueConstants.FileSystem );
+        ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
+        ZfsProperty<bool> gen2Enabled = gen2Record.Enabled;
+        ZfsProperty<bool> gen3Enabled = gen3Record.UpdateProperty( ZfsPropertyNames.EnabledPropertyName, gen3Record.Enabled.Value );
+        Assume.That( gen1Enabled.IsLocal, Is.True );
+        Assume.That( gen2Enabled.IsLocal, Is.False );
+        Assume.That( gen2Enabled.Source, Is.EqualTo( "inherited from gen1" ) );
+        Assume.That( gen3Enabled.IsLocal, Is.True );
+        Assert.That( gen3Enabled.InheritedFrom, Is.EqualTo( ZfsPropertySourceConstants.Local ) );
     }
 
     [Test]
@@ -198,14 +244,14 @@ public class ZfsPropertyTests
         ZfsProperty<bool> zfsProperty = ZfsProperty<bool>.CreateWithoutParent( propertyName, propertyValue );
         return testValue switch
         {
-            int tv => !(zfsProperty != tv),
-            ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => !(zfsProperty != tv),
-            ZfsProperty<bool> tv => !(zfsProperty != tv),
-            string tv => !(zfsProperty != tv),
-            ZfsProperty<string> tv => !(zfsProperty != tv),
-            DateTimeOffset tv => !(zfsProperty != tv),
-            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            int tv => !( zfsProperty != tv ),
+            ZfsProperty<int> tv => !( zfsProperty != tv ),
+            bool tv => !( zfsProperty != tv ),
+            ZfsProperty<bool> tv => !( zfsProperty != tv ),
+            string tv => !( zfsProperty != tv ),
+            ZfsProperty<string> tv => !( zfsProperty != tv ),
+            DateTimeOffset tv => !( zfsProperty != tv ),
+            ZfsProperty<DateTimeOffset> tv => !( zfsProperty != tv ),
             _ => false
         };
     }
@@ -217,14 +263,14 @@ public class ZfsPropertyTests
         ZfsProperty<DateTimeOffset> zfsProperty = ZfsProperty<DateTimeOffset>.CreateWithoutParent( propertyName, propertyValue );
         return testValue switch
         {
-            int tv => !(zfsProperty != tv),
-            ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => !(zfsProperty != tv),
-            ZfsProperty<bool> tv => !(zfsProperty != tv),
-            string tv => !(zfsProperty != tv),
-            ZfsProperty<string> tv => !(zfsProperty != tv),
-            DateTimeOffset tv => !(zfsProperty != tv),
-            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            int tv => !( zfsProperty != tv ),
+            ZfsProperty<int> tv => !( zfsProperty != tv ),
+            bool tv => !( zfsProperty != tv ),
+            ZfsProperty<bool> tv => !( zfsProperty != tv ),
+            string tv => !( zfsProperty != tv ),
+            ZfsProperty<string> tv => !( zfsProperty != tv ),
+            DateTimeOffset tv => !( zfsProperty != tv ),
+            ZfsProperty<DateTimeOffset> tv => !( zfsProperty != tv ),
             _ => false
         };
     }
@@ -236,14 +282,14 @@ public class ZfsPropertyTests
         ZfsProperty<int> zfsProperty = ZfsProperty<int>.CreateWithoutParent( propertyName, propertyValue );
         return testValue switch
         {
-            int tv => !(zfsProperty != tv),
-            ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => !(zfsProperty != tv),
-            ZfsProperty<bool> tv => !(zfsProperty != tv),
-            string tv => !(zfsProperty != tv),
-            ZfsProperty<string> tv => !(zfsProperty != tv),
-            DateTimeOffset tv => !(zfsProperty != tv),
-            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            int tv => !( zfsProperty != tv ),
+            ZfsProperty<int> tv => !( zfsProperty != tv ),
+            bool tv => !( zfsProperty != tv ),
+            ZfsProperty<bool> tv => !( zfsProperty != tv ),
+            string tv => !( zfsProperty != tv ),
+            ZfsProperty<string> tv => !( zfsProperty != tv ),
+            DateTimeOffset tv => !( zfsProperty != tv ),
+            ZfsProperty<DateTimeOffset> tv => !( zfsProperty != tv ),
             _ => false
         };
     }
@@ -255,14 +301,14 @@ public class ZfsPropertyTests
         ZfsProperty<string> zfsProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, propertyValue );
         return testValue switch
         {
-            int tv => !(zfsProperty != tv),
-            ZfsProperty<int> tv => !(zfsProperty != tv),
-            bool tv => !(zfsProperty != tv),
-            ZfsProperty<bool> tv => !(zfsProperty != tv),
-            string tv => !(zfsProperty != tv),
-            ZfsProperty<string> tv => !(zfsProperty != tv),
-            DateTimeOffset tv => !(zfsProperty != tv),
-            ZfsProperty<DateTimeOffset> tv => !(zfsProperty != tv),
+            int tv => !( zfsProperty != tv ),
+            ZfsProperty<int> tv => !( zfsProperty != tv ),
+            bool tv => !( zfsProperty != tv ),
+            ZfsProperty<bool> tv => !( zfsProperty != tv ),
+            string tv => !( zfsProperty != tv ),
+            ZfsProperty<string> tv => !( zfsProperty != tv ),
+            DateTimeOffset tv => !( zfsProperty != tv ),
+            ZfsProperty<DateTimeOffset> tv => !( zfsProperty != tv ),
             _ => false
         };
     }
@@ -279,6 +325,22 @@ public class ZfsPropertyTests
         IZfsProperty propertyBBoxed = propertyB;
         Assert.That( propertyABoxed, Is.Not.SameAs( propertyBBoxed ) );
         Assert.That( propertyABoxed, Is.Not.SameAs( propertyABoxedCopy ) );
+    }
+
+    [Test]
+    public void Source_Correct_WhenIsLocalFalseAndParentIsAlsoInheriting( )
+    {
+        ZfsRecord gen1Record = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+        ZfsRecord gen2Record = gen1Record.CreateChildDataset( $"{gen1Record.Name}/gen2", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord gen3Record = gen2Record.CreateChildDataset( $"{gen2Record.Name}/gen3", ZfsPropertyValueConstants.FileSystem );
+        ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
+        ZfsProperty<bool> gen2Enabled = gen2Record.Enabled;
+        ZfsProperty<bool> gen3Enabled = gen3Record.Enabled;
+        Assume.That( gen1Enabled.IsLocal, Is.True );
+        Assume.That( gen2Enabled.IsLocal, Is.False );
+        Assume.That( gen2Enabled.Source, Is.EqualTo( "inherited from gen1" ) );
+        Assume.That( gen3Enabled.IsLocal, Is.False );
+        Assert.That( gen3Enabled.Source, Is.EqualTo( "inherited from gen1" ) );
     }
 
     [Test]
@@ -480,5 +542,11 @@ public class ZfsPropertyTests
             new TestCaseData( "nameString", "string", ZfsProperty<bool>.CreateWithoutParent( "nameString", true ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", "string", ZfsProperty<bool>.CreateWithoutParent( "nameString", false ) ) { ExpectedResult = false, HasExpectedResult = true }
         };
+    }
+
+    private bool WarnOnBadTypeAndReturnFalse( )
+    {
+        Assert.Warn( "Bad test - type would throw a compile error" );
+        return false;
     }
 }
