@@ -107,15 +107,6 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 
-    readonly string IZfsProperty.Source =>
-        IsLocal switch
-        {
-            true => ZfsPropertySourceConstants.Local,
-            false when Owner is null => ZfsPropertySourceConstants.None,
-            false when Owner.ParentDataset[ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
-            false => Owner.ParentDataset[ Name ].Source
-        };
-
     [JsonIgnore]
     public readonly bool IsInherited => !IsLocal;
 
