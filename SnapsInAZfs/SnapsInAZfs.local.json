@@ -2,12 +2,12 @@
   "$schema": "SnapsInAZfs.local.schema.json",
   "$id": "SnapsInAZfs.local.json",
   "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
-  "ZfsPath": "/usr/local/sbin/zfs", 
-  "ZpoolPath": "/usr/local/sbin/zpool", 
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
-  "Daemonize": true, 
+  "Daemonize": false,
   "Monitoring": {
     "Nagios": {
       "$comments": "Nagios-specific monitoring options",

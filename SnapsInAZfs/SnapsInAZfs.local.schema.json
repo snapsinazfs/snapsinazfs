@@ -31,7 +31,12 @@
         "Daemonize": {
             "type": "boolean",
             "description": "If SnapsInAZfs will run as a service",
-            "default": false 
+            "default": false
+        },
+        "DaemonTimerIntervalSeconds": {
+            "type": "integer",
+            "description": "The number of seconds between timer events when running as a service",
+            "default": 10
         },
         "TakeSnapshots": {
             "type": "boolean",

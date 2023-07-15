@@ -30,6 +30,7 @@ internal static class ZfsTasks
         {
             zfsInheritTasks.Add( commandRunner.InheritZfsPropertyAsync( dryRun, zfsPath, property ).ContinueWith( inheritTask => {
                 // ReSharper disable once AsyncConverter.AsyncWait
+                // ReSharper disable once AsyncApostle.AsyncWait
                 if ( inheritTask.Result )
                 {
                     Interlocked.Increment( ref successfulOperations );

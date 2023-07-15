@@ -4,6 +4,8 @@
   "$comments": "Default settings for SnapsInAZfs. It is not recommended to modify this file. Customized settings should be specified in /etc/SnapsInAZfs/SnapsInAZfs.local.json",
   "TakeSnapshots": false,
   "PruneSnapshots": false,
+  "Daemonize": false,
+  "DaemonTimerIntervalSeconds": 10,
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
   "DryRun": false,

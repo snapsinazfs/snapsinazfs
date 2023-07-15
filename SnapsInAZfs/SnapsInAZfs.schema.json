@@ -23,6 +23,16 @@
             "description": "The path to the zpool utility",
             "default": "/usr/local/sbin/zpool"
         },
+        "Daemonize": {
+            "type": "boolean",
+            "description": "If SnapsInAZfs will run as a service",
+            "default": false
+        },
+        "DaemonTimerIntervalSeconds": {
+            "type": "integer",
+            "description": "The number of seconds between timer events when running as a service",
+            "default": 10
+        },
         "DryRun": {
             "type": "boolean",
             "description": "If SnapsInAZfs will perform a dry run and make no changes to ZFS.",
@@ -49,11 +59,14 @@
     },
     "additionalProperties": false,
     "required": [
+        "Daemonize",
+        "DaemonTimerIntervalSeconds",
         "ZfsPath",
         "ZpoolPath",
         "Monitoring",
         "TakeSnapshots",
-        "PruneSnapshots"
+        "PruneSnapshots",
+        "Templates"
     ],
     "$defs": {
         "Templates": {
