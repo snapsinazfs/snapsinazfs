@@ -277,7 +277,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
-        SnapshotPeriodKind periodKind = snap.Period.Value.ToSnapshotPeriod( ).Kind;
+        SnapshotPeriodKind periodKind = snap.Period.Value.ToSnapshotPeriodKind( );
         Snapshots[ periodKind ][ snap.Name ] = snap;
         switch ( periodKind )
         {

@@ -28,23 +28,6 @@ public static class TypeExtensions
         return property.Value ? 0 : 1;
     }
 
-    /// <summary>
-    ///     Gets an integer index for radio button groups assuming the order of true,false from this
-    ///     <see langword="bool" /> value
-    /// </summary>
-    /// <param name="value">
-    ///     The <see langword="bool" /> to convert to an integer index for radio button groups
-    /// </param>
-    /// <returns>
-    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
-    ///     0: true<br />
-    ///     1: false<br />
-    /// </returns>
-    public static int AsTrueFalseRadioIndex( this bool value )
-    {
-        return value ? 0 : 1;
-    }
-
     public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period )
     {
         return period.Kind switch
@@ -75,13 +58,6 @@ public static class TypeExtensions
             value[ ..endIndex ];
     }
 
-    public static string GetZfsPathRoot( this string value )
-    {
-        int endIndex = value.IndexOfAny( new[] { '/', '@', '#' }, 1 );
-
-        return endIndex == -1 ? value : value[ ..endIndex ];
-    }
-
     public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
     {
         return retentionProperty.Value == 0;
@@ -110,11 +86,6 @@ public static class TypeExtensions
         return string.Join( '\n', strings );
     }
 
-    public static SnapshotPeriod ToSnapshotPeriod( this string input )
-    {
-        return (SnapshotPeriod)input;
-    }
-
     public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
     {
         return SnapshotPeriod.StringToSnapshotPeriodKind( input );
@@ -132,11 +103,6 @@ public static class TypeExtensions
     public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
     {
         return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
-    }
-
-    public static string ToStringForZfsSet( this IDictionary<string, IZfsProperty> properties )
-    {
-        return properties.Select( kvp => kvp.Value.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 
     /// <summary>
