@@ -13,6 +13,7 @@ dotnet_diagnostic.CS1591.severity = none
 dotnet_diagnostic.CS8618.severity = none
 [ZfsProperty.cs]
 dotnet_diagnostic.CS0660.severity = none
+dotnet_diagnostic.CS8509.severity = none
 
 [*.cs]
 

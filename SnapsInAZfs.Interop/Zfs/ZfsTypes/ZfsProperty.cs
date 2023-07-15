@@ -32,8 +32,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     public readonly string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
 
     [JsonIgnore]
-    public readonly string Source =>
-        IsLocal switch
+    public readonly string Source => IsLocal switch
         {
             true => ZfsPropertySourceConstants.Local,
             false when Owner is null => ZfsPropertySourceConstants.None,
@@ -104,7 +103,6 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         string value => value,
         bool boolValue => boolValue.ToString( ).ToLowerInvariant( ),
         DateTimeOffset dtoValue => dtoValue.ToString( "O" ),
-        _ => throw new InvalidOperationException( $"Invalid value type for ZfsProperty {Name} ({typeof( T ).FullName})" )
     };
 
     [JsonIgnore]
