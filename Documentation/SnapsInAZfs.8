@@ -44,6 +44,12 @@ Cannot be specified with most other command line options.
 Create snapshots and prune expired snapshots.
 Equivalent to specifying both --take-snapshots and --prune-snapshots.
 .TP
+\f[B]--daemonize\f[R], \f[B]-Daemonize\f[R]
+Force SnapsInAZfs to run in daemon mode.
+If run with this argument from the command-line, exit by pressing
+control-c.\ The systemd service already includes this argument in its
+ExecStart line.
+.TP
 \f[B]-vv\f[R], \f[B]--debug\f[R], \f[B]-Debug\f[R]
 Debug level output logging.
 Change log level in SnapsInAZfs.nlog.json for normal usage.
@@ -63,6 +69,13 @@ making changes to ZFS.
 .TP
 \f[B]-h\f[R], \f[B]--help\f[R], \f[B]-Help\f[R]
 Displays usage information on the command line.
+.TP
+\f[B]--no-daemonize\f[R], \f[B]-NoDaemonize\f[R]
+Opposite of --daemonize.
+If you have set Daemonize to true in configuration files, this will
+override that, so that you can run SnapsInAZfs from the command line
+without having to change configuration or manually end the process with
+ctrl-c.
 .TP
 \f[B]--no-prune-snapshots\f[R], \f[B]-NoPruneSnapshots\f[R]
 Opposite of --prune-snapshots.

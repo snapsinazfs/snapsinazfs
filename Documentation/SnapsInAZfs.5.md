@@ -55,16 +55,20 @@ They can be overridden by command-line arguments, as noted.
 **/DryRun** (boolean - "true" or "false")
 : This is a global setting that controls whether SnapsInAZfs will perform
 a dry run, when invoked. If this setting is "true," SnapsInAZfs will perform
-a dry run and make no changes to ZFS. The command-line option **\-\-dry-run**
-overrides this setting.
+a dry run and make no changes to ZFS.
+
+&nbsp;
+: The command-line option **\-\-dry-run** overrides this setting.
 
 **/TakeSnapshots** (boolean - "true" or "false")
 : This is a global setting that controls whether SnapsInAZfs will take new
 snapshots. If this setting is true, SnapsInAZfs will take snapshots according
 to the properties set on each ZFS dataset. If this setting is false, new
 snapshot processing is skipped and no new snapshots will be taken, regardless
-of the snapsinazfs.com:takesnapshots property set on each ZFS dataset. The
-command-line options **\-\-take-snapshots** and **\-\-no-take-snapshots**
+of the snapsinazfs.com:takesnapshots property set on each ZFS dataset.
+
+&nbps;
+: The command-line options **\-\-take-snapshots** and **\-\-no-take-snapshots**
 override this setting.
 
 **/PruneSnapshots** (boolean - "true" or "false")
@@ -74,8 +78,48 @@ snapshots according to the properties set on each snapshot or inherited from
 its parent dataset. If this setting is false, existing snapshots will not be
 pruned, regardless of the snapsinazfs.com:prunesnapshots property setting on each
 ZFS dataset, the retention properties on each ZFS dataset or snapshot, or the
-age of the snapshot. The command-line options **\-\-prune-snapshots** and
-**\-\-no-prune-snapshots** override this setting.
+age of the snapshot.
+
+&nbsp;
+: The command-line options **\-\-prune-snapshots** and **\-\-no-prune-snapshots**
+override this setting.
+
+**/Daemonize** (boolean - "true" or "false")
+: This is a global setting that instructs SnapsInAZfs to continue running and
+to process events on a timer, rather than running once and exiting. This option
+was designed for systemd, but it may work under other service managers, as well.
+
+&nbsp;
+: The command-line options **\-\-damonize** and **\-\-no-daemonize** override this
+setting.
+
+**/DaemonTimerIntervalSeconds** (integer - default 10 - recommended between 10 and 60)
+: This is a global setting that is only used when running as a daemon. When
+running as a daemon, SnapsInAZfs uses a lightweight periodic timer to check if it
+needs to do anything. This setting controls how many seconds pass between ticks
+of that timer. The timer tries to maintain close aliasing to the top of the minute,
+and will automatically adjust itself to keep within 500ms, if the timer or system
+clock drift.
+
+&nbsp;
+: There is no benefit to increasing this setting, as it is extremely
+lightweight and the processing to determine if it needs to run at any given tick is
+very short and fast and does not involve any ZFS operations. Decreasing it also gives
+no benefit, as the default setting is already more aggressive than the smallest time
+interval that can be configured for frequent snapshots.
+
+&nbsp;
+: Only adjust this value if you understand how it will affect the operation of SIAZ.
+Increasing this setting beyond 60 seconds may result in frequent snapshots not
+happening when you expect them to.
+
+&nbsp;
+: 10 seconds was chosen because it allows the timer to correct itself more frequently,
+but does not impact the system or the functioning of SIAZ negatively.
+This setting is ignored when not running as a daemon.
+
+&nbsp;
+: The command-line option **\-\-daemon-timer-interval** overrides this setting.
 
 **/ZfsPath** (string)
 : This is the path to the `zfs` executable. The default path should be correct

@@ -29,6 +29,11 @@ most other command line options.
 : Create snapshots and prune expired snapshots. Equivalent to specifying both
 \-\-take-snapshots and \-\-prune-snapshots.
 
+**\-\-daemonize**, **-Daemonize**
+: Force SnapsInAZfs to run in daemon mode. If run with this argument from the
+command-line, exit by pressing control-c. The systemd service already includes
+this argument in its ExecStart line.
+
 **-vv**, **\-\-debug**, **-Debug**
 : Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal
 usage. Very verbose and logs many operations that are not relevant outside of
@@ -45,6 +50,11 @@ those actions without making changes to ZFS.
 
 **-h**, **\-\-help**, **-Help**
 : Displays usage information on the command line.
+
+**\-\-no-daemonize**, **-NoDaemonize**
+: Opposite of \-\-daemonize. If you have set Daemonize to true in configuration
+files, this will override that, so that you can run SnapsInAZfs from the command
+line without having to change configuration or manually end the process with ctrl-c.
 
 **\-\-no-prune-snapshots**, **-NoPruneSnapshots**
 : Opposite of \-\-prune-snapshots. Will prevent ANY snapshots from being

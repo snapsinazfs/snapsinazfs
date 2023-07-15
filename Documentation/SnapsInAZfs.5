@@ -97,6 +97,8 @@ This is a global setting that controls whether SnapsInAZfs will perform
 a dry run, when invoked.
 If this setting is \[lq]true,\[rq] SnapsInAZfs will perform a dry run
 and make no changes to ZFS.
+.TP
+\ 
 The command-line option \f[B]--dry-run\f[R] overrides this setting.
 .TP
 \f[B]/TakeSnapshots\f[R] (boolean - \[lq]true\[rq] or \[lq]false\[rq])
@@ -107,6 +109,8 @@ the properties set on each ZFS dataset.
 If this setting is false, new snapshot processing is skipped and no new
 snapshots will be taken, regardless of the snapsinazfs.com:takesnapshots
 property set on each ZFS dataset.
+.TP
+&nbps;
 The command-line options \f[B]--take-snapshots\f[R] and
 \f[B]--no-take-snapshots\f[R] override this setting.
 .TP
@@ -120,8 +124,54 @@ If this setting is false, existing snapshots will not be pruned,
 regardless of the snapsinazfs.com:prunesnapshots property setting on
 each ZFS dataset, the retention properties on each ZFS dataset or
 snapshot, or the age of the snapshot.
+.TP
+\ 
 The command-line options \f[B]--prune-snapshots\f[R] and
 \f[B]--no-prune-snapshots\f[R] override this setting.
+.TP
+\f[B]/Daemonize\f[R] (boolean - \[lq]true\[rq] or \[lq]false\[rq])
+This is a global setting that instructs SnapsInAZfs to continue running
+and to process events on a timer, rather than running once and exiting.
+This option was designed for systemd, but it may work under other
+service managers, as well.
+.TP
+\ 
+The command-line options \f[B]--damonize\f[R] and
+\f[B]--no-daemonize\f[R] override this setting.
+.TP
+\f[B]/DaemonTimerIntervalSeconds\f[R] (integer - default 10 - recommended between 10 and 60)
+This is a global setting that is only used when running as a daemon.
+When running as a daemon, SnapsInAZfs uses a lightweight periodic timer
+to check if it needs to do anything.
+This setting controls how many seconds pass between ticks of that timer.
+The timer tries to maintain close aliasing to the top of the minute, and
+will automatically adjust itself to keep within 500ms, if the timer or
+system clock drift.
+.TP
+\ 
+There is no benefit to increasing this setting, as it is extremely
+lightweight and the processing to determine if it needs to run at any
+given tick is very short and fast and does not involve any ZFS
+operations.
+Decreasing it also gives no benefit, as the default setting is already
+more aggressive than the smallest time interval that can be configured
+for frequent snapshots.
+.TP
+\ 
+Only adjust this value if you understand how it will affect the
+operation of SIAZ.
+Increasing this setting beyond 60 seconds may result in frequent
+snapshots not happening when you expect them to.
+.TP
+\ 
+10 seconds was chosen because it allows the timer to correct itself more
+frequently, but does not impact the system or the functioning of SIAZ
+negatively.
+This setting is ignored when not running as a daemon.
+.TP
+\ 
+The command-line option \f[B]--daemon-timer-interval\f[R] overrides this
+setting.
 .TP
 \f[B]/ZfsPath\f[R] (string)
 This is the path to the \f[V]zfs\f[R] executable.
