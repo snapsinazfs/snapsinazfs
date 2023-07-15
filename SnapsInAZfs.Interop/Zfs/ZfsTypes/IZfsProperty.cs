@@ -78,8 +78,6 @@ public interface IZfsProperty
         { ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet ) },
         { ZfsPropertyNames.SnapshotTimestampPropertyName, ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) }
     } );
-
-    bool IsInherited => !IsLocal;
     public bool IsLocal { get; init; }
 
     public ZfsRecord? Owner { get; set; }
