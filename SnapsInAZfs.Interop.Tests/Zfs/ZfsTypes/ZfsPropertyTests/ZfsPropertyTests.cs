@@ -588,7 +588,7 @@ public class ZfsPropertyTests
         };
     }
 
-    private bool WarnOnBadTypeAndReturnFalse( )
+    private static bool WarnOnBadTypeAndReturnFalse( )
     {
         Assert.Warn( "Bad test - type would throw a compile error" );
         return false;

@@ -3,6 +3,7 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Diagnostics.CodeAnalysis;
+#pragma warning disable CA1051
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
