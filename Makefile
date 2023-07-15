@@ -110,6 +110,9 @@ install-doc:
 	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.json.5
 	mandb -q
 
+install-logrotate-rule:
+	install -C -v -m 644 $(SNAPSINAZFS_SOLUTION_ROOT)/siaz_logrotate.conf $(ETCDIR)/logrotate.d/snapsinazfs
+
 install-release:	publish-release
 	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
 
