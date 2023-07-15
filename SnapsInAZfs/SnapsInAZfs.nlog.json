@@ -53,6 +53,11 @@
           }
         ]
       },
+      "journald": {
+        "type": "journald",
+        "layout": "${message} ${exception:format=tostring}",
+        "syslogIdentifier": "snapsinazfs" 
+      },
       "own-console-debug": {
         "type": "ColoredConsole",
         "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=tostring}|${callsite}${onexception:inner=\\:${callsite-linenumber}}",
@@ -117,14 +122,23 @@
         "writeTo": "all-file",
         "filterDefaultAction": "Log",
         "final": false,
-        "enabled": false
+        "enabled": true
       },
       {
         "ruleName": "Console",
         "logger": "*",
         "minLevel": "Debug",
         "writeTo": "own-console",
-        "filterDefaultAction": "Log"
+        "filterDefaultAction": "Log",
+        "enabled": true
+      },
+      {
+        "ruleName": "journald",
+        "logger": "*",
+        "minLevel": "Info",
+        "writeTo": "journald",
+        "filterDefaultAction": "Log",
+        "enabled": false
       }
     ]
   }
