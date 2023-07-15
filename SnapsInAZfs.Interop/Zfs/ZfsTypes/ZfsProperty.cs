@@ -149,18 +149,6 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         return new( name, in value, isLocal );
     }
 
-    public readonly bool Equals<TO>( TO other ) where TO : notnull
-    {
-        return ( Value, other ) switch
-        {
-            (int v, ZfsProperty<int> o) => Name == o.Name && v == o.Value && IsLocal == o.IsLocal,
-            (string v, ZfsProperty<string> o) => Name == o.Name && v == o.Value && IsLocal == o.IsLocal,
-            (DateTimeOffset v, ZfsProperty<DateTimeOffset> o) => Name == o.Name && v == o.Value && IsLocal == o.IsLocal,
-            (bool v, ZfsProperty<bool> o) => Name == o.Name && v == o.Value && IsLocal == o.IsLocal,
-            _ => false
-        };
-    }
-
     /// <inheritdoc />
     public readonly override int GetHashCode( )
     {

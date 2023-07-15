@@ -30,8 +30,14 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty.Equals( tv ),
             DateTimeOffset tv => zfsProperty.Equals( tv ),
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
-            _ => zfsProperty.Equals( testValue )
+            _ => WarnOnBadTypeAndReturnFalse( )
         };
+    }
+
+    private bool WarnOnBadTypeAndReturnFalse( )
+    {
+        Assert.Warn( "Bad test - type would throw a compile error" );
+        return false;
     }
 
     [Test]
@@ -49,7 +55,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty.Equals( tv ),
             DateTimeOffset tv => zfsProperty.Equals( tv ),
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
-            _ => zfsProperty.Equals( testValue )
+            _ => WarnOnBadTypeAndReturnFalse( )
         };
     }
 
@@ -68,7 +74,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty.Equals( tv ),
             DateTimeOffset tv => zfsProperty.Equals( tv ),
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
-            _ => zfsProperty.Equals( testValue )
+            _ => WarnOnBadTypeAndReturnFalse( )
         };
     }
 
@@ -87,7 +93,7 @@ public class ZfsPropertyTests
             ZfsProperty<string> tv => zfsProperty.Equals( tv ),
             DateTimeOffset tv => zfsProperty.Equals( tv ),
             ZfsProperty<DateTimeOffset> tv => zfsProperty.Equals( tv ),
-            _ => zfsProperty.Equals( testValue )
+            _ => WarnOnBadTypeAndReturnFalse( )
         };
     }
 
