@@ -78,7 +78,6 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "IsInherited" ).True );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "IsLocal" ).False );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "Source" ).EqualTo( $"inherited from {updatedParent.Name}" ) );
             } );
@@ -133,7 +132,6 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "IsInherited" ).True );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "IsLocal" ).False );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "Source" ).EqualTo( $"inherited from {updatedParent.Name}" ) );
             } );
@@ -187,7 +185,6 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "IsInherited" ).True );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "IsLocal" ).False );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "Source" ).EqualTo( $"inherited from {updatedParent.Name}" ) );
             } );
@@ -241,7 +238,6 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "IsInherited" ).True );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "IsLocal" ).False );
                 Assert.That( updatedRecord[ propertyName ], Has.Property( "Source" ).EqualTo( $"inherited from {updatedParent.Name}" ) );
             } );

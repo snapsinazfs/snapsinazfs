@@ -9,6 +9,7 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui.Trees;
+#pragma warning disable CS1998
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 
