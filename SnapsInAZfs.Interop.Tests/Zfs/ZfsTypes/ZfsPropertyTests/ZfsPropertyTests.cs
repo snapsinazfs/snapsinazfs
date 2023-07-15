@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -79,43 +79,6 @@ public class ZfsPropertyTests
         return property.IsLocal;
     }
     //todo: Need to test proper resolution of the source property
-
-    [Test]
-    [TestCase( ZfsPropertyNames.EnabledPropertyName, ExpectedResult = true )]
-    [TestCase( ZfsNativePropertyNames.Available, ExpectedResult = false )]
-    public bool IsSnapsInAZfsProperty_CanDifferentiateProperties( string propertyName )
-    {
-        ZfsProperty<string> property = ZfsProperty<string>.CreateWithoutParent( propertyName, "test value" );
-        return property.IsSnapsInAZfsProperty;
-    }
-
-    [Test]
-    [TestCase( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.EnabledPropertyName )]
-    [TestCase( ZfsPropertyNames.PruneSnapshotsPropertyName )]
-    [TestCase( ZfsPropertyNames.RecursionPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotNamePropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotPeriodPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionDailyPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName )]
-    [TestCase( ZfsPropertyNames.SnapshotTimestampPropertyName )]
-    [TestCase( ZfsPropertyNames.TakeSnapshotsPropertyName )]
-    [TestCase( ZfsPropertyNames.TemplatePropertyName )]
-    public void IsSnapsInAZfsProperty_CanIdentifyKnownSiazProperties( string propertyName )
-    {
-        ZfsProperty<string> siazProperty = ZfsProperty<string>.CreateWithoutParent( propertyName, "test value" );
-        Assert.That( siazProperty.IsSnapsInAZfsProperty, Is.True );
-    }
 
     [Test]
     public void ReferenceEqualityOfInterfaceFalse( )

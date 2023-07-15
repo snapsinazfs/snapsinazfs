@@ -20,7 +20,6 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         this.Name = Name;
         this.Value = Value;
         this.IsLocal = IsLocal;
-        IsSnapsInAZfsProperty = Name.StartsWith( "snapsinazfs.com:" );
     }
 
     public ZfsProperty( ZfsRecord Owner, string Name, in T Value, bool IsLocal = true )
@@ -29,15 +28,7 @@ public record struct ZfsProperty<T> : IZfsProperty, IEquatable<T> where T : notn
         this.Name = Name;
         this.Value = Value;
         this.IsLocal = IsLocal;
-        IsSnapsInAZfsProperty = Name.StartsWith( "snapsinazfs.com:" );
     }
-
-    /// <summary>
-    ///     Gets whether this is a SnapsInAZfs property or not
-    /// </summary>
-    /// <remarks>Set by constructor, if property name begins with "snapsinazfs.com:"</remarks>
-    [JsonIgnore]
-    public bool IsSnapsInAZfsProperty { get; }
 
     [JsonIgnore]
     public readonly string Source =>
