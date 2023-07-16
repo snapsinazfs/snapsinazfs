@@ -72,9 +72,9 @@ public static class TypeExtensions
     ///     The length of the resulting string overflows the maximum allowed length (
     ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
     /// </exception>
-    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings )
+    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings, bool withSpaces=false )
     {
-        return string.Join( ',', strings );
+        return withSpaces ? string.Join( ", ", strings ) : string.Join( ',', strings );
     }
 
     /// <exception cref="OutOfMemoryException">
