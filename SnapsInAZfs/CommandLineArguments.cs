@@ -17,6 +17,7 @@ public class CommandLineArguments
 {
     [ArgDescription( "Checks the property schema for SnapsInAZfs in zfs and reports any missing properties for pool roots." )]
     [ArgShortcut( "--check-zfs-properties" )]
+    [ArgCantBeCombinedWith("PrepareZfsProperties")]
     public bool CheckZfsProperties { get; set; }
 
     [ArgDescription( "Launches SnapsInAZfs' built-in interactive configuration console" )]
@@ -82,7 +83,7 @@ public class CommandLineArguments
 
     [ArgDescription( "Force SnapsInAZfs to NOT run as a daemon" )]
     [ArgShortcut( "--no-daemonize" )]
-    [ArgCantBeCombinedWith( "Daemonize|Version|Help" )]
+    [ArgCantBeCombinedWith( "Daemonize|Cron|DaemonTimerInterval" )]
     public bool NoDaemonize { get; set; }
 
     [ArgDescription( "Disables snapshot pruning." )]
