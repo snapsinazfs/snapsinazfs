@@ -54,7 +54,7 @@ public class CommandLineArguments
     [ArgShortcut( "n" )]
     public bool DryRun { get; set; }
 
-    [ArgDescription( "Prunes expired snapshots, even if their parent datasets are currently involved in a send or receive operation. Implies --prune-snapshots as well." )]
+    [ArgDescription( "Provided only for backward-compatibility with sanoid. Has no effect, as SnapsInAZfs uses deferred destroy for pruning." )]
     [ArgShortcut( "--force-prune" )]
     [ArgShortcut( "--force-prune-snapshots" )]
     public bool ForcePrune { get; set; }
@@ -99,7 +99,7 @@ public class CommandLineArguments
     [ArgShortcut( "--prepare-zfs-properties" )]
     public bool PrepareZfsProperties { get; set; }
 
-    [ArgDescription( "Prunes expired snapshots, except for snapshots of datasets currently involved in a send or receive operation." )]
+    [ArgDescription( "Prunes expired snapshots" )]
     [ArgShortcut( "--prune-snapshots" )]
     [ArgCantBeCombinedWith( "NoPruneSnapshots" )]
     public bool PruneSnapshots { get; set; }
