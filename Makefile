@@ -10,6 +10,8 @@ RELEASEPUBLISHDIR ?= $(PUBLISHROOT)/$(RELEASECONFIG)
 DEBUGCONFIG ?= Debug
 DEBUGDIR ?= $(BUILDDIR)/$(DEBUGCONFIG)
 DEBUGPUBLISHDIR ?= $(PUBLISHROOT)/$(DEBUGCONFIG)
+SIAZ ?= SnapsInAZfs
+SIAZLC ?= snapsinazfs
 
 PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/SnapsInAZfs.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.schema.json
 PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/SnapsInAZfs.monitoring.schema.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.schema.json
@@ -105,7 +107,9 @@ install-config-local-force:
 	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json
 
 install-doc:
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/SnapsInAZfs.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/$(SIAZ).8
+	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/$(SIAZLC).8
+	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/siaz.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
 	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.json.5
 	mandb -q
@@ -133,7 +137,9 @@ uninstall-config-local:
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:
-	rm -fv $(MANDIR)/man8/SnapsInAZfs.8 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZ).8 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZLC).8 2>/dev/null
+	rm -fv $(MANDIR)/man8/siaz.8 2>/dev/null
 	rm -fv $(MANDIR)/man5/SnapsInAZfs.5 2>/dev/null
 	mandb -q
 
