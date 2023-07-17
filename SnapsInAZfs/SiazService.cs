@@ -38,7 +38,8 @@ public class SiazService : BackgroundService
         _settings = settings;
         _zfsCommandRunner = zfsCommandRunner;
         _commandLineArguments = Args.GetAmbientArgs<CommandLineArguments>( );
-        _daemonTimerInterval = TimeSpan.FromSeconds( Math.Min( 60, _settings.DaemonTimerIntervalSeconds ) );
+        _settings.DaemonTimerIntervalSeconds = Math.Clamp( _settings.DaemonTimerIntervalSeconds, 1, 60 );
+        _daemonTimerInterval = TimeSpan.FromSeconds( _settings.DaemonTimerIntervalSeconds );
     }
 
     /// <summary>
