@@ -315,21 +315,20 @@ internal static class ZfsTasks
 
         Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, period, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
-        if ( commandRunner.TakeSnapshot( ds, period, timestamp, settings, template, out snapshot ) )
+        TakeSnapshotOperationStatus takeSnapshotStatus = commandRunner.TakeSnapshot( ds, period, timestamp, settings, template, out snapshot );
+        switch ( takeSnapshotStatus )
         {
-            ds.AddSnapshot( snapshot! );
-            Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
-            return true;
+            case TakeSnapshotOperationStatus.DryRun:
+                Logger.Info( "DRY RUN: Snapshot for dataset {0} not taken", ds.Name );
+                return false;
+            case TakeSnapshotOperationStatus.Success:
+                ds.AddSnapshot( snapshot! );
+                Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
+                return true;
+            default:
+                Logger.Error( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
+                return false;
         }
-
-        if ( settings.DryRun )
-        {
-            Logger.Info( "DRY RUN: Snapshot for dataset {0} not taken", ds.Name );
-            return false;
-        }
-
-        Logger.Error( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
-        return false;
     }
 
     internal static bool UpdateZfsDatasetSchema( bool dryRun, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )

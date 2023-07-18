@@ -65,7 +65,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override TakeSnapshotOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
@@ -78,13 +78,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !snapshot.ValidateName( ) )
             {
                 Logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
-                return false;
+                return TakeSnapshotOperationStatus.NameValidationFailed;
             }
         }
         catch ( ArgumentNullException ex )
         {
             Logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
-            return false;
+            return TakeSnapshotOperationStatus.NameValidationFailed;
         }
 
         string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
@@ -96,7 +96,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( snapsInAZfsSettings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
-            return false;
+            return TakeSnapshotOperationStatus.DryRun;
         }
 
         Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
@@ -108,18 +108,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 snapshotProcess?.WaitForExit( );
                 if ( snapshotProcess?.ExitCode == 0 )
                 {
-                    return true;
+                    return TakeSnapshotOperationStatus.Success;
                 }
 
                 Logger.Error( "Snapshot creation failed for {0}", snapshot.Name );
             }
 
-            return false;
+            return TakeSnapshotOperationStatus.ZfsProcessFailure;
         }
         catch ( Exception e )
         {
             Logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
-            return false;
+            return TakeSnapshotOperationStatus.ZfsProcessFailure;
         }
     }
 
