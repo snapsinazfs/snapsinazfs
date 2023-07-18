@@ -7,14 +7,14 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- As of today (2023-07-05), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
+ As of today (2023-07-18), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
  stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
  
  SnapsInAZfs is also capable of running as a systemd service. A unit file and `make` recipe for installing and
  uninstalling the service are included.
 
- Version 1.0.0-Beta-3 has been tagged as a release on github, for testing. This comes with what should be the
+ Version 1.0.0-Beta-8 has been tagged as a release on github, for testing. This comes with what should be the
  obvious disclaimer that this is a beta-stage project and you should not trust important systems with it.\
  That said, I'm running it on my home lab as well as a non-critical production system at work, and it's
  behaving as expected for my use cases, so far. 
@@ -27,16 +27,8 @@
   - SnapsInAZfs.Settings: Contains formal definitions of settings in code. The .net configuration binder is used to
   populate an instance of this class, in SnapsInAZfs, and command line arguments are used to override individual
   values, as appropriate.
-  - Test projects: Each class library project will have a test project defined, for unit tests. I didn't initially
-  write this using TDD, so these are not yet well-defined. I am working on adding tests right now. I won't tag a
-  non-beta release until I've gotten significant coverage from the unit tests and fixed anything they reveal.
-
- My intention is to keep the project/solution easily useable from both Visual Studio 2022+ on Windows as well as
- vscode on Linux (I will be using both environments to develop it). As I use ReSharper on Visual Studio in
- Windows, there may end up being some ReSharper-related files and directives in code. However, since ZFS and,
- therefore, SnapsInAZfs currenly are a Linux-targeted toolset, release tags of the project will always be guaranteed
- to compile and run under Linux (at minimum, Ubuntu 22.04 and later and RHEL/CentOS 8.6 and later, as that's what
- I have) with the project's required version of the dotnet runtime installed.
+  - SnapsInAZfs.Interop.Tests: Tests for the SnapsInAZfs.Interop library.
+  - SnapsInAZfs.Settings.Tests: Tests for the SnapsInAZfs.Settings library.
 
  ## Dependencies
 
@@ -65,9 +57,7 @@
 
  This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a
  combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to
- `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`,
- and install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json`, making backups of any
- replaced configuration files along the way.
+ `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json` (only if one does not already exist), and install documentation to the appropriate man directories.
 
  To clean build artifacts, run `make clean`, which removes the release build files and intermediates,
  or `make extraclean`, which removes build artifacts and intermediates for all defined project
@@ -144,14 +134,15 @@
 
  ## Getting Help
 
- SIAZ comes with man pages that are installed when you run `make install`. Just type `man SnapsInAZfs` at the
- command line for general program help or `man SnapsInAZfs.5` for configuration help. The source documents for
- the man pages are markdown files which can also be viewed in any markdown-compatible viewer, such as github.com
- itself. The files are located in the `/Documentation` folder, in the repository. `.md` files are the markdown
- source files, and `.#` files are files formatted for man, translated from markdown by `pandoc`.
-
+ SIAZ comes with man pages that are installed when you run `make install`.\
+ These man pages are:
+ - snapsinazfs(8)
+ - snapsinazfs(5)
+ - snapsinazfs-zfsprops(5)
+ - snapsinazfs-config-console(8)
+ 
  The code itself is also heavily documented and quite verbose, so you may be able to find what you're looking for
- in the code. I have intentionally left some constructs which could be simplified in code as separate or more
+ in the code, if it is not covered in the manual. I have intentionally left some constructs which could be simplified in code as separate or more
  verbose operations, specifically to make it easier to read and understand. The compiler can easily optimize those
  situations away, so there is no performance concern. Even debug builds of SIAZ run quite fast with thousands of
  ZFS objects on modest hardware.
@@ -175,8 +166,7 @@
 
  If you intend to contribute, please adhere to the code style of the project, which generally follows standard
  recommendations for C#, with small deviations if and when I think they improve the readability of the code. Most jarringly, that means native types and native function calls will generally use the names of their native counterparts.
- I will publish ReSharper settings files that reflect the general formatting rules used, once there is a
- significant amount of code in the project and the style has therefore become more stable.
+ I have included ReSharper settings files that reflect the general formatting rules used.
  
  If you happen to _really_ want to contribute to this project in a major way, I'm happy to collaborate. For now,
  though, I would prefer for such collaboration to occur via pull requests from a fork of this repository, branched
@@ -184,15 +174,21 @@
 
  ## License
 
- This project is licensed under the GNU General Public License, version 3.0
+ This project is licensed under the MIT License
+
+ Copyright 2023 Brandon Thetford
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
  ## Acknowledgements
 
- While this project is a "clean room"/from-scratch implementation, it was inspired by and follows many of the core
- principles of "Sanoid," created by Jim Salter. Sanoid is also licensed under the GPL version 3.0, though the name
- belongs to Jim. He graciously offered to allow this project to use a name that had "sanoid" in it, so long as
- it was unique enough not to be easily confused with sanoid (very understandable!), but I decided to just go
- ahead and pick a new name.
+ While this project is a "clean room"/from-scratch implementation, it was inspired by and follows some of the core
+ principles of "Sanoid," created by Jim Salter, for ease of migration for existing Sanoid users. Sanoid is licensed under the GPL version 3.0, though the name
+ belongs to Jim.
 
  My personal thanks go to Jim Salter and anyone who contributed to Sanoid, over the years, as it has been an
  indespensible tool in my professional life and my nerdy home tech life.
