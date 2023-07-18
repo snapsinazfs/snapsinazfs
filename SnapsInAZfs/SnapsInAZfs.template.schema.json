@@ -18,11 +18,6 @@
                     "default": 15,
                     "enum": [5, 10, 15, 20, 30]
                 },
-                "UseLocalTime": {
-                    "type": "boolean",
-                    "description": "Whether snapshot timing uses local time (true - default) or UTC (false).",
-                    "default": true
-                },
                 "HourlyMinute": {
                     "type": "integer",
                     "description": "The minute of the hour to take hourly snapshots. 0 means top of the hour.",
@@ -92,7 +87,6 @@
             },
             "additionalProperties": false,
             "required": [
-                "UseLocalTime",
                 "HourlyMinute",
                 "DailyTime",
                 "WeeklyDay",

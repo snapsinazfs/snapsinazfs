@@ -15,7 +15,7 @@ public record SnapshotTimingSettings
     /// <summary>
     ///     Gets or sets the time of day that daily snapshots are taken
     /// </summary>
-    [JsonPropertyOrder( 4 )]
+    [JsonPropertyOrder( 3 )]
     public required TimeOnly DailyTime { get; init; }
 
     /// <summary>
@@ -24,14 +24,14 @@ public record SnapshotTimingSettings
     /// <remarks>
     ///     Should be a whole number factor of 60, such as 5, 10, 15, 20, or 30
     /// </remarks>
-    [JsonPropertyOrder( 2 )]
+    [JsonPropertyOrder( 1 )]
     public required int FrequentPeriod { get; init; }
 
     /// <summary>
     ///     Gets or sets the minute of the hour that hourly snapshots are taken
     /// </summary>
     [ValueRange( 0, 59 )]
-    [JsonPropertyOrder( 3 )]
+    [JsonPropertyOrder( 2 )]
     public required int HourlyMinute { get; init; }
 
     /// <summary>
@@ -42,31 +42,25 @@ public record SnapshotTimingSettings
     ///     the month
     /// </remarks>
     [ValueRange( 1, 31 )]
-    [JsonPropertyOrder( 7 )]
+    [JsonPropertyOrder( 6 )]
     public required int MonthlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that monthly snapshots are taken
     /// </summary>
-    [JsonPropertyOrder( 8 )]
+    [JsonPropertyOrder( 7 )]
     public required TimeOnly MonthlyTime { get; init; }
-
-    /// <summary>
-    ///     Gets or sets whether local time is used for snapshot naming and processing.
-    /// </summary>
-    [JsonPropertyOrder( 1 )]
-    public required bool UseLocalTime { get; init; }
 
     /// <summary>
     ///     Gets or sets the day of the week on which weekly snapshots are taken
     /// </summary>
-    [JsonPropertyOrder( 5 )]
+    [JsonPropertyOrder( 4 )]
     public required DayOfWeek WeeklyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that weekly snapshots are taken
     /// </summary>
-    [JsonPropertyOrder( 6 )]
+    [JsonPropertyOrder( 5 )]
     public required TimeOnly WeeklyTime { get; init; }
 
     /// <summary>
@@ -77,20 +71,20 @@ public record SnapshotTimingSettings
     ///     <see cref="YearlyMonth" />
     /// </remarks>
     [ValueRange( 1, 31 )]
-    [JsonPropertyOrder( 10 )]
+    [JsonPropertyOrder( 9 )]
     public required int YearlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the month of the year in which yearly snapshots will be taken
     /// </summary>
     [ValueRange( 1, 12 )]
-    [JsonPropertyOrder( 9 )]
+    [JsonPropertyOrder( 8 )]
     public required int YearlyMonth { get; init; }
 
     /// <summary>
     ///     Gets or sets the time of day that yearly snapshots are taken
     /// </summary>
-    [JsonPropertyOrder( 11 )]
+    [JsonPropertyOrder( 10 )]
     public required TimeOnly YearlyTime { get; init; }
 
     /// <summary>
@@ -101,7 +95,6 @@ public record SnapshotTimingSettings
     {
         return new( )
         {
-            UseLocalTime = true,
             FrequentPeriod = 15,
             HourlyMinute = 0,
             DailyTime = TimeOnly.MinValue,

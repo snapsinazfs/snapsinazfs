@@ -31,7 +31,6 @@
         "YearlySuffix": "yearly"
       },
       "SnapshotTiming": {
-        "UseLocalTime": true,
         "FrequentPeriod": 15,
         "HourlyMinute": 0,
         "DailyTime": "00:00:00",
