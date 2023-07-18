@@ -35,6 +35,7 @@ internal class Program
         Settings.TakeSnapshots = ( Settings.TakeSnapshots || args.TakeSnapshots ) && !args.NoTakeSnapshots;
         Settings.PruneSnapshots = ( Settings.PruneSnapshots || args.PruneSnapshots ) && !args.NoPruneSnapshots;
         Settings.Daemonize = ( Settings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
+        Settings.DaemonTimerIntervalSeconds = args.DaemonTimerInterval is > 0 and <= 60 ? (uint)args.DaemonTimerInterval : Settings.DaemonTimerIntervalSeconds;
     }
 
     public static async Task<int> Main( string[] argv )

@@ -38,8 +38,8 @@ public class CommandLineArguments
 
     [ArgDescription( "Override the configured daemon event processing timer. Specified as a whole number of seconds. Default: 10" )]
     [ArgShortcut( "--daemon-timer-interval" )]
-    [ArgDefaultValue( 10 )]
-    public int DaemonTimerInterval { get; set; } = 10;
+    [ArgDefaultValue( 0 )]
+    public int DaemonTimerInterval { get; set; } = 0;
 
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]
