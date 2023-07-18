@@ -110,6 +110,12 @@ install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/$(SIAZ).8
 	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/$(SIAZLC).8
 	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/siaz.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-config-console.8 $(MANDIR)/man8/$(SIAZ)-config-console.8
+	cp -fl  $(MANDIR)/man8/$(SIAZ)-config-console.8 $(MANDIR)/man8/$(SIAZLC)-config-console.8
+	cp -fl  $(MANDIR)/man8/$(SIAZ)-config-console.8 $(MANDIR)/man8/siaz-config-console.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-zfsprops.5 $(MANDIR)/man5/$(SIAZ)-zfsprops.5
+	cp -fl  $(MANDIR)/man5/$(SIAZ)-zfsprops.5 $(MANDIR)/man5/$(SIAZLC)-zfsprops.5
+	cp -fl  $(MANDIR)/man5/$(SIAZ)-zfsprops.5 $(MANDIR)/man5/siaz-zfsprops.5
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MANDIR)/man5/$(SIAZ).5
 	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZLC).5
 	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/siaz.5
@@ -143,6 +149,12 @@ uninstall-doc:
 	rm -fv $(MANDIR)/man8/$(SIAZ).8 2>/dev/null
 	rm -fv $(MANDIR)/man8/$(SIAZLC).8 2>/dev/null
 	rm -fv $(MANDIR)/man8/siaz.8 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZ)-config-console.8 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZLC)-config-console.8 2>/dev/null
+	rm -fv $(MANDIR)/man8/siaz-config-console.8 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZ)-zfsprops.5 2>/dev/null
+	rm -fv $(MANDIR)/man8/$(SIAZLC)-zfsprops.5 2>/dev/null
+	rm -fv $(MANDIR)/man8/siaz-zfsprops.5 2>/dev/null
 	rm -fv $(MANDIR)/man5/$(SIAZ).5 2>/dev/null
 	rm -fv $(MANDIR)/man5/$(SIAZLC).5 2>/dev/null
 	rm -fv $(MANDIR)/man5/siaz.5 2>/dev/null
