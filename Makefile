@@ -110,8 +110,11 @@ install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/$(SIAZ).8
 	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/$(SIAZLC).8
 	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/siaz.8
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.5
-	cp -fl $(MANDIR)/man5/SnapsInAZfs.5 $(MANDIR)/man5/SnapsInAZfs.json.5
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MANDIR)/man5/$(SIAZ).5
+	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZLC).5
+	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/siaz.5
+	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZ).json.5
+	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZLC).json.5
 	mandb -q
 
 install-release:	publish-release
@@ -140,7 +143,11 @@ uninstall-doc:
 	rm -fv $(MANDIR)/man8/$(SIAZ).8 2>/dev/null
 	rm -fv $(MANDIR)/man8/$(SIAZLC).8 2>/dev/null
 	rm -fv $(MANDIR)/man8/siaz.8 2>/dev/null
-	rm -fv $(MANDIR)/man5/SnapsInAZfs.5 2>/dev/null
+	rm -fv $(MANDIR)/man5/$(SIAZ).5 2>/dev/null
+	rm -fv $(MANDIR)/man5/$(SIAZLC).5 2>/dev/null
+	rm -fv $(MANDIR)/man5/siaz.5 2>/dev/null
+	rm -fv $(MANDIR)/man5/$(SIAZ).json.5 2>/dev/null
+	rm -fv $(MANDIR)/man5/$(SIAZLC).json.5 2>/dev/null
 	mandb -q
 
 uninstall-everything:	uninstall-service	uninstall	uninstall-config-local
