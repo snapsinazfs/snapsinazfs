@@ -26,12 +26,12 @@
     "targets": {
       "all-file": {
         "type": "File",
-        "fileName": "${var_logdir}/nlog-all-${shortdate}.log",
+        "fileName": "${var_logdir}/all/snapsinazfs-${shortdate}.log",
         "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=tostring}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
       },
       "error-file": {
         "type": "File",
-        "fileName": "${var_logdir}/nlog-error-${shortdate}.log",
+        "fileName": "${var_logdir}/error/snapsinazfs-error-${shortdate}.log",
         "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=@}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
       },
       "own-console": {
