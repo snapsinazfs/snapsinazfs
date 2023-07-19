@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // Copyright 2023 Brandon Thetford
 // 
@@ -210,27 +210,27 @@ internal static class ZfsTasks
 
             foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
-                bool destroySuccessful = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( false );
-                if ( destroySuccessful || settings.DryRun )
+                ZfsCommandRunnerOperationStatus destroyStatus = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( false );
+                switch ( destroyStatus )
                 {
-                    if ( settings.DryRun )
-                    {
+                    case ZfsCommandRunnerOperationStatus.DryRun:
                         Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
-                    }
-                    else
-                    {
+                        goto Remove;
+                    case ZfsCommandRunnerOperationStatus.Success:
                         Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
-                    }
-
-                    if ( !ds.RemoveSnapshot( snapshot ) )
-                    {
-                        Logger.Debug( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
-                    }
-
-                    continue;
+                    Remove:
+                        if ( !ds.RemoveSnapshot( snapshot ) )
+                        {
+                            Logger.Debug( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
+                        }
+                        continue;
+                    case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
+                    case ZfsCommandRunnerOperationStatus.Failure:
+                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+                    default:
+                        Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
+                        continue;
                 }
-
-                Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
             }
         }
     }
@@ -321,13 +321,13 @@ internal static class ZfsTasks
 
         Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, period, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
-        TakeSnapshotOperationStatus takeSnapshotStatus = commandRunner.TakeSnapshot( ds, period, timestamp, settings, template, out snapshot );
-        switch ( takeSnapshotStatus )
+        ZfsCommandRunnerOperationStatus zfsCommandRunnerStatus = commandRunner.TakeSnapshot( ds, period, timestamp, settings, template, out snapshot );
+        switch ( zfsCommandRunnerStatus )
         {
-            case TakeSnapshotOperationStatus.DryRun:
+            case ZfsCommandRunnerOperationStatus.DryRun:
                 Logger.Info( "DRY RUN: Snapshot for dataset {0} not taken", ds.Name );
                 return false;
-            case TakeSnapshotOperationStatus.Success:
+            case ZfsCommandRunnerOperationStatus.Success:
                 ds.AddSnapshot( snapshot! );
                 Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
                 return true;

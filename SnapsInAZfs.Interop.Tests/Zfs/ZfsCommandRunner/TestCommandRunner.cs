@@ -17,9 +17,9 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     private new static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync(Snapshot snapshot, SnapsInAZfsSettings settings)
+    public override async Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
-        throw new NotImplementedException();
+        throw new NotImplementedException( );
     }
 
     public override async Task GetDatasetsAndSnapshotsFromZfsAsync(SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots)
@@ -64,7 +64,7 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override TakeSnapshotOperationStatus TakeSnapshot(ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot)
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot(ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot)
     {
         throw new NotImplementedException();
     }

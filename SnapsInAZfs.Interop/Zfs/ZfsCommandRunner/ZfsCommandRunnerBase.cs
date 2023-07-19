@@ -22,10 +22,10 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract TakeSnapshotOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
+    public abstract ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
 
     /// <inheritdoc />
-    public abstract Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
+    public abstract Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <inheritdoc />
     public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );

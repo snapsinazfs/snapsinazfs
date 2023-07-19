@@ -11,7 +11,7 @@
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 [Flags]
-public enum TakeSnapshotOperationStatus
+public enum ZfsCommandRunnerOperationStatus
 {
     Success = 0,
     Failure = 1,

@@ -24,9 +24,13 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     // ReSharper disable RedundantAwait
     // ReSharper disable AsyncConverter.AsyncAwaitMayBeElidedHighlighting
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
+    /// <remarks>
+    /// This method always either succeeds or reports DryRun.
+    /// </remarks>
+    public override async Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
-        return await Task.FromResult( true ).ConfigureAwait( true );
+        await Task.Delay( 100 ).ConfigureAwait( true );
+        return await Task.FromResult( settings.DryRun ? ZfsCommandRunnerOperationStatus.DryRun : ZfsCommandRunnerOperationStatus.Success ).ConfigureAwait( true );
     }
     // ReSharper restore AsyncConverter.AsyncAwaitMayBeElidedHighlighting
     // ReSharper restore RedundantAwait
@@ -82,13 +86,19 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
         snapshot = new( snapName, period.Kind, timestamp, ds );
-        return true;
+        if ( Program.Settings.DryRun )
+        {
+            string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", Program.Settings.ZfsPath, $"snapshot {arguments}" );
+            return ZfsCommandRunnerOperationStatus.DryRun;
+        }
+        return ZfsCommandRunnerOperationStatus.Success;
     }
 
     /// <inheritdoc />

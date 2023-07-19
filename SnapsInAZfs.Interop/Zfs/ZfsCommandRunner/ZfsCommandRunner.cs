@@ -71,7 +71,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
-    public override TakeSnapshotOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
@@ -84,13 +84,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !snapshot.ValidateName( ) )
             {
                 Logger.Error( "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
-                return TakeSnapshotOperationStatus.NameValidationFailed;
+                return ZfsCommandRunnerOperationStatus.NameValidationFailed;
             }
         }
         catch ( ArgumentNullException ex )
         {
             Logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not taken", snapshot.Name );
-            return TakeSnapshotOperationStatus.NameValidationFailed;
+            return ZfsCommandRunnerOperationStatus.NameValidationFailed;
         }
 
         string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
@@ -102,7 +102,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( snapsInAZfsSettings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
-            return TakeSnapshotOperationStatus.DryRun;
+            return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
         Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
@@ -114,23 +114,23 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 snapshotProcess?.WaitForExit( );
                 if ( snapshotProcess?.ExitCode == 0 )
                 {
-                    return TakeSnapshotOperationStatus.Success;
+                    return ZfsCommandRunnerOperationStatus.Success;
                 }
 
                 Logger.Error( "Snapshot creation failed for {0}", snapshot.Name );
             }
 
-            return TakeSnapshotOperationStatus.ZfsProcessFailure;
+            return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
         }
         catch ( Exception e )
         {
             Logger.Error( e, "Error running {0} {1}. Snapshot may not exist", zfsSnapshotStartInfo.FileName, zfsSnapshotStartInfo.Arguments );
-            return TakeSnapshotOperationStatus.ZfsProcessFailure;
+            return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
         }
     }
 
     /// <inheritdoc />
-    public override async Task<bool> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
+    public override async Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
         Logger.Debug( "Requested to destroy snapshot {0}", snapshot.Name );
         try
@@ -140,13 +140,13 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( !snapshot.ValidateName( ) )
             {
                 Logger.Error( "Snapshot name {0} is invalid. Snapshot not destroyed", snapshot.Name );
-                return false;
+                return ZfsCommandRunnerOperationStatus.NameValidationFailed;
             }
         }
         catch ( ArgumentNullException ex )
         {
             Logger.Error( ex, "Snapshot name {0} is invalid. Snapshot not destroyed", snapshot.Name );
-            return false;
+            return ZfsCommandRunnerOperationStatus.NameValidationFailed;
         }
 
         string arguments = $"destroy -d {snapshot.Name}";
@@ -158,7 +158,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( settings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsDestroyStartInfo.Arguments );
-            return false;
+            return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
         Logger.Debug( "Calling `{0} {1}`", PathToZfsUtility, arguments );
@@ -172,19 +172,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                     await zfsDestroyProcess.WaitForExitAsync( ).ConfigureAwait( true );
                     if ( zfsDestroyProcess.ExitCode == 0 )
                     {
-                        return true;
+                        return ZfsCommandRunnerOperationStatus.Success;
                     }
                 }
 
                 Logger.Error( "Destroy snapshot failed for {0}", snapshot.Name );
             }
 
-            return false;
+            return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
         }
         catch ( Exception e )
         {
             Logger.Error( e, "Error running {0} {1}. Snapshot may still exist", zfsDestroyStartInfo.FileName, zfsDestroyStartInfo.Arguments );
-            return false;
+            return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
         }
     }
 
