@@ -40,7 +40,7 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    public override Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
     {
         throw new NotImplementedException( );
     }
@@ -52,13 +52,13 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties(bool dryRun, string zfsPath, params IZfsProperty[] properties)
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
         throw new NotImplementedException();
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties(bool dryRun, string zfsPath, List<IZfsProperty> properties)
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, List<IZfsProperty> properties )
     {
         throw new NotImplementedException();
     }

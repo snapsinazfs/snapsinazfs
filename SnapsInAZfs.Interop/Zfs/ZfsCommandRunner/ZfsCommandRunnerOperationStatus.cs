@@ -17,5 +17,7 @@ public enum ZfsCommandRunnerOperationStatus
     Failure = 1,
     DryRun = 2,
     NameValidationFailed = 4 | Failure,
-    ZfsProcessFailure = 8 | Failure
+    ZfsProcessFailure = 8 | Failure,
+    ZeroLengthRequest = 16,
+    OneOrMoreOperationsFailed = 32 | Failure
 }

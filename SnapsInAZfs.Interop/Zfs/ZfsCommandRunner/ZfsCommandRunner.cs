@@ -11,6 +11,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -189,26 +190,25 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    /// <exception cref="ArgumentException">If name validation fails for <paramref name="zfsPath" /></exception>
-    public override bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    public override async Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
         // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
         // ReSharper disable once ExceptionNotDocumentedOptional
         if ( !ZfsRecord.ValidateName( ZfsPropertyValueConstants.FileSystem, zfsPath ) )
         {
-            throw new ArgumentException( $"Unable to update schema for {zfsPath}. PropertyName is invalid.", nameof( zfsPath ) );
+            return ZfsCommandRunnerOperationStatus.NameValidationFailed;
         }
 
-        return PrivateSetZfsProperty( dryRun, zfsPath, properties );
+        return await PrivateSetZfsPropertyAsync( dryRun, zfsPath, properties ).ConfigureAwait( true );
     }
 
     /// <inheritdoc />
-    public override bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    public override async Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, List<IZfsProperty> properties )
     {
         if ( properties.Count == 0 )
         {
             Logger.Debug( "Asked to set properties for {0} but no properties provided", zfsPath );
-            return false;
+            return ZfsCommandRunnerOperationStatus.ZeroLengthRequest;
         }
 
         string propertiesSetString = properties.ToStringForZfsSet( );
@@ -223,7 +223,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             if ( dryRun )
             {
                 Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-                return false;
+                return ZfsCommandRunnerOperationStatus.DryRun;
             }
 
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
@@ -233,18 +233,18 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
-                return false;
+                Logger.Error( ioex, "Error running zfs set operation. Exit status: {0}", Marshal.GetLastSystemError( ) );
+                return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
             if ( !zfsSetProcess.HasExited )
             {
                 Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 5000 );
+                await zfsSetProcess.WaitForExitAsync( ).ConfigureAwait( true );
             }
 
             Logger.Trace( "zfs set process finished" );
-            return true;
+            return ZfsCommandRunnerOperationStatus.Success;
         }
     }
 
@@ -368,12 +368,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    public override async Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
     {
         if ( propertyToInherit.Owner is null )
         {
             Logger.Error( "Property has no reference to the dataset it belongs to. Cannot inherit." );
-            return false;
+            return ZfsCommandRunnerOperationStatus.Failure;
         }
         Logger.Trace( "Attempting to inherit property {0} on {1} from {2}", propertyToInherit.Name, zfsPath, propertyToInherit.Owner.ParentDataset.Name );
         ProcessStartInfo zfsInheritStartInfo = new( PathToZfsUtility, $"inherit {propertyToInherit.Name} {zfsPath}" )
@@ -384,7 +384,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( dryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsInheritStartInfo.FileName, zfsInheritStartInfo.Arguments );
-            return false;
+            return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
         using ( Process zfsInheritProcess = new( ) { StartInfo = zfsInheritStartInfo } )
@@ -397,19 +397,19 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             catch ( InvalidOperationException ioex )
             {
                 Logger.Error( ioex, "Error running zfs inherit operation for {0} on {1}", propertyToInherit.Name, propertyToInherit.Owner.Name );
-                return false;
+                return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
             if ( !zfsInheritProcess.HasExited )
             {
+                Logger.Trace( "Waiting for zfs inherit process to exit" );
                 using CancellationTokenSource tokenSource = new( 5000 );
                 ConfiguredTaskAwaitable waitForExitAsync = zfsInheritProcess.WaitForExitAsync( tokenSource.Token ).ConfigureAwait( false );
-                Logger.Trace( "Waiting for zfs inherit process to exit" );
                 await waitForExitAsync;
             }
 
             Logger.Trace( "zfs inherit process finished" );
-            return true;
+            return ZfsCommandRunnerOperationStatus.Success;
         }
     }
 
@@ -459,16 +459,16 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         }
     }
 
-    /// <inheritdoc cref="SetZfsProperties(bool,string,SnapsInAZfs.Interop.Zfs.ZfsTypes.IZfsProperty[])" />
+    /// <inheritdoc cref="SetZfsPropertiesAsync" />
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
-    private static bool PrivateSetZfsProperty( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    private static async Task<ZfsCommandRunnerOperationStatus> PrivateSetZfsPropertyAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
         if ( properties.Length == 0 )
         {
             Logger.Trace( "No properties to set" );
-            return false;
+            return ZfsCommandRunnerOperationStatus.ZeroLengthRequest;
         }
 
         string propertiesToSet = properties.ToStringForZfsSet( );
@@ -481,7 +481,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         if ( dryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-            return false;
+            return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
         using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
@@ -493,18 +493,26 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
-                return false;
+                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError() );
+                return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
             if ( !zfsSetProcess.HasExited )
             {
                 Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 3000 );
+                try
+                {
+                    await zfsSetProcess.WaitForExitAsync( ).ConfigureAwait( false );
+                }
+                catch ( Exception ex )
+                {
+                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError() );
+                    return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
+                }
             }
 
             Logger.Trace( "zfs set process finished" );
-            return true;
+            return ZfsCommandRunnerOperationStatus.Success;
         }
     }
 
