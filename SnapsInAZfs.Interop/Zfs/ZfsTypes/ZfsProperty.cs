@@ -120,6 +120,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     public string Name { get; init; }
     public bool IsLocal { get; init; }
 
+    public static ZfsProperty<T> DefaultProperty( ) => new( );
     public static ZfsProperty<bool> CreateWithoutParent( string name, in bool value, bool isLocal = true )
     {
         Logger.Trace( "Creating ZfsProperty<bool> {0} without parent dataset", name );
