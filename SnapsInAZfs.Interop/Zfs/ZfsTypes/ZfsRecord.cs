@@ -536,6 +536,12 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             return new( );
         }
 
+        if ( !_pruneSnapshotsField.Value )
+        {
+            Logger.Debug( "Dataset {0} is not enabled for pruning", Name );
+            return new( );
+        }
+
         Logger.Debug( "Checking prune deferral setting for dataset {0}", Name );
         if ( SnapshotRetentionPruneDeferral.Value != 0 && PercentBytesUsed < SnapshotRetentionPruneDeferral.Value )
         {
@@ -899,6 +905,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             Logger.Trace( "Inspecting match {0}", match.Value );
             if ( match.Success )
             {
+                Logger.Trace( "Match successful" );
                 continue;
             }
 
@@ -924,9 +931,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
         List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
-        Logger.Debug( "{0} snapshots of {1} available for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
+        Logger.Trace( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString( true ) );
         if ( snapshotsSetForPruning.Count <= retentionValue )
         {
+            Logger.Trace( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod, Name, snapshotsSetForPruning.Count, retentionValue );
             return;
         }
 
@@ -936,7 +944,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         for ( int i = 0; i < numberToPrune; i++ )
         {
             Snapshot snap = snapshotsSetForPruning[ i ];
-            Logger.Debug( "Adding snapshot {0} to prune list", snap.Name );
+            Logger.Trace( "Adding snapshot {0} to prune list", snap.Name );
             snapshotsToPrune.Add( snap );
         }
     }

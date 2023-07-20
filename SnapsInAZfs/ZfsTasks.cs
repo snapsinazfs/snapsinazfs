@@ -209,7 +209,7 @@ internal static class ZfsTasks
 
             List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
 
-            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, snapshotsToPruneForDataset.Select( s => s.Name ).ToCommaSeparatedSingleLineString( ) );
+            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, snapshotsToPruneForDataset.ToCommaSeparatedSingleLineString( true ) );
 
             foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
             {
