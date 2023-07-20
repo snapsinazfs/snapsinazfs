@@ -66,7 +66,7 @@ public interface IZfsCommandRunner
     ///     If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
     ///     Otherwise, a <see langword="bool" /> indicating success or failure of the operation
     /// </returns>
-    public Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
+    public Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
     bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
 
@@ -82,7 +82,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A <see langword="bool" /> indicating success or failure of the operation.
     /// </returns>
-    public bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );
+    public Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties );
 
     /// <summary>
     ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
@@ -100,7 +100,7 @@ public interface IZfsCommandRunner
     ///     If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
     ///     Otherwise, a <see langword="bool" /> indicating success or failure of the operation
     /// </returns>
-    public bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
+    public Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
     /// <summary>
     ///     Creates a zfs snapshot

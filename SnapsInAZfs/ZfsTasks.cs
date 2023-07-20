@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // Copyright 2023 Brandon Thetford
 // 
@@ -24,7 +24,7 @@ internal static class ZfsTasks
     private static readonly AutoResetEvent SnapshotAutoResetEvent = new( true );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static void TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    internal static async Task TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
         {
@@ -127,21 +127,24 @@ internal static class ZfsTasks
 
             if ( propsToSet.Any( ) )
             {
-                Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, string.Join( ',', propsToSet.Select( p => $"{p.Name}: {p.ValueString}" ) ) );
-                if ( commandRunner.SetZfsProperties( settings.DryRun, ds.Name, propsToSet.ToArray( ) ) && !settings.DryRun )
+                Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, propsToSet.Select( p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString( ) );
+                ZfsCommandRunnerOperationStatus setPropertiesResult = await  commandRunner.SetZfsPropertiesAsync( settings.DryRun, ds.Name, propsToSet.ToArray( ) );
+                switch ( setPropertiesResult )
                 {
-                    Logger.Debug( "Property set successful" );
+                    case ZfsCommandRunnerOperationStatus.Success:
+                        Logger.Debug( "Property set successful" );
+                    continue;
+                    case ZfsCommandRunnerOperationStatus.DryRun:
+                        Logger.Info( "DRY RUN: No properties were set on actual datasets" );
+                    continue;
+                    case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
+                        Logger.Warn( "Set property request contained 0 elements for {0}", ds.Name );
+                        continue;
+                    default:
+                        Logger.Error( "Error setting properties for dataset {0}", ds.Name );
                     continue;
                 }
 
-                if ( settings.DryRun )
-                {
-                    Logger.Info( "DRY RUN: No properties were set on actual datasets" );
-                    continue;
-                }
-
-                Logger.Error( "Error setting properties for dataset {0}", ds.Name );
-                continue;
             }
 
             Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );

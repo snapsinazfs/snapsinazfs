@@ -20,6 +20,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using SnapsInAZfs.ConfigConsole.TreeNodes;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
 
@@ -491,11 +492,12 @@ public partial class ZfsConfigurationWindow
             }
 
             string zfsObjectPath = SelectedTreeNode.TreeDataset.Name;
-            bool areAnyPropertiesModified = SelectedTreeNode.GetModifiedZfsProperties( out List<IZfsProperty>? modifiedZfsProperties );
+            bool areAnyPropertiesModified = SelectedTreeNode.IsLocallyModified;
             bool areAnyPropertiesInherited = SelectedTreeNode.GetInheritedZfsProperties( out List<IZfsProperty>? inheritedZfsProperties );
             List<string> pendingCommands = new( );
             if ( areAnyPropertiesModified )
             {
+                SelectedTreeNode.GetModifiedZfsProperties( out List<IZfsProperty>? modifiedZfsProperties );
                 pendingCommands.Add( $"zfs set {modifiedZfsProperties!.ToStringForZfsSet( )} {zfsObjectPath}" );
             }
 
@@ -519,25 +521,39 @@ public partial class ZfsConfigurationWindow
             Logger.Info( "Saving changes to {0}", zfsObjectPath );
             if ( areAnyPropertiesModified )
             {
-                if ( !ZfsTasks.SetPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, modifiedZfsProperties!, ConfigConsole.CommandRunner! ) && !Program.Settings.DryRun )
+                SelectedTreeNode.GetModifiedZfsProperties( out List<IZfsProperty>? modifiedZfsProperties );
+                ZfsCommandRunnerOperationStatus setPropertiesResult = await ZfsTasks.SetPropertiesForDatasetAsync( Program.Settings!.DryRun, zfsObjectPath, modifiedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
+                Logger.Trace( "Set properties result was {0}", setPropertiesResult );
+                switch ( setPropertiesResult )
                 {
-                    Logger.Trace( "Result from SetPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.SetPropertiesForDataset" );
-                    if ( !Program.Settings.DryRun )
-                    {
+                    case ZfsCommandRunnerOperationStatus.Success:
+                        Logger.Debug( "Set properties operation successful for {0}", zfsObjectPath );
+                        break;
+                    case ZfsCommandRunnerOperationStatus.DryRun:
+                        Logger.Info( "DRY RUN: Pretending set properties operation was successful for {0}", zfsObjectPath );
+                        break;
+                    case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
+                    default:
                         Logger.Error( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
-                    }
+                        break;
                 }
             }
 
             if ( areAnyPropertiesInherited )
             {
-                if ( !await ZfsTasks.InheritPropertiesForDataset( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait( true ) && !Program.Settings.DryRun )
+                ZfsCommandRunnerOperationStatus inheritPropertiesResult = await ZfsTasks.InheritPropertiesForDatasetAsync( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait( true );
+                switch ( inheritPropertiesResult )
                 {
-                    Logger.Trace( "Result from InheritPropertiesForDataset was false, either because DryRun==true or an error occurred in ZfsTasks.InheritPropertiesForDataset" );
-                    if ( !Program.Settings.DryRun )
-                    {
+                    case ZfsCommandRunnerOperationStatus.Success:
+                        Logger.Info( "DRY RUN: Pretending all requested properties were inherited successfully for {0}", zfsObjectPath );
+                        break;
+                    case ZfsCommandRunnerOperationStatus.DryRun:
+                        Logger.Info( "DRY RUN: Pretending all requested properties were inherited successfully for {0}", zfsObjectPath );
+                        break;
+                    case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
+                    default:
                         Logger.Error( "Inheriting ZFS properties for ZFS object {0} failed", zfsObjectPath );
-                    }
+                        break;
                 }
             }
 

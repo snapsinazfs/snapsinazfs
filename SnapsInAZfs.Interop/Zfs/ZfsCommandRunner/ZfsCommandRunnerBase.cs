@@ -28,10 +28,10 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <inheritdoc />
-    public abstract bool SetZfsProperties( bool dryRun, string zfsPath, params IZfsProperty[] properties );
+    public abstract Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties );
 
     /// <inheritdoc />
-    public abstract bool SetZfsProperties( bool dryRun, string zfsPath, List<IZfsProperty> properties );
+    public abstract Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
     /// <inheritdoc />
     public abstract Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
@@ -45,7 +45,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
 
     /// <inheritdoc />
-    public abstract Task<bool> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
+    public abstract Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
     /// <inheritdoc />
     public abstract bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
@@ -90,7 +90,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             if ( propertiesToSet.Count > 0 )
             {
                 Logger.Debug( "Timestamps are out of sync for {0} - updating properties", ds.Name );
-                SetZfsProperties( settings.DryRun, ds.Name, propertiesToSet );
+                SetZfsPropertiesAsync( settings.DryRun, ds.Name, propertiesToSet );
             }
         } );
     }
