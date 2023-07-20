@@ -1,0 +1,664 @@
+.ds SIAZB \fBSnapsInAZfs\fP
+.ds SIAZ SnapsInAZfs
+.ds SIAZZP \*[SIAZ]\-zfsprops
+.ds SIAZLC snapsinazfs
+.ds SIAZZPLC \*[SIAZLC]\-zfsprops
+.ds SIAZNS snapsinazfs\.com
+.TH \*[SIAZZP] 7 "July 20, 2023" "\*[SIAZZP] Manual"
+.SH NAME
+.PP
+\fB\*[SIAZZP](7)\fP, \fB\*[SIAZZPLC](7)\fP, \fBsiaz-zfsprops(7)\fP - ZFS Properties for \*[SIAZ]
+.SH SYNOPSIS
+.PP
+Explanation of ZFS user properties that \*[SIAZ] creates and uses
+.SH DESCRIPTION
+.PP
+\*[SIAZ] stores most of its configuration as metadata within ZFS itself, using ZFS user properties (\fBzfsprops(7)\fP - User Properties).\&
+This allows a visible, auditable, and familiar way to examine and configure the behavior of \*[SIAZ] on a per-dataset basis,
+which is especially helpful for inheritance of settings within the ZFS tree,
+and also ensures that configuration is durable across zfs send/receive operations,
+especially for replication scenarios.\&
+.PP
+All ZFS user properties that \*[SIAZ] creates and uses are defined in the \*[SIAZNS] namespace.
+For example: \fI\*[SIAZNS]:takesnapshots\fP.
+.PP
+In general, all properties in the \*[SIAZNS] namespace are intended to be set and modified only by \*[SIAZ] and,
+as such, SHOULD NOT be modified manually by the user using `zfs set`,
+or through any means other than via the
+configuration console (\fB\*[SIAZLC]\-config\-console(8)\fP)
+or via the \*[SIAZ] API (\fB\*[SIAZLC]-api(3)\fP).\&
+.PP
+However, these values are also intended to be easy to understand,
+and are not only possible, but \fIencouraged\fP, where relevant,
+to be used for monitoring and reporting purposes,
+by the user or by applications capable of reading ZFS user properties.\&
+.PP
+\*[SIAZ],
+by version 1.1,
+will expose an API that SHOULD be used by other utilities and scripts,
+to make changes to the \*[SIAZ] configuration,
+outside of the configuration console,
+in a simple and supported way.\&
+.PP
+Properties are described in this document as their namespace-qualified names,
+their expected type/format,
+allowed values, where applicable,
+what types of zfs objects they are relevant for,
+what they do,
+and any caveats, where applicable.\&
+.SS PROPERTY TYPES
+.PP
+There are 5 types of properties in use by \*[SIAZ].\&
+This section lists those types and their basic rules.\&
+Specific restrictions applicable to individual properties will be noted in their respective entries in the \fBPROPERTIES\fP section below.\&
+.PP
+All property values MUST be specified as un-quoted strings
+(any quoting or escaping necessary required by your shell,
+for example, to set values containing spaces,
+MUST still follow the rules for your shell),
+and all property values MUST adhere to ZFS limitations
+(at present, this means less than or equal to 8192 bytes).\&
+See \fBzfsprops(7)\fP.\&
+.TP
+.B boolean
+Boolean properties MUST have a value of \fBtrue\fP or \fBfalse\fP
+.TQ
+.B integer
+Integer properties MUST have whole-number numeric-only values within the range of a 32-bit signed two\(aqs complement integer.\&
+Where negative values are allowed, a single hyphen character preceding the integer, without whitespace, is used to denote a negative value.\&
+.IP
+Suffixes are not allowed.\&
+.TQ
+.B unsigned integer
+Unsigned integer properties MUST have whole-number, positive, numeric-only values within the range of a 32-bit unsigned integer.\&
+.IP
+Suffixes are not allowed.\&
+.TQ
+.B string
+String properties are arbitrary text data.\&
+.IP
+String properties will have their expected formats described in their respective entries.\&
+.IP
+String properties MAY be enumerations, in which case that will be specified and the legal values will be given.\&
+.TQ
+.B datetimeoffset
+DateTimeOffset properties describe an exact point in time, like a Unix timestamp, but in a human-readable format and with greater range and precision.\&
+.IP
+DateTimeOffset properties MUST have values that conform to the ISO8601 standard for date and time representation.\&
+.IP
+DateTimeOffset properties MAY have an offset component in any legal offset, including Z (for UTC) or any positive or negative offset.\&
+.IP
+DateTimeOffset properties MAY have fractional values for the seconds component of their times.\&
+If a DateTimeOffset property has a fractional seconds component, it MUST be no longer than 7 digits, following a decimal (.) character.\&
+.IP
+Example 1: \fB2023-01-01T00:00:00.0000000Z\fP is exactly midnight, UTC, on the first day of January, 2023, in the Gregorian calendar.\&
+.IP
+Example 2: \fB2023-01-01T00:00:00.0000000-05:00\fP is exactly midnight on the first day of January, 2023, with a negative 5 hour time zone offset, which could correspond to the America/NewYork time zone, during standard time.\&
+This value is equal to and describes the same point in time as \fB2023-01-01T05:00:00.0000000Z\fP.\&
+.SS PROPERTIES
+.PP
+This section describes each property \*[SIAZ] defines and uses.\&
+Properties are given by name, with their types, what kind of ZFS objects they are applicable to, descriptions of their functions, and any applicable restrictions.\&
+.TP
+.B snapsinazfs.com:enabled
+.RS
+.TP
+Type:
+boolean
+.TQ
+Applicable To:
+filesystems, volumes, snapshots
+.TQ
+Description:
+This property enables or disables all processing of an object by \*[SIAZ].\&
+.IP
+This is a single, atomic, value for an object in the ZFS tree,
+which allows or prevents any operations from being taken on that object,
+by \*[SIAZ],
+including taking new snapshots,
+pruning expired snapshots,
+or any other actions that are enabled or disabled by a boolean property on that object.\&
+If set to true, further processing of the current object will be allowed.\&
+.IP
+For each possible action to be taken on an object, the specific boolean property to enable or disable that functionality for that object must also be set to true.\&
+.IP
+If set to false, no actions will be performed on the current object by \*[SIAZ], regardless of the value configured for those operations on the current object.\&
+.IP
+Hence, this property is essentially a master kill-switch for \*[SIAZ], on a given object.\&
+.RE
+.TQ
+.B snapsinazfs.com:lastdailysnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+This property, if defined locally, is the timestamp of the last daily snapshot that \*[SIAZ] took of this object.\&
+.IP
+If this property is not set or is inherited by a filesystem or volume, its value is not valid and does not apply to the object inheriting the property.\&
+.IP
+\*[SIAZ] explicitly defines this property on all datasets, when run with \fB\-\-prepare\-zfs\-properties\fP, and sets its value to the Unix Epoch (\fB1970-01-01T00:00:00.0000000Z\fP), initially.\&
+Any time \*[SIAZ] takes a daily snapshot of the given dataset, it will issue a `zfs set` command to update this property for that dataset to the timestamp of the snapshot it just took.\&
+.TQ
+Caveats:
+In general, this property SHOULD NOT be set, modified, or removed by the user.\&
+Any snapshot created without using the \*[SIAZ] API (\fB\*[SIAZ]-api(3)\fP) will not and SHOULD NOT have this property set locally, and this property also SHOULD NOT be updated for that snapshot\(aqs parent dataset without using the \*[SIAZ] API.\&
+.RE
+.TQ
+.B snapsinazfs.com:lastfrequentsnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:lastdailysnapshottimestamp\fP, but for frequent snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:lasthourlysnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystem, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:lastdailysnapshottimestamp\fP, but for hourly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:lastmonthlysnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:lastdailysnapshottimestamp\fP, but for monthly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:lastweeklysnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:lastdailysnapshottimestamp\fP, but for weekly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:lastyearlysnapshottimestamp
+.RS
+.TP
+Type:
+DateTimeOffset
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:lastdailysnapshottimestamp\fP, but for yearly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:prunesnapshots
+.RS
+.TP
+Type:
+boolean
+.TQ
+Applicable To:
+filesystems, volumes, snapshots
+.TQ
+Description:
+This property enables or disables the pruning of expired snapshots for the current object.\&
+.IP
+A value of \fBtrue\fP enables pruning expired snapshots, if \fBsnapsinazfs.com:enabled\fP is also \fBtrue\fP.\&
+.IP
+A value of \fBfalse\fP disables pruning of expired snapshots for a dataset when applied to a dataset.\&
+.IP
+This property can also be explicitly set on a snapshot.\&
+If set to \fBtrue\fP on a snapshot (by default, it is inherited, so it will be true upon creation),
+this property has no effect and will be treated according to its parent dataset\(aqs value of this property.\&
+In other words, a value of \fBtrue\fP for this property, on a snapshot, DOES NOT override the setting of its parent dataset.\&
+.IP
+If set to \fBfalse\fP on a snapshot,
+that snapshot will be exempt from pruning and will also not count toward the retention limit for snapshots of the same period in its parent dataset.\&
+This can be used to preserve a snapshot without affecting normal operation of \*[SIAZ].\&
+.IP
+For example, if a dataset is configured to retain 2 daily snapshots,
+2 daily snapshots exist for that dataset,
+with this property set to \fBfalse\fP on one of them,
+the next run of \*[SIAZ] will behave as if that snapshot does not exist,
+and will take a third snapshot, without pruning either of the existing snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:recursion
+.RS
+.TP
+Type:
+string (enumerated)
+.TQ
+Values:
+zfs, siaz
+.TQ
+Applicable To:
+filesystems, volumes, snapshots
+.TQ
+Description:
+This property, when set on or inherited by a dataset, determines the type of recursion used for snapshots of that dataset.\&
+.IP
+This value MUST be either \fBzfs\fB or \fBsiaz\fP (default), and may be set locally or inherited.\&
+.RS
+.TP
+For datasets:
+.IP
+When set to \fBsiaz\fP (the default),
+on a dataset,
+an individual snapshot of that dataset will be taken,
+if snapshots are enabled.\&
+.IP
+When set to \fBzfs\fP,
+on a dataset,
+\*[SIAZ] will use zfs native recursion when taking the snapshot of that dataset,
+using `zfs snapshot \-r` (\fBzfs-snapshot(8)\fP),
+if snapshots are enabled.\&
+.IP
+If \*[SIAZ] encounters a dataset with this property equal to \fBzfs\fP,
+and that dataset has an ancestor with a setting of \fBzfs\fP for this property,
+taking snapshots for that dataset will be skipped.\&
+.IP
+If \*[SIAZ] encounters a dataset with this property equal to \fBsiaz\fP,
+and that dataset has an ancestor with a setting of \fBzfs\fP for this property,
+taking snapshots for that dataset will be skipped and a message will be logged at WARN severity,
+notifying the user of that case and that the configuration should be checked.\&
+This is by design.\&
+If you encounter this warning,
+the proper solution is to evaluate what type of recursion is appropriate for a given sub-tree,
+for your use case,
+and, if \fBzfs\fP native recursion is desired at a given level,
+all descendent datasets of that dataset should inherit this property.\&
+.IP
+Using the configuration console when adjusting this setting will help avoid this situation.\&
+.TQ
+For snapshots:
+This property is informational on snapshots.\&
+.IP
+When \*[SIAZ] takes a snapshot, this property is explicitly defined locally on that snapshot,
+by specifying it as an option to the `zfs snapshot` command (as `-o snapsinazfs.com:recursion:[value]`).\&
+This is not currently used by \*[SIAZ],
+but is set locally so that, if the parent dataset\(aqs recursion setting is changed,
+this metadata of how the snapshot was created will still be correct,
+as inheriting this property from the parent dataset would render this property inaccurate,
+if it is changed on the parent.\&
+.IP
+.B It is possible that future functionality of \*[SIAZ] may utilize this property.
+.RE
+.RE
+.TQ
+.B snapsinazfs.com:retention:daily
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+This property sets the maximum number of daily snapshots that will be kept for the dataset,
+before the oldest daily snapshots of that dataset will become eligible for pruning.\&
+.IP
+Once this number of daily snapshots is exceeded,
+the oldest n daily snapshots of this dataset,
+where n is equal to the number of daily snapshots of this dataset that do not have the \fB\*[SIAZNS]:prunesnapshots\fP property set to \fBfalse\fP,
+will be eligible for pruning.\&
+.IP
+If \fB\*[SIAZNS]:prunesnapshots\fP and \fB\*[SIAZNS]:enabled\fP are both \fBtrue\fP, for this dataset,
+those eligible snapshots will be queued for deferred pruning (using `zfs destroy -d`),
+if the global \fBPruneSnapshots\fP setting (\fB\*[SIAZLC](5)\fP) is also \fBtrue\fP.\&
+.IP
+A setting of 0 means that you do not want new daily snapshots to be taken.\&
+If pruning is enabled for this dataset,
+and this property is set to 0,
+all daily snapshots of this dataset will be pruned,
+except for snapshots with the \fB\*[SIAZNS]:prunesnapshots\fP property set to \fBfalse\fP,
+which will be kept as described in the \fB\*[SIAZNS]:prunesnapshots\fP section.\&
+.IP
+There is currently no \(dqmagic\(dq value defined that means infinity,
+but the maximum value is 2147483647,
+which is potentially likely to outlive your storage pool, anyway.\&
+.IP
+All other properties in the \*[SIAZNS]:retention namespace behave as this property,
+but for their corresponding snapshot periods.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:frequent
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:retention:daily\fP, but for frequent snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:hourly
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:retention:daily\fP, but for hourly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:monthly
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:retention:daily\fP, but for monthly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:prunedeferral
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+This property sets a threshold for pruning snapshots based on the amount of used space percentage,
+for the current dataset.\&
+.IP
+\(dqUsed space percentage\(dq is defined here as the dataset\(aqs reported \(dqused\(dq native ZFS property (\fBzfsprops(7)\fP),
+divided by the dataset\(aqs reported \(dqavailable\(dq native ZFS property.\&
+.RS
+.IP
+.B Note that this includes all children of the dataset,
+.B as well, and takes into account quotas, reservations by the dataset or its children,
+.B snapshots, and anything else mentioned in zfsprops(7) for the available and used properties.\&
+.RE
+.IP
+This value is NOT a direct measure of physically-available space in your pool, in almost any situation.\&
+Be aware of how ZFS reports these properties when setting this threshold.\&
+.TQ
+Values:
+If this property is set to 0 (the default), it will be ignored and have no effect.\&
+.IP
+If this property is set to a value from 1 to 100, inclusive,
+it is interpreted as a whole-number percentage,
+and snapshots of any configured period will not be pruned
+unless the value of used space percentage (\fBused\fP / \fBavailable\fP) is greater than or equal to this value.\&
+In this way, you can set limits for snapshot retention properties, but,
+unless the used space percentage exceeds this threshold,
+the rest of the snapshot prune logic is skipped entirely for this dataset,
+which means that no snapshots of any period will be pruned for this dataset.\&
+.IP
+However, once this threshold is reached,
+the snapshot pruning code becomes active, again,
+and the retention limits you have set will be enforced.\&
+.IP
+Take care, as, if your prunedeferral and retention counts are not tuned appropriately for your usage patterns,
+you can end up with a significant number of snapshots suddenly becoming eligible for pruning and thus removed,
+when the threshold is crossed.\&
+.IP
+For example, if you set a high prunedeferral percentage (80%, for example),
+but the other retention counts are small values (4 for each, for example),
+you may have dozens or even hundreds of snapshots, when the prunedeferral threshold is crossed,
+at which time all but the newest 4 of each kind of snapshot will be pruned.\&
+While \*[SIAZ] does use the \fB-d\fP option when calling `zfs destroy`,
+this situation will still cause a very significant and potentially lengthy period of high IO activity,
+as ZFS destroys all of those snapshots and works to release the internal structures associated with them.\&
+.IP
+In general, the higher your prunedeferral setting, the higher your snapshot retention counts should likely be.\&
+There is, however, no one correct answer or \(dqbest\(dq answer,
+as it will always depend on your data, access patterns, size of your pool, and many other settings in ZFS itself, \*[SIAZ],
+and anything else even remotely related to your storage system.\&
+.IP
+Careful planning and tuning of this setting and properties that will interact with it is CRITICAL.\&
+It is wise to start from very small values for prunedeferral,
+and slowly adjust it and other retention settings upward,
+as you monitor the resulting behavior.\&
+.IP
+With proper and careful tuning, it is possible to achieve a very effective and flexible configuration with minimal surprises.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:weekly
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:retention:daily\fP, but for weekly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:retention:yearly
+.RS
+.TP
+Type:
+integer
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+Same as \fBsnapsinazfs.com:retention:daily\fP, but for yearly snapshots.\&
+.RE
+.TQ
+.B snapsinazfs.com:snapshot:period
+.RS
+.TP
+Type:
+string (enumerated)
+.TQ
+Applicable To:
+snapshots
+.TQ
+Description:
+This property indicates the period (\fBfrequent\fP, \fBhourly\fP, \fBdaily\fP, \fBweekly\fP, \fBmonthly\fP, or \fByearly\fP) of a snapshot.\&
+.IP
+It is used by \*[SIAZ] so that the name of the snapshot does not affect processing of the snapshot, for pruning operations.\&
+.IP
+This value is never changed by \*[SIAZ],
+once a snapshot is created,
+and should also not be changed by anything or anyone else.\&
+.IP
+This property is used by \*[SIAZ] to group snapshots for pruning operations.\&
+This property is also used by \*[SIAZ] for sorting snapshots,
+as the second component of the sorting key
+(which is composed of timestamp, period, and name).\&
+Ascending order of periods,
+for sorting purposes,
+is the same order as the following list of legal values for this property.\&
+.TQ
+Values:
+This property MUST be one of these exact string values:
+.RS
+.IP
+.B \(bu frequent
+.IP
+.B \(bu hourly
+.IP
+.B \(bu daily
+.IP
+.B \(bu weekly
+.IP
+.B \(bu monthly
+.IP
+.B \(bu yearly
+.RE
+.IP
+Other values, including no value, will result in this snapshot being skipped by \*[SIAZ].\&
+.RE
+.TQ
+.B snapsinazfs.com:snapshot:timestamp
+.RS
+.TP
+Type:
+datetimeoffset
+.TQ
+Applicable To:
+snapshots
+.TQ
+Description:
+This property contains the exact timestamp at which the operation to take snapshots was started,
+to the maximum precision the executing system can provide.\&
+.IP
+This property \fBDOES NOT\fP indicate the time the snapshot was actually created by zfs,
+though it will generally be quite close,
+for most systems.\&
+ZFS already has a native property for creation time,
+aptly named \(dq\fBcreation\fP\(dq.\&
+.IP
+The snapsinazfs.com:snapshot:timestamp property is used by \*[SIAZ] for sorting snapshots,
+as the highest priority component of the sort key
+(which is composed of timestamp, period, and then name).\&
+.IP
+This value was the same value used during snapshot creation,
+and was passed to the format function with the timestamp format string for the template set on the parent dataset,
+to construct the timestamp portion of the snapshot name.\&
+.IP
+Snapshots of \fBall\fP periods taken during the same execution of the \*[SIAZ] main loop
+will all have exactly the same timestamp value which,
+in general, should have a whole-number minute with a 00 seconds component (with potentially non-zero fractional seconds).\&
+This ensures that timestamps taken at the same time are implicitly sortable by their period,
+in the order they were actually taken,
+and makes snapshot names more consistent and predictable.\&
+.IP
+If you require the actual snapshot creation time for any purpose,
+use the native \fBcreation\fP ZFS property which can be retrieved as a unix timestamp using the -p option with `zfs get`.\&
+Otherwise, that property is displayed only to minute precision, by default.\&
+\*[SIAZ] does not use the native \fBcreation\fP property for any purpose (in fact, it does not even retrieve it at all).\&
+.RE
+.TQ
+.B snapsinazfs.com:takesnapshots
+.RS
+.TP
+Type:
+boolean
+.TQ
+Applicable To:
+filesystems, volumes
+.TQ
+Description:
+This property enables or disables the creation of new snapshots for the current dataset.\&
+.IP
+A value of \fBtrue\fP enables taking new snapshots for the current dataset, if \fBsnapsinazfs.com:enabled\fP is also \fBtrue\fP.\&
+.IP
+Snapshots to be taken are then further restricted by the retention properties described above.\&
+If a retention property is 0,
+for a snapshot period,
+snapshots will not be taken for that period,
+for the current dataset.\&
+.IP
+The retention settings above,
+when set to non-zero values,
+ONLY impose limits for the purpose of pruning
+(a value of zero on a retention property prevents new snapshots of that period from being taken).
+Non-zero retention values do NOT prevent snapshots from being taken,
+no matter how many snapshots of a given period exist on a dataset.\&
+If this property is set to true,
+enabled is set to true,
+the associated retention setting is non-zero,
+no ancestor datasets have \fBzfs\fP recursion,
+and it is time for a snapshot for a given period,
+a snapshot of that period will be taken.\&
+.IP
+A value of \fBfalse\fP disables taking new snapshots for the current dataset,
+regardless of other settings.\&
+.IP
+Unlike prunesnapshots,
+this property has no relevance to snapshot objects,
+and is not explicitly set on them.\&
+.RE
+.TQ
+.B snapsinazfs.com:template
+.RS
+.TP
+Type:
+string
+.TQ
+Applicable To:
+filesystems, volumes, snapshots
+.TQ
+Description:
+This property,
+when applied to a dataset,
+is the name of a template,
+which MUST exist in the JSON configuration files (\fB\*[SIAZLC](5)\fP),
+to use for the purposes of timing and naming of new snapshots,
+for the dataset it is applied to.\&
+.IP
+When applied to a snapshot,
+it is informational only,
+and refers to the template which was used when creating the snapshot.\&
+.IP
+This property SHOULD NOT be modified manually or by anything other than the \*[SIAZ] configuration console (\fB\*[SIAZLC]\-config\-console(8)\fP).\&
+The configuration console makes sure that you do not try to delete a template that is in use by any existing dataset,
+as well as only allows setting the template property on a dataset to one of the names of templates that are currently defined in configuration.\&
+.TQ
+Restrictions:
+This property MUST be set to the exact case-sensitive name of a template that is configured in the JSON configuration used to run \*[SIAZ].\&
+If the template specified for a dataset does not exist,
+new snapshots of that dataset will NOT be taken.\&
+.RE
+.SH AUTHORS
+.PP
+\*[SIAZ] is created by Brandon Thetford, and was inspired by sanoid\*(Tm, which was created by Jim Salter.\&
+.SH REPORTING BUGS
+.PP
+The source code and issue tracker for \*[SIAZ] are hosted on GitHub, at
+.UR https://github.com/snapsinazfs/snapsinazfs
+.UE
+.PP
+Bugs, including documentation bugs, should be reported there.\&
+.SH COPYRIGHT
+.PP
+Copyright 2023 Brandon Thetford
+.PP
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the Software), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+.PP
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+.PP
+THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+.SH SEE ALSO
+.TP
+.B \*[SIAZLC](8)
+.TQ
+.B \*[SIAZLC](5)
+.TQ
+.B \*[SIAZ]\-config\-console(8)
+.TQ
+.B \*[SIAZLC]\-api(3)
