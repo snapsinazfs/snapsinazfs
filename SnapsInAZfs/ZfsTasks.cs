@@ -24,7 +24,7 @@ internal static class ZfsTasks
     private static readonly AutoResetEvent SnapshotAutoResetEvent = new( true );
 
     /// <exception cref="InvalidOperationException">If an invalid value is returned when getting the mutex</exception>
-    internal static async Task TakeAllConfiguredSnapshots( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    internal static async Task TakeAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, DateTimeOffset timestamp, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
         if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
         {
@@ -42,8 +42,7 @@ internal static class ZfsTasks
 #pragma warning disable CS8600
             if ( !settings.Templates.TryGetValue( ds.Template.Value, out TemplateSettings template ) )
             {
-                string errorMessage = $"Template {ds.Template.Name} specified for {ds.Name} not found in configuration - skipping";
-                Logger.Error( errorMessage );
+                Logger.Error( "Template {0} specified for {1} not found in configuration - skipping snapshots for {1}", ds.Template.Name, ds.Name );
                 continue;
             }
 #pragma warning restore CS8600
@@ -128,7 +127,7 @@ internal static class ZfsTasks
             if ( propsToSet.Any( ) )
             {
                 Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, propsToSet.Select( p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString( ) );
-                ZfsCommandRunnerOperationStatus setPropertiesResult = await  commandRunner.SetZfsPropertiesAsync( settings.DryRun, ds.Name, propsToSet.ToArray( ) );
+                ZfsCommandRunnerOperationStatus setPropertiesResult = await commandRunner.SetZfsPropertiesAsync( settings.DryRun, ds.Name, propsToSet.ToArray( ) ).ConfigureAwait( true );
                 switch ( setPropertiesResult )
                 {
                     case ZfsCommandRunnerOperationStatus.Success:

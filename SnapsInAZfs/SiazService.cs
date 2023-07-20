@@ -258,7 +258,7 @@ public class SiazService : BackgroundService
         if ( _settings is { TakeSnapshots: true } )
         {
             Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshots( zfsCommandRunner, _settings, currentTimestamp, datasets, snapshots );
+            ZfsTasks.TakeAllConfiguredSnapshotsAsync( zfsCommandRunner, _settings, currentTimestamp, datasets, snapshots );
         }
         else
         {

@@ -799,14 +799,14 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         //Exit early if retention settings say no weeklies
         if ( !SnapshotRetentionWeekly.IsWanted( ) )
         {
+            Logger.Debug( "Weekly snapshot not wanted for {0} {1}", Kind, Name );
             return false;
         }
 
-        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
-        // going to optimize it all away anyway.
         Logger.Trace( "Checking if weekly snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         if ( timestamp < LastWeeklySnapshotTimestamp.Value )
         {
+            Logger.Debug( "Weekly snapshot not needed for {0} {1}", Kind, Name );
             return false;
         }
 
