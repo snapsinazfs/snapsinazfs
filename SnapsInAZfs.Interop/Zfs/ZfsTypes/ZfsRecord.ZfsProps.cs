@@ -2,13 +2,14 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½Softwareï¿½), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED ï¿½AS ISï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Diagnostics.CodeAnalysis;
+
 #pragma warning disable CA1051
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -97,25 +98,6 @@ public partial record ZfsRecord
     /// </summary>
     public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
 
-    public bool TryGetBoolProperty( string propertyName, out ZfsProperty<bool> boolProperty )
-    {
-        switch ( propertyName )
-        {
-            case ZfsPropertyNames.EnabledPropertyName:
-                boolProperty = _enabled;
-                return true;
-            case ZfsPropertyNames.TakeSnapshotsPropertyName:
-                boolProperty = _takeSnapshots;
-                return true;
-            case ZfsPropertyNames.PruneSnapshotsPropertyName:
-                boolProperty = _pruneSnapshotsField;
-                return true;
-            default:
-                boolProperty = ZfsProperty<bool>.DefaultProperty( );
-                return false;
-        }
-    }
-
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not a supported int property</exception>
     [SuppressMessage( "ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Switch expressions cannot be ref return" )]
     public ref readonly ZfsProperty<int> GetIntProperty( string propertyName )
@@ -195,6 +177,25 @@ public partial record ZfsRecord
     ///     this object
     /// </summary>
     public event StringPropertyChangedEventHandler? StringPropertyChanged;
+
+    public bool TryGetBoolProperty( string propertyName, out ZfsProperty<bool> boolProperty )
+    {
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.EnabledPropertyName:
+                boolProperty = _enabled;
+                return true;
+            case ZfsPropertyNames.TakeSnapshotsPropertyName:
+                boolProperty = _takeSnapshots;
+                return true;
+            case ZfsPropertyNames.PruneSnapshotsPropertyName:
+                boolProperty = _pruneSnapshotsField;
+                return true;
+            default:
+                boolProperty = ZfsProperty<bool>.DefaultProperty( );
+                return false;
+        }
+    }
 
     /// <exception cref="Exception">A delegate callback throws an exception</exception>
     /// <exception cref="ArgumentOutOfRangeException">An unsupported <paramref name="propertyName" /> was supplied</exception>
@@ -458,6 +459,26 @@ public partial record ZfsRecord
         }
     }
 
+    internal void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
+    {
+        if ( !child.SubscribedToParentPropertyChangeEvents )
+        {
+            return;
+        }
+
+        IntPropertyChanged -= child.OnParentUpdatedIntProperty;
+        BoolPropertyChanged -= child.OnParentUpdatedBoolProperty;
+        StringPropertyChanged -= child.OnParentUpdatedStringProperty;
+        child.SubscribedToParentPropertyChangeEvents = false;
+    }
+
+    internal void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
+    {
+        IntPropertyChanged -= snap.OnParentUpdatedIntProperty;
+        BoolPropertyChanged -= snap.OnParentUpdatedBoolProperty;
+        StringPropertyChanged -= snap.OnParentUpdatedStringProperty;
+    }
+
     private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
         Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
@@ -466,7 +487,7 @@ public partial record ZfsRecord
                 ZfsPropertyNames.EnabledPropertyName => _enabled.IsInherited,
                 ZfsPropertyNames.TakeSnapshotsPropertyName => _takeSnapshots.IsInherited,
                 ZfsPropertyNames.PruneSnapshotsPropertyName => _pruneSnapshotsField.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating boolean property",updatedProperty.Name )
+                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating boolean property", updatedProperty.Name )
             } )
         {
             UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
@@ -509,26 +530,6 @@ public partial record ZfsRecord
     {
         BoolPropertyChanged += snap.OnParentUpdatedBoolProperty;
         StringPropertyChanged += snap.OnParentUpdatedStringProperty;
-    }
-
-    internal void UnsubscribeChildFromPropertyEvents( ZfsRecord child )
-    {
-        if ( !child.SubscribedToParentPropertyChangeEvents )
-        {
-            return;
-        }
-
-        IntPropertyChanged -= child.OnParentUpdatedIntProperty;
-        BoolPropertyChanged -= child.OnParentUpdatedBoolProperty;
-        StringPropertyChanged -= child.OnParentUpdatedStringProperty;
-        child.SubscribedToParentPropertyChangeEvents = false;
-    }
-
-    internal void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
-    {
-        IntPropertyChanged -= snap.OnParentUpdatedIntProperty;
-        BoolPropertyChanged -= snap.OnParentUpdatedBoolProperty;
-        StringPropertyChanged -= snap.OnParentUpdatedStringProperty;
     }
 
     public delegate void BoolPropertyChangedEventHandler( ZfsRecord sender, ref ZfsProperty<bool> property );
