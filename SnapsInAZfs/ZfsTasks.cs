@@ -70,7 +70,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -80,7 +80,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -90,7 +90,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -100,7 +100,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -110,7 +110,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -120,7 +120,7 @@ internal static class ZfsTasks
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
                 if ( success && !settings.DryRun && snapshot is not null )
                 {
-                    snapshots[ snapshot.SnapshotName.Value ] = snapshot;
+                    snapshots[ snapshot.Name ] = snapshot;
                 }
             }
 
@@ -185,8 +185,6 @@ internal static class ZfsTasks
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
         await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
 
-        // snapshotName is a constant string. Thus, this NullReferenceException is not possible.
-        // ReSharper disable once ExceptionNotDocumentedOptional
         Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 

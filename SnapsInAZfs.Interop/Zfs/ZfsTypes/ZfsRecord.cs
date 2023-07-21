@@ -338,7 +338,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return snap;
     }
 
-    public Snapshot CreateAndAddSnapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, string snapshotName, string periodString, DateTimeOffset snapshotTimestamp, ZfsRecord dataset )
+    public Snapshot CreateAndAddSnapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, string periodString, DateTimeOffset snapshotTimestamp, ZfsRecord dataset )
     {
         Logger.Trace( "Creating and adding snapshot {0} to {1} {2}", snapName, Kind, Name );
         Snapshot snap = new( snapName,
@@ -360,7 +360,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                              retentionMonthly,
                              retentionYearly,
                              retentionPruneDeferral,
-                             snapshotName,
                              periodString,
                              snapshotTimestamp,
                              dataset );

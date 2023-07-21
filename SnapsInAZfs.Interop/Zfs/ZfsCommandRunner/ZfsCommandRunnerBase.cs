@@ -436,7 +436,6 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
                                                         retentionMonthly.Value,
                                                         retentionYearly.Value,
                                                         retentionPruneDeferral.Value,
-                                                        rawZfsObject.Properties[ ZfsPropertyNames.SnapshotNamePropertyName ].Value,
                                                         rawZfsObject.Properties[ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value,
                                                         snapshotTimestamp,
                                                         dataset );

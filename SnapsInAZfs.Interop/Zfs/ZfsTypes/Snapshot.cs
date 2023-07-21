@@ -45,7 +45,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
             parentDataset.SnapshotRetentionMonthly,
             parentDataset.SnapshotRetentionYearly,
             parentDataset.SnapshotRetentionPruneDeferral,
-            new(name),
             (SnapshotPeriod)periodKind,
             timestamp,
             parentDataset )
@@ -55,7 +54,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
     /// <summary>
     /// Creates a new snapshot from all properties
     /// </summary>
-    public Snapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in string snapshotName, in string snapshotPeriod, in DateTimeOffset snapshotTimestamp, ZfsRecord parent )
+    public Snapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in string snapshotPeriod, in DateTimeOffset snapshotTimestamp, ZfsRecord parent )
         : base( snapName,
                 ZfsPropertyValueConstants.Snapshot,
                 enabled,
@@ -81,7 +80,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
                 parent,
                 true )
     {
-        _snapshotName = new( this, ZfsPropertyNames.SnapshotNamePropertyName, snapshotName );
         _period = new( this, ZfsPropertyNames.SnapshotPeriodPropertyName, snapshotPeriod );
         _timestamp = new( this, ZfsPropertyNames.SnapshotTimestampPropertyName, snapshotTimestamp );
     }
@@ -170,7 +168,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         // If timestamps are different, sort on period, by its SnapshotPeriodKind equivalent
         return !Period.Value.Equals( other.Period.Value )
             ? Period.Value.ToSnapshotPeriodKind( ).CompareTo( other.Period.Value.ToSnapshotPeriodKind( ) )
-            : string.Compare( SnapshotName.Value, other.SnapshotName.Value, StringComparison.Ordinal );
+            : string.Compare( Name, Name, StringComparison.Ordinal );
     }
 
     /// <summary>
@@ -214,7 +212,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
                                     SnapshotRetentionMonthly,
                                     SnapshotRetentionYearly,
                                     SnapshotRetentionPruneDeferral,
-                                    SnapshotName.Value,
                                     Period.Value,
                                     Timestamp.Value,
                                     parent );
@@ -223,13 +220,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
     {
-        return $"-o {SnapshotName.SetString} -o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
+        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
     }
 
     /// <inheritdoc />
     public override string ToString( )
     {
-        return $"{SnapshotName.Value}";
+        return $"{Name}";
     }
 
     /// <inheritdoc />
@@ -246,7 +243,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _snapshotName.Equals( other._snapshotName )
                && _timestamp.Equals( other._timestamp )
                && _enabled.Equals( other.Enabled )
                && Kind == other.Kind
@@ -264,7 +260,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _snapshotName.Equals( other._snapshotName )
                && _timestamp.Equals( other._timestamp )
                && _enabled.Equals( other.Enabled )
                && Kind == other.Kind
@@ -277,6 +272,6 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
     /// <inheritdoc />
     public override int GetHashCode( )
     {
-        return HashCode.Combine( base.GetHashCode( ), _period, _snapshotName, _timestamp );
+        return HashCode.Combine( base.GetHashCode( ), _period, Name, _timestamp );
     }
 }
