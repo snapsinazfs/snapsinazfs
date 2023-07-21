@@ -929,6 +929,7 @@ public partial class ZfsConfigurationWindow
                         throw new InvalidOperationException( $"Unexpected dialogResult received: {dialogResult}", e );
                 }
             }
+            recursionInheritButton.Enabled = treeDataset.Recursion.IsInherited;
 
             int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == treeDataset.Template.Value );
             if ( templateIndex == -1 )
@@ -944,28 +945,36 @@ public partial class ZfsConfigurationWindow
             templateListView.EnsureSelectedItemVisible( );
             templateListView.Enabled = true;
             templateSourceTextField.Text = treeDataset.Template.InheritedFrom;
+            templateInheritButton.Enabled = treeDataset.Template.IsInherited;
 
             retentionFrequentTextField.Text = treeDataset.SnapshotRetentionFrequent.ValueString;
             retentionFrequentTextField.ColorScheme = treeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionFrequentTextField.Enabled = true;
+            retentionFrequentInheritButton.Enabled = treeDataset.SnapshotRetentionFrequent.IsInherited;
             retentionHourlyTextField.Text = treeDataset.SnapshotRetentionHourly.ValueString;
             retentionHourlyTextField.ColorScheme = treeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionHourlyTextField.Enabled = true;
+            retentionHourlyInheritButton.Enabled = treeDataset.SnapshotRetentionHourly.IsInherited;
             retentionDailyTextField.Text = treeDataset.SnapshotRetentionDaily.ValueString;
             retentionDailyTextField.ColorScheme = treeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionDailyTextField.Enabled = true;
+            retentionDailyInheritButton.Enabled = treeDataset.SnapshotRetentionDaily.IsInherited;
             retentionWeeklyTextField.Text = treeDataset.SnapshotRetentionWeekly.ValueString;
             retentionWeeklyTextField.ColorScheme = treeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionWeeklyTextField.Enabled = true;
+            retentionWeeklyInheritButton.Enabled = treeDataset.SnapshotRetentionWeekly.IsInherited;
             retentionMonthlyTextField.Text = treeDataset.SnapshotRetentionMonthly.ValueString;
             retentionMonthlyTextField.ColorScheme = treeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionMonthlyTextField.Enabled = true;
+            retentionMonthlyInheritButton.Enabled = treeDataset.SnapshotRetentionMonthly.IsInherited;
             retentionYearlyTextField.Text = treeDataset.SnapshotRetentionYearly.ValueString;
             retentionYearlyTextField.ColorScheme = treeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionYearlyTextField.Enabled = true;
+            retentionYearlyInheritButton.Enabled = treeDataset.SnapshotRetentionYearly.IsInherited;
             retentionPruneDeferralTextField.Text = treeDataset.SnapshotRetentionPruneDeferral.ValueString;
             retentionPruneDeferralTextField.ColorScheme = treeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionPruneDeferralTextField.Enabled = true;
+            retentionPruneDeferralInheritButton.Enabled = treeDataset.SnapshotRetentionPruneDeferral.IsInherited;
 
             recentFrequentTextField.Text = treeDataset.LastFrequentSnapshotTimestamp.IsLocal ? treeDataset.LastFrequentSnapshotTimestamp.ValueString : "None";
             recentHourlyTextField.Text = treeDataset.LastHourlySnapshotTimestamp.IsLocal ? treeDataset.LastHourlySnapshotTimestamp.ValueString : "None";
