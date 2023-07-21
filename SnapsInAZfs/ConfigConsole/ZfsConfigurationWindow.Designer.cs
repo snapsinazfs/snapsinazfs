@@ -36,10 +36,8 @@ namespace SnapsInAZfs.ConfigConsole {
         private Terminal.Gui.ColorScheme treeAndListViewColorScheme;
         
         private Terminal.Gui.FrameView zfsConfigurationTreeFrame;
-
-        internal Terminal.Gui.TreeView zfsTreeView;
         
-        private Terminal.Gui.FrameView snapshotsFrame;
+        internal Terminal.Gui.TreeView zfsTreeView;
         
         private Terminal.Gui.FrameView generalFrame;
         
@@ -107,29 +105,43 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.TextValidateField retentionFrequentTextField;
         
+        private Terminal.Gui.Button retentionFrequentInheritButton;
+        
         private Terminal.Gui.Label retentionHourlyLabel;
         
         private Terminal.Gui.TextValidateField retentionHourlyTextField;
+        
+        private Terminal.Gui.Button retentionHourlyInheritButton;
         
         private Terminal.Gui.Label retentionDailyLabel;
         
         private Terminal.Gui.TextValidateField retentionDailyTextField;
         
+        private Terminal.Gui.Button retentionDailyInheritButton;
+        
         private Terminal.Gui.Label retentionWeeklyLabel;
         
         private Terminal.Gui.TextValidateField retentionWeeklyTextField;
+        
+        private Terminal.Gui.Button retentionWeeklyInheritButton;
         
         private Terminal.Gui.Label retentionMonthlyLabel;
         
         private Terminal.Gui.TextValidateField retentionMonthlyTextField;
         
+        private Terminal.Gui.Button retentionMonthlyInheritButton;
+        
         private Terminal.Gui.Label retentionYearlyLabel;
         
         private Terminal.Gui.TextValidateField retentionYearlyTextField;
         
+        private Terminal.Gui.Button retentionYearlyInheritButton;
+        
         private Terminal.Gui.Label zfsConfigurationPropertiesRetentionPruneDeferralLabel;
         
         private Terminal.Gui.TextValidateField retentionPruneDeferralTextField;
+        
+        private Terminal.Gui.Button retentionPruneDeferralInheritButton;
         
         private Terminal.Gui.FrameView recentFrame;
         
@@ -145,20 +157,6 @@ namespace SnapsInAZfs.ConfigConsole {
         
         private Terminal.Gui.TextField recentYearlyTextField;
         
-        private Terminal.Gui.FrameView snapshotPropertiesFrame;
-        
-        private Terminal.Gui.Label snapshotNameLabel;
-        
-        private Terminal.Gui.TextField snapshotNameTextField;
-        
-        private Terminal.Gui.Label snapshotPeriodLabel;
-        
-        private Terminal.Gui.TextField snapshotNameTextField2;
-        
-        private Terminal.Gui.Label snapshotNameLabel3;
-        
-        private Terminal.Gui.TextField snapshotNameTextField3;
-        
         private Terminal.Gui.FrameView zfsConfigurationActionsFrame;
         
         private Terminal.Gui.Button refreshButton;
@@ -172,13 +170,6 @@ namespace SnapsInAZfs.ConfigConsole {
             this.resetCurrentButton = new Terminal.Gui.Button();
             this.refreshButton = new Terminal.Gui.Button();
             this.zfsConfigurationActionsFrame = new Terminal.Gui.FrameView();
-            this.snapshotNameTextField3 = new Terminal.Gui.TextField();
-            this.snapshotNameLabel3 = new Terminal.Gui.Label();
-            this.snapshotNameTextField2 = new Terminal.Gui.TextField();
-            this.snapshotPeriodLabel = new Terminal.Gui.Label();
-            this.snapshotNameTextField = new Terminal.Gui.TextField();
-            this.snapshotNameLabel = new Terminal.Gui.Label();
-            this.snapshotPropertiesFrame = new Terminal.Gui.FrameView();
             this.recentYearlyTextField = new Terminal.Gui.TextField();
             this.recentMonthlyTextField = new Terminal.Gui.TextField();
             this.recentWeeklyTextField = new Terminal.Gui.TextField();
@@ -186,18 +177,25 @@ namespace SnapsInAZfs.ConfigConsole {
             this.recentHourlyTextField = new Terminal.Gui.TextField();
             this.recentFrequentTextField = new Terminal.Gui.TextField();
             this.recentFrame = new Terminal.Gui.FrameView();
+            this.retentionPruneDeferralInheritButton = new Terminal.Gui.Button();
             this.retentionPruneDeferralTextField = new Terminal.Gui.TextValidateField();
             this.zfsConfigurationPropertiesRetentionPruneDeferralLabel = new Terminal.Gui.Label();
+            this.retentionYearlyInheritButton = new Terminal.Gui.Button();
             this.retentionYearlyTextField = new Terminal.Gui.TextValidateField();
             this.retentionYearlyLabel = new Terminal.Gui.Label();
+            this.retentionMonthlyInheritButton = new Terminal.Gui.Button();
             this.retentionMonthlyTextField = new Terminal.Gui.TextValidateField();
             this.retentionMonthlyLabel = new Terminal.Gui.Label();
+            this.retentionWeeklyInheritButton = new Terminal.Gui.Button();
             this.retentionWeeklyTextField = new Terminal.Gui.TextValidateField();
             this.retentionWeeklyLabel = new Terminal.Gui.Label();
+            this.retentionDailyInheritButton = new Terminal.Gui.Button();
             this.retentionDailyTextField = new Terminal.Gui.TextValidateField();
             this.retentionDailyLabel = new Terminal.Gui.Label();
+            this.retentionHourlyInheritButton = new Terminal.Gui.Button();
             this.retentionHourlyTextField = new Terminal.Gui.TextValidateField();
             this.retentionHourlyLabel = new Terminal.Gui.Label();
+            this.retentionFrequentInheritButton = new Terminal.Gui.Button();
             this.retentionFrequentTextField = new Terminal.Gui.TextValidateField();
             this.retentionFrequentLabel = new Terminal.Gui.Label();
             this.retentionFrame = new Terminal.Gui.FrameView();
@@ -231,7 +229,6 @@ namespace SnapsInAZfs.ConfigConsole {
             this.nameTextField = new Terminal.Gui.TextField();
             this.nameLabel = new Terminal.Gui.Label();
             this.generalFrame = new Terminal.Gui.FrameView();
-            this.snapshotsFrame = new Terminal.Gui.FrameView();
             this.zfsTreeView = new Terminal.Gui.TreeView();
             this.zfsConfigurationTreeFrame = new Terminal.Gui.FrameView();
             this.whiteOnRed = new Terminal.Gui.ColorScheme();
@@ -294,8 +291,8 @@ namespace SnapsInAZfs.ConfigConsole {
             this.treeAndListViewColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.BrightBlue);
             this.treeAndListViewColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightYellow, Terminal.Gui.Color.Cyan);
             this.treeAndListViewColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Gray, Terminal.Gui.Color.Blue);
-            this.Width = 156;
-            this.Height = 31;
+            this.Width = 148;
+            this.Height = 26;
             this.X = Pos.Center();
             this.Y = Pos.Center();
             this.ColorScheme = this.whiteOnBlue;
@@ -307,8 +304,8 @@ namespace SnapsInAZfs.ConfigConsole {
             this.Border.DrawMarginFrame = true;
             this.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.Title = "ZFS Configuration";
-            this.zfsConfigurationTreeFrame.Width = 78;
-            this.zfsConfigurationTreeFrame.Height = 24;
+            this.zfsConfigurationTreeFrame.Width = 70;
+            this.zfsConfigurationTreeFrame.Height = 19;
             this.zfsConfigurationTreeFrame.X = 1;
             this.zfsConfigurationTreeFrame.Y = 0;
             this.zfsConfigurationTreeFrame.ColorScheme = this.whiteOnBlue;
@@ -322,7 +319,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.zfsConfigurationTreeFrame.Title = "ZFS Objects";
             this.Add(this.zfsConfigurationTreeFrame);
             this.zfsTreeView.Width = Dim.Fill(0);
-            this.zfsTreeView.Height = Dim.Fill(9);
+            this.zfsTreeView.Height = Dim.Fill(0);
             this.zfsTreeView.X = 0;
             this.zfsTreeView.Y = 0;
             this.zfsTreeView.ColorScheme = this.treeAndListViewColorScheme;
@@ -335,22 +332,9 @@ namespace SnapsInAZfs.ConfigConsole {
             this.zfsTreeView.Style.LeaveLastRow = false;
             this.zfsTreeView.Style.ShowBranchLines = true;
             this.zfsConfigurationTreeFrame.Add(this.zfsTreeView);
-            this.snapshotsFrame.Width = Dim.Fill(0);
-            this.snapshotsFrame.Height = Dim.Fill(0);
-            this.snapshotsFrame.X = 0;
-            this.snapshotsFrame.Y = 13;
-            this.snapshotsFrame.Data = "snapshotsFrame";
-            this.snapshotsFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.snapshotsFrame.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.snapshotsFrame.Border.Effect3D = false;
-            this.snapshotsFrame.Border.Effect3DBrush = null;
-            this.snapshotsFrame.Border.DrawMarginFrame = true;
-            this.snapshotsFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotsFrame.Title = "Snapshots";
-            this.zfsConfigurationTreeFrame.Add(this.snapshotsFrame);
             this.generalFrame.Width = 73;
             this.generalFrame.Height = 10;
-            this.generalFrame.X = 80;
+            this.generalFrame.X = 72;
             this.generalFrame.Y = 0;
             this.generalFrame.Data = "generalFrame";
             this.generalFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
@@ -635,9 +619,9 @@ namespace SnapsInAZfs.ConfigConsole {
             this.templateSourceTextField.Text = "";
             this.templateSourceTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.generalFrame.Add(this.templateSourceTextField);
-            this.retentionFrame.Width = 21;
+            this.retentionFrame.Width = 26;
             this.retentionFrame.Height = 9;
-            this.retentionFrame.X = 80;
+            this.retentionFrame.X = 72;
             this.retentionFrame.Y = 10;
             this.retentionFrame.Data = "retentionFrame";
             this.retentionFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
@@ -666,6 +650,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionFrequentTextField.Text = "";
             this.retentionFrequentTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionFrequentTextField);
+            this.retentionFrequentInheritButton.Width = 4;
+            this.retentionFrequentInheritButton.Height = 1;
+            this.retentionFrequentInheritButton.X = 19;
+            this.retentionFrequentInheritButton.Y = 0;
+            this.retentionFrequentInheritButton.Data = "retentionFrequentInheritButton";
+            this.retentionFrequentInheritButton.Text = "⬆";
+            this.retentionFrequentInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionFrequentInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionFrequentInheritButton);
             this.retentionHourlyLabel.Width = 5;
             this.retentionHourlyLabel.Height = 1;
             this.retentionHourlyLabel.X = 2;
@@ -684,6 +677,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionHourlyTextField.Text = "";
             this.retentionHourlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionHourlyTextField);
+            this.retentionHourlyInheritButton.Width = 4;
+            this.retentionHourlyInheritButton.Height = 1;
+            this.retentionHourlyInheritButton.X = 19;
+            this.retentionHourlyInheritButton.Y = 1;
+            this.retentionHourlyInheritButton.Data = "retentionHourlyInheritButton";
+            this.retentionHourlyInheritButton.Text = "⬆";
+            this.retentionHourlyInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionHourlyInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionHourlyInheritButton);
             this.retentionDailyLabel.Width = 5;
             this.retentionDailyLabel.Height = 1;
             this.retentionDailyLabel.X = 2;
@@ -702,6 +704,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionDailyTextField.Text = "";
             this.retentionDailyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionDailyTextField);
+            this.retentionDailyInheritButton.Width = 4;
+            this.retentionDailyInheritButton.Height = 1;
+            this.retentionDailyInheritButton.X = 19;
+            this.retentionDailyInheritButton.Y = 2;
+            this.retentionDailyInheritButton.Data = "retentionDailyInheritButton";
+            this.retentionDailyInheritButton.Text = "⬆";
+            this.retentionDailyInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionDailyInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionDailyInheritButton);
             this.retentionWeeklyLabel.Width = 3;
             this.retentionWeeklyLabel.Height = 1;
             this.retentionWeeklyLabel.X = 2;
@@ -720,6 +731,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionWeeklyTextField.Text = "";
             this.retentionWeeklyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionWeeklyTextField);
+            this.retentionWeeklyInheritButton.Width = 4;
+            this.retentionWeeklyInheritButton.Height = 1;
+            this.retentionWeeklyInheritButton.X = 19;
+            this.retentionWeeklyInheritButton.Y = 3;
+            this.retentionWeeklyInheritButton.Data = "retentionWeeklyInheritButton";
+            this.retentionWeeklyInheritButton.Text = "⬆";
+            this.retentionWeeklyInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionWeeklyInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionWeeklyInheritButton);
             this.retentionMonthlyLabel.Width = 5;
             this.retentionMonthlyLabel.Height = 1;
             this.retentionMonthlyLabel.X = 2;
@@ -738,6 +758,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionMonthlyTextField.Text = "";
             this.retentionMonthlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionMonthlyTextField);
+            this.retentionMonthlyInheritButton.Width = 4;
+            this.retentionMonthlyInheritButton.Height = 1;
+            this.retentionMonthlyInheritButton.X = 19;
+            this.retentionMonthlyInheritButton.Y = 4;
+            this.retentionMonthlyInheritButton.Data = "retentionMonthlyInheritButton";
+            this.retentionMonthlyInheritButton.Text = "⬆";
+            this.retentionMonthlyInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionMonthlyInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionMonthlyInheritButton);
             this.retentionYearlyLabel.Width = 5;
             this.retentionYearlyLabel.Height = 1;
             this.retentionYearlyLabel.X = 2;
@@ -756,6 +785,15 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionYearlyTextField.Text = "";
             this.retentionYearlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionYearlyTextField);
+            this.retentionYearlyInheritButton.Width = 4;
+            this.retentionYearlyInheritButton.Height = 1;
+            this.retentionYearlyInheritButton.X = 19;
+            this.retentionYearlyInheritButton.Y = 5;
+            this.retentionYearlyInheritButton.Data = "retentionYearlyInheritButton";
+            this.retentionYearlyInheritButton.Text = "⬆";
+            this.retentionYearlyInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionYearlyInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionYearlyInheritButton);
             this.zfsConfigurationPropertiesRetentionPruneDeferralLabel.Width = 5;
             this.zfsConfigurationPropertiesRetentionPruneDeferralLabel.Height = 1;
             this.zfsConfigurationPropertiesRetentionPruneDeferralLabel.X = 2;
@@ -774,9 +812,18 @@ namespace SnapsInAZfs.ConfigConsole {
             this.retentionPruneDeferralTextField.Text = "";
             this.retentionPruneDeferralTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.retentionFrame.Add(this.retentionPruneDeferralTextField);
-            this.recentFrame.Width = 51;
+            this.retentionPruneDeferralInheritButton.Width = 4;
+            this.retentionPruneDeferralInheritButton.Height = 1;
+            this.retentionPruneDeferralInheritButton.X = 19;
+            this.retentionPruneDeferralInheritButton.Y = 6;
+            this.retentionPruneDeferralInheritButton.Data = "retentionPruneDeferralInheritButton";
+            this.retentionPruneDeferralInheritButton.Text = "⬆";
+            this.retentionPruneDeferralInheritButton.TextAlignment = Terminal.Gui.TextAlignment.Centered;
+            this.retentionPruneDeferralInheritButton.IsDefault = false;
+            this.retentionFrame.Add(this.retentionPruneDeferralInheritButton);
+            this.recentFrame.Width = Dim.Fill(1);
             this.recentFrame.Height = 8;
-            this.recentFrame.X = 102;
+            this.recentFrame.X = Pos.Right(retentionFrame);
             this.recentFrame.Y = 10;
             this.recentFrame.Data = "recentFrame";
             this.recentFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
@@ -847,73 +894,6 @@ namespace SnapsInAZfs.ConfigConsole {
             this.recentYearlyTextField.Text = "";
             this.recentYearlyTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.recentFrame.Add(this.recentYearlyTextField);
-            this.snapshotPropertiesFrame.Width = 73;
-            this.snapshotPropertiesFrame.Height = 5;
-            this.snapshotPropertiesFrame.X = 80;
-            this.snapshotPropertiesFrame.Y = 19;
-            this.snapshotPropertiesFrame.Data = "snapshotPropertiesFrame";
-            this.snapshotPropertiesFrame.Border.BorderStyle = Terminal.Gui.BorderStyle.Single;
-            this.snapshotPropertiesFrame.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.snapshotPropertiesFrame.Border.Effect3D = false;
-            this.snapshotPropertiesFrame.Border.Effect3DBrush = null;
-            this.snapshotPropertiesFrame.Border.DrawMarginFrame = true;
-            this.snapshotPropertiesFrame.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Title = "Snapshot";
-            this.Add(this.snapshotPropertiesFrame);
-            this.snapshotNameLabel.Width = 4;
-            this.snapshotNameLabel.Height = 1;
-            this.snapshotNameLabel.X = 2;
-            this.snapshotNameLabel.Y = 0;
-            this.snapshotNameLabel.Data = "snapshotNameLabel";
-            this.snapshotNameLabel.Text = "Name";
-            this.snapshotNameLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameLabel);
-            this.snapshotNameTextField.Width = Dim.Fill(1);
-            this.snapshotNameTextField.Height = 1;
-            this.snapshotNameTextField.X = 12;
-            this.snapshotNameTextField.Y = 0;
-            this.snapshotNameTextField.ColorScheme = this.inheritedPropertyTextFieldColorScheme;
-            this.snapshotNameTextField.Secret = false;
-            this.snapshotNameTextField.Data = "snapshotNameTextField";
-            this.snapshotNameTextField.Text = "";
-            this.snapshotNameTextField.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameTextField);
-            this.snapshotPeriodLabel.Width = 4;
-            this.snapshotPeriodLabel.Height = 1;
-            this.snapshotPeriodLabel.X = 2;
-            this.snapshotPeriodLabel.Y = 1;
-            this.snapshotPeriodLabel.Data = "snapshotPeriodLabel";
-            this.snapshotPeriodLabel.Text = "Period";
-            this.snapshotPeriodLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotPeriodLabel);
-            this.snapshotNameTextField2.Width = Dim.Fill(1);
-            this.snapshotNameTextField2.Height = 1;
-            this.snapshotNameTextField2.X = 12;
-            this.snapshotNameTextField2.Y = 1;
-            this.snapshotNameTextField2.ColorScheme = this.inheritedPropertyTextFieldColorScheme;
-            this.snapshotNameTextField2.Secret = false;
-            this.snapshotNameTextField2.Data = "snapshotNameTextField2";
-            this.snapshotNameTextField2.Text = "";
-            this.snapshotNameTextField2.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameTextField2);
-            this.snapshotNameLabel3.Width = 4;
-            this.snapshotNameLabel3.Height = 1;
-            this.snapshotNameLabel3.X = 2;
-            this.snapshotNameLabel3.Y = 2;
-            this.snapshotNameLabel3.Data = "snapshotNameLabel3";
-            this.snapshotNameLabel3.Text = "Timestamp";
-            this.snapshotNameLabel3.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameLabel3);
-            this.snapshotNameTextField3.Width = Dim.Fill(1);
-            this.snapshotNameTextField3.Height = 1;
-            this.snapshotNameTextField3.X = 12;
-            this.snapshotNameTextField3.Y = 2;
-            this.snapshotNameTextField3.ColorScheme = this.inheritedPropertyTextFieldColorScheme;
-            this.snapshotNameTextField3.Secret = false;
-            this.snapshotNameTextField3.Data = "snapshotNameTextField3";
-            this.snapshotNameTextField3.Text = "";
-            this.snapshotNameTextField3.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.snapshotPropertiesFrame.Add(this.snapshotNameTextField3);
             this.zfsConfigurationActionsFrame.Width = 60;
             this.zfsConfigurationActionsFrame.Height = 5;
             this.zfsConfigurationActionsFrame.X = Pos.Center();
