@@ -104,7 +104,7 @@ public partial class ZfsConfigurationWindow
         recursionRadioGroup.SelectedItemChanged -= RecursionRadioGroupSelectedItemChanged;
         recursionInheritButton.Clicked -= RecursionInheritButtonClick;
         templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
-        templateInheritButton.Clicked += TemplateInheritButtonClick;
+        templateInheritButton.Clicked -= TemplateInheritButtonClick;
         retentionFrequentTextField.Leave -= RetentionFrequentTextFieldOnLeave;
         retentionHourlyTextField.Leave -= RetentionHourlyTextFieldOnLeave;
         retentionDailyTextField.Leave -= RetentionDailyTextFieldOnLeave;
