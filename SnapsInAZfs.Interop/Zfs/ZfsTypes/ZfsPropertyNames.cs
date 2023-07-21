@@ -21,7 +21,6 @@ public static class ZfsPropertyNames
     public const string EnabledPropertyName = "snapsinazfs.com:enabled";
     public const string PruneSnapshotsPropertyName = "snapsinazfs.com:prunesnapshots";
     public const string RecursionPropertyName = "snapsinazfs.com:recursion";
-    public const string SnapshotNamePropertyName = "snapsinazfs.com:snapshot:name";
     public const string SnapshotPeriodPropertyName = "snapsinazfs.com:snapshot:period";
     public const string SnapshotRetentionDailyPropertyName = "snapsinazfs.com:retention:daily";
     public const string SnapshotRetentionFrequentPropertyName = "snapsinazfs.com:retention:frequent";

@@ -16,26 +16,19 @@ public sealed partial record Snapshot
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private readonly ZfsProperty<string> _period;
-
-    private readonly ZfsProperty<string> _snapshotName;
-
     private readonly ZfsProperty<DateTimeOffset> _timestamp;
 
     public ref readonly ZfsProperty<string> Period => ref _period;
 
-    public ref readonly ZfsProperty<string> SnapshotName => ref _snapshotName;
-
     public ref readonly ZfsProperty<DateTimeOffset> Timestamp => ref _timestamp;
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the SnapshotName or Period properties</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the Timestamp or Period properties</exception>
     public override ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
-            case ZfsPropertyNames.SnapshotNamePropertyName:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot name cannot be changed." );
             case ZfsPropertyNames.SnapshotPeriodPropertyName:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), "Snapshot period cannot be changed." );
             default:

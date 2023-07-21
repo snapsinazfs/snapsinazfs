@@ -52,7 +52,7 @@ public class SnapshotTests
         Snapshot leftSnapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( leftPeriod, leftTimestamp, leftParent );
         Snapshot rightSnapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( rightPeriod, rightTimestamp, rightParent );
 
-        int nameComparisonResult = string.CompareOrdinal( leftSnapshot.SnapshotName.Value, rightSnapshot.SnapshotName.Value );
+        int nameComparisonResult = string.CompareOrdinal( leftSnapshot.Name, rightSnapshot.Name );
         int snapshotComparisonResult = leftSnapshot.CompareTo( rightSnapshot );
         Assert.That( snapshotComparisonResult, Is.EqualTo( nameComparisonResult ) );
     }
@@ -90,32 +90,16 @@ public class SnapshotTests
         parent.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, recursion );
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( period, timestamp, parent );
         string periodString = (SnapshotPeriod)period;
-        string testOptionsString = $"-o {ZfsPropertyNames.SnapshotNamePropertyName}=testRoot@autosnap_{timestamp:s}_{periodString} -o {ZfsPropertyNames.SnapshotPeriodPropertyName}={periodString} -o {ZfsPropertyNames.SnapshotTimestampPropertyName}={timestamp:O} -o {ZfsPropertyNames.RecursionPropertyName}={recursion}";
+        string testOptionsString = $"-o {ZfsPropertyNames.SnapshotPeriodPropertyName}={periodString} -o {ZfsPropertyNames.SnapshotTimestampPropertyName}={timestamp:O} -o {ZfsPropertyNames.RecursionPropertyName}={recursion}";
         string snapshotOptionsString = snapshot.GetSnapshotOptionsStringForZfsSnapshot( );
         Assert.That( snapshotOptionsString, Is.EqualTo( testOptionsString ) );
     }
 
     [Test]
-    public void ToString_ReturnsSnapshotName( )
+    public void ToString_ReturnsName( )
     {
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshot( SnapshotPeriod.Frequent, DateTimeOffset.Now );
-        Assert.That( snapshot.ToString( ), Is.EqualTo( snapshot.SnapshotName.Value ) );
-    }
-
-    [Test]
-    public void UpdateProperty_SnapshotName( )
-    {
-        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshot( SnapshotPeriod.Frequent, DateTimeOffset.Now );
-        ZfsProperty<string> original = snapshot.SnapshotName with { };
-
-        Assume.That( original.Source, Is.EqualTo( ZfsPropertySourceConstants.Local ) );
-        Assume.That( snapshot.SnapshotName, Is.EqualTo( original ) );
-
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotNamePropertyName, "newName" ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
-            Assert.That( snapshot.SnapshotName, Is.EqualTo( original ) );
-        } );
+        Assert.That( snapshot.ToString( ), Is.EqualTo( snapshot.Name ) );
     }
 
     [Test]
