@@ -106,12 +106,19 @@ public partial class ZfsConfigurationWindow
         templateListView.SelectedItemChanged -= TemplateListViewOnSelectedItemChanged;
         templateInheritButton.Clicked -= TemplateInheritButtonClick;
         retentionFrequentTextField.Leave -= RetentionFrequentTextFieldOnLeave;
+        retentionFrequentInheritButton.Clicked -= RetentionFrequentInheritButtonClick;
         retentionHourlyTextField.Leave -= RetentionHourlyTextFieldOnLeave;
+        retentionHourlyInheritButton.Clicked -= RetentionHourlyInheritButtonClick;
         retentionDailyTextField.Leave -= RetentionDailyTextFieldOnLeave;
+        retentionDailyInheritButton.Clicked -= RetentionDailyInheritButtonClick;
         retentionWeeklyTextField.Leave -= RetentionWeeklyTextFieldOnLeave;
+        retentionWeeklyInheritButton.Clicked -= RetentionWeeklyInheritButtonClick;
         retentionMonthlyTextField.Leave -= RetentionMonthlyTextFieldOnLeave;
+        retentionMonthlyInheritButton.Clicked -= RetentionMonthlyInheritButtonClick;
         retentionYearlyTextField.Leave -= RetentionYearlyTextFieldOnLeave;
+        retentionYearlyInheritButton.Clicked -= RetentionYearlyInheritButtonClick;
         retentionPruneDeferralTextField.Leave -= RetentionPruneDeferralTextFieldOnLeave;
+        retentionPruneDeferralInheritButton.Clicked -= RetentionPruneDeferralInheritButtonClick;
         saveCurrentButton.Clicked -= SaveCurrentButtonOnClicked;
         // ReSharper restore HeapView.ObjectAllocation.Possible
         _eventsEnabled = false;
@@ -149,6 +156,7 @@ public partial class ZfsConfigurationWindow
 
         Logger.Debug( "Enabling event handlers for zfs configuration fields" );
 
+        // ReSharper disable HeapView.ObjectAllocation.Possible
         refreshButton.Clicked += RefreshZfsTreeViewFromZfs;
         resetCurrentButton.Clicked += ResetCurrentButtonOnClicked;
         zfsTreeView.SelectionChanged += zfsTreeViewOnSelectionChanged;
@@ -163,13 +171,21 @@ public partial class ZfsConfigurationWindow
         templateListView.SelectedItemChanged += TemplateListViewOnSelectedItemChanged;
         templateInheritButton.Clicked += TemplateInheritButtonClick;
         retentionFrequentTextField.Leave += RetentionFrequentTextFieldOnLeave;
+        retentionFrequentInheritButton.Clicked += RetentionFrequentInheritButtonClick;
         retentionHourlyTextField.Leave += RetentionHourlyTextFieldOnLeave;
+        retentionHourlyInheritButton.Clicked += RetentionHourlyInheritButtonClick;
         retentionDailyTextField.Leave += RetentionDailyTextFieldOnLeave;
+        retentionDailyInheritButton.Clicked += RetentionDailyInheritButtonClick;
         retentionWeeklyTextField.Leave += RetentionWeeklyTextFieldOnLeave;
+        retentionWeeklyInheritButton.Clicked += RetentionWeeklyInheritButtonClick;
         retentionMonthlyTextField.Leave += RetentionMonthlyTextFieldOnLeave;
+        retentionMonthlyInheritButton.Clicked += RetentionMonthlyInheritButtonClick;
         retentionYearlyTextField.Leave += RetentionYearlyTextFieldOnLeave;
+        retentionYearlyInheritButton.Clicked += RetentionYearlyInheritButtonClick;
         retentionPruneDeferralTextField.Leave += RetentionPruneDeferralTextFieldOnLeave;
+        retentionPruneDeferralInheritButton.Clicked += RetentionPruneDeferralInheritButtonClick;
         saveCurrentButton.Clicked += SaveCurrentButtonOnClicked;
+        // ReSharper enable HeapView.ObjectAllocation.Possible
         _eventsEnabled = true;
         Logger.Debug( "Event handlers for zfs configuration fields enabled" );
     }
@@ -278,6 +294,20 @@ public partial class ZfsConfigurationWindow
         EnableEventHandlers( );
     }
 
+    private void RetentionDailyInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Daily Retention Setting", $"Inherit Daily Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionDaily.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionDailyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void RetentionDailyTextFieldOnLeave( FocusEventArgs e )
     {
         try
@@ -303,6 +333,20 @@ public partial class ZfsConfigurationWindow
             UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
+        }
+    }
+
+    private void RetentionFrequentInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Frequent Retention Setting", $"Inherit Frequent Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionFrequent.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
         }
     }
 
@@ -334,6 +378,20 @@ public partial class ZfsConfigurationWindow
         }
     }
 
+    private void RetentionHourlyInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Hourly Retention Setting", $"Inherit Hourly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionHourly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void RetentionHourlyTextFieldOnLeave( FocusEventArgs e )
     {
         try
@@ -359,6 +417,20 @@ public partial class ZfsConfigurationWindow
             UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
+        }
+    }
+
+    private void RetentionMonthlyInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Monthly Retention Setting", $"Inherit Monthly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionMonthly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
         }
     }
 
@@ -390,6 +462,20 @@ public partial class ZfsConfigurationWindow
         }
     }
 
+    private void RetentionPruneDeferralInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Prune Deferral Retention Setting", $"Inherit Prune Deferral Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionPruneDeferral.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void RetentionPruneDeferralTextFieldOnLeave( FocusEventArgs e )
     {
         try
@@ -418,6 +504,20 @@ public partial class ZfsConfigurationWindow
         }
     }
 
+    private void RetentionWeeklyInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Weekly Retention Setting", $"Inherit Weekly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionWeekly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
+        }
+    }
+
     private void RetentionWeeklyTextFieldOnLeave( FocusEventArgs e )
     {
         try
@@ -443,6 +543,20 @@ public partial class ZfsConfigurationWindow
             UpdateFieldsForSelectedZfsTreeNode( false );
             UpdateButtonState( );
             EnableEventHandlers( );
+        }
+    }
+
+    private void RetentionYearlyInheritButtonClick( )
+    {
+        int queryResult = MessageBox.Query( "Inherit Yearly Retention Setting", $"Inherit Yearly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionYearly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        switch ( queryResult )
+        {
+            case 0:
+                return;
+            case 1:
+                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode( );
+                return;
         }
     }
 
