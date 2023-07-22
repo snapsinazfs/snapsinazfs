@@ -929,7 +929,7 @@ public partial class ZfsConfigurationWindow
                         throw new InvalidOperationException( $"Unexpected dialogResult received: {dialogResult}", e );
                 }
             }
-            recursionInheritButton.Enabled = treeDataset.Recursion.IsInherited;
+            recursionInheritButton.Enabled = treeDataset is { IsPoolRoot: false, Recursion.IsLocal: true };
 
             int templateIndex = ConfigConsole.TemplateListItems.FindIndex( t => t.TemplateName == treeDataset.Template.Value );
             if ( templateIndex == -1 )
@@ -945,36 +945,36 @@ public partial class ZfsConfigurationWindow
             templateListView.EnsureSelectedItemVisible( );
             templateListView.Enabled = true;
             templateSourceTextField.Text = treeDataset.Template.InheritedFrom;
-            templateInheritButton.Enabled = treeDataset.Template.IsInherited;
+            templateInheritButton.Enabled = treeDataset is { IsPoolRoot: false, Template.IsLocal: true };
 
             retentionFrequentTextField.Text = treeDataset.SnapshotRetentionFrequent.ValueString;
             retentionFrequentTextField.ColorScheme = treeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionFrequentTextField.Enabled = true;
-            retentionFrequentInheritButton.Enabled = treeDataset.SnapshotRetentionFrequent.IsInherited;
+            retentionFrequentInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionFrequent.IsLocal: true };
             retentionHourlyTextField.Text = treeDataset.SnapshotRetentionHourly.ValueString;
             retentionHourlyTextField.ColorScheme = treeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionHourlyTextField.Enabled = true;
-            retentionHourlyInheritButton.Enabled = treeDataset.SnapshotRetentionHourly.IsInherited;
+            retentionHourlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionHourly.IsLocal: true };
             retentionDailyTextField.Text = treeDataset.SnapshotRetentionDaily.ValueString;
             retentionDailyTextField.ColorScheme = treeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionDailyTextField.Enabled = true;
-            retentionDailyInheritButton.Enabled = treeDataset.SnapshotRetentionDaily.IsInherited;
+            retentionDailyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionDaily.IsLocal: true };
             retentionWeeklyTextField.Text = treeDataset.SnapshotRetentionWeekly.ValueString;
             retentionWeeklyTextField.ColorScheme = treeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionWeeklyTextField.Enabled = true;
-            retentionWeeklyInheritButton.Enabled = treeDataset.SnapshotRetentionWeekly.IsInherited;
+            retentionWeeklyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionWeekly.IsLocal: true };
             retentionMonthlyTextField.Text = treeDataset.SnapshotRetentionMonthly.ValueString;
             retentionMonthlyTextField.ColorScheme = treeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionMonthlyTextField.Enabled = true;
-            retentionMonthlyInheritButton.Enabled = treeDataset.SnapshotRetentionMonthly.IsInherited;
+            retentionMonthlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionMonthly.IsLocal: true };
             retentionYearlyTextField.Text = treeDataset.SnapshotRetentionYearly.ValueString;
             retentionYearlyTextField.ColorScheme = treeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionYearlyTextField.Enabled = true;
-            retentionYearlyInheritButton.Enabled = treeDataset.SnapshotRetentionYearly.IsInherited;
+            retentionYearlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionYearly.IsLocal: true };
             retentionPruneDeferralTextField.Text = treeDataset.SnapshotRetentionPruneDeferral.ValueString;
             retentionPruneDeferralTextField.ColorScheme = treeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
             retentionPruneDeferralTextField.Enabled = true;
-            retentionPruneDeferralInheritButton.Enabled = treeDataset.SnapshotRetentionPruneDeferral.IsInherited;
+            retentionPruneDeferralInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionPruneDeferral.IsLocal: true };
 
             recentFrequentTextField.Text = treeDataset.LastFrequentSnapshotTimestamp.IsLocal ? treeDataset.LastFrequentSnapshotTimestamp.ValueString : "None";
             recentHourlyTextField.Text = treeDataset.LastHourlySnapshotTimestamp.IsLocal ? treeDataset.LastHourlySnapshotTimestamp.ValueString : "None";
