@@ -2,11 +2,11 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½Softwareï¿½), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED ï¿½AS ISï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -14,6 +14,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 using SnapsInAZfs.Settings.Settings;
@@ -523,28 +524,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return hashCode.ToHashCode( );
     }
 
-    /// <summary>
-    ///     Gets the collection of <see cref="Snapshot" />s, groups by <see cref="SnapshotPeriodKind" />
-    /// </summary>
-    /// <remarks>
-    ///     Note that this is a reference type, as are the values of this collection.<br />
-    ///     Thus, when cloning a <see cref="ZfsRecord" /> using the <see langword="with" /> operator, this collection
-    ///     needs to be re-created and all of its values deep-copied manually, if unique references are needed.
-    /// </remarks>
-    private static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( )
-    {
-        return new(
-            new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
-            {
-                { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
-                { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
-            } );
-    }
-
     public List<Snapshot> GetSnapshotsToPrune( )
     {
         Logger.Debug( "Getting list of snapshots to prune for dataset {0}", Name );
@@ -883,8 +862,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return Snapshots[ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove( snapshot.Name, out _ );
     }
 
-    /// <exception cref="ArgumentNullException">name must be a non-null, non-empty, non-whitespace string <paramref name="name"/></exception>
-    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="name"/> is longer than 255 characters (ZFS limit)</exception>
+    /// <exception cref="ArgumentNullException">
+    ///     name must be a non-null, non-empty, non-whitespace string <paramref name="name" />
+    /// </exception>
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="name" /> is longer than 255 characters (ZFS limit)</exception>
     public static bool ValidateName( string kind, string name, Regex? validatorRegex = null )
     {
         Logger.Debug( "Validating name \"{0}\"", name );
@@ -944,6 +925,28 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     protected internal bool ValidateName( )
     {
         return ValidateName( Name );
+    }
+
+    /// <summary>
+    ///     Gets the collection of <see cref="Snapshot" />s, groups by <see cref="SnapshotPeriodKind" />
+    /// </summary>
+    /// <remarks>
+    ///     Note that this is a reference type, as are the values of this collection.<br />
+    ///     Thus, when cloning a <see cref="ZfsRecord" /> using the <see langword="with" /> operator, this collection
+    ///     needs to be re-created and all of its values deep-copied manually, if unique references are needed.
+    /// </remarks>
+    private static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection( )
+    {
+        return new(
+            new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+            {
+                { SnapshotPeriodKind.Frequent, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Hourly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Daily, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Weekly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Monthly, new ConcurrentDictionary<string, Snapshot>( ) },
+                { SnapshotPeriodKind.Yearly, new ConcurrentDictionary<string, Snapshot>( ) }
+            } );
     }
 
     private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
