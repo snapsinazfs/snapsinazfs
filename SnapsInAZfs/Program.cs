@@ -54,7 +54,7 @@ internal class Program
         DateTimeOffset currentTimestamp = DateTimeOffset.Now;
 
         Logger.Trace( "Parsing command-line arguments" );
-        CommandLineArguments? args = Args.Parse<CommandLineArguments>( argv );
+        CommandLineArguments? args = await Args.ParseAsync<CommandLineArguments>( argv ).ConfigureAwait( true );
 
         // The nullability context in PowerArgs is wrong, so this absolutely can be null
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -72,7 +72,7 @@ internal class Program
 
         if ( args.Version )
         {
-            string versionString = $"SnapsInAZfs Version: { Assembly.GetExecutingAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: { Assembly.GetExecutingAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );

@@ -68,6 +68,7 @@ public class SiazService : BackgroundService
         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
         if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || LastExecutionResultCode is not SiazExecutionResultCode.Completed )
         {
+            serviceCancellationToken.ThrowIfCancellationRequested( );
             Environment.Exit( ExitStatus );
             return;
         }
@@ -258,7 +259,7 @@ public class SiazService : BackgroundService
         if ( _settings is { TakeSnapshots: true } )
         {
             Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-            ZfsTasks.TakeAllConfiguredSnapshotsAsync( zfsCommandRunner, _settings, currentTimestamp, datasets, snapshots );
+            await ZfsTasks.TakeAllConfiguredSnapshotsAsync( zfsCommandRunner, _settings, currentTimestamp, datasets, snapshots ).ConfigureAwait( true );
         }
         else
         {
