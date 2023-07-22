@@ -101,7 +101,7 @@
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
     <PackageReference Include="PowerArgs" Version="4.0.2" />
-    <PackageReference Include="Terminal.Gui" Version="1.12.1" />
+    <PackageReference Include="Terminal.Gui" Version="1.13.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
