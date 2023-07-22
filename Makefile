@@ -139,7 +139,7 @@ install-service:
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
+	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=Linux-Release-R2R -p:VersionSuffix=$(VERSIONSUFFIX) -o $(RELEASEPUBLISHDIR) SnapsInAZfs/SnapsInAZfs.csproj
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
