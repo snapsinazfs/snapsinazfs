@@ -325,7 +325,8 @@ internal static class ZfsTasks
         switch ( zfsCommandRunnerStatus )
         {
             case ZfsCommandRunnerOperationStatus.DryRun:
-                Logger.Info( "DRY RUN: Snapshot for dataset {0} not taken", ds.Name );
+                ds.AddSnapshot( snapshot! );
+                Logger.Info( "DRY RUN: Pretending snapshot {0} was successfully taken", snapshot!.Name );
                 return false;
             case ZfsCommandRunnerOperationStatus.Success:
                 ds.AddSnapshot( snapshot! );
