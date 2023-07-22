@@ -168,7 +168,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         // If timestamps are different, sort on period, by its SnapshotPeriodKind equivalent
         return !Period.Value.Equals( other.Period.Value )
             ? Period.Value.ToSnapshotPeriodKind( ).CompareTo( other.Period.Value.ToSnapshotPeriodKind( ) )
-            : string.Compare( Name, Name, StringComparison.Ordinal );
+            : string.Compare( Name, other.Name, StringComparison.Ordinal );
     }
 
     /// <summary>
