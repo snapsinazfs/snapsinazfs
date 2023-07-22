@@ -650,8 +650,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             return false;
         }
 
-        // Yes, this can all be done in-line, but this is easier to debug, is more explicit, and the compiler is
-        // going to optimize it all away anyway.
         Logger.Trace( "Checking if frequent snapshot is needed for dataset {0} at timestamp {1:O}", Name, timestamp );
         if ( timestamp < LastFrequentSnapshotTimestamp.Value )
         {

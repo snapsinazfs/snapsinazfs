@@ -283,6 +283,22 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                 }
             }
                 break;
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
+            {
+                lock ( _propertyChangeCollectionsLock )
+                {
+                    RevertIntPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
+
+                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritIntPropertyFromParent( propertyName );
+                }
+            }
+                break;
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:

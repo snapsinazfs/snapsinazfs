@@ -147,6 +147,36 @@ public partial record ZfsRecord
 
     /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
     /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
+    public ref readonly ZfsProperty<int> InheritIntPropertyFromParent( string propertyName )
+    {
+        if ( IsPoolRoot )
+        {
+            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+        }
+
+        switch ( propertyName )
+        {
+            case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionFrequent.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionHourly.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionDaily.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionWeekly.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionMonthly.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionYearly.Value, false );
+            case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
+                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionPruneDeferral.Value, false );
+            default:
+                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+        }
+    }
+
+    /// <exception cref="InvalidOperationException">A pool root cannot inherit a property</exception>
+    /// <exception cref="ArgumentOutOfRangeException">An unrecognized property name was provided.</exception>
     /// <exception cref="Exception">A delegate callback throws an exception</exception>
     public ref readonly ZfsProperty<string> InheritStringPropertyFromParent( string propertyName )
     {
