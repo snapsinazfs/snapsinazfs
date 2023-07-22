@@ -222,6 +222,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.RecursionPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -304,6 +305,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionDailyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -346,6 +348,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -388,6 +391,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -430,6 +434,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -472,6 +477,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -514,6 +520,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -556,6 +563,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -826,6 +834,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TakeSnapshotsPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
@@ -847,6 +856,7 @@ public partial class ZfsConfigurationWindow
             case 1:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TemplatePropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
+                UpdateButtonState( );
                 return;
         }
     }
