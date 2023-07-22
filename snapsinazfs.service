@@ -1,6 +1,6 @@
 [Unit]
 Description=SnapsInAZfs Service
-Documentation=man:SnapsInAZfs(8) man:SnapsInAZfs(5)
+Documentation=man:snapsinazfs(8) man:snapsinazfs(5) man:snapsinazfs-zfsprops(7)
 Requisite=zfs.target
 After=zfs.target
 ConditionFileNotEmpty=/etc/SnapsInAZfs/SnapsInAZfs.local.json
