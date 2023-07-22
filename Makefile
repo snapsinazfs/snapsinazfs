@@ -28,6 +28,9 @@ ETCDIR ?= /etc
 
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
 
+VERSIONSUFFIXFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)/VersionSuffix
+VERSIONSUFFIX := $(shell cat ${VERSIONSUFFIXFILE})
+
 all:	build-release
 
 clean:  clean-all
@@ -88,7 +91,7 @@ build-debug:
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$$(<VersionSuffix) SnapsInAZfs/SnapsInAZfs.csproj
+	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) SnapsInAZfs/SnapsInAZfs.csproj
 
 reinstall:	uninstall	clean	install
 
