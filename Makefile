@@ -18,7 +18,10 @@ PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/SnapsInAZfs.monitoring.schema.
 
 SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
 MANDIR ?= /usr/local/man
-
+MAN3DIR ?= $(MANDIR)/man3
+MAN5DIR ?= $(MAN5DIR)
+MAN7DIR ?= $(MANDIR)/man7
+MAN8DIR ?= $(MAN8DIR)
 LOCALSBINDIR ?= /usr/local/sbin
 LOCALSHAREDIR ?= /usr/local/share
 ETCDIR ?= /etc
@@ -107,20 +110,20 @@ install-config-local-force:
 	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json
 
 install-doc:
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MANDIR)/man8/$(SIAZ).8
-	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/$(SIAZLC).8
-	cp -fl  $(MANDIR)/man8/$(SIAZ).8 $(MANDIR)/man8/siaz.8
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-config-console.8 $(MANDIR)/man8/$(SIAZ)-config-console.8
-	cp -fl  $(MANDIR)/man8/$(SIAZ)-config-console.8 $(MANDIR)/man8/$(SIAZLC)-config-console.8
-	cp -fl  $(MANDIR)/man8/$(SIAZ)-config-console.8 $(MANDIR)/man8/siaz-config-console.8
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-zfsprops.5 $(MANDIR)/man5/$(SIAZ)-zfsprops.5
-	cp -fl  $(MANDIR)/man5/$(SIAZ)-zfsprops.5 $(MANDIR)/man5/$(SIAZLC)-zfsprops.5
-	cp -fl  $(MANDIR)/man5/$(SIAZ)-zfsprops.5 $(MANDIR)/man5/siaz-zfsprops.5
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MANDIR)/man5/$(SIAZ).5
-	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZLC).5
-	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/siaz.5
-	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZ).json.5
-	cp -fl  $(MANDIR)/man5/$(SIAZ).5 $(MANDIR)/man5/$(SIAZLC).json.5
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MAN8DIR)/$(SIAZ).8
+	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/$(SIAZLC).8
+	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/siaz.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-config-console.8 $(MAN8DIR)/$(SIAZ)-config-console.8
+	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZLC)-config-console.8
+	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/siaz-config-console.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
+	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZLC)-zfsprops.7
+	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/siaz-zfsprops.7
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).5
+	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).5
+	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/siaz.5
+	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).json.5
+	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).json.5
 	mandb -q
 
 install-release:	publish-release
@@ -146,20 +149,20 @@ uninstall-config-local:
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:
-	rm -fv $(MANDIR)/man8/$(SIAZ).8 2>/dev/null
-	rm -fv $(MANDIR)/man8/$(SIAZLC).8 2>/dev/null
-	rm -fv $(MANDIR)/man8/siaz.8 2>/dev/null
-	rm -fv $(MANDIR)/man8/$(SIAZ)-config-console.8 2>/dev/null
-	rm -fv $(MANDIR)/man8/$(SIAZLC)-config-console.8 2>/dev/null
-	rm -fv $(MANDIR)/man8/siaz-config-console.8 2>/dev/null
-	rm -fv $(MANDIR)/man8/$(SIAZ)-zfsprops.5 2>/dev/null
-	rm -fv $(MANDIR)/man8/$(SIAZLC)-zfsprops.5 2>/dev/null
-	rm -fv $(MANDIR)/man8/siaz-zfsprops.5 2>/dev/null
-	rm -fv $(MANDIR)/man5/$(SIAZ).5 2>/dev/null
-	rm -fv $(MANDIR)/man5/$(SIAZLC).5 2>/dev/null
-	rm -fv $(MANDIR)/man5/siaz.5 2>/dev/null
-	rm -fv $(MANDIR)/man5/$(SIAZ).json.5 2>/dev/null
-	rm -fv $(MANDIR)/man5/$(SIAZLC).json.5 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZ).8 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZLC).8 2>/dev/null
+	rm -fv $(MAN8DIR)/siaz.8 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZ)-config-console.8 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZLC)-config-console.8 2>/dev/null
+	rm -fv $(MAN8DIR)/siaz-config-console.8 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
+	rm -fv $(MAN8DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
+	rm -fv $(MAN8DIR)/siaz-zfsprops.7 2>/dev/null
+	rm -fv $(MAN5DIR)/$(SIAZ).5 2>/dev/null
+	rm -fv $(MAN5DIR)/$(SIAZLC).5 2>/dev/null
+	rm -fv $(MAN5DIR)/siaz.5 2>/dev/null
+	rm -fv $(MAN5DIR)/$(SIAZ).json.5 2>/dev/null
+	rm -fv $(MAN5DIR)/$(SIAZLC).json.5 2>/dev/null
 	mandb -q
 
 uninstall-everything:	uninstall-service	uninstall	uninstall-config-local
