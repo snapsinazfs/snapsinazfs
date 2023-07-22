@@ -88,7 +88,7 @@ build-debug:
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 SnapsInAZfs/SnapsInAZfs.csproj
+	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$$(<VersionSuffix) SnapsInAZfs/SnapsInAZfs.csproj
 
 reinstall:	uninstall	clean	install
 

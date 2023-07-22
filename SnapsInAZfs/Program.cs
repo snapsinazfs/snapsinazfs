@@ -72,7 +72,7 @@ internal class Program
 
         if ( args.Version )
         {
-            string versionString = $"SnapsInAZfs Version: {Assembly.GetExecutingAssembly( ).GetName( ).Version}";
+            string versionString = $"SnapsInAZfs Version: { Assembly.GetExecutingAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );

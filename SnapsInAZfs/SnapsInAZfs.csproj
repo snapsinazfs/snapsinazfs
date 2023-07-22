@@ -7,15 +7,17 @@
     <LangVersion>11</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <DebugType>embedded</DebugType>
     <AssemblyVersion>1.0.0</AssemblyVersion>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
     <Platforms>x64</Platforms>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
@@ -25,15 +27,22 @@
     <PublishSingleFile>True</PublishSingleFile>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
     <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS</DefineConstants>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG</DefineConstants>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
