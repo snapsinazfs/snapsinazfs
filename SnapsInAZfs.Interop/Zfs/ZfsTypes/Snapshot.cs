@@ -243,13 +243,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _timestamp.Equals( other._timestamp )
-               && _enabled.Equals( other.Enabled )
+               && Timestamp.Equals( other._timestamp )
+               && Enabled.Equals( other.Enabled )
                && Kind == other.Kind
                && Name == other.Name
-               && _pruneSnapshotsField.Equals( other.PruneSnapshots )
-               && _recursion.Equals( other.Recursion )
-               && _template.Equals( other.Template );
+               && PruneSnapshots.Equals( other.PruneSnapshots )
+               && Recursion.Equals( other.Recursion )
+               && Template.Equals( other.Template );
     }
 
     public bool Equals( Snapshot other )
@@ -260,13 +260,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _timestamp.Equals( other._timestamp )
-               && _enabled.Equals( other.Enabled )
+               && Timestamp.Equals( other._timestamp )
+               && Enabled.Equals( other.Enabled )
                && Kind == other.Kind
                && Name == other.Name
-               && _pruneSnapshotsField.Equals( other.PruneSnapshots )
-               && _recursion.Equals( other.Recursion )
-               && _template.Equals( other.Template );
+               && PruneSnapshots.Equals( other.PruneSnapshots )
+               && Recursion.Equals( other.Recursion )
+               && Template.Equals( other.Template );
     }
 
     /// <inheritdoc />
