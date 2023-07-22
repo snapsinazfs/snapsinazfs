@@ -79,9 +79,9 @@ public record FormattingSettings
     ///     <paramref name="periodKind" />, and <paramref name="timestamp" />, in conjunction with configured settings for this
     ///     object
     /// </summary>
-    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
+    public string GenerateFullSnapshotName( string datasetName, in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp )
     {
-        return $"{datasetName}@{GenerateShortSnapshotName( periodKind, timestamp )}";
+        return $"{datasetName}@{GenerateShortSnapshotName( in periodKind, in timestamp )}";
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ public record FormattingSettings
     ///     <paramref name="timestamp" />, in conjunction with configured settings for this
     ///     object
     /// </summary>
-    public string GenerateShortSnapshotName( SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
+    public string GenerateShortSnapshotName( in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp )
     {
         return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{periodKind switch
         {

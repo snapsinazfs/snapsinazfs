@@ -2,11 +2,11 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½Softwareï¿½), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED ï¿½AS ISï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -364,6 +364,25 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                              snapshotTimestamp,
                              dataset );
         AddSnapshot( snap );
+        return snap;
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="Snapshot" /> from the given <paramref name="period" /> and <paramref name="timestamp" />,
+    /// using <paramref name="template"/> to generate its name.
+    /// </summary>
+    /// <param name="period">The period for the new <see cref="Snapshot" /></param>
+    /// <param name="timestamp">The timestamp for the new <see cref="Snapshot" /></param>
+    /// <param name="template"></param>
+    /// <returns>
+    ///     A reference to the created <see cref="Snapshot" />
+    /// </returns>
+    [MustUseReturnValue]
+    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in TemplateSettings template )
+    {
+        Logger.Trace( "Creating {0} snapshot for {1} {2}", period, Kind, Name );
+        string snapName = template.GenerateFullSnapshotName( Name, in period.Kind, in timestamp );
+        Snapshot snap = new( snapName, in period.Kind, in timestamp, this );
         return snap;
     }
 

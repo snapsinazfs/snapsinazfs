@@ -29,8 +29,8 @@ public record TemplateSettings
     public SnapshotTimingSettings SnapshotTiming { get; set; } = SnapshotTimingSettings.GetDefault( );
 
     /// <inheritdoc cref="FormattingSettings.GenerateFullSnapshotName" />
-    public string GenerateFullSnapshotName( string datasetName, SnapshotPeriodKind periodKind, DateTimeOffset timestamp )
+    public string GenerateFullSnapshotName( string datasetName, in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp )
     {
-        return Formatting.GenerateFullSnapshotName( datasetName, periodKind, timestamp );
+        return Formatting.GenerateFullSnapshotName( datasetName, in periodKind, in timestamp );
     }
 }

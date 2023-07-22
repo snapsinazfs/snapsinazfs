@@ -19,7 +19,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
 {
     private SnapshotPeriod( SnapshotPeriodKind kind )
     {
-        Kind = kind;
+        _kind = kind;
     }
 
     /// <summary>
@@ -37,10 +37,12 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     /// </summary>
     public static SnapshotPeriod Hourly { get; } = new( SnapshotPeriodKind.Hourly );
 
+    private readonly SnapshotPeriodKind _kind;
+
     /// <summary>
     ///     Gets the <see cref="SnapshotPeriodKind" /> value for this object
     /// </summary>
-    public SnapshotPeriodKind Kind { get; }
+    public ref readonly SnapshotPeriodKind Kind => ref _kind;
 
     /// <summary>
     ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Monthly" />
