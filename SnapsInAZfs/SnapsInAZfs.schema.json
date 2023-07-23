@@ -13,6 +13,26 @@
             "type": "string",
             "description": "Comments about this document."
         },
+        "DryRun": {
+            "type": "boolean",
+            "description": "If SnapsInAZfs will perform a dry run and make no changes to ZFS.",
+            "default": false
+        },
+        "TakeSnapshots": {
+            "type": "boolean",
+            "description": "If running SnapsInAZfs will take snapshots by default",
+            "default": false
+        },
+        "PruneSnapshots": {
+            "type": "boolean",
+            "description": "If running SnapsInAZfs will prune expired snapshots by default",
+            "default": false
+        },
+        "LocalSystemName": {
+            "type": "string",
+            "description": "The name of the local system, which will be set in the snapsinazfs.com:sourcesystem zfs property of objects created on this system",
+            "default": "StandaloneSiazSystem"
+        },
         "ZfsPath": {
             "type": "string",
             "description": "The path to the zfs utility",
@@ -33,21 +53,6 @@
             "description": "The number of seconds between timer events when running as a service",
             "default": 10
         },
-        "DryRun": {
-            "type": "boolean",
-            "description": "If SnapsInAZfs will perform a dry run and make no changes to ZFS.",
-            "default": false
-        },
-        "TakeSnapshots": {
-            "type": "boolean",
-            "description": "If running SnapsInAZfs will take snapshots by default",
-            "default": false
-        },
-        "PruneSnapshots": {
-            "type": "boolean",
-            "description": "If running SnapsInAZfs will prune expired snapshots by default",
-            "default": false
-        },
         "Monitoring": {
             "$ref": "#/$defs/Monitoring",
             "additionalProperties": false
@@ -63,6 +68,7 @@
         "DaemonTimerIntervalSeconds",
         "ZfsPath",
         "ZpoolPath",
+        "LocalSystemName",
         "Monitoring",
         "TakeSnapshots",
         "PruneSnapshots",

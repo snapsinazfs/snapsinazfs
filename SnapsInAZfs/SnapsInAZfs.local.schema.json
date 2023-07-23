@@ -13,30 +13,10 @@
             "type": "string",
             "description": "Comments about this document."
         },
-        "ZfsPath": {
-            "type": "string",
-            "description": "The path to the zfs utility",
-            "default": "/usr/local/sbin/zfs"
-        },
-        "ZpoolPath": {
-            "type": "string",
-            "description": "The path to the zpool utility",
-            "default": "/usr/local/sbin/zpool"
-        },
         "DryRun": {
             "type": "boolean",
             "description": "If SnapsInAZfs will perform a dry run and make no changes to ZFS.",
             "default": false
-        },
-        "Daemonize": {
-            "type": "boolean",
-            "description": "If SnapsInAZfs will run as a service",
-            "default": false
-        },
-        "DaemonTimerIntervalSeconds": {
-            "type": "integer",
-            "description": "The number of seconds between timer events when running as a service",
-            "default": 10
         },
         "TakeSnapshots": {
             "type": "boolean",
@@ -47,6 +27,31 @@
             "type": "boolean",
             "description": "If running SnapsInAZfs will prune expired snapshots by default",
             "default": false
+        },
+        "LocalSystemName": {
+            "type": "string",
+            "description": "The name of the local system, which will be set in the snapsinazfs.com:sourcesystem zfs property of objects created on this system",
+            "default": "StandaloneSiazSystem"
+        },
+        "ZfsPath": {
+            "type": "string",
+            "description": "The path to the zfs utility",
+            "default": "/usr/local/sbin/zfs"
+        },
+        "ZpoolPath": {
+            "type": "string",
+            "description": "The path to the zpool utility",
+            "default": "/usr/local/sbin/zpool"
+        },
+        "Daemonize": {
+            "type": "boolean",
+            "description": "If SnapsInAZfs will run as a service",
+            "default": false
+        },
+        "DaemonTimerIntervalSeconds": {
+            "type": "integer",
+            "description": "The number of seconds between timer events when running as a service",
+            "default": 10
         },
         "Monitoring": {
             "$ref": "#/$defs/Monitoring",
