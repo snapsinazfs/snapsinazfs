@@ -249,13 +249,15 @@ Overrides this setting, forcing its value to \fBfalse\fP.
 .TP
 Type: string
 .IP
-This setting defines the value that will be used for the \fB\*[SIAZNS]:sourcesystem\fP ZFS property (\fB\*[SIAZLC]-zfsprops(7)\fP).\&
+This setting defines the value that will be used for the \fB\*[SIAZNS]:sourcesystem\fP ZFS property (\fB\*[SIAZLC]\-zfsprops(7)\fP).\&
 .IP
 This value may be used by future versions of \*[SIAZ] to allow special handling of snapshots received from another system,
 but is not currently used for anything other than setting the sourcesystem property, at this time.\&
 .IP
-This value MUST be set to a non-empty, non-whitespace-only string, and SHOULD be unique among all systems using \*[SIAZ].\&
+This value MUST be set to a non\-empty, non\-whitespace-only string, and SHOULD be unique among all systems using \*[SIAZ].\&
 It is strongly recommended that this setting be set to the fully\-qualified DNS name of the system \*[SIAZ] is running on.\&
+.IP
+The default value is \fBStandaloneSiazSystem\fP, and is intended as a place\-holder for single\-system deployments only.\&
 .RE
 .
 .
