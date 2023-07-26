@@ -563,6 +563,25 @@ Otherwise, that property is displayed only to minute precision, by default.\&
 \*[SIAZ] does not use the native \fBcreation\fP property for any purpose (in fact, it does not even retrieve it at all).\&
 .RE
 .TQ
+.B snapsinazfs.com:sourcesystem
+.RS
+.TP
+Type:
+string
+.TQ
+Applicable To:
+filesystems, volumes, snapshots
+.TQ
+Description:
+This property is set explicitly, locally, on all snapshots that \*[SIAZ] creates.\&
+.IP
+Its value will be set to the value specified in the JSON configuration files, in the \fBLocalSystemName\fP setting.\&
+.IP
+This property will be usef in future versions of \*[SIAZ] to allow for different treatment of snapshots received from other systems, but is not currently used.\&
+.IP
+This property MUST be a non-empty, non-whitespace-only string.\&
+.RE
+.TQ
 .B snapsinazfs.com:takesnapshots
 .RS
 .TP

@@ -1,6 +1,7 @@
 .ds SIAZB \fBSnapsInAZfs\fP
 .ds SIAZ SnapsInAZfs
 .ds SIAZLC snapsinazfs
+.ds SIAZNS \*[SIAZLC]\.com
 .ds SCONF /usr/local/share/\*[SIAZ]/\*[SIAZ].json
 .ds SLCONF /etc/\*[SIAZ]/\*[SIAZ].local.json
 .ds SNCONF /etc/\*[SIAZ]/\*[SIAZ].nlog.json
@@ -186,7 +187,7 @@ Enables execution of code that handles creating new snapshots.\&
 Does NOT imply taking snapshots for any dataset.\&
 A dataset must have appropriate properties set for a snapshot to be taken.\&
 See
-.B snapsinazfs-zfsprops(5)\fR.\&
+.B snapsinazfs-zfsprops(7)\fR.\&
 .TQ 4
 .B \(bu false
 Disables execution of code that handles creating new snapshots.\&
@@ -222,7 +223,7 @@ Enables execution of code that handles checking for expiration of existing snaps
 Does NOT imply pruning snapshots for any dataset.\&
 A dataset must have appropriate properties set for any of its snapshots to be pruned.\&
 See
-.B snapsinazfs-zfsprops(5)\fR.\&
+.B snapsinazfs-zfsprops(7)\fR.\&
 .TQ 4
 .B \(bu false
 Disables execution of code that handles checking for expiration of existing snapshots and pruning of snapshots that have expired.\&
@@ -239,6 +240,22 @@ Overrides this setting, forcing its value to \fBtrue\fP.
 .B \-\-no\-prune\-snapshots
 Overrides this setting, forcing its value to \fBfalse\fP.
 .RE
+.RE
+.
+.
+.TQ
+.B /LocalSystemName
+.RS
+.TP
+Type: string
+.IP
+This setting defines the value that will be used for the \fB\*[SIAZNS]:sourcesystem\fP ZFS property (\fB\*[SIAZLC]-zfsprops(7)\fP).\&
+.IP
+This value may be used by future versions of \*[SIAZ] to allow special handling of snapshots received from another system,
+but is not currently used for anything other than setting the sourcesystem property, at this time.\&
+.IP
+This value MUST be set to a non-empty, non-whitespace-only string, and SHOULD be unique among all systems using \*[SIAZ].\&
+It is strongly recommended that this setting be set to the fully\-qualified DNS name of the system \*[SIAZ] is running on.\&
 .RE
 .
 .
@@ -1006,6 +1023,7 @@ Nodes beginning with the $ symbol are metadata and are not parsed by \*[SIAZ] an
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
   "DryRun": false,
+  "LocalSystemName": "StandaloneSiazSystem",
   "Monitoring": {
     "Nagios": {
       "$comments": "Nagios-specific monitoring options",
@@ -1057,6 +1075,7 @@ Nodes beginning with the $ symbol are metadata and are not parsed by \*[SIAZ] an
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "DryRun": false,
+  "LocalSystemName": "StandaloneSiazSystem",
   "Daemonize": false,
   "Monitoring": {
     "Nagios": {
@@ -1098,8 +1117,8 @@ Nodes beginning with the $ symbol are metadata and are not parsed by \*[SIAZ] an
 .EE
 .SH SEE ALSO
 .TP
-.B \*[SIAZ](8)
+.B \*[SIAZLC](8)
 .TQ
-.B \*[SIAZ]\-zfsprops(5)
+.B \*[SIAZLC]\-zfsprops(7)
 .TQ
-.B \*[SIAZ]\-config\-console(8)
+.B \*[SIAZLC]\-config\-console(8)
