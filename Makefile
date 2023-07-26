@@ -191,14 +191,14 @@ test-everything-verbose:
 save-snapsinazfs-zfs-properties:
 	@test ! -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Properties already saved. Will not overwrite. ; false ; }
 	@echo "#!/bin/bash -x" >propWipeUndoScript.sh
-	zfs get all -s local -rHo name,property,value | grep snapsinazfs.com | while read obj prop val ; do echo zfs set $${prop}\=\"$${val}\" $${obj} >>propWipeUndoScript.sh ; done
+	zfs get all -s local -rHo name,property,value | grep "snapsinazfs.com:" | while read obj prop val ; do echo zfs set $${prop}\=\"$${val}\" $${obj} >>propWipeUndoScript.sh ; done
 	chmod 774 propWipeUndoScript.sh
 	@echo Undo script saved as ./propWipeUndoScript
 	@echo Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore snapsinazfs.com properties
 
 wipe-snapsinazfs-zfs-properties:
 	@test -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Must save properties before wiping ; false ; }
-	zfs get all -s local -rHo name,property | grep snapsinazfs.com | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
+	zfs get all -s local -rHo name,property | grep "snapsinazfs.com:" | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
 	$(info All properties removed)
 	$(info Run make restore-wiped-zfs-properties to restore configuration)
 
