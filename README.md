@@ -7,18 +7,16 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- As of today (2023-07-26), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
- stored in ZFS itself, via ZFS user properties, for everything except the timing and naming settings, which are still
- in configuration files, and provides a TUI for making configuration easy.
+ As of today (2023-07-26), the core functionality of SIAZ, including the ability to take and prune snapshots,
+ the configuration console, documentation, a systemd service, enhanced logging, full install/uninstall via make recipes,
+ and zfs property backup, cleanup, and restore, is all implemented, and I consider the application to be ready for version 1.0.0 release.
  
- SnapsInAZfs is also capable of running as a systemd service. A unit file and `make` recipe for installing and
- uninstalling the service are included.
+ I will be tagging release candidate versions for a period of time, during which I'll continue to make refinements and bug fixes,
+ but new feature development will happen in branches that won't be merged to master until after the final 1.0.0 release.
+ 
+ Note that this is still pre-release software, and it should be treated as such.
 
- Beta verisons are being tagged on github, and are available for testing.\
- This comes with what should be the
- obvious disclaimer that this is a beta-stage project and use on important systems is at your own risk.\
- That said, I'm running it on my home lab as well as a non-critical production system at work, and it's
- behaving as expected for my use cases, so far. 
+ Please report any issues in the issue tracker, with as much detail as you can provide. Detailed logs are greatly appreciated and do not reveal secret information beyond the names of your ZFS datasets and snapshots.
  
  ## Project Organization
  
