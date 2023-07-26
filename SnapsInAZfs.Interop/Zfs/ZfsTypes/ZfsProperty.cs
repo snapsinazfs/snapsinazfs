@@ -321,63 +321,63 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         if ( !ZfsProperty<bool>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.EnabledPropertyName ], out enabled ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.EnabledPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.EnabledPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<bool>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.TakeSnapshotsPropertyName ], out takeSnapshots ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.TakeSnapshotsPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.TakeSnapshotsPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<bool>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.PruneSnapshotsPropertyName ], out pruneSnapshots ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.PruneSnapshotsPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.PruneSnapshotsPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ], out lastFrequentSnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ], out lastHourlySnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ], out lastDailySnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ], out lastWeeklySnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ], out lastMonthlySnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<DateTimeOffset>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ], out lastYearlySnapshotTimestamp ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
@@ -388,56 +388,56 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ], out retentionFrequent ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ], out retentionHourly ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ], out retentionDaily ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionDailyPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ], out retentionWeekly ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ], out retentionMonthly ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ], out retentionYearly ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( !ZfsProperty<int>.TryParse( rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ], out retentionPruneDeferral ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, rawZfsObject.Properties[ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out bytesUsed );
             return false;
         }
 
         if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, out bytesAvailable ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Available, rawZfsObject.Properties[ ZfsNativePropertyNames.Available ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out _, out bytesUsed );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out _, out bytesUsed );
             bytesAvailable = 0;
             return false;
         }
@@ -445,15 +445,16 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, out bytesUsed ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Used, rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, rawZfsObject.Kind, dsName );
-            SetAllOutParametersNull( out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out _ );
+            SetAllOutParametersNull( out enabled, out takeSnapshots, out pruneSnapshots, out lastFrequentSnapshotTimestamp, out lastHourlySnapshotTimestamp, out lastDailySnapshotTimestamp, out lastWeeklySnapshotTimestamp, out lastMonthlySnapshotTimestamp, out lastYearlySnapshotTimestamp, out recursion, out template, out retentionFrequent, out retentionHourly, out retentionDaily, out retentionWeekly, out retentionMonthly, out retentionYearly, out retentionPruneDeferral, out sourceSystem, out bytesAvailable, out _ );
             bytesUsed = 0;
             return false;
         }
 
         return true;
 
-        static void SetAllOutParametersNull( out ZfsProperty<bool>? takeSnapshots, out ZfsProperty<bool>? pruneSnapshots, out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string> recursion, out ZfsProperty<string> template, out ZfsProperty<int>? retentionFrequent, out ZfsProperty<int>? retentionHourly, out ZfsProperty<int>? retentionDaily, out ZfsProperty<int>? retentionWeekly, out ZfsProperty<int>? retentionMonthly, out ZfsProperty<int>? retentionYearly, out ZfsProperty<int>? retentionPruneDeferral, out ZfsProperty<string> sourceSystem, out long bytesAvailable, out long bytesUsed )
+        static void SetAllOutParametersNull( out ZfsProperty<bool>? enabled, out ZfsProperty<bool>? takeSnapshots, out ZfsProperty<bool>? pruneSnapshots, out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string> recursion, out ZfsProperty<string> template, out ZfsProperty<int>? retentionFrequent, out ZfsProperty<int>? retentionHourly, out ZfsProperty<int>? retentionDaily, out ZfsProperty<int>? retentionWeekly, out ZfsProperty<int>? retentionMonthly, out ZfsProperty<int>? retentionYearly, out ZfsProperty<int>? retentionPruneDeferral, out ZfsProperty<string> sourceSystem, out long bytesAvailable, out long bytesUsed )
         {
+            enabled = null;
             takeSnapshots = null;
             pruneSnapshots = null;
             lastFrequentSnapshotTimestamp = null;
