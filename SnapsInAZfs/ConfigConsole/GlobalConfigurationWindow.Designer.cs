@@ -8,10 +8,11 @@
 //      the code is regenerated.
 //  </auto-generated>
 // -----------------------------------------------------------------------------
-
-using Terminal.Gui;
-
 namespace SnapsInAZfs.ConfigConsole {
+    using System;
+    using Terminal.Gui;
+    
+    
     public partial class GlobalConfigurationWindow : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme whiteOnBlue;
@@ -30,6 +31,10 @@ namespace SnapsInAZfs.ConfigConsole {
 
         internal Terminal.Gui.RadioGroup pruneSnapshotsRadioGroup;
         
+        private Terminal.Gui.Label localSystemNameLabel;
+
+        internal Terminal.Gui.TextField localSystemNameTextBox;
+        
         private Terminal.Gui.Label pathToZfsLabel;
 
         internal Terminal.Gui.TextField pathToZfsTextField;
@@ -46,6 +51,8 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZpoolLabel = new Terminal.Gui.Label();
             this.pathToZfsTextField = new Terminal.Gui.TextField();
             this.pathToZfsLabel = new Terminal.Gui.Label();
+            this.localSystemNameTextBox = new Terminal.Gui.TextField();
+            this.localSystemNameLabel = new Terminal.Gui.Label();
             this.pruneSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
             this.pruneSnapshotsLabel = new Terminal.Gui.Label();
             this.takeSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
@@ -65,7 +72,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
             this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
             this.Width = 68;
-            this.Height = 11;
+            this.Height = 12;
             this.X = Pos.Center();
             this.Y = Pos.Center();
             this.ColorScheme = this.whiteOnBlue;
@@ -140,10 +147,28 @@ namespace SnapsInAZfs.ConfigConsole {
                     "false"};
             this.pruneSnapshotsRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.Add(this.pruneSnapshotsRadioGroup);
+            this.localSystemNameLabel.Width = 4;
+            this.localSystemNameLabel.Height = 1;
+            this.localSystemNameLabel.X = 3;
+            this.localSystemNameLabel.Y = 4;
+            this.localSystemNameLabel.Data = "localSystemNameLabel";
+            this.localSystemNameLabel.Text = "Local System Name";
+            this.localSystemNameLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.Add(this.localSystemNameLabel);
+            this.localSystemNameTextBox.Width = 35;
+            this.localSystemNameTextBox.Height = 1;
+            this.localSystemNameTextBox.X = 28;
+            this.localSystemNameTextBox.Y = 4;
+            this.localSystemNameTextBox.ColorScheme = this.tgDefault;
+            this.localSystemNameTextBox.Secret = false;
+            this.localSystemNameTextBox.Data = "localSystemNameTextBox";
+            this.localSystemNameTextBox.Text = "";
+            this.localSystemNameTextBox.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.Add(this.localSystemNameTextBox);
             this.pathToZfsLabel.Width = 18;
             this.pathToZfsLabel.Height = 1;
             this.pathToZfsLabel.X = 3;
-            this.pathToZfsLabel.Y = 4;
+            this.pathToZfsLabel.Y = 5;
             this.pathToZfsLabel.Data = "pathToZfsLabel";
             this.pathToZfsLabel.Text = "Path to zfs Utility";
             this.pathToZfsLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -151,7 +176,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZfsTextField.Width = 35;
             this.pathToZfsTextField.Height = 1;
             this.pathToZfsTextField.X = 28;
-            this.pathToZfsTextField.Y = 4;
+            this.pathToZfsTextField.Y = 5;
             this.pathToZfsTextField.ColorScheme = this.tgDefault;
             this.pathToZfsTextField.Secret = false;
             this.pathToZfsTextField.Data = "pathToZfsTextField";
@@ -161,7 +186,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZpoolLabel.Width = 4;
             this.pathToZpoolLabel.Height = 1;
             this.pathToZpoolLabel.X = 3;
-            this.pathToZpoolLabel.Y = 5;
+            this.pathToZpoolLabel.Y = 6;
             this.pathToZpoolLabel.Data = "pathToZpoolLabel";
             this.pathToZpoolLabel.Text = "Path to zpool Utility";
             this.pathToZpoolLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -169,7 +194,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZpoolTextField.Width = 35;
             this.pathToZpoolTextField.Height = 1;
             this.pathToZpoolTextField.X = 28;
-            this.pathToZpoolTextField.Y = 5;
+            this.pathToZpoolTextField.Y = 6;
             this.pathToZpoolTextField.ColorScheme = this.tgDefault;
             this.pathToZpoolTextField.Secret = false;
             this.pathToZpoolTextField.Data = "pathToZpoolTextField";

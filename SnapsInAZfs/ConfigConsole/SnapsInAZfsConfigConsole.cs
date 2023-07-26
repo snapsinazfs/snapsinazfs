@@ -230,6 +230,7 @@ public partial class SnapsInAZfsConfigConsole
                 DryRun = _globalConfigurationWindow!.dryRunRadioGroup.GetSelectedBooleanFromLabel( ),
                 TakeSnapshots = _globalConfigurationWindow.takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
                 PruneSnapshots = _globalConfigurationWindow.pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( ),
+                LocalSystemName = _globalConfigurationWindow.localSystemNameTextBox.Text.ToString( )!,
                 ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
                 ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
                 Templates = Program.Settings!.Templates
