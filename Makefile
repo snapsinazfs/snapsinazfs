@@ -25,7 +25,7 @@ MAN8DIR ?= $(MANDIR)/man8
 LOCALSBINDIR ?= /usr/local/sbin
 LOCALSHAREDIR ?= /usr/local/share
 ETCDIR ?= /etc
-
+SIAZLOCALCONFIGFILENAME ?= SnapsInAZfs.local.json
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
 
 VERSIONSUFFIXFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)/VersionSuffix
@@ -87,7 +87,7 @@ build:	build-release
 
 build-debug:
 	mkdir -p $(DEBUGDIR)
-	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR)
+	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) SnapsInAZfs/SnapsInAZfs.csproj
 
 build-release:
 	mkdir -p $(RELEASEDIR)
@@ -104,12 +104,12 @@ install-config-base:
 
 install-config-local:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
-	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json ; }
+	@test -s $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME) || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZLOCALCONFIGFILENAME) $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME) ; }
 	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json ; }
 
 install-config-local-force:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
-	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZLOCALCONFIGFILENAME) $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME)
 	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json
 
 install-doc:
@@ -130,7 +130,9 @@ install-doc:
 	mandb -q
 
 install-release:	publish-release
-	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/SnapsInAZfs
+	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZ)
+	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZLC)
+	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/siaz
 
 install-service:
 	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/snapsinazfs.service /usr/lib/systemd/system/snapsinazfs.service
@@ -147,7 +149,7 @@ uninstall-config-base:
 	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
 
 uninstall-config-local:
-	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.local.json* 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME)* 2>/dev/null
 	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json* 2>/dev/null
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
@@ -158,9 +160,9 @@ uninstall-doc:
 	rm -fv $(MAN8DIR)/$(SIAZ)-config-console.8 2>/dev/null
 	rm -fv $(MAN8DIR)/$(SIAZLC)-config-console.8 2>/dev/null
 	rm -fv $(MAN8DIR)/siaz-config-console.8 2>/dev/null
-	rm -fv $(MAN8DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
-	rm -fv $(MAN8DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
-	rm -fv $(MAN8DIR)/siaz-zfsprops.7 2>/dev/null
+	rm -fv $(MAN7DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
+	rm -fv $(MAN7DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
+	rm -fv $(MAN7DIR)/siaz-zfsprops.7 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZ).5 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZLC).5 2>/dev/null
 	rm -fv $(MAN5DIR)/siaz.5 2>/dev/null
@@ -172,7 +174,9 @@ uninstall-everything:	uninstall-service	uninstall	uninstall-config-local
 
 uninstall-release:
 	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
-	rm -fv $(LOCALSBINDIR)/SnapsInAZfs 2>/dev/null
+	rm -fv $(LOCALSBINDIR)/$(SIAZ) 2>/dev/null
+	rm -fv $(LOCALSBINDIR)/$(SIAZLC) 2>/dev/null
+	rm -fv $(LOCALSBINDIR)/siaz 2>/dev/null
 
 uninstall-service:
 	systemctl stop snapsinazfs.service
@@ -196,8 +200,7 @@ save-snapsinazfs-zfs-properties:
 	@echo Undo script saved as ./propWipeUndoScript.sh
 	@echo Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore snapsinazfs.com properties
 
-wipe-snapsinazfs-zfs-properties:
-	@test -s $(SNAPSINAZFS_SOLUTION_ROOT)/propWipeUndoScript.sh || { echo Must save properties before wiping ; false ; }
+wipe-snapsinazfs-zfs-properties:	save-snapsinazfs-zfs-properties
 	zfs get all -s local -rHo name,property | grep "snapsinazfs.com:" | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
 	$(info All properties removed)
 	$(info Run make restore-wiped-zfs-properties to restore configuration)
