@@ -233,7 +233,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
     {
-        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
+        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString} -o {SourceSystem.SetString}";
     }
 
     /// <inheritdoc />

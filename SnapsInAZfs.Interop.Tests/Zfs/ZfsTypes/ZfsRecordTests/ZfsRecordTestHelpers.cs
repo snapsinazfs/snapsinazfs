@@ -47,7 +47,7 @@ public class ZfsRecordTestHelpers
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1 ),
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1 ),
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ),
-                                                          ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, "testSystem" ),
+                                                          ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, ZfsPropertyValueConstants.StandaloneSiazSystem ),
                                                           107374182400L, // 100 GiB
                                                           10737418240L );
     }
