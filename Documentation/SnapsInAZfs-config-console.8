@@ -3,7 +3,295 @@
 .ds SIAZCC \*[SIAZ]\-config\-console
 .ds SIAZLC snapsinazfs
 .ds SIAZCCLC \*[SIAZLC]\-config\-console
-.TH \*[SIAZCC] 8 "July 18, 2023" "\*[SIAZCC] Manual"
+.TH \*[SIAZCC] 8 "July 26, 2023" "\*[SIAZCC] Manual"
 .SH NAME
 .PP
 \fB\*[SIAZCC](8)\fP, \fB\*[SIAZCCLC](8)\fP - Configuration Console for \*[SIAZ]
+.SH SYNOPSIS
+.B \*[SIAZLC] \-\-config\-console
+.SH DESCRIPTION
+.PP
+\fB\*[SIAZCC]\fP is a TUI for configuring \*[SIAZ] in a safe, validated way,
+including changing both JSON configuration (\fB\*[SIAZLC](5)\fP)
+and ZFS properties (\fB\*[SIAZLC]\-zfsprops(7)\fP).\&
+.PP
+The \fB\*[SIAZCC]\fP is built in to \*[SIAZ],
+and is invoked by passing the \fB\-\-config\-console\fP command-line option to \*[SIAZ].\&
+.PP
+Note that most other command-line options are prohibited when using the config-console.\&
+.PP
+When the config console is invoked, \*[SIAZ] will launch directly into the config console and then,
+upon exit, \*[SIAZ] will exit without performing any other operations.\&
+.PP
+Using the config console provides a visual interface,
+compatible with all common terminal emulators,
+that makes the appropriate changes to the appropriate configuration objects,
+without the need for the user to edit or understand the JSON configuration files
+or the ZFS user properties that \*[SIAZ] sets and uses in ZFS,
+which helps avoid a wide range of potential mistakes and typographical errors that could otherwise result in a non\-working configuration.\&
+.PP
+The configuration console supports mouse input,
+for interacting with visual elements,
+on most terminal emulators,
+including nested sessions inside terminal managers such as tmux or screen.\&
+.PP
+While the config console is running, console logging output will be suspended,
+but all other logging targets will still operate as configured.\&
+.PP
+The configuration console will never make any changes to ZFS without first informing the user what commands it is about to run,
+and will not make any changes to JSON configuration files without prompting for which file to save the new configuration to,
+using a TUI version of a save file dialog.\&
+.PP
+Any configuration change about to be performed can be either confirmed or aborted,
+from the prompt or save dialog that will be displayed to the user.\&
+.SS Configuration Windows
+The configuration console is organized into separate \(dqwindows\(dq.\&
+One window is allowed to be open at a time, and they can be opened via global hot\-keys or by using the main menu bar.\&
+Opening a window while another is currently opened will automatically close the previous window and open the new window.\&
+Values entered into a window that is closed are not lost.\&
+.RS
+.TP
+.B Global Configuration Window
+The global configuration window is used to configure global application settings,
+which exist at the root level of the JSON configuration files (\fB\*[SIAZLC](5)\fP).\&
+.IP
+The values displayed upon opening the global configuration window are the final configured values,
+as \*[SIAZ] sees them, after building them from the base configuration, with the local configuration layered on top of it.\&
+.IP
+Values entered into the text fields of this window will have basic correctness validation checks applied,
+including validating that the paths to the zfs and zpool executables are real, accessible, executable paths.\&
+The save function will not allow you to save the configuration if invalid values are entered.\&
+.IP
+This window is not used for template configuration.\&
+For that, use the Template Configuration Window, described below.\&
+.IP
+Note that changes made to global configuration do not affect currently\-running instances of \*[SIAZ],
+such as if it is running as a service.\&
+For configuration changes to global JSON configuration files to take effect,
+the service must be restarted, to re\-load the configuration.\&
+.TQ
+.B Template Configuration Window
+The template configuration window allows modification, creation, and removal of templates,
+which are stored in the \fBTemplates\fP node of the JSON configuration files.\&
+.IP
+The template configuration window performs basic validity checks,
+and also prevents removal of templates that are currently applied to file systems or volumes in your ZFS configuration.\&
+.IP
+All template options can be modified from this interface,
+and all templates that exist in your JSON configuration will be displayed in a list,
+allowing for modification.\&
+.IP
+When creating a new template in the template configuration window,
+the currently\-selected template\(aqs values will be cloned,
+and any desired modifications can be made to the new template.\&
+.IP
+To save changes to a template, first click the \fBApply\fP button,
+which saves a temporary copy of the values in the current session,
+but \fBdoes not save the changes to disk\fP.\&
+.IP
+Once all desired changes have been made to any templates,
+click the \fBCommit All\fP button, which commits those changes to the working template set for the current session,
+allowing the modified template results to be used from and viewed in the ZFS Configuration Window.\&
+\fBThis also will not save your changes to disk\fP, which you will be reminded of with a confirmation dialog.\&
+.IP
+To save your changes to the JSON configuration files,
+use the \fBSave\fP command in the \fBFile\fP menu,
+which will invoke the global save dialog, allowing you to save your configuration to the desired path.\&
+.IP
+Note that \*[SIAZ] only loads configuration from the paths described in \fB\*[SIAZLC](5)\fP,
+so you must save to your local configuration, for these changes to affect future executions of \*[SIAZ].\&
+.IP
+Also note that changes made to template configuration do not affect currently\-running instances of \*[SIAZ],
+such as if it is running as a service.\&
+For configuration changes to global JSON configuration files to take effect,
+the service must be restarted, to re\-load the configuration.\&
+If templates are modified, those changes \fBwill not\fP be seen by \*[SIAZ] until the service is restarted.\&
+.TQ
+.B ZFS Configuration Window
+The ZFS Configuration Window allows you to make changes to all user-editable ZFS properties in the \*[SIAZNS] namespace
+that \*[SIAZ] uses to inform its operation.\&
+.IP
+This window displays the entire ZFS hierarchy as a tree,
+on the left side of the window,
+and the settings for the selected object on the right.\&
+.IP
+Using the keyboard or mouse,
+navigate to and select the desired node in your ZFS tree,
+and set any desired options using the input fields on the right.\&
+.IP
+At any time, a fresh copy of the ZFS configuration can be re\-loaded by pressing the
+.B Refresh
+button, which will discard all pending changes and use the same zfs get operation that was used when initially loading this window
+to retrieve the current tree and all configured settings from ZFS.\&
+.IP
+.RS
+.TP
+.B This window is culture-aware
+The names of days and months used in drop-down menus on the right side of the window
+will be displayed according to the language and calendar rules of the current executing environment\(aqs configured culture,
+as provided by the .net runtime.\&
+Selected values will be translated to their appropriate corresponding numeric values,
+when saving changes, using the same rules that \*[SIAZ] uses during normal operation,
+ensuring intuitive and consistent configuration and operation.\&
+.TP
+.B Value Display
+\fBLocally\-defined\fP values are indicated with light grey backgrounds and dark text,
+for text fields, and with white text and no backgrounds, for radio button fields.\&
+.IP
+\fBRead\-only\fP fields are displayed with dark backgrounds and darker text,
+and will not allow their values to be modified by the user.\&
+These fields include the object name, type, inheritance sources, and timestamp fields,
+which are provided for informational purposes.\&
+.IP
+\fBInherited\fP values are indicated with a dark shaded background, similar to read\-only fields,
+and the source of those inherited values is displayed for some settings.\&
+If a value is modified for an object in the tree,
+its color scheme will update to indicate that it is locally-defined,
+once focus has left that field.\&
+For some text fields that have real\-time regular expression\-based validation,
+the bacground of the field will change to red,
+while an illegal value exists in the field.\&
+Once the value is changed to an acceptable value, the background will return to normal,
+indicating the validity of the entered value.\&
+.IP
+\fBModified\fP values are maintained in the configuration console session and are not lost when switching between nodes in the tree,
+unless \fBRefresh\fP or \fBReset Current Item\fP are clicked.\&
+.IP
+There is currently no warning if you have unsaved pending changes,
+when clicking the \fBRefresh\fP or \fBReset Current Item\fP buttons.\&
+All pending changes will be lost for the associated objects,
+when these buttons are clicked.\&
+.TQ
+.B Saving Changes
+If any setting modified on a tree node differs from the value it had in ZFS upon the most recent refresh,
+including if the value is the same, and only inheritance was changed
+(such as explicitly setting a previously\-inherited value of true to true on the local object),
+that tree node is then considered \(dqlocally\-modified\(dq,
+and the \fBSave Current Item\fP button will become enabled.\&
+If the configuration is returned to an identical state as its starting state,
+the object will no longer be considered modified,
+and the save button will be disabled,
+to prevent unnecessary non\-changes.
+.IP
+Clicking the \fBSave Current Item\fP button will prompt you with a confirmation dialog,
+indicating the command or commands that will be executed to achieve the displayed configuration changes,
+to allow you to verify that the intended changes are about to be executed.\&
+Confirming this dialog will immediately execute the displayed commands and update the base object of the selected
+node in the config console session accordingly,
+so that the state of fields and buttons will match the operations that were just applied to ZFS.\&
+Canceling the confirmation dialog cancels the pending commands and makes no changes to the in\-memory objects,
+as if you hadn't clicked the save button at all.\&
+.IP
+There is no \(dqSave All\(dq option, by design,
+to force changes to be made in an ordered fashion by the user,
+to help prevent unintended consequences of multiple changes being made at once,
+and so that the user will have the opportunity to inspect the new state of the configuration tree
+at each step of a set of desired changes.\&
+This also serves to avoid unnecessary redundant operations that may be caused by making changes in multiple places
+that have the same result.\&
+.IP
+Saving changes to ZFS objects does not cause any changes to JSON configuration to be written to disk.\&
+If you have pending changes in the template or global configuration windows,
+be sure to use the save option in the file menu to commit those changes to disk.\&
+.TQ
+.B Inheritance
+For non\-root objects,
+if a value is defined locally, but you want that value to be inherited,
+click the inherit button for that setting (the button with an upward\-pointing arrow immediately to the right of each field).\&
+This will prompt you to confirm or cancel a \fBzfs inherit\fP operation to carry out the change.\&
+Inheritance follows ZFS rules for inheritance,
+and is always set for the specific setting you clicked the button for,
+on the currently\-selected tree node only.\&
+.IP
+The confirmation dialog will show you the new effective value the inherited setting will have,
+as a result of the change, so that you do not have to go back to the parent node to check first.\&
+Since normal ZFS inheritance rules are in effect,
+if direct descendents of the node you choose to inherit a setting for are also configured to inherit that setting,
+the setting will apply down the tree accordingly.\&
+The ZFS Configuration Window will NEVER explicitly recursively set or explicitly recursively inherit any setting,
+and ONLY operates on one node at a time.\&
+.IP
+For root objects, the inheritance buttons are always disabled, as there is nothing to inherit from.\&
+.IP
+Any edits you make to settings will be kept consistent in the current session,
+for display purposes.\&
+For example, if you change \fBEnabled\fP to \fBfalse\fP on a pool root,
+and its children are configured to inherit the \fBEnabled\fP property,
+those children will be displayed with the new effective setting,
+if you click on one of those child nodes.\&
+.IP
+A child node inheriting a newly\-modified setting from a parent will NOT be considered locally\-modified, however,
+if no actual local changes have been made by the user to that node.\&
+As such, the save and reset buttons for such child nodes will remain disabled,
+indicating that they do not have pending changes that are locally\-significant.\&
+This allows you to make several changes throughout the tree,
+while being able to view what will be the effective results of your changes,
+without actually having to commit those changes to ZFS first.\&
+.TQ
+.B Templates
+If changes were made in the template configuration window that affect any objects in the ZFS tree,
+or if a newly\-created template was applied to any object in the ZFS tree,
+those changes will NOT be visible to \*[SIAZ] until the next time it is launched.\&
+This means that,
+if you are running \*[SIAZ] as a service,
+you MUST restart the service, to ensure changes to templates are loaded.\&
+If an object in the ZFS tree is configured with a template that is not currently loaded by \*[SIAZ],
+a warning will be logged if a snapshot was to be taken of that object,
+and the object will be SKIPPED,
+with no new snapshots being taken of it until the configuration is reloaded by restarting the service.\&
+This does not affect invocations of \*[SIAZ] that are not running as a service,
+as the full configuration is loaded at application start\-up.
+.TQ
+.B Unexpected Errors
+If an unexpected error occurs that could leave the interface in an inconsistent state,
+such as an error while executing a zfs set or zfs inherit operation,
+an error dialog will be displayed at the time of the error.\&
+Upon dismissing the error dialog, the ZFS configuration window will immediately close
+and will be disabled for the remainder of the current configuration console session,
+out of an abundance of caution,
+to prevent unintended results.\&
+If this occurs, and you do not remember the last operation that was attempted and wish to troubleshoot the problem,
+you can find the text of the attempted command in the \*[SIAZ] logs,
+so long as appropriate logging configuration exists (default configuration will log these commands).
+.RE
+.RE
+.SH EXIT STATUS
+The configuration console should only ever return an exit status of 0, unless an unhandled exception occurs.\&
+If a non-zero exit status is returned, when using the configuration console,
+it should be considered a bug and it is requested that it be reported on the github issue tracker.\&
+.SH BUGS
+There are some known odd visual behaviors in the configuration console,
+such as some visual states not updating until focus is changed,
+strange/unexpected behavior of the backspace key,
+and cursor/text selection often not being visible.\&
+.IP
+Most of these are known and are cosmetic.\&
+As such they are not currently intended to be fixed,
+since there is an upcoming major release planned of the \fBTerminal.Gui\fP framework that \*[SIAZ] uses.\&
+Once the new version of Terminal.Gui is released,
+the configuration console will be completely re\-worked to use the new framework,
+which promises many improvements and bug fixes.\&
+.IP
+Since these cosmetic issues do not affect the actual operation of \*[SIAZ],
+I would rather spend my effort working on the rest of the application,
+to avoid duplicating effort before the new Terminal.Gui release.\&
+.SH REPORTING BUGS
+The source code and issue tracker for \*[SIAZ] are hosted on GitHub, at
+.UR https://github.com/snapsinazfs/snapsinazfs
+.UE
+.SH COPYRIGHT
+.PP
+MIT LICENSE
+.PP
+Copyright 2023 Brandon Thetford
+.PP
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish,>.PP
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+.PP
+THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR AN>.SH SEE ALSO
+.TP
+.B \*[SIAZ](8)
+.TQ
+.B \*[SIAZ](5)
+.TQ
+.B \*[SIAZ]\-zfsprops(7)
