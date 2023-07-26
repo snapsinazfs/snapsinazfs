@@ -1,4 +1,4 @@
-// LICENSE:
+﻿// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -39,6 +39,10 @@ public static partial class NativeMethods
     // ReSharper disable once StringLiteralTypo
     [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "euidaccess", SetLastError = true )]
     public static partial int EuidAccess( string pathname, UnixFileTestMode mode );
+
+    // ReSharper disable once StringLiteralTypo
+    [LibraryImport( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "gethostname", SetLastError = true )]
+    public static partial int gethostname( string name, uint len );
 
     /// <summary>
     ///     The libc open function. Opens a file.

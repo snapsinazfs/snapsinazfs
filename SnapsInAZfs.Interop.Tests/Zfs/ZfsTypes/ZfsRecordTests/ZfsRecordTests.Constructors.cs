@@ -1,6 +1,12 @@
 // LICENSE:
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
+// Copyright 2023 Brandon Thetford
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
@@ -14,6 +20,24 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 public class ZfsRecordTests_Constructors
 {
     [Test]
+    [Category( "General" )]
+    [Category( "TypeChecks" )]
+    [TestCase( "" )]
+    [TestCase( " " )]
+    [TestCase( "  " )]
+    [TestCase( "\t" )]
+    [TestCase( "\n" )]
+    [TestCase( "\r" )]
+    [TestCase( null )]
+    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    {
+        Assert.That( ( ) =>
+        {
+            ZfsRecord badRecord = new( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem );
+        }, Throws.ArgumentNullException );
+    }
+
+    [Test]
     [Description( "Test of the constructor that can only be used to create pool root FileSystem records" )]
     [Order( 1 )]
     [NonParallelizable]
@@ -22,7 +46,7 @@ public class ZfsRecordTests_Constructors
     [TestCase( "testRootZfsRecord2", ZfsPropertyValueConstants.FileSystem )]
     public void Constructor_ZfsRecord_Name_Kind_ExpectedPropertiesSet( string name, string kind )
     {
-        ZfsRecord dataset = new( name, kind );
+        ZfsRecord dataset = new( name, kind, "testSystem" );
         Assert.That( dataset, Is.Not.Null );
         Assert.That( dataset, Is.InstanceOf<ZfsRecord>( ) );
         Assert.Multiple( ( ) =>
@@ -71,10 +95,10 @@ public class ZfsRecordTests_Constructors
     [TestCase( "testRootZfsRecord2/ChildVol1", ZfsPropertyValueConstants.Volume, "testRootZfsRecord2" )]
     public void Constructor_ZfsRecord_Name_Kind_Parent_ExpectedPropertiesSet( string name, string kind, string parentName )
     {
-        ZfsRecord parentDataset = new( parentName, ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord parentDataset = new( parentName, ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Assume.That( parentDataset, Is.Not.Null );
         Assume.That( parentDataset, Is.TypeOf<ZfsRecord>( ) );
-        ZfsRecord dataset = new( name, kind, true, parentDataset );
+        ZfsRecord dataset = new( name, kind, "testSystem", true, parentDataset );
         Assert.Multiple( ( ) =>
         {
             Assert.That( dataset, Is.Not.Null );
@@ -89,7 +113,9 @@ public class ZfsRecordTests_Constructors
             Assert.That( dataset.NameValidatorRegex, Is.SameAs( ZfsIdentifierRegexes.DatasetNameRegex( ) ) );
             Assert.That( dataset.BytesAvailable, Is.Zero );
             Assert.That( dataset.BytesUsed, Is.Zero );
+#pragma warning disable NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
             Assert.That( dataset.Enabled.Equals( new ZfsProperty<bool>( dataset, ZfsPropertyNames.EnabledPropertyName, false, false ) ), Is.True );
+#pragma warning restore NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
             Assert.That( dataset.LastDailySnapshotTimestamp, Is.EqualTo( new ZfsProperty<DateTimeOffset>( dataset, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) ) );
             Assert.That( dataset.LastFrequentSnapshotTimestamp, Is.EqualTo( new ZfsProperty<DateTimeOffset>( dataset, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) ) );
             Assert.That( dataset.LastHourlySnapshotTimestamp, Is.EqualTo( new ZfsProperty<DateTimeOffset>( dataset, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) ) );

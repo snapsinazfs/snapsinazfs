@@ -72,11 +72,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
-        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetTemplate );
+        ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
+        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetTemplate, in snapshotSourceSystem );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
@@ -353,17 +354,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
+    public override Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
         string zfsGetArgs = $"{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hpt filesystem -d 0";
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
-        }
-
-        return rootsAndTheirProperties;
+        return GetPoolRootsAndPropertyValiditiesAsync( zfsGetArgs );
     }
 
     /// <inheritdoc />
