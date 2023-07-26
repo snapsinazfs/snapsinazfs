@@ -32,10 +32,15 @@ public class ZfsCommandRunnerBaseTests
     [TestCaseSource( nameof( GetUnformattedStringPropertyTestCases ) )]
     [TestCaseSource( nameof( GetNativeLongPropertyTestCases ) )]
     [TestCaseSource( nameof( GetNativeTypePropertyTestCases ) )]
-    [TestCase( "INVALID FAKE PROPERTY NAME", "Some value", ZfsPropertySourceConstants.Local, ExpectedResult = false )]
     public bool CheckIfPropertyIsValid( string propertyName, string propertyValue, string propertySource )
     {
         return ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy( propertyName, propertyValue, propertySource );
+    }
+
+    [Test]
+    public void CheckIfPropertyIsValid_ThrowsOnNameOutOfRange( )
+    {
+        Assert.That( ( ) => ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy( "BOGUS PROPERTY NAME", "Unimportant Value", ZfsPropertySourceConstants.Local ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
     private static List<TestCaseData> GetBooleanPropertyTestCases( )
