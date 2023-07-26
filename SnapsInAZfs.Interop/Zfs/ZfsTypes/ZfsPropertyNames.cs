@@ -12,24 +12,26 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public static class ZfsPropertyNames
 {
-    public const string DatasetLastDailySnapshotTimestampPropertyName = "snapsinazfs.com:lastdailysnapshottimestamp";
-    public const string DatasetLastFrequentSnapshotTimestampPropertyName = "snapsinazfs.com:lastfrequentsnapshottimestamp";
-    public const string DatasetLastHourlySnapshotTimestampPropertyName = "snapsinazfs.com:lasthourlysnapshottimestamp";
-    public const string DatasetLastMonthlySnapshotTimestampPropertyName = "snapsinazfs.com:lastmonthlysnapshottimestamp";
-    public const string DatasetLastWeeklySnapshotTimestampPropertyName = "snapsinazfs.com:lastweeklysnapshottimestamp";
-    public const string DatasetLastYearlySnapshotTimestampPropertyName = "snapsinazfs.com:lastyearlysnapshottimestamp";
-    public const string EnabledPropertyName = "snapsinazfs.com:enabled";
-    public const string PruneSnapshotsPropertyName = "snapsinazfs.com:prunesnapshots";
-    public const string RecursionPropertyName = "snapsinazfs.com:recursion";
-    public const string SnapshotPeriodPropertyName = "snapsinazfs.com:snapshot:period";
-    public const string SnapshotRetentionDailyPropertyName = "snapsinazfs.com:retention:daily";
-    public const string SnapshotRetentionFrequentPropertyName = "snapsinazfs.com:retention:frequent";
-    public const string SnapshotRetentionHourlyPropertyName = "snapsinazfs.com:retention:hourly";
-    public const string SnapshotRetentionMonthlyPropertyName = "snapsinazfs.com:retention:monthly";
-    public const string SnapshotRetentionPruneDeferralPropertyName = "snapsinazfs.com:retention:prunedeferral";
-    public const string SnapshotRetentionWeeklyPropertyName = "snapsinazfs.com:retention:weekly";
-    public const string SnapshotRetentionYearlyPropertyName = "snapsinazfs.com:retention:yearly";
-    public const string SnapshotTimestampPropertyName = "snapsinazfs.com:snapshot:timestamp";
-    public const string TakeSnapshotsPropertyName = "snapsinazfs.com:takesnapshots";
-    public const string TemplatePropertyName = "snapsinazfs.com:template";
+    public const string DatasetLastDailySnapshotTimestampPropertyName = $"{SiazNamespace}:lastdailysnapshottimestamp";
+    public const string DatasetLastFrequentSnapshotTimestampPropertyName = $"{SiazNamespace}:lastfrequentsnapshottimestamp";
+    public const string DatasetLastHourlySnapshotTimestampPropertyName = $"{SiazNamespace}:lasthourlysnapshottimestamp";
+    public const string DatasetLastMonthlySnapshotTimestampPropertyName = $"{SiazNamespace}:lastmonthlysnapshottimestamp";
+    public const string DatasetLastWeeklySnapshotTimestampPropertyName = $"{SiazNamespace}:lastweeklysnapshottimestamp";
+    public const string DatasetLastYearlySnapshotTimestampPropertyName = $"{SiazNamespace}:lastyearlysnapshottimestamp";
+    public const string EnabledPropertyName = $"{SiazNamespace}:enabled";
+    public const string PruneSnapshotsPropertyName = $"{SiazNamespace}:prunesnapshots";
+    public const string RecursionPropertyName = $"{SiazNamespace}:recursion";
+    public const string SnapshotPeriodPropertyName = $"{SiazNamespace}:snapshot:period";
+    public const string SnapshotRetentionDailyPropertyName = $"{SiazNamespace}:retention:daily";
+    public const string SnapshotRetentionFrequentPropertyName = $"{SiazNamespace}:retention:frequent";
+    public const string SnapshotRetentionHourlyPropertyName = $"{SiazNamespace}:retention:hourly";
+    public const string SnapshotRetentionMonthlyPropertyName = $"{SiazNamespace}:retention:monthly";
+    public const string SnapshotRetentionPruneDeferralPropertyName = $"{SiazNamespace}:retention:prunedeferral";
+    public const string SnapshotRetentionWeeklyPropertyName = $"{SiazNamespace}:retention:weekly";
+    public const string SnapshotRetentionYearlyPropertyName = $"{SiazNamespace}:retention:yearly";
+    public const string SnapshotTimestampPropertyName = $"{SiazNamespace}:snapshot:timestamp";
+    public const string SourceSystem = $"{SiazNamespace}:sourcesystem";
+    public const string TakeSnapshotsPropertyName = $"{SiazNamespace}:takesnapshots";
+    public const string TemplatePropertyName = $"{SiazNamespace}:template";
+    internal const string SiazNamespace = "snapsinazfs.com";
 }
