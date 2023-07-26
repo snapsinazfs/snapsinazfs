@@ -413,6 +413,16 @@ internal static class ZfsTasks
                 }
             }
 
+            foreach ( ( string propName, _ ) in IZfsProperty.DefaultDatasetProperties )
+            {
+                if ( propName.StartsWith( ZfsPropertyNames.SiazNamespace ) && !propertyValidities.ContainsKey( propName ) )
+                {
+                    propertyValidities.TryAdd( propName, false );
+                    missingPropertiesFound = missingPropertiesFoundForPool = true;
+                }
+            }
+
+
             Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
 
             switch ( args )
