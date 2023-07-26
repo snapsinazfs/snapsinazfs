@@ -68,7 +68,7 @@ public interface IZfsCommandRunner
     /// </returns>
     public Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
-    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
+    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray );
 
     /// <summary>
     ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />

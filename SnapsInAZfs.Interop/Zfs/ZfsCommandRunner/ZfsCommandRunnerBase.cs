@@ -47,7 +47,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
     /// <inheritdoc />
-    public abstract bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
+    public abstract bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray );
 
     protected void CheckAndUpdateLastSnapshotTimesForDatasets( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
     {

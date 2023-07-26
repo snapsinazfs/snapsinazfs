@@ -46,7 +46,7 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync(bool dryRun, string poolName, string[] propertyArray)
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray )
     {
         throw new NotImplementedException();
     }

@@ -407,22 +407,21 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string dsName, string[] properties )
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string dsName, string[] properties )
     {
         if ( properties.Length == 0 )
         {
             Logger.Warn( "Asked to set properties for {0} but no properties provided", dsName );
             return false;
         }
-
-        string propertiesSetString = properties.Select( propName => IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
+        string propertiesSetString = properties.Select( propName => propName == ZfsPropertyNames.SourceSystem ? ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, settings.LocalSystemName ).SetString : IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
         Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        if ( dryRun )
+        if ( settings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             return false;

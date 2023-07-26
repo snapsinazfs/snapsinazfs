@@ -338,7 +338,7 @@ internal static class ZfsTasks
         }
     }
 
-    internal static bool UpdateZfsDatasetSchema( bool dryRun, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
+    internal static bool UpdateZfsDatasetSchema( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
     {
         bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
@@ -358,13 +358,13 @@ internal static class ZfsTasks
 
             // Attempt to set the missing properties for the pool.
             // Log an error if unsuccessful
-            if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( dryRun, poolName, propertyArray ) )
+            if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( settings, poolName, propertyArray ) )
             {
                 Logger.Info( "Finished updating properties for pool {0}", poolName );
             }
             else
             {
-                if ( dryRun )
+                if ( settings.DryRun )
                 {
                     Logger.Info( "DRY RUN: Properties intentionally not set for {0}: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
                 }
