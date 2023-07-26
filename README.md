@@ -7,15 +7,16 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- As of today (2023-07-18), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
- stored in ZFS itself, via user properties, for everything except the timing and naming settings, which are still
+ As of today (2023-07-26), SnapsInAZfs is capable of taking and pruning snapshots, using configuration
+ stored in ZFS itself, via ZFS user properties, for everything except the timing and naming settings, which are still
  in configuration files, and provides a TUI for making configuration easy.
  
  SnapsInAZfs is also capable of running as a systemd service. A unit file and `make` recipe for installing and
  uninstalling the service are included.
 
- Version 1.0.0-Beta-8 has been tagged as a release on github, for testing. This comes with what should be the
- obvious disclaimer that this is a beta-stage project and you should not trust important systems with it.\
+ Beta verisons are being tagged on github, and are available for testing.\
+ This comes with what should be the
+ obvious disclaimer that this is a beta-stage project and use on important systems is at your own risk.\
  That said, I'm running it on my home lab as well as a non-critical production system at work, and it's
  behaving as expected for my use cases, so far. 
  
@@ -138,7 +139,7 @@
  These man pages are:
  - snapsinazfs(8)
  - snapsinazfs(5)
- - snapsinazfs-zfsprops(5)
+ - snapsinazfs-zfsprops(7)
  - snapsinazfs-config-console(8)
  
  The code itself is also heavily documented and quite verbose, so you may be able to find what you're looking for
