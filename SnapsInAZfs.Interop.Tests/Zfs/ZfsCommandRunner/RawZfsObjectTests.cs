@@ -1,5 +1,5 @@
-﻿// LICENSE:
-// 
+﻿#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -7,7 +7,12 @@
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
 
+#endregion
+
+using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
@@ -86,9 +91,62 @@ public class RawZfsObjectTests
     }
 
     [Test]
-    public void ConvertToDatasetAndAddToCollection( )
+    public void ConvertToDatasetAndAddToCollection_RootFileSystemAllPropertiesExist( )
     {
+        ZfsRecord expectedRecord = ZfsRecord.CreateInstanceFromAllProperties( "testRoot",
+                                                                              ZfsPropertyValueConstants.FileSystem,
+                                                                              ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.EnabledPropertyName, true ),
+                                                                              ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.TakeSnapshotsPropertyName, true ),
+                                                                              ZfsProperty<bool>.CreateWithoutParent( ZfsPropertyNames.PruneSnapshotsPropertyName, true ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ),
+                                                                              ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs ),
+                                                                              ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 6 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, 5 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, 4 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, 3 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 2 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1 ),
+                                                                              ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ),
+                                                                              ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem" ),
+                                                                              54321,
+                                                                              12345
+        );
+        RawZfsObject testObject = new( ZfsPropertyValueConstants.FileSystem );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.FileSystem, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.EnabledPropertyName, "true", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
+        string dsName = "testRoot";
+        ConcurrentDictionary<string, ZfsRecord> datasets = new( );
+        testObject.ConvertToDatasetAndAddToCollection( dsName, datasets );
 
+        Assert.That( datasets, Does.ContainKey( dsName ) );
+        ZfsRecord ds = datasets[ dsName ];
+        Assert.That( ds, Is.EqualTo( expectedRecord ) );
     }
 
     private static TestCaseData[] GetAddRawProperty_TestCases( )

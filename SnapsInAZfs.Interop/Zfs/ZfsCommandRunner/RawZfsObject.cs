@@ -55,7 +55,7 @@ public class RawZfsObject
             throw new ArgumentNullException( nameof( dsName ), "Cannot convert to ZfsRecord - Missing name" );
         }
 
-        if ( Properties.Count < 23 )
+        if ( Properties.Count < 21 )
         {
             throw new InvalidOperationException( "Cannot convert to ZfsRecord - Missing one or more properties" );
         }
