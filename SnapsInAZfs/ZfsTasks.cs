@@ -338,7 +338,7 @@ internal static class ZfsTasks
         }
     }
 
-    internal static bool UpdateZfsDatasetSchema( bool dryRun, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
+    internal static bool UpdateZfsDatasetSchema( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
     {
         bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
@@ -350,15 +350,21 @@ internal static class ZfsTasks
             // ReSharper disable once ExceptionNotDocumentedOptional
             string[] propertyArray = propertiesToAdd.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToArray( );
 
+            if ( propertyArray.Length == 0 )
+            {
+                Logger.Info( "No missing properties to set for {0} - Skipping", poolName );
+                continue;
+            }
+
             // Attempt to set the missing properties for the pool.
             // Log an error if unsuccessful
-            if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( dryRun, poolName, propertyArray ) )
+            if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( settings, poolName, propertyArray ) )
             {
                 Logger.Info( "Finished updating properties for pool {0}", poolName );
             }
             else
             {
-                if ( dryRun )
+                if ( settings.DryRun )
                 {
                     Logger.Info( "DRY RUN: Properties intentionally not set for {0}: {1}", poolName, JsonSerializer.Serialize( propertyArray ) );
                 }
@@ -412,6 +418,16 @@ internal static class ZfsTasks
                     missingPropertiesFound = missingPropertiesFoundForPool = true;
                 }
             }
+
+            foreach ( ( string propName, _ ) in IZfsProperty.DefaultDatasetProperties )
+            {
+                if ( propName.StartsWith( ZfsPropertyNames.SiazNamespace ) && !propertyValidities.ContainsKey( propName ) )
+                {
+                    propertyValidities.TryAdd( propName, false );
+                    missingPropertiesFound = missingPropertiesFoundForPool = true;
+                }
+            }
+
 
             Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
 

@@ -222,7 +222,7 @@ public class SiazService : BackgroundService
             {
                 // Requested schema update
                 // Run the update and return EOK or ENOATTR based on success of the updates
-                return ZfsTasks.UpdateZfsDatasetSchema( _settings.DryRun, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
+                return ZfsTasks.UpdateZfsDatasetSchema( _settings, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
                     ? SiazExecutionResultCode.ZfsPropertyUpdate_Succeeded
                     : SiazExecutionResultCode.ZfsPropertyUpdate_Failed;
             }

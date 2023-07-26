@@ -18,14 +18,14 @@ namespace SnapsInAZfs.Settings.Settings;
 /// </summary>
 public record SnapsInAZfsSettings
 {
-    [JsonPropertyOrder( 4 )]
+    [JsonPropertyOrder( 5 )]
     public bool Daemonize { get; set; }
 
     /// <summary>
     ///     Gets or sets how often the timer runs when running as a service. Values greater than 1 minute are not supported and are
     ///     advised against
     /// </summary>
-    [JsonPropertyOrder( 5 )]
+    [JsonPropertyOrder( 6 )]
     public uint DaemonTimerIntervalSeconds { get; set; } = 10;
 
     /// <summary>
@@ -33,6 +33,20 @@ public record SnapsInAZfsSettings
     /// </summary>
     [JsonPropertyOrder( 1 )]
     public bool DryRun { get; set; }
+
+    // ReSharper disable once CommentTypo
+    /// <summary>
+    ///     Gets or sets the local system name SnapsInAZfs will use
+    /// </summary>
+    /// <remarks>
+    ///     This is used for operations involving the snapsinazfs.com:sourcesystem property.<br />
+    ///     This setting is mandatory and cannot be an empty or all-whitespace string.<br />
+    ///     This setting SHOULD be unique among all systems involved in replicating snapshots managed by SnapsInAZfs, and the recommended
+    ///     value is the FQDN of the local system.<br />
+    ///     If this value is invalid upon startup, SnapsInAZfs will log an error and terminate.
+    /// </remarks>
+    [JsonPropertyOrder( 4 )]
+    public string LocalSystemName { get; set; } = String.Empty;
 
     /// <summary>
     ///     Gets or sets the global PruneSnapshots setting
@@ -50,18 +64,18 @@ public record SnapsInAZfsSettings
     ///     Gets or sets the templates sub-section
     /// </summary>
     // ReSharper disable once CollectionNeverUpdated.Global
-    [JsonPropertyOrder( 8 )]
+    [JsonPropertyOrder( 9 )]
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new( );
 
     /// <summary>
     ///     Gets or sets the path to the zfs utility
     /// </summary>
-    [JsonPropertyOrder( 6 )]
+    [JsonPropertyOrder( 7 )]
     public string ZfsPath { get; set; } = "/usr/local/sbin/zfs";
 
     /// <summary>
     ///     Gets or sets the path to the zpool utility
     /// </summary>
-    [JsonPropertyOrder( 7 )]
+    [JsonPropertyOrder( 8 )]
     public string ZpoolPath { get; set; } = "/usr/local/sbin/zpool";
 }

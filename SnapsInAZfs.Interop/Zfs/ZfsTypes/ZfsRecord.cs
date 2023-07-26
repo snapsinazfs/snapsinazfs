@@ -25,8 +25,16 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    public ZfsRecord( string Name, string Kind, bool inheritProperties = true, ZfsRecord? parent = null )
+    /// <exception cref="ArgumentNullException">
+    ///     <paramref name="sourceSystem" /> is <see langword="null" />, empty, or only whitespace
+    /// </exception>
+    public ZfsRecord( string Name, string Kind, string sourceSystem = "", bool inheritProperties = true, ZfsRecord? parent = null )
     {
+        if ( string.IsNullOrWhiteSpace( sourceSystem ) )
+        {
+            throw new ArgumentNullException( nameof( sourceSystem ) );
+        }
+
         this.Name = Name;
         IsPoolRoot = parent is null;
         ParentDataset = parent ?? this;
@@ -38,7 +46,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             ZfsPropertyValueConstants.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
         };
-
         if ( parent is not null && inheritProperties )
         {
             _enabled = parent.Enabled with { IsLocal = false, Owner = this };
@@ -57,6 +64,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             _snapshotRetentionPruneDeferral = parent.SnapshotRetentionPruneDeferral with { IsLocal = false, Owner = this };
             _snapshotRetentionWeekly = parent.SnapshotRetentionWeekly with { IsLocal = false, Owner = this };
             _snapshotRetentionYearly = parent.SnapshotRetentionYearly with { IsLocal = false, Owner = this };
+            _sourceSystem = parent.SourceSystem with { IsLocal = false, Value = sourceSystem, Owner = this };
             _takeSnapshots = parent.TakeSnapshots with { IsLocal = false, Owner = this };
             _template = parent.Template with { IsLocal = false, Owner = this };
         }
@@ -78,13 +86,20 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             _snapshotRetentionPruneDeferral = new( this, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 );
             _snapshotRetentionWeekly = new( this, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1 );
             _snapshotRetentionYearly = new( this, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1 );
+            _sourceSystem = new( this, ZfsPropertyNames.SourceSystem, sourceSystem );
             _takeSnapshots = new( this, ZfsPropertyNames.TakeSnapshotsPropertyName, false );
             _template = new( this, ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default );
         }
     }
 
-    protected ZfsRecord( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, long bytesAvailable, long bytesUsed, ZfsRecord? parent = null, bool forcePropertyOwnership = false )
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
+    protected ZfsRecord( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in ZfsProperty<string> sourceSystem, in long bytesAvailable, in long bytesUsed, ZfsRecord? parent = null, bool forcePropertyOwnership = false )
     {
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
+
         Name = name;
         IsPoolRoot = parent is null;
         ParentDataset = parent ?? this;
@@ -131,6 +146,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
             _recursion = recursion with { Owner = this, IsLocal = isASnapshot || recursion.IsLocal };
             _template = template with { Owner = this, IsLocal = isASnapshot || template.IsLocal };
+            _sourceSystem = sourceSystem with { Owner = this };
 
             _snapshotRetentionFrequent = retentionFrequent with { Owner = this, IsLocal = notASnapshot && retentionFrequent.IsLocal };
             _snapshotRetentionHourly = retentionHourly with { Owner = this, IsLocal = notASnapshot && retentionHourly.IsLocal };
@@ -159,6 +175,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
             _recursion = recursion;
             _template = template;
+            _sourceSystem = sourceSystem;
 
             _snapshotRetentionFrequent = retentionFrequent;
             _snapshotRetentionHourly = retentionHourly;
@@ -190,9 +207,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
     [JsonIgnore]
     public ZfsRecord ParentDataset { get; }
-
-    [JsonIgnore]
-    public ZfsRecord PoolRoot => IsPoolRoot ? this : ParentDataset.PoolRoot;
 
     public int SnapshotCount => Snapshots.Values.Sum( d => d.Count );
 
@@ -260,6 +274,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
             && SnapshotRetentionPruneDeferral == other.SnapshotRetentionPruneDeferral
             && SnapshotRetentionWeekly == other.SnapshotRetentionWeekly
             && SnapshotRetentionYearly == other.SnapshotRetentionYearly
+            && SourceSystem == other.SourceSystem
             && TakeSnapshots == other.TakeSnapshots
             && Template == other.Template
             && SnapshotCount == other.SnapshotCount
@@ -339,9 +354,15 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return snap;
     }
 
-    public Snapshot CreateAndAddSnapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, string periodString, DateTimeOffset snapshotTimestamp, ZfsRecord dataset )
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
+    public Snapshot CreateAndAddSnapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, string periodString, in ZfsProperty<string> sourceSystem, in DateTimeOffset snapshotTimestamp, ZfsRecord dataset )
     {
         Logger.Trace( "Creating and adding snapshot {0} to {1} {2}", snapName, Kind, Name );
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
+
         Snapshot snap = new( snapName,
                              enabled,
                              takeSnapshots,
@@ -361,6 +382,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                              retentionMonthly,
                              retentionYearly,
                              retentionPruneDeferral,
+                             sourceSystem,
                              periodString,
                              snapshotTimestamp,
                              dataset );
@@ -368,27 +390,16 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         return snap;
     }
 
-    /// <summary>
-    ///     Creates a new <see cref="Snapshot" /> from the given <paramref name="period" /> and <paramref name="timestamp" />,
-    /// using <paramref name="template"/> to generate its name.
-    /// </summary>
-    /// <param name="period">The period for the new <see cref="Snapshot" /></param>
-    /// <param name="timestamp">The timestamp for the new <see cref="Snapshot" /></param>
-    /// <param name="template"></param>
-    /// <returns>
-    ///     A reference to the created <see cref="Snapshot" />
-    /// </returns>
-    [MustUseReturnValue]
-    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in TemplateSettings template )
+    /// <exception cref="ArgumentNullException">
+    ///     <paramref name="sourceSystem" /> is <see langword="null" />, empty, or only whitespace
+    /// </exception>
+    public ZfsRecord CreateChildDataset( string name, string kind, string sourceSystem = "", bool inheritProperties = true, long bytesAvailable = -1, long bytesUsed = -1 )
     {
-        Logger.Trace( "Creating {0} snapshot for {1} {2}", period, Kind, Name );
-        string snapName = template.GenerateFullSnapshotName( Name, in period.Kind, in timestamp );
-        Snapshot snap = new( snapName, in period.Kind, in timestamp, this );
-        return snap;
-    }
+        if ( string.IsNullOrWhiteSpace( sourceSystem ) )
+        {
+            throw new ArgumentNullException( nameof( sourceSystem ) );
+        }
 
-    public ZfsRecord CreateChildDataset( string name, string kind, bool inheritProperties = true, long bytesAvailable = -1, long bytesUsed = -1 )
-    {
         bool propertiesLocal = !inheritProperties;
         ZfsRecord newDs = inheritProperties
             ? new( name,
@@ -411,19 +422,49 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                    SnapshotRetentionMonthly with { IsLocal = propertiesLocal },
                    SnapshotRetentionYearly with { IsLocal = propertiesLocal },
                    SnapshotRetentionPruneDeferral with { IsLocal = propertiesLocal },
+                   SourceSystem with { IsLocal = true, Value = sourceSystem },
                    bytesAvailable,
                    bytesUsed,
                    this,
                    true )
-            : new( name, kind, false, this );
+            : new( name, kind, sourceSystem, false, this );
 
         AddDataset( newDs );
         return newDs;
     }
 
-    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in long bytesAvailable, in long bytesUsed, ZfsRecord? parent = null )
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
+    public static ZfsRecord CreateInstanceFromAllProperties( string name, string kind, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in ZfsProperty<string> sourceSystem, in long bytesAvailable, in long bytesUsed, ZfsRecord? parent = null )
     {
-        return new( name, kind, enabled, takeSnapshots, pruneSnapshots, lastFrequentSnapshotTimestamp, lastHourlySnapshotTimestamp, lastDailySnapshotTimestamp, lastWeeklySnapshotTimestamp, lastMonthlySnapshotTimestamp, lastYearlySnapshotTimestamp, recursion, template, retentionFrequent, retentionHourly, retentionDaily, retentionWeekly, retentionMonthly, retentionYearly, retentionPruneDeferral, bytesAvailable, bytesUsed, parent, true );
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
+        return new( name, kind, in enabled, in takeSnapshots, in pruneSnapshots, in lastFrequentSnapshotTimestamp, in lastHourlySnapshotTimestamp, in lastDailySnapshotTimestamp, in lastWeeklySnapshotTimestamp, in lastMonthlySnapshotTimestamp, in lastYearlySnapshotTimestamp, in recursion, in template, in retentionFrequent, in retentionHourly, in retentionDaily, in retentionWeekly, in retentionMonthly, in retentionYearly, in retentionPruneDeferral, in sourceSystem, in bytesAvailable, in bytesUsed, parent, true );
+    }
+
+    /// <summary>
+    ///     Creates a new <see cref="Snapshot" /> from the given <paramref name="period" /> and <paramref name="timestamp" />,
+    ///     using <paramref name="template" /> to generate its name.
+    /// </summary>
+    /// <param name="period">The period for the new <see cref="Snapshot" /></param>
+    /// <param name="timestamp">The timestamp for the new <see cref="Snapshot" /></param>
+    /// <param name="template"></param>
+    /// <param name="sourceSystem"></param>
+    /// <returns>
+    ///     A reference to the created <see cref="Snapshot" />
+    /// </returns>
+    [MustUseReturnValue]
+    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in TemplateSettings template, in ZfsProperty<string> sourceSystem )
+    {
+        Logger.Trace( "Creating {0} snapshot for {1} {2}", period, Kind, Name );
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
+        string snapName = template.GenerateFullSnapshotName( Name, in period.Kind, in timestamp );
+        Snapshot snap = new( snapName, in period.Kind, in sourceSystem, in timestamp, this );
+        return snap;
     }
 
     /// <summary>
@@ -467,6 +508,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                                    SnapshotRetentionMonthly,
                                    SnapshotRetentionYearly,
                                    SnapshotRetentionPruneDeferral,
+                                   SourceSystem,
                                    BytesAvailable,
                                    BytesUsed,
                                    parent,

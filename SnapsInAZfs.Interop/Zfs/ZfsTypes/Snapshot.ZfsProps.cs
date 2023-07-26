@@ -56,8 +56,8 @@ public sealed partial record Snapshot
         Logger.Trace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
             {
-                ZfsPropertyNames.TemplatePropertyName => _template.IsInherited,
-                ZfsPropertyNames.RecursionPropertyName => _recursion.IsInherited,
+                ZfsPropertyNames.TemplatePropertyName => Template.IsInherited,
+                ZfsPropertyNames.RecursionPropertyName => Recursion.IsInherited,
                 _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating string property", updatedProperty.Name )
             } )
         {

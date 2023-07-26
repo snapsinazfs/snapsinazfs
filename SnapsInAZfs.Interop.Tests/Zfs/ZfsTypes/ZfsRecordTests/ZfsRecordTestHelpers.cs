@@ -3,6 +3,8 @@
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
 using System.Globalization;
+using System.Net.NetworkInformation;
+
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -17,6 +19,11 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 public class ZfsRecordTestHelpers
 {
     public static SnapsInAZfsSettings Settings { get; set; }
+    private static string GetHostName( )
+    {
+        IPGlobalProperties hostIpGlobalProps = IPGlobalProperties.GetIPGlobalProperties( );
+        return $"{hostIpGlobalProps.HostName}.{hostIpGlobalProps.DomainName}";
+    }
 
     internal static ZfsRecord GetNewTestRootFileSystem( string name = "testRoot" )
     {
@@ -40,6 +47,7 @@ public class ZfsRecordTestHelpers
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 1 ),
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1 ),
                                                           ZfsProperty<int>.CreateWithoutParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ),
+                                                          ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, ZfsPropertyValueConstants.StandaloneSiazSystem ),
                                                           107374182400L, // 100 GiB
                                                           10737418240L );
     }

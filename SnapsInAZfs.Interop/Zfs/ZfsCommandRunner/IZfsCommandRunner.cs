@@ -68,7 +68,7 @@ public interface IZfsCommandRunner
     /// </returns>
     public Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
-    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray );
+    bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray );
 
     /// <summary>
     ///     Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
@@ -108,7 +108,7 @@ public interface IZfsCommandRunner
     /// <returns>
     ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
     /// </returns>
-    public ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
+    public ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
 
     public IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 

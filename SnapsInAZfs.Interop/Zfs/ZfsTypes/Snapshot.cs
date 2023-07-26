@@ -19,12 +19,14 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
     /// </summary>
     /// <param name="name">The name of the <see cref="Snapshot"/></param>
     /// <param name="periodKind">The <see cref="SnapshotPeriodKind"/> of the <see cref="Snapshot"/></param>
+    /// <param name="sourceSystem">The <see cref="ZfsRecord.SourceSystem"/> property to use for the new <see cref="Snapshot"/></param>
     /// <param name="timestamp">The timestamp of the <see cref="Snapshot"/></param>
     /// <param name="parentDataset">The <see cref="ZfsRecord"/> this <see cref="Snapshot"/> belongs to</param>
     /// <remarks>
     /// The <see cref="ZfsRecord.Recursion">Recursion</see> and <see cref="ZfsRecord.Template">Template</see> properties will be set to local.
     /// </remarks>
-    public Snapshot( string name, in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp, ZfsRecord parentDataset )
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
+    public Snapshot( string name, in SnapshotPeriodKind periodKind, in ZfsProperty<string> sourceSystem, in DateTimeOffset timestamp, ZfsRecord parentDataset )
         : this(
             name,
             parentDataset.Enabled,
@@ -45,16 +47,21 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
             parentDataset.SnapshotRetentionMonthly,
             parentDataset.SnapshotRetentionYearly,
             parentDataset.SnapshotRetentionPruneDeferral,
+            sourceSystem,
             (SnapshotPeriod)periodKind,
             timestamp,
             parentDataset )
     {
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
     }
 
     /// <summary>
     /// Creates a new snapshot from all properties
     /// </summary>
-    public Snapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in string snapshotPeriod, in DateTimeOffset snapshotTimestamp, ZfsRecord parent )
+    public Snapshot( string snapName, in ZfsProperty<bool> enabled, in ZfsProperty<bool> takeSnapshots, in ZfsProperty<bool> pruneSnapshots, in ZfsProperty<DateTimeOffset> lastFrequentSnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastHourlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastDailySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastWeeklySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastMonthlySnapshotTimestamp, in ZfsProperty<DateTimeOffset> lastYearlySnapshotTimestamp, in ZfsProperty<string> recursion, in ZfsProperty<string> template, in ZfsProperty<int> retentionFrequent, in ZfsProperty<int> retentionHourly, in ZfsProperty<int> retentionDaily, in ZfsProperty<int> retentionWeekly, in ZfsProperty<int> retentionMonthly, in ZfsProperty<int> retentionYearly, in ZfsProperty<int> retentionPruneDeferral, in ZfsProperty<string> sourceSystem, in string snapshotPeriod, in DateTimeOffset snapshotTimestamp, ZfsRecord parent )
         : base( snapName,
                 ZfsPropertyValueConstants.Snapshot,
                 enabled,
@@ -75,11 +82,16 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
                 retentionMonthly,
                 retentionYearly,
                 retentionPruneDeferral,
+                sourceSystem,
                 0,
                 0,
                 parent,
                 true )
     {
+        if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
+        {
+            throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
+        }
         _period = new( this, ZfsPropertyNames.SnapshotPeriodPropertyName, snapshotPeriod );
         _timestamp = new( this, ZfsPropertyNames.SnapshotTimestampPropertyName, snapshotTimestamp );
     }
@@ -212,6 +224,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
                                     SnapshotRetentionMonthly,
                                     SnapshotRetentionYearly,
                                     SnapshotRetentionPruneDeferral,
+                                    SourceSystem,
                                     Period.Value,
                                     Timestamp.Value,
                                     parent );
@@ -220,7 +233,7 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
 
     public string GetSnapshotOptionsStringForZfsSnapshot( )
     {
-        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString}";
+        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString} -o {SourceSystem.SetString}";
     }
 
     /// <inheritdoc />
@@ -243,13 +256,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _timestamp.Equals( other._timestamp )
-               && _enabled.Equals( other.Enabled )
+               && Timestamp.Equals( other._timestamp )
+               && Enabled.Equals( other.Enabled )
                && Kind == other.Kind
                && Name == other.Name
-               && _pruneSnapshotsField.Equals( other.PruneSnapshots )
-               && _recursion.Equals( other.Recursion )
-               && _template.Equals( other.Template );
+               && PruneSnapshots.Equals( other.PruneSnapshots )
+               && Recursion.Equals( other.Recursion )
+               && Template.Equals( other.Template );
     }
 
     public bool Equals( Snapshot other )
@@ -260,13 +273,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>
         }
 
         return _period.Equals( other._period )
-               && _timestamp.Equals( other._timestamp )
-               && _enabled.Equals( other.Enabled )
+               && Timestamp.Equals( other._timestamp )
+               && Enabled.Equals( other.Enabled )
                && Kind == other.Kind
                && Name == other.Name
-               && _pruneSnapshotsField.Equals( other.PruneSnapshots )
-               && _recursion.Equals( other.Recursion )
-               && _template.Equals( other.Template );
+               && PruneSnapshots.Equals( other.PruneSnapshots )
+               && Recursion.Equals( other.Recursion )
+               && Template.Equals( other.Template );
     }
 
     /// <inheritdoc />

@@ -27,7 +27,7 @@ public class ZfsRecordTests_Snapshots
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
         Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ) );
         ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Assume.That( childDs, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Empty );
@@ -145,7 +145,7 @@ public class ZfsRecordTests_Snapshots
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind periodKind )
     {
         ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, childDs );
         childDs.AddSnapshot( snapshot );
         Assert.Multiple( ( ) =>
@@ -171,7 +171,7 @@ public class ZfsRecordTests_Snapshots
     public void GetSnapshotsToPrune_NoSnapshotsInDataset( )
     {
         ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem );
+        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Assume.That( childDs, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Empty );

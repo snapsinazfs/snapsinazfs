@@ -16,23 +16,15 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public partial record ZfsRecord
 {
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<bool> _enabled;
-
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<bool> _pruneSnapshotsField;
-
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<string> _recursion;
-
-    // ReSharper disable once InconsistentNaming
-    protected ZfsProperty<string> _template;
+    private ZfsProperty<bool> _enabled;
     private ZfsProperty<DateTimeOffset> _lastDailySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastFrequentSnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastHourlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastMonthlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastWeeklySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastYearlySnapshotTimestamp;
+    private ZfsProperty<bool> _pruneSnapshotsField;
+    private ZfsProperty<string> _recursion;
     private ZfsProperty<int> _snapshotRetentionDaily;
     private ZfsProperty<int> _snapshotRetentionFrequent;
     private ZfsProperty<int> _snapshotRetentionHourly;
@@ -40,7 +32,9 @@ public partial record ZfsRecord
     private ZfsProperty<int> _snapshotRetentionPruneDeferral;
     private ZfsProperty<int> _snapshotRetentionWeekly;
     private ZfsProperty<int> _snapshotRetentionYearly;
+    private ZfsProperty<string> _sourceSystem;
     private ZfsProperty<bool> _takeSnapshots;
+    private ZfsProperty<string> _template;
 
     public ref readonly ZfsProperty<bool> Enabled => ref _enabled;
 
@@ -69,6 +63,7 @@ public partial record ZfsRecord
                 ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
                 ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
                 ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
+                ZfsPropertyNames.SourceSystem => SourceSystem,
                 _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
             };
         }
@@ -89,6 +84,7 @@ public partial record ZfsRecord
     public ref readonly ZfsProperty<int> SnapshotRetentionPruneDeferral => ref _snapshotRetentionPruneDeferral;
     public ref readonly ZfsProperty<int> SnapshotRetentionWeekly => ref _snapshotRetentionWeekly;
     public ref readonly ZfsProperty<int> SnapshotRetentionYearly => ref _snapshotRetentionYearly;
+    public ref readonly ZfsProperty<string> SourceSystem => ref _sourceSystem;
     public ref readonly ZfsProperty<bool> TakeSnapshots => ref _takeSnapshots;
     public ref readonly ZfsProperty<string> Template => ref _template;
 
@@ -241,6 +237,10 @@ public partial record ZfsRecord
                 _recursion = _recursion with { Value = propertyValue, IsLocal = isLocal };
                 StringPropertyChanged?.Invoke( this, ref _recursion );
                 return ref _recursion;
+            case ZfsPropertyNames.SourceSystem:
+                _sourceSystem = _sourceSystem with { Value = propertyValue, IsLocal = isLocal };
+                StringPropertyChanged?.Invoke( this, ref _sourceSystem );
+                return ref _sourceSystem;
             default:
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported property" );
         }

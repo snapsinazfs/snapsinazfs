@@ -1,4 +1,4 @@
-﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:Boolean x:Key="/Default/CodeEditing/ContextActionTable/DisabledContextActions/=JetBrains_002EReSharper_002EIntentions_002ECSharp_002EContextActions_002EConvertToBlockScopedNamespaceAction/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeEditing/GenerateMemberBody/DebuggerStepThroughAccessors/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeEditing/GenerateMemberBody/DocumentationGenerationKind/@EntryValue">Inherit</s:String>
@@ -330,31 +330,40 @@
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForSimpleTypes/@EntryValue">UseExplicitType</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/ShowEditorConfigStatusBarIndicator/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/SyncToVisualStudio/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">LICENSE:&#xD;
-&#xD;
-Copyright 2023 Brandon Thetford&#xD;
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderRegionName/@EntryValue">MIT LICENSE</s:String>
+	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Copyright $CURRENT_YEAR$ Brandon Thetford&#xD;
 &#xD;
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#xD;
 &#xD;
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#xD;
 &#xD;
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</s:String>
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.&#xD;
+&#xD;
+See https://opensource.org/license/MIT/</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=UI/@EntryIndexedValue">UI</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=EnumMember/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Locals/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="aaBb_AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Other/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PrivateStaticReadonly/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=Property/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=PublicFields/@EntryIndexedValue">&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="_" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=c353cf98_002D35f6_002D4180_002D877d_002D58749e97ea2e/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Private, Protected, ProtectedInternal, Internal, Public, PrivateProtected" Description="types_should_be_pascal_case"&gt;&lt;ElementKinds&gt;&lt;Kind Name="CLASS" /&gt;&lt;Kind Name="STRUCT" /&gt;&lt;Kind Name="INTERFACE" /&gt;&lt;Kind Name="ENUM" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/Policy&gt;</s:String>
 	
 	<s:String x:Key="/Default/Environment/ConfigurationSense/CustomConfigurationFiles/=F300DC1B_002DE643_002D4CCB_002D80EE_002DA7F840B07500_002Ff_003ASanoid_002Esln/@EntryIndexedValue">["5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.json/l:..?Sanoid?Sanoid.json","5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.local.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.local.json/l:..?Sanoid?Sanoid.local.json","5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.nlog.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.nlog.json/l:..?Sanoid?Sanoid.nlog.json"]</s:String>
 	<s:String x:Key="/Default/Environment/ConfigurationSense/CustomConfigurationFiles/=F300DC1B_002DE643_002D4CCB_002D80EE_002DA7F840B07500_002Ff_003ASnapsInAZfs_002Esln/@EntryIndexedValue">["9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.json","9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.local.json","9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.nlog.json"]</s:String>
 	<s:Boolean x:Key="/Default/Environment/Feedback/SendActivityLogs/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsCommandRunner_002ERawProperty_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsCommandRunner_002ERawZfsObject_003B_002Ecctor/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002EIZfsProperty_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002ETypeExtensions_003BToNewlineSeparatedString/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002ETypeExtensions_003BToSpaceSeparatedSingleLineString/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002EZfsPropertyValueConstants_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Hierarchy/Build/SolBuilderDuo/UseMsbuildSolutionBuilder/@EntryValue">NewVersion</s:String>
+	
+	
+	
+	
+	
 	<s:Boolean x:Key="/Default/Environment/MemoryUsageIndicator/IsVisible/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=TextEditor_002DTrackChanges_002D2/@EntryIndexedValue">DO_NOTHING</s:String>
 	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=TextEditor_002DTrackChanges_002D2/@EntryIndexedValue"></s:String>
@@ -376,6 +385,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ENOENT/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=EPERM/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=EWOULDBLOCK/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=FQDN/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=hourlies/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=ioex/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=journald/@EntryIndexedValue">True</s:Boolean>

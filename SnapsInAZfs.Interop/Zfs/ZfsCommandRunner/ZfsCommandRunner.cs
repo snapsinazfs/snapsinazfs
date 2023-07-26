@@ -72,11 +72,12 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
-        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetTemplate );
+        ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
+        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetTemplate, in snapshotSourceSystem );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
@@ -353,17 +354,10 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
+    public override Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
         string zfsGetArgs = $"{IZfsProperty.KnownDatasetProperties.ToCommaSeparatedSingleLineString( )} -Hpt filesystem -d 0";
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
-        }
-
-        return rootsAndTheirProperties;
+        return GetPoolRootsAndPropertyValiditiesAsync( zfsGetArgs );
     }
 
     /// <inheritdoc />
@@ -413,22 +407,21 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string dsName, string[] properties )
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string dsName, string[] properties )
     {
         if ( properties.Length == 0 )
         {
             Logger.Warn( "Asked to set properties for {0} but no properties provided", dsName );
             return false;
         }
-
-        string propertiesSetString = properties.Select( propName => IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
+        string propertiesSetString = properties.Select( propName => propName == ZfsPropertyNames.SourceSystem ? ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, settings.LocalSystemName ).SetString : IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
         Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
         {
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        if ( dryRun )
+        if ( settings.DryRun )
         {
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             return false;

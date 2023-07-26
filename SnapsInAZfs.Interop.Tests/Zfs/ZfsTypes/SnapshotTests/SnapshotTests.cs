@@ -90,7 +90,8 @@ public class SnapshotTests
         parent.UpdateProperty( ZfsPropertyNames.RecursionPropertyName, recursion );
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( period, timestamp, parent );
         string periodString = (SnapshotPeriod)period;
-        string testOptionsString = $"-o {ZfsPropertyNames.SnapshotPeriodPropertyName}={periodString} -o {ZfsPropertyNames.SnapshotTimestampPropertyName}={timestamp:O} -o {ZfsPropertyNames.RecursionPropertyName}={recursion}";
+        string sourceSystem = ZfsPropertyValueConstants.StandaloneSiazSystem;
+        string testOptionsString = $"-o {ZfsPropertyNames.SnapshotPeriodPropertyName}={periodString} -o {ZfsPropertyNames.SnapshotTimestampPropertyName}={timestamp:O} -o {ZfsPropertyNames.RecursionPropertyName}={recursion} -o {ZfsPropertyNames.SourceSystem}={sourceSystem}";
         string snapshotOptionsString = snapshot.GetSnapshotOptionsStringForZfsSnapshot( );
         Assert.That( snapshotOptionsString, Is.EqualTo( testOptionsString ) );
     }

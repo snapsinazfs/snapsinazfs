@@ -48,17 +48,9 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
+    public override Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( )
     {
-        const string fileName = "poolroots-withproperties.txt";
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", fileName ).ConfigureAwait( true ) )
-        {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
-        }
-
-        return rootsAndTheirProperties;
+        return GetPoolRootsAndPropertyValiditiesAsync( "poolroots-withproperties.txt" );
     }
 
     /// <inheritdoc />
@@ -69,9 +61,9 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( bool dryRun, string poolName, string[] propertyArray )
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray )
     {
-        return !dryRun;
+        return !settings.DryRun;
     }
 
     /// <inheritdoc />
@@ -89,16 +81,17 @@ public class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         string snapName = datasetTemplate.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
-        snapshot = new( snapName, period.Kind, timestamp, ds );
-        if ( Program.Settings.DryRun )
+        ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
+        snapshot = new( snapName, in period.Kind, in snapshotSourceSystem, in timestamp, ds );
+        if ( snapsInAZfsSettings.DryRun )
         {
             string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
-            Logger.Info( "DRY RUN: Would execute `{0} {1}`", Program.Settings.ZfsPath, $"snapshot {arguments}" );
+            Logger.Info( "DRY RUN: Would execute `{0} {1}`", snapsInAZfsSettings.ZfsPath, $"snapshot {arguments}" );
             return ZfsCommandRunnerOperationStatus.DryRun;
         }
         return ZfsCommandRunnerOperationStatus.Success;
