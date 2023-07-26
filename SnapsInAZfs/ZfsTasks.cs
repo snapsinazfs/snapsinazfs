@@ -350,6 +350,12 @@ internal static class ZfsTasks
             // ReSharper disable once ExceptionNotDocumentedOptional
             string[] propertyArray = propertiesToAdd.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToArray( );
 
+            if ( propertyArray.Length == 0 )
+            {
+                Logger.Info( "No missing properties to set for {0} - Skipping", poolName );
+                continue;
+            }
+
             // Attempt to set the missing properties for the pool.
             // Log an error if unsuccessful
             if ( zfsCommandRunner.SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( dryRun, poolName, propertyArray ) )
