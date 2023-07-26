@@ -230,6 +230,7 @@ public class SiazService : BackgroundService
 
         if ( args.ConfigConsole )
         {
+            _settings.Daemonize = false;
             ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
             Environment.Exit( 0 );
             return SiazExecutionResultCode.ConfigConsole_CleanExit;
