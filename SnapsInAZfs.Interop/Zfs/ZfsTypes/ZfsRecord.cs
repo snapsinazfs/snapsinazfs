@@ -191,8 +191,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
     private ImmutableSortedDictionary<string, ZfsRecord>? _sortedChildDatasets;
 
-    public long BytesAvailable { get; }
-    public long BytesUsed { get; }
+    public long BytesAvailable { get; init; }
+    public long BytesUsed { get; init; }
 
     public int ChildDatasetCount => _childDatasets.Count;
     public bool IsPoolRoot { get; }
@@ -427,7 +427,11 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
                    bytesUsed,
                    this,
                    true )
-            : new( name, kind, sourceSystem, false, this );
+            : new( name, kind, sourceSystem, false, this )
+            {
+                BytesAvailable = bytesAvailable,
+                BytesUsed = bytesUsed
+            };
 
         AddDataset( newDs );
         return newDs;

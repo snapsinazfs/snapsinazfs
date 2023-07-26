@@ -91,6 +91,58 @@ public class RawZfsObjectTests
     }
 
     [Test]
+    public void ConvertToDatasetAndAddToCollection_ChildFileSystem_AddedToParent( )
+    {
+        ZfsRecord expectedRootRecord = GetTestRootRecord( );
+        const string dsName = "testRoot/child";
+        ZfsRecord expectedChildRecord = expectedRootRecord.CreateChildDataset( dsName, ZfsPropertyValueConstants.FileSystem, ZfsPropertyValueConstants.StandaloneSiazSystem, false, 54321, 12345 );
+        ZfsRecord testRootRecord = GetTestRootRecord( );
+        RawZfsObject testObject = new( ZfsPropertyValueConstants.FileSystem );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.FileSystem, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.EnabledPropertyName, "false", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, "false", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "-1", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsPropertyNames.SourceSystem, ZfsPropertyValueConstants.StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
+        ConcurrentDictionary<string, ZfsRecord> datasets = new( )
+        {
+            [ testRootRecord.Name ] = testRootRecord
+        };
+
+        Assume.That( datasets, Does.ContainKey( testRootRecord.Name ) );
+        Assume.That( datasets[ testRootRecord.Name ].ChildDatasetCount, Is.Zero );
+
+        bool conversionResult = testObject.ConvertToDatasetAndAddToCollection( dsName, datasets );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( conversionResult, Is.True );
+            Assert.That( datasets, Does.ContainKey( dsName ) );
+            Assert.That( datasets[ testRootRecord.Name ].ChildDatasetCount, Is.EqualTo( 1 ) );
+            bool getChildResult = datasets[ testRootRecord.Name ].GetChild( dsName, out ZfsRecord? retrievedChildRecord );
+            Assert.That( getChildResult, Is.True );
+            Assert.That( retrievedChildRecord?.Equals( expectedChildRecord ), Is.True );
+            ZfsRecord ds = datasets[ dsName ];
+            Assert.That( ds, Is.EqualTo( expectedChildRecord ) );
+        } );
+    }
+
+    [Test]
     public void ConvertToDatasetAndAddToCollection_RootFileSystemAllPropertiesExist( )
     {
         ZfsRecord expectedRecord = GetTestRootRecord( );
