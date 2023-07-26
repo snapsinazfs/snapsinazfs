@@ -63,7 +63,7 @@ public class RawZfsObjectTests
             Assert.That( obj.Properties, Has.ItemAt( propertyName ).InstanceOf<RawProperty>( ) );
             Assert.That( obj.Properties.IndexOfKey( propertyName ), Is.EqualTo( expectedIndex ) );
             Assert.That( obj.Properties[ propertyName ].Name, Is.EqualTo( propertyName ) );
-            Assert.That( obj.Properties[ propertyName ].Value, Is.EqualTo( rawPropertyTestCaseArray.Single( rp => (string)rp.Arguments[ 0 ] == propertyName ).Arguments[ 1 ] ) );
+            Assert.That( obj.Properties[ propertyName ].Value, Is.EqualTo( rawPropertyTestCaseArray.Single( rp => rp?.Arguments[ 0 ] is string pn && pn == propertyName ).Arguments[ 1 ] ) );
             Assert.That( obj.Properties[ propertyName ].Source, Is.EqualTo( propertySource ) );
         } );
     }
