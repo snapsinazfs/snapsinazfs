@@ -117,11 +117,14 @@ public class RawZfsObjectTests
         testObject.AddRawProperty( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
         testObject.AddRawProperty( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
         testObject.AddRawProperty( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
-        string dsName = "testRoot";
+        const string dsName = "testRoot";
         ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-        testObject.ConvertToDatasetAndAddToCollection( dsName, datasets );
-
-        Assert.That( datasets, Does.ContainKey( dsName ) );
+        bool conversionResult = testObject.ConvertToDatasetAndAddToCollection( dsName, datasets );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( conversionResult, Is.True );
+            Assert.That( datasets, Does.ContainKey( dsName ) );
+        } );
         ZfsRecord ds = datasets[ dsName ];
         Assert.That( ds, Is.EqualTo( expectedRecord ) );
     }

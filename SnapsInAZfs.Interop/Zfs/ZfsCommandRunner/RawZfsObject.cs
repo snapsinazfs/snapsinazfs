@@ -47,7 +47,9 @@ public class RawZfsObject
         Properties.Add( propertyName, new( propertyName, propertyValue, propertySource ) );
     }
 
-    public void ConvertToDatasetAndAddToCollection( string dsName, ConcurrentDictionary<string, ZfsRecord> datasets )
+    /// <exception cref="InvalidOperationException">Cannot convert to ZfsRecord - Missing one or more properties</exception>
+    /// <exception cref="ArgumentNullException">Cannot convert to ZfsRecord - Missing name <paramref name="dsName"/></exception>
+    public bool ConvertToDatasetAndAddToCollection( string dsName, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
         Logger.Trace( "Parsing property values for {0} {1}", Kind, dsName );
         if ( string.IsNullOrWhiteSpace( dsName ) )
@@ -86,7 +88,7 @@ public class RawZfsObject
                                                                           out long bytesUsed ) )
         {
             Logger.Error( "Failed parsing object {0} from ZFS", dsName );
-            return;
+            return false;
         }
 
         string parentName = dsName.GetZfsPathParent( );
@@ -120,6 +122,8 @@ public class RawZfsObject
         {
             datasets[ parentName ].AddDataset( newDs );
         }
+
+        return true;
     }
 
     /// <summary>
