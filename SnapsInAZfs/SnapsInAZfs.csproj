@@ -28,6 +28,7 @@
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
     <DebugType>embedded</DebugType>
+    <TieredCompilation>False</TieredCompilation>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
