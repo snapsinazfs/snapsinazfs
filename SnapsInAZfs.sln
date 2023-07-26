@@ -19,10 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Application
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{ED331CBD-09F6-4C14-A686-D675761E4979}"
 	ProjectSection(SolutionItems) = preProject
+		Documentation\SnapsInAZfs-config-console.8 = Documentation\SnapsInAZfs-config-console.8
+		Documentation\SnapsInAZfs-zfsprops.7 = Documentation\SnapsInAZfs-zfsprops.7
 		Documentation\SnapsInAZfs.5 = Documentation\SnapsInAZfs.5
-		Documentation\SnapsInAZfs.5.md = Documentation\SnapsInAZfs.5.md
 		Documentation\SnapsInAZfs.8 = Documentation\SnapsInAZfs.8
-		Documentation\SnapsInAZfs.8.md = Documentation\SnapsInAZfs.8.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs", "SnapsInAZfs\SnapsInAZfs.csproj", "{9E62331B-EE99-45B8-916F-04DA39EB3829}"
