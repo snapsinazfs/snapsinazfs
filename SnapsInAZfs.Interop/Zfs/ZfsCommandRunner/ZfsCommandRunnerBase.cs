@@ -165,6 +165,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             if ( !rawObjects.TryGetValue( objectName, out RawZfsObject? obj ) )
             {
                 rawObjects.Add( objectName, new( propertyValue ) );
+                rawObjects[ objectName ].AddRawProperty( in lineTokens[ 1 ], in propertyValue, in lineTokens[ 3 ] );
                 continue;
             }
 
