@@ -1,5 +1,5 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -7,6 +7,10 @@
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
@@ -94,6 +98,16 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         } );
     }
 
+    /// <summary>
+    ///     Performs basic parse and range checks on properties that are required to be defined on pool roots
+    /// </summary>
+    /// <param name="name">The name of the property</param>
+    /// <param name="value">The raw string value of the property</param>
+    /// <param name="source">The source string of the property</param>
+    /// <returns>
+    ///     A boolean value indicating if the property passed basic parse and range checks, and was defined as local or inherited
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">If the provided property name is not one of the expected values</exception>
     protected static bool CheckIfPropertyIsValid( string name, string value, string source )
     {
         if ( source == "-" )
@@ -103,7 +117,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
         return name switch
         {
-            "type" => !string.IsNullOrWhiteSpace( value ) && value == "filesystem",
+            "type" => !string.IsNullOrWhiteSpace( value ) && value is ZfsPropertyValueConstants.FileSystem or ZfsPropertyValueConstants.Volume,
             ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
             ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
             ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
