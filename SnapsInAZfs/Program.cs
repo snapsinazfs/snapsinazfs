@@ -123,7 +123,7 @@ internal class Program
 
         using IHost serviceHost = Host.CreateDefaultBuilder( )
                                 .UseSystemd( )
-                                .ConfigureServices( ( _, services ) => { services.AddHostedService( ServiceInstanceProvider ); } )
+                                .ConfigureServices( ( _, services ) => { services.AddHostedService( GetSiazServiceInstance ); } )
                                 .Build( );
 
         SiazService.Timestamp = currentTimestamp;
@@ -135,7 +135,7 @@ internal class Program
         return SiazService.ExitStatus;
     }
 
-    private static SiazService ServiceInstanceProvider( IServiceProvider arg )
+    private static SiazService GetSiazServiceInstance( IServiceProvider arg )
     {
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         #if DEBUG_WINDOWS
