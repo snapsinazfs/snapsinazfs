@@ -114,23 +114,22 @@
     <PackageReference Include="Terminal.Gui" Version="1.13.5" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-    <None Update="allsnapshots-withproperties.txt">
+  <ItemGroup>
+    <None Remove="poolroots-withproperties.txt" />
+    <None Remove="fullZfsGet.txt" />
+  </ItemGroup>
+  <ItemGroup Condition="$(DefineConstants.Contains('DEBUG'))">
+    <None Include="poolroots-withproperties.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="poolroots-withproperties.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="poolprops-bad-schemacheck.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="fullZfsGet.txt">
+    <None Include="fullZfsGet.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
+    <ProjectReference Include="..\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
     <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
   </ItemGroup>
 
