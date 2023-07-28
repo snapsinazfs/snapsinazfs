@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop.Tests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings.Tests", "SnapsInAZfs.Settings.Tests\SnapsInAZfs.Settings.Tests.csproj", "{1B2C893E-BB15-443C-886C-2C4212E03F11}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring", "SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj", "{68209F8D-FE0F-4B75-B098-D2B9293F7201}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -85,6 +87,14 @@ Global
 		{1B2C893E-BB15-443C-886C-2C4212E03F11}.Release|x64.Build.0 = Release|x64
 		{1B2C893E-BB15-443C-886C-2C4212E03F11}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
 		{1B2C893E-BB15-443C-886C-2C4212E03F11}.Release-R2R|x64.Build.0 = Release-R2R|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Debug|x64.ActiveCfg = Debug|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Debug|x64.Build.0 = Debug|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Debug-Windows|x64.ActiveCfg = Debug-Windows|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Debug-Windows|x64.Build.0 = Debug-Windows|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Release|x64.ActiveCfg = Release|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Release|x64.Build.0 = Release|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Release-R2R|x64.ActiveCfg = Release-R2R|x64
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201}.Release-R2R|x64.Build.0 = Release-R2R|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -95,6 +105,7 @@ Global
 		{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 		{527FCFD8-6D39-429F-B067-EDFB6A98AC97} = {F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}
 		{1B2C893E-BB15-443C-886C-2C4212E03F11} = {F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}
+		{68209F8D-FE0F-4B75-B098-D2B9293F7201} = {BF90F296-1208-445D-A45D-E11D7F00EB95}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C48CFF09-F3F8-4708-B33C-C996B0B4C693}
