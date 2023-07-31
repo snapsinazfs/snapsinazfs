@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -18,6 +18,7 @@
     <StartupObject>SnapsInAZfs.Program</StartupObject>
     <Platforms>x64</Platforms>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <EnableDefaultContentItems>False</EnableDefaultContentItems>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
