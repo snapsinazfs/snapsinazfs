@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -23,9 +23,9 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
 
     private ApplicationState _applicationState;
 
-    public DateTimeOffset SnapshotsPrunedLastEnded { get; set; }
+    public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
-    public DateTimeOffset SnapshotsTakenLastEnded { get; set; }
+    public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
     public string GetApplicationState( )
     {
