@@ -8,15 +8,18 @@
 // 
 // THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System.Configuration;
+using System.Net;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
+using LogLevel = NLog.LogLevel;
+using Monitor = SnapsInAZfs.Monitoring.Monitor;
 
 namespace SnapsInAZfs;
 
@@ -27,6 +30,7 @@ internal class Program
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     internal static SnapsInAZfsSettings? Settings;
+    internal static readonly Monitor ServiceObserver = new ( );
 
     /// <summary>
     ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
@@ -73,7 +77,7 @@ internal class Program
         if ( args.Version )
         {
             // ReSharper disable once ExceptionNotDocumented
-            string versionString = $"SnapsInAZfs Version: { Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );
@@ -120,35 +124,59 @@ internal class Program
         }
 
         ApplyCommandLineArgumentOverrides( in args );
-
-        using IHost serviceHost = Host.CreateDefaultBuilder( )
-                                .UseSystemd( )
-                                .ConfigureServices( ( _, services ) => { services.AddHostedService( GetSiazServiceInstance ); } )
-                                .Build( );
-
         SiazService.Timestamp = currentTimestamp;
+        using SiazService serviceInstance = GetSiazServiceInstance( );
+        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
+        WebApplication svc;
+        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+        {
+            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+            svc = serviceBuilder.Build( );
+            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
+            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+        }
+        else
+        {
+            svc = serviceBuilder.Build( );
+        }
         using CancellationTokenSource tokenSource = new( );
         CancellationToken masterToken = tokenSource.Token;
-
-        await serviceHost.RunAsync( masterToken ).ConfigureAwait( true );
-
+        await svc.StartAsync( masterToken ).ConfigureAwait(true);
+        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
         return SiazService.ExitStatus;
     }
 
-    private static SiazService GetSiazServiceInstance( IServiceProvider arg )
+    private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
+    {
+        kestrelOptions.Configure( ).Load( );
+        if ( ( Settings?.Monitoring.UnixSocketEnabled ?? false ) && !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
+        {
+            kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
+        }
+
+        if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
+        {
+            kestrelOptions.ListenAnyIP( Settings.Monitoring.TcpListenerPort );
+        }
+    }
+
+    private static SiazService GetSiazServiceInstance( )
     {
         Logger.Trace( "Getting ZFS command runner for the current environment" );
-        #if DEBUG_WINDOWS
+    #if DEBUG_WINDOWS
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
         {
             PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
             _ => new DummyZfsCommandRunner( )
         };
-        #else
+    #else
         IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
-        #endif
+    #endif
 
-        SiazService service = new( Settings!, zfsCommandRunner );
+        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
         return service;
     }
 
@@ -175,3 +203,4 @@ internal class Program
         }
     }
 }
+
