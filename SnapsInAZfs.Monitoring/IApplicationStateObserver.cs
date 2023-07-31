@@ -16,6 +16,20 @@ namespace SnapsInAZfs.Monitoring;
 
 public interface IApplicationStateObserver
 {
+    /// <summary>
+    ///     Gets a string representation of the monitored <see cref="IApplicationStateObservable" />'s current state.
+    /// </summary>
+    /// <returns>
+    ///     A string representing the current state of the monitored observable object.
+    /// </returns>
     string GetApplicationState( );
-    void RegisterApplicationStateObservable( IApplicationStateObservable observableObject );
+
+    /// <summary>
+    ///     Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />
+    /// </summary>
+    /// <remarks>
+    ///     Implementations should typically subscribe the observer object to the observable object's
+    ///     <see cref="IApplicationStateObservable.ApplicationStateChanged" /> <see langword="event" />
+    /// </remarks>
+    public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true );
 }
