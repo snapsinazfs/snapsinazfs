@@ -31,6 +31,7 @@
     <PublishSingleFile>True</PublishSingleFile>
     <DebugType>embedded</DebugType>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <TieredCompilation>False</TieredCompilation>
   </PropertyGroup>
 
   <ItemGroup>

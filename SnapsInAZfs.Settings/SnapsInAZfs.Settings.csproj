@@ -26,6 +26,7 @@
 		<PublishSingleFile>True</PublishSingleFile>
 		<DebugType>embedded</DebugType>
 		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+		<TieredCompilation>False</TieredCompilation>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
