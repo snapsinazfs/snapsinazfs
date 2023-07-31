@@ -359,6 +359,7 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002ETypeExtensions_003BToNewlineSeparatedString/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002ETypeExtensions_003BToSpaceSeparatedSingleLineString/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsTypes_002EZfsPropertyValueConstants_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EApplicationStateChangedEventArgs_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnApplicationStateChanged/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnBeginPruningSnapshots/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnBeginTakingSnapshots/@EntryIndexedValue">True</s:Boolean>
@@ -368,6 +369,7 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnPruneSnapshotSucceeded/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnTakeSnapshotFailed/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnTakeSnapshotSucceeded/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002ESnapshotOperationEventArgs_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Hierarchy/Build/SolBuilderDuo/UseMsbuildSolutionBuilder/@EntryValue">NewVersion</s:String>
 	
 	
