@@ -27,6 +27,8 @@ LOCALSHAREDIR ?= /usr/local/share
 ETCDIR ?= /etc
 SIAZLOCALCONFIGFILENAME ?= SnapsInAZfs.local.json
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
+LOGROOT ?= /var/log
+LOGPATH ?= $(LOGROOT)/$(SIAZ)
 
 VERSIONSUFFIXFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)/VersionSuffix
 VERSIONSUFFIX := $(shell cat ${VERSIONSUFFIXFILE})
@@ -133,6 +135,7 @@ install-release:	publish-release
 	install --backup=existing -C -D -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZ)
 	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZLC)
 	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/siaz
+	mkdir -p $(LOGPATH)
 
 install-service:
 	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/snapsinazfs.service /usr/lib/systemd/system/snapsinazfs.service
@@ -170,7 +173,10 @@ uninstall-doc:
 	rm -fv $(MAN5DIR)/$(SIAZLC).json.5 2>/dev/null
 	mandb -q
 
-uninstall-everything:	uninstall-service	uninstall	uninstall-config-local
+uninstall-everything:	uninstall-service	uninstall	uninstall-config-local	uninstall-logs
+
+uninstall-logs:
+	rm -rfv $(LOGPATH) 2>/dev/null
 
 uninstall-release:
 	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
