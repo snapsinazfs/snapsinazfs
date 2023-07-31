@@ -12,6 +12,7 @@
 
 #endregion
 
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using NLog;
 
@@ -149,12 +150,14 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
     /// <inheritdoc />
     public uint SnapshotsPrunedSucceededLastExecution { get; set; }
 
+    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
     public string GetVersion( )
     {
         // ReSharper disable once ExceptionNotDocumented
         return Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion ?? string.Empty;
     }
 
+    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
     public long GetWorkingSet( )
     {
         return Environment.WorkingSet;
