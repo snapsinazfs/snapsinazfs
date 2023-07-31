@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
+    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
     <Optimize>True</Optimize>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <PublishReadyToRun>True</PublishReadyToRun>
@@ -43,6 +44,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
