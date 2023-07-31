@@ -78,4 +78,7 @@ public record SnapsInAZfsSettings
     /// </summary>
     [JsonPropertyOrder( 8 )]
     public string ZpoolPath { get; set; } = "/usr/local/sbin/zpool";
+
+    [JsonPropertyOrder( 10 )]
+    public MonitoringSettings Monitoring { get; set; } = new( );
 }
