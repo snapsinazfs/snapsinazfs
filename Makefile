@@ -130,7 +130,7 @@ install-doc:
 	mandb -q
 
 install-release:	publish-release
-	install --backup=existing -C -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZ)
+	install --backup=existing -C -D -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZ)
 	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZLC)
 	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/siaz
 
