@@ -13,6 +13,7 @@ using NLog.Config;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui;
+using LogLevel = NLog.LogLevel;
 using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.TemplateConfigurationListItem;
 
 #pragma warning disable CA2000

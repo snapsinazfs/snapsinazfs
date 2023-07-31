@@ -10,18 +10,18 @@
 // 
 // See https://opensource.org/license/MIT/
 
-#endregion
-
-using System.Diagnostics.CodeAnalysis;
+using System.Configuration;
+using System.Net;
 using System.Reflection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using System.Text.Json;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
+using LogLevel = NLog.LogLevel;
+using Monitor = SnapsInAZfs.Monitoring.Monitor;
 
 namespace SnapsInAZfs;
 
@@ -34,6 +34,7 @@ internal class Program
 
     private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
     internal static SnapsInAZfsSettings? Settings;
+    internal static readonly Monitor ServiceObserver = new ( );
 
     public static async Task<int> Main( string[] argv )
     {
@@ -61,7 +62,7 @@ internal class Program
         if ( args.Version )
         {
             // ReSharper disable once ExceptionNotDocumented
-            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );
@@ -187,51 +188,60 @@ internal class Program
             return false;
         }
 
-        return true;
+        ApplyCommandLineArgumentOverrides( in args );
+        SiazService.Timestamp = currentTimestamp;
+        using SiazService serviceInstance = GetSiazServiceInstance( );
+        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
+        WebApplication svc;
+        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+        {
+            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+            svc = serviceBuilder.Build( );
+            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
+            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+        }
+        else
+        {
+            svc = serviceBuilder.Build( );
+        }
+        using CancellationTokenSource tokenSource = new( );
+        CancellationToken masterToken = tokenSource.Token;
+        await svc.StartAsync( masterToken ).ConfigureAwait(true);
+        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
+        return SiazService.ExitStatus;
     }
 
-        using IHost serviceHost = Host.CreateDefaultBuilder( )
-                                .UseSystemd( )
-                                .ConfigureServices( ( _, services ) => { services.AddHostedService( GetSiazServiceInstance ); } )
-                                .Build( );
-
-        Logger.Trace( "Getting ZFS command runner for the current environment" );
-        try
-        {
-            // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
-        #if DEBUG_WINDOWS
-            zfsCommandRunner = Environment.OSVersion.Platform switch
-            {
-                PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
-                _ => new DummyZfsCommandRunner( )
-            };
-        #else
-            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
-        #endif
-        }
-        catch ( FileNotFoundException ex )
-        {
-            Logger.Fatal( ex, ex.Message );
-            zfsCommandRunner = null;
-            return false;
-        }
-
-        if ( reuseSingleton )
-        {
-            ZfsCommandRunnerSingleton = zfsCommandRunner;
-        }
-
-        return true;
-    }
-
-    private static SiazService GetSiazServiceInstance( IServiceProvider arg )
+    private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
     {
-        if ( !TryGetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        kestrelOptions.Configure( ).Load( );
+        if ( ( Settings?.Monitoring.UnixSocketEnabled ?? false ) && !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
         {
-            return null;
+            kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
         }
 
-        SiazService service = new( settings!, zfsCommandRunner );
+        if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
+        {
+            kestrelOptions.ListenAnyIP( Settings.Monitoring.TcpListenerPort );
+        }
+    }
+
+    private static SiazService GetSiazServiceInstance( )
+    {
+        Logger.Trace( "Getting ZFS command runner for the current environment" );
+    #if DEBUG_WINDOWS
+        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
+            _ => new DummyZfsCommandRunner( )
+        };
+    #else
+        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
+    #endif
+
+        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
         return service;
     }
 
@@ -258,3 +268,4 @@ internal class Program
         }
     }
 }
+
