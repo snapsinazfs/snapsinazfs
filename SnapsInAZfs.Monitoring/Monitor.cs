@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -17,28 +17,104 @@ using NLog;
 
 namespace SnapsInAZfs.Monitoring;
 
+/// <summary>
+///     A general monitoring class that implements <see cref="IMonitor" />, <see cref="IApplicationStateObserver" />, and
+///     <see cref="ISnapshotOperationsObserver" />, and allows monitoring of one of each (which can be the same object)
+/// </summary>
 public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOperationsObserver
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     private ApplicationState _applicationState;
+    private IApplicationStateObservable? _applicationStateObservable;
+    private bool _applicationStateObservableEventSubscribed;
+    private ISnapshotOperationsObservable? _snapshotOperationsObservable;
 
     public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
     public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
+    /// <summary>
+    ///     Gets the state of the registered <see cref="IApplicationStateObservable" /> object.
+    /// </summary>
+    /// <returns>
+    ///     If subscribed to the <see cref="IApplicationStateObservable.ApplicationStateChanged" /> event, returns the last known state
+    ///     this object was informed of.<br />
+    ///     If not subscribed, gets the current <see cref="IApplicationStateObservable.State" /> value from the registered object.<br />
+    ///     If no object is registered, returns the string "Not Registered"
+    /// </returns>
     public string GetApplicationState( )
     {
-        return _applicationState.ToString( "G" );
+        return _applicationStateObservable switch
+        {
+            null => "Not Registered",
+            _ => _applicationStateObservableEventSubscribed ? _applicationState.ToString( "G" ) : _applicationStateObservable.State.ToString( "G" )
+        };
     }
 
-    public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject )
+    /// <summary>
+    ///     Registers an <see cref="IApplicationStateObservable" /> object with this <see cref="Monitor" /> instance by subscribing to
+    ///     the <see cref="IApplicationStateObservable" /> object's <see cref="IApplicationStateObservable.ApplicationStateChanged" />
+    ///     <see langword="event" />, if <paramref name="subscribeToEvents" /> is <see langword="true" />, and setting a local reference
+    ///     to the registered object.
+    /// </summary>
+    /// <paramref name="observableObject">
+    ///     The <see cref="IApplicationStateObservable" /> object instance to register to this <see cref="Monitor" />
+    /// </paramref>
+    /// <paramref name="subscribeToEvents">
+    ///     Whether to subscribe to <paramref name="observableObject" />'s
+    ///     <see cref="IApplicationStateObservable.ApplicationStateChanged" /> event.<br />
+    ///     Default is <see langword="true" />.
+    /// </paramref>
+    /// <remarks>
+    ///     Enforces one monitored object per Observer.<br />
+    ///     Can also be used to re-register the same object to subscribe or unsubscribe to the event.
+    /// </remarks>
+    /// <exception cref="InvalidOperationException">
+    ///     Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object.
+    /// </exception>
+    public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true )
     {
-        observableObject.ApplicationStateChanged += ServiceOnApplicationStateChanged;
+        if ( _applicationStateObservable is not null && !ReferenceEquals( _applicationStateObservable, observableObject ) )
+        {
+            throw new InvalidOperationException( "Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object." );
+        }
+
+        _applicationStateObservable ??= observableObject;
+        switch ( subscribeToEvents )
+        {
+            case true when !_applicationStateObservableEventSubscribed:
+                _applicationStateObservable.ApplicationStateChanged += ServiceOnApplicationStateChanged;
+                _applicationStateObservableEventSubscribed = true;
+                break;
+            case false when _applicationStateObservableEventSubscribed:
+                _applicationStateObservable.ApplicationStateChanged -= ServiceOnApplicationStateChanged;
+                _applicationStateObservableEventSubscribed = false;
+                break;
+        }
     }
 
+    /// <summary>
+    ///     Registers an <see cref="ISnapshotOperationsObservable" /> object with this <see cref="Monitor" /> instance by subscribing to
+    ///     the <see cref="ISnapshotOperationsObservable" /> object's <see langword="event" />s and setting a local reference to the
+    ///     registered object.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    ///     Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object.
+    /// </exception>
     public void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject )
     {
+        if ( _snapshotOperationsObservable is not null && !ReferenceEquals( _snapshotOperationsObservable, observableObject ) )
+        {
+            throw new InvalidOperationException( "Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object." );
+        }
+
+        if ( _snapshotOperationsObservable is not null )
+        {
+            return;
+        }
+
+        _snapshotOperationsObservable = observableObject;
         observableObject.BeginTakingSnapshots += ServiceOnBeginTakingSnapshots;
         observableObject.TakeSnapshotSucceeded += ServiceOnTakeSnapshotSucceeded;
         observableObject.TakeSnapshotFailed += ServiceOnTakeSnapshotFailed;
