@@ -72,21 +72,6 @@ public class CommandLineArguments
     [HelpHook]
     public bool Help { get; set; }
 
-    [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on." )]
-    [ArgShortcut( "--monitor-capacity" )]
-    [ArgShortcut( "--monitor-capacity-nagios" )]
-    public bool MonitorCapacity { get; set; }
-
-    [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the health of the zpool your filesystems are on." )]
-    [ArgShortcut( "--monitor-health" )]
-    [ArgShortcut( "--monitor-health-nagios" )]
-    public bool MonitorHealth { get; set; }
-
-    [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the health of your snapshots." )]
-    [ArgShortcut( "--monitor-snapshots" )]
-    [ArgShortcut( "--monitor-snapshots-nagios" )]
-    public bool MonitorSnapshots { get; set; }
-
     [ArgDescription( "Force SnapsInAZfs to NOT run as a daemon" )]
     [ArgShortcut( "--no-daemonize" )]
     [ArgCantBeCombinedWith( "Daemonize|Cron" )]
