@@ -10,13 +10,7 @@
   "ZpoolPath": "/usr/local/sbin/zpool",
   "Daemonize": false,
   "Monitoring": {
-    "Nagios": {
-      "$comments": "Nagios-specific monitoring options",
-      "MonitorType": "Nagios",
-      "Capacity": false,
-      "Health": false,
-      "Snapshots": false
-    }
+    "Enabled": false
   },
   "Templates": {
     "production": {

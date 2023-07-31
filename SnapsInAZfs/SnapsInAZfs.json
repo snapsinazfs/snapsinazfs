@@ -10,15 +10,6 @@
   "DaemonTimerIntervalSeconds": 10,
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
-  "Monitoring": {
-    "Nagios": {
-      "$comments": "Nagios-specific monitoring options",
-      "MonitorType": "Nagios",
-      "Capacity": false,
-      "Health": false,
-      "Snapshots": false
-    }
-  },
   "Templates": {
     "default": {
       "Formatting": {
@@ -45,5 +36,12 @@
         "YearlyTime": "00:00:00"
       }
     }
-  }
+  },
+  "Monitoring": {
+    "Enabled":  false, 
+    "TcpListenerEnabled": false,
+    "TcpListenerPort": 60763,
+    "UnixSocketEnabled": false,
+    "UnixSocketPath": "/run/SnapsInAZfs/MonitorSocket" 
+  } 
 }
