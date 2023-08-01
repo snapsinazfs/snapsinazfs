@@ -7,9 +7,9 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- As of today (2023-07-26), the core functionality of SIAZ, including the ability to take and prune snapshots,
+ As of today (2023-07-31), the core functionality of SIAZ, including the ability to take and prune snapshots,
  the configuration console, documentation, a systemd service, enhanced logging, full install/uninstall via make recipes,
- and zfs property backup, cleanup, and restore, is all implemented, and I consider the application to be ready for version 1.0.0 release.
+ and zfs property backup, cleanup, and restore, is all implemented, and I consider the application to be almost ready for version 1.0.0 release.
  
  I will be tagging release candidate versions for a period of time, during which I'll continue to make refinements and bug fixes,
  but new feature development will happen in branches that won't be merged to master until after the final 1.0.0 release.
@@ -49,23 +49,20 @@
 
  ## Building/Installing From Source
  
- After cloning this repository, execute the following commands to build and install SnapsInAZfs using make:
+ After cloning this repository, execute the following commands to build and install SnapsInAZfs using `make`:
 
      make
      make install
-
- This will fetch all .net dependencies from NuGet, build SnapsInAZfs in the ./publish/Release-R2R/ folder as a
- combined "Ready-to-Run" (partially natively pre-compiled) executable file, install SnapsInAZfs to
- `/usr/local/sbin/SnapsInAZfs`, install all base configuration files to `/usr/local/share/SnapsInAZfs/`, install a local configuration file at `/etc/SnapsInAZfs/SnapsInAZfs.local.json` (only if one does not already exist), and install documentation to the appropriate man directories.
-
- To clean build artifacts, run `make clean`, which removes the release build files and intermediates,
- or `make extraclean`, which removes build artifacts and intermediates for all defined project
- configurations and removes the `build` and `publish` folders, as well. The `clean` and `extraclean` recipes do
- not touch anything outside the repository folder, such as installed binaries, documentation, or configuration.
  
  To install the systemd service unit for SIAZ, run `make install-service`, which ONLY installs the service unit
- to /usr/lib/systemd/system/snapsinazfs.service, enables it, and runs `systemctl daemon-reload`.\
+ to `/usr/lib/systemd/system/snapsinazfs.service`, enables it, and runs `systemctl daemon-reload`.\
  The `install-service` recipe will not build SIAZ or perform any other actions.
+
+ For detailed installation documentation,
+ including descriptions of all Makefile recipes, build configurations, and other relevant details,
+ run `make help` from the repository root directory.
+
+ The man page displayed by that make recipe is the authoritative installation guide and supercedes anything that may appear in this document, if discrepancies exist.
 
  ## Uninstalling
 
