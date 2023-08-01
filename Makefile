@@ -1,3 +1,6 @@
+MAKEFLAGS := $(filter-out -j,$(MAKEFLAGS))
+MAKEFLAGS := $(filter-out -jobs,$(MAKEFLAGS))
+
 SNAPSINAZFS_SOLUTION_ROOT ?= .
 
 PROJECTFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)SnapsInAZfs/SnapsInAZfs.csproj
@@ -94,6 +97,11 @@ build-debug:
 build-release:
 	mkdir -p $(RELEASEDIR)
 	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) SnapsInAZfs/SnapsInAZfs.csproj
+
+help:	help-install
+
+help-install:
+	man --nh -l $(SNAPSINAZFSDOCDIR)/install.8
 
 reinstall:	uninstall	clean	install
 

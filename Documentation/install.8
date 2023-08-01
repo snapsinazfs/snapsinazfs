@@ -1,0 +1,651 @@
+.ds SIAZB \fBSnapsInAZfs\fP
+.ds SIAZ SnapsInAZfs
+.ds SIAZLC snapsinazfs
+.ds SIAZS siaz
+.TH \*[SIAZB] 8 "July 31, 2023" "\*[SIAZB] Build/Installation Manual"
+.SH NAME
+.PP
+.B \*[SIAZ] Build and Installation Manual
+.PP
+.SH SYNOPSIS
+.PP
+.SY make help\-install
+.PP
+.SY make [build\-option]
+.OP all
+.OP build
+.OP build\-debug
+.OP build\-release
+.PP
+.SY make [clean\-option]
+.OP clean
+.OP clean\-all
+.OP clean\-debug
+.OP clean\-release
+.OP extraclean
+.PP
+.SY make [install\-option]
+.OP install
+.OP install\-config
+.OP install\-config\-base
+.OP install\-config\-local
+.OP install\-config\-local\-force
+.OP install\-doc
+.OP install\-release
+.OP install\-service
+.OP publish\-release
+.OP reinstall
+.PP
+.SY make [test\-option]
+.OP test
+.OP test\-everything
+.OP test\-everything\-verbose
+.PP
+.SY make [uninstall\-option]
+.OP uninstall
+.OP uninstall\-config\-base
+.OP uninstall\-config\-local
+.OP uninstall\-doc
+.OP uninstall\-everything
+.OP uninstall\-logs
+.OP uninstall\-release
+.OP uninstall\-service
+.PP
+.SY make [zfsprop\-option]
+.OP restore\-wiped\-zfs\-properties
+.OP save\-snapsinazfs\-zfs\-properties
+.OP wipe\-snapsinazfs\-zfs\-properties
+.YS
+.PP
+.SH DESCRIPTION
+.PP
+This manual provides help for building and installing \*[SIAZ] using GNU Make,
+as well as basic information about manual compilation using the dotnet cli.\&
+.IP
+Compilation using the dotnet cli is only minimally documented here and support is not guaranteed to be available for builds created using the dotnet cli,
+whether using the provided configurations or your own configurations.\&
+Explanations of available configurations that are not used in \fBmake\fP recipes are provided for informational and convenience purposes only.\&
+.PP
+For explanation of the make recipes and what they do,
+see the \fBOPTIONS\fP section below.\&
+.TP
+.B Typical Build dnd Install Procedure for Production Use
+For new or upgrade builds and installations of \*[SIAZ],
+the standard and recommended procedure is to execute the following command,
+from the root of the cloned source repository:\&
+.IP
+.B make ; make install
+.IP
+This will build the application using the recommended build configuration,
+generate a single\-file executable,
+install the executable to \fI/usr/local/sbin/\fP,
+install man pages to \fI/usr/share/man/\fP,
+install base configuration and configuration schema documents to \fI/usr/local/share/\*[SIAZ]/\fP,
+and install local configuration files to \fI/etc/\*[SIAZ]/\FP.\&
+.IP
+Existing LOCAL configuration files, if encountered, will not be overwritten,
+but BASE configuration files will be overwritten.\&
+Any overwritten files will have a backup copy saved in place,
+with a tilde (~) suffix, in case you made unsupported changes to base configuration.\&
+After install, see \fB\*[SIAZLC](5)\fP for configuration documentation.\&
+.TQ
+.B Requirements
+.IP
+To build from source, you must have the .net 7.0 SDK installed.\&
+Once built, only the .net 7.0 runtime is required to execute \*[SIAZ].\&
+.RS
+.IP
+Framework\-independent builds can be created,
+which remove the requirement for any .net runtime to be installed to execute \*[SIAZ].\&
+Such builds are not supported at this time.\&
+See documentation at
+.UR https://learn.microsoft.com/en\-us/dotnet/core/deploying/
+Microsoft Learn
+.UE
+for details on build options not documented or supported here.\&
+.RE
+.RS
+.TP
+.B Note to Ubuntu users
+.IP
+The snap package for the .net SDK has known problems, especially for resolving the path of the SDK.\&
+Use the dotnet7 apt package provided by Canonical for best results.\&
+The dotnet\-sdk\-7.0 package provided by Microsoft in the microsoft\-prod repository can be made to work,
+but may require a symlink to the sdk directory,
+as it is not properly defined in the Microsoft\-provided package for Ubuntu.\&
+Support for that is not provided here.\&
+.RE
+.IP
+To use the Makefile,
+which makes the build and installation process much easier,
+and is the preferred and supported way to build \*[SIAZ],
+you must also have GNU Make installed.\&
+.IP
+The Makefile assumes a bash\-compatible shell is in use,
+and all recipes are bash\-compatible.\&
+While they are also likely to be compatible with other shells,
+compatibility with other shells is not guaranteed.\&
+.IP
+You must have write privileges to \fI/usr/local/sbin\fP, \fI/usr/local/share\fP, \fI/usr/share/man\fP, \fI/etc\fP, and \fI/var/log\fP to install,
+using the pre\-defined variables in the Makefile.\&
+This generally means you will need root\-level privileges, whether implicitly or via sudo or some other mechanism.\&
+If necessary, prepend `sudo ` to any `make` commands in this guide.\&
+Most paths are defined as variables in the Makefile and can be overridden,
+if necessary.\&
+See \fBmake(1)\fP.\&
+.TQ
+.B Provided Build Configurations
+.IP
+The solution and project files define four build configurations,
+which are used by the dotnet cli (invoked by the relevant make recipes) to control build output.\&
+If you use the make recipes, you will not need to use these explicitly,
+but they are described here for informational purposes:
+.RS
+.TP 4
+.B Debug
+Intended for use in development.\&
+Only used in *\-debug make recipes.\&
+This configuration should not be used for general usage of the application and is not supported for general use.\&
+.TQ
+.B Debug\-Windows
+Intended for use when developing/debugging \*[SIAZ] on Windows, in Visual Studio.\&
+This configuration produces a build that does not invoke zfs in any way, and thus is effectively non\-functional.\&
+It uses text files provided in the git repository as input to simulate output from specific ZFS commands,
+so it can be used on Windows without ZFS.\&
+.IP
+Execution of these builds executes all normal program logic,
+except for that which would interact with ZFS,
+and provides generally identical output as a normal build would,
+except that it is based on the sample input text files, rather than actual ZFS data from your system.\&
+.IP
+While these builds may run on Linux, compatibility with Linux is neither intended nor guaranteed.\&
+.IP
+.B This is the only configuration that can be successfully run on Windows.\&
+.B All other configurations require ZFS.\&
+.TQ
+.B Release
+This configuration results in a build which is optimized,
+is \fBNOT\fP combined into a single executable file,
+is \fBNOT\fP pre\-compiled to native code,
+and has \(dqTiered Compilation\(dq enabled.\&
+See
+.UR https://learn.microsoft.com/en\-us/dotnet/core/runtime\-config/compilation
+the Microsoft Learn Documentation on Tiered Compilation
+.UE
+for details.\&
+.IP
+These builds are likely to be larger, overall, than \fBRelease\-R2R\fP builds,
+are not supported or used by the Makefile for build or install,
+will have slower startup performance (every time the application is launched),
+may encounter minor JIT compilation delays upon the first call to each function,
+but \fIMAY\fP potentially have slightly lower run\-time memory usage.\&
+.IP
+These builds, while they are suitable for production use,
+are not the recommended build configuration for production use.\&
+.IP
+The recommended build configuration for production use,
+and the configuration used by the
+.BR all ", " *\-release ", and " install
+recipes, is \fBRelease\-R2R\fP (see below).\&
+.TQ
+.B Release\-R2R
+This configuration results in a build which is optimized,
+is combined into a single executable file,
+is partially pre\-compiled to native code,
+and has Tiered Compilation disabled (which helps with native pre\-compilation).\&
+.IP
+This is the recommended build configuration and is the configuration used by the
+.BR all ", " *\-release ", and " install
+recipes.\&
+.SH OPTIONS
+The options defined above are GNU Make recipes,
+which are defined in the included Makefile.\&
+See \fBmake(1)\fP for help running \fBmake\fP,
+if you are unfamiliar with it.\&
+.PP
+In general,
+you invoke the recipes using the \fBmake recipe\-name\fP syntax.\&
+No other flags or options should be required for standard builds,
+and many are irrelevant or incompatible, anyway,
+as the recipes are simply bash\-compatible scripts that invoke the dotnet cli and various standard POSIX utilties.\&
+.PP
+If multiple recipes are specified in a single invocation of make,
+they are executed in the order you specified them.\&
+.PP
+.B Parallel builds are not supported and may cause errors,
+.B as all recipes are intended to be executed in the order in which they are defined.\&
+.B Thus, the use of the \-j option to make is not supported and the makefile will filter those options out.\&
+.nh
+.TP
+.B help\-install
+This recipe executes \fBman \-l Documentation/install.8\fP,
+which shows this document.\&
+.TQ
+.B all
+.IP
+This recipe is also the default recipe that is called if you execute \fBmake\fP with no recipe.\&
+.IP
+This recipe calls the \fBbuild\-release\fB recipe (see \fBbuild\-release\fP below).\&
+.TQ
+.B build
+.IP
+This recipe is a synonym for the \fBbuild\-release\fP recipe and simply calls that recipe.\&
+.TQ
+.B build\-debug
+.IP
+Compiles the application using the Debug configuration.\&
+.IP
+This results in output that is not optimized,
+is not combined into a single executable file,
+and which has the DEBUG and TRACE preprocessor constants defined,
+which may result in additional conditional code being compiled into the application or from referenced libraries.\&
+.IP
+Debug builds are intended for development debugging use and are not recommended or supported for normal use.\&
+Debug builds may be larger, slower, and consume more system resources,
+and may have additional behaviors, due to conditionally\-compiled code, which may cause undesired output and increased resource usage.\&
+.IP
+Debug builds are not intended for troubleshooting and, in general,
+will not provide additional helpful output.\&
+When filing an issue, do not use a Debug build unless you are explicitly asked to do so.\&
+.TQ
+.B build\-release
+.IP
+This recipe builds the application using the \fBRelease\-R2R\fP configuration.\&
+.IP
+This creates executable output which is optimized,
+is combined into a single executable file,
+is partially pre\-compiled to native code, to enhance startup performance,
+and which has embedded symbols for debugging and to enable useful stack traces when errors are encountered.\&
+.IP
+This is the suggested and default recipe for production builds.\&
+.TQ
+.B clean , clean\-all
+These recipes perform the same operation.\&
+The \fBclean\fP recipe simply calls the \fBclean\-all\fP recipe.\&
+.IP
+When this recipe is run,
+both the \fBclean\-debug\fP and \fBclean\-release\fP recipes will be run.\&
+See below for descriptions of those recipes.\&
+.IP
+While it is not generally \fIrequired\fP to run any of the \fBclean\fP recipes,
+it is suggested that you run the appropriate \fBclean\fP recipe for your executed \fBbuild\fP recipe,
+after installation, to reclaim otherwise wasted disk space,
+and is a good practice to perform before checking out or compiling a new version of the code.\&
+.TQ
+.B clean\-debug
+This recipe runs \fBdotnet clean\fP using the Debug configuration,
+which results in removal of build artifacts build using the Debug build configuration,
+such as after running \fBmake build\-debug\fP.\&
+It then explicitly runs a series of \fBrm\fP and \fBrmdir\fP commands
+to remove intermediate build directories created for the library projects in the solution,
+as well as the Debug build directory in the \*[SIAZ] project directory.\&
+If the containing bin and obj directories are empty after removing the Debug sub\-directories,
+the bin and obj directories will be removed, as well.\&
+.TQ
+.B clean\-release
+Same as \fBclean\-debug\fP, except operates on the \fBRelease\-R2R\fP build configuration,
+and also removes the \fI./publish\fP directory.\&
+.TQ
+.B extraclean
+First calls both the \fBclean\-debug\fP and \fBclean\-release\fP recipes.\&
+Then, upon successful completion of those recipes,
+also force\-removes (via rm \-rfv) the bin and obj folders for all non\-test projects in the solution.\&
+This means all build artifacts, for all build configurations defined in the solution, will be removed.\&
+.IP
+This is a useful recipe to run before running \fBgit pull\fP to update the code,
+as it will effectively leave the non\-test project directories in their original states,
+as they were before you ran other make recipes,
+allowing for a clean execution of git pull and a clean build thereafter,
+with the exception of any other changes you may have made to files or directories in the solution.\&
+.TQ
+.B install
+Should only be called after running \fBmake\fP, \fBmake all\fP, or \fBmake build\-release\fP.
+.IP
+This recipe performs the standard recommended installation of \*[SIAZ].\&
+.IP
+This recipe first calls the \fBinstall\-release\fP recipe and then,
+only upon success of that recipe,
+calls the
+.BR install\-config " and " install\-doc " recipes."
+.IP
+See below for descriptions of those recipes.\&
+.IP
+This is part of the recommended build and install procedure for \*[SIAZ],
+which is: \fBmake ; make install\fP
+.TQ
+.B install\-config
+This recipe installs configuration files and configuration file schema documents for \*[SIAZ].\&
+.IP
+This recipe first calls the \fBinstall\-config\-local\fP recipe and then,
+only upon success of that recipe,
+calls the \fBinstall\-config\-base\fP recipe.\&
+.TQ
+.B install\-config\-base
+This recipe installs the base configuration files and the configuration schema documents to the \fI/usr/local/share/\*[SIAZ]\fP directory,
+creating that directory and any parent directories, if necessary.\&
+If any installed files already exist at the destination,
+backup copies of those files will be made,
+which will have a tilde (~) suffix.\&
+.IP
+Base configuration files are not intended to be modified by the user,
+so you should not depend on the backup functionality and should treat all files in the \fI/usr/local/share/\*[SIAZ]\fP directory as read\-only.\&
+.IP
+Base configuration files are required by the application and,
+if there has been a schema change since your previous version,
+the configuration file from the previous version is no longer valid.\&
+For this reason, the base configuration files are always written, and you should avoid making changes to them.\&
+.IP
+After standard installation,
+see \fB \*[SIAZLC](5)\fP for configuration documentation.\&
+.TQ
+.B install\-config\-local
+This recipe installs the local configuration files to the \fI/etc/\*[SIAZ]\fP directory,
+creating that directory, if necessary.\&
+If any installed files already exist at the destination,
+they will not be overwritten, and the new file will simply be skipped.\&
+You are responsible for resolving any potential schema changes that may have occurred,
+though breaking schema changes will typically be avoided, in new versions, for LOCAL configuration files.\&
+.IP
+After standard installation,
+see \fB \*[SIAZLC](5)\fP for configuration documentation.\&
+.TQ
+.B install\-config\-local\-force
+This recipe performs the same function as the \fBinstall\-config\-local\fP recipe,
+except that it will overwrite existing files and make backup copies of existing files with a tilde (~) suffix.\&
+.IP
+This recipe is intended for use when you need to reset your local configuration to defaults,
+or if you want new local configuration files written that have any relevant schema changes applied.\&
+.IP
+If you wish to preserve your previous configuration,
+you can either rename the backup file or copy the desired portions of it to the new file.\&
+.IP
+Note that only one backup file is created.\&
+So, if you execute this recipe more than once,
+the original copies of the local configuration files that you had before running it will have been lost.\&
+If you need to preserve backup copies beyond one execution of this recipe,
+you are responsible for doing so through any appropriate means.\&
+.TQ
+.B install\-doc
+This recipe installs the man pages (excluding this one) contained in the ./Documentation directory
+to the \fI/usr/share/man\fP directory,
+in the appropriate sub\-directories for their respective sections.\&
+.IP
+Existing files, if encountered, are unconditionally overwritten without making backup copies.\&
+.IP
+Aliases are made of each of the man page files,
+using hard links,
+to provide all\-lowercase and abbreviated names for each one (using the abbreviation \(dqsiaz\(dq in place of \(dq\*[SIAZ]\(dq).\&
+.IP
+After copying the files to their destinations,
+this recipe then runs \fBmandb \-q\fP,
+to update your mandb,
+so that you can access the newly\-installed man pages immediately, after install.\&
+.TQ
+.B install\-release
+This recipe first calls the \fBpublish\-release\fP recipe,
+and then installs the executable created by that recipe to \fI/usr/local/sbin/\*[SIAZ]\fP.\&
+Hard links are then created for that file at \fI/usr/local/sbin/\*[SIAZLC]\fP and \fI/usr/local/sbin/\*[SIAZS]\fP,
+as aliases for user convenience.\&
+This recipe also creates the \fI/var/log/\*[SIAZ]\fP directory,
+if it does not already exist,
+to support the default target path of the included default nlog configuration.\&
+.TQ
+.B install\-service
+This recipe installs the included \*[SIAZLC].service systemd service unit file to \fI/usr/lib/systemd/system/\*[SIAZLC].service\fP
+and then runs \fBsystemctl daemon\-reload\fP,
+to refresh systemd\(aqs unit definitions,
+and also runs \fBsystemctl enable \*[SIAZLC].service\fP,
+which creates additional aliases for the service name, as defined in \fI/usr/lib/systemd/system/\*[SIAZLC].service\fP,
+and causes the service to automatically start at system boot,
+after \fBzfs.target\fP starts.\&
+.TQ
+.B publish\-release
+This recipe calls dotnet publish,
+using the \fBRelease\-R2R\fP build configuration,
+which creates the single\-file, partially natively pre\-compiled executable,
+and places it in the publish directory, in the root of the solution directory,
+creating the publish directory if it does not exist.\&
+.IP
+This recipe is also responsible for ensuring that the proper version suffix,
+if one is defined,
+is appended to the version string for the application.\&
+If you use a \*[SIAZ] executable that was not compiled using the appropriate version suffix,
+the output of the \fB\-\-version\fP option passed to \*[SIAZ] or the version reported in log or monitor output from \*[SIAZ]
+will be incorrect, making support more difficult, if you are unable to provide the specific commit hash or tag that you built from.\&
+.IP
+This recipe is automatically called by the \fBinstall\fP recipe,
+so you should not generally have to manually run it.\&
+.TQ
+.B reinstall
+This recipe calls, in order, the
+.BR uninstall ", " clean ", and " install " recipes."\&
+This has the effect of performing a clean build and installation,
+while preserving your LOCAL cofiguration files.\&
+.IP
+As with the uninstall recipes,
+it is not recommended to run this recipe using a different version of the Makefile than the version that was used to run the \fBinstall\fP recipes,
+as that could result in files that are no longer included in the new version not being removed during uninstall,
+if any such changes were made between versions.\&
+Such changes will \fItypically\fP be mentioned in release change logs,
+but are not guaranteed to be,
+so the best practice is to always use the same version of the Makefile for install, reinstall, and uninstall operations.\&
+.TQ
+.BR test ", " test\-everything ", and " test\-everything\-verbose
+These recipes execute unit tests using \fBdotnet test\fP,
+using the \fBRelease\-R2R\fP build configuration.\&
+.IP
+The \fBtest\fP recipe is an alias for \fBtest\-everything\fP,
+and runs all safe unit tests (i\.e\. tests which will not affect the state of your system) defined in the test projects in the
+.I ./Tests
+directory in the solution root directory.\&
+.IP
+The verbose version of the recipe simply increases the verbosity of the test runner,
+and is unlikely to be useful outside of a development/debugging context.\&
+.IP
+Thousands of unit tests are defined,
+but they are extremely fast,
+and typical execution time of the entire test suite,
+after compilation of the test projects,
+is just a few seconds, on any remotely modern system.\&
+.IP
+Release tags are automatically tested via GitHub Actions,
+whenever a \(dqrelease\-SIAZ...\(dq tag is pushed to GitHub.\&
+Thus, if you are building from one of those tags,
+these tests have already been run and passed,
+in an Ubuntu 22.04 environment.\&
+Builds that fail unit tests will never be tagged with a release tag.\&
+Even so, and even if your environment is identical to the test environment,
+it is never a bad idea to run the tests on your system,
+out of an abundance of caution,
+to be sure that your compiled copy of the code performs as expected according to the defined tests.\&
+.IP
+As with any unit test suite,
+note that the unit tests for \*[SIAZ] and its component library projects are not guaranteed to be exhaustive,
+and can only guarantee that the exact code that is tested,
+in the exact way it is tested,
+performs as expected by the tests,
+as the tests are written,
+and therefore do not provide a guarantee that the software is free of bugs.\&
+.IP
+If you encounter unexpected failures in unit tests from code checked out from a release tag,
+please check GitHub and file a bug report, if one does not already exist for that failure.\&
+.TQ
+.B uninstall\-*
+The uninstall recipes perform the inverse of their associated install recipes,
+by deleting installed files and any hard links created of them, during install.\&
+.IP
+The exception is that only the \fBuninstall\-everything\fP and \fBuninstall\-config\-local\fP recipes will remove LOCAL configuration files.\&
+All of the other uninstall recipes leave the \fI/etc/\*[SIAZ]\fP directory and its contents intact.\&
+.IP
+These recipes do not imply nor do they call any of the \fBclean\fP recipes.\&
+.TQ
+.BR save\-snapsinazfs\-zfs\-properties ", " restore\-wiped\-zfs\-properties ", and " wipe\-snapsinazfs\-zfs\-properties
+These recipes are primarily intended for use when uninstalling \*[SIAZ],
+if you wish to purge all ZFS user properties created by \*[SIAZ] from ZFS.\&
+.IP
+.B THE restore\-wiped\-zfs\-properties and wipe\-snapsinazfs\-zfs\-properties RECIPES WILL MAKE CHANGES TO ALL FILESYSTEMS, VOLUMES, AND SNAPSHOTS IN ZFS.
+.IP
+You are responsible for the results of executing these recipes,
+and recovery of \*[SIAZ] properties lost due to use of these recipes is not provided.\&
+Use of these recipes is at your own risk,
+in all situations,
+for all reasons,
+at all times.\&
+.IP
+These recipes will not affect anything else in ZFS except ZFS user properties in the \fB\*[SIAZLC].com:\fP namespace.\&
+.IP
+The save recipe runs a zfs get command to dump all ZFS user properties that have the \fB\*[SIAZLC].com:\fP namespace,
+and writes them to a bash\-compatible shell script in the solution root directory that can be run to set those properties back to the state they were in,
+on ALL objects,
+at the time the save recipe was run.\&
+The save recipe will not make any changes to ZFS, and will not include properties that are not in the \fB\*[SIAZLC].com:\fP namespace in the restore script.\&
+.IP
+When the save recipe is run,
+any existing restore scripts,
+up to 20 previous versions (by default),
+are saved and not overwritten by the current execution of the save recipe,
+using the \fBsavelog\fP command included in most major Linux distributions.\&
+.IP
+The wipe recipe first cals the save recipe,
+to provide a safeguard against accidents,
+and then runs zfs inherit commands on all filesystems, volumes, and namespaces in ZFS,
+to remove all of the ZFS user properties in the \fB\*[SIAZLC].com:\fP namespace.\&
+.IP
+To undo this operation,
+execute the restore script created by the implicitly\-invoked save recipe.\&
+.IP
+The restore recipe executes the most recent copy of the restore script,
+if it exists,
+in the solution root directory.\&
+This has the same effect as executing the restore script yourself,
+and does not perform any other operation other than logging what it did to the console.\&
+.IP
+As with the wipe recipe,
+this recipe executes immediately and WILL make changes to ZFS,
+if any of the properties in the restore script have been removed or modified since the restore script was created.\&
+.IP
+If no restore script exists,
+this recipe will simply report that no such script exists and then terminate without doing anything else.\&
+.IP
+The only zfs operations executed by these recipes or the scripts they create/use are \fBzfs set\fP (for restore)
+and \fBzfs inherit\fP (for wipe).\&
+Thus, these recipes and their scripts will not, themselves,
+create or destroy any filesystems, volumes, or snapshots in ZFS.\&
+Therefore, they will ONLY affect \*[SIAZ] itself,
+or any software you may have created or installed that makes use of the ZFS properties in the \fB\*[SIAZLC].com:\fP namespace.\&
+Support for any such software is beyond the scope of \*[SIAZ],
+and is thus not supported and use or creation of such software is your responsibility and at your own risk.\&
+.hy
+.RE
+.SH EXIT STATUS
+.PP
+Success of any make recipe is indicated by an exit status of 0,
+or, if the \-q flag was used, potentially an exit status of 1,
+from \fBmake\fP.\&
+.PP
+Any other exit status indicates failure,
+most likely of one or more steps in one or more recipes.\&
+.PP
+See \fBmake(1)\fP for documentation of your environment\(aqs version of \fBmake\fP.\&
+.SH ENVIRONMENT
+For advanced users who understand how make works,
+how their system\(aqs directory structure is laid out,
+and who can read and understand the provided Makefile:
+.PP
+The Makefile uses several variables,
+most of which are defined with the \fB\?\=\fP operator,
+meaning that they can be overridden by setting them before running make.\&
+.PP
+This allows the Makefile to be adapted to environments that do not exactly match the environments that \*[SIAZ]
+was developed and tested on.\&
+At this time, I have not had the time to learn proper usage of autoconf,
+to provide a standard \./configure script,
+to automatically set things up for different systems.\&
+I would like to, eventually, but I'd also appreciate it greatly if anyone with knowledge of autoconf is willing to make a contribution in that regard.\&
+.PP
+Limited support MAY be provided for issues filed relating to the Makefile and these variables,
+but time, resources, and other limitations will apply and no promises are made if you have a problem I am not able or willing to address.\&
+.PP
+See the Makefile for which variables are used.\&
+All variables are defined at the top of the Makefile,
+and none are set or modified in any of the recipes,
+in the current version of the Makefile as of 2023\-07\-31.\&
+.SH CAVEATS
+.TP
+.B Mandatory Access Control (MAC)
+.IP
+\*[SIAZ] and its associated Makefile do not currently employ any MAC functionality.\&
+This is something that will be addressed in a future release,
+but is not yet scheduled for implementation.\&
+.IP
+If your environment requires use of MAC and you encounter problems related to MAC in installation or execution of \*[SIAZ],
+you will need to define the appropriate policy or exceptions yourself.
+.IP
+Some key permissions that may be required, depending on your \*[SIAZ] configuration (in abstract \- translate these to your MAC solutions as appropriate):
+.RS
+.IP \(bu 2
+Read/write to log files in \fI/var/log/\*[SIAZ]\fP (or wherever you configure nlog to write to)
+.IP \(bu
+Read/write to configuration files in \fI/usr/local/\*[SIAZ]\fP and \fI/etc/\*[SIAZ]\fP
+.IP \(bu
+Execute on \fI/usr/sbin/zfs\fP and \fI/usr/sbin/zpool\fP (or wherever your zfs executables are installed)
+.IP \(bu
+Create/open/listen on unix sockets for HTTP monitoring, if enabled in your configuration
+.IP \(bu
+Create/open/listen on TCP sockets for HTTP monitoring, if enabled in your configuration (as well as extra privileges, as necessary, if you configure the TCP port to use a \(dqprivileged\(dq port below 1024 \- Default is 60763)
+.IP \(bu
+Create/write to the system journal in a unique namespace
+.IP \(bu
+Permission to run as a systemd service, if using \*[SIAZ] as a systemd service
+.IP \(bu
+Any other permissions that are necessitated by any custom nlog configuration you define
+.RE
+.SH REPORTING BUGS
+\*[SIAZ] is hosted on GitHub,
+under the \*[SIAZ] organization,
+at
+.UR https://github.com/snapsinazfs/snapsinazfs
+https://github.com/snapsinazfs/snapsinazfs
+.UE
+, supported and maintained at present by myself.\&
+.PP
+Bugs, feature requests, or private security vulnerability reports can be filed using the
+.UR https://github.com/snapsinazfs/snapsinazfs/issues
+issue tracker.\&
+.UE
+Please try to be as detailed as possible, when filing any issues of any kind,
+and, if relevant, include logs, configuration files, screenshots, screen recordings,
+or other relevant information about your environment that may assist in resolving your issue.\&
+\*[SIAZ] logs and configuration files do not include private information,
+with the potential exception of IP addresses (if monitoring is configured),
+but feel free to sanitize any files you submit, if you consider any of their contents private or confidential.\&
+The privacy of anything you submit is your responsibility and neither
+I, GitHub, nor the \*[SIAZ] organization or any of its associates, contributors, or benefactors
+share any responsibility for any damages resulting from anything you submit.\&
+.SH COPYRIGHT
+\*[SIAZ] is licensed under the MIT License.
+.IP
+Copyright 2023 Brandon Thetford
+.IP
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \(dqSoftware\(dq), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+.IP
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+.IP
+THE SOFTWARE IS PROVIDED \(dqAS IS\(dq, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+.PP
+The text of this license is also provided in the LICENSE file in the root of the solution directory.\&
+.SH SEE ALSO
+After installation, the following man pages are available:
+.PP
+.B \*[SIAZLC](8)
+.PP
+.B \*[SIAZLC](5)
+.PP
+.B \*[SIAZLC]\-zfsprops(7)
+.PP
+.B \*[SIAZLC]\-config\-console(8)
+.PP
+These man pages are also in the \fIDocumentation\fP directory,
+which is located in the solution root directory,
+and can be viewed by running \fBman \-l [filename]\fP,
+where \fB[filename]\fP is the relative or absolute path to one of the files in that directory.\&
