@@ -44,7 +44,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
+    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;TRACE</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
