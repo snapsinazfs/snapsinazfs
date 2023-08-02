@@ -2,19 +2,18 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
-using System.Configuration;
+#endregion
+
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Reflection;
-using System.Text.Json;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
@@ -34,28 +33,8 @@ internal class Program
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
+    internal static readonly Monitor ServiceObserver = new( );
     internal static SnapsInAZfsSettings? Settings;
-    internal static readonly Monitor ServiceObserver = new ( );
-
-    /// <summary>
-    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-    ///     the CLI
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="programSettings">A reference to an instance of a <see cref="SnapsInAZfsSettings"/> object to modify</param>
-    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
-    {
-        Logger.Debug( "Overriding settings using arguments from command line." );
-
-        programSettings.DryRun |= args.DryRun;
-        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
-        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.Cron ) && !args.NoPruneSnapshots;
-        programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
-        if ( args.DaemonTimerInterval > 0 )
-        {
-            programSettings.DaemonTimerIntervalSeconds = Math.Clamp( (uint)args.DaemonTimerInterval, 1u, 60u );
-        }
-    }
 
     public static async Task<int> Main( string[] argv )
     {
@@ -83,7 +62,7 @@ internal class Program
         if ( args.Version )
         {
             // ReSharper disable once ExceptionNotDocumented
-            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );
@@ -101,7 +80,7 @@ internal class Program
         SiazService.Timestamp = currentTimestamp;
         using SiazService serviceInstance = GetSiazServiceInstance( );
         WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
-        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
+        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
         WebApplication svc;
         if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
         {
@@ -116,11 +95,34 @@ internal class Program
         {
             svc = serviceBuilder.Build( );
         }
+
         using CancellationTokenSource tokenSource = new( );
         CancellationToken masterToken = tokenSource.Token;
-        await svc.StartAsync( masterToken ).ConfigureAwait(true);
+        await svc.StartAsync( masterToken ).ConfigureAwait( true );
         await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
         return SiazService.ExitStatus;
+    }
+
+    /// <summary>
+    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+    ///     the CLI
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="programSettings">
+    ///     A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
+    /// </param>
+    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
+    {
+        Logger.Debug( "Overriding settings using arguments from command line." );
+
+        programSettings.DryRun |= args.DryRun;
+        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
+        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.Cron ) && !args.NoPruneSnapshots;
+        programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
+        if ( args.DaemonTimerInterval > 0 )
+        {
+            programSettings.DaemonTimerIntervalSeconds = Math.Clamp( args.DaemonTimerInterval, 1u, 60u );
+        }
     }
 
     internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] SnapsInAZfsSettings? settings )
@@ -224,4 +226,3 @@ internal class Program
         }
     }
 }
-
