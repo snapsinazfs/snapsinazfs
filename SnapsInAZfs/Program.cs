@@ -47,8 +47,8 @@ internal class Program
         Logger.Debug( "Overriding settings using arguments from command line." );
 
         programSettings.DryRun |= args.DryRun;
-        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots ) && !args.NoTakeSnapshots;
-        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots ) && !args.NoPruneSnapshots;
+        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
+        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.Cron ) && !args.NoPruneSnapshots;
         programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
         if ( args.DaemonTimerInterval > 0 )
         {
