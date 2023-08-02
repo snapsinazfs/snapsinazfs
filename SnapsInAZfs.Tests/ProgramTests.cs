@@ -47,6 +47,7 @@ public class ProgramTests
         settingsPropertyInfo.SetValue( initialSettings, initialSettingValue );
         settingsPropertyInfo.SetValue( possiblyChangedSettings, initialSettingValue );
         CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( argStrings );
+        Assume.That(testArgs, Is.Not.Null );
         argPropertyInfo.SetValue( testArgs, argValue );
         Assume.That( settingsPropertyInfo.GetValue( initialSettings ), Is.EqualTo( initialSettingValue ) );
         Assume.That( settingsPropertyInfo.GetValue( initialSettings ), Is.EqualTo( settingsPropertyInfo.GetValue( possiblyChangedSettings ) ) );
@@ -63,32 +64,32 @@ public class ProgramTests
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied( )
     {
-        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[ ] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[ ] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, new[] { "--daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, new[] { "--daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, new[ ] { "--daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, new[ ] { "--daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Daemonize" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), false, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoDaemonize" )!, new[] { "--no-daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), true, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoDaemonize" )!, new[] { "--no-daemonize" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), false, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoDaemonize" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoDaemonize" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "Daemonize" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, new[] { "--take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, new[] { "--take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, new[ ] { "--take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, new[ ] { "--take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "TakeSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, new[] { "--no-take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, new[] { "--no-take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, new[ ] { "--no-take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, new[ ] { "--no-take-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoTakeSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, new[] { "--prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, new[] { "--prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, new[ ] { "--prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, new[ ] { "--prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "PruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, new[] { "--no-prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, new[] { "--no-prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, new[ ] { "--no-prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, new[ ] { "--no-prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
     }
