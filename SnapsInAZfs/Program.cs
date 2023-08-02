@@ -11,6 +11,7 @@
 // See https://opensource.org/license/MIT/
 
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -97,78 +98,29 @@ internal class Program
         }
 
         ApplyCommandLineArgumentOverrides( in args, Settings );
-
-        if ( args.ConfigConsole )
-        {
-            try
-            {
-                if ( TryGetZfsCommandRunner( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
-                {
-                    ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
-                }
-            }
-            catch ( Exception e )
-            {
-                Logger.Fatal( e, "Error in configuration console - Exiting" );
-                return (int)Errno.GenericError;
-            }
-
-            return 0;
-        }
-
         SiazService.Timestamp = currentTimestamp;
-        SiazService? serviceInstance = null;
-        try
+        using SiazService serviceInstance = GetSiazServiceInstance( );
+        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
+        WebApplication svc;
+        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
         {
-            serviceInstance = GetSiazServiceInstance( Settings );
-            if ( serviceInstance is null )
-            {
-                Logger.Fatal( "Failed to create service instance - exiting" );
-                return (int)Errno.ENOATTR;
-            }
-
-            // Disposal happens after service shutdown, so this inspection can be ignored here
-            // ReSharper disable once AccessToDisposedClosure
-            using IHost serviceHost = Host.CreateDefaultBuilder( )
-                                          .UseSystemd( )
-                                          .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } )
-                                          .Build( );
-
-            SiazService.Timestamp = currentTimestamp;
-            using CancellationTokenSource tokenSource = new( );
-            CancellationToken masterToken = tokenSource.Token;
-
-            await serviceHost.StartAsync( masterToken ).ConfigureAwait( true );
-            await serviceHost.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-
-            return SiazService.ExitStatus;
+            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+            svc = serviceBuilder.Build( );
+            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
+            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
         }
-        finally
+        else
         {
-            serviceInstance?.Dispose( );
+            svc = serviceBuilder.Build( );
         }
-    }
-
-    /// <summary>
-    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-    ///     the CLI
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="programSettings">
-    ///     A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
-    /// </param>
-    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
-    {
-        Logger.Debug( "Overriding settings using arguments from command line." );
-
-        programSettings.DryRun |= args.DryRun;
-        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
-        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.ForcePrune || args.Cron ) && !args.NoPruneSnapshots;
-        programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
-        if ( args.DaemonTimerInterval > 0 )
-        {
-            programSettings.DaemonTimerIntervalSeconds = Math.Clamp( args.DaemonTimerInterval, 1u, 60u );
-        }
+        using CancellationTokenSource tokenSource = new( );
+        CancellationToken masterToken = tokenSource.Token;
+        await svc.StartAsync( masterToken ).ConfigureAwait(true);
+        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
+        return SiazService.ExitStatus;
     }
 
     internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] SnapsInAZfsSettings? settings )
@@ -207,30 +159,7 @@ internal class Program
             return false;
         }
 
-        ApplyCommandLineArgumentOverrides( in args, Settings );
-        SiazService.Timestamp = currentTimestamp;
-        using SiazService serviceInstance = GetSiazServiceInstance( );
-        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
-        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
-        WebApplication svc;
-        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
-        {
-            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
-            svc = serviceBuilder.Build( );
-            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
-            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
-            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
-            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
-        }
-        else
-        {
-            svc = serviceBuilder.Build( );
-        }
-        using CancellationTokenSource tokenSource = new( );
-        CancellationToken masterToken = tokenSource.Token;
-        await svc.StartAsync( masterToken ).ConfigureAwait(true);
-        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-        return SiazService.ExitStatus;
+        return true;
     }
 
     private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
