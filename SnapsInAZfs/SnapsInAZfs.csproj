@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -152,5 +152,7 @@
     <Using Include="NLog" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
-
+<ItemGroup>
+  <InternalsVisibleTo Include="SnapsInAZfs.Tests"/>
+</ItemGroup>
 </Project>
