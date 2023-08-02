@@ -36,6 +36,26 @@ internal class Program
     internal static SnapsInAZfsSettings? Settings;
     internal static readonly Monitor ServiceObserver = new ( );
 
+    /// <summary>
+    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+    ///     the CLI
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="programSettings">A reference to an instance of a <see cref="SnapsInAZfsSettings"/> object to modify</param>
+    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
+    {
+        Logger.Debug( "Overriding settings using arguments from command line." );
+
+        programSettings.DryRun |= args.DryRun;
+        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots ) && !args.NoTakeSnapshots;
+        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots ) && !args.NoPruneSnapshots;
+        programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
+        if ( args.DaemonTimerInterval > 0 )
+        {
+            programSettings.DaemonTimerIntervalSeconds = Math.Clamp( (uint)args.DaemonTimerInterval, 1u, 60u );
+        }
+    }
+
     public static async Task<int> Main( string[] argv )
     {
         LoggingSettings.ConfigureLogger( );
@@ -187,7 +207,7 @@ internal class Program
             return false;
         }
 
-        ApplyCommandLineArgumentOverrides( in args );
+        ApplyCommandLineArgumentOverrides( in args, Settings );
         SiazService.Timestamp = currentTimestamp;
         using SiazService serviceInstance = GetSiazServiceInstance( );
         WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
