@@ -100,5 +100,14 @@ public class ProgramTests
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, new[ ] { "--no-prune-snapshots" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoPruneSnapshots" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=0" }, 0u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=0" }, 0u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=10" }, 10u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=10" }, 10u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=20" }, 20u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 20u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=20" }, 20u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 20u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=61" }, 61u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 60u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[ ] { "--daemon-timer-interval=61" }, 61u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 60u );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, Array.Empty<string>( ), 0u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
     }
 }
