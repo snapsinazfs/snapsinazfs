@@ -64,6 +64,7 @@ public class CommandLineArguments
     [ArgDescription( "Provided only for backward-compatibility with sanoid. Has no effect, as SnapsInAZfs uses deferred destroy for pruning." )]
     [ArgShortcut( "--force-prune" )]
     [ArgShortcut( "--force-prune-snapshots" )]
+    [ArgCantBeCombinedWith( "NoPruneSnapshots" )]
     public bool ForcePrune { get; set; }
 
     [ArgDescription( "Shows this help" )]
