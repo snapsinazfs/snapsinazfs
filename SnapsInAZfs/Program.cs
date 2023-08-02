@@ -236,9 +236,16 @@ internal class Program
     private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
     {
         kestrelOptions.Configure( ).Load( );
-        if ( ( Settings?.Monitoring.UnixSocketEnabled ?? false ) && !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
+        if ( Settings?.Monitoring.UnixSocketEnabled ?? false )
         {
-            kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
+            if ( !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
+            {
+                kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
+            }
+            else
+            {
+                Logger.Error( "UnixSocketPath must be a valid path" );
+            }
         }
 
         if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
