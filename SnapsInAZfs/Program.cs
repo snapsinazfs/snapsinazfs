@@ -170,8 +170,7 @@ internal class Program
                                            #if ALLOW_ADJACENT_CONFIG_FILE
                                                .AddJsonFile( "SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                           #if !WINDOWS
+                                           #else
                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
                                            #endif
