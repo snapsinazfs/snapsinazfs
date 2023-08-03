@@ -77,6 +77,22 @@ internal class Program
         }
 
         ApplyCommandLineArgumentOverrides( in args, Settings );
+
+        if ( args.ConfigConsole )
+        {
+            try
+            {
+                ConfigConsole.ConfigConsole.RunConsoleInterface( GetZfsCommandRunner( Settings ) );
+            }
+            catch ( Exception e )
+            {
+                Logger.Fatal( e, "Error in configuration console - Exiting" );
+                return (int)Errno.GenericError;
+            }
+            return 0;
+        }
+
+
         SiazService.Timestamp = currentTimestamp;
         using SiazService serviceInstance = GetSiazServiceInstance( );
         WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
