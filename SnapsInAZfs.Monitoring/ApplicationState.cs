@@ -23,5 +23,6 @@ public enum ApplicationState
     PruningSnapshots = 4,
     CheckingZfsPropertySchema = 5,
     Executing = 6,
-    UpdatingZfsPropertySchema = 7
+    UpdatingZfsPropertySchema = 7,
+    UpdatingZfsPropertySchemaCompleted = 8
 }

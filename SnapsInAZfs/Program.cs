@@ -2,18 +2,18 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
-using System.Configuration;
-using System.Net;
+#endregion
+
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Text.Json;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
@@ -33,28 +33,8 @@ internal class Program
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
+    internal static readonly Monitor ServiceObserver = new( );
     internal static SnapsInAZfsSettings? Settings;
-    internal static readonly Monitor ServiceObserver = new ( );
-
-    /// <summary>
-    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-    ///     the CLI
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="programSettings">A reference to an instance of a <see cref="SnapsInAZfsSettings"/> object to modify</param>
-    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
-    {
-        Logger.Debug( "Overriding settings using arguments from command line." );
-
-        programSettings.DryRun |= args.DryRun;
-        programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots ) && !args.NoTakeSnapshots;
-        programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots ) && !args.NoPruneSnapshots;
-        programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
-        if ( args.DaemonTimerInterval > 0 )
-        {
-            programSettings.DaemonTimerIntervalSeconds = Math.Clamp( (uint)args.DaemonTimerInterval, 1u, 60u );
-        }
-    }
 
     public static async Task<int> Main( string[] argv )
     {
@@ -82,7 +62,7 @@ internal class Program
         if ( args.Version )
         {
             // ReSharper disable once ExceptionNotDocumented
-            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly()?.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );
@@ -127,20 +107,30 @@ internal class Program
                 return (int)Errno.ENOATTR;
             }
 
+            WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+
             // Disposal happens after service shutdown, so this inspection can be ignored here
             // ReSharper disable once AccessToDisposedClosure
-            using IHost serviceHost = Host.CreateDefaultBuilder( )
-                                          .UseSystemd( )
-                                          .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } )
-                                          .Build( );
+            serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
+            WebApplication svc;
+            if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+            {
+                serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+                svc = serviceBuilder.Build( );
+                RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+                statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+                statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
+                statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+            }
+            else
+            {
+                svc = serviceBuilder.Build( );
+            }
 
-            SiazService.Timestamp = currentTimestamp;
             using CancellationTokenSource tokenSource = new( );
             CancellationToken masterToken = tokenSource.Token;
-
-            await serviceHost.StartAsync( masterToken ).ConfigureAwait( true );
-            await serviceHost.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-
+            await svc.StartAsync( masterToken ).ConfigureAwait( true );
+            await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
             return SiazService.ExitStatus;
         }
         finally
@@ -190,7 +180,8 @@ internal class Program
                                            #if ALLOW_ADJACENT_CONFIG_FILE
                                                .AddJsonFile( "SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #else
+                                           #endif
+                                           #if !WINDOWS
                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
                                            #endif
@@ -207,30 +198,44 @@ internal class Program
             return false;
         }
 
-        ApplyCommandLineArgumentOverrides( in args, Settings );
-        SiazService.Timestamp = currentTimestamp;
-        using SiazService serviceInstance = GetSiazServiceInstance( );
-        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
-        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( (_) => serviceInstance ); } );
-        WebApplication svc;
-        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+        return true;
+    }
+
+    internal static bool TryGetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
+    {
+        if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
         {
-            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
-            svc = serviceBuilder.Build( );
-            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
-            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
-            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
-            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+            zfsCommandRunner = singleton;
+            return true;
         }
-        else
+
+        Logger.Trace( "Getting ZFS command runner for the current environment" );
+        try
         {
-            svc = serviceBuilder.Build( );
+            // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+        #if DEBUG_WINDOWS
+            zfsCommandRunner = Environment.OSVersion.Platform switch
+            {
+                PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
+                _ => new DummyZfsCommandRunner( )
+            };
+        #else
+            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
+        #endif
         }
-        using CancellationTokenSource tokenSource = new( );
-        CancellationToken masterToken = tokenSource.Token;
-        await svc.StartAsync( masterToken ).ConfigureAwait(true);
-        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-        return SiazService.ExitStatus;
+        catch ( FileNotFoundException ex )
+        {
+            Logger.Fatal( ex, ex.Message );
+            zfsCommandRunner = null;
+            return false;
+        }
+
+        if ( reuseSingleton )
+        {
+            ZfsCommandRunnerSingleton = zfsCommandRunner;
+        }
+
+        return true;
     }
 
     private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
@@ -254,20 +259,14 @@ internal class Program
         }
     }
 
-    private static SiazService GetSiazServiceInstance( )
+    private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
     {
-        Logger.Trace( "Getting ZFS command runner for the current environment" );
-    #if DEBUG_WINDOWS
-        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
+        if ( !TryGetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
         {
-            PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( )
-        };
-    #else
-        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
-    #endif
+            return null;
+        }
 
-        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        SiazService service = new( settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
         return service;
     }
 
@@ -294,4 +293,3 @@ internal class Program
         }
     }
 }
-
