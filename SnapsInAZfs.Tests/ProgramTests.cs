@@ -24,13 +24,6 @@ namespace SnapsInAZfs.Tests;
 [TestOf( typeof( Program ) )]
 public class ProgramTests
 {
-    [SetUp]
-    public void SetUpCleanProgramRun( )
-    {
-        Program.Settings = null;
-        Program.ZfsCommandRunnerSingleton = null;
-    }
-
     [Test]
     [TestCaseSource( nameof( GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied ) )]
     public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied<T>( PropertyInfo argPropertyInfo, string[] argStrings, T argValue, PropertyInfo settingsPropertyInfo, T initialSettingValue, T expectedFinalSettingValue )
@@ -96,6 +89,13 @@ public class ProgramTests
         Console.SetOut( stdout );
     }
 
+    [SetUp]
+    public void SetUpCleanProgramRun( )
+    {
+        Program.Settings = null;
+        Program.ZfsCommandRunnerSingleton = null;
+    }
+
     [Test]
     public void TryGetZfsCommandRunner_CanGetSingleton( )
     {
@@ -133,6 +133,30 @@ public class ProgramTests
             Assert.That( zfsCommandRunnerB, Is.Not.SameAs( zfsCommandRunnerA ) );
             Assert.That( Program.ZfsCommandRunnerSingleton, Is.Null );
         } );
+    }
+
+    [Test]
+    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZfsPaths( [Values( "", " ", "\t", "\n", "\r" )] string zfsPath )
+    {
+        SnapsInAZfsSettings initialSettings = new( )
+        {
+            ZfsPath = zfsPath
+        };
+        Assume.That( Program.ZfsCommandRunnerSingleton, Is.Null );
+        bool result = Program.TryGetZfsCommandRunner( initialSettings, out _ );
+        Assert.That( result, Is.False );
+    }
+
+    [Test]
+    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZpoolPaths( [Values( "", " ", "\t", "\n", "\r" )] string zpoolPath )
+    {
+        SnapsInAZfsSettings initialSettings = new( )
+        {
+            ZpoolPath = zpoolPath
+        };
+        Assume.That( Program.ZfsCommandRunnerSingleton, Is.Null );
+        bool result = Program.TryGetZfsCommandRunner( initialSettings, out _ );
+        Assert.That( result, Is.False );
     }
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied( )

@@ -35,6 +35,7 @@ internal class Program
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
+    [ExcludeFromCodeCoverage(Justification = "Largely un-testable")]
     public static async Task<int> Main( string[] argv )
     {
         LoggingSettings.ConfigureLogger( );
@@ -197,6 +198,12 @@ internal class Program
         {
             GetZfsCommandRunner( settings, out zfsCommandRunner );
         }
+        catch ( ArgumentNullException ex )
+        {
+            Logger.Fatal( ex, "Null or empty string provided for ZfsPath or ZpoolPath - Cannot continue" );
+            zfsCommandRunner = null;
+            return false;
+        }
         catch ( FileNotFoundException ex )
         {
             Logger.Fatal( ex, ex.Message );
@@ -230,7 +237,7 @@ internal class Program
         zfsCommandRunner = Environment.OSVersion.Platform switch
         {
             PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( )
+            _ => new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath )
         };
     #else
             zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
