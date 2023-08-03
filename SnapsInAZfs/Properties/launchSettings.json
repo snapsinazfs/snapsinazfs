@@ -1,15 +1,23 @@
 {
   "profiles": {
-    "SnapsInAZfs": {
-      "commandName": "Project"
+    "SnapsInAZfs --config-console": {
+      "commandName": "Project",
+      "commandLineArgs": "--config-console"
     },
-    "DryRun": {
+    "SnapsInAZfs --dry-run --take-snapshots": {
+      "commandName": "Project",
+      "commandLineArgs": "--dry-run --take-snapshots"
+    },
+    "SnapsInAZfs --debug --daemonize --take-snapshots --prune-snapshots": {
+      "commandName": "Project",
+      "commandLineArgs": "--debug --daemonize --take-snapshots --prune-snapshots"
+    },
+    "SnapsInAZfs --dry-run": {
       "commandName": "Project",
       "commandLineArgs": "--dry-run"
     },
-    "DryRun TakeSnapshots": {
-      "commandName": "Project",
-      "commandLineArgs": "--dry-run --take-snapshots"
+    "SnapsInAZfs": {
+      "commandName": "Project"
     }
   }
 }

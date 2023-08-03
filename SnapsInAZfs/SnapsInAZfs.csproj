@@ -33,13 +33,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-    <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG</DefineConstants>
+    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
@@ -138,5 +138,7 @@
     <Using Include="NLog" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
-
+<ItemGroup>
+  <InternalsVisibleTo Include="SnapsInAZfs.Tests"/>
+</ItemGroup>
 </Project>
