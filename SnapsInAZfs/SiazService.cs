@@ -35,10 +35,6 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     private readonly TimeSpan _daemonTimerInterval;
 
     private readonly SnapsInAZfsSettings _settings;
-    // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-    private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
-    private readonly IApplicationStateObserver _stateObserver;
-    // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
     private readonly IZfsCommandRunner _zfsCommandRunner;
     private static DateTimeOffset _lastRunTime = DateTimeOffset.Now;
     private static DateTimeOffset _nextRunTime = DateTimeOffset.Now;
@@ -94,6 +90,80 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
 
     public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
 
+    public async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
+    {
+        Logger.Debug( "Checking zfs properties schema" );
+
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( false );
+        bool missingPropertiesFound = false;
+        foreach ( ( string poolName, ConcurrentDictionary<string, bool>? propertyValidities ) in poolRootsWithPropertyValidities )
+        {
+            Logger.Debug( "Checking property validities for pool root {0}", poolName );
+            bool missingPropertiesFoundForPool = false;
+            foreach ( ( string propName, bool propValue ) in propertyValidities )
+            {
+                if ( !IZfsProperty.DefaultDatasetProperties.ContainsKey( propName ) )
+                {
+                    Logger.Trace( "Not interested in property {0} for pool root schema check", propName );
+                    continue;
+                }
+
+                Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
+                if ( propValue )
+                {
+                    Logger.Trace( "Pool root {0} has property {1} with a valid value", poolName, propName );
+                    continue;
+                }
+
+                Logger.Debug( "Pool root {0} has missing or invalid property {1}", poolName, propName );
+                if ( !missingPropertiesFoundForPool )
+                {
+                    missingPropertiesFound = missingPropertiesFoundForPool = true;
+                }
+            }
+
+            foreach ( ( string propName, _ ) in IZfsProperty.DefaultDatasetProperties )
+            {
+                if ( propName.StartsWith( ZfsPropertyNames.SiazNamespace ) && !propertyValidities.ContainsKey( propName ) )
+                {
+                    propertyValidities.TryAdd( propName, false );
+                    missingPropertiesFound = missingPropertiesFoundForPool = true;
+                }
+            }
+
+            Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
+
+            switch ( args )
+            {
+                case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
+                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    continue;
+                case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
+                    Logger.Info( "No missing properties in pool {0}", poolName );
+                    continue;
+                case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
+                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    continue;
+                case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
+                    Logger.Info( "No missing properties in pool {0}", poolName );
+                    continue;
+                case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
+                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    continue;
+                case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
+                    Logger.Debug( "No missing properties in pool {0}", poolName );
+                    continue;
+            }
+        }
+
+        return new( poolRootsWithPropertyValidities, missingPropertiesFound );
+    }
+
+    public Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    {
+        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
+    }
+
     /// <inheritdoc />
     protected override async Task ExecuteAsync( CancellationToken stoppingToken )
     {
@@ -103,6 +173,9 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         // Otherwise, set a timer and start ticking
         using CancellationTokenSource tokenSource = CancellationTokenSource.CreateLinkedTokenSource( stoppingToken );
         CancellationToken serviceCancellationToken = tokenSource.Token;
+
+        // Run once, unconditionally
+        // Afterward, only continue if we're running as a daemon, stop hasn't been requested, and there wasn't an error.
         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
         if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || LastExecutionResultCode is not SiazExecutionResultCode.Completed )
         {
@@ -111,9 +184,18 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             return;
         }
 
+        // We're running as a daemon.
+        // Set up the timer and prepare to loop infinitely,
+        // using that timer, until stop is requested or something bad happens.
         _lastRunTime = DateTimeOffset.Now;
-        int greatestCommonFrequentIntervalMinutes = GetGreatestCommonFrequentIntervalFactor( );
-        SetNextRunTime( greatestCommonFrequentIntervalMinutes );
+        int greatestCommonFrequentIntervalMinutes = GetGreatestCommonFrequentIntervalFactor( _settings.Templates );
+
+        // The timer aliases its run time to the top of the calculated minute,
+        // so the first run time on the timer will almost always be less than the configured interval.
+        // This is fine, as no action will be taken unless it actually is time to do so.
+        // All subsequent runs will be on the greatest common factor of all configured frequent intervals in all templates.
+
+        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
 
         Timestamp = DateTimeOffset.Now;
         TimeSpan timerInterval = GetNewTimerInterval( );
@@ -154,13 +236,13 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
 
                     // Get this on every tick, in case config has been updated since last run.
                     // .net has already updated it in memory, if it was changed, so this is quick.
-                    greatestCommonFrequentIntervalMinutes = GetGreatestCommonFrequentIntervalFactor( );
+                    greatestCommonFrequentIntervalMinutes = GetGreatestCommonFrequentIntervalFactor( _settings.Templates );
 
                     if ( Timestamp >= _nextRunTime )
                     {
                         _lastRunTime = DateTimeOffset.Now;
                         Logger.Debug( "Running configured SIAZ operations at {0:O}", _lastRunTime );
-                        SetNextRunTime( greatestCommonFrequentIntervalMinutes );
+                        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
 
                         // Fire this off asynchronously
                         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
@@ -181,6 +263,73 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         finally
         {
             daemonRunTimer.Dispose( );
+        }
+    }
+
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    internal async Task<Errno> PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
+    {
+        if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
+        {
+            Logger.Error( "Timed out waiting to prune snapshots. Another operation is in progress." );
+            return Errno.EBUSY;
+        }
+
+        Logger.Info( "Begin pruning snapshots for all configured datasets" );
+        BeginPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
+
+        EndPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        Logger.Info( "Finished pruning snapshots" );
+        SnapshotAutoResetEvent.Set( );
+
+        return Errno.EOK;
+
+        async Task PruneSnapshotsForDatasetAsync( ZfsRecord ds )
+        {
+            if ( ds is not { Enabled.Value: true } )
+            {
+                Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
+                return;
+            }
+
+            if ( ds is not { PruneSnapshots.Value: true } )
+            {
+                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
+                return;
+            }
+
+            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
+
+            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, snapshotsToPruneForDataset.ToCommaSeparatedSingleLineString( true ) );
+
+            foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
+            {
+                ZfsCommandRunnerOperationStatus destroyStatus = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( false );
+                switch ( destroyStatus )
+                {
+                    case ZfsCommandRunnerOperationStatus.DryRun:
+                        Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
+                        goto Remove;
+                    case ZfsCommandRunnerOperationStatus.Success:
+                        Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
+                    Remove:
+                        if ( !ds.RemoveSnapshot( snapshot ) )
+                        {
+                            Logger.Debug( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
+                        }
+
+                        PruneSnapshotSucceeded?.Invoke( this, new( snapshot.Name, snapshot.Timestamp.Value ) );
+                        continue;
+                    case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
+                    case ZfsCommandRunnerOperationStatus.Failure:
+                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+                    default:
+                        PruneSnapshotFailed?.Invoke( this, new( ds.Name, snapshot.Timestamp.Value ) );
+                        Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
+                        continue;
+                }
+            }
         }
     }
 
@@ -336,251 +485,6 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    private async Task<SiazExecutionResultCode> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
-    {
-        try
-        {
-            using CancellationTokenSource tokenSource = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken );
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( _settings ) );
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            State = ApplicationState.CheckingZfsPropertySchema;
-            CheckZfsPropertiesSchemaResult schemaCheckResult = await CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
-            State = ApplicationState.Executing;
-
-            Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            // Check
-            switch ( args )
-            {
-                case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Requested check and no properties were missing.
-                    // Return 0
-                    return SiazExecutionResultCode.ZfsPropertyCheck_AllPropertiesPresent;
-                }
-                case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Requested check and some properties were missing.
-                    // Return ENOATTR (1093)
-                    return SiazExecutionResultCode.ZfsPropertyCheck_MissingProperties;
-                }
-                case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
-                {
-                    // Did not request check or update (normal run) but properties were missing.
-                    // Cannot safely do anything useful
-                    // Log a fatal error and exit with ENOATTR
-                    Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
-                    return SiazExecutionResultCode.ZfsPropertyCheck_MissingProperties_Fatal;
-                }
-                case { PrepareZfsProperties: true }:
-                {
-                    // Requested schema update
-                    // Run the update and return EOK or ENOATTR based on success of the updates
-                    State = ApplicationState.UpdatingZfsPropertySchema;
-                    return UpdateZfsDatasetSchema( _settings, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
-                        ? SiazExecutionResultCode.ZfsPropertyUpdate_Succeeded
-                        : SiazExecutionResultCode.ZfsPropertyUpdate_Failed;
-                }
-            }
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-            ConcurrentDictionary<string, Snapshot> snapshots = new( );
-
-            Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
-            State = ApplicationState.GettingDataFromZfs;
-            await GetDatasetsAndSnapshotsFromZfsAsync( _settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
-            State = ApplicationState.Executing;
-
-            Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            // Handle taking new snapshots, if requested
-            if ( _settings is { TakeSnapshots: true } )
-            {
-                Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
-                State = ApplicationState.TakingSnapshots;
-                await TakeAllConfiguredSnapshotsAsync( currentTimestamp, datasets, snapshots ).ConfigureAwait( true );
-                State = ApplicationState.Executing;
-            }
-            else
-            {
-                Logger.Info( "Not taking snapshots" );
-            }
-
-            if ( cancellationToken.IsCancellationRequested )
-            {
-                return SiazExecutionResultCode.CancelledByToken;
-            }
-
-            // Handle pruning old snapshots, if requested
-            if ( _settings is { PruneSnapshots: true } )
-            {
-                Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
-                State = ApplicationState.PruningSnapshots;
-                await PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, _settings, datasets ).ConfigureAwait( true );
-                State = ApplicationState.Executing;
-            }
-            else
-            {
-                Logger.Info( "Not pruning snapshots" );
-            }
-
-            // As a final step, if we are executing as a daemon, unsubscribe all datasets from their parents' events,
-            // to reduce how many generations old objects will live before the GC cleans them up
-            // ReSharper disable once InvertIf
-            if ( _settings is { Daemonize: true } )
-            {
-                foreach ( ( string _, ZfsRecord ds ) in datasets )
-                {
-                    if ( ds.IsPoolRoot )
-                    {
-                        UnsubscribeChildRecordsFromEvents( ds );
-                    }
-                }
-
-                static void UnsubscribeChildRecordsFromEvents( ZfsRecord node )
-                {
-                    foreach ( ( string _, ZfsRecord child ) in node.GetSortedChildDatasets( ) )
-                    {
-                        UnsubscribeChildRecordsFromEvents( child );
-                        node.UnsubscribeChildFromPropertyEvents( child );
-                    }
-
-                    foreach ( ( SnapshotPeriodKind _, ConcurrentDictionary<string, Snapshot> dict ) in node.Snapshots )
-                    {
-                        foreach ( ( string _, Snapshot snap ) in dict )
-                        {
-                            node.UnsubscribeSnapshotFromPropertyEvents( snap );
-                        }
-                    }
-                }
-            }
-
-            return SiazExecutionResultCode.Completed;
-        }
-        finally
-        {
-            State = ApplicationState.Idle;
-        }
-    }
-
-    private int GetGreatestCommonFrequentIntervalFactor( )
-    {
-        return _settings.Templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
-    }
-
-    private TimeSpan GetNewTimerInterval( )
-    {
-        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
-        DateTimeOffset truncatedTimePlusInterval = currentTimeTruncatedToTopOfCurrentHour + _daemonTimerInterval;
-        while ( truncatedTimePlusInterval < Timestamp.AddMilliseconds( 1 ) )
-        {
-            truncatedTimePlusInterval += _daemonTimerInterval;
-        }
-
-        return truncatedTimePlusInterval.Subtract( Timestamp );
-    }
-
-    private static void SetNextRunTime( int greatestCommonFrequentIntervalMinutes )
-    {
-        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
-        DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    internal async Task<Errno> PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
-    {
-        if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
-        {
-            Logger.Error( "Timed out waiting to prune snapshots. Another operation is in progress." );
-            return Errno.EBUSY;
-        }
-
-        Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        BeginPruningSnapshots?.Invoke( this, EventArgs.Empty );
-        await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
-
-        EndPruningSnapshots?.Invoke( this, EventArgs.Empty );
-        Logger.Info( "Finished pruning snapshots" );
-        SnapshotAutoResetEvent.Set( );
-
-        return Errno.EOK;
-
-        async Task PruneSnapshotsForDatasetAsync( ZfsRecord ds )
-        {
-            if ( ds is not { Enabled.Value: true } )
-            {
-                Logger.Debug( "Dataset {0} is disabled - skipping prune", ds.Name );
-                return;
-            }
-
-            if ( ds is not { PruneSnapshots.Value: true } )
-            {
-                Logger.Debug( "Dataset {0} not configured to prune snapshots - skipping", ds.Name );
-                return;
-            }
-
-            List<Snapshot> snapshotsToPruneForDataset = ds.GetSnapshotsToPrune( );
-
-            Logger.Debug( "Need to prune the following snapshots from {0}: {1}", ds.Name, snapshotsToPruneForDataset.ToCommaSeparatedSingleLineString( true ) );
-
-            foreach ( Snapshot snapshot in snapshotsToPruneForDataset )
-            {
-                ZfsCommandRunnerOperationStatus destroyStatus = await commandRunner.DestroySnapshotAsync( snapshot, settings ).ConfigureAwait( false );
-                switch ( destroyStatus )
-                {
-                    case ZfsCommandRunnerOperationStatus.DryRun:
-                        Logger.Info( "DRY RUN: Snapshot not destroyed, but pretending it was for simulation" );
-                        goto Remove;
-                    case ZfsCommandRunnerOperationStatus.Success:
-                        Logger.Info( "Destroyed snapshot {0}", snapshot.Name );
-                    Remove:
-                        if ( !ds.RemoveSnapshot( snapshot ) )
-                        {
-                            Logger.Debug( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
-                        }
-
-                        PruneSnapshotSucceeded?.Invoke( this, new( snapshot.Name, snapshot.Timestamp.Value ) );
-                        continue;
-                    case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
-                    case ZfsCommandRunnerOperationStatus.Failure:
-                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
-                    default:
-                        PruneSnapshotFailed?.Invoke( this, new( ds.Name, snapshot.Timestamp.Value ) );
-                        Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
-                        continue;
-                }
-            }
-        }
-    }
-
-    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     internal bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
         Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, period );
@@ -690,8 +594,10 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         }
     }
 
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     internal bool UpdateZfsDatasetSchema( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities, IZfsCommandRunner zfsCommandRunner )
     {
+        State = ApplicationState.UpdatingZfsPropertySchema;
         bool errorsEncountered = false;
         Logger.Debug( "Requested update of zfs properties schema" );
         foreach ( ( string poolName, ConcurrentDictionary<string, bool> propertiesToAdd ) in poolRootsWithPropertyValidities )
@@ -734,84 +640,200 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             Logger.Error( "Some operations failed. See previous log output." );
         }
 
+        State = ApplicationState.UpdatingZfsPropertySchemaCompleted;
         return !errorsEncountered;
+    }
+
+    /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    private async Task<SiazExecutionResultCode> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
+    {
+        try
+        {
+            using CancellationTokenSource tokenSource = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken );
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            Logger.Debug( "Using Settings: {0}", JsonSerializer.Serialize( _settings ) );
+
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            State = ApplicationState.CheckingZfsPropertySchema;
+            CheckZfsPropertiesSchemaResult schemaCheckResult = await CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
+            State = ApplicationState.Executing;
+
+            Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
+
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            // Check
+            switch ( args )
+            {
+                case { CheckZfsProperties: true } when !schemaCheckResult.MissingPropertiesFound:
+                {
+                    // Requested check and no properties were missing.
+                    // Return 0
+                    return SiazExecutionResultCode.ZfsPropertyCheck_AllPropertiesPresent;
+                }
+                case { CheckZfsProperties: true } when schemaCheckResult.MissingPropertiesFound:
+                {
+                    // Requested check and some properties were missing.
+                    // Return ENOATTR (1093)
+                    return SiazExecutionResultCode.ZfsPropertyCheck_MissingProperties;
+                }
+                case { CheckZfsProperties: false, PrepareZfsProperties: false } when schemaCheckResult.MissingPropertiesFound:
+                {
+                    // Did not request check or update (normal run) but properties were missing.
+                    // Cannot safely do anything useful
+                    // Log a fatal error and exit with ENOATTR
+                    Logger.Fatal( "Missing properties were found in zfs. Cannot continue. Exiting" );
+                    return SiazExecutionResultCode.ZfsPropertyCheck_MissingProperties_Fatal;
+                }
+                case { PrepareZfsProperties: true }:
+                {
+                    // Requested schema update
+                    // Run the update and return EOK or ENOATTR based on success of the updates
+                    return UpdateZfsDatasetSchema( _settings, schemaCheckResult.PoolRootsWithPropertyValidities, zfsCommandRunner )
+                        ? SiazExecutionResultCode.ZfsPropertyUpdate_Succeeded
+                        : SiazExecutionResultCode.ZfsPropertyUpdate_Failed;
+                }
+            }
+
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            ConcurrentDictionary<string, ZfsRecord> datasets = new( );
+            ConcurrentDictionary<string, Snapshot> snapshots = new( );
+
+            Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
+            State = ApplicationState.GettingDataFromZfs;
+            await GetDatasetsAndSnapshotsFromZfsAsync( _settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
+            State = ApplicationState.Executing;
+
+            Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
+
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            // Handle taking new snapshots, if requested
+            if ( _settings is { TakeSnapshots: true } )
+            {
+                Logger.Debug( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
+                State = ApplicationState.TakingSnapshots;
+                await TakeAllConfiguredSnapshotsAsync( currentTimestamp, datasets, snapshots ).ConfigureAwait( true );
+                State = ApplicationState.Executing;
+            }
+            else
+            {
+                Logger.Info( "Not taking snapshots" );
+            }
+
+            if ( cancellationToken.IsCancellationRequested )
+            {
+                return SiazExecutionResultCode.CancelledByToken;
+            }
+
+            // Handle pruning old snapshots, if requested
+            if ( _settings is { PruneSnapshots: true } )
+            {
+                Logger.Debug( "PruneSnapshots is true. Pruning configured snapshots" );
+                State = ApplicationState.PruningSnapshots;
+                await PruneAllConfiguredSnapshotsAsync( zfsCommandRunner, _settings, datasets ).ConfigureAwait( true );
+                State = ApplicationState.Executing;
+            }
+            else
+            {
+                Logger.Info( "Not pruning snapshots" );
+            }
+
+            // As a final step, if we are executing as a daemon, unsubscribe all datasets from their parents' events,
+            // to reduce how many generations old objects will live before the GC cleans them up
+            // ReSharper disable once InvertIf
+            if ( _settings is { Daemonize: true } )
+            {
+                foreach ( ( string _, ZfsRecord ds ) in datasets )
+                {
+                    if ( ds.IsPoolRoot )
+                    {
+                        UnsubscribeChildRecordsFromEvents( ds );
+                    }
+                }
+
+                static void UnsubscribeChildRecordsFromEvents( ZfsRecord node )
+                {
+                    foreach ( ( string _, ZfsRecord child ) in node.GetSortedChildDatasets( ) )
+                    {
+                        UnsubscribeChildRecordsFromEvents( child );
+                        node.UnsubscribeChildFromPropertyEvents( child );
+                    }
+
+                    foreach ( ( SnapshotPeriodKind _, ConcurrentDictionary<string, Snapshot> dict ) in node.Snapshots )
+                    {
+                        foreach ( ( string _, Snapshot snap ) in dict )
+                        {
+                            node.UnsubscribeSnapshotFromPropertyEvents( snap );
+                        }
+                    }
+                }
+            }
+
+            return SiazExecutionResultCode.Completed;
+        }
+        finally
+        {
+            State = ApplicationState.Idle;
+        }
+    }
+
+    private int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
+    {
+        return templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+    }
+
+    private TimeSpan GetNewTimerInterval( )
+    {
+        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
+        DateTimeOffset truncatedTimePlusInterval = currentTimeTruncatedToTopOfCurrentHour + _daemonTimerInterval;
+
+        // This is the time equivalent, to millisecond precision, of offsetting a loop stop condition by 1
+        // Without this, whole factors of 60 will result in an off-by-one error
+        // DateTimeOffset supports even greater precision, but not all systems/clocks can handle that accurately,
+        // and that would be overkill for this purpose anyway.
+        DateTimeOffset timestampPlusOneMillisecond = Timestamp.AddMilliseconds( 1 );
+        while ( truncatedTimePlusInterval < timestampPlusOneMillisecond )
+        {
+            truncatedTimePlusInterval += _daemonTimerInterval;
+        }
+
+        return truncatedTimePlusInterval.Subtract( Timestamp );
+    }
+
+    private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes )
+    {
+        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
+        DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
     }
 
     public record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
-    public async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
-    {
-        Logger.Debug( "Checking zfs properties schema" );
+    // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
+    private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
 
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities = await zfsCommandRunner.GetPoolRootsAndPropertyValiditiesAsync( ).ConfigureAwait( false );
-        bool missingPropertiesFound = false;
-        foreach ( ( string poolName, ConcurrentDictionary<string, bool>? propertyValidities ) in poolRootsWithPropertyValidities )
-        {
-            Logger.Debug( "Checking property validities for pool root {0}", poolName );
-            bool missingPropertiesFoundForPool = false;
-            foreach ( ( string propName, bool propValue ) in propertyValidities )
-            {
-                if ( !IZfsProperty.DefaultDatasetProperties.ContainsKey( propName ) )
-                {
-                    Logger.Trace( "Not interested in property {0} for pool root schema check", propName );
-                    continue;
-                }
-
-                Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
-                if ( propValue )
-                {
-                    Logger.Trace( "Pool root {0} has property {1} with a valid value", poolName, propName );
-                    continue;
-                }
-
-                Logger.Debug( "Pool root {0} has missing or invalid property {1}", poolName, propName );
-                if ( !missingPropertiesFoundForPool )
-                {
-                    missingPropertiesFound = missingPropertiesFoundForPool = true;
-                }
-            }
-
-            foreach ( ( string propName, _ ) in IZfsProperty.DefaultDatasetProperties )
-            {
-                if ( propName.StartsWith( ZfsPropertyNames.SiazNamespace ) && !propertyValidities.ContainsKey( propName ) )
-                {
-                    propertyValidities.TryAdd( propName, false );
-                    missingPropertiesFound = missingPropertiesFoundForPool = true;
-                }
-            }
-
-            Logger.Debug( "Finished checking property validities for pool root {0}", poolName );
-
-            switch ( args )
-            {
-                case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
-                    continue;
-                case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
-                    Logger.Info( "No missing properties in pool {0}", poolName );
-                    continue;
-                case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
-                    continue;
-                case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
-                    Logger.Info( "No missing properties in pool {0}", poolName );
-                    continue;
-                case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
-                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
-                    continue;
-                case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
-                    Logger.Debug( "No missing properties in pool {0}", poolName );
-                    continue;
-            }
-        }
-
-        return new( poolRootsWithPropertyValidities, missingPropertiesFound );
-    }
-
-    public Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
-    {
-        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
-    }
+    private readonly IApplicationStateObserver _stateObserver;
+    // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
 
 #region Implementation of ISnapshotOperationsObservable
 
