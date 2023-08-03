@@ -138,5 +138,7 @@
     <Using Include="NLog" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
-
+<ItemGroup>
+  <InternalsVisibleTo Include="SnapsInAZfs.Tests"/>
+</ItemGroup>
 </Project>
