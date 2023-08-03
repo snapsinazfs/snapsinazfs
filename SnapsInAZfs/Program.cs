@@ -46,13 +46,7 @@ internal class Program
 
         // The nullability context in PowerArgs is wrong, so this absolutely can be null
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if ( args is null )
-        {
-            Logger.Trace( "Help argument provided. Exiting." );
-            return (int)Errno.ECANCELED;
-        }
-
-        if ( args.Help )
+        if ( args is null || args.Help )
         {
             Logger.Trace( "Help argument provided. Exiting." );
             return (int)Errno.ECANCELED;
