@@ -68,8 +68,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         PathToZpoolUtility = pathToZpool;
     }
 
-    private static string PathToZfsUtility { get; set; } = "/usr/sbin/zfs";
-    private static string PathToZpoolUtility { get; set; } = "/usr/sbin/zpool";
+    private string PathToZfsUtility { get; set; }
+    private string PathToZpoolUtility { get; set; }
 
     /// <inheritdoc />
     public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
@@ -455,7 +455,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     /// <remarks>
     ///     Does not perform name validation
     /// </remarks>
-    private static async Task<ZfsCommandRunnerOperationStatus> PrivateSetZfsPropertyAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    private async Task<ZfsCommandRunnerOperationStatus> PrivateSetZfsPropertyAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
         if ( properties.Length == 0 )
         {
