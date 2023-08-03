@@ -42,10 +42,10 @@ public class CommandLineArguments
     [ArgCantBeCombinedWith( "NoDaemonize|CheckZfsProperties|PrepareZfsProperties|ConfigConsole|Version|Help" )]
     public bool Daemonize { get; set; }
 
-    [ArgDescription( "Override the configured daemon event processing timer. Specified as a whole number of seconds. Default: 10" )]
+    [ArgDescription( "Override the configured daemon event processing timer. Specified as a whole number of seconds." )]
     [ArgShortcut( "--daemon-timer-interval" )]
     [ArgDefaultValue( 0 )]
-    public int DaemonTimerInterval { get; set; } = 0;
+    public uint DaemonTimerInterval { get; set; } = 0;
 
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
     [ArgShortcut( "--debug" )]
@@ -89,7 +89,7 @@ public class CommandLineArguments
 
     [ArgDescription( "Force SnapsInAZfs to NOT run as a daemon" )]
     [ArgShortcut( "--no-daemonize" )]
-    [ArgCantBeCombinedWith( "Daemonize|Cron|DaemonTimerInterval" )]
+    [ArgCantBeCombinedWith( "Daemonize|Cron" )]
     public bool NoDaemonize { get; set; }
 
     [ArgDescription( "Disables snapshot pruning." )]
