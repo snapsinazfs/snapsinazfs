@@ -64,7 +64,7 @@ internal class Program
 
         SetCommandLineLoggingOverride( args );
 
-        if ( !LoadConfigurationFromConfigurationFiles( Settings ) )
+        if ( !LoadConfigurationFromConfigurationFiles( ref Settings ) )
         {
             return (int)Errno.EFTYPE;
         }
@@ -144,7 +144,7 @@ internal class Program
         }
     }
 
-    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] SnapsInAZfsSettings? settings )
+    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )]ref  SnapsInAZfsSettings? settings )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
@@ -173,7 +173,7 @@ internal class Program
         Logger.Trace( "Building settings objects from IConfiguration" );
         try
         {
-            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
         }
         catch ( Exception ex )
         {
