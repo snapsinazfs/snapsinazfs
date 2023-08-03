@@ -82,7 +82,7 @@ internal class Program
         {
             try
             {
-                if ( GetZfsCommandRunner( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
+                if ( TryGetZfsCommandRunner( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
                 {
                     ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
                 }
@@ -224,7 +224,7 @@ internal class Program
 
     private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
     {
-        if ( !GetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        if ( !TryGetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
         {
             return null;
         }
@@ -235,7 +235,7 @@ internal class Program
 
     private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
-    internal static bool GetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
+    internal static bool TryGetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
     {
         if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
         {
