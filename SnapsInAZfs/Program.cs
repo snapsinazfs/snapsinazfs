@@ -82,7 +82,10 @@ internal class Program
         {
             try
             {
-                ConfigConsole.ConfigConsole.RunConsoleInterface( GetZfsCommandRunner( Settings ) );
+                if ( GetZfsCommandRunner( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
+                {
+                    ConfigConsole.ConfigConsole.RunConsoleInterface( zfsCommandRunner );
+                }
             }
             catch ( Exception e )
             {
@@ -94,29 +97,46 @@ internal class Program
 
 
         SiazService.Timestamp = currentTimestamp;
-        using SiazService serviceInstance = GetSiazServiceInstance( );
-        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
-        serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
-        WebApplication svc;
-        if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+        SiazService? serviceInstance = null;
+        try
         {
-            serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
-            svc = serviceBuilder.Build( );
-            RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
-            statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
-            statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
-            statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
-        }
-        else
-        {
-            svc = serviceBuilder.Build( );
-        }
+            serviceInstance = GetSiazServiceInstance( Settings );
+            if ( serviceInstance is null )
+            {
+                Logger.Fatal( "Failed to create service instance - exiting" );
+                return (int)Errno.ENOATTR;
+            }
 
-        using CancellationTokenSource tokenSource = new( );
-        CancellationToken masterToken = tokenSource.Token;
-        await svc.StartAsync( masterToken ).ConfigureAwait( true );
-        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-        return SiazService.ExitStatus;
+            WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+
+            // Disposal happens after service shutdown, so this inspection can be ignored here
+            // ReSharper disable once AccessToDisposedClosure
+            serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
+            WebApplication svc;
+            if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+            {
+                serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+                svc = serviceBuilder.Build( );
+                RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+                statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+                statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
+                statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+            }
+            else
+            {
+                svc = serviceBuilder.Build( );
+            }
+
+            using CancellationTokenSource tokenSource = new( );
+            CancellationToken masterToken = tokenSource.Token;
+            await svc.StartAsync( masterToken ).ConfigureAwait( true );
+            await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
+            return SiazService.ExitStatus;
+        }
+        finally
+        {
+            serviceInstance?.Dispose( );
+        }
     }
 
     /// <summary>
@@ -202,27 +222,53 @@ internal class Program
         }
     }
 
-    private static SiazService GetSiazServiceInstance( )
+    private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
     {
-        IZfsCommandRunner zfsCommandRunner = GetZfsCommandRunner( );
+        if ( !GetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        {
+            return null;
+        }
 
-        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        SiazService service = new( settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
         return service;
     }
 
-    internal static IZfsCommandRunner GetZfsCommandRunner( SnapsInAZfsSettings settings )
+    private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
+
+    internal static bool GetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
     {
-        Logger.Trace( "Getting ZFS command runner for the current environment" );
-    #if DEBUG_WINDOWS
-        IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
+        if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
         {
-            PlatformID.Unix => new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( )
-        };
-    #else
-        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
-    #endif
-        return zfsCommandRunner;
+            zfsCommandRunner = singleton;
+            return true;
+        }
+
+        Logger.Trace( "Getting ZFS command runner for the current environment" );
+        try
+        {
+            // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+        #if DEBUG_WINDOWS
+            zfsCommandRunner = Environment.OSVersion.Platform switch
+            {
+                PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
+                _ => new DummyZfsCommandRunner( )
+            };
+        #else
+            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
+        #endif
+        }
+        catch ( FileNotFoundException ex )
+        {
+            Logger.Fatal( ex, ex.Message );
+            zfsCommandRunner = null;
+            return false;
+        }
+
+        if ( reuseSingleton )
+        {
+            ZfsCommandRunnerSingleton = zfsCommandRunner;
+        }
+        return true;
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
