@@ -188,19 +188,25 @@ internal class Program
 
     private static SiazService GetSiazServiceInstance( )
     {
+        IZfsCommandRunner zfsCommandRunner = GetZfsCommandRunner( );
+
+        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        return service;
+    }
+
+    internal static IZfsCommandRunner GetZfsCommandRunner( SnapsInAZfsSettings settings )
+    {
         Logger.Trace( "Getting ZFS command runner for the current environment" );
     #if DEBUG_WINDOWS
         IZfsCommandRunner zfsCommandRunner = Environment.OSVersion.Platform switch
         {
-            PlatformID.Unix => new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath ),
+            PlatformID.Unix => new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath ),
             _ => new DummyZfsCommandRunner( )
         };
     #else
-        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( Settings!.ZfsPath, Settings.ZpoolPath );
+        IZfsCommandRunner zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
     #endif
-
-        SiazService service = new( Settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
-        return service;
+        return zfsCommandRunner;
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
