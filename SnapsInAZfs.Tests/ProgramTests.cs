@@ -24,6 +24,13 @@ namespace SnapsInAZfs.Tests;
 [TestOf( typeof( Program ) )]
 public class ProgramTests
 {
+    [SetUp]
+    public void SetUpCleanProgramRun( )
+    {
+        Program.Settings = null;
+        Program.ZfsCommandRunnerSingleton = null;
+    }
+
     [Test]
     [TestCaseSource( nameof( GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied ) )]
     public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied<T>( PropertyInfo argPropertyInfo, string[] argStrings, T argValue, PropertyInfo settingsPropertyInfo, T initialSettingValue, T expectedFinalSettingValue )
@@ -90,10 +97,8 @@ public class ProgramTests
     }
 
     [Test]
-    [NonParallelizable]
     public void TryGetZfsCommandRunner_CanGetSingleton( )
     {
-        Program.ZfsCommandRunnerSingleton = null;
         SnapsInAZfsSettings initialSettings = new( );
         Assume.That( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool createSingletonResult = Program.TryGetZfsCommandRunner( initialSettings, out IZfsCommandRunner? zfsCommandRunnerA );
@@ -109,10 +114,8 @@ public class ProgramTests
     }
 
     [Test]
-    [NonParallelizable]
     public void TryGetZfsCommandRunner_DoesNotCreateSingletonWhenReuseSingletonFalse( )
     {
-        Program.ZfsCommandRunnerSingleton = null;
         SnapsInAZfsSettings initialSettings = new( );
         Assume.That( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool createSingletonResult = Program.TryGetZfsCommandRunner( initialSettings, out IZfsCommandRunner? zfsCommandRunnerA, false );
