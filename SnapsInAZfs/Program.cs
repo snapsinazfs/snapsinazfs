@@ -244,7 +244,7 @@ internal class Program
     #endif
     }
 
-    private static void SetCommandLineLoggingOverride( CommandLineArguments args )
+    internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
     {
         if ( args.Debug )
         {

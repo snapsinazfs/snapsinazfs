@@ -13,6 +13,8 @@
 #endregion
 
 using System.Reflection;
+using NLog;
+using NLog.Config;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
@@ -94,6 +96,18 @@ public class ProgramTests
     {
         Program.Settings = null;
         Program.ZfsCommandRunnerSingleton = null;
+        ResetNLogToNoOutput( );
+    }
+
+    private static void ResetNLogToNoOutput( )
+    {
+        if ( LogManager.Configuration is not null )
+        {
+            LogManager.Shutdown( );
+        }
+
+        LogManager.Setup( ).LoadConfiguration( builder => { builder.ForLogger( ).FilterLevels( LogLevel.Trace, LogLevel.Off ).WriteToNil( ); } );
+        LogManager.ReconfigExistingLoggers( true );
     }
 
     [Test]

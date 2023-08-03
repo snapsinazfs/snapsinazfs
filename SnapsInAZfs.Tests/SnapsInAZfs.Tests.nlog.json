@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json.schemastore.org/appsettings.json",
+  "Logging": {
+    "LogLevel": {
+      "Default": "Info"
+    }
+  },
+  "NLog": {
+    "autoReload": false,
+    "throwConfigExceptions": false,
+    "internalLogLevel": "Info",
+    "internalLogFile": "internal-nlog.log",
+    "extensions": [
+      { "assembly": "NLog.Extensions.Logging" }
+    ],
+    "time": {
+      "type": "FastLocal"
+    },
+    "default-wrapper": {
+      "type": "AsyncWrapper",
+      "overflowAction": "Block"
+    },
+    "targets": {
+      "all-file": {
+        "type": "File",
+        "fileName": "SnapsInAZfs.Tests-${shortdate}.log",
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=tostring}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
+      },
+      "error-file": {
+        "type": "File",
+        "fileName": "SnapsInAZfs.Tests-error-${shortdate}.log",
+        "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${logger:shortName=true}|${message} ${exception:format=@}|${callsite}${onexception:inner=\\:${callsite-linenumber}}"
+      }
+    },
+    "rules": [
+      {
+        "ruleName": "ErrorFile",
+        "logger": "*",
+        "minLevel": "Warn",
+        "writeTo": "error-file",
+        "filterDefaultAction": "Log",
+        "final": false,
+        "enabled": false
+      },
+      {
+        "ruleName": "LogFile",
+        "logger": "*",
+        "minLevel": "Info",
+        "writeTo": "all-file",
+        "filterDefaultAction": "Log",
+        "final": true,
+        "enabled": false
+      }
+    ]
+  }
+}

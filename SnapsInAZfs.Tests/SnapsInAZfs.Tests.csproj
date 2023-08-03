@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -10,6 +10,16 @@
     <Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
     <Platforms>x64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SnapsInAZfs.Tests.nlog.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SnapsInAZfs.Tests.nlog.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
