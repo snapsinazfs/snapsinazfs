@@ -161,6 +161,15 @@ public class ProgramTests
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied( )
     {
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[ ] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
