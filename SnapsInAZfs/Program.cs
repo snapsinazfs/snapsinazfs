@@ -144,7 +144,7 @@ internal class Program
         }
     }
 
-    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )]ref  SnapsInAZfsSettings? settings )
+    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )]ref  SnapsInAZfsSettings? settings )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
@@ -219,7 +219,7 @@ internal class Program
             return null;
         }
 
-        SiazService service = new( settings!, zfsCommandRunner );
+        SiazService service = new( settings, zfsCommandRunner );
         return service;
     }
 
@@ -257,6 +257,11 @@ internal class Program
         if ( args.Trace )
         {
             LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Trace );
+        }
+
+        if ( args.Verbose )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Info );
         }
     }
 }
