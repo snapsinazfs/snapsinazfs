@@ -31,9 +31,9 @@ internal class Program
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
-    private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
     internal static SnapsInAZfsSettings? Settings;
+
+    internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
     public static async Task<int> Main( string[] argv )
     {
@@ -201,16 +201,7 @@ internal class Program
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         try
         {
-            // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
-        #if DEBUG_WINDOWS
-            zfsCommandRunner = Environment.OSVersion.Platform switch
-            {
-                PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
-                _ => new DummyZfsCommandRunner( )
-            };
-        #else
-            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
-        #endif
+            GetZfsCommandRunner( settings, out zfsCommandRunner );
         }
         catch ( FileNotFoundException ex )
         {
@@ -236,6 +227,20 @@ internal class Program
 
         SiazService service = new( settings!, zfsCommandRunner );
         return service;
+    }
+
+    private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
+    {
+        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+    #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER
+        zfsCommandRunner = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
+            _ => new DummyZfsCommandRunner( )
+        };
+    #else
+            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
+    #endif
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
