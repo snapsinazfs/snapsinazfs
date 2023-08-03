@@ -31,11 +31,12 @@ internal class Program
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-
-    private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
     internal static readonly Monitor ServiceObserver = new( );
     internal static SnapsInAZfsSettings? Settings;
 
+    internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
+
+    [ExcludeFromCodeCoverage(Justification = "Largely un-testable")]
     public static async Task<int> Main( string[] argv )
     {
         LoggingSettings.ConfigureLogger( );
@@ -47,13 +48,7 @@ internal class Program
 
         // The nullability context in PowerArgs is wrong, so this absolutely can be null
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if ( args is null )
-        {
-            Logger.Trace( "Help argument provided. Exiting." );
-            return (int)Errno.ECANCELED;
-        }
-
-        if ( args.Help )
+        if ( args is null || args.Help )
         {
             Logger.Trace( "Help argument provided. Exiting." );
             return (int)Errno.ECANCELED;
@@ -71,7 +66,7 @@ internal class Program
 
         SetCommandLineLoggingOverride( args );
 
-        if ( !LoadConfigurationFromConfigurationFiles( Settings ) )
+        if ( !LoadConfigurationFromConfigurationFiles( ref Settings ) )
         {
             return (int)Errno.EFTYPE;
         }
@@ -161,7 +156,7 @@ internal class Program
         }
     }
 
-    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] SnapsInAZfsSettings? settings )
+    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )]ref  SnapsInAZfsSettings? settings )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
@@ -190,7 +185,7 @@ internal class Program
         Logger.Trace( "Building settings objects from IConfiguration" );
         try
         {
-            Settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
         }
         catch ( Exception ex )
         {
@@ -212,16 +207,13 @@ internal class Program
         Logger.Trace( "Getting ZFS command runner for the current environment" );
         try
         {
-            // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
-        #if DEBUG_WINDOWS
-            zfsCommandRunner = Environment.OSVersion.Platform switch
-            {
-                PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
-                _ => new DummyZfsCommandRunner( )
-            };
-        #else
-            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
-        #endif
+            GetZfsCommandRunner( settings, out zfsCommandRunner );
+        }
+        catch ( ArgumentNullException ex )
+        {
+            Logger.Fatal( ex, "Null or empty string provided for ZfsPath or ZpoolPath - Cannot continue" );
+            zfsCommandRunner = null;
+            return false;
         }
         catch ( FileNotFoundException ex )
         {
@@ -270,6 +262,20 @@ internal class Program
         return service;
     }
 
+    private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
+    {
+        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+    #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER
+        zfsCommandRunner = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
+            _ => new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath )
+        };
+    #else
+            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
+    #endif
+    }
+
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
     {
         if ( args.Debug )
@@ -290,6 +296,11 @@ internal class Program
         if ( args.Trace )
         {
             LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Trace );
+        }
+
+        if ( args.Verbose )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Info );
         }
     }
 }

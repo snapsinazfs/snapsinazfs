@@ -21,6 +21,28 @@ namespace SnapsInAZfs;
 /// </summary>
 public class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
+    // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
+    private readonly string _zfsPath;
+    private readonly string _zpoolPath;
+    // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
+
+    /// <exception cref="ArgumentNullException">Path to zfs or zpool utility cannot be null <paramref name="pathToZfs"/></exception>
+    public DummyZfsCommandRunner( string pathToZfs, string pathToZpool )
+    {
+        if ( string.IsNullOrWhiteSpace( pathToZfs ) )
+        {
+            throw new ArgumentNullException( nameof( pathToZfs ), "Path to zfs utility cannot be null" );
+        }
+        if ( string.IsNullOrWhiteSpace( pathToZpool ) )
+        {
+            throw new ArgumentNullException( nameof( pathToZpool ), "Path to zpool utility cannot be null" );
+        }
+
+        _zfsPath = pathToZfs;
+        _zpoolPath = pathToZpool;
+        Logger.Debug( "DummyZfsCommandRunner created with fake ZFS utilities at {0} and {1}", _zfsPath, _zpoolPath );
+    }
+
     // ReSharper disable RedundantAwait
     // ReSharper disable AsyncConverter.AsyncAwaitMayBeElidedHighlighting
     /// <inheritdoc />
