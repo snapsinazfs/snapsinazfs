@@ -43,6 +43,32 @@ public class ZfsCommandRunnerBaseTests
         Assert.That( ( ) => ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy( "BOGUS PROPERTY NAME", "Unimportant Value", ZfsPropertySourceConstants.Local ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
+    [Test]
+    public void ParseAndValidatePoolRootZfsGetLine_ReturnsFalseWhenArrayTooShort( [ValueSource( nameof( GetShortLineTokenArrays ) )] string[] lineTokens )
+    {
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> testCollection = new( );
+        Assume.That( testCollection, Is.Empty );
+        bool methodResult = ZfsCommandRunnerBaseProtectedMethodsTestClass.ParseAndValidatePoolRootZfsGetLineProxy( lineTokens, ref testCollection );
+        Assert.That( methodResult, Is.False );
+        Assert.That( testCollection, Is.Empty );
+    }
+
+    [Test]
+    public void ParseAndValidatePoolRootZfsGetLine_ReturnsTrueAndContainsPropertyValiditiesWhenValid( [ValueSource( nameof( GetValidZfsPoolRootLineTokenArrays ) )] string[] lineTokens )
+    {
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> testCollection = new( );
+        Assume.That( testCollection, Is.Empty );
+        bool methodResult = ZfsCommandRunnerBaseProtectedMethodsTestClass.ParseAndValidatePoolRootZfsGetLineProxy( lineTokens, ref testCollection );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( methodResult, Is.True );
+            Assert.That( testCollection, Is.Not.Empty );
+            Assert.That( testCollection, Does.ContainKey( lineTokens[ 0 ] ) );
+            Assert.That( testCollection[ lineTokens[ 0 ] ], Does.ContainKey( lineTokens[ 1 ] ) );
+            Assert.That( testCollection[ lineTokens[ 0 ] ][ lineTokens[ 1 ] ], Is.True );
+        } );
+    }
+
     private static List<TestCaseData> GetBooleanPropertyTestCases( )
     {
         string[] propertyNames = { ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName };
@@ -91,6 +117,13 @@ public class ZfsCommandRunnerBaseTests
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
+    private static IEnumerable<string[]> GetShortLineTokenArrays( )
+    {
+        yield return new[] { "testPool" };
+        yield return new[] { "testPool", "testProperty" };
+        yield return new[] { "testPool", "testProperty", "testValue" };
+    }
+
     private static List<TestCaseData> GetUnformattedStringPropertyTestCases( )
     {
         string[] propertyNames = { ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem };
@@ -105,6 +138,48 @@ public class ZfsCommandRunnerBaseTests
         (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), true ), ( "-1", false ) };
         (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+    }
+
+    private static IEnumerable<string[]> GetValidZfsPoolRootLineTokenArrays( )
+    {
+        yield return new[] { "testRootA", "snapsinazfs.com:enabled", "false", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:prunesnapshots", "false", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:recursion", "siaz", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:daily", "7", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:frequent", "4", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:hourly", "6", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:monthly", "12", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:prunedeferral", "0", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:weekly", "5", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:retention:yearly", "1", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:takesnapshots", "false", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:template", "default", "local" };
+        yield return new[] { "testRootA", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:enabled", "false", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:prunesnapshots", "false", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:recursion", "siaz", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:daily", "7", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:frequent", "4", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:hourly", "6", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:monthly", "12", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:prunedeferral", "0", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:weekly", "5", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:retention:yearly", "1", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:takesnapshots", "false", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:template", "default", "local" };
+        yield return new[] { "testRootB", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local" };
     }
 }
 
@@ -126,6 +201,11 @@ public abstract class ZfsCommandRunnerBaseProtectedMethodsTestClass : ZfsCommand
     public static bool CheckIfPropertyIsValidProxy( string propertyName, string propertyValue, string propertySource )
     {
         return CheckIfPropertyIsValid( propertyName, propertyValue, propertySource );
+    }
+
+    public static bool ParseAndValidatePoolRootZfsGetLineProxy( string[] lineTokens, ref ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
+    {
+        return ParseAndValidatePoolRootZfsGetLine( lineTokens, ref rootsAndTheirProperties );
     }
 
 #region Overrides of ZfsCommandRunnerBase

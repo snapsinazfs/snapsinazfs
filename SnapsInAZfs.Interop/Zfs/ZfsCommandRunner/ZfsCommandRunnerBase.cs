@@ -150,7 +150,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
         {
             string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            ParseAndValidatePoolRootZfsGetLine( lineTokens, rootsAndTheirProperties );
+            ParseAndValidatePoolRootZfsGetLine( lineTokens, ref rootsAndTheirProperties );
         }
 
         return rootsAndTheirProperties;
@@ -187,18 +187,20 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
     }
 
-    protected static void ParseAndValidatePoolRootZfsGetLine( string[] lineTokens, ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
+    protected static bool ParseAndValidatePoolRootZfsGetLine( string[] lineTokens, ref ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
     {
         if ( lineTokens.Length < 4 )
         {
-            return;
+            return false;
         }
 
-        string poolName = lineTokens[ 0 ];
+        ref string poolName = ref lineTokens[ 0 ];
         string propName = lineTokens[ 1 ];
         string propValue = lineTokens[ 2 ];
         string propSource = lineTokens[ 3 ];
         rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
+
+        return true;
 
         ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
         {

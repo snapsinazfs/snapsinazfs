@@ -96,6 +96,7 @@ public class SnapshotPeriodTests
     [Test]
     public void ToString_AsExpected( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod period )
     {
+    #pragma warning disable CS8524
         string periodString = period.Kind switch
         {
             SnapshotPeriodKind.Frequent => SnapshotPeriod.FrequentString,
@@ -105,8 +106,8 @@ public class SnapshotPeriodTests
             SnapshotPeriodKind.Monthly => SnapshotPeriod.MonthlyString,
             SnapshotPeriodKind.Yearly => SnapshotPeriod.YearlyString,
             SnapshotPeriodKind.NotSet => SnapshotPeriod.NotSetString,
-            _ => SnapshotPeriod.NotSetString
         };
         Assert.That( period.ToString( ), Is.EqualTo( periodString ) );
+    #pragma warning restore CS8524
     }
 }
