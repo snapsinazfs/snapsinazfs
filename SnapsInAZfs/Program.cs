@@ -92,9 +92,9 @@ internal class Program
                 Logger.Fatal( e, "Error in configuration console - Exiting" );
                 return (int)Errno.GenericError;
             }
+
             return 0;
         }
-
 
         SiazService.Timestamp = currentTimestamp;
         SiazService? serviceInstance = null;
@@ -201,40 +201,6 @@ internal class Program
         return true;
     }
 
-    private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
-    {
-        kestrelOptions.Configure( ).Load( );
-        if ( Settings?.Monitoring.UnixSocketEnabled ?? false )
-        {
-            if ( !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
-            {
-                kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
-            }
-            else
-            {
-                Logger.Error( "UnixSocketPath must be a valid path" );
-            }
-        }
-
-        if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
-        {
-            kestrelOptions.ListenAnyIP( Settings.Monitoring.TcpListenerPort );
-        }
-    }
-
-    private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
-    {
-        if ( !TryGetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
-        {
-            return null;
-        }
-
-        SiazService service = new( settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
-        return service;
-    }
-
-    private static IZfsCommandRunner? ZfsCommandRunnerSingleton;
-
     internal static bool TryGetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
     {
         if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
@@ -268,7 +234,40 @@ internal class Program
         {
             ZfsCommandRunnerSingleton = zfsCommandRunner;
         }
+
         return true;
+    }
+
+    private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
+    {
+        kestrelOptions.Configure( ).Load( );
+        if ( Settings?.Monitoring.UnixSocketEnabled ?? false )
+        {
+            if ( !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
+            {
+                kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
+            }
+            else
+            {
+                Logger.Error( "UnixSocketPath must be a valid path" );
+            }
+        }
+
+        if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
+        {
+            kestrelOptions.ListenAnyIP( Settings.Monitoring.TcpListenerPort );
+        }
+    }
+
+    private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
+    {
+        if ( !TryGetZfsCommandRunner( settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        {
+            return null;
+        }
+
+        SiazService service = new( settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        return service;
     }
 
     private static void SetCommandLineLoggingOverride( CommandLineArguments args )
