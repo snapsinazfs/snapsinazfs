@@ -20,6 +20,7 @@ using Microsoft.Extensions.Hosting;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
 
@@ -256,8 +257,19 @@ internal class Program
         ConfigurationBuilder configBuilder = new( );
         foreach ( string filePath in args.ConfigFiles )
         {
+            if ( !File.Exists( filePath ) )
+            {
+                Logger.Error( "Configuration file not found at {0}", filePath );
+                continue;
+            }
             Logger.Trace( "Loading configuration file {0}", filePath );
             configBuilder.AddJsonFile( filePath, false, false );
+        }
+
+        if ( configBuilder.Sources.Count == 0 )
+        {
+            Logger.Fatal( "Configuration files not found at any of these locations: {0}", args.ConfigFiles.ToCommaSeparatedSingleLineString( true ) );
+            return false;
         }
 
         IConfigurationRoot rootConfiguration = configBuilder.Build( );
