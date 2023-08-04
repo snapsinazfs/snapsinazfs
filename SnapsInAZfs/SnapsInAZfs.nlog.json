@@ -6,7 +6,7 @@
     }
   },
   "NLog": {
-    "autoReload": true,
+    "autoReload": false,
     "throwConfigExceptions": false,
     "internalLogLevel": "Warn",
     "internalLogFile": "${basedir}/internal-nlog.txt",
