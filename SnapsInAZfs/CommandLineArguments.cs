@@ -39,7 +39,7 @@ public class CommandLineArguments
     [ArgCantBeCombinedWith( "DryRun|TakeSnapshots|PruneSnapshots|ForcePrune|CheckZfsProperties|PrepareZfsProperties" )]
     public bool ConfigConsole { get; set; }
 
-    [ArgDescription( "A comma or space-separated list of configuration files to load" )]
+    [ArgDescription( "A comma-separated list of configuration files to load" )]
     [ArgShortcut( "--config" )]
     [ArgShortcut( "--config-file" )]
     [ArgShortcut( "--config-files" )]
