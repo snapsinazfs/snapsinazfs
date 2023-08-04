@@ -23,17 +23,16 @@ public static class LoggingSettings
     /// <summary>
     ///     Configures NLog using SnapsInAZfs.nlog.json
     /// </summary>
-    public static void ConfigureLogger( )
+    public static void ConfigureLogger( in string[] configFiles )
     {
 #pragma warning disable CA2000
-        IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
-                                            #if WINDOWS
-                                                .AddJsonFile("SnapsInAZfs.nlog.json", true, false)
-                                            #else
-                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", false, false )
-                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, true )
-                                            #endif
-                                                .Build( );
+        IConfigurationBuilder configManager = new ConfigurationManager();
+        foreach ( string configFile in configFiles.Where( File.Exists ) )
+        {
+            configManager.AddJsonFile( configFile, false, false );
+        }
+
+        IConfigurationRoot nlogJsonConfigRoot = configManager.Build( );
 #pragma warning restore CA2000
         LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
     }

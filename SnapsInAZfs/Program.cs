@@ -35,21 +35,21 @@ internal class Program
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
-    [ExcludeFromCodeCoverage(Justification = "Largely un-testable")]
+    [ExcludeFromCodeCoverage( Justification = "Largely un-testable" )]
     public static async Task<int> Main( string[] argv )
     {
-        LoggingSettings.ConfigureLogger( );
+        CommandLineArguments? args = await Args.ParseAsync<CommandLineArguments>( argv ).ConfigureAwait( true );
+
+        LoggingSettings.ConfigureLogger( args.LoggingConfigFiles );
 
         DateTimeOffset currentTimestamp = DateTimeOffset.Now;
 
-        Logger.Trace( "Parsing command-line arguments" );
-        CommandLineArguments? args = await Args.ParseAsync<CommandLineArguments>( argv ).ConfigureAwait( true );
-
         // The nullability context in PowerArgs is wrong, so this absolutely can be null
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         if ( args is null || args.Help )
         {
             Logger.Trace( "Help argument provided. Exiting." );
+            LogManager.Shutdown( );
             return (int)Errno.ECANCELED;
         }
 
@@ -60,13 +60,15 @@ internal class Program
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
             Logger.Trace( "Version argument provided. Exiting." );
+            LogManager.Shutdown( );
             return (int)Errno.ECANCELED;
         }
 
         SetCommandLineLoggingOverride( args );
 
-        if ( !LoadConfigurationFromConfigurationFiles( ref Settings ) )
+        if ( !LoadConfigurationFromConfigurationFiles( ref Settings, args ) )
         {
+            LogManager.Shutdown( );
             return (int)Errno.EFTYPE;
         }
 
@@ -84,9 +86,11 @@ internal class Program
             catch ( Exception e )
             {
                 Logger.Fatal( e, "Error in configuration console - Exiting" );
+                LogManager.Shutdown( );
                 return (int)Errno.GenericError;
             }
 
+            LogManager.Shutdown( );
             return 0;
         }
 
@@ -98,6 +102,7 @@ internal class Program
             if ( serviceInstance is null )
             {
                 Logger.Fatal( "Failed to create service instance - exiting" );
+                LogManager.Shutdown( );
                 return (int)Errno.ENOATTR;
             }
 
@@ -115,6 +120,7 @@ internal class Program
             await serviceHost.StartAsync( masterToken ).ConfigureAwait( true );
             await serviceHost.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
 
+            LogManager.Shutdown( );
             return SiazService.ExitStatus;
         }
         finally
@@ -145,44 +151,32 @@ internal class Program
         }
     }
 
-    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )]ref  SnapsInAZfsSettings? settings )
+    internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
     {
-        // Configuration is built in the following order from various sources.
-        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
-        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
-        // override earlier values.
-        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
-        // and is loaded/parsed FIRST, before any configuration specified below.
-        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-        // See documentation for a more detailed explanation with examples.
-        // Configuration order:
-        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
-        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
-        // 6. Command-line arguments passed on invocation of SnapsInAZfs
-        Logger.Debug( "Getting base configuration from files" );
-        IConfigurationRoot rootConfiguration = new ConfigurationBuilder( )
-                                           #if ALLOW_ADJACENT_CONFIG_FILE
-                                               .AddJsonFile( "SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                           #if !WINDOWS
-                                               .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", true, false )
-                                               .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.local.json", true, false )
-                                           #endif
-                                               .Build( );
-
-        Logger.Trace( "Building settings objects from IConfiguration" );
-        try
+        if ( args.Debug )
         {
-            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-        }
-        catch ( Exception ex )
-        {
-            Logger.Fatal( ex, "Unable to parse settings from JSON" );
-            return false;
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Debug );
         }
 
-        return true;
+        if ( args.Quiet )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Warn );
+        }
+
+        if ( args.ReallyQuiet )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Off );
+        }
+
+        if ( args.Trace )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Trace );
+        }
+
+        if ( args.Verbose )
+        {
+            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Info );
+        }
     }
 
     internal static bool TryGetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
@@ -244,31 +238,41 @@ internal class Program
     #endif
     }
 
-    internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
+    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, in CommandLineArguments args )
     {
-        if ( args.Debug )
+        // Configuration is built in the following order from various sources.
+        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
+        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
+        // override earlier values.
+        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
+        // and is loaded/parsed FIRST, before any configuration specified below.
+        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
+        // See snapsinazfs(5) for detailed configuration documentation.
+        // Configuration order, if not overridden by command-line options:
+        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
+        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
+        // 6. Command-line arguments passed on invocation of SnapsInAZfs
+        Logger.Debug( "Getting base configuration from files" );
+        ConfigurationBuilder configBuilder = new( );
+        foreach ( string filePath in args.ConfigFiles )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Debug );
+            Logger.Trace( "Loading configuration file {0}", filePath );
+            configBuilder.AddJsonFile( filePath, false, false );
         }
 
-        if ( args.Quiet )
+        IConfigurationRoot rootConfiguration = configBuilder.Build( );
+
+        Logger.Trace( "Building settings objects from IConfiguration" );
+        try
         {
-            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Warn );
+            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Fatal( ex, "Unable to parse settings from JSON" );
+            return false;
         }
 
-        if ( args.ReallyQuiet )
-        {
-            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Off );
-        }
-
-        if ( args.Trace )
-        {
-            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Trace );
-        }
-
-        if ( args.Verbose )
-        {
-            LoggingSettings.OverrideConsoleLoggingLevel( LogLevel.Info );
-        }
+        return true;
     }
 }
