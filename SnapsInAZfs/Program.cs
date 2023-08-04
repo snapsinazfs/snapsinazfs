@@ -41,18 +41,16 @@ internal class Program
     {
         CommandLineArguments? args = await Args.ParseAsync<CommandLineArguments>( argv ).ConfigureAwait( true );
 
-        LoggingSettings.ConfigureLogger( args.LoggingConfigFiles );
-
-        DateTimeOffset currentTimestamp = DateTimeOffset.Now;
-
         // The nullability context in PowerArgs is wrong, so this absolutely can be null
         // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         if ( args is null || args.Help )
         {
-            Logger.Trace( "Help argument provided. Exiting." );
             LogManager.Shutdown( );
             return (int)Errno.ECANCELED;
         }
+
+        LoggingSettings.ConfigureLogger( args.LoggingConfigFiles );
 
         if ( args.Version )
         {
@@ -95,7 +93,7 @@ internal class Program
             return 0;
         }
 
-        SiazService.Timestamp = currentTimestamp;
+        SiazService.Timestamp = DateTimeOffset.Now;
         SiazService? serviceInstance = null;
         try
         {
@@ -114,7 +112,7 @@ internal class Program
                                           .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } )
                                           .Build( );
 
-            SiazService.Timestamp = currentTimestamp;
+            SiazService.Timestamp = DateTimeOffset.Now;
             using CancellationTokenSource tokenSource = new( );
             CancellationToken masterToken = tokenSource.Token;
 
