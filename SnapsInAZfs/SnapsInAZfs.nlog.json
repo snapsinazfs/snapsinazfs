@@ -2,13 +2,13 @@
   "$schema": "https://json.schemastore.org/appsettings.json",
   "Logging": {
     "LogLevel": {
-      "Default": "Debug"
+      "Default": "Info"
     }
   },
   "NLog": {
     "autoReload": true,
-    "throwConfigExceptions": true,
-    "internalLogLevel": "Info",
+    "throwConfigExceptions": false,
+    "internalLogLevel": "Warn",
     "internalLogFile": "${basedir}/internal-nlog.txt",
     "extensions": [
       { "assembly": "NLog.Extensions.Logging" }
