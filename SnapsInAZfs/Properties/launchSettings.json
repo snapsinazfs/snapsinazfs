@@ -1,12 +1,15 @@
 {
   "profiles": {
+    "SnapsInAZfs": {
+      "commandName": "Project"
+    },
     "SnapsInAZfs --config-console": {
       "commandName": "Project",
       "commandLineArgs": "--config-console"
     },
-    "SnapsInAZfs --dry-run --take-snapshots": {
+    "SnapsInAZfs --config-files SnapsInAZfs.json SnapsInAZfs.local.json": {
       "commandName": "Project",
-      "commandLineArgs": "--dry-run --take-snapshots"
+      "commandLineArgs": "--config-files SnapsInAZfs.json SnapsInAZfs.local.json"
     },
     "SnapsInAZfs --debug --daemonize --take-snapshots --prune-snapshots": {
       "commandName": "Project",
@@ -16,8 +19,13 @@
       "commandName": "Project",
       "commandLineArgs": "--dry-run"
     },
-    "SnapsInAZfs": {
-      "commandName": "Project"
+    "SnapsInAZfs --dry-run --take-snapshots": {
+      "commandName": "Project",
+      "commandLineArgs": "--dry-run --take-snapshots"
+    },
+    "SnapsInAZfs --help": {
+      "commandName": "Project",
+      "commandLineArgs": "--help"
     }
   }
 }
