@@ -25,7 +25,6 @@ namespace SnapsInAZfs;
 ///     The command line arguments that SnapsInAZfs can accept
 /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
-[TabCompletion( EnableFileSystemTabCompletion = true )]
 // ReSharper disable once ClassNeverInstantiated.Global
 public class CommandLineArguments
 {
