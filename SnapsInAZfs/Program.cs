@@ -259,7 +259,7 @@ internal class Program
         {
             if ( !File.Exists( filePath ) )
             {
-                Logger.Warn( "Configuration file not found at {0}", filePath );
+                Logger.Debug( "Configuration file not found at {0}", filePath );
                 continue;
             }
 
