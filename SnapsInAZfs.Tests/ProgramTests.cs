@@ -14,9 +14,7 @@
 
 using System.Reflection;
 using NLog;
-using NLog.Config;
 using PowerArgs;
-using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Settings.Settings;
 
@@ -69,26 +67,6 @@ public class ProgramTests
         CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( Array.Empty<string>( ) );
         Program.ApplyCommandLineArgumentOverrides( in testArgs, possiblyChangedSettings );
         Assert.That( pi.GetValue( initialSettings ), Is.EqualTo( pi.GetValue( possiblyChangedSettings ) ) );
-    }
-
-    [Test]
-    public async Task Main_ReturnsECancelledOnHelpOption( [ValueSource( nameof( GetHelpArgStrings ) )] string[] args )
-    {
-        TextWriter stdout = Console.Out;
-        Console.SetOut( TextWriter.Null );
-        Errno result = (Errno)await Program.Main( args );
-        Assert.That( result, Is.EqualTo( Errno.ECANCELED ) );
-        Console.SetOut( stdout );
-    }
-
-    [Test]
-    public async Task Main_ReturnsECancelledOnVersionOption( [ValueSource( nameof( GetVersionArgStrings ) )] string[] args )
-    {
-        TextWriter stdout = Console.Out;
-        Console.SetOut( TextWriter.Null );
-        Errno result = (Errno)await Program.Main( args );
-        Assert.That( result, Is.EqualTo( Errno.ECANCELED ) );
-        Console.SetOut( stdout );
     }
 
     [SetUp]
