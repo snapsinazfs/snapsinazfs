@@ -7,10 +7,6 @@
       "commandName": "Project",
       "commandLineArgs": "--config-console"
     },
-    "SnapsInAZfs --config-files SnapsInAZfs.json SnapsInAZfs.local.json": {
-      "commandName": "Project",
-      "commandLineArgs": "--config-files SnapsInAZfs.json SnapsInAZfs.local.json"
-    },
     "SnapsInAZfs --debug --daemonize --take-snapshots --prune-snapshots": {
       "commandName": "Project",
       "commandLineArgs": "--debug --daemonize --take-snapshots --prune-snapshots"
@@ -26,6 +22,10 @@
     "SnapsInAZfs --help": {
       "commandName": "Project",
       "commandLineArgs": "--help"
+    },
+    "SnapsInAZfs --config-files SnapsInAZfs.json SnapsInAZfs.local.json SnapsInAZfs.nlog.json": {
+      "commandName": "Project",
+      "commandLineArgs": "--config-files SnapsInAZfs.json SnapsInAZfs.local.json SnapsInAZfs.nlog.json"
     }
   }
 }

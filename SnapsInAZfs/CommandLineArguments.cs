@@ -41,8 +41,9 @@ public class CommandLineArguments
 
     [ArgDescription( "A comma or space-separated list of configuration files to load" )]
     [ArgShortcut( "--config" )]
+    [ArgShortcut( "--config-file" )]
     [ArgShortcut( "--config-files" )]
-    public string[] ConfigFiles { get; set; } = OperatingSystem.IsWindows( ) ? new[] { "SnapsInAZfs.json", "SnapsInAZfs.local.json" } : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json" };
+    public string[] ConfigFiles { get; set; } = Array.Empty<string>( );
 
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]
@@ -82,11 +83,6 @@ public class CommandLineArguments
     [ArgShortcut( "--help" )]
     [HelpHook]
     public bool Help { get; set; }
-
-    [ArgDescription( "A comma or space-separated list of nlog configuration files to load" )]
-    [ArgShortcut( "--logging-config" )]
-    [ArgShortcut( "--logging-config-files" )]
-    public string[] LoggingConfigFiles { get; set; } = OperatingSystem.IsWindows( ) ? new[] { "SnapsInAZfs.nlog.json" } : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json" };
 
     [ArgDescription( "This option is designed to be run by a Nagios monitoring system. It reports on the capacity of the zpool your filesystems are on." )]
     [ArgShortcut( "--monitor-capacity" )]

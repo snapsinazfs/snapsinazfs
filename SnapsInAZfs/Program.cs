@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ï¿½Softwareï¿½), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED ï¿½AS ISï¿½, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -17,6 +17,8 @@ using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NLog.Config;
+using NLog.Extensions.Logging;
 using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
@@ -50,7 +52,13 @@ internal class Program
             return (int)Errno.ECANCELED;
         }
 
-        LoggingSettings.ConfigureLogger( args.LoggingConfigFiles );
+        if ( !LoadConfigurationFromConfigurationFiles( ref Settings, in args ) )
+        {
+            LogManager.Shutdown( );
+            return (int)Errno.EFTYPE;
+        }
+
+        SetCommandLineLoggingOverride( args );
 
         if ( args.Version )
         {
@@ -61,14 +69,6 @@ internal class Program
             Logger.Trace( "Version argument provided. Exiting." );
             LogManager.Shutdown( );
             return (int)Errno.ECANCELED;
-        }
-
-        SetCommandLineLoggingOverride( args );
-
-        if ( !LoadConfigurationFromConfigurationFiles( ref Settings, args ) )
-        {
-            LogManager.Shutdown( );
-            return (int)Errno.EFTYPE;
         }
 
         ApplyCommandLineArgumentOverrides( in args, Settings );
@@ -253,20 +253,23 @@ internal class Program
         // 6. Command-line arguments passed on invocation of SnapsInAZfs
         Logger.Debug( "Getting base configuration from files" );
         ConfigurationBuilder configBuilder = new( );
-        foreach ( string filePath in args.ConfigFiles )
+
+        IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0 ? args.ConfigFiles : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" };
+        foreach ( string filePath in requestedFiles )
         {
             if ( !File.Exists( filePath ) )
             {
-                Logger.Error( "Configuration file not found at {0}", filePath );
+                Logger.Warn( "Configuration file not found at {0}", filePath );
                 continue;
             }
+
             Logger.Trace( "Loading configuration file {0}", filePath );
             configBuilder.AddJsonFile( filePath, false, false );
         }
 
         if ( configBuilder.Sources.Count == 0 )
         {
-            Logger.Fatal( "Configuration files not found at any of these locations: {0}", args.ConfigFiles.ToCommaSeparatedSingleLineString( true ) );
+            Logger.Fatal( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString( true ) );
             return false;
         }
 
@@ -276,6 +279,8 @@ internal class Program
         try
         {
             settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+            IConfigurationSection nlogConfigSection = rootConfiguration.GetSection( "NLog" );
+            LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration( nlogConfigSection ) : new LoggingConfiguration( );
         }
         catch ( Exception ex )
         {
