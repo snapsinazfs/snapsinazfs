@@ -20,23 +20,6 @@ namespace SnapsInAZfs.Settings.Logging;
 /// </summary>
 public static class LoggingSettings
 {
-    /// <summary>
-    ///     Configures NLog using SnapsInAZfs.nlog.json
-    /// </summary>
-    public static void ConfigureLogger( )
-    {
-#pragma warning disable CA2000
-        IConfigurationRoot nlogJsonConfigRoot = new ConfigurationManager( )
-                                            #if WINDOWS
-                                                .AddJsonFile("SnapsInAZfs.nlog.json", true, false)
-                                            #else
-                                                .AddJsonFile( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", false, false )
-                                                .AddJsonFile( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", true, true )
-                                            #endif
-                                                .Build( );
-#pragma warning restore CA2000
-        LogManager.Configuration = new NLogLoggingConfiguration( nlogJsonConfigRoot.GetSection( "NLog" ) );
-    }
     public static void OverrideConsoleLoggingLevel( LogLevel level )
     {
         if ( LogManager.Configuration == null )
