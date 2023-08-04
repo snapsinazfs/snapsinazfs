@@ -1,14 +1,21 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using PowerArgs;
+
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
 
 #pragma warning disable CS1591
 
@@ -23,7 +30,7 @@ public class CommandLineArguments
 {
     [ArgDescription( "Checks the property schema for SnapsInAZfs in zfs and reports any missing properties for pool roots." )]
     [ArgShortcut( "--check-zfs-properties" )]
-    [ArgCantBeCombinedWith("PrepareZfsProperties")]
+    [ArgCantBeCombinedWith( "PrepareZfsProperties" )]
     public bool CheckZfsProperties { get; set; }
 
     [ArgDescription( "Launches SnapsInAZfs' built-in interactive configuration console" )]
@@ -31,6 +38,12 @@ public class CommandLineArguments
     [ArgShortcut( "--config-console" )]
     [ArgCantBeCombinedWith( "DryRun|TakeSnapshots|PruneSnapshots|ForcePrune|CheckZfsProperties|PrepareZfsProperties" )]
     public bool ConfigConsole { get; set; }
+
+    [ArgDescription( "A comma-separated list of configuration files to load" )]
+    [ArgShortcut( "--config" )]
+    [ArgShortcut( "--config-file" )]
+    [ArgShortcut( "--config-files" )]
+    public string[] ConfigFiles { get; set; } = Array.Empty<string>( );
 
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]
@@ -44,7 +57,6 @@ public class CommandLineArguments
 
     [ArgDescription( "Override the configured daemon event processing timer. Specified as a whole number of seconds." )]
     [ArgShortcut( "--daemon-timer-interval" )]
-    [ArgDefaultValue( 0 )]
     public uint DaemonTimerInterval { get; set; } = 0;
 
     [ArgDescription( "Debug level output logging. Change log level in SnapsInAZfs.nlog.json for normal usage." )]
@@ -68,7 +80,7 @@ public class CommandLineArguments
     public bool ForcePrune { get; set; }
 
     [ArgDescription( "Shows this help" )]
-    [ArgShortcut( "-h" )]
+    [ArgShortcut( "h" )]
     [ArgShortcut( "--help" )]
     [HelpHook]
     public bool Help { get; set; }
