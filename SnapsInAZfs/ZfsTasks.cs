@@ -68,7 +68,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -78,7 +78,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -88,7 +88,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -98,7 +98,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -108,7 +108,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -118,7 +118,7 @@ internal static class ZfsTasks
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
-                if ( success && !settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
