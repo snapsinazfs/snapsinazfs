@@ -200,7 +200,7 @@ public class ProgramTests
 
     private static PropertyInfo[] GetSnapsInAZfsSettingsPropertyInfos( )
     {
-        return typeof( SnapsInAZfsSettings ).GetProperties( ).Where( pi => pi.Name is not nameof( SnapsInAZfsSettings.Monitoring ) and not nameof( SnapsInAZfsSettings.Templates ) ).ToArray( );
+        return typeof( SnapsInAZfsSettings ).GetProperties( ).Where( pi => pi.Name is not nameof( SnapsInAZfsSettings.Templates ) ).ToArray( );
     }
 
     private static IEnumerable<string[]> GetVersionArgStrings( )
