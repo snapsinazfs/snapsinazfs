@@ -12,20 +12,16 @@
 
 #endregion
 
-using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
-using BitConverter = System.BitConverter;
 
 namespace SnapsInAZfs.Tests;
 
 [TestFixture]
 [TestOf( typeof( TypeExtensions ) )]
+[Parallelizable]
 public class TypeExtensionsTests
 {
-    private static int[][]? ArrayOfThreeIntegerArrays { get; set; }
-
     [Test]
     public void GreatestCommonFactor_OneTerm_ReturnsInput( [Range( 1, 1, 60 )] int term )
     {
@@ -36,8 +32,8 @@ public class TypeExtensionsTests
     [Test]
     [Parallelizable( ParallelScope.All )]
     [Category( "Exhaustive" )]
-    [TestCaseSource( nameof( ArrayOfThreeIntegerArrays ) )]
-    [Pairwise]
+    [Explicit("Long-Running")]
+    [TestCaseSource(nameof(GetThreeTermTestCases))]
     public void GreatestCommonFactor_ThreeTerms_ReturnsCorrectResult( int term1, int term2, int term3 )
     {
         int[] terms = { term1, term2, term3 };
@@ -58,7 +54,8 @@ public class TypeExtensionsTests
             for ( int biggerNumber = result + 1; biggerNumber < 60; biggerNumber++ )
             {
                 Assert.That( ( term1 % biggerNumber ) + ( term2 % biggerNumber ) + ( term3 % biggerNumber ), Is.Not.Zero );
-                Assert.That( terms.Select( t => t % biggerNumber ), Has.Some.Positive );
+                int number = biggerNumber;
+                Assert.That( terms.Select( t => t % number ), Has.Some.Positive );
             }
         } );
     }
@@ -83,15 +80,10 @@ public class TypeExtensionsTests
             for ( int biggerNumber = result + 1; biggerNumber < 60; biggerNumber++ )
             {
                 Assert.That( ( term1 % biggerNumber ) + ( term2 % biggerNumber ), Is.Not.Zero );
-                Assert.That( terms.Select( t => t % biggerNumber ), Has.Some.Positive );
+                int number = biggerNumber;
+                Assert.That( terms.Select( t => t % number ), Has.Some.Positive );
             }
         } );
-    }
-
-    [OneTimeSetUp]
-    public void SetUpTestCases( )
-    {
-        ArrayOfThreeIntegerArrays = GetThreeTermTestCases( ).ToArray( );
     }
 
     /// <summary>
@@ -103,13 +95,13 @@ public class TypeExtensionsTests
     [UsedImplicitly]
     private static void GenerateThreeIntGcfTestFile( )
     {
-        using FileStream f = File.Create( "GreatestCommonFactor_ThreeTermTestCaseInput.dat", 12 * 1024 );
+        using FileStream f = File.Create( "GreatestCommonFactor_ThreeTermTestCaseInput2.dat", 12288 );
         HashSet<int[]> trios = new( new IntArrayComparer( ) );
-        for ( int term1 = 1; term1 < 60; term1++ )
+        for ( int term1 = 1; term1 <= 60; term1++ )
         {
-            for ( int term2 = term1; term2 < 60; term2++ )
+            for ( int term2 = term1 + 1; term2 <= 60; term2++ )
             {
-                for ( int term3 = term2 + 1; term3 < 60; term3++ )
+                for ( int term3 = term2 + 1; term3 <= 60; term3++ )
                 {
                     int[] arr = { term1, term2, term3 };
                     if ( trios.Add( arr ) )
@@ -144,7 +136,8 @@ public class TypeExtensionsTests
             f.ReadExactly( s );
             yield return MemoryMarshal.Cast<byte, int>( s ).ToArray( );
         }
-        f.Close();
+
+        f.Close( );
     }
 
     private static IEnumerable<int[]> GetTwoTermTestCases( )
@@ -176,4 +169,5 @@ public class TypeExtensionsTests
             return obj.GetHashCode( );
         }
     }
+
 }

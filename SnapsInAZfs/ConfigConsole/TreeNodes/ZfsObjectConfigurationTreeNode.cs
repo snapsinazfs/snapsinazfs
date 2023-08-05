@@ -18,7 +18,7 @@ namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 /// <summary>
 ///     Represents a node in the tree of datasets in <see cref="ZfsConfigurationWindow" />
 /// </summary>
-public class ZfsObjectConfigurationTreeNode : TreeNode
+public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private readonly ConcurrentDictionary<string, IZfsProperty> _inheritedPropertiesSinceLastSave = new( );

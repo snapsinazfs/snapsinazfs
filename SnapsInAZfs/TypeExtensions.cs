@@ -22,7 +22,7 @@ internal static class TypeExtensions
     /// <param name="terms"></param>
     /// <param name="fallback">Fallback value if the collection is empty</param>
     /// <returns></returns>
-    internal static int GreatestCommonFactor( this IList<int> terms, int fallback = 1 )
+    public static int GreatestCommonFactor( this IList<int> terms, int fallback = 1 )
     {
         int count = terms.Count;
         if ( count <= 1 )
