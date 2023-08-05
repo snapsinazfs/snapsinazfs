@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -62,6 +62,7 @@ public class ProgramTests
     {
         SnapsInAZfsSettings initialSettings = new( );
         SnapsInAZfsSettings possiblyChangedSettings = new( );
+
         Assume.That( pi.GetValue( initialSettings ), Is.EqualTo( pi.GetValue( possiblyChangedSettings ) ) );
 
         CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( Array.Empty<string>( ) );
@@ -75,17 +76,6 @@ public class ProgramTests
         Program.Settings = null;
         Program.ZfsCommandRunnerSingleton = null;
         ResetNLogToNoOutput( );
-    }
-
-    private static void ResetNLogToNoOutput( )
-    {
-        if ( LogManager.Configuration is not null )
-        {
-            LogManager.Shutdown( );
-        }
-
-        LogManager.Setup( ).LoadConfiguration( builder => { builder.ForLogger( ).FilterLevels( LogLevel.Trace, LogLevel.Off ).WriteToNil( ); } );
-        LogManager.ReconfigExistingLoggers( true );
     }
 
     [Test]
@@ -153,15 +143,15 @@ public class ProgramTests
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied( )
     {
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "TakeSnapshots" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[ ] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, new[] { "--cron" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "Cron" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "PruneSnapshots" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[ ] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, new[] { "--dry-run" }, true, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), false, true );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DryRun" )!, Array.Empty<string>( ), false, typeof( SnapsInAZfsSettings ).GetProperty( "DryRun" ), true, true );
@@ -218,5 +208,16 @@ public class ProgramTests
         yield return new[] { "-V" };
         yield return new[] { "-Version" };
         yield return new[] { "--version" };
+    }
+
+    private static void ResetNLogToNoOutput( )
+    {
+        if ( LogManager.Configuration is not null )
+        {
+            LogManager.Shutdown( );
+        }
+
+        LogManager.Setup( ).LoadConfiguration( builder => { builder.ForLogger( ).FilterLevels( LogLevel.Trace, LogLevel.Off ).WriteToNil( ); } );
+        LogManager.ReconfigExistingLoggers( true );
     }
 }
