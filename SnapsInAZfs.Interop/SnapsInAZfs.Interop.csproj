@@ -80,7 +80,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
-    <PackageReference Include="NLog" Version="5.2.2" />
+    <PackageReference Include="NLog" Version="5.2.3" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
   </ItemGroup>
