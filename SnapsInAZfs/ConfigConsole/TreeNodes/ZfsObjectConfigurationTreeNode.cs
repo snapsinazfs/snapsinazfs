@@ -150,13 +150,12 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the modified properties collection" );
             }
 
             foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
@@ -169,13 +168,12 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the inherited properties collection" );
             }
 
             if ( clearChangedPropertiesCollections )
@@ -207,13 +205,12 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the modified properties collection" );
             }
 
             foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
@@ -226,13 +223,12 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the inherited properties collection" );
             }
 
             if ( clearChangedPropertiesCollections )
