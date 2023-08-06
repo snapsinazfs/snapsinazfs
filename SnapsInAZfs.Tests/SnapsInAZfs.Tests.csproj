@@ -24,14 +24,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GreatestCommonFactor_ThreeTermTestCaseInput.dat" />
     <None Remove="SnapsInAZfs.Tests.nlog.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="GreatestCommonFactor_ThreeTermTestCaseInput.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="SnapsInAZfs.Tests.nlog.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -53,6 +49,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SnapsInAZfs\SnapsInAZfs.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="GreatestCommonFactor_ThreeTermTestCaseInput.dat">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

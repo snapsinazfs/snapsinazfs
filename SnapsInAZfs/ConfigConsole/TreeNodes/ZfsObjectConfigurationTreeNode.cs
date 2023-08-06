@@ -1,12 +1,16 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
@@ -18,12 +22,14 @@ namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 /// <summary>
 ///     Represents a node in the tree of datasets in <see cref="ZfsConfigurationWindow" />
 /// </summary>
-public class ZfsObjectConfigurationTreeNode : TreeNode
+public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private readonly object _childrenLock = new( );
     private readonly ConcurrentDictionary<string, IZfsProperty> _inheritedPropertiesSinceLastSave = new( );
 
     private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSave = new( );
+    private readonly object _propertyChangeCollectionsLock = new( );
 
     /// <summary>
     ///     Creates a new instance of a <see cref="ZfsObjectConfigurationTreeNode" /> having the specified <paramref name="name" /> (used
@@ -45,8 +51,6 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     }
 
     private List<ITreeNode>? _children;
-    private readonly object _propertyChangeCollectionsLock = new( );
-    private readonly object _childrenLock = new();
 
     /// <inheritdoc />
     public override IList<ITreeNode> Children
@@ -146,13 +150,12 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the modified properties collection" );
             }
 
             foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
@@ -165,13 +168,12 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         TreeDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the inherited properties collection" );
             }
 
             if ( clearChangedPropertiesCollections )
@@ -203,13 +205,12 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the modified properties collection" );
             }
 
             foreach ( string propName in _inheritedPropertiesSinceLastSave.Keys )
@@ -222,13 +223,12 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                     case ZfsProperty<int> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
-                    case ZfsProperty<DateTimeOffset> prop:
-                        BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
-                        continue;
                     case ZfsProperty<string> prop:
                         BaseDataset.UpdateProperty( propName, prop.Value, prop.IsLocal );
                         continue;
                 }
+
+                throw new InvalidOperationException( $"An unexpected property ({propName}) was encountered in the inherited properties collection" );
             }
 
             if ( clearChangedPropertiesCollections )
@@ -240,22 +240,24 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
     }
 
     /// <summary>
-    ///     Inherits the given property for <see cref="TreeDataset" /> from its parent
+    ///     Inherits the given property for <see cref="TreeDataset" /> from its parent and reports success or failure
     /// </summary>
     /// <param name="propertyName"></param>
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not handled by this method</exception>
-    /// <exception cref="ArgumentException">If <paramref name="propertyName" /> is a non-inheritable property</exception>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating if the requested property was inherited
+    /// </returns>
     /// <remarks>
     ///     If the specified property has already been modified, this method first reverts the change to that property before inheriting
     ///     from parent.
     /// </remarks>
-    public void InheritPropertyFromParent( string propertyName )
+    public bool InheritPropertyFromParent( string propertyName )
     {
         if ( TreeDataset.IsPoolRoot )
         {
             Logger.Warn( "Invalid attempt to inherit a property on pool root {0}", TreeDataset.Name );
-            return;
+            return false;
         }
 
         switch ( propertyName )
@@ -268,10 +270,14 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertBooleanPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritBoolPropertyFromParent( propertyName );
+                    ZfsProperty<bool> boolProperty = TreeDataset.InheritBoolPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = boolProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.RecursionPropertyName:
             case ZfsPropertyNames.TemplatePropertyName:
             {
@@ -279,10 +285,14 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertStringPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritStringPropertyFromParent( propertyName );
+                    ZfsProperty<string> stringProperty = TreeDataset.InheritStringPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = stringProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
             case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
             case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
@@ -295,22 +305,28 @@ public class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertIntPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritIntPropertyFromParent( propertyName );
+                    ZfsProperty<int> intProperty = TreeDataset.InheritIntPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = intProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
-                throw new ArgumentException( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof( propertyName ) );
+                Logger.Error( new ArgumentException( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof( propertyName ) ) );
+                return false;
             default:
             {
                 if ( IZfsProperty.AllKnownProperties.Contains( propertyName ) )
                 {
-                    throw new ArgumentOutOfRangeException( $"Property {propertyName} cannot be inherited", new NotImplementedException( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) );
+                    Logger.Error( new ArgumentOutOfRangeException( $"Property {propertyName} cannot be inherited", new InvalidOperationException( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) ) );
+                    return false;
                 }
 
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"Property {propertyName} cannot be inherited - unsupported property" );
