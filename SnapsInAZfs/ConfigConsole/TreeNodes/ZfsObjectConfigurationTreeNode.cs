@@ -240,22 +240,24 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     }
 
     /// <summary>
-    ///     Inherits the given property for <see cref="TreeDataset" /> from its parent
+    ///     Inherits the given property for <see cref="TreeDataset" /> from its parent and reports success or failure
     /// </summary>
     /// <param name="propertyName"></param>
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not handled by this method</exception>
-    /// <exception cref="ArgumentException">If <paramref name="propertyName" /> is a non-inheritable property</exception>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
+    /// <returns>
+    ///     A <see langword="bool" /> indicating if the requested property was inherited
+    /// </returns>
     /// <remarks>
     ///     If the specified property has already been modified, this method first reverts the change to that property before inheriting
     ///     from parent.
     /// </remarks>
-    public void InheritPropertyFromParent( string propertyName )
+    public bool InheritPropertyFromParent( string propertyName )
     {
         if ( TreeDataset.IsPoolRoot )
         {
             Logger.Warn( "Invalid attempt to inherit a property on pool root {0}", TreeDataset.Name );
-            return;
+            return false;
         }
 
         switch ( propertyName )
@@ -268,10 +270,14 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertBooleanPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritBoolPropertyFromParent( propertyName );
+                    ZfsProperty<bool> boolProperty = TreeDataset.InheritBoolPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = boolProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.RecursionPropertyName:
             case ZfsPropertyNames.TemplatePropertyName:
             {
@@ -279,10 +285,14 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertStringPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritStringPropertyFromParent( propertyName );
+                    ZfsProperty<string> stringProperty = TreeDataset.InheritStringPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = stringProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
             case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
             case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
@@ -295,22 +305,28 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                 {
                     RevertIntPropertyToBase( propertyName, _modifiedPropertiesSinceLastSave );
 
-                    _inheritedPropertiesSinceLastSave[ propertyName ] = TreeDataset.InheritIntPropertyFromParent( propertyName );
+                    ZfsProperty<int> intProperty = TreeDataset.InheritIntPropertyFromParent( propertyName );
+                    if ( IsModified )
+                    {
+                        _inheritedPropertiesSinceLastSave[ propertyName ] = intProperty;
+                    }
                 }
             }
-                break;
+                return true;
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
-                throw new ArgumentException( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof( propertyName ) );
+                Logger.Error( new ArgumentException( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof( propertyName ) ) );
+                return false;
             default:
             {
                 if ( IZfsProperty.AllKnownProperties.Contains( propertyName ) )
                 {
-                    throw new ArgumentOutOfRangeException( $"Property {propertyName} cannot be inherited", new NotImplementedException( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) );
+                    Logger.Error( new ArgumentOutOfRangeException( $"Property {propertyName} cannot be inherited", new InvalidOperationException( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) ) );
+                    return false;
                 }
 
                 throw new ArgumentOutOfRangeException( nameof( propertyName ), $"Property {propertyName} cannot be inherited - unsupported property" );
