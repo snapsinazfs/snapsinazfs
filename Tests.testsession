@@ -1,0 +1,7 @@
+<SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &lt;Tests&gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session">
+  <Not>
+    <TestAncestor>
+      <TestId>NUnit3x::7EA459FB-0977-49E1-92C8-2DA47C1294BB::net7.0::SnapsInAZfs.Tests.TypeExtensionsTests.GreatestCommonFactor_ThreeTerms_ReturnsCorrectResult</TestId>
+    </TestAncestor>
+  </Not>
+</SessionState>
