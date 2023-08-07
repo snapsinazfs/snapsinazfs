@@ -208,7 +208,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     [JsonIgnore]
     public ZfsRecord ParentDataset { get; }
 
-    public int SnapshotCount => Snapshots.Values.Sum( d => d.Count );
+    public int SnapshotCount => Snapshots.Values.Sum( static d => d.Count );
 
     public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = GetNewSnapshotCollection( );
 
@@ -995,7 +995,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
     private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
-        List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( kvp => kvp.Value.PruneSnapshots.Value ).Select( kvp => kvp.Value ).ToList( );
+        List<Snapshot> snapshotsSetForPruning = Snapshots[ snapshotPeriod.Kind ].Where( static kvp => kvp.Value.PruneSnapshots.Value ).Select( static kvp => kvp.Value ).ToList( );
         Logger.Trace( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString( true ) );
         if ( snapshotsSetForPruning.Count <= retentionValue )
         {

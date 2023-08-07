@@ -47,6 +47,8 @@
     <Compile Remove="Libc\bits\Types.cs" />
     <Compile Remove="Libc\bits\Typesizes.cs" />
     <Compile Remove="Libc\Enums\PthreadEnums.cs" />
+    <Compile Remove="Libc\Enums\UnixFileTestMode.cs" />
+    <Compile Remove="Libc\NativeMethods.cs" />
     <Compile Remove="Libc\Structs\StatFs64.cs" />
     <Compile Remove="Zfs\Native\Enums\LibZfsError.cs" />
     <Compile Remove="Zfs\Native\Enums\ZfsBoolean.cs" />
@@ -65,6 +67,8 @@
     <None Include="Libc\bits\Types.cs" />
     <None Include="Libc\bits\Typesizes.cs" />
     <None Include="Libc\Enums\PthreadEnums.cs" />
+    <None Include="Libc\Enums\UnixFileTestMode.cs" />
+    <None Include="Libc\NativeMethods.cs" />
     <None Include="Libc\Structs\StatFs64.cs" />
     <None Include="Zfs\Native\Enums\LibZfsError.cs" />
     <None Include="Zfs\Native\Enums\ZfsBoolean.cs" />
@@ -81,7 +85,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
     <PackageReference Include="NLog" Version="5.2.3" />
-    <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
   </ItemGroup>
 
   <ItemGroup>

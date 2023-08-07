@@ -1,12 +1,16 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -20,7 +24,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 /// <summary>
 /// </summary>
-public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
+public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 {
     private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -68,8 +72,8 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         PathToZpoolUtility = pathToZpool;
     }
 
-    private string PathToZfsUtility { get; set; }
-    private string PathToZpoolUtility { get; set; }
+    private string PathToZfsUtility { get; }
+    private string PathToZpoolUtility { get; }
 
     /// <inheritdoc />
     public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
@@ -218,8 +222,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             CreateNoWindow = true,
             RedirectStandardOutput = true
         };
-        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        using ( Process zfsSetProcess = new( ) )
         {
+            zfsSetProcess.StartInfo = zfsSetStartInfo;
             if ( dryRun )
             {
                 Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
@@ -286,8 +291,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             RedirectStandardOutput = true
         };
         Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
-        using ( Process zfsProcess = new( ) { StartInfo = zfsProcessStartInfo } )
+        using ( Process zfsProcess = new( ) )
         {
+            zfsProcess.StartInfo = zfsProcessStartInfo;
             Logger.Debug( "Calling {0} {1}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
             try
             {
@@ -332,8 +338,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             RedirectStandardOutput = true
         };
         Logger.Debug( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZpoolUtility, verb, args );
-        using ( Process zpoolExecProcess = new( ) { StartInfo = zpoolExecStartInfo } )
+        using ( Process zpoolExecProcess = new( ) )
         {
+            zpoolExecProcess.StartInfo = zpoolExecStartInfo;
             Logger.Debug( "Calling {0} {1} {2}", zpoolExecStartInfo.FileName, verb, args );
             try
             {
@@ -368,6 +375,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Error( "Property has no reference to the dataset it belongs to. Cannot inherit." );
             return ZfsCommandRunnerOperationStatus.Failure;
         }
+
         Logger.Trace( "Attempting to inherit property {0} on {1} from {2}", propertyToInherit.Name, zfsPath, propertyToInherit.Owner.ParentDataset.Name );
         ProcessStartInfo zfsInheritStartInfo = new( PathToZfsUtility, $"inherit {propertyToInherit.Name} {zfsPath}" )
         {
@@ -380,8 +388,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
-        using ( Process zfsInheritProcess = new( ) { StartInfo = zfsInheritStartInfo } )
+        using ( Process zfsInheritProcess = new( ) )
         {
+            zfsInheritProcess.StartInfo = zfsInheritStartInfo;
             Logger.Debug( "Calling {0} {1}", zfsInheritStartInfo.FileName, zfsInheritStartInfo.Arguments );
             try
             {
@@ -414,6 +423,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             Logger.Warn( "Asked to set properties for {0} but no properties provided", dsName );
             return false;
         }
+
         string propertiesSetString = properties.Select( propName => propName == ZfsPropertyNames.SourceSystem ? ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, settings.LocalSystemName ).SetString : IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
         Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
         ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
@@ -427,8 +437,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return false;
         }
 
-        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        using ( Process zfsSetProcess = new( ) )
         {
+            zfsSetProcess.StartInfo = zfsSetStartInfo;
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             try
             {
@@ -476,8 +487,9 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return ZfsCommandRunnerOperationStatus.DryRun;
         }
 
-        using ( Process zfsSetProcess = new( ) { StartInfo = zfsSetStartInfo } )
+        using ( Process zfsSetProcess = new( ) )
         {
+            zfsSetProcess.StartInfo = zfsSetStartInfo;
             Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
             try
             {
@@ -485,7 +497,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError() );
+                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
                 return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
@@ -498,7 +510,7 @@ public class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 catch ( Exception ex )
                 {
-                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError() );
+                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
                     return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
                 }
             }
