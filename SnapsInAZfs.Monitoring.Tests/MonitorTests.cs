@@ -46,10 +46,15 @@ public class MonitorTests
         Monitor testMonitor = new( );
         SnapshotOperationsObservableMock observable = new( );
 
-        testMonitor.SnapshotsPrunedSucceededLastExecution = 1u;
-        testMonitor.SnapshotsPrunedFailedLastExecution = 1u;
-        testMonitor.SnapshotsTakenSucceededLastExecution = 1u;
-        testMonitor.SnapshotsTakenFailedLastExecution = 1u;
+        // Use reflection to set the fields to non-zero values, since we don't want to expose setters on the properties
+        FieldInfo snapshotsPrunedSucceededLastExecutionFieldInfo = typeof( Monitor ).GetField( "_snapshotsPrunedSucceededLastExecution", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsPrunedSucceededLastExecutionFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsPrunedFailedLastExecutionFieldInfo = typeof( Monitor ).GetField( "_snapshotsPrunedFailedLastExecution", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsPrunedFailedLastExecutionFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsTakenSucceededLastExecutionFieldInfo = typeof( Monitor ).GetField( "_snapshotsTakenSucceededLastExecution", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsTakenSucceededLastExecutionFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsTakenFailedLastExecutionFieldInfo = typeof( Monitor ).GetField( "_snapshotsTakenFailedLastExecution", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsTakenFailedLastExecutionFieldInfo.SetValue( testMonitor, 1u );
 
         Assume.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.EqualTo( 1u ) );
         Assume.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1u ) );
@@ -348,6 +353,9 @@ public class MonitorTests
                 _state = value;
             }
         }
+
+        /// <inheritdoc />
+        public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
         public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged
         {

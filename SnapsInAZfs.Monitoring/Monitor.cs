@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -31,6 +31,22 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
     private bool _applicationStateObservableEventSubscribed;
     private ISnapshotOperationsObservable? _snapshotOperationsObservable;
 
+    private uint _snapshotsPrunedFailedLastExecution;
+
+    private uint _snapshotsPrunedFailedSinceStart;
+
+    private uint _snapshotsPrunedSucceededLastExecution;
+
+    private uint _snapshotsPrunedSucceededSinceStart;
+
+    private uint _snapshotsTakenFailedLastExecution;
+
+    private uint _snapshotsTakenFailedSinceStart;
+
+    private uint _snapshotsTakenSucceededLastExecution;
+
+    private uint _snapshotsTakenSucceededSinceStart;
+
     public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
     public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
@@ -49,8 +65,15 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
         return _applicationStateObservable switch
         {
             null => "Not Registered",
-            _ => _applicationStateObservableEventSubscribed ? _applicationState.ToString( "G" ) : _applicationStateObservable.State.ToString( "G" )
+            _ when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
+            _ => _applicationStateObservable.State.ToString( "G" )
         };
+    }
+
+    /// <inheritdoc />
+    public DateTimeOffset GetServiceStartTime( )
+    {
+        return _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
     }
 
     /// <summary>
@@ -95,6 +118,36 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
         }
     }
 
+    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
+    public string GetVersion( )
+    {
+        // ReSharper disable once ExceptionNotDocumented
+        return Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion ?? string.Empty;
+    }
+
+    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
+    public long GetWorkingSet( )
+    {
+        return Environment.WorkingSet;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsTakenSucceededSinceStart( )
+    {
+        return SnapshotsTakenSucceededSinceStart;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsPrunedSucceededSinceStart( )
+    {
+        return SnapshotsPrunedSucceededSinceStart;
+    }
+
+    public SnapshotCountMetrics GetAllCounts( )
+    {
+        return new( in _snapshotsPrunedFailedLastExecution, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastExecution, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastExecution, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastExecution, in _snapshotsTakenSucceededSinceStart );
+    }
+
     /// <summary>
     ///     Registers an <see cref="ISnapshotOperationsObservable" /> object with this <see cref="Monitor" /> instance by subscribing to
     ///     the <see cref="ISnapshotOperationsObservable" /> object's <see langword="event" />s and setting a local reference to the
@@ -127,41 +180,28 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
     }
 
     /// <inheritdoc />
-    public uint SnapshotsTakenFailedSinceStart { get; set; }
+    public uint SnapshotsTakenFailedSinceStart => _snapshotsTakenFailedSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsTakenSucceededSinceStart { get; set; }
+    public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedFailedLastExecution { get; set; }
+    public uint SnapshotsPrunedFailedLastExecution => _snapshotsPrunedFailedLastExecution;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedFailedSinceStart { get; set; }
+    public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsTakenFailedLastExecution { get; set; }
+    public uint SnapshotsTakenFailedLastExecution => _snapshotsTakenFailedLastExecution;
 
     /// <inheritdoc />
-    public uint SnapshotsTakenSucceededLastExecution { get; set; }
+    public uint SnapshotsTakenSucceededLastExecution => _snapshotsTakenSucceededLastExecution;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedSucceededSinceStart { get; set; }
+    public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedSucceededLastExecution { get; set; }
-
-    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
-    public string GetVersion( )
-    {
-        // ReSharper disable once ExceptionNotDocumented
-        return Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion ?? string.Empty;
-    }
-
-    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
-    public long GetWorkingSet( )
-    {
-        return Environment.WorkingSet;
-    }
+    public uint SnapshotsPrunedSucceededLastExecution => _snapshotsPrunedSucceededLastExecution;
 
     private void ServiceOnApplicationStateChanged( object? sender, ApplicationStateChangedEventArgs e )
     {
@@ -172,15 +212,15 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
     private void ServiceOnBeginPruningSnapshots( object? sender, EventArgs e )
     {
         Logger.Debug( "Received BeginPruningSnapshots event from {0}", sender?.GetType( ).Name );
-        SnapshotsPrunedSucceededLastExecution = 0u;
-        SnapshotsPrunedFailedLastExecution = 0u;
+        Interlocked.Exchange( ref _snapshotsPrunedSucceededLastExecution, 0u );
+        Interlocked.Exchange( ref _snapshotsPrunedFailedLastExecution, 0u );
     }
 
     private void ServiceOnBeginTakingSnapshots( object? sender, EventArgs e )
     {
         Logger.Debug( "Received BeginTakingSnapshots event from {0}", sender?.GetType( ).Name );
-        SnapshotsTakenSucceededLastExecution = 0u;
-        SnapshotsTakenFailedLastExecution = 0u;
+        Interlocked.Exchange( ref _snapshotsTakenSucceededLastExecution, 0u );
+        Interlocked.Exchange( ref _snapshotsTakenFailedLastExecution, 0u );
     }
 
     private void ServiceOnEndPruningSnapshots( object? sender, EventArgs e )
@@ -198,28 +238,33 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
     private void ServiceOnPruneSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Debug( "Received PruneSnapshotFailed event from {0}", sender?.GetType( ).Name );
-        SnapshotsPrunedFailedLastExecution++;
-        SnapshotsPrunedFailedSinceStart++;
+        Interlocked.Increment( ref _snapshotsPrunedFailedLastExecution );
+        Interlocked.Increment( ref _snapshotsPrunedFailedSinceStart );
     }
 
     private void ServiceOnPruneSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Debug( "Received PruneSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
-        SnapshotsPrunedSucceededSinceStart++;
-        SnapshotsPrunedSucceededLastExecution++;
+        Interlocked.Increment( ref _snapshotsPrunedSucceededLastExecution );
+        Interlocked.Increment( ref _snapshotsPrunedSucceededSinceStart );
     }
 
     private void ServiceOnTakeSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Debug( "Received TakeSnapshotFailed event from {0}", sender?.GetType( ).Name );
-        SnapshotsTakenFailedLastExecution++;
-        SnapshotsTakenFailedSinceStart++;
+        Interlocked.Increment( ref _snapshotsTakenFailedLastExecution );
+        Interlocked.Increment( ref _snapshotsTakenFailedSinceStart );
     }
 
     private void ServiceOnTakeSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Debug( "Received TakeSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
-        SnapshotsTakenSucceededSinceStart++;
-        SnapshotsTakenSucceededLastExecution++;
+        Interlocked.Increment( ref _snapshotsTakenSucceededLastExecution );
+        Interlocked.Increment( ref _snapshotsTakenSucceededSinceStart );
+    }
+
+    public async Task<ApplicationStateMetrics> GetFullApplicationStateAsync( )
+    {
+        return new( GetApplicationState( ), GetServiceStartTime( ), GetVersion( ) );
     }
 }

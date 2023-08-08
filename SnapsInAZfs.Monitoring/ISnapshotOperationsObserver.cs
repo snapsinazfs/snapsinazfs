@@ -21,13 +21,18 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface ISnapshotOperationsObserver
 {
-    uint SnapshotsPrunedFailedLastExecution { get; set; }
-    uint SnapshotsPrunedFailedSinceStart { get; set; }
-    uint SnapshotsPrunedSucceededLastExecution { get; set; }
-    uint SnapshotsPrunedSucceededSinceStart { get; set; }
-    uint SnapshotsTakenFailedLastExecution { get; set; }
-    uint SnapshotsTakenFailedSinceStart { get; set; }
-    uint SnapshotsTakenSucceededLastExecution { get; set; }
-    uint SnapshotsTakenSucceededSinceStart { get; set; }
+    uint SnapshotsPrunedFailedLastExecution { get; }
+    uint SnapshotsPrunedFailedSinceStart { get; }
+    uint SnapshotsPrunedSucceededLastExecution { get; }
+    uint SnapshotsPrunedSucceededSinceStart { get; }
+    uint SnapshotsTakenFailedLastExecution { get; }
+    uint SnapshotsTakenFailedSinceStart { get; }
+    uint SnapshotsTakenSucceededLastExecution { get; }
+    uint SnapshotsTakenSucceededSinceStart { get; }
+
+    uint GetSnapshotsTakenSucceededSinceStart( );
+    uint GetSnapshotsPrunedSucceededSinceStart( );
+
+    SnapshotCountMetrics GetAllCounts( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
 }

@@ -15,9 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
@@ -39,6 +36,7 @@ internal class Program
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     internal static readonly Monitor ServiceObserver = new( );
     internal static SnapsInAZfsSettings? Settings;
+    private static IConfigurationRoot? _configurationRoot;
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
@@ -56,7 +54,7 @@ internal class Program
             return (int)Errno.ECANCELED;
         }
 
-        if ( !LoadConfigurationFromConfigurationFiles( ref Settings, in args ) )
+        if ( !LoadConfigurationFromConfigurationFiles( ref Settings, out _configurationRoot, in args ) )
         {
             LogManager.Shutdown( );
             return (int)Errno.EFTYPE;
@@ -113,16 +111,29 @@ internal class Program
 
             // Disposal happens after service shutdown, so this inspection can be ignored here
             // ReSharper disable once AccessToDisposedClosure
-            serviceBuilder.Host.UseSystemd( ).ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
+            serviceBuilder.Host
+                          .UseSystemd( )
+                          .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
             WebApplication svc;
             if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
             {
-                serviceBuilder.WebHost.UseKestrel( ConfigureKestrelOptions );
+                IConfigurationSection kestrelConfig = _configurationRoot.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" );
+                serviceBuilder.WebHost
+                              .UseConfiguration( kestrelConfig )
+                              .UseKestrel( ConfigureKestrelOptions );
                 svc = serviceBuilder.Build( );
                 RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+                statusGroup.MapGet( "/", ServiceObserver.GetApplicationState );
                 statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
+                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationStateAsync );
                 statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
                 statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
+                statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );
+                RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
+                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllCounts );
+                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllCounts );
+                snapshotsGroup.MapGet( "/takensucceededsincestart", ServiceObserver.GetSnapshotsTakenSucceededSinceStart );
+                snapshotsGroup.MapGet( "/prunedsucceededsincestart", ServiceObserver.GetSnapshotsPrunedSucceededSinceStart );
             }
             else
             {
@@ -227,23 +238,8 @@ internal class Program
 
     private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
     {
-        kestrelOptions.Configure( ).Load( );
-        if ( Settings?.Monitoring.UnixSocketEnabled ?? false )
-        {
-            if ( !string.IsNullOrWhiteSpace( Settings.Monitoring.UnixSocketPath ) )
-            {
-                kestrelOptions.ListenUnixSocket( Settings.Monitoring.UnixSocketPath );
-            }
-            else
-            {
-                Logger.Error( "UnixSocketPath must be a valid path" );
-            }
-        }
-
-        if ( Settings?.Monitoring.TcpListenerEnabled ?? false )
-        {
-            kestrelOptions.ListenAnyIP( Settings.Monitoring.TcpListenerPort );
-        }
+        kestrelOptions.Configure(_configurationRoot!.GetRequiredSection("Monitoring").GetSection("Kestrel") )
+                      .Load( );
     }
 
     private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
@@ -253,7 +249,7 @@ internal class Program
             return null;
         }
 
-        SiazService service = new( settings!, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        SiazService service = new( settings, zfsCommandRunner, ServiceObserver, ServiceObserver );
         return service;
     }
 
@@ -271,7 +267,7 @@ internal class Program
     #endif
     }
 
-    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, in CommandLineArguments args )
+    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen(true)] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
@@ -304,10 +300,11 @@ internal class Program
         if ( configBuilder.Sources.Count == 0 )
         {
             Logger.Fatal( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString( true ) );
+            rootConfiguration = null;
             return false;
         }
 
-        IConfigurationRoot rootConfiguration = configBuilder.Build( );
+        rootConfiguration = configBuilder.Build( );
 
         Logger.Trace( "Building settings objects from IConfiguration" );
         try

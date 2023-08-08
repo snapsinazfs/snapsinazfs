@@ -27,7 +27,7 @@ namespace SnapsInAZfs;
 /// <summary>
 ///     The service class for running everything but the configuration console
 /// </summary>
-public class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable
+public sealed class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private static readonly AutoResetEvent SnapshotAutoResetEvent = new( true );
@@ -77,7 +77,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     public ApplicationState State
     {
         get => _state;
-        set
+        internal set
         {
             if ( _state != value )
             {
@@ -87,6 +87,9 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             _state = value;
         }
     }
+
+    /// <inheritdoc />
+    public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
     public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
 
@@ -827,12 +830,13 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
     }
 
-    public record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
+    public sealed record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
     // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
     private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
 
     private readonly IApplicationStateObserver _stateObserver;
+
     // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
 
 #region Implementation of ISnapshotOperationsObservable

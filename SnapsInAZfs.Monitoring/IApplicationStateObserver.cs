@@ -29,6 +29,31 @@ public interface IApplicationStateObserver
     string GetApplicationState( );
 
     /// <summary>
+    ///     Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
+    ///     <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />
+    /// </summary>
+    /// <returns></returns>
+    DateTimeOffset GetServiceStartTime( );
+
+    /// <summary>
+    ///     Gets the version of the application
+    /// </summary>
+    /// <returns>The application version, as a <see langword="string" /></returns>
+    /// <remarks>
+    ///     Returns the version of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+    /// </remarks>
+    string GetVersion( );
+
+    /// <summary>
+    ///     Gets the current working set (memory usage) of the application, in bytes
+    /// </summary>
+    /// <returns>The current working set, in bytes, as a <see langword="long" /></returns>
+    /// <remarks>
+    ///     Returns the working set of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+    /// </remarks>
+    long GetWorkingSet( );
+
+    /// <summary>
     ///     Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />
     /// </summary>
     /// <remarks>

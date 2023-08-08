@@ -12,15 +12,29 @@
 
 #endregion
 
+using System.Text.Json.Serialization;
+
 namespace SnapsInAZfs.Monitoring;
 
-/// <summary>
-///     Interface defining minimum implementation of an object that can be observed by an <see cref="IApplicationStateObserver" />
-/// </summary>
-public interface IApplicationStateObservable
+public sealed class ApplicationStateMetrics
 {
-    ApplicationState State { get; }
-    DateTimeOffset ServiceStartTime { get; }
+    public ApplicationStateMetrics( )
+    {
+    }
 
-    event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
+    public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, string version )
+    {
+        Version = version;
+        State = state;
+        ServiceStartTime = serviceStartTime;
+    }
+
+    [JsonPropertyOrder( 2 )]
+    public DateTimeOffset ServiceStartTime { get; set; }
+
+    [JsonPropertyOrder( 1 )]
+    public string State { get; set; }
+
+    [JsonPropertyOrder( 3 )]
+    public string Version { get; set; }
 }
