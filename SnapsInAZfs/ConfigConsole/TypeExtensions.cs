@@ -242,6 +242,7 @@ public static class TypeExtensions
     /// <param name="value"></param>
     /// <returns>The time portion of <paramref name="value" /></returns>
     [Pure]
+    [ExcludeFromCodeCoverage( Justification = "Just a proxy method to framework functionality" )]
     public static TimeOnly ToTimeOnly( this TimeSpan value )
     {
         return TimeOnly.FromTimeSpan( value );

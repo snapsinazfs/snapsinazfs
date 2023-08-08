@@ -1,22 +1,26 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
 
-using NLog.LayoutRenderers.Wrappers;
+#endregion
 
 namespace SnapsInAZfs.Settings.Settings;
 
 /// <summary>
 ///     A class for extra convenience when dealing with the <see cref="SnapshotPeriodKind" /> enum
 /// </summary>
-public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<SnapshotPeriod>
+public sealed class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<SnapshotPeriod>
 {
+    private readonly SnapshotPeriodKind _kind;
+
     private SnapshotPeriod( SnapshotPeriodKind kind )
     {
         _kind = kind;
@@ -36,8 +40,6 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     ///     Gets a <see cref="SnapshotPeriod" /> with <see cref="Kind" /> pre-set to <see cref="SnapshotPeriodKind.Hourly" />
     /// </summary>
     public static SnapshotPeriod Hourly { get; } = new( SnapshotPeriodKind.Hourly );
-
-    private readonly SnapshotPeriodKind _kind;
 
     /// <summary>
     ///     Gets the <see cref="SnapshotPeriodKind" /> value for this object
@@ -104,9 +106,14 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
     public override bool Equals( object? obj )
     {
         if ( obj is not SnapshotPeriod other )
+        {
             return false;
+        }
+
         if ( ReferenceEquals( this, obj ) )
+        {
             return true;
+        }
 
         return Kind == other.Kind;
     }
@@ -156,6 +163,12 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
         };
     }
 
+    /// <inheritdoc />
+    public override string ToString( )
+    {
+        return this;
+    }
+
     /// <summary>
     ///     Implicit or explicit conversion to <see langword="string" />, for the given <see cref="SnapshotPeriod" /> object
     /// </summary>
@@ -171,7 +184,7 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             SnapshotPeriodKind.Weekly => WeeklyString,
             SnapshotPeriodKind.Monthly => MonthlyString,
             SnapshotPeriodKind.Yearly => YearlyString,
-            SnapshotPeriodKind.NotSet => NotSetString,
+            SnapshotPeriodKind.NotSet => NotSetString
         };
     }
 
@@ -190,14 +203,8 @@ public class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparable<Snaps
             SnapshotPeriodKind.Weekly => Weekly,
             SnapshotPeriodKind.Monthly => Monthly,
             SnapshotPeriodKind.Yearly => Yearly,
-            SnapshotPeriodKind.NotSet => NotSet,
+            SnapshotPeriodKind.NotSet => NotSet
         };
     }
 #pragma warning restore CS8524
-
-    /// <inheritdoc />
-    public override string ToString( )
-    {
-        return this;
-    }
 }

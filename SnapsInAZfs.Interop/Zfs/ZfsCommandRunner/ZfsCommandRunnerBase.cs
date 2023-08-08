@@ -56,7 +56,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected void CheckAndUpdateLastSnapshotTimesForDatasets( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
         Logger.Trace( "Checking all dataset last snapshot times" );
-        Parallel.ForEach( datasets.Values, new( ) { MaxDegreeOfParallelism = 4 }, ds =>
+        foreach ( ZfsRecord ds in datasets.Values )
         {
             List<IZfsProperty> propertiesToSet = new( );
             if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
@@ -95,7 +95,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
                 Logger.Debug( "Timestamps are out of sync for {0} - updating properties", ds.Name );
                 SetZfsPropertiesAsync( settings.DryRun, ds.Name, propertiesToSet );
             }
-        } );
+        }
     }
 
     /// <summary>

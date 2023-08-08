@@ -25,16 +25,19 @@ See \fB\*[SIAZ](8)\fP for general \*[SIAZB] documentation.\&
 .SS CONFIGURATION PRECEDENCE
 .PP
 When \*[SIAZ] starts, it loads configuration in order, first from
-.I \*[SCONF]\fR,
-and then from
-.I \*[SLCONF]\fR,
+\fI\*[SCONF]\fP, \fI\*[SLCONF]\fP, and then from \fI \*[SNCONF]\fP,
 combining them into the final configuration, before any command-line options are used as final overrides of their corresponding settings.\&
+Files of the same names,
+but located in the same directory as the \*[SIAZ] executable will also be loaded,
+by default, and in the same order.\&
 .PP
-Any configuration items defined in both files will be combined.\&
-If the same key/value pair for any specific element exists in both files,
-.nh
-the value in \fI\*[SLCONF]\fP replaces the value loaded from \fI\*[SCONF]\fP.\&
-.hy
+Any configuration items defined in multiple files will be combined.\&
+If the same key/value pair for any specific element exists in multiple files,
+the value from files loaded later replaces the value loaded from previous files.\&
+.PP
+Configuration file loading can be overridden by the user,
+by providing alternate configuration file paths in the \fB\-\-config\fP command\-line option.\&
+See \fB\*[SIAZLC](8)\fP for details.\&
 .IP
 See
 .B EXAMPLES
@@ -42,7 +45,7 @@ See
 .PP
 .TP
 \fI\*[SCONF]\fP
-This is the base configuration file for \*[SIAZ].\&
+This is the default base configuration file for \*[SIAZ].\&
 .IP
 .B It is not intended to be modified by the user.\&
 .IP

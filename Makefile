@@ -237,10 +237,11 @@ uninstall-service:
 	rm -rf /usr/lib/systemd/system/snapsinazfs.service
 	systemctl daemon-reload
 
-test:	test-everything
+test:
+	dotnet test --configuration=$(TESTCONFIG) --verbosity=quiet --nologo --filter TestCategory\!=Exhaustive
 
 test-everything:
-	dotnet test --configuration=$(TESTCONFIG) --verbosity=minimal --nologo
+	dotnet test --configuration=$(TESTCONFIG) --verbosity=quiet --nologo
 
 test-everything-verbose:
 	dotnet test --configuration=$(TESTCONFIG) --verbosity=normal --nologo

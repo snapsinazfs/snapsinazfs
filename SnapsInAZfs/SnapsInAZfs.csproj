@@ -123,7 +123,8 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
-    <PackageReference Include="NLog" Version="5.2.2" />
+    <PackageReference Include="NLog" Version="5.2.3" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.3" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="PowerArgs" Version="4.0.2" />
     <PackageReference Include="Terminal.Gui" Version="1.13.5" />
@@ -153,6 +154,6 @@
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
 <ItemGroup>
-  <InternalsVisibleTo Include="SnapsInAZfs.Tests"/>
+  <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
 </ItemGroup>
 </Project>

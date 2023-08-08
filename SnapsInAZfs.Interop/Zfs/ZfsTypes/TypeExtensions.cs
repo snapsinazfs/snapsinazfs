@@ -89,7 +89,7 @@ public static class TypeExtensions
     /// </exception>
     public static string ToCommaSeparatedSingleLineString( this IEnumerable<ZfsRecord> records, bool withSpaces = false )
     {
-        return ToCommaSeparatedSingleLineString( records.Order( ).Select( r => r.Name ), withSpaces );
+        return ToCommaSeparatedSingleLineString( records.Order( ).Select( static r => r.Name ), withSpaces );
     }
 
     /// <exception cref="OutOfMemoryException">
@@ -117,7 +117,7 @@ public static class TypeExtensions
 
     public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
     {
-        return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
+        return properties.Select( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 
     /// <summary>
@@ -138,6 +138,6 @@ public static class TypeExtensions
             throw new ArgumentException( "Empty collection provided", nameof( properties ) );
         }
 
-        return properties.Select( p => p.SetString ).ToSpaceSeparatedSingleLineString( );
+        return properties.Select( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 }

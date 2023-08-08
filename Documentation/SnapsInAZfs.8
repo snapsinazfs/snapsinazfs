@@ -10,6 +10,7 @@
 .PP
 .SY \*[SIAZB]
 .nh
+.OP \-\-config
 .OP \-\-daemonize|\-\-no-daemonize
 .OP \-\-debug|\-\-quiet|\-\-really-quiet|\-\-verbose|\-\-trace
 .OP \-\-dry-run|\-\-dryrun
@@ -77,6 +78,7 @@ See \fBSnapsInAZfs-zfsprops(7)\fP for information on these properties.
 All options, except for
 \fB\-\-help\fP,
 \fB\-\-version\fP,
+\fB\-\-config\fP,
 \fB\-\-config\-console\fP,
 \fB\-\-prepare\-zfs\-properties\fP,
 and \fB\-\-check\-zfs\-properties\fP,
@@ -109,6 +111,23 @@ Display version information and exit.\&
 This option cannot be combined with any other option.\&
 .RE
 .RE
+.
+.
+.SS Configuration File Load Override
+.TP
+\fB\-\-config\fP, \fB\-\-config\-files\fP
+.RS
+.RS
+Specify alternate configuration files to load,
+replacing the defaults.\&
+.LP
+Configuration files are specified as a comma\-separated list of relative or absolute paths.\&
+.LP
+Files will be loaded in the order specified.\&
+.RE
+.RE
+.
+.
 .SS Configuration Console
 .TP
 \fB\-\-config\-console\fP, \fB\-\-configconsole\fP
