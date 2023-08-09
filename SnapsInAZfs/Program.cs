@@ -21,6 +21,7 @@ using PowerArgs;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Monitoring;
 using SnapsInAZfs.Settings.Logging;
 using SnapsInAZfs.Settings.Settings;
 using LogLevel = NLog.LogLevel;
@@ -35,7 +36,7 @@ internal class Program
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private static IConfigurationRoot? _configurationRoot;
-    internal static readonly Monitor ServiceObserver = new( );
+    internal static readonly IMonitor ServiceObserver = new Monitor( );
     internal static SnapsInAZfsSettings? Settings;
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
@@ -125,7 +126,7 @@ internal class Program
                 RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
                 statusGroup.MapGet( "/", ServiceObserver.GetApplicationState );
                 statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
-                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationStateAsync );
+                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationState );
                 statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
                 statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
                 statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );

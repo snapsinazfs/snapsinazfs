@@ -28,6 +28,8 @@ public interface IApplicationStateObserver
     /// </returns>
     string GetApplicationState( );
 
+    ApplicationStateMetrics GetFullApplicationState( );
+
     /// <summary>
     ///     Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
     ///     <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />

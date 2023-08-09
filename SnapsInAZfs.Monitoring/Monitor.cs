@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -22,7 +22,7 @@ namespace SnapsInAZfs.Monitoring;
 ///     A general monitoring class that implements <see cref="IMonitor" />, <see cref="IApplicationStateObserver" />, and
 ///     <see cref="ISnapshotOperationsObserver" />, and allows monitoring of one of each (which can be the same object)
 /// </summary>
-public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOperationsObserver
+public sealed class Monitor : IMonitor
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -202,6 +202,11 @@ public sealed class Monitor : IMonitor, IApplicationStateObserver, ISnapshotOper
 
     /// <inheritdoc />
     public uint SnapshotsPrunedSucceededLastExecution => _snapshotsPrunedSucceededLastExecution;
+
+    public ApplicationStateMetrics GetFullApplicationState( )
+    {
+        return new( GetApplicationState( ), GetServiceStartTime( ), GetVersion( ) );
+    }
 
     private void ServiceOnApplicationStateChanged( object? sender, ApplicationStateChangedEventArgs e )
     {

@@ -49,4 +49,8 @@
     <PackageReference Include="NLog" Version="5.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
+  </ItemGroup>
+
 </Project>
