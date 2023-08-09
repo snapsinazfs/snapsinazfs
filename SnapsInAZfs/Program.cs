@@ -34,9 +34,9 @@ internal class Program
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static IConfigurationRoot? _configurationRoot;
     internal static readonly Monitor ServiceObserver = new( );
     internal static SnapsInAZfsSettings? Settings;
-    private static IConfigurationRoot? _configurationRoot;
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
@@ -238,7 +238,7 @@ internal class Program
 
     private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
     {
-        kestrelOptions.Configure(_configurationRoot!.GetRequiredSection("Monitoring").GetSection("Kestrel") )
+        kestrelOptions.Configure( _configurationRoot!.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" ) )
                       .Load( );
     }
 
@@ -267,7 +267,7 @@ internal class Program
     #endif
     }
 
-    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen(true)] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
+    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
