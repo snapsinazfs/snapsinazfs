@@ -162,11 +162,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         return new( poolRootsWithPropertyValidities, missingPropertiesFound );
     }
 
-    private static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
-    {
-        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
-    }
-
     /// <inheritdoc />
     protected override async Task ExecuteAsync( CancellationToken stoppingToken )
     {
@@ -815,6 +810,11 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         {
             State = ApplicationState.Idle;
         }
+    }
+
+    private static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    {
+        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 
     private int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
