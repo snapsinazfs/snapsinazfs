@@ -78,7 +78,7 @@ public class SiazService : BackgroundService
         SetNextRunTime( greatestCommonFrequentIntervalMinutes );
 
         Timestamp = DateTimeOffset.Now;
-        TimeSpan timerInterval = GetNewTimerInterval( );
+        GetNewTimerInterval(in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
         const int maxDriftMilliseconds = 500;
 
         PeriodicTimer daemonRunTimer = new( timerInterval );
@@ -98,9 +98,10 @@ public class SiazService : BackgroundService
                 {
                     Timestamp = DateTimeOffset.Now;
                     Logger.Trace( "Timer ticked at {0:O}", Timestamp );
-                    if ( Timestamp.Millisecond > maxDriftMilliseconds )
+                    TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
+                    if ( drift.TotalMilliseconds > maxDriftMilliseconds )
                     {
-                        timerInterval = GetNewTimerInterval( );
+                        GetNewTimerInterval(in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
                         Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
                         daemonRunTimer.Dispose( );
                         try
@@ -151,16 +152,16 @@ public class SiazService : BackgroundService
         return _settings.Templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
     }
 
-    private TimeSpan GetNewTimerInterval( )
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
     {
-        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
-        DateTimeOffset truncatedTimePlusInterval = currentTimeTruncatedToTopOfCurrentHour + _daemonTimerInterval;
-        while ( truncatedTimePlusInterval < Timestamp.AddMilliseconds( 1 ) )
+        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
+        nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
+        while ( nextTickTimestamp < timestamp.AddMilliseconds( 1 ) )
         {
-            truncatedTimePlusInterval += _daemonTimerInterval;
+            nextTickTimestamp += configuredTimerInterval;
         }
 
-        return truncatedTimePlusInterval.Subtract( Timestamp );
+        calculatedTimerInterval = nextTickTimestamp - timestamp;
     }
 
     private static void SetNextRunTime( int greatestCommonFrequentIntervalMinutes )
