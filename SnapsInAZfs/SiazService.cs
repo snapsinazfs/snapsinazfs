@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the �Software�), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED �AS IS�, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -198,7 +198,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
 
         Timestamp = DateTimeOffset.Now;
-        TimeSpan timerInterval = GetNewTimerInterval( );
+        GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
         const int maxDriftMilliseconds = 500;
 
         PeriodicTimer daemonRunTimer = new( timerInterval );
@@ -218,9 +218,10 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
                 {
                     Timestamp = DateTimeOffset.Now;
                     Logger.Debug( "Timer ticked at {0:O}", Timestamp );
-                    if ( Timestamp.Millisecond > maxDriftMilliseconds )
+                    TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
+                    if ( drift.TotalMilliseconds > maxDriftMilliseconds )
                     {
-                        timerInterval = GetNewTimerInterval( );
+                        GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
                         Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
                         daemonRunTimer.Dispose( );
                         try
@@ -264,6 +265,23 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         {
             daemonRunTimer.Dispose( );
         }
+    }
+
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    {
+        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
+        nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
+
+        // This is the time equivalent, to millisecond precision, of offsetting a loop stop condition by 1
+        // Without this, whole factors of 60 will result in an off-by-one error
+        // DateTimeOffset supports even greater precision, but not all systems/clocks can handle that accurately,
+        // and that would be overkill for this purpose anyway.
+        while ( nextTickTimestamp < timestamp.AddMilliseconds( 1 ) )
+        {
+            nextTickTimestamp += configuredTimerInterval;
+        }
+
+        calculatedTimerInterval = nextTickTimestamp - timestamp;
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
@@ -799,24 +817,6 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     private int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
     {
         return templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
-    }
-
-    private TimeSpan GetNewTimerInterval( )
-    {
-        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
-        DateTimeOffset truncatedTimePlusInterval = currentTimeTruncatedToTopOfCurrentHour + _daemonTimerInterval;
-
-        // This is the time equivalent, to millisecond precision, of offsetting a loop stop condition by 1
-        // Without this, whole factors of 60 will result in an off-by-one error
-        // DateTimeOffset supports even greater precision, but not all systems/clocks can handle that accurately,
-        // and that would be overkill for this purpose anyway.
-        DateTimeOffset timestampPlusOneMillisecond = Timestamp.AddMilliseconds( 1 );
-        while ( truncatedTimePlusInterval < timestampPlusOneMillisecond )
-        {
-            truncatedTimePlusInterval += _daemonTimerInterval;
-        }
-
-        return truncatedTimePlusInterval.Subtract( Timestamp );
     }
 
     private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes )
