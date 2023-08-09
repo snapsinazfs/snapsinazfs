@@ -47,6 +47,7 @@
     <Compile Remove="Libc\bits\Types.cs" />
     <Compile Remove="Libc\bits\Typesizes.cs" />
     <Compile Remove="Libc\Enums\PthreadEnums.cs" />
+    <Compile Remove="Libc\Enums\UnixFileFlags.cs" />
     <Compile Remove="Libc\Enums\UnixFileTestMode.cs" />
     <Compile Remove="Libc\NativeMethods.cs" />
     <Compile Remove="Libc\Structs\StatFs64.cs" />
@@ -60,6 +61,12 @@
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\libzfs_handle.cs" />
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zfs_handle.cs" />
     <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zpool_handle.cs" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <None Include="Libc\Enums\UnixFileFlags.cs" />
   </ItemGroup>
 
   <ItemGroup>
