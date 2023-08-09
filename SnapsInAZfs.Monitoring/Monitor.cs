@@ -231,13 +231,13 @@ public sealed class Monitor : IMonitor
     private void ServiceOnEndPruningSnapshots( object? sender, DateTimeOffset timestamp )
     {
         Logger.Trace( "Received EndPruningSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
-        SnapshotsPrunedLastEnded = DateTimeOffset.Now;
+        SnapshotsPrunedLastEnded = timestamp;
     }
 
     private void ServiceOnEndTakingSnapshots( object? sender, DateTimeOffset timestamp )
     {
         Logger.Trace( "Received EndTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
-        SnapshotsTakenLastEnded = DateTimeOffset.Now;
+        SnapshotsTakenLastEnded = timestamp;
     }
 
     private void ServiceOnPruneSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
