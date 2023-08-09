@@ -1,12 +1,16 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -51,7 +55,7 @@ public class SiazService : BackgroundService
     /// <summary>
     ///     Gets the last exit code that was set by methods called by the service.
     /// </summary>
-    public static int ExitStatus { get; private set; } = (int)Errno.EOK;
+    public static int ExitStatus { get; } = (int)Errno.EOK;
 
     internal static SiazExecutionResultCode LastExecutionResultCode = SiazExecutionResultCode.None;
 
@@ -78,7 +82,7 @@ public class SiazService : BackgroundService
         SetNextRunTime( greatestCommonFrequentIntervalMinutes );
 
         Timestamp = DateTimeOffset.Now;
-        GetNewTimerInterval(in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
+        GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
         const int maxDriftMilliseconds = 500;
 
         PeriodicTimer daemonRunTimer = new( timerInterval );
@@ -101,7 +105,7 @@ public class SiazService : BackgroundService
                     TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
                     if ( drift.TotalMilliseconds > maxDriftMilliseconds )
                     {
-                        GetNewTimerInterval(in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
+                        GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
                         Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
                         daemonRunTimer.Dispose( );
                         try
@@ -147,32 +151,7 @@ public class SiazService : BackgroundService
         }
     }
 
-    private int GetGreatestCommonFrequentIntervalFactor( )
-    {
-        return _settings.Templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
-    }
-
-    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
-    {
-        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
-        nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
-        while ( nextTickTimestamp < timestamp.AddMilliseconds( 1 ) )
-        {
-            nextTickTimestamp += configuredTimerInterval;
-        }
-
-        calculatedTimerInterval = nextTickTimestamp - timestamp;
-    }
-
-    private static void SetNextRunTime( int greatestCommonFrequentIntervalMinutes )
-    {
-        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
-        DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
-    }
-
-    internal async Task<SiazExecutionResultCode>ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
+    internal async Task<SiazExecutionResultCode> ExecuteSiazAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args, DateTimeOffset currentTimestamp, CancellationToken cancellationToken )
     {
         using CancellationTokenSource tokenSource = CancellationTokenSource.CreateLinkedTokenSource( cancellationToken );
         if ( cancellationToken.IsCancellationRequested )
@@ -237,7 +216,6 @@ public class SiazService : BackgroundService
         ConcurrentDictionary<string, ZfsRecord> datasets = new( );
         ConcurrentDictionary<string, Snapshot> snapshots = new( );
 
-
         Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
 
         await ZfsTasks.GetDatasetsAndSnapshotsFromZfsAsync( _settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
@@ -281,7 +259,7 @@ public class SiazService : BackgroundService
         // ReSharper disable once InvertIf
         if ( _settings is { Daemonize: true } )
         {
-            foreach ( (string _,ZfsRecord ds) in datasets )
+            foreach ( ( string _, ZfsRecord ds ) in datasets )
             {
                 if ( ds.IsPoolRoot )
                 {
@@ -308,5 +286,30 @@ public class SiazService : BackgroundService
         }
 
         return SiazExecutionResultCode.Completed;
+    }
+
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    {
+        DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
+        nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
+        while ( nextTickTimestamp < timestamp.AddMilliseconds( 1 ) )
+        {
+            nextTickTimestamp += configuredTimerInterval;
+        }
+
+        calculatedTimerInterval = nextTickTimestamp - timestamp;
+    }
+
+    private int GetGreatestCommonFrequentIntervalFactor( )
+    {
+        return _settings.Templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+    }
+
+    private static void SetNextRunTime( int greatestCommonFrequentIntervalMinutes )
+    {
+        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
+        DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
     }
 }
