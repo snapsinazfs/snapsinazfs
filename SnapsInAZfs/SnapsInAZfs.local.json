@@ -15,7 +15,7 @@
       "AllowedHosts": "*",
       "Endpoints": {
         "TcpMonitoringEndpoint": {
-          "Url": "http://*:60765"
+          "Url": "http://*:60763"
         }
         //"UnixSocketMonitoringEndpoint": {
         //  "Url": "http://unix:/run/SnapsInAZfs.sock"
