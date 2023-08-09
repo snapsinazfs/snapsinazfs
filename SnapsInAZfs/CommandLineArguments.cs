@@ -85,10 +85,20 @@ public class CommandLineArguments
     [HelpHook]
     public bool Help { get; set; }
 
+    [ArgDescription( "Enables the monitoring endpoints" )]
+    [ArgShortcut( "--monitor" )]
+    [ArgCantBeCombinedWith( "NoMonitor|NoDaemonize|ConfigConsole" )]
+    public bool Monitor { get; set; }
+
     [ArgDescription( "Force SnapsInAZfs to NOT run as a daemon" )]
     [ArgShortcut( "--no-daemonize" )]
     [ArgCantBeCombinedWith( "Daemonize|Cron" )]
     public bool NoDaemonize { get; set; }
+
+    [ArgDescription( "Disables the monitoring endpoints and prevents kestrel from loading at all" )]
+    [ArgShortcut( "--no-monitor" )]
+    [ArgCantBeCombinedWith( "Monitor" )]
+    public bool NoMonitor { get; set; }
 
     [ArgDescription( "Disables snapshot pruning." )]
     [ArgShortcut( "--no-prune-snapshots" )]

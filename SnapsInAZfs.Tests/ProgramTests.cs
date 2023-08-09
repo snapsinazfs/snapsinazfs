@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -68,6 +68,25 @@ public class ProgramTests
         CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( Array.Empty<string>( ) );
         Program.ApplyCommandLineArgumentOverrides( in testArgs, possiblyChangedSettings );
         Assert.That( pi.GetValue( initialSettings ), Is.EqualTo( pi.GetValue( possiblyChangedSettings ) ) );
+    }
+
+    [Test]
+    [TestCaseSource( nameof( GetCasesForApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied ) )]
+    public void ApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied( PropertyInfo argPropertyInfo, string[] argStrings, bool argValue, PropertyInfo settingsPropertyInfo, bool initialSettingValue, bool expectedFinalSettingValue )
+    {
+        SnapsInAZfsSettings initialSettings = new( );
+        SnapsInAZfsSettings possiblyChangedSettings = new( );
+        settingsPropertyInfo.SetValue( initialSettings.Monitoring, initialSettingValue );
+        settingsPropertyInfo.SetValue( possiblyChangedSettings.Monitoring, initialSettingValue );
+        CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( argStrings );
+        Assume.That( testArgs, Is.Not.Null );
+        argPropertyInfo.SetValue( testArgs, argValue );
+        Assume.That( settingsPropertyInfo.GetValue( initialSettings.Monitoring ), Is.EqualTo( initialSettingValue ) );
+        Assume.That( settingsPropertyInfo.GetValue( initialSettings.Monitoring ), Is.EqualTo( settingsPropertyInfo.GetValue( possiblyChangedSettings.Monitoring ) ) );
+        Assume.That( argPropertyInfo.GetValue( testArgs ), Is.EqualTo( argValue ) );
+
+        Program.ApplyCommandLineArgumentOverrides( in testArgs, possiblyChangedSettings );
+        Assert.That( settingsPropertyInfo.GetValue( possiblyChangedSettings.Monitoring ), Is.EqualTo( expectedFinalSettingValue ) );
     }
 
     [SetUp]
@@ -189,6 +208,18 @@ public class ProgramTests
         yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=61" }, 61u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 60u );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=61" }, 61u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 60u );
         yield return new( typeof( CommandLineArguments ).GetProperty( "DaemonTimerInterval" )!, Array.Empty<string>( ), 0u, typeof( SnapsInAZfsSettings ).GetProperty( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+    }
+
+    private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied( )
+    {
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
     }
 
     private static IEnumerable<string[]> GetHelpArgStrings( )

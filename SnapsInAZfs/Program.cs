@@ -168,10 +168,12 @@ internal class Program
         programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
         programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.ForcePrune || args.Cron ) && !args.NoPruneSnapshots;
         programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
+        programSettings.Monitoring.Enabled = ( programSettings.Monitoring.Enabled || args.Monitor ) && args is { NoMonitor: false, ConfigConsole: false };
         if ( args.DaemonTimerInterval > 0 )
         {
             programSettings.DaemonTimerIntervalSeconds = Math.Clamp( args.DaemonTimerInterval, 1u, 60u );
         }
+
     }
 
     internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
