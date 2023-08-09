@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -210,66 +210,61 @@ public sealed class Monitor : IMonitor
 
     private void ServiceOnApplicationStateChanged( object? sender, ApplicationStateChangedEventArgs e )
     {
-        Logger.Debug( "Service state changed from {0:G} to {1:G}", e.Previous, e.Current );
+        Logger.Trace( "Service state changed from {0:G} to {1:G}", e.Previous, e.Current );
         _applicationState = e.Current;
     }
 
-    private void ServiceOnBeginPruningSnapshots( object? sender, EventArgs e )
+    private void ServiceOnBeginPruningSnapshots( object? sender, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Received BeginPruningSnapshots event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received BeginPruningSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         Interlocked.Exchange( ref _snapshotsPrunedSucceededLastExecution, 0u );
         Interlocked.Exchange( ref _snapshotsPrunedFailedLastExecution, 0u );
     }
 
-    private void ServiceOnBeginTakingSnapshots( object? sender, EventArgs e )
+    private void ServiceOnBeginTakingSnapshots( object? sender, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Received BeginTakingSnapshots event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received BeginTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         Interlocked.Exchange( ref _snapshotsTakenSucceededLastExecution, 0u );
         Interlocked.Exchange( ref _snapshotsTakenFailedLastExecution, 0u );
     }
 
-    private void ServiceOnEndPruningSnapshots( object? sender, EventArgs e )
+    private void ServiceOnEndPruningSnapshots( object? sender, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Received EndPruningSnapshots event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received EndPruningSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         SnapshotsPrunedLastEnded = DateTimeOffset.Now;
     }
 
-    private void ServiceOnEndTakingSnapshots( object? sender, EventArgs e )
+    private void ServiceOnEndTakingSnapshots( object? sender, DateTimeOffset timestamp )
     {
-        Logger.Debug( "Received EndTakingSnapshots event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received EndTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         SnapshotsTakenLastEnded = DateTimeOffset.Now;
     }
 
     private void ServiceOnPruneSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
-        Logger.Debug( "Received PruneSnapshotFailed event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received PruneSnapshotFailed event from {0}", sender?.GetType( ).Name );
         Interlocked.Increment( ref _snapshotsPrunedFailedLastExecution );
         Interlocked.Increment( ref _snapshotsPrunedFailedSinceStart );
     }
 
     private void ServiceOnPruneSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
-        Logger.Debug( "Received PruneSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
+        Logger.Trace( "Received PruneSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
         Interlocked.Increment( ref _snapshotsPrunedSucceededLastExecution );
         Interlocked.Increment( ref _snapshotsPrunedSucceededSinceStart );
     }
 
     private void ServiceOnTakeSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
-        Logger.Debug( "Received TakeSnapshotFailed event from {0}", sender?.GetType( ).Name );
+        Logger.Trace( "Received TakeSnapshotFailed event from {0}", sender?.GetType( ).Name );
         Interlocked.Increment( ref _snapshotsTakenFailedLastExecution );
         Interlocked.Increment( ref _snapshotsTakenFailedSinceStart );
     }
 
     private void ServiceOnTakeSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
-        Logger.Debug( "Received TakeSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
+        Logger.Trace( "Received TakeSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
         Interlocked.Increment( ref _snapshotsTakenSucceededLastExecution );
         Interlocked.Increment( ref _snapshotsTakenSucceededSinceStart );
-    }
-
-    public async Task<ApplicationStateMetrics> GetFullApplicationStateAsync( )
-    {
-        return new( GetApplicationState( ), GetServiceStartTime( ), GetVersion( ) );
     }
 }

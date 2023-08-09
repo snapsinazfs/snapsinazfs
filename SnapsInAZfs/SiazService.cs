@@ -294,10 +294,10 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        BeginPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        BeginPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
 
-        EndPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        EndPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 
@@ -362,7 +362,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         }
 
         Logger.Info( "Begin taking snapshots for all configured datasets" );
-        BeginTakingSnapshots?.Invoke( this, EventArgs.Empty );
+        BeginTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         State = ApplicationState.TakingSnapshots;
         //Need to operate on a sorted collection
         ImmutableSortedDictionary<string, ZfsRecord> sortedDatasets = datasets.ToImmutableSortedDictionary( );
@@ -476,7 +476,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );
         }
 
-        EndTakingSnapshots?.Invoke( this, EventArgs.Empty );
+        EndTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         Logger.Info( "Finished taking snapshots" );
 
         SnapshotAutoResetEvent.Set( );
@@ -844,16 +844,16 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 #region Implementation of ISnapshotOperationsObservable
 
     /// <inheritdoc />
-    public event EventHandler? BeginPruningSnapshots;
+    public event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? BeginTakingSnapshots;
+    public event EventHandler<DateTimeOffset>? BeginTakingSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? EndPruningSnapshots;
+    public event EventHandler<DateTimeOffset>? EndPruningSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? EndTakingSnapshots;
+    public event EventHandler<DateTimeOffset>? EndTakingSnapshots;
 
     /// <inheritdoc />
     public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
