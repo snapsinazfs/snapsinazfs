@@ -83,5 +83,5 @@ public sealed record SnapsInAZfsSettings
     public string ZpoolPath { get; set; } = "/usr/local/sbin/zpool";
 
     [JsonPropertyOrder( 10 )]
-    public MonitoringSettings Monitoring { get; set; } = new( );
+    public MonitoringSettings Monitoring { get; set; } = new( ) { Enabled = false };
 }

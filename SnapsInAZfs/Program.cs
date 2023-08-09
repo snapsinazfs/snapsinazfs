@@ -14,7 +14,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
@@ -116,13 +117,18 @@ internal class Program
                           .UseSystemd( )
                           .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
             WebApplication svc;
-            if ( Settings.Monitoring.TcpListenerEnabled || Settings.Monitoring.UnixSocketEnabled )
+            if ( Settings.Monitoring.Enabled )
             {
-                IConfigurationSection kestrelConfig = _configurationRoot.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" );
                 serviceBuilder.WebHost
-                              .UseConfiguration( kestrelConfig )
-                              .UseKestrel( ConfigureKestrelOptions );
+                              .UseKestrel( static ( _, kestrelOptions ) =>
+                              {
+                                  kestrelOptions.Configure( _configurationRoot
+                                                            .GetRequiredSection( "Monitoring" )
+                                                            .GetSection( "Kestrel" ) )
+                                                .Load( );
+                              } );
                 svc = serviceBuilder.Build( );
+
                 RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
                 statusGroup.MapGet( "/", ServiceObserver.GetApplicationState );
                 statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
@@ -130,6 +136,7 @@ internal class Program
                 statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
                 statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
                 statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );
+
                 RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
                 snapshotsGroup.MapGet( "/", ServiceObserver.GetAllCounts );
                 snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllCounts );
@@ -242,12 +249,6 @@ internal class Program
         }
 
         return true;
-    }
-
-    private static void ConfigureKestrelOptions( WebHostBuilderContext builderContext, KestrelServerOptions kestrelOptions )
-    {
-        kestrelOptions.Configure( _configurationRoot!.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" ) )
-                      .Load( );
     }
 
     private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )

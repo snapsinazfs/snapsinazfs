@@ -12,28 +12,9 @@
 
 #endregion
 
-using NLog;
-using NLog.Config;
-using LogLevel = NLog.LogLevel;
+namespace SnapsInAZfs.Settings.Settings;
 
-namespace SnapsInAZfs.Settings.Logging;
-
-/// <summary>
-///     Configuration for logging using NLog
-/// </summary>
-public static class LoggingSettings
+public sealed class KestrelEndpointConfiguration
 {
-    public static void OverrideConsoleLoggingLevel( LogLevel level )
-    {
-        if ( LogManager.Configuration == null )
-        {
-            return;
-        }
-
-        for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration.LoggingRules.Count; ruleIndex++ )
-        {
-            LoggingRule? rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
-            rule?.SetLoggingLevels( level, LogLevel.Off );
-        }
-    }
+    public required string Url { get; set; }
 }

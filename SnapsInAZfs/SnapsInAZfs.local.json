@@ -16,10 +16,10 @@
       "Endpoints": {
         "TcpMonitoringEndpoint": {
           "Url": "http://*:60765"
-        },
-        "UnixSocketMonitoringEndpoint": {
-          "Url": "http://unix:/run/SnapsInAZfs.sock"
         }
+        //"UnixSocketMonitoringEndpoint": {
+        //  "Url": "http://unix:/run/SnapsInAZfs.sock"
+        //}
       },
       "Limits": {
         "MaxConcurrentConnections": 20,

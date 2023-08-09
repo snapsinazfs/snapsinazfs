@@ -12,28 +12,24 @@
 
 #endregion
 
-using NLog;
-using NLog.Config;
-using LogLevel = NLog.LogLevel;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
-namespace SnapsInAZfs.Settings.Logging;
+namespace SnapsInAZfs.Settings.Settings;
 
 /// <summary>
-///     Configuration for logging using NLog
+///     Class that implements most of the public properties of <see cref="KestrelServerOptions" />, except for those that cannot be
+///     serialized by the <see cref="JsonSerializer" />
 /// </summary>
-public static class LoggingSettings
+public sealed class KestrelConfiguration
 {
-    public static void OverrideConsoleLoggingLevel( LogLevel level )
-    {
-        if ( LogManager.Configuration == null )
-        {
-            return;
-        }
-
-        for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration.LoggingRules.Count; ruleIndex++ )
-        {
-            LoggingRule? rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
-            rule?.SetLoggingLevels( level, LogLevel.Off );
-        }
-    }
+    public bool? AddServerHeader { get; set; }
+    public bool? AllowAlternateSchemes { get; set; }
+    public string? AllowedHosts { get; set; }
+    public bool? AllowResponseHeaderCompression { get; set; }
+    public bool? AllowSynchronousIO { get; set; }
+    public bool? DisableStringReuse { get; set; }
+    public Dictionary<string, KestrelEndpointConfiguration>? Endpoints { get; set; }
+    public KestrelServerLimits? Limits { get; set; } = new( );
 }
