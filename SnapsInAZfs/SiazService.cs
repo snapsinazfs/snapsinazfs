@@ -193,7 +193,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         // This is fine, as no action will be taken unless it actually is time to do so.
         // All subsequent runs will be on the greatest common factor of all configured frequent intervals in all templates.
 
-        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
+        SetNextRunTime( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
         Timestamp = DateTimeOffset.Now;
         GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
@@ -241,7 +241,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                     {
                         _lastRunTime = DateTimeOffset.Now;
                         Logger.Debug( "Running configured SIAZ operations at {0:O}", _lastRunTime );
-                        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
+                        SetNextRunTime( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
                         // Fire this off asynchronously
                         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
@@ -822,12 +822,12 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         return templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
     }
 
-    private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes )
+    private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
     {
-        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
+        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute % greatestCommonFrequentIntervalMinutes, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
+        DateTimeOffset lastRunTimePlusFrequentInterval = lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
     }
 
     public sealed record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
