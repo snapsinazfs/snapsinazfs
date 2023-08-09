@@ -27,7 +27,7 @@ using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.ConfigConsole;
 
-public partial class ZfsConfigurationWindow
+public sealed partial class ZfsConfigurationWindow
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

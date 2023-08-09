@@ -28,7 +28,7 @@ using Terminal.Gui;
 
 namespace SnapsInAZfs.ConfigConsole;
 
-public partial class SnapsInAZfsConfigConsole
+public sealed partial class SnapsInAZfsConfigConsole
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

@@ -12,7 +12,7 @@
 using Terminal.Gui;
 
 namespace SnapsInAZfs.ConfigConsole {
-    public partial class TemplateConfigurationWindow : Terminal.Gui.Window {
+    public sealed partial class TemplateConfigurationWindow : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme whiteOnRed;
         

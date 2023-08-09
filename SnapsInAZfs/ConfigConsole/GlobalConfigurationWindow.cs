@@ -19,7 +19,7 @@
 
 namespace SnapsInAZfs.ConfigConsole;
 
-public partial class GlobalConfigurationWindow
+public sealed partial class GlobalConfigurationWindow
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 

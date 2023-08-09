@@ -26,7 +26,7 @@ namespace SnapsInAZfs;
 /// </summary>
 [ArgExceptionBehavior( ArgExceptionPolicy.StandardExceptionHandling )]
 // ReSharper disable once ClassNeverInstantiated.Global
-public class CommandLineArguments
+public sealed class CommandLineArguments
 {
     [ArgDescription( "Checks the property schema for SnapsInAZfs in zfs and reports any missing properties for pool roots." )]
     [ArgShortcut( "--check-zfs-properties" )]
