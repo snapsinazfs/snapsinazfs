@@ -40,15 +40,6 @@
   "Monitoring": {
     "Enabled":  false, 
     "Kestrel": {
-      "AllowedHosts": "*",
-      "Endpoints": {
-        "TcpMonitoringEndpoint": {
-          "Url": "http://*:60765"
-        },
-        "UnixSocketMonitoringEndpoint": {
-          "Url": "http://unix:/run/SnapsInAZfs.sock" 
-        } 
-      },
       "Limits": {
         "MaxConcurrentConnections": 20,
         "KeepAliveTimeout": 60 
