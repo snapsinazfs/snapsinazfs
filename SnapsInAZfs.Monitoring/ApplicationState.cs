@@ -24,5 +24,6 @@ public enum ApplicationState
     CheckingZfsPropertySchema = 5,
     Executing = 6,
     UpdatingZfsPropertySchema = 7,
-    UpdatingZfsPropertySchemaCompleted = 8
+    UpdatingZfsPropertySchemaCompleted = 8,
+    Terminating = 9
 }

@@ -177,6 +177,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
         if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || LastExecutionResultCode is not SiazExecutionResultCode.Completed )
         {
+            State = ApplicationState.Terminating;
             serviceCancellationToken.ThrowIfCancellationRequested( );
             Environment.Exit( ExitStatus );
             return;
@@ -261,6 +262,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         }
         finally
         {
+            State = ApplicationState.Terminating;
             daemonRunTimer.Dispose( );
         }
     }
