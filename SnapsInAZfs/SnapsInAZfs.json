@@ -47,10 +47,7 @@
       "Endpoints": {
         "HttpMonitoringEndpoint": {
           "Url": "http://*:60765"
-        },
-        "UnixSocketMonitoringEndpoint": {
-          "SocketPath": "/run/SnapsInAZfs/MonitorSocket"
-        } 
+        }
       },
       "Limits": {
         "MaxConcurrentConnections": 20,
