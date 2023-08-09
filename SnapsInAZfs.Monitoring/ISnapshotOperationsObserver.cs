@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -30,9 +30,14 @@ public interface ISnapshotOperationsObserver
     uint SnapshotsTakenSucceededLastRun { get; }
     uint SnapshotsTakenSucceededSinceStart { get; }
 
-    uint GetSnapshotsTakenSucceededSinceStart( );
-    uint GetSnapshotsPrunedSucceededSinceStart( );
-
     SnapshotCountMetrics GetAllCounts( );
+    uint GetSnapshotsPrunedFailedLastRun( );
+    uint GetSnapshotsPrunedFailedSinceStart( );
+    uint GetSnapshotsPrunedSucceededLastRun( );
+    uint GetSnapshotsPrunedSucceededSinceStart( );
+    uint GetSnapshotsTakenFailedLastRun( );
+    uint GetSnapshotsTakenFailedSinceStart( );
+    uint GetSnapshotsTakenSucceededLastRun( );
+    uint GetSnapshotsTakenSucceededSinceStart( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
 }

@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -132,20 +132,56 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
+    public uint GetSnapshotsTakenSucceededLastRun( )
+    {
+        return _snapshotsTakenSucceededLastRun;
+    }
+
+    /// <inheritdoc />
     public uint GetSnapshotsTakenSucceededSinceStart( )
     {
-        return SnapshotsTakenSucceededSinceStart;
+        return _snapshotsTakenSucceededSinceStart;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsPrunedSucceededLastRun( )
+    {
+        return _snapshotsPrunedSucceededLastRun;
     }
 
     /// <inheritdoc />
     public uint GetSnapshotsPrunedSucceededSinceStart( )
     {
-        return SnapshotsPrunedSucceededSinceStart;
+        return _snapshotsPrunedSucceededSinceStart;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsTakenFailedLastRun( )
+    {
+        return _snapshotsTakenFailedLastRun;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsTakenFailedSinceStart( )
+    {
+        return _snapshotsTakenFailedSinceStart;
     }
 
     public SnapshotCountMetrics GetAllCounts( )
     {
         return new( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart );
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsPrunedFailedLastRun( )
+    {
+        return _snapshotsPrunedFailedLastRun;
+    }
+
+    /// <inheritdoc />
+    public uint GetSnapshotsPrunedFailedSinceStart( )
+    {
+        return _snapshotsPrunedFailedSinceStart;
     }
 
     /// <summary>

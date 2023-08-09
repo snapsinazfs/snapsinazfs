@@ -135,6 +135,12 @@ internal class Program
                 snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllCounts );
                 snapshotsGroup.MapGet( "/takensucceededsincestart", ServiceObserver.GetSnapshotsTakenSucceededSinceStart );
                 snapshotsGroup.MapGet( "/prunedsucceededsincestart", ServiceObserver.GetSnapshotsPrunedSucceededSinceStart );
+                snapshotsGroup.MapGet( "/takenfailedsincestart", ServiceObserver.GetSnapshotsTakenFailedSinceStart );
+                snapshotsGroup.MapGet( "/prunedfailedsincestart", ServiceObserver.GetSnapshotsPrunedFailedSinceStart );
+                snapshotsGroup.MapGet( "/takensucceededlastrun", ServiceObserver.GetSnapshotsTakenSucceededLastRun );
+                snapshotsGroup.MapGet( "/prunedsucceededlastrun", ServiceObserver.GetSnapshotsPrunedSucceededLastRun );
+                snapshotsGroup.MapGet( "/takenfailedlastrun", ServiceObserver.GetSnapshotsTakenFailedLastRun );
+                snapshotsGroup.MapGet( "/prunedfailedlastrun", ServiceObserver.GetSnapshotsPrunedFailedLastRun );
             }
             else
             {
@@ -174,7 +180,6 @@ internal class Program
         {
             programSettings.DaemonTimerIntervalSeconds = Math.Clamp( args.DaemonTimerInterval, 1u, 60u );
         }
-
     }
 
     internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
