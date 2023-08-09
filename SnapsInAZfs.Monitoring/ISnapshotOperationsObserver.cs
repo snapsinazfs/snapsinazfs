@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -21,13 +21,13 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface ISnapshotOperationsObserver
 {
-    uint SnapshotsPrunedFailedLastExecution { get; }
+    uint SnapshotsPrunedFailedLastRun { get; }
     uint SnapshotsPrunedFailedSinceStart { get; }
-    uint SnapshotsPrunedSucceededLastExecution { get; }
+    uint SnapshotsPrunedSucceededLastRun { get; }
     uint SnapshotsPrunedSucceededSinceStart { get; }
-    uint SnapshotsTakenFailedLastExecution { get; }
+    uint SnapshotsTakenFailedLastRun { get; }
     uint SnapshotsTakenFailedSinceStart { get; }
-    uint SnapshotsTakenSucceededLastExecution { get; }
+    uint SnapshotsTakenSucceededLastRun { get; }
     uint SnapshotsTakenSucceededSinceStart { get; }
 
     uint GetSnapshotsTakenSucceededSinceStart( );

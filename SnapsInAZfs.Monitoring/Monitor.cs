@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -31,19 +31,19 @@ public sealed class Monitor : IMonitor
     private bool _applicationStateObservableEventSubscribed;
     private ISnapshotOperationsObservable? _snapshotOperationsObservable;
 
-    private uint _snapshotsPrunedFailedLastExecution;
+    private uint _snapshotsPrunedFailedLastRun;
 
     private uint _snapshotsPrunedFailedSinceStart;
 
-    private uint _snapshotsPrunedSucceededLastExecution;
+    private uint _snapshotsPrunedSucceededLastRun;
 
     private uint _snapshotsPrunedSucceededSinceStart;
 
-    private uint _snapshotsTakenFailedLastExecution;
+    private uint _snapshotsTakenFailedLastRun;
 
     private uint _snapshotsTakenFailedSinceStart;
 
-    private uint _snapshotsTakenSucceededLastExecution;
+    private uint _snapshotsTakenSucceededLastRun;
 
     private uint _snapshotsTakenSucceededSinceStart;
 
@@ -145,7 +145,7 @@ public sealed class Monitor : IMonitor
 
     public SnapshotCountMetrics GetAllCounts( )
     {
-        return new( in _snapshotsPrunedFailedLastExecution, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastExecution, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastExecution, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastExecution, in _snapshotsTakenSucceededSinceStart );
+        return new( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart );
     }
 
     /// <summary>
@@ -186,22 +186,22 @@ public sealed class Monitor : IMonitor
     public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedFailedLastExecution => _snapshotsPrunedFailedLastExecution;
+    public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
 
     /// <inheritdoc />
     public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsTakenFailedLastExecution => _snapshotsTakenFailedLastExecution;
+    public uint SnapshotsTakenFailedLastRun => _snapshotsTakenFailedLastRun;
 
     /// <inheritdoc />
-    public uint SnapshotsTakenSucceededLastExecution => _snapshotsTakenSucceededLastExecution;
+    public uint SnapshotsTakenSucceededLastRun => _snapshotsTakenSucceededLastRun;
 
     /// <inheritdoc />
     public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedSucceededLastExecution => _snapshotsPrunedSucceededLastExecution;
+    public uint SnapshotsPrunedSucceededLastRun => _snapshotsPrunedSucceededLastRun;
 
     public ApplicationStateMetrics GetFullApplicationState( )
     {
@@ -217,15 +217,15 @@ public sealed class Monitor : IMonitor
     private void ServiceOnBeginPruningSnapshots( object? sender, DateTimeOffset timestamp )
     {
         Logger.Trace( "Received BeginPruningSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
-        Interlocked.Exchange( ref _snapshotsPrunedSucceededLastExecution, 0u );
-        Interlocked.Exchange( ref _snapshotsPrunedFailedLastExecution, 0u );
+        Interlocked.Exchange( ref _snapshotsPrunedSucceededLastRun, 0u );
+        Interlocked.Exchange( ref _snapshotsPrunedFailedLastRun, 0u );
     }
 
     private void ServiceOnBeginTakingSnapshots( object? sender, DateTimeOffset timestamp )
     {
         Logger.Trace( "Received BeginTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
-        Interlocked.Exchange( ref _snapshotsTakenSucceededLastExecution, 0u );
-        Interlocked.Exchange( ref _snapshotsTakenFailedLastExecution, 0u );
+        Interlocked.Exchange( ref _snapshotsTakenSucceededLastRun, 0u );
+        Interlocked.Exchange( ref _snapshotsTakenFailedLastRun, 0u );
     }
 
     private void ServiceOnEndPruningSnapshots( object? sender, DateTimeOffset timestamp )
@@ -243,28 +243,28 @@ public sealed class Monitor : IMonitor
     private void ServiceOnPruneSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Trace( "Received PruneSnapshotFailed event from {0}", sender?.GetType( ).Name );
-        Interlocked.Increment( ref _snapshotsPrunedFailedLastExecution );
+        Interlocked.Increment( ref _snapshotsPrunedFailedLastRun );
         Interlocked.Increment( ref _snapshotsPrunedFailedSinceStart );
     }
 
     private void ServiceOnPruneSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Trace( "Received PruneSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
-        Interlocked.Increment( ref _snapshotsPrunedSucceededLastExecution );
+        Interlocked.Increment( ref _snapshotsPrunedSucceededLastRun );
         Interlocked.Increment( ref _snapshotsPrunedSucceededSinceStart );
     }
 
     private void ServiceOnTakeSnapshotFailed( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Trace( "Received TakeSnapshotFailed event from {0}", sender?.GetType( ).Name );
-        Interlocked.Increment( ref _snapshotsTakenFailedLastExecution );
+        Interlocked.Increment( ref _snapshotsTakenFailedLastRun );
         Interlocked.Increment( ref _snapshotsTakenFailedSinceStart );
     }
 
     private void ServiceOnTakeSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
     {
         Logger.Trace( "Received TakeSnapshotSucceeded event from {0} for {1}", sender?.GetType( ).Name, e.Name );
-        Interlocked.Increment( ref _snapshotsTakenSucceededLastExecution );
+        Interlocked.Increment( ref _snapshotsTakenSucceededLastRun );
         Interlocked.Increment( ref _snapshotsTakenSucceededSinceStart );
     }
 }
