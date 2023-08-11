@@ -41,7 +41,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring", "S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring.Tests", "SnapsInAZfs.Monitoring.Tests\SnapsInAZfs.Monitoring.Tests.csproj", "{78494ECB-D883-49BA-A5E2-23D75C1BF59C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SnapsInAZfs.Tests", "SnapsInAZfs.Tests\SnapsInAZfs.Tests.csproj", "{7EA459FB-0977-49E1-92C8-2DA47C1294BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Tests", "SnapsInAZfs.Tests\SnapsInAZfs.Tests.csproj", "{7EA459FB-0977-49E1-92C8-2DA47C1294BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
