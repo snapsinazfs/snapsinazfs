@@ -1,31 +1,45 @@
 {
   "profiles": {
     "SnapsInAZfs": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --config-console": {
       "commandName": "Project",
-      "commandLineArgs": "--config-console"
+      "commandLineArgs": "--config-console",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --debug --daemonize --take-snapshots --prune-snapshots": {
       "commandName": "Project",
-      "commandLineArgs": "--debug --daemonize --take-snapshots --prune-snapshots"
+      "commandLineArgs": "--debug --daemonize --take-snapshots --prune-snapshots",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --dry-run": {
       "commandName": "Project",
-      "commandLineArgs": "--dry-run"
+      "commandLineArgs": "--dry-run",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --dry-run --take-snapshots": {
       "commandName": "Project",
-      "commandLineArgs": "--dry-run --take-snapshots"
+      "commandLineArgs": "--dry-run --take-snapshots",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --help": {
       "commandName": "Project",
-      "commandLineArgs": "--help"
+      "commandLineArgs": "--help",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     },
     "SnapsInAZfs --config-files SnapsInAZfs.json SnapsInAZfs.local.json SnapsInAZfs.nlog.json": {
       "commandName": "Project",
-      "commandLineArgs": "--config-files SnapsInAZfs.json SnapsInAZfs.local.json SnapsInAZfs.nlog.json"
+      "commandLineArgs": "--config-files SnapsInAZfs.json SnapsInAZfs.local.json SnapsInAZfs.nlog.json",
+      "sslPort": 0,
+      "applicationUrl": "http://*:60763"
     }
   }
 }
