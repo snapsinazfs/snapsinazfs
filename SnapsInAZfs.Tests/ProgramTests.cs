@@ -13,8 +13,11 @@
 #endregion
 
 using System.Reflection;
+using System.Text.Json.Serialization;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using PowerArgs;
+using SnapsInAZfs.ConfigConsole;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Settings.Settings;
 
@@ -87,6 +90,27 @@ public class ProgramTests
 
         Program.ApplyCommandLineArgumentOverrides( in testArgs, possiblyChangedSettings );
         Assert.That( settingsPropertyInfo.GetValue( possiblyChangedSettings.Monitoring ), Is.EqualTo( expectedFinalSettingValue ) );
+    }
+
+    [Test]
+    [TestCase( new object[] { "SnapsInAZfs.json", "SnapsInAZfs.local.json", "fakeMonitoringSettingsForRoundTripTest.json" } )]
+    [TestCase( new object[] { "CombinedConfigurationForRoundTripTest.json" } )]
+    public void LoadConfigurationFromConfigurationFiles_RoundTripSafe( params string[] filePaths )
+    {
+        Assume.That( filePaths.Length > 0 );
+        foreach ( string filePath in filePaths )
+        {
+            Assume.That( filePath, Does.Exist );
+        }
+
+        ConfigurationBuilder builder = new( );
+        builder.AddJsonFile( "SnapsInAZfs.json", true, false );
+        builder.AddJsonFile( "SnapsInAZfs.local.json", true, false );
+        builder.AddJsonFile( "fakeMonitoringSettingsForRoundTripTest.json", true, false );
+        IConfigurationRoot configurationRoot = builder.Build( );
+        string serializedJson = configurationRoot.SerializeToJson( )!.ToJsonString( new( ) { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } );
+        string expectedJson = File.ReadAllText( "CombinedConfigurationForRoundTripTest.json" );
+        Assert.That( serializedJson, Is.EqualTo( expectedJson ) );
     }
 
     [SetUp]
@@ -222,23 +246,9 @@ public class ProgramTests
         yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
     }
 
-    private static IEnumerable<string[]> GetHelpArgStrings( )
-    {
-        yield return new[] { "-h" };
-        yield return new[] { "-Help" };
-        yield return new[] { "--help" };
-    }
-
     private static PropertyInfo[] GetSnapsInAZfsSettingsPropertyInfos( )
     {
         return typeof( SnapsInAZfsSettings ).GetProperties( ).Where( pi => pi.Name is not nameof( SnapsInAZfsSettings.Templates ) ).ToArray( );
-    }
-
-    private static IEnumerable<string[]> GetVersionArgStrings( )
-    {
-        yield return new[] { "-V" };
-        yield return new[] { "-Version" };
-        yield return new[] { "--version" };
     }
 
     private static void ResetNLogToNoOutput( )

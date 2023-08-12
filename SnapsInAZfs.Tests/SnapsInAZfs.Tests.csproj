@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -24,10 +24,30 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="CombinedConfigurationForRoundTripTest.json" />
+    <None Remove="fakeMonitoringSettingsForRoundTripTest.json" />
+    <None Remove="SnapsInAZfs.json" />
+    <None Remove="SnapsInAZfs.local.json" />
     <None Remove="SnapsInAZfs.Tests.nlog.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="CombinedConfigurationForRoundTripTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="fakeMonitoringSettingsForRoundTripTest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
     <Content Include="SnapsInAZfs.Tests.nlog.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

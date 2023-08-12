@@ -278,7 +278,7 @@ internal class Program
     #endif
     }
 
-    private static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
+    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.

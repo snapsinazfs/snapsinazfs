@@ -1,0 +1,49 @@
+{
+  "$schema": "SnapsInAZfs.schema.json",
+  "$id": "SnapsInAZfs.json",
+  "$comments": "Default settings for SnapsInAZfs. It is not recommended to modify this file. Customized settings should be specified in /etc/SnapsInAZfs/SnapsInAZfs.local.json",
+  "DryRun": false,
+  "TakeSnapshots": false,
+  "PruneSnapshots": false,
+  "LocalSystemName": "StandaloneSiazSystem",
+  "Daemonize": false,
+  "DaemonTimerIntervalSeconds": 10,
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool",
+  "Templates": {
+    "default": {
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "DailySuffix": "daily",
+        "WeeklySuffix": "weekly",
+        "MonthlySuffix": "monthly",
+        "YearlySuffix": "yearly"
+      },
+      "SnapshotTiming": {
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "DailyTime": "00:00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00:00",
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "YearlyMonth": 1,
+        "YearlyDay": 1,
+        "YearlyTime": "00:00:00"
+      }
+    }
+  },
+  "Monitoring": {
+    "Enabled":  false, 
+    "Kestrel": {
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60 
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
+  "$id": "SnapsInAZfs.local.json",
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "Daemonize": false,
+  "DaemonTimerIntervalSeconds": 10,
+  "DryRun": false,
+  "LocalSystemName": "StandaloneSiazSystem",
+  "Monitoring": {
+    "Enabled": false,
+    "Kestrel": {
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "TcpMonitoringEndpoint": {
+          "Url": "http://*:60763"
+        }
+      },
+      "Limits": {
+        "KeepAliveTimeout": 60,
+        "MaxConcurrentConnections": 20
+      },
+      "SomeFakeKey": {
+        "FakeChildKey": {
+          "FakeChildProperty1": true,
+          "FakeChildProperty2": "some string"
+        }
+      }
+    }
+  },
+  "PruneSnapshots": false,
+  "TakeSnapshots": false,
+  "Templates": {
+    "default": {
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "DailySuffix": "daily",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "MonthlySuffix": "monthly",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "WeeklySuffix": "weekly",
+        "YearlySuffix": "yearly"
+      },
+      "SnapshotTiming": {
+        "DailyTime": "00:00:00",
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00:00",
+        "YearlyDay": 1,
+        "YearlyMonth": 1,
+        "YearlyTime": "00:00:00"
+      }
+    },
+    "production": {
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "DailySuffix": "daily",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "MonthlySuffix": "monthly",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "WeeklySuffix": "weekly",
+        "YearlySuffix": "yearly"
+      },
+      "SnapshotTiming": {
+        "DailyTime": "00:00:00",
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00:00",
+        "YearlyDay": 1,
+        "YearlyMonth": 1,
+        "YearlyTime": "00:00:00"
+      }
+    }
+  },
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool"
+}

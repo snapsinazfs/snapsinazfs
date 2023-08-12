@@ -1,0 +1,57 @@
+{
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "$id": "SnapsInAZfs.local.json",
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
+  "DryRun": false,
+  "TakeSnapshots": false,
+  "PruneSnapshots": false,
+  "LocalSystemName": "StandaloneSiazSystem",
+  "ZfsPath": "/usr/local/sbin/zfs",
+  "ZpoolPath": "/usr/local/sbin/zpool",
+  "Daemonize": false,
+  "Monitoring": {
+    "Enabled": false,
+    "Kestrel": {
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "TcpMonitoringEndpoint": {
+          "Url": "http://*:60763"
+        }
+        //"UnixSocketMonitoringEndpoint": {
+        //  "Url": "http://unix:/run/SnapsInAZfs.sock"
+        //}
+      },
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60
+      }
+    }
+  },
+  "Templates": {
+    "production": {
+      "Formatting": {
+        "ComponentSeparator": "_",
+        "Prefix": "autosnap",
+        "TimestampFormatString": "yyyy-MM-dd_HH\\:mm\\:ss",
+        "FrequentSuffix": "frequently",
+        "HourlySuffix": "hourly",
+        "DailySuffix": "daily",
+        "WeeklySuffix": "weekly",
+        "MonthlySuffix": "monthly",
+        "YearlySuffix": "yearly"
+      },
+      "SnapshotTiming": {
+        "FrequentPeriod": 15,
+        "HourlyMinute": 0,
+        "DailyTime": "00:00:00",
+        "WeeklyDay": 1,
+        "WeeklyTime": "00:00:00",
+        "MonthlyDay": 1,
+        "MonthlyTime": "00:00:00",
+        "YearlyMonth": 1,
+        "YearlyDay": 1,
+        "YearlyTime": "00:00:00"
+      }
+    }
+  }
+}
