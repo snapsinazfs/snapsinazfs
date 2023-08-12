@@ -22,5 +22,5 @@ public sealed class MonitoringSettings
     public required bool Enabled { get; set; }
 
     [JsonPropertyOrder( 2 )]
-    public KestrelConfiguration? Kestrel { get; set; }
+    public object Kestrel { get; set; }
 }

@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Routing;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
+using SnapsInAZfs.ConfigConsole;
 using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -320,6 +321,9 @@ internal class Program
         try
         {
             settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+            IEnumerable<IConfigurationSection> kestrelSettings = rootConfiguration.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" ).GetChildren(  );
+            settings.Monitoring.Kestrel = kestrelSettings.ToDictionary( static k => k.Key, static v => v.SerializeToJson(  ) );
+
             IConfigurationSection nlogConfigSection = rootConfiguration.GetSection( "NLog" );
             LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration( nlogConfigSection ) : new LoggingConfiguration( );
         }
