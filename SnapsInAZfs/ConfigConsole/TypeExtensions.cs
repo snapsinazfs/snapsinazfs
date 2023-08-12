@@ -217,7 +217,7 @@ public static class TypeExtensions
     /// </remarks>
     [Pure]
     [SuppressMessage( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
-    public static int ToInt32( this ustring value, int fallbackValue )
+    public static int ToInt32( this ustring value, in int fallbackValue )
     {
         try
         {
