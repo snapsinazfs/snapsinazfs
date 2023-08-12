@@ -198,30 +198,32 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         Timestamp = DateTimeOffset.Now;
         GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
-        const int maxDriftMilliseconds = 500;
+        const int maxDriftMilliseconds = 300;
 
         PeriodicTimer daemonRunTimer = new( timerInterval );
         try
         {
             while ( !serviceCancellationToken.IsCancellationRequested && await daemonRunTimer.WaitForNextTickAsync( serviceCancellationToken ).ConfigureAwait( true ) )
             {
-                if ( timerInterval < _daemonTimerInterval )
+                TimeSpan differenceBetweenCurrentAndConfiguredInterval = timerInterval.Subtract( _daemonTimerInterval ).Duration( );
+                if ( differenceBetweenCurrentAndConfiguredInterval.TotalMilliseconds > maxDriftMilliseconds )
                 {
+                    Logger.Debug( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
                     daemonRunTimer.Dispose( );
                     daemonRunTimer = new( _daemonTimerInterval );
                     timerInterval = _daemonTimerInterval;
-                    Logger.Debug( "Clock corrected. Adjusting timer interval to {0:G}", timerInterval );
                 }
 
                 try
                 {
                     Timestamp = DateTimeOffset.Now;
-                    Logger.Debug( "Timer ticked at {0:O}", Timestamp );
+                    Logger.Debug( "Timer ticked at {0:O} - Interval: {1:G}", Timestamp, timerInterval );
                     TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
+                    GetNextTickTimestamp( in Timestamp, in _daemonTimerInterval, out expectedTickTimestamp );
                     if ( drift.TotalMilliseconds > maxDriftMilliseconds )
                     {
                         GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
-                        Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
+                        Logger.Debug( "Clock drifted beyond threshold (drift: {0:G}). Adjusting timer interval to {1:G}", drift, timerInterval );
                         daemonRunTimer.Dispose( );
                         try
                         {
@@ -267,7 +269,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         }
     }
 
-    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    internal static void GetNextTickTimestamp( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out DateTimeOffset nextTickTimestamp )
     {
         DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
@@ -280,7 +282,11 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         {
             nextTickTimestamp += configuredTimerInterval;
         }
+    }
 
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    {
+        GetNextTickTimestamp( in timestamp, in configuredTimerInterval, out nextTickTimestamp );
         calculatedTimerInterval = nextTickTimestamp - timestamp;
     }
 
