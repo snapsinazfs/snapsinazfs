@@ -21,23 +21,14 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface ISnapshotOperationsObserver
 {
-    uint SnapshotsPrunedFailedLastRun { get; }
-    uint SnapshotsPrunedFailedSinceStart { get; }
-    uint SnapshotsPrunedSucceededLastRun { get; }
-    uint SnapshotsPrunedSucceededSinceStart { get; }
-    uint SnapshotsTakenFailedLastRun { get; }
-    uint SnapshotsTakenFailedSinceStart { get; }
-    uint SnapshotsTakenSucceededLastRun { get; }
-    uint SnapshotsTakenSucceededSinceStart { get; }
-
-    SnapshotCountMetrics GetAllCounts( );
-    uint GetSnapshotsPrunedFailedLastRun( );
-    uint GetSnapshotsPrunedFailedSinceStart( );
-    uint GetSnapshotsPrunedSucceededLastRun( );
-    uint GetSnapshotsPrunedSucceededSinceStart( );
-    uint GetSnapshotsTakenFailedLastRun( );
-    uint GetSnapshotsTakenFailedSinceStart( );
-    uint GetSnapshotsTakenSucceededLastRun( );
-    uint GetSnapshotsTakenSucceededSinceStart( );
+    SnapshotCountMetrics GetAllSnapshotCounts( );
+    uint GetSnapshotsPrunedFailedLastRunCount( );
+    uint GetSnapshotsPrunedFailedSinceStartCount( );
+    uint GetSnapshotsPrunedSucceededLastRunCount( );
+    uint GetSnapshotsPrunedSucceededSinceStartCount( );
+    uint GetSnapshotsTakenFailedLastRunCount( );
+    uint GetSnapshotsTakenFailedSinceStartCount( );
+    uint GetSnapshotsTakenSucceededLastRunCount( );
+    uint GetSnapshotsTakenSucceededSinceStartCount( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
 }

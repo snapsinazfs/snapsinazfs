@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -132,54 +132,54 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenSucceededLastRun( )
+    public uint GetSnapshotsTakenSucceededLastRunCount( )
     {
         return _snapshotsTakenSucceededLastRun;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenSucceededSinceStart( )
+    public uint GetSnapshotsTakenSucceededSinceStartCount( )
     {
         return _snapshotsTakenSucceededSinceStart;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedSucceededLastRun( )
+    public uint GetSnapshotsPrunedSucceededLastRunCount( )
     {
         return _snapshotsPrunedSucceededLastRun;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedSucceededSinceStart( )
+    public uint GetSnapshotsPrunedSucceededSinceStartCount( )
     {
         return _snapshotsPrunedSucceededSinceStart;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenFailedLastRun( )
+    public uint GetSnapshotsTakenFailedLastRunCount( )
     {
         return _snapshotsTakenFailedLastRun;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenFailedSinceStart( )
+    public uint GetSnapshotsTakenFailedSinceStartCount( )
     {
         return _snapshotsTakenFailedSinceStart;
     }
 
-    public SnapshotCountMetrics GetAllCounts( )
+    public SnapshotCountMetrics GetAllSnapshotCounts( )
     {
         return new( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedFailedLastRun( )
+    public uint GetSnapshotsPrunedFailedLastRunCount( )
     {
         return _snapshotsPrunedFailedLastRun;
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedFailedSinceStart( )
+    public uint GetSnapshotsPrunedFailedSinceStartCount( )
     {
         return _snapshotsPrunedFailedSinceStart;
     }

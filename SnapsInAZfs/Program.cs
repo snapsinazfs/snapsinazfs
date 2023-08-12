@@ -140,16 +140,16 @@ internal class Program
                 statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );
 
                 RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
-                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllCounts );
-                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllCounts );
-                snapshotsGroup.MapGet( "/takensucceededsincestart", ServiceObserver.GetSnapshotsTakenSucceededSinceStart );
-                snapshotsGroup.MapGet( "/prunedsucceededsincestart", ServiceObserver.GetSnapshotsPrunedSucceededSinceStart );
-                snapshotsGroup.MapGet( "/takenfailedsincestart", ServiceObserver.GetSnapshotsTakenFailedSinceStart );
-                snapshotsGroup.MapGet( "/prunedfailedsincestart", ServiceObserver.GetSnapshotsPrunedFailedSinceStart );
-                snapshotsGroup.MapGet( "/takensucceededlastrun", ServiceObserver.GetSnapshotsTakenSucceededLastRun );
-                snapshotsGroup.MapGet( "/prunedsucceededlastrun", ServiceObserver.GetSnapshotsPrunedSucceededLastRun );
-                snapshotsGroup.MapGet( "/takenfailedlastrun", ServiceObserver.GetSnapshotsTakenFailedLastRun );
-                snapshotsGroup.MapGet( "/prunedfailedlastrun", ServiceObserver.GetSnapshotsPrunedFailedLastRun );
+                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCounts );
+                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCounts );
+                snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCount );
+                snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCount );
+                snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCount );
+                snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCount );
+                snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCount );
+                snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCount );
+                snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCount );
+                snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCount );
             }
             else
             {
