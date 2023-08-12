@@ -248,7 +248,7 @@ public class ProgramTests
 
     private static PropertyInfo[] GetSnapsInAZfsSettingsPropertyInfos( )
     {
-        return typeof( SnapsInAZfsSettings ).GetProperties( ).Where( pi => pi.Name is not nameof( SnapsInAZfsSettings.Templates ) ).ToArray( );
+        return typeof( SnapsInAZfsSettings ).GetProperties( ).Where( pi => pi.Name is not nameof( SnapsInAZfsSettings.Templates ) and not nameof( SnapsInAZfsSettings.Monitoring ) ).ToArray( );
     }
 
     private static void ResetNLogToNoOutput( )

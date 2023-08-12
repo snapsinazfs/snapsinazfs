@@ -33,9 +33,9 @@ public sealed class Monitor : IMonitor
     private ApplicationState _applicationState;
     private IApplicationStateObservable? _applicationStateObservable;
     private bool _applicationStateObservableEventSubscribed;
-    private ISnapshotOperationsObservable? _snapshotOperationsObservable;
 
-    private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds();
+    private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds( );
+    private ISnapshotOperationsObservable? _snapshotOperationsObservable;
 
     private uint _snapshotsPrunedFailedLastRun;
 
@@ -136,14 +136,10 @@ public sealed class Monitor : IMonitor
                 break;
             case false when _applicationStateObservableEventSubscribed:
                 _applicationStateObservable.ApplicationStateChanged -= ServiceOnApplicationStateChanged;
+                _applicationStateObservable.NextRunTimeChanged -= ServiceOnNextRunTimeChanged;
                 _applicationStateObservableEventSubscribed = false;
                 break;
         }
-    }
-
-    private void ServiceOnNextRunTimeChanged( object? sender, long e )
-    {
-        Interlocked.Exchange( ref _nextRunTime, e );
     }
 
     [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
@@ -311,6 +307,11 @@ public sealed class Monitor : IMonitor
     {
         Logger.Trace( "Received EndTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         SnapshotsTakenLastEnded = timestamp;
+    }
+
+    private void ServiceOnNextRunTimeChanged( object? sender, long e )
+    {
+        Interlocked.Exchange( ref _nextRunTime, e );
     }
 
     private void ServiceOnPruneSnapshotFailed( object? sender, SnapshotOperationEventArgs e )

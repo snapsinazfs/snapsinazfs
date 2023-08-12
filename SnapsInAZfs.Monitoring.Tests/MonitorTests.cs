@@ -120,10 +120,13 @@ public class MonitorTests
         ApplicationStateObservableMock observable = new( );
         Monitor testMonitor = new( );
         Assume.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assume.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
         testMonitor.RegisterApplicationStateObservable( observable, isSubscribedInitially );
         Assert.That( observable.IsApplicationStateChangedSubscribed, Is.EqualTo( isSubscribedInitially ) );
+        Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.EqualTo( isSubscribedInitially ) );
         testMonitor.RegisterApplicationStateObservable( observable, false );
         Assert.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
     }
 
     [Test]
@@ -132,8 +135,13 @@ public class MonitorTests
         ApplicationStateObservableMock observable = new( );
         Monitor testMonitor = new( );
         Assume.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assume.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
         testMonitor.RegisterApplicationStateObservable( observable );
-        Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
+        Assert.Multiple( ( ) =>
+        {
+            Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
+            Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.True );
+        } );
     }
 
     [Test]
@@ -334,11 +342,13 @@ public class MonitorTests
         return typeof( Monitor ).GetEvents( ).Where( ei => ei.EventHandlerType == typeof( EventHandler<SnapshotOperationEventArgs> ) );
     }
 
-    private class ApplicationStateObservableMock : IApplicationStateObservable
+    private sealed class ApplicationStateObservableMock : IApplicationStateObservable
     {
         private ApplicationState _state;
 
         public bool IsApplicationStateChangedSubscribed { get; private set; }
+
+        public bool IsNextRunTimeChangedSubscribed { get; private set; }
 
         public ApplicationState State
         {
@@ -372,17 +382,34 @@ public class MonitorTests
         }
 
         /// <inheritdoc />
-        public event EventHandler<long>? NextRunTimeChanged;
+        public event EventHandler<long>? NextRunTimeChanged
+        {
+            add
+            {
+                IsNextRunTimeChangedSubscribed = true;
+                _nextRunTimeChanged += value;
+            }
+            remove
+            {
+                IsNextRunTimeChangedSubscribed = false;
+                _nextRunTimeChanged -= value;
+            }
+        }
+
+        public void RaiseNextRunTimeChangedEvent( in DateTimeOffset timestamp )
+        {
+            _nextRunTimeChanged?.Invoke( this, timestamp.ToUnixTimeMilliseconds( ) );
+        }
 
         private event EventHandler<ApplicationStateChangedEventArgs>? _applicationStateChanged;
+
+        private event EventHandler<long>? _nextRunTimeChanged;
     }
 
-    private class SnapshotOperationsObservableMock : ISnapshotOperationsObservable
+    private sealed class SnapshotOperationsObservableMock : ISnapshotOperationsObservable
     {
         public bool DidBeginPruningSnapshotsRegisterMultiple { get; private set; }
-
         public bool DidBeginTakingSnapshotsRegisterMultiple { get; private set; }
-
         public bool DidEndPruningSnapshotsRegisterMultiple { get; private set; }
         public bool DidEndTakingSnapshotsRegisterMultiple { get; private set; }
         public bool DidPruneSnapshotFailedRegisterMultiple { get; private set; }
