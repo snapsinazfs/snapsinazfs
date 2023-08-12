@@ -18,7 +18,7 @@ namespace SnapsInAZfs.Monitoring;
 
 public sealed class ApplicationStateMetrics
 {
-    public ApplicationStateMetrics( string state, in DateTimeOffset serviceStartTime, in DateTimeOffset nextRunTime, string version )
+    public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, DateTimeOffset nextRunTime, string version )
     {
         Version = version;
         State = state;
