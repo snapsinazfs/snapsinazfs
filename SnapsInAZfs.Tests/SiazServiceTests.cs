@@ -1,4 +1,8 @@
-﻿namespace SnapsInAZfs.Tests;
+﻿using System.Diagnostics;
+using NUnit.Framework.Internal;
+using SnapsInAZfs.Settings.Settings;
+
+namespace SnapsInAZfs.Tests;
 
 [TestFixture]
 [TestOf(typeof(SiazService))]

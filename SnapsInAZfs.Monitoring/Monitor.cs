@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -25,11 +25,17 @@ namespace SnapsInAZfs.Monitoring;
 public sealed class Monitor : IMonitor
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private readonly List<string> _snapshotsPrunedFailedLastRunNames = new( );
+    private readonly object _snapshotsPrunedFailedLastRunNamesLock = new( );
+    private readonly List<string> _snapshotsTakenFailedLastRunNames = new( );
+    private readonly object _snapshotsTakenFailedLastRunNamesLock = new( );
 
     private ApplicationState _applicationState;
     private IApplicationStateObservable? _applicationStateObservable;
     private bool _applicationStateObservableEventSubscribed;
     private ISnapshotOperationsObservable? _snapshotOperationsObservable;
+
+    private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds();
 
     private uint _snapshotsPrunedFailedLastRun;
 
@@ -47,9 +53,25 @@ public sealed class Monitor : IMonitor
 
     private uint _snapshotsTakenSucceededSinceStart;
 
+    public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
+
+    public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
+
     public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
 
+    public uint SnapshotsPrunedSucceededLastRun => _snapshotsPrunedSucceededLastRun;
+
+    public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
+
+    public uint SnapshotsTakenFailedLastRun => _snapshotsTakenFailedLastRun;
+
+    public uint SnapshotsTakenFailedSinceStart => _snapshotsTakenFailedSinceStart;
+
     public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
+
+    public uint SnapshotsTakenSucceededLastRun => _snapshotsTakenSucceededLastRun;
+
+    public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
 
     /// <summary>
     ///     Gets the state of the registered <see cref="IApplicationStateObservable" /> object.
@@ -109,6 +131,7 @@ public sealed class Monitor : IMonitor
         {
             case true when !_applicationStateObservableEventSubscribed:
                 _applicationStateObservable.ApplicationStateChanged += ServiceOnApplicationStateChanged;
+                _applicationStateObservable.NextRunTimeChanged += ServiceOnNextRunTimeChanged;
                 _applicationStateObservableEventSubscribed = true;
                 break;
             case false when _applicationStateObservableEventSubscribed:
@@ -116,6 +139,11 @@ public sealed class Monitor : IMonitor
                 _applicationStateObservableEventSubscribed = false;
                 break;
         }
+    }
+
+    private void ServiceOnNextRunTimeChanged( object? sender, long e )
+    {
+        Interlocked.Exchange( ref _nextRunTime, e );
     }
 
     [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
@@ -216,28 +244,29 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
-    public uint SnapshotsTakenFailedSinceStart => _snapshotsTakenFailedSinceStart;
+    public List<string> GetSnapshotsTakenFailedLastRunNames( )
+    {
+        lock ( _snapshotsTakenFailedLastRunNames )
+        {
+            return _snapshotsTakenFailedLastRunNames.ToList( );
+        }
+    }
 
     /// <inheritdoc />
-    public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
+    public List<string> GetSnapshotsPrunedFailedLastRunNames( )
+    {
+        lock ( _snapshotsPrunedFailedLastRunNames )
+        {
+            return _snapshotsPrunedFailedLastRunNames.ToList( );
+        }
+    }
 
     /// <inheritdoc />
-    public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
-
-    /// <inheritdoc />
-    public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
-
-    /// <inheritdoc />
-    public uint SnapshotsTakenFailedLastRun => _snapshotsTakenFailedLastRun;
-
-    /// <inheritdoc />
-    public uint SnapshotsTakenSucceededLastRun => _snapshotsTakenSucceededLastRun;
-
-    /// <inheritdoc />
-    public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
-
-    /// <inheritdoc />
-    public uint SnapshotsPrunedSucceededLastRun => _snapshotsPrunedSucceededLastRun;
+    public DateTimeOffset GetNextRunTime( )
+    {
+        long nextRunTime = Interlocked.Read( ref _nextRunTime );
+        return DateTimeOffset.FromUnixTimeMilliseconds( nextRunTime );
+    }
 
     public ApplicationStateMetrics GetFullApplicationState( )
     {
@@ -255,6 +284,10 @@ public sealed class Monitor : IMonitor
         Logger.Trace( "Received BeginPruningSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         Interlocked.Exchange( ref _snapshotsPrunedSucceededLastRun, 0u );
         Interlocked.Exchange( ref _snapshotsPrunedFailedLastRun, 0u );
+        lock ( _snapshotsPrunedFailedLastRunNamesLock )
+        {
+            _snapshotsPrunedFailedLastRunNames.Clear( );
+        }
     }
 
     private void ServiceOnBeginTakingSnapshots( object? sender, DateTimeOffset timestamp )
@@ -262,6 +295,10 @@ public sealed class Monitor : IMonitor
         Logger.Trace( "Received BeginTakingSnapshots event from {0}, sent at {1:O}", sender?.GetType( ).Name, timestamp );
         Interlocked.Exchange( ref _snapshotsTakenSucceededLastRun, 0u );
         Interlocked.Exchange( ref _snapshotsTakenFailedLastRun, 0u );
+        lock ( _snapshotsTakenFailedLastRunNamesLock )
+        {
+            _snapshotsTakenFailedLastRunNames.Clear( );
+        }
     }
 
     private void ServiceOnEndPruningSnapshots( object? sender, DateTimeOffset timestamp )
@@ -281,6 +318,10 @@ public sealed class Monitor : IMonitor
         Logger.Trace( "Received PruneSnapshotFailed event from {0}", sender?.GetType( ).Name );
         Interlocked.Increment( ref _snapshotsPrunedFailedLastRun );
         Interlocked.Increment( ref _snapshotsPrunedFailedSinceStart );
+        lock ( _snapshotsPrunedFailedLastRunNamesLock )
+        {
+            _snapshotsPrunedFailedLastRunNames.Add( e.Name );
+        }
     }
 
     private void ServiceOnPruneSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )
@@ -295,6 +336,10 @@ public sealed class Monitor : IMonitor
         Logger.Trace( "Received TakeSnapshotFailed event from {0}", sender?.GetType( ).Name );
         Interlocked.Increment( ref _snapshotsTakenFailedLastRun );
         Interlocked.Increment( ref _snapshotsTakenFailedSinceStart );
+        lock ( _snapshotsTakenFailedLastRunNamesLock )
+        {
+            _snapshotsTakenFailedLastRunNames.Add( e.Name );
+        }
     }
 
     private void ServiceOnTakeSnapshotSucceeded( object? sender, SnapshotOperationEventArgs e )

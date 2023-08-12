@@ -57,8 +57,23 @@ public interface ISnapshotOperationsObservable
     /// </remarks>
     event EventHandler<DateTimeOffset>? EndTakingSnapshots;
 
-    event EventHandler<SnapshotOperationEventArgs> PruneSnapshotFailed;
-    event EventHandler<SnapshotOperationEventArgs> PruneSnapshotSucceeded;
-    event EventHandler<SnapshotOperationEventArgs> TakeSnapshotFailed;
-    event EventHandler<SnapshotOperationEventArgs> TakeSnapshotSucceeded;
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to prune a snapshot fails
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to prune a snapshot succeeds
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotSucceeded;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to take a new snapshot fails
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotFailed;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to take a new snapshot succeeds
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 }

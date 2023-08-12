@@ -36,8 +36,8 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
     private readonly SnapsInAZfsSettings _settings;
     private readonly IZfsCommandRunner _zfsCommandRunner;
-    private static DateTimeOffset _lastRunTime = DateTimeOffset.Now;
-    private static DateTimeOffset _nextRunTime = DateTimeOffset.Now;
+    private DateTimeOffset _lastRunTime = DateTimeOffset.Now;
+    private DateTimeOffset _nextRunTime = DateTimeOffset.Now;
 
     /// <summary>
     ///     Creates a new instance of the service class
@@ -819,29 +819,25 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 
-    private int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
+    private static int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
     {
-        return templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+        return templates.Values.Select( static t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
     }
-
-    private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
+    private void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
     {
         DateTimeOffset lastRunTimeSnappedToFrequentPeriod = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute % greatestCommonFrequentIntervalMinutes, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
         DateTimeOffset lastRunTimePlusFrequentInterval = lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
         nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
+        NextRunTimeChanged?.Invoke( this, nextRunTime.ToUnixTimeMilliseconds( ) );
     }
 
     public sealed record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
     // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
     private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
-
     private readonly IApplicationStateObserver _stateObserver;
-
     // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
-
-#region Implementation of ISnapshotOperationsObservable
 
     /// <inheritdoc />
     public event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
@@ -867,5 +863,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     /// <inheritdoc />
     public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
-#endregion
+    /// <inheritdoc />
+    public event EventHandler<long>? NextRunTimeChanged;
 }

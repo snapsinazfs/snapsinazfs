@@ -31,4 +31,6 @@ public interface ISnapshotOperationsObserver
     uint GetSnapshotsTakenSucceededLastRunCount( );
     uint GetSnapshotsTakenSucceededSinceStartCount( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
+    List<string> GetSnapshotsTakenFailedLastRunNames( );
+    List<string> GetSnapshotsPrunedFailedLastRunNames( );
 }

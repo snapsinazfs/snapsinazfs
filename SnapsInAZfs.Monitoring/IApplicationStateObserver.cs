@@ -63,4 +63,6 @@ public interface IApplicationStateObserver
     ///     <see cref="IApplicationStateObservable.ApplicationStateChanged" /> <see langword="event" />
     /// </remarks>
     public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true );
+
+    DateTimeOffset GetNextRunTime( );
 }

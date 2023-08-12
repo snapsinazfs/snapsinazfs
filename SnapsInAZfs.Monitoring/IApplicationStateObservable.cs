@@ -23,4 +23,5 @@ public interface IApplicationStateObservable
     DateTimeOffset ServiceStartTime { get; }
 
     event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
+    event EventHandler<long>? NextRunTimeChanged;
 }

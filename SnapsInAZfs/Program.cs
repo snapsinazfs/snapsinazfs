@@ -138,6 +138,7 @@ internal class Program
                 statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
                 statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
                 statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );
+                statusGroup.MapGet( "/nextruntime", ServiceObserver.GetNextRunTime );
 
                 RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
                 snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCounts );
@@ -150,6 +151,8 @@ internal class Program
                 snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCount );
                 snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCount );
                 snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCount );
+                snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNames );
+                snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNames );
             }
             else
             {

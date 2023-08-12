@@ -371,6 +371,9 @@ public class MonitorTests
             }
         }
 
+        /// <inheritdoc />
+        public event EventHandler<long>? NextRunTimeChanged;
+
         private event EventHandler<ApplicationStateChangedEventArgs>? _applicationStateChanged;
     }
 
