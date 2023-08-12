@@ -321,8 +321,12 @@ internal class Program
         try
         {
             settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-            IEnumerable<IConfigurationSection> kestrelSettings = rootConfiguration.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" ).GetChildren(  );
-            settings.Monitoring.Kestrel = kestrelSettings.ToDictionary( static k => k.Key, static v => v.SerializeToJson(  ) );
+            IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" );
+            if ( kestrelSection.Exists( ) )
+            {
+                IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren( );
+                settings.Monitoring.Kestrel = kestrelSettings.ToDictionary( static k => k.Key, static v => v.SerializeToJson( ) );
+            }
 
             IConfigurationSection nlogConfigSection = rootConfiguration.GetSection( "NLog" );
             LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration( nlogConfigSection ) : new LoggingConfiguration( );
