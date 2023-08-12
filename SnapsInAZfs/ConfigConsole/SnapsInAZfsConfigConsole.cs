@@ -12,8 +12,6 @@
 
 #endregion
 
-#nullable enable
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SnapsInAZfs.Settings.Settings;
@@ -239,7 +237,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                 ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
                 ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
                 Templates = Program.Settings!.Templates,
-                Monitoring = Program.Settings!.Monitoring
+                Monitoring = Program.Settings.Monitoring
             };
 
             ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
