@@ -22,8 +22,8 @@ public sealed class ApplicationStateMetrics
     {
         Version = version;
         State = state;
-        ServiceStartTime = serviceStartTime;
-        NextRunTime = nextRunTime;
+        ServiceStartTime = serviceStartTime.ToLocalTime( );
+        NextRunTime = nextRunTime.ToLocalTime( );
     }
 
     [JsonPropertyOrder( 3 )]
