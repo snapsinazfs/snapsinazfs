@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
 using NLog;
 
 namespace SnapsInAZfs.Monitoring;
@@ -240,21 +241,31 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
-    public List<string> GetSnapshotsTakenFailedLastRunNames( )
+    public IResult GetSnapshotsTakenFailedLastRunNames( )
     {
-        lock ( _snapshotsTakenFailedLastRunNames )
+        lock ( _snapshotsTakenFailedLastRunNamesLock )
         {
-            return _snapshotsTakenFailedLastRunNames.ToList( );
+            if ( _snapshotsTakenFailedLastRunNames.Count != 0 )
+            {
+                return Results.Json( _snapshotsTakenFailedLastRunNames.ToList( ) );
+            }
         }
+
+        return Results.NoContent( );
     }
 
     /// <inheritdoc />
-    public List<string> GetSnapshotsPrunedFailedLastRunNames( )
+    public IResult GetSnapshotsPrunedFailedLastRunNames( )
     {
-        lock ( _snapshotsPrunedFailedLastRunNames )
+        lock ( _snapshotsPrunedFailedLastRunNamesLock )
         {
-            return _snapshotsPrunedFailedLastRunNames.ToList( );
+            if ( _snapshotsPrunedFailedLastRunNames.Count != 0 )
+            {
+                return Results.Json( _snapshotsPrunedFailedLastRunNames.ToList( ) );
+            }
         }
+
+        return Results.NoContent( );
     }
 
     /// <inheritdoc />

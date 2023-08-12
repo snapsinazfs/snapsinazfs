@@ -12,6 +12,8 @@
 
 #endregion
 
+using Microsoft.AspNetCore.Http;
+
 namespace SnapsInAZfs.Monitoring;
 
 /// <summary>
@@ -31,6 +33,6 @@ public interface ISnapshotOperationsObserver
     uint GetSnapshotsTakenSucceededLastRunCount( );
     uint GetSnapshotsTakenSucceededSinceStartCount( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
-    List<string> GetSnapshotsTakenFailedLastRunNames( );
-    List<string> GetSnapshotsPrunedFailedLastRunNames( );
+    IResult GetSnapshotsTakenFailedLastRunNames( );
+    IResult GetSnapshotsPrunedFailedLastRunNames( );
 }
