@@ -22,5 +22,6 @@ public sealed class MonitoringSettings
     public required bool Enabled { get; set; }
 
     [JsonPropertyOrder( 2 )]
-    public object Kestrel { get; set; }
+    [JsonIgnore( Condition = JsonIgnoreCondition.WhenWritingNull )]
+    public object? Kestrel { get; set; }
 }
