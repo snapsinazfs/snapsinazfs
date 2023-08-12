@@ -18,12 +18,16 @@ namespace SnapsInAZfs.Monitoring;
 
 public sealed class ApplicationStateMetrics
 {
-    public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, string version )
+    public ApplicationStateMetrics( string state, in DateTimeOffset serviceStartTime, in DateTimeOffset nextRunTime, string version )
     {
         Version = version;
         State = state;
         ServiceStartTime = serviceStartTime;
+        NextRunTime = nextRunTime;
     }
+
+    [JsonPropertyOrder( 3 )]
+    public DateTimeOffset NextRunTime { get; set; }
 
     [JsonPropertyOrder( 2 )]
     public DateTimeOffset ServiceStartTime { get; set; }
@@ -31,6 +35,6 @@ public sealed class ApplicationStateMetrics
     [JsonPropertyOrder( 1 )]
     public string? State { get; set; }
 
-    [JsonPropertyOrder( 3 )]
+    [JsonPropertyOrder( 4 )]
     public string? Version { get; set; }
 }

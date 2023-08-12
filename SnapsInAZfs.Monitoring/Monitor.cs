@@ -266,7 +266,7 @@ public sealed class Monitor : IMonitor
 
     public ApplicationStateMetrics GetFullApplicationState( )
     {
-        return new( GetApplicationState( ), GetServiceStartTime( ), GetVersion( ) );
+        return new( GetApplicationState( ), GetServiceStartTime( ), GetNextRunTime( ), GetVersion( ) );
     }
 
     private void ServiceOnApplicationStateChanged( object? sender, ApplicationStateChangedEventArgs e )
