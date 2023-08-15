@@ -59,6 +59,7 @@ public sealed class Monitor : IMonitor
     internal DateTimeOffset ServiceStartTime => _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
 
     private static string? Version => Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion;
+    private const string ErrorGettingSnapshotCount = "Error getting snapshot count";
 
     /// <summary>
     ///     Gets the state of the registered <see cref="IApplicationStateObservable" /> object.
@@ -70,32 +71,56 @@ public sealed class Monitor : IMonitor
     ///     string.<br />
     ///     If no object is registered, returns the string "Not Registered"
     /// </returns>
-    public Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync( )
+    public async Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync( )
     {
-        return Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( _applicationStateObservable switch
+        try
         {
-            not null => TypedResults.Ok( GetApplicationState( ) ),
-            _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
-        } );
+            return await Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( _applicationStateObservable switch
+            {
+                not null => TypedResults.Ok( GetApplicationState( ) ),
+                _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting application state" );
+            return await Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync( )
+    public async Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync( )
     {
-        return Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( _applicationStateObservable switch
+        try
         {
-            not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Version ?? "Unknown" ) ),
-            _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
-        } );
+            return await Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( _applicationStateObservable switch
+            {
+                not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Version ?? "Unknown" ) ),
+                _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting application state" );
+            return await Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
-    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync( )
+    public async Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync( )
     {
-        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _applicationStateObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( ServiceStartTime )
-        } );
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _applicationStateObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( ServiceStartTime )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting service start time" );
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <summary>
@@ -144,109 +169,197 @@ public sealed class Monitor : IMonitor
         }
     }
 
-    public Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync( )
+    public async Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync( )
     {
-        // ReSharper disable once ExceptionNotDocumented
-        string? informationalVersion = Version;
-        return Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( informationalVersion switch
+        try
         {
-            null or "" => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( informationalVersion )
-        } );
+            // ReSharper disable once ExceptionNotDocumented
+            string? informationalVersion = Version;
+            return await Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( informationalVersion switch
+            {
+                null or "" => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( informationalVersion )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting application version" );
+            return await Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
-    public Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync( )
+    public async Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync( )
     {
-        return Task.FromResult<Results<Ok<long>, StatusCodeHttpResult>>( TypedResults.Ok( Environment.WorkingSet ) );
-    }
-
-    /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededLastRunCountAsync( )
-    {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsTakenSucceededLastRun )
-        } );
-    }
-
-    /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededSinceStartCountAsync( )
-    {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            return await Task.FromResult<Results<Ok<long>, StatusCodeHttpResult>>( TypedResults.Ok( Environment.WorkingSet ) ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsTakenSucceededSinceStart )
-        } );
+            Logger.Error( e, "Error getting application working set" );
+            return await Task.FromResult<Results<Ok<long>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededLastRunCountAsync( )
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededLastRunCountAsync( )
     {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsPrunedSucceededLastRun )
-        } );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsTakenSucceededLastRun )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededSinceStartCountAsync( )
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededSinceStartCountAsync( )
     {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsPrunedSucceededSinceStart )
-        } );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsTakenSucceededSinceStart )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunCountAsync( )
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededLastRunCountAsync( )
     {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsTakenFailedLastRun )
-        } );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsPrunedSucceededLastRun )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedSinceStartCountAsync( )
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededSinceStartCountAsync( )
     {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsTakenFailedSinceStart )
-        } );
-    }
-
-    public Task<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>> GetAllSnapshotCountsAsync( )
-    {
-        return Task.FromResult<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsPrunedSucceededSinceStart )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( new SnapshotCountMetrics( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart ) )
-        } );
-    }
-
-    /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunCountAsync( )
-    {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
-        {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsPrunedFailedLastRun )
-        } );
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedSinceStartCountAsync( )
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunCountAsync( )
     {
-        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( _snapshotsPrunedFailedSinceStart )
-        } );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsTakenFailedLastRun )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedSinceStartCountAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsTakenFailedSinceStart )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    public async Task<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>> GetAllSnapshotCountsAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( new SnapshotCountMetrics( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart ) )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunCountAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsPrunedFailedLastRun )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedSinceStartCountAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( _snapshotsPrunedFailedSinceStart )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, ErrorGettingSnapshotCount );
+            return await Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     /// <summary>
@@ -311,34 +424,58 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
-    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotTakenTimeAsync( )
+    public async Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotTakenTimeAsync( )
     {
-        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        try
         {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( SnapshotsTakenLastEnded )
-        } );
-    }
-
-    /// <inheritdoc />
-    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotPrunedTimeAsync( )
-    {
-        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
-        {
-            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-            _ => TypedResults.Ok( SnapshotsPrunedLastEnded )
-        } );
-    }
-
-    /// <inheritdoc />
-    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync( )
-    {
-        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>(
-            _applicationStateObservable switch
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
             {
                 null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
-                _ => TypedResults.Ok( DateTimeOffset.FromUnixTimeMilliseconds( Interlocked.Read( ref _nextRunTime ) ) )
-            } );
+                _ => TypedResults.Ok( SnapshotsTakenLastEnded )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting timestamp" );
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotPrunedTimeAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( SnapshotsPrunedLastEnded )
+            } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting timestamp" );
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync( )
+    {
+        try
+        {
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>(
+                _applicationStateObservable switch
+                {
+                    null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                    _ => TypedResults.Ok( DateTimeOffset.FromUnixTimeMilliseconds( Interlocked.Read( ref _nextRunTime ) ) )
+                } ).ConfigureAwait( false );
+        }
+        catch ( Exception e )
+        {
+            Logger.Error( e, "Error getting timestamp" );
+            return await Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.InternalServerError ) ).ConfigureAwait( false );
+        }
     }
 
     private string GetApplicationState( )
