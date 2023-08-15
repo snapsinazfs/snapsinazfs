@@ -95,7 +95,7 @@ public sealed class Monitor : IMonitor
         {
             return await Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( _applicationStateObservable switch
             {
-                not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Version ?? "Unknown" ) ),
+                not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Environment.WorkingSet, Version ?? "Unknown" ) ),
                 _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
             } ).ConfigureAwait( false );
         }

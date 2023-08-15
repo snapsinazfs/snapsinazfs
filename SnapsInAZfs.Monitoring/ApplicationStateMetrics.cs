@@ -18,12 +18,13 @@ namespace SnapsInAZfs.Monitoring;
 
 public sealed class ApplicationStateMetrics
 {
-    public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, DateTimeOffset nextRunTime, string version )
+    public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, DateTimeOffset nextRunTime, long workingSet, string version )
     {
         Version = version;
         State = state;
         ServiceStartTime = serviceStartTime.ToLocalTime( );
         NextRunTime = nextRunTime.ToLocalTime( );
+        WorkingSet = workingSet;
     }
 
     [JsonPropertyOrder( 3 )]
@@ -38,6 +39,9 @@ public sealed class ApplicationStateMetrics
     [JsonPropertyOrder( 4 )]
     public string? Version { get; set; }
 
+    [JsonPropertyOrder( 5 )]
+    public long WorkingSet { get; set; }
+
     [JsonIgnore]
-    internal static ApplicationStateMetrics Empty => new( string.Empty, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, string.Empty );
+    internal static ApplicationStateMetrics Empty => new( string.Empty, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, 0L, string.Empty );
 }
