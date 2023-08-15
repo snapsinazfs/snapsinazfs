@@ -2,11 +2,11 @@
 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
@@ -18,7 +18,7 @@ namespace SnapsInAZfs.Monitoring.Tests;
 
 [TestFixture]
 [TestOf( typeof( Monitor ) )]
-public class MonitorTests
+public partial class MonitorTests
 {
     [Test]
     public void AllDateTimeOffsetPropertiesUnixEpochByDefault( )
@@ -46,15 +46,20 @@ public class MonitorTests
         Monitor testMonitor = new( );
         SnapshotOperationsObservableMock observable = new( );
 
-        testMonitor.SnapshotsPrunedSucceededLastExecution = 1u;
-        testMonitor.SnapshotsPrunedFailedLastExecution = 1u;
-        testMonitor.SnapshotsTakenSucceededLastExecution = 1u;
-        testMonitor.SnapshotsTakenFailedLastExecution = 1u;
+        // Use reflection to set the fields to non-zero values, since we don't want to expose setters on the properties
+        FieldInfo snapshotsPrunedSucceededLastRunFieldInfo = typeof( Monitor ).GetField( "_snapshotsPrunedSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsPrunedSucceededLastRunFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsPrunedFailedLastRunFieldInfo = typeof( Monitor ).GetField( "_snapshotsPrunedFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsPrunedFailedLastRunFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsTakenSucceededLastRunFieldInfo = typeof( Monitor ).GetField( "_snapshotsTakenSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsTakenSucceededLastRunFieldInfo.SetValue( testMonitor, 1u );
+        FieldInfo snapshotsTakenFailedLastRunFieldInfo = typeof( Monitor ).GetField( "_snapshotsTakenFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        snapshotsTakenFailedLastRunFieldInfo.SetValue( testMonitor, 1u );
 
-        Assume.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.EqualTo( 1u ) );
-        Assume.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1u ) );
-        Assume.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.EqualTo( 1u ) );
-        Assume.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.EqualTo( 1u ) );
+        Assume.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.EqualTo( 1u ) );
+        Assume.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1u ) );
+        Assume.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.EqualTo( 1u ) );
+        Assume.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1u ) );
 
         testMonitor.RegisterSnapshotOperationsObservable( observable );
 
@@ -68,12 +73,12 @@ public class MonitorTests
         Assume.That( observable.IsTakeSnapshotSucceededRegistered, Is.True );
 
         observable.RaiseBeginPruningSnapshotsEvent( );
-        Assert.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.Zero );
-        Assert.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.Zero );
+        Assert.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.Zero );
+        Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.Zero );
 
         observable.RaiseBeginTakingSnapshotsEvent( );
-        Assert.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.Zero );
-        Assert.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.Zero );
+        Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
+        Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.Zero );
     }
 
     [Test]
@@ -115,10 +120,13 @@ public class MonitorTests
         ApplicationStateObservableMock observable = new( );
         Monitor testMonitor = new( );
         Assume.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assume.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
         testMonitor.RegisterApplicationStateObservable( observable, isSubscribedInitially );
         Assert.That( observable.IsApplicationStateChangedSubscribed, Is.EqualTo( isSubscribedInitially ) );
+        Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.EqualTo( isSubscribedInitially ) );
         testMonitor.RegisterApplicationStateObservable( observable, false );
         Assert.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
     }
 
     [Test]
@@ -127,38 +135,13 @@ public class MonitorTests
         ApplicationStateObservableMock observable = new( );
         Monitor testMonitor = new( );
         Assume.That( observable.IsApplicationStateChangedSubscribed, Is.False );
+        Assume.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
         testMonitor.RegisterApplicationStateObservable( observable );
-        Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
-    }
-
-    [Test]
-    public void RegisterApplicationStateObservable_ReturnsObservableStateIfSecondParameterFalse( )
-    {
-        ApplicationStateObservableMock observable = new( )
+        Assert.Multiple( ( ) =>
         {
-            State = ApplicationState.Executing
-        };
-        Monitor testMonitor = new( );
-        Assume.That( testMonitor.GetApplicationState( ), Is.EqualTo( "Not Registered" ) );
-        testMonitor.RegisterApplicationStateObservable( observable, false );
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
-        observable.State = ApplicationState.Idle;
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
-    }
-
-    [Test]
-    public void RegisterApplicationStateObservable_ReturnsObservableStateIfSecondParameterFalseAfterReRegister( )
-    {
-        ApplicationStateObservableMock observable = new( )
-        {
-            State = ApplicationState.Executing
-        };
-        Monitor testMonitor = new( );
-        Assume.That( testMonitor.GetApplicationState( ), Is.EqualTo( "Not Registered" ) );
-        testMonitor.RegisterApplicationStateObservable( observable );
-        Assert.That( testMonitor.GetApplicationState( ), Is.Not.EqualTo( observable.State.ToString( "G" ) ) );
-        testMonitor.RegisterApplicationStateObservable( observable, false );
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
+            Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
+            Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.True );
+        } );
     }
 
     [Test]
@@ -250,13 +233,13 @@ public class MonitorTests
         Monitor testMonitor = new( );
         SnapshotOperationsObservableMock observable = new( );
 
-        Assume.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.Zero );
+        Assume.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.Zero );
         Assume.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.Zero );
-        Assume.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.Zero );
+        Assume.That( testMonitor.SnapshotsTakenFailedLastRun, Is.Zero );
         Assume.That( testMonitor.SnapshotsTakenFailedSinceStart, Is.Zero );
-        Assume.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.Zero );
+        Assume.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.Zero );
         Assume.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
-        Assume.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.Zero );
+        Assume.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
         Assume.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
 
         testMonitor.RegisterSnapshotOperationsObservable( observable );
@@ -274,71 +257,68 @@ public class MonitorTests
         observable.RaisePruneSnapshotFailedEvent( "snapshot name", in now );
         Assert.Multiple( ( ) =>
         {
-            Assert.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenFailedSinceStart, Is.Zero );
-            Assert.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
-            Assert.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
         } );
 
         observable.RaiseTakeSnapshotFailedEvent( "snapshot name", in now );
         Assert.Multiple( ( ) =>
         {
-            Assert.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
-            Assert.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
         } );
 
         observable.RaisePruneSnapshotSucceededEvent( "snapshot name", in now );
         Assert.Multiple( ( ) =>
         {
-            Assert.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.Zero );
+            Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
         } );
 
         observable.RaiseTakeSnapshotSucceededEvent( "snapshot name", in now );
         Assert.Multiple( ( ) =>
         {
-            Assert.That( testMonitor.SnapshotsPrunedFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenFailedLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsPrunedSucceededLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsPrunedSucceededLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo( 1 ) );
-            Assert.That( testMonitor.SnapshotsTakenSucceededLastExecution, Is.EqualTo( 1 ) );
+            Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.EqualTo( 1 ) );
         } );
     }
 
-    private static IEnumerable<EventInfo> getSnapshotOperationEventArgsEvents( )
-    {
-        return typeof( Monitor ).GetEvents( ).Where( ei => ei.EventHandlerType == typeof( EventHandler<SnapshotOperationEventArgs> ) );
-    }
-
-    private class ApplicationStateObservableMock : IApplicationStateObservable
+    private sealed class ApplicationStateObservableMock : IApplicationStateObservable
     {
         private ApplicationState _state;
 
         public bool IsApplicationStateChangedSubscribed { get; private set; }
 
+        public bool IsNextRunTimeChangedSubscribed { get; private set; }
+
         public ApplicationState State
         {
             get => _state;
-            set
+            private set
             {
                 if ( _state != value )
                 {
@@ -348,6 +328,9 @@ public class MonitorTests
                 _state = value;
             }
         }
+
+        /// <inheritdoc />
+        public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
         public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged
         {
@@ -363,15 +346,40 @@ public class MonitorTests
             }
         }
 
+        /// <inheritdoc />
+        public event EventHandler<long>? NextRunTimeChanged
+        {
+            add
+            {
+                IsNextRunTimeChangedSubscribed = true;
+                _nextRunTimeChanged += value;
+            }
+            remove
+            {
+                IsNextRunTimeChangedSubscribed = false;
+                _nextRunTimeChanged -= value;
+            }
+        }
+
+        public void RaiseNextRunTimeChangedEvent( in DateTimeOffset timestamp )
+        {
+            _nextRunTimeChanged?.Invoke( this, timestamp.ToUnixTimeMilliseconds( ) );
+        }
+
+        public void RaiseApplicationStateChangedEvent( ApplicationState state )
+        {
+            State = state;
+        }
+
         private event EventHandler<ApplicationStateChangedEventArgs>? _applicationStateChanged;
+
+        private event EventHandler<long>? _nextRunTimeChanged;
     }
 
-    private class SnapshotOperationsObservableMock : ISnapshotOperationsObservable
+    private sealed class SnapshotOperationsObservableMock : ISnapshotOperationsObservable
     {
         public bool DidBeginPruningSnapshotsRegisterMultiple { get; private set; }
-
         public bool DidBeginTakingSnapshotsRegisterMultiple { get; private set; }
-
         public bool DidEndPruningSnapshotsRegisterMultiple { get; private set; }
         public bool DidEndTakingSnapshotsRegisterMultiple { get; private set; }
         public bool DidPruneSnapshotFailedRegisterMultiple { get; private set; }
@@ -388,7 +396,7 @@ public class MonitorTests
         public bool IsTakeSnapshotSucceededRegistered { get; private set; }
 
         /// <inheritdoc />
-        public event EventHandler? BeginPruningSnapshots
+        public event EventHandler<DateTimeOffset>? BeginPruningSnapshots
         {
             add
             {
@@ -404,7 +412,7 @@ public class MonitorTests
         }
 
         /// <inheritdoc />
-        public event EventHandler? BeginTakingSnapshots
+        public event EventHandler<DateTimeOffset>? BeginTakingSnapshots
         {
             add
             {
@@ -420,7 +428,7 @@ public class MonitorTests
         }
 
         /// <inheritdoc />
-        public event EventHandler? EndPruningSnapshots
+        public event EventHandler<DateTimeOffset>? EndPruningSnapshots
         {
             add
             {
@@ -436,7 +444,7 @@ public class MonitorTests
         }
 
         /// <inheritdoc />
-        public event EventHandler? EndTakingSnapshots
+        public event EventHandler<DateTimeOffset>? EndTakingSnapshots
         {
             add
             {
@@ -517,22 +525,22 @@ public class MonitorTests
 
         public void RaiseBeginPruningSnapshotsEvent( )
         {
-            _beginPruningSnapshots?.Invoke( this, EventArgs.Empty );
+            _beginPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         }
 
         public void RaiseBeginTakingSnapshotsEvent( )
         {
-            _beginTakingSnapshots?.Invoke( this, EventArgs.Empty );
+            _beginTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         }
 
         public void RaiseEndPruningSnapshotsEvent( )
         {
-            _endPruningSnapshots?.Invoke( this, EventArgs.Empty );
+            _endPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         }
 
         public void RaiseEndTakingSnapshotsEvent( )
         {
-            _endTakingSnapshots?.Invoke( this, EventArgs.Empty );
+            _endTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         }
 
         public void RaisePruneSnapshotFailedEvent( string name, in DateTimeOffset timestamp )
@@ -555,13 +563,13 @@ public class MonitorTests
             _takeSnapshotSucceeded?.Invoke( this, new( name, in timestamp ) );
         }
 
-        private event EventHandler? _beginPruningSnapshots;
+        private event EventHandler<DateTimeOffset>? _beginPruningSnapshots;
 
-        private event EventHandler? _beginTakingSnapshots;
+        private event EventHandler<DateTimeOffset>? _beginTakingSnapshots;
 
-        private event EventHandler? _endPruningSnapshots;
+        private event EventHandler<DateTimeOffset>? _endPruningSnapshots;
 
-        private event EventHandler? _endTakingSnapshots;
+        private event EventHandler<DateTimeOffset>? _endTakingSnapshots;
 
         private event EventHandler<SnapshotOperationEventArgs>? _pruneSnapshotFailed;
 

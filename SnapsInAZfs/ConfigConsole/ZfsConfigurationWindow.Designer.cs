@@ -13,7 +13,7 @@ namespace SnapsInAZfs.ConfigConsole {
     using Terminal.Gui;
     
     
-    public partial class ZfsConfigurationWindow : Terminal.Gui.Window {
+    public sealed partial class ZfsConfigurationWindow : Terminal.Gui.Window {
         
         private Terminal.Gui.ColorScheme whiteOnRed;
         

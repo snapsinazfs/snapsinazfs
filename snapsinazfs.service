@@ -19,6 +19,9 @@ LogNamespace=snapsinazfs
 ConfigurationDirectory=SnapsInAZfs
 Nice=1
 OOMPolicy=continue
+#Set this to 1 if you want to use dotnet diagnostic tools for debugging
+#Leave it at 0 for normal use, as it opens a unix socket listener for .net diagnostic tooling, if set to 1
+Environment=DOTNET_EnableDiagnostics=0
 
 [Install]
 Alias=siaz.service SnapsInAZfs.service

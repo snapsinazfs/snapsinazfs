@@ -29,7 +29,7 @@ public interface ISnapshotOperationsObservable
     ///     Note this event is slightly different than <see cref="BeginTakingSnapshots" />, as this event happens AFTER determination of
     ///     snapshots to prune.
     /// </remarks>
-    event EventHandler BeginPruningSnapshots;
+    event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
 
     /// <summary>
     ///     <see langword="event" /> invoked when the process of taking new snapshots has begun, before any snapshots are taken, and
@@ -39,7 +39,7 @@ public interface ISnapshotOperationsObservable
     ///     Note this event is slightly different than <see cref="BeginPruningSnapshots" />, as this event happens before determination
     ///     of snapshots to take, since those are calculated on-the-fly.
     /// </remarks>
-    event EventHandler BeginTakingSnapshots;
+    event EventHandler<DateTimeOffset>? BeginTakingSnapshots;
 
     /// <summary>
     ///     <see langword="event" /> invoked after all eligible snapshots have been pruned
@@ -47,7 +47,7 @@ public interface ISnapshotOperationsObservable
     /// <remarks>
     ///     This event will still be invoked if no snapshots were pruned.
     /// </remarks>
-    event EventHandler EndPruningSnapshots;
+    event EventHandler<DateTimeOffset>? EndPruningSnapshots;
 
     /// <summary>
     ///     <see langword="event" /> invoked after all configured snapshots have been taken
@@ -55,10 +55,25 @@ public interface ISnapshotOperationsObservable
     /// <remarks>
     ///     This event will still be invoked if no new snapshots were taken.
     /// </remarks>
-    event EventHandler EndTakingSnapshots;
+    event EventHandler<DateTimeOffset>? EndTakingSnapshots;
 
-    event EventHandler<SnapshotOperationEventArgs> PruneSnapshotFailed;
-    event EventHandler<SnapshotOperationEventArgs> PruneSnapshotSucceeded;
-    event EventHandler<SnapshotOperationEventArgs> TakeSnapshotFailed;
-    event EventHandler<SnapshotOperationEventArgs> TakeSnapshotSucceeded;
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to prune a snapshot fails
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to prune a snapshot succeeds
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotSucceeded;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to take a new snapshot fails
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotFailed;
+
+    /// <summary>
+    ///     <see langword="event" /> invoked when an attempt to take a new snapshot succeeds
+    /// </summary>
+    event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 }

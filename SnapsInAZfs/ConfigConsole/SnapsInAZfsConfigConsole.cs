@@ -12,8 +12,6 @@
 
 #endregion
 
-#nullable enable
-
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using SnapsInAZfs.Settings.Settings;
@@ -28,7 +26,7 @@ using Terminal.Gui;
 
 namespace SnapsInAZfs.ConfigConsole;
 
-public partial class SnapsInAZfsConfigConsole
+public sealed partial class SnapsInAZfsConfigConsole
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
@@ -238,7 +236,8 @@ public partial class SnapsInAZfsConfigConsole
                 LocalSystemName = _globalConfigurationWindow.localSystemNameTextBox.Text.ToString( )!,
                 ZfsPath = _globalConfigurationWindow.pathToZfsTextField.Text.ToString( )!,
                 ZpoolPath = _globalConfigurationWindow.pathToZpoolTextField.Text.ToString( )!,
-                Templates = Program.Settings!.Templates
+                Templates = Program.Settings!.Templates,
+                Monitoring = Program.Settings.Monitoring
             };
 
             ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
@@ -297,7 +296,7 @@ public partial class SnapsInAZfsConfigConsole
                     }
                 }
 
-                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.Never } ) );
+                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
                 return ( true, path );
             }
         }

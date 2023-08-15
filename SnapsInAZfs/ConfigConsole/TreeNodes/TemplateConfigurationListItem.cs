@@ -19,7 +19,7 @@ namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 /// <param name="TemplateName">The name of the template. Will be used as the display text in the list</param>
 /// <param name="ViewSettings">The view copy of the template</param>
 /// <param name="BaseSettings">The base copy of the template</param>
-public record TemplateConfigurationListItem( string TemplateName, TemplateSettings ViewSettings, TemplateSettings BaseSettings )
+public sealed record TemplateConfigurationListItem( string TemplateName, TemplateSettings ViewSettings, TemplateSettings BaseSettings )
 {
     /// <summary>
     ///     Gets or sets a reference to the base copy of the template

@@ -78,7 +78,7 @@
         },
         "Monitoring": {
             "type": "object",
-            "description": "Configuration section for configurable formatting options for monitoring.",
+            "description": "Configuration section for application monitoring functionality.",
             "additionalProperties": {
                 "$ref": "SnapsInAZfs.monitoring.schema.json",
                 "type": "object"
