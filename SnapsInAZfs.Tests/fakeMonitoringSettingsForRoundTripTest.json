@@ -1,0 +1,12 @@
+{
+  "Monitoring": {
+    "Kestrel": {
+      "SomeFakeKey":{
+        "FakeChildKey":{
+          "FakeChildProperty1": true,
+            "FakeChildProperty2": "some string"
+        }
+      }
+    }
+  }
+}

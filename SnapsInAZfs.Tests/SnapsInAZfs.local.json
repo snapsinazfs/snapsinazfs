@@ -1,17 +1,34 @@
 {
-  "$schema": "SnapsInAZfs.schema.json",
-  "$id": "SnapsInAZfs.json",
-  "$comments": "Default settings for SnapsInAZfs. It is not recommended to modify this file. Customized settings should be specified in /etc/SnapsInAZfs/SnapsInAZfs.local.json",
+  "$schema": "SnapsInAZfs.local.schema.json",
+  "$id": "SnapsInAZfs.local.json",
+  "$comments": "Values specified here supersede and extend the base configuration in SnapsInAZfs.json.",
   "DryRun": false,
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "LocalSystemName": "StandaloneSiazSystem",
-  "Daemonize": false,
-  "DaemonTimerIntervalSeconds": 10,
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
+  "Daemonize": false,
+  "Monitoring": {
+    "Enabled": false,
+    "Kestrel": {
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "TcpMonitoringEndpoint": {
+          "Url": "http://*:60763"
+        }
+        //"UnixSocketMonitoringEndpoint": {
+        //  "Url": "http://unix:/run/SnapsInAZfs.sock"
+        //}
+      },
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60
+      }
+    }
+  },
   "Templates": {
-    "default": {
+    "production": {
       "Formatting": {
         "ComponentSeparator": "_",
         "Prefix": "autosnap",
@@ -34,15 +51,6 @@
         "YearlyMonth": 1,
         "YearlyDay": 1,
         "YearlyTime": "00:00:00"
-      }
-    }
-  },
-  "Monitoring": {
-    "EnableHttp":  false, 
-    "Kestrel": {
-      "Limits": {
-        "MaxConcurrentConnections": 20,
-        "KeepAliveTimeout": 60 
       }
     }
   }

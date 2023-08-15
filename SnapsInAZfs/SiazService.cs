@@ -27,7 +27,7 @@ namespace SnapsInAZfs;
 /// <summary>
 ///     The service class for running everything but the configuration console
 /// </summary>
-public class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable
+public sealed class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private static readonly AutoResetEvent SnapshotAutoResetEvent = new( true );
@@ -36,8 +36,8 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
 
     private readonly SnapsInAZfsSettings _settings;
     private readonly IZfsCommandRunner _zfsCommandRunner;
-    private static DateTimeOffset _lastRunTime = DateTimeOffset.Now;
-    private static DateTimeOffset _nextRunTime = DateTimeOffset.Now;
+    private DateTimeOffset _lastRunTime = DateTimeOffset.Now;
+    private DateTimeOffset _nextRunTime = DateTimeOffset.Now;
 
     /// <summary>
     ///     Creates a new instance of the service class
@@ -77,7 +77,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     public ApplicationState State
     {
         get => _state;
-        set
+        internal set
         {
             if ( _state != value )
             {
@@ -87,6 +87,9 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             _state = value;
         }
     }
+
+    /// <inheritdoc />
+    public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
     public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
 
@@ -159,11 +162,6 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         return new( poolRootsWithPropertyValidities, missingPropertiesFound );
     }
 
-    public Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
-    {
-        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
-    }
-
     /// <inheritdoc />
     protected override async Task ExecuteAsync( CancellationToken stoppingToken )
     {
@@ -179,6 +177,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
         if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || LastExecutionResultCode is not SiazExecutionResultCode.Completed )
         {
+            State = ApplicationState.Terminating;
             serviceCancellationToken.ThrowIfCancellationRequested( );
             Environment.Exit( ExitStatus );
             return;
@@ -195,34 +194,36 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         // This is fine, as no action will be taken unless it actually is time to do so.
         // All subsequent runs will be on the greatest common factor of all configured frequent intervals in all templates.
 
-        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
+        SetNextRunTime( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
         Timestamp = DateTimeOffset.Now;
         GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out TimeSpan timerInterval, out DateTimeOffset expectedTickTimestamp );
-        const int maxDriftMilliseconds = 500;
+        const int maxDriftMilliseconds = 300;
 
         PeriodicTimer daemonRunTimer = new( timerInterval );
         try
         {
             while ( !serviceCancellationToken.IsCancellationRequested && await daemonRunTimer.WaitForNextTickAsync( serviceCancellationToken ).ConfigureAwait( true ) )
             {
-                if ( timerInterval < _daemonTimerInterval )
+                TimeSpan differenceBetweenCurrentAndConfiguredInterval = timerInterval.Subtract( _daemonTimerInterval ).Duration( );
+                if ( differenceBetweenCurrentAndConfiguredInterval.TotalMilliseconds > maxDriftMilliseconds )
                 {
+                    Logger.Debug( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
                     daemonRunTimer.Dispose( );
                     daemonRunTimer = new( _daemonTimerInterval );
                     timerInterval = _daemonTimerInterval;
-                    Logger.Debug( "Clock corrected. Adjusting timer interval to {0:G}", timerInterval );
                 }
 
                 try
                 {
                     Timestamp = DateTimeOffset.Now;
-                    Logger.Debug( "Timer ticked at {0:O}", Timestamp );
+                    Logger.Debug( "Timer ticked at {0:O} - Interval: {1:G}", Timestamp, timerInterval );
                     TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
+                    GetNextTickTimestamp( in Timestamp, in _daemonTimerInterval, out expectedTickTimestamp );
                     if ( drift.TotalMilliseconds > maxDriftMilliseconds )
                     {
                         GetNewTimerInterval( in Timestamp, in _daemonTimerInterval, out timerInterval, out expectedTickTimestamp );
-                        Logger.Debug( "Clock drifted beyond threshold. Adjusting timer interval to {0:G}", timerInterval );
+                        Logger.Debug( "Clock drifted beyond threshold (drift: {0:G}). Adjusting timer interval to {1:G}", drift, timerInterval );
                         daemonRunTimer.Dispose( );
                         try
                         {
@@ -243,7 +244,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
                     {
                         _lastRunTime = DateTimeOffset.Now;
                         Logger.Debug( "Running configured SIAZ operations at {0:O}", _lastRunTime );
-                        SetNextRunTime( in greatestCommonFrequentIntervalMinutes );
+                        SetNextRunTime( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
                         // Fire this off asynchronously
                         LastExecutionResultCode = await ExecuteSiazAsync( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait( true );
@@ -263,11 +264,12 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         }
         finally
         {
+            State = ApplicationState.Terminating;
             daemonRunTimer.Dispose( );
         }
     }
 
-    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    internal static void GetNextTickTimestamp( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out DateTimeOffset nextTickTimestamp )
     {
         DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         nextTickTimestamp = currentTimeTruncatedToTopOfCurrentHour + configuredTimerInterval;
@@ -280,7 +282,11 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         {
             nextTickTimestamp += configuredTimerInterval;
         }
+    }
 
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    {
+        GetNextTickTimestamp( in timestamp, in configuredTimerInterval, out nextTickTimestamp );
         calculatedTimerInterval = nextTickTimestamp - timestamp;
     }
 
@@ -294,10 +300,10 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
-        BeginPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        BeginPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         await Parallel.ForEachAsync( datasets.Values, new ParallelOptions { MaxDegreeOfParallelism = 4 }, async ( ds, _ ) => await PruneSnapshotsForDatasetAsync( ds ).ConfigureAwait( false ) ).ConfigureAwait( false );
 
-        EndPruningSnapshots?.Invoke( this, EventArgs.Empty );
+        EndPruningSnapshots?.Invoke( this, DateTimeOffset.Now );
         Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 
@@ -362,7 +368,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         }
 
         Logger.Info( "Begin taking snapshots for all configured datasets" );
-        BeginTakingSnapshots?.Invoke( this, EventArgs.Empty );
+        BeginTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         State = ApplicationState.TakingSnapshots;
         //Need to operate on a sorted collection
         ImmutableSortedDictionary<string, ZfsRecord> sortedDatasets = datasets.ToImmutableSortedDictionary( );
@@ -396,7 +402,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -406,7 +412,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -416,7 +422,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Daily snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Daily, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -426,7 +432,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -436,7 +442,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -446,7 +452,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
-                if ( success && !_settings.DryRun && snapshot is not null )
+                if ( success && snapshot is not null )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
                 }
@@ -476,7 +482,7 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
             Logger.Debug( "No snapshots needed for dataset {0}", ds.Name );
         }
 
-        EndTakingSnapshots?.Invoke( this, EventArgs.Empty );
+        EndTakingSnapshots?.Invoke( this, DateTimeOffset.Now );
         Logger.Info( "Finished taking snapshots" );
 
         SnapshotAutoResetEvent.Set( );
@@ -814,40 +820,43 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
         }
     }
 
-    private int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
+    private static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        return templates.Values.Select( t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 
-    private static void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes )
+    internal static int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
     {
-        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = Timestamp.Subtract( new TimeSpan( 0, 0, Timestamp.Minute % greatestCommonFrequentIntervalMinutes, Timestamp.Second, Timestamp.Millisecond, Timestamp.Microsecond ) );
+        return templates.Values.Select( static t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+    }
+
+    private void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
+    {
+        DateTimeOffset lastRunTimeSnappedToFrequentPeriod = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute % greatestCommonFrequentIntervalMinutes, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
         DateTimeOffset lastRunTimeSnappedToNextFrequentPeriod = lastRunTimeSnappedToFrequentPeriod.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        DateTimeOffset lastRunTimePlusFrequentInterval = _lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
-        _nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
+        DateTimeOffset lastRunTimePlusFrequentInterval = lastRunTime.AddMinutes( greatestCommonFrequentIntervalMinutes );
+        nextRunTime = new[] { lastRunTimePlusFrequentInterval, lastRunTimeSnappedToNextFrequentPeriod }.Min( );
+        NextRunTimeChanged?.Invoke( this, nextRunTime.ToUnixTimeMilliseconds( ) );
     }
 
-    public record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
+    public sealed record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
     // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
     private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
-
     private readonly IApplicationStateObserver _stateObserver;
     // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
 
-#region Implementation of ISnapshotOperationsObservable
+    /// <inheritdoc />
+    public event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? BeginPruningSnapshots;
+    public event EventHandler<DateTimeOffset>? BeginTakingSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? BeginTakingSnapshots;
+    public event EventHandler<DateTimeOffset>? EndPruningSnapshots;
 
     /// <inheritdoc />
-    public event EventHandler? EndPruningSnapshots;
-
-    /// <inheritdoc />
-    public event EventHandler? EndTakingSnapshots;
+    public event EventHandler<DateTimeOffset>? EndTakingSnapshots;
 
     /// <inheritdoc />
     public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
@@ -861,5 +870,6 @@ public class SiazService : BackgroundService, IApplicationStateObservable, ISnap
     /// <inheritdoc />
     public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
-#endregion
+    /// <inheritdoc />
+    public event EventHandler<long>? NextRunTimeChanged;
 }

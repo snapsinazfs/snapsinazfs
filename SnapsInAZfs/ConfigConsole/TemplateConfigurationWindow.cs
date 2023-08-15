@@ -26,7 +26,7 @@ using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.Templa
 
 namespace SnapsInAZfs.ConfigConsole;
 
-public partial class TemplateConfigurationWindow
+public sealed partial class TemplateConfigurationWindow
 {
     internal static bool TemplatesAddedRemovedOrModified;
     private static readonly ustring InvalidFieldValueDialogTitle = ustring.Make( InvalidFieldValueDialogTitleString );

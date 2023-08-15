@@ -19,7 +19,9 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface IApplicationStateObservable
 {
+    DateTimeOffset ServiceStartTime { get; }
     ApplicationState State { get; }
 
     event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
+    event EventHandler<long>? NextRunTimeChanged;
 }

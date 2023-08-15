@@ -14,6 +14,6 @@
 
 namespace SnapsInAZfs.Monitoring;
 
-public interface IMonitor
+public interface IMonitor : IApplicationStateObserver, ISnapshotOperationsObserver
 {
 }

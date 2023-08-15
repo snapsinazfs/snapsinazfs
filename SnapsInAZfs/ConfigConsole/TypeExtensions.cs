@@ -1,15 +1,20 @@
-// LICENSE:
-// 
+#region MIT LICENSE
+
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json.Nodes;
 using NStack;
 using Terminal.Gui;
 
@@ -126,6 +131,51 @@ public static class TypeExtensions
         return group.RadioLabels[ group.SelectedItem ].ToString( ) ?? throw new InvalidOperationException( "Failed getting radio group selected label string" );
     }
 
+    public static JsonNode? SerializeToJson( this IConfiguration configSection )
+    {
+        JsonObject obj = new( );
+
+        IConfigurationSection[] nodeChildren = configSection.GetChildren( ).ToArray( );
+        foreach ( IConfigurationSection childSection in nodeChildren )
+        {
+            if ( childSection.Path.EndsWith( ":0" ) )
+            {
+                JsonArray arrayNode = new( );
+
+                foreach ( IConfigurationSection arrayNodeChild in nodeChildren )
+                {
+                    arrayNode.Add( SerializeToJson( arrayNodeChild ) );
+                }
+
+                return arrayNode;
+            }
+
+            obj.Add( childSection.Key, SerializeToJson( childSection ) );
+        }
+
+        if ( obj.Any( ) || configSection is not IConfigurationSection section )
+        {
+            return obj;
+        }
+
+        if ( bool.TryParse( section.Value, out bool boolean ) )
+        {
+            return JsonValue.Create( boolean );
+        }
+
+        if ( decimal.TryParse( section.Value, out decimal real ) )
+        {
+            return JsonValue.Create( real );
+        }
+
+        if ( long.TryParse( section.Value, out long integer ) )
+        {
+            return JsonValue.Create( integer );
+        }
+
+        return JsonValue.Create( section.Value );
+    }
+
     /// <summary>
     ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int" /> version of it
     /// </summary>
@@ -167,7 +217,7 @@ public static class TypeExtensions
     /// </remarks>
     [Pure]
     [SuppressMessage( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
-    public static int ToInt32( this ustring value, int fallbackValue )
+    public static int ToInt32( this ustring value, in int fallbackValue )
     {
         try
         {

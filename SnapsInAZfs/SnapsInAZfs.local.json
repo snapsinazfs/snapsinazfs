@@ -10,7 +10,22 @@
   "ZpoolPath": "/usr/local/sbin/zpool",
   "Daemonize": false,
   "Monitoring": {
-    "Enabled": false
+    "EnableHttp": false,
+    "Kestrel": {
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "TcpMonitoringEndpoint": {
+          "Url": "http://*:60763"
+        }
+        //"UnixSocketMonitoringEndpoint": {
+        //  "Url": "http://unix:/run/SnapsInAZfs.sock"
+        //}
+      },
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60
+      }
+    }
   },
   "Templates": {
     "production": {

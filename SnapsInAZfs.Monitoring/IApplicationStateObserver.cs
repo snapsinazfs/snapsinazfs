@@ -12,6 +12,8 @@
 
 #endregion
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace SnapsInAZfs.Monitoring;
 
 /// <summary>
@@ -26,7 +28,36 @@ public interface IApplicationStateObserver
     /// <returns>
     ///     A string representing the current state of the monitored observable object.
     /// </returns>
-    string GetApplicationState( );
+    Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync( );
+
+    Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync( );
+
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync( );
+
+    /// <summary>
+    ///     Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
+    ///     <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />
+    /// </summary>
+    /// <returns></returns>
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync( );
+
+    /// <summary>
+    ///     Gets the version of the application
+    /// </summary>
+    /// <returns>The application version, as a <see langword="string" /></returns>
+    /// <remarks>
+    ///     Returns the version of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+    /// </remarks>
+    Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync( );
+
+    /// <summary>
+    ///     Gets the current working set (memory usage) of the application, in bytes
+    /// </summary>
+    /// <returns>The current working set, in bytes, as a <see langword="long" /></returns>
+    /// <remarks>
+    ///     Returns the working set of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+    /// </remarks>
+    Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync( );
 
     /// <summary>
     ///     Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />

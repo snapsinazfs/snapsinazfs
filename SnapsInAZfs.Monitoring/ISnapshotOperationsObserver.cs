@@ -12,6 +12,8 @@
 
 #endregion
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace SnapsInAZfs.Monitoring;
 
 /// <summary>
@@ -21,13 +23,18 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface ISnapshotOperationsObserver
 {
-    uint SnapshotsPrunedFailedLastExecution { get; set; }
-    uint SnapshotsPrunedFailedSinceStart { get; set; }
-    uint SnapshotsPrunedSucceededLastExecution { get; set; }
-    uint SnapshotsPrunedSucceededSinceStart { get; set; }
-    uint SnapshotsTakenFailedLastExecution { get; set; }
-    uint SnapshotsTakenFailedSinceStart { get; set; }
-    uint SnapshotsTakenSucceededLastExecution { get; set; }
-    uint SnapshotsTakenSucceededSinceStart { get; set; }
+    Task<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>> GetAllSnapshotCountsAsync( );
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotPrunedTimeAsync( );
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotTakenTimeAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunCountAsync( );
+    Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunNamesAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededLastRunCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunCountAsync( );
+    Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunNamesAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededLastRunCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededSinceStartCountAsync( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
 }

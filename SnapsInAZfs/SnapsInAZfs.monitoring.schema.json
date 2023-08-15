@@ -8,31 +8,16 @@
             "type": "string",
             "description": "Comments about this document. Not used in configuration validation."
         },
-        "Enabled": {
+        "EnableHttp": {
             "type": "boolean",
-            "description": "Global enable setting for all monitoring functionality. If true, monitoring is allowed. If false, all monitoring is disabled.",
+            "description": "Global enable setting for http monitoring functionality. If true, HTTP listeners are enabled. If false, HTTP listeners are disabled.",
             "default": false
         },
-        "TcpListenerEnabled": {
-            "type": "boolean",
-            "description": "Enable listening for HTTP monitoring requests via TCP",
-            "default": false
-        },
-        "TcpListenerPort": {
-            "type": "integer",
-            "description": "If TCP listener is enabled, listen on this port",
-            "default": 60763
-        },
-        "UnixSocketEnabled": {
-            "type": "boolean",
-            "description": "Enable listening for HTTP monitoring requests via unix socket. Use if monitoring locally or with a reverse proxy.",
-            "default": false
-        },
-        "UnixSocketPath": {
-            "type": "string",
-            "description": "If unix socket is enabled, use this path",
-            "default": "/run/SnapsInAZfs/MonitorSocket"
-        }
+        "Kestrel": {
+            "type": "object",
+            "description": "Standard KestrelServerOptions configuration. See Microsoft documentation for details.",
+            "additionalProperties": true 
+        } 
     },
     "additionalProperties": false
 }

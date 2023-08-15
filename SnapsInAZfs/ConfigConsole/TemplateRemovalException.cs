@@ -13,7 +13,7 @@ namespace SnapsInAZfs.ConfigConsole;
 /// <summary>
 ///     An exception type for failure to remove a template when requested
 /// </summary>
-public class TemplateRemovalException : ApplicationException
+public sealed class TemplateRemovalException : ApplicationException
 {
     /// <summary>
     ///     Creates a new instance of the <see cref="TemplateRemovalException" /> with the specified
