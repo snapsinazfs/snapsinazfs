@@ -12,7 +12,7 @@
 
 #endregion
 
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace SnapsInAZfs.Monitoring;
 
@@ -23,16 +23,18 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface ISnapshotOperationsObserver
 {
-    SnapshotCountMetrics GetAllSnapshotCounts( );
-    uint GetSnapshotsPrunedFailedLastRunCount( );
-    uint GetSnapshotsPrunedFailedSinceStartCount( );
-    uint GetSnapshotsPrunedSucceededLastRunCount( );
-    uint GetSnapshotsPrunedSucceededSinceStartCount( );
-    uint GetSnapshotsTakenFailedLastRunCount( );
-    uint GetSnapshotsTakenFailedSinceStartCount( );
-    uint GetSnapshotsTakenSucceededLastRunCount( );
-    uint GetSnapshotsTakenSucceededSinceStartCount( );
+    Task<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>> GetAllSnapshotCountsAsync( );
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotPrunedTimeAsync( );
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotTakenTimeAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunCountAsync( );
+    Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunNamesAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededLastRunCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunCountAsync( );
+    Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunNamesAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedSinceStartCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededLastRunCountAsync( );
+    Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededSinceStartCountAsync( );
     void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject );
-    IResult GetSnapshotsTakenFailedLastRunNames( );
-    IResult GetSnapshotsPrunedFailedLastRunNames( );
 }

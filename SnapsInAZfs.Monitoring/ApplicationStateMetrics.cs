@@ -37,4 +37,7 @@ public sealed class ApplicationStateMetrics
 
     [JsonPropertyOrder( 4 )]
     public string? Version { get; set; }
+
+    [JsonIgnore]
+    internal static ApplicationStateMetrics Empty => new( string.Empty, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, string.Empty );
 }

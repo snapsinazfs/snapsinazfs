@@ -38,7 +38,7 @@
     }
   },
   "Monitoring": {
-    "Enabled":  false, 
+    "EnableHttp":  false, 
     "Kestrel": {
       "Limits": {
         "MaxConcurrentConnections": 20,

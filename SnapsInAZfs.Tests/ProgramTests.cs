@@ -236,14 +236,14 @@ public class ProgramTests
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied( )
     {
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), true, true );
-        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "Enabled" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, new[] { "--monitor" }, true, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), false, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "Monitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), true, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, new[] { "--no-monitor" }, true, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), false, false );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), true, true );
+        yield return new( typeof( CommandLineArguments ).GetProperty( "NoMonitor" )!, Array.Empty<string>( ), false, typeof( MonitoringSettings ).GetProperty( "EnableHttp" ), false, false );
     }
 
     private static PropertyInfo[] GetSnapsInAZfsSettingsPropertyInfos( )

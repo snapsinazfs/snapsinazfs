@@ -18,7 +18,7 @@ namespace SnapsInAZfs.Monitoring.Tests;
 
 [TestFixture]
 [TestOf( typeof( Monitor ) )]
-public class MonitorTests
+public partial class MonitorTests
 {
     [Test]
     public void AllDateTimeOffsetPropertiesUnixEpochByDefault( )
@@ -142,36 +142,6 @@ public class MonitorTests
             Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
             Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.True );
         } );
-    }
-
-    [Test]
-    public void RegisterApplicationStateObservable_ReturnsObservableStateIfSecondParameterFalse( )
-    {
-        ApplicationStateObservableMock observable = new( )
-        {
-            State = ApplicationState.Executing
-        };
-        Monitor testMonitor = new( );
-        Assume.That( testMonitor.GetApplicationState( ), Is.EqualTo( "Not Registered" ) );
-        testMonitor.RegisterApplicationStateObservable( observable, false );
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
-        observable.State = ApplicationState.Idle;
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
-    }
-
-    [Test]
-    public void RegisterApplicationStateObservable_ReturnsObservableStateIfSecondParameterFalseAfterReRegister( )
-    {
-        ApplicationStateObservableMock observable = new( )
-        {
-            State = ApplicationState.Executing
-        };
-        Monitor testMonitor = new( );
-        Assume.That( testMonitor.GetApplicationState( ), Is.EqualTo( "Not Registered" ) );
-        testMonitor.RegisterApplicationStateObservable( observable );
-        Assert.That( testMonitor.GetApplicationState( ), Is.Not.EqualTo( observable.State.ToString( "G" ) ) );
-        testMonitor.RegisterApplicationStateObservable( observable, false );
-        Assert.That( testMonitor.GetApplicationState( ), Is.EqualTo( observable.State.ToString( "G" ) ) );
     }
 
     [Test]
@@ -337,11 +307,6 @@ public class MonitorTests
         } );
     }
 
-    private static IEnumerable<EventInfo> getSnapshotOperationEventArgsEvents( )
-    {
-        return typeof( Monitor ).GetEvents( ).Where( ei => ei.EventHandlerType == typeof( EventHandler<SnapshotOperationEventArgs> ) );
-    }
-
     private sealed class ApplicationStateObservableMock : IApplicationStateObservable
     {
         private ApplicationState _state;
@@ -353,7 +318,7 @@ public class MonitorTests
         public ApplicationState State
         {
             get => _state;
-            set
+            private set
             {
                 if ( _state != value )
                 {
@@ -399,6 +364,11 @@ public class MonitorTests
         public void RaiseNextRunTimeChangedEvent( in DateTimeOffset timestamp )
         {
             _nextRunTimeChanged?.Invoke( this, timestamp.ToUnixTimeMilliseconds( ) );
+        }
+
+        public void RaiseApplicationStateChangedEvent( ApplicationState state )
+        {
+            State = state;
         }
 
         private event EventHandler<ApplicationStateChangedEventArgs>? _applicationStateChanged;

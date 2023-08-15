@@ -117,9 +117,12 @@ internal class Program
             // ReSharper disable once AccessToDisposedClosure
             serviceBuilder.Host
                           .UseSystemd( )
-                          .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
+                          .ConfigureServices( ( _, services ) =>
+                          {
+                              services.AddHostedService( _ => serviceInstance );
+                          } );
             WebApplication svc;
-            if ( Settings.Monitoring.Enabled )
+            if ( Settings.Monitoring.EnableHttp )
             {
                 serviceBuilder.WebHost
                               .UseKestrel( static ( _, kestrelOptions ) =>
@@ -131,28 +134,32 @@ internal class Program
                               } );
                 svc = serviceBuilder.Build( );
 
+                // ReSharper disable HeapView.DelegateAllocation
                 RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
-                statusGroup.MapGet( "/", ServiceObserver.GetApplicationState );
-                statusGroup.MapGet( "/state", ServiceObserver.GetApplicationState );
-                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationState );
-                statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSet );
-                statusGroup.MapGet( "/version", ServiceObserver.GetVersion );
-                statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTime );
-                statusGroup.MapGet( "/nextruntime", ServiceObserver.GetNextRunTime );
+                statusGroup.MapGet( "/", ServiceObserver.GetApplicationStateAsync );
+                statusGroup.MapGet( "/state", ServiceObserver.GetApplicationStateAsync );
+                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationStateAsync );
+                statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSetAsync );
+                statusGroup.MapGet( "/version", ServiceObserver.GetVersionAsync );
+                statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTimeAsync );
+                statusGroup.MapGet( "/nextruntime", ServiceObserver.GetNextRunTimeAsync );
 
                 RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
-                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCounts );
-                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCounts );
-                snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCount );
-                snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCount );
-                snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCount );
-                snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCount );
-                snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCount );
-                snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCount );
-                snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCount );
-                snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCount );
-                snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNames );
-                snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNames );
+                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCountsAsync );
+                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCountsAsync );
+                snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCountAsync );
+                snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCountAsync );
+                snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCountAsync );
+                snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCountAsync );
+                snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCountAsync );
+                snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCountAsync );
+                snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCountAsync );
+                snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCountAsync );
+                snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNamesAsync );
+                snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNamesAsync );
+                snapshotsGroup.MapGet( "/lastsnapshottakentime", ServiceObserver.GetLastSnapshotTakenTimeAsync );
+                snapshotsGroup.MapGet( "/lastsnapshotprunedtime", ServiceObserver.GetLastSnapshotPrunedTimeAsync );
+                // ReSharper restore HeapView.DelegateAllocation
             }
             else
             {
@@ -187,11 +194,73 @@ internal class Program
         programSettings.TakeSnapshots = ( programSettings.TakeSnapshots || args.TakeSnapshots || args.Cron ) && !args.NoTakeSnapshots;
         programSettings.PruneSnapshots = ( programSettings.PruneSnapshots || args.PruneSnapshots || args.ForcePrune || args.Cron ) && !args.NoPruneSnapshots;
         programSettings.Daemonize = ( programSettings.Daemonize || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
-        programSettings.Monitoring.Enabled = ( programSettings.Monitoring.Enabled || args.Monitor ) && args is { NoMonitor: false, ConfigConsole: false };
+        programSettings.Monitoring.EnableHttp = ( programSettings.Monitoring.EnableHttp || args.Monitor ) && args is { NoMonitor: false, ConfigConsole: false };
         if ( args.DaemonTimerInterval > 0 )
         {
             programSettings.DaemonTimerIntervalSeconds = Math.Clamp( args.DaemonTimerInterval, 1u, 60u );
         }
+    }
+
+    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
+    {
+        // Configuration is built in the following order from various sources.
+        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
+        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
+        // override earlier values.
+        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
+        // and is loaded/parsed FIRST, before any configuration specified below.
+        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
+        // See snapsinazfs(5) for detailed configuration documentation.
+        // Configuration order, if not overridden by command-line options:
+        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
+        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
+        // 6. Command-line arguments passed on invocation of SnapsInAZfs
+        Logger.Debug( "Getting base configuration from files" );
+        ConfigurationBuilder configBuilder = new( );
+
+        IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0 ? args.ConfigFiles : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" };
+        foreach ( string filePath in requestedFiles )
+        {
+            if ( !File.Exists( filePath ) )
+            {
+                Logger.Debug( "Configuration file not found at {0}", filePath );
+                continue;
+            }
+
+            Logger.Trace( "Loading configuration file {0}", filePath );
+            configBuilder.AddJsonFile( filePath, false, false );
+        }
+
+        if ( configBuilder.Sources.Count == 0 )
+        {
+            Logger.Fatal( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString( true ) );
+            rootConfiguration = null;
+            return false;
+        }
+
+        rootConfiguration = configBuilder.Build( );
+
+        Logger.Trace( "Building settings objects from IConfiguration" );
+        try
+        {
+            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
+            IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" );
+            if ( kestrelSection.Exists( ) )
+            {
+                IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren( );
+                settings.Monitoring.Kestrel = kestrelSettings.ToDictionary( static k => k.Key, static v => v.SerializeToJson( ) );
+            }
+
+            IConfigurationSection nlogConfigSection = rootConfiguration.GetSection( "NLog" );
+            LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration( nlogConfigSection ) : new LoggingConfiguration( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Fatal( ex, "Unable to parse settings from JSON" );
+            return false;
+        }
+
+        return true;
     }
 
     internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
@@ -279,67 +348,5 @@ internal class Program
     #else
             zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
     #endif
-    }
-
-    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
-    {
-        // Configuration is built in the following order from various sources.
-        // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
-        // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
-        // override earlier values.
-        // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
-        // and is loaded/parsed FIRST, before any configuration specified below.
-        // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-        // See snapsinazfs(5) for detailed configuration documentation.
-        // Configuration order, if not overridden by command-line options:
-        // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
-        // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
-        // 6. Command-line arguments passed on invocation of SnapsInAZfs
-        Logger.Debug( "Getting base configuration from files" );
-        ConfigurationBuilder configBuilder = new( );
-
-        IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0 ? args.ConfigFiles : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" };
-        foreach ( string filePath in requestedFiles )
-        {
-            if ( !File.Exists( filePath ) )
-            {
-                Logger.Debug( "Configuration file not found at {0}", filePath );
-                continue;
-            }
-
-            Logger.Trace( "Loading configuration file {0}", filePath );
-            configBuilder.AddJsonFile( filePath, false, false );
-        }
-
-        if ( configBuilder.Sources.Count == 0 )
-        {
-            Logger.Fatal( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString( true ) );
-            rootConfiguration = null;
-            return false;
-        }
-
-        rootConfiguration = configBuilder.Build( );
-
-        Logger.Trace( "Building settings objects from IConfiguration" );
-        try
-        {
-            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
-            IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection( "Monitoring" ).GetSection( "Kestrel" );
-            if ( kestrelSection.Exists( ) )
-            {
-                IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren( );
-                settings.Monitoring.Kestrel = kestrelSettings.ToDictionary( static k => k.Key, static v => v.SerializeToJson( ) );
-            }
-
-            IConfigurationSection nlogConfigSection = rootConfiguration.GetSection( "NLog" );
-            LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration( nlogConfigSection ) : new LoggingConfiguration( );
-        }
-        catch ( Exception ex )
-        {
-            Logger.Fatal( ex, "Unable to parse settings from JSON" );
-            return false;
-        }
-
-        return true;
     }
 }

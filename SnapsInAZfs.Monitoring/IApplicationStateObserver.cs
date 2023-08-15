@@ -12,6 +12,8 @@
 
 #endregion
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 namespace SnapsInAZfs.Monitoring;
 
 /// <summary>
@@ -26,16 +28,18 @@ public interface IApplicationStateObserver
     /// <returns>
     ///     A string representing the current state of the monitored observable object.
     /// </returns>
-    string GetApplicationState( );
+    Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync( );
 
-    ApplicationStateMetrics GetFullApplicationState( );
+    Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync( );
+
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync( );
 
     /// <summary>
     ///     Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
     ///     <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />
     /// </summary>
     /// <returns></returns>
-    DateTimeOffset GetServiceStartTime( );
+    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync( );
 
     /// <summary>
     ///     Gets the version of the application
@@ -44,7 +48,7 @@ public interface IApplicationStateObserver
     /// <remarks>
     ///     Returns the version of the application owning the <see cref="IApplicationStateObserver" /> object instance.
     /// </remarks>
-    string GetVersion( );
+    Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync( );
 
     /// <summary>
     ///     Gets the current working set (memory usage) of the application, in bytes
@@ -53,7 +57,7 @@ public interface IApplicationStateObserver
     /// <remarks>
     ///     Returns the working set of the application owning the <see cref="IApplicationStateObserver" /> object instance.
     /// </remarks>
-    long GetWorkingSet( );
+    Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync( );
 
     /// <summary>
     ///     Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />
@@ -63,6 +67,4 @@ public interface IApplicationStateObserver
     ///     <see cref="IApplicationStateObservable.ApplicationStateChanged" /> <see langword="event" />
     /// </remarks>
     public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true );
-
-    DateTimeOffset GetNextRunTime( );
 }

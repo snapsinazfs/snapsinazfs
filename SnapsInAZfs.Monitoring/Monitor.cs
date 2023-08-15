@@ -13,8 +13,10 @@
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using NLog;
 
 namespace SnapsInAZfs.Monitoring;
@@ -30,49 +32,33 @@ public sealed class Monitor : IMonitor
     private readonly object _snapshotsPrunedFailedLastRunNamesLock = new( );
     private readonly List<string> _snapshotsTakenFailedLastRunNames = new( );
     private readonly object _snapshotsTakenFailedLastRunNamesLock = new( );
-
     private ApplicationState _applicationState;
     private IApplicationStateObservable? _applicationStateObservable;
     private bool _applicationStateObservableEventSubscribed;
-
     private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds( );
     private ISnapshotOperationsObservable? _snapshotOperationsObservable;
-
     private uint _snapshotsPrunedFailedLastRun;
-
     private uint _snapshotsPrunedFailedSinceStart;
-
     private uint _snapshotsPrunedSucceededLastRun;
-
     private uint _snapshotsPrunedSucceededSinceStart;
-
     private uint _snapshotsTakenFailedLastRun;
-
     private uint _snapshotsTakenFailedSinceStart;
-
     private uint _snapshotsTakenSucceededLastRun;
-
     private uint _snapshotsTakenSucceededSinceStart;
-
     public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
-
     public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
-
     public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
-
     public uint SnapshotsPrunedSucceededLastRun => _snapshotsPrunedSucceededLastRun;
-
     public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
-
     public uint SnapshotsTakenFailedLastRun => _snapshotsTakenFailedLastRun;
-
     public uint SnapshotsTakenFailedSinceStart => _snapshotsTakenFailedSinceStart;
-
     public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
-
     public uint SnapshotsTakenSucceededLastRun => _snapshotsTakenSucceededLastRun;
-
     public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
+    internal DateTimeOffset NextRunTime => DateTimeOffset.FromUnixTimeMilliseconds( Interlocked.Read( ref _nextRunTime ) );
+    internal DateTimeOffset ServiceStartTime => _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
+
+    private static string? Version => Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion;
 
     /// <summary>
     ///     Gets the state of the registered <see cref="IApplicationStateObservable" /> object.
@@ -80,23 +66,36 @@ public sealed class Monitor : IMonitor
     /// <returns>
     ///     If subscribed to the <see cref="IApplicationStateObservable.ApplicationStateChanged" /> event, returns the last known state
     ///     this object was informed of.<br />
-    ///     If not subscribed, gets the current <see cref="IApplicationStateObservable.State" /> value from the registered object.<br />
+    ///     If not subscribed, gets the current <see cref="IApplicationStateObservable.State" /> value from the registered object, as a
+    ///     string.<br />
     ///     If no object is registered, returns the string "Not Registered"
     /// </returns>
-    public string GetApplicationState( )
+    public Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync( )
     {
-        return _applicationStateObservable switch
+        return Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( _applicationStateObservable switch
         {
-            null => "Not Registered",
-            _ when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
-            _ => _applicationStateObservable.State.ToString( "G" )
-        };
+            not null => TypedResults.Ok( GetApplicationState( ) ),
+            _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+        } );
     }
 
     /// <inheritdoc />
-    public DateTimeOffset GetServiceStartTime( )
+    public Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync( )
     {
-        return _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
+        return Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( _applicationStateObservable switch
+        {
+            not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Version ?? "Unknown" ) ),
+            _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+        } );
+    }
+
+    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync( )
+    {
+        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _applicationStateObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( ServiceStartTime )
+        } );
     }
 
     /// <summary>
@@ -120,6 +119,8 @@ public sealed class Monitor : IMonitor
     /// <exception cref="InvalidOperationException">
     ///     Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object.
     /// </exception>
+    [SuppressMessage( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
+    [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
     public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true )
     {
         if ( _applicationStateObservable is not null && !ReferenceEquals( _applicationStateObservable, observableObject ) )
@@ -143,70 +144,109 @@ public sealed class Monitor : IMonitor
         }
     }
 
-    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
-    public string GetVersion( )
+    public Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync( )
     {
         // ReSharper disable once ExceptionNotDocumented
-        return Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion ?? string.Empty;
+        string? informationalVersion = Version;
+        return Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( informationalVersion switch
+        {
+            null or "" => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( informationalVersion )
+        } );
     }
 
-    [ExcludeFromCodeCoverage( Justification = "Not useful to test this" )]
-    public long GetWorkingSet( )
+    public Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync( )
     {
-        return Environment.WorkingSet;
-    }
-
-    /// <inheritdoc />
-    public uint GetSnapshotsTakenSucceededLastRunCount( )
-    {
-        return _snapshotsTakenSucceededLastRun;
-    }
-
-    /// <inheritdoc />
-    public uint GetSnapshotsTakenSucceededSinceStartCount( )
-    {
-        return _snapshotsTakenSucceededSinceStart;
+        return Task.FromResult<Results<Ok<long>, StatusCodeHttpResult>>( TypedResults.Ok( Environment.WorkingSet ) );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedSucceededLastRunCount( )
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededLastRunCountAsync( )
     {
-        return _snapshotsPrunedSucceededLastRun;
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsTakenSucceededLastRun )
+        } );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedSucceededSinceStartCount( )
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenSucceededSinceStartCountAsync( )
     {
-        return _snapshotsPrunedSucceededSinceStart;
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsTakenSucceededSinceStart )
+        } );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenFailedLastRunCount( )
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededLastRunCountAsync( )
     {
-        return _snapshotsTakenFailedLastRun;
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsPrunedSucceededLastRun )
+        } );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsTakenFailedSinceStartCount( )
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedSucceededSinceStartCountAsync( )
     {
-        return _snapshotsTakenFailedSinceStart;
-    }
-
-    public SnapshotCountMetrics GetAllSnapshotCounts( )
-    {
-        return new( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart );
-    }
-
-    /// <inheritdoc />
-    public uint GetSnapshotsPrunedFailedLastRunCount( )
-    {
-        return _snapshotsPrunedFailedLastRun;
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsPrunedSucceededSinceStart )
+        } );
     }
 
     /// <inheritdoc />
-    public uint GetSnapshotsPrunedFailedSinceStartCount( )
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunCountAsync( )
     {
-        return _snapshotsPrunedFailedSinceStart;
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsTakenFailedLastRun )
+        } );
+    }
+
+    /// <inheritdoc />
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsTakenFailedSinceStartCountAsync( )
+    {
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsTakenFailedSinceStart )
+        } );
+    }
+
+    public Task<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>> GetAllSnapshotCountsAsync( )
+    {
+        return Task.FromResult<Results<Ok<SnapshotCountMetrics>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( new SnapshotCountMetrics( in _snapshotsPrunedFailedLastRun, in _snapshotsPrunedFailedSinceStart, in _snapshotsPrunedSucceededLastRun, in _snapshotsPrunedSucceededSinceStart, in _snapshotsTakenFailedLastRun, in _snapshotsTakenFailedSinceStart, in _snapshotsTakenSucceededLastRun, in _snapshotsTakenSucceededSinceStart ) )
+        } );
+    }
+
+    /// <inheritdoc />
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunCountAsync( )
+    {
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsPrunedFailedLastRun )
+        } );
+    }
+
+    /// <inheritdoc />
+    public Task<Results<Ok<uint>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedSinceStartCountAsync( )
+    {
+        return Task.FromResult<Results<Ok<uint>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( _snapshotsPrunedFailedSinceStart )
+        } );
     }
 
     /// <summary>
@@ -217,6 +257,8 @@ public sealed class Monitor : IMonitor
     /// <exception cref="InvalidOperationException">
     ///     Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object.
     /// </exception>
+    [SuppressMessage( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
+    [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
     public void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject )
     {
         if ( _snapshotOperationsObservable is not null && !ReferenceEquals( _snapshotOperationsObservable, observableObject ) )
@@ -241,43 +283,72 @@ public sealed class Monitor : IMonitor
     }
 
     /// <inheritdoc />
-    public IResult GetSnapshotsTakenFailedLastRunNames( )
+    public Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsTakenFailedLastRunNamesAsync( )
     {
+        if ( _snapshotOperationsObservable is null )
+        {
+            return Task.FromResult<Results<Ok<List<string>>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ) );
+        }
+
         lock ( _snapshotsTakenFailedLastRunNamesLock )
         {
-            if ( _snapshotsTakenFailedLastRunNames.Count != 0 )
-            {
-                return Results.Json( _snapshotsTakenFailedLastRunNames.ToList( ) );
-            }
+            return Task.FromResult<Results<Ok<List<string>>, StatusCodeHttpResult>>( TypedResults.Ok( _snapshotsTakenFailedLastRunNames.ToList( ) ) );
         }
-
-        return Results.NoContent( );
     }
 
     /// <inheritdoc />
-    public IResult GetSnapshotsPrunedFailedLastRunNames( )
+    public Task<Results<Ok<List<string>>, StatusCodeHttpResult>> GetSnapshotsPrunedFailedLastRunNamesAsync( )
     {
+        if ( _snapshotOperationsObservable is null )
+        {
+            return Task.FromResult<Results<Ok<List<string>>, StatusCodeHttpResult>>( TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ) );
+        }
+
         lock ( _snapshotsPrunedFailedLastRunNamesLock )
         {
-            if ( _snapshotsPrunedFailedLastRunNames.Count != 0 )
-            {
-                return Results.Json( _snapshotsPrunedFailedLastRunNames.ToList( ) );
-            }
+            return Task.FromResult<Results<Ok<List<string>>, StatusCodeHttpResult>>( TypedResults.Ok( _snapshotsPrunedFailedLastRunNames.ToList( ) ) );
         }
-
-        return Results.NoContent( );
     }
 
     /// <inheritdoc />
-    public DateTimeOffset GetNextRunTime( )
+    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotTakenTimeAsync( )
     {
-        long nextRunTime = Interlocked.Read( ref _nextRunTime );
-        return DateTimeOffset.FromUnixTimeMilliseconds( nextRunTime );
+        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( SnapshotsTakenLastEnded )
+        } );
     }
 
-    public ApplicationStateMetrics GetFullApplicationState( )
+    /// <inheritdoc />
+    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetLastSnapshotPrunedTimeAsync( )
     {
-        return new( GetApplicationState( ), GetServiceStartTime( ), GetNextRunTime( ), GetVersion( ) );
+        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>( _snapshotOperationsObservable switch
+        {
+            null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+            _ => TypedResults.Ok( SnapshotsPrunedLastEnded )
+        } );
+    }
+
+    /// <inheritdoc />
+    public Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync( )
+    {
+        return Task.FromResult<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>>(
+            _applicationStateObservable switch
+            {
+                null => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable ),
+                _ => TypedResults.Ok( DateTimeOffset.FromUnixTimeMilliseconds( Interlocked.Read( ref _nextRunTime ) ) )
+            } );
+    }
+
+    private string GetApplicationState( )
+    {
+        return _applicationStateObservable switch
+        {
+            null => "Not Registered",
+            not null when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
+            _ => _applicationStateObservable.State.ToString( "G" )
+        };
     }
 
     private void ServiceOnApplicationStateChanged( object? sender, ApplicationStateChangedEventArgs e )

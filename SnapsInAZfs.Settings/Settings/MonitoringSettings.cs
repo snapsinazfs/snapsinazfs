@@ -19,7 +19,7 @@ namespace SnapsInAZfs.Settings.Settings;
 public sealed class MonitoringSettings
 {
     [JsonPropertyOrder( 1 )]
-    public required bool Enabled { get; set; }
+    public required bool EnableHttp { get; set; }
 
     [JsonPropertyOrder( 2 )]
     [JsonIgnore( Condition = JsonIgnoreCondition.WhenWritingNull )]

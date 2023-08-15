@@ -10,7 +10,7 @@
   "ZpoolPath": "/usr/local/sbin/zpool",
   "Daemonize": false,
   "Monitoring": {
-    "Enabled": false,
+    "EnableHttp": false,
     "Kestrel": {
       "AllowedHosts": "*",
       "Endpoints": {

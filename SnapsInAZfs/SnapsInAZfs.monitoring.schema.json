@@ -8,9 +8,9 @@
             "type": "string",
             "description": "Comments about this document. Not used in configuration validation."
         },
-        "Enabled": {
+        "EnableHttp": {
             "type": "boolean",
-            "description": "Global enable setting for all monitoring functionality. If true, monitoring is allowed. If false, all monitoring is disabled.",
+            "description": "Global enable setting for http monitoring functionality. If true, HTTP listeners are enabled. If false, HTTP listeners are disabled.",
             "default": false
         },
         "Kestrel": {
