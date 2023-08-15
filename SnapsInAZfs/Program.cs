@@ -99,83 +99,11 @@ internal class Program
             return 0;
         }
 
-        SiazService.Timestamp = DateTimeOffset.Now;
-        SiazService? serviceInstance = null;
-        try
+        return Settings.Monitoring.EnableHttp switch
         {
-            serviceInstance = GetSiazServiceInstance( Settings );
-            if ( serviceInstance is null )
-            {
-                Logger.Fatal( "Failed to create service instance - exiting" );
-                LogManager.Shutdown( );
-                return (int)Errno.ENOATTR;
-            }
-
-            WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
-
-            // Disposal happens after service shutdown, so this inspection can be ignored here
-            // ReSharper disable once AccessToDisposedClosure
-            serviceBuilder.Host
-                          .UseSystemd( )
-                          .ConfigureServices( ( _, services ) =>
-                          {
-                              services.AddHostedService( _ => serviceInstance );
-                          } );
-            WebApplication svc;
-            if ( Settings.Monitoring.EnableHttp )
-            {
-                serviceBuilder.WebHost
-                              .UseKestrel( static ( _, kestrelOptions ) =>
-                              {
-                                  kestrelOptions.Configure( _configurationRoot
-                                                            .GetRequiredSection( "Monitoring" )
-                                                            .GetSection( "Kestrel" ) )
-                                                .Load( );
-                              } );
-                svc = serviceBuilder.Build( );
-
-                // ReSharper disable HeapView.DelegateAllocation
-                RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
-                statusGroup.MapGet( "/", ServiceObserver.GetApplicationStateAsync );
-                statusGroup.MapGet( "/state", ServiceObserver.GetApplicationStateAsync );
-                statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationStateAsync );
-                statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSetAsync );
-                statusGroup.MapGet( "/version", ServiceObserver.GetVersionAsync );
-                statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTimeAsync );
-                statusGroup.MapGet( "/nextruntime", ServiceObserver.GetNextRunTimeAsync );
-
-                RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
-                snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCountsAsync );
-                snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCountsAsync );
-                snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCountAsync );
-                snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCountAsync );
-                snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCountAsync );
-                snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCountAsync );
-                snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCountAsync );
-                snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCountAsync );
-                snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCountAsync );
-                snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCountAsync );
-                snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNamesAsync );
-                snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNamesAsync );
-                snapshotsGroup.MapGet( "/lastsnapshottakentime", ServiceObserver.GetLastSnapshotTakenTimeAsync );
-                snapshotsGroup.MapGet( "/lastsnapshotprunedtime", ServiceObserver.GetLastSnapshotPrunedTimeAsync );
-                // ReSharper restore HeapView.DelegateAllocation
-            }
-            else
-            {
-                svc = serviceBuilder.Build( );
-            }
-
-            using CancellationTokenSource tokenSource = new( );
-            CancellationToken masterToken = tokenSource.Token;
-            await svc.StartAsync( masterToken ).ConfigureAwait( true );
-            await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
-            return SiazService.ExitStatus;
-        }
-        finally
-        {
-            serviceInstance?.Dispose( );
-        }
+            true => await RunWithKestrelAsync( Settings, _configurationRoot ).ConfigureAwait( true ),
+            _ => await RunWithoutKestrelAsync( Settings ).ConfigureAwait( true )
+        };
     }
 
     /// <summary>
@@ -332,8 +260,12 @@ internal class Program
             return null;
         }
 
-        SiazService service = new( settings, zfsCommandRunner, ServiceObserver, ServiceObserver );
-        return service;
+        if ( settings.Monitoring.EnableHttp )
+        {
+            return new( settings, zfsCommandRunner, ServiceObserver, ServiceObserver );
+        }
+
+        return new( settings, zfsCommandRunner );
     }
 
     private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
@@ -348,5 +280,93 @@ internal class Program
     #else
             zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
     #endif
+    }
+
+    private static async Task<int> RunWithKestrelAsync( SnapsInAZfsSettings settings, IConfigurationRoot configurationRoot )
+    {
+        SiazService.Timestamp = DateTimeOffset.Now;
+        using SiazService? serviceInstance = GetSiazServiceInstance( settings );
+        if ( serviceInstance is null )
+        {
+            Logger.Fatal( "Failed to create service instance - exiting" );
+            LogManager.Shutdown( );
+            return (int)Errno.ENOATTR;
+        }
+
+        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
+
+        // Disposal happens after service shutdown, so this inspection can be ignored here
+        // ReSharper disable once AccessToDisposedClosure
+        serviceBuilder.Host
+                      .UseSystemd( )
+                      .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } );
+        serviceBuilder.WebHost
+                      .UseConfiguration( configurationRoot
+                                         .GetRequiredSection( "Monitoring" )
+                                         .GetSection( "Kestrel" ) )
+                      .UseKestrel( ( _, kestrelOptions ) =>
+                      {
+                          kestrelOptions.Configure( configurationRoot
+                                                    .GetRequiredSection( "Monitoring" )
+                                                    .GetSection( "Kestrel" ) )
+                                        .Load( );
+                      } );
+        WebApplication svc = serviceBuilder.Build( );
+
+        // ReSharper disable HeapView.DelegateAllocation
+        RouteGroupBuilder statusGroup = svc.MapGroup( "/" );
+        statusGroup.MapGet( "/", ServiceObserver.GetApplicationStateAsync );
+        statusGroup.MapGet( "/state", ServiceObserver.GetApplicationStateAsync );
+        statusGroup.MapGet( "/fullstate", ServiceObserver.GetFullApplicationStateAsync );
+        statusGroup.MapGet( "/workingset", ServiceObserver.GetWorkingSetAsync );
+        statusGroup.MapGet( "/version", ServiceObserver.GetVersionAsync );
+        statusGroup.MapGet( "/servicestarttime", ServiceObserver.GetServiceStartTimeAsync );
+        statusGroup.MapGet( "/nextruntime", ServiceObserver.GetNextRunTimeAsync );
+
+        RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
+        snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCountsAsync );
+        snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCountsAsync );
+        snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCountAsync );
+        snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCountAsync );
+        snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCountAsync );
+        snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCountAsync );
+        snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNamesAsync );
+        snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNamesAsync );
+        snapshotsGroup.MapGet( "/lastsnapshottakentime", ServiceObserver.GetLastSnapshotTakenTimeAsync );
+        snapshotsGroup.MapGet( "/lastsnapshotprunedtime", ServiceObserver.GetLastSnapshotPrunedTimeAsync );
+        // ReSharper restore HeapView.DelegateAllocation
+        using CancellationTokenSource tokenSource = new( );
+        CancellationToken masterToken = tokenSource.Token;
+        await svc.StartAsync( masterToken ).ConfigureAwait( true );
+        await svc.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
+        return SiazService.ExitStatus;
+    }
+
+    private static async Task<int> RunWithoutKestrelAsync( SnapsInAZfsSettings settings )
+    {
+        SiazService.Timestamp = DateTimeOffset.Now;
+        using SiazService? serviceInstance = GetSiazServiceInstance( settings );
+        if ( serviceInstance is null )
+        {
+            Logger.Fatal( "Failed to create service instance - exiting" );
+            LogManager.Shutdown( );
+            return (int)Errno.ENOATTR;
+        }
+
+        // Disposal happens after service shutdown, so this inspection can be ignored here
+        // ReSharper disable once AccessToDisposedClosure
+        IHost serviceHost = Host.CreateDefaultBuilder( )
+                                .UseSystemd( )
+                                .ConfigureServices( ( _, services ) => { services.AddHostedService( _ => serviceInstance ); } )
+                                .Build( );
+        using CancellationTokenSource tokenSource = new( );
+        CancellationToken masterToken = tokenSource.Token;
+        await serviceHost.StartAsync( masterToken ).ConfigureAwait( true );
+        await serviceHost.WaitForShutdownAsync( masterToken ).ConfigureAwait( true );
+        return SiazService.ExitStatus;
     }
 }

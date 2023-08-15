@@ -36,11 +36,26 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
     private readonly SnapsInAZfsSettings _settings;
     private readonly IZfsCommandRunner _zfsCommandRunner;
-    private DateTimeOffset _lastRunTime = DateTimeOffset.Now;
-    private DateTimeOffset _nextRunTime = DateTimeOffset.Now;
 
     /// <summary>
-    ///     Creates a new instance of the service class
+    ///     Creates a new instance of the service class, without monitoring
+    /// </summary>
+    /// <param name="settings"></param>
+    /// <param name="zfsCommandRunner"></param>
+    public SiazService( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner )
+    {
+        _settings = settings;
+        _zfsCommandRunner = zfsCommandRunner;
+        _commandLineArguments = Args.GetAmbientArgs<CommandLineArguments>( );
+        _settings.DaemonTimerIntervalSeconds = Math.Clamp( _settings.DaemonTimerIntervalSeconds, 1, 60 );
+
+        // The clamp immediately above this makes this exception not possible
+        // ReSharper disable once ExceptionNotDocumented
+        _daemonTimerInterval = TimeSpan.FromSeconds( _settings.DaemonTimerIntervalSeconds );
+    }
+
+    /// <summary>
+    ///     Creates a new instance of the service class, with monitoring
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="zfsCommandRunner"></param>
@@ -61,6 +76,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         _stateObserver.RegisterApplicationStateObservable( this );
         _snapshotOperationsObserver.RegisterSnapshotOperationsObservable( this );
     }
+
+    private DateTimeOffset _lastRunTime = DateTimeOffset.Now;
+    private DateTimeOffset _nextRunTime = DateTimeOffset.Now;
 
     private ApplicationState _state = ApplicationState.Init;
 
@@ -92,6 +110,33 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
     public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
+
+    /// <inheritdoc />
+    public event EventHandler<long>? NextRunTimeChanged;
+
+    /// <inheritdoc />
+    public event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
+
+    /// <inheritdoc />
+    public event EventHandler<DateTimeOffset>? BeginTakingSnapshots;
+
+    /// <inheritdoc />
+    public event EventHandler<DateTimeOffset>? EndPruningSnapshots;
+
+    /// <inheritdoc />
+    public event EventHandler<DateTimeOffset>? EndTakingSnapshots;
+
+    /// <inheritdoc />
+    public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
+
+    /// <inheritdoc />
+    public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotSucceeded;
+
+    /// <inheritdoc />
+    public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotFailed;
+
+    /// <inheritdoc />
+    public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
     public async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
@@ -269,6 +314,17 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         }
     }
 
+    internal static int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
+    {
+        return templates.Values.Select( static t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
+    }
+
+    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
+    {
+        GetNextTickTimestamp( in timestamp, in configuredTimerInterval, out nextTickTimestamp );
+        calculatedTimerInterval = nextTickTimestamp - timestamp;
+    }
+
     internal static void GetNextTickTimestamp( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out DateTimeOffset nextTickTimestamp )
     {
         DateTimeOffset currentTimeTruncatedToTopOfCurrentHour = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
@@ -282,12 +338,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         {
             nextTickTimestamp += configuredTimerInterval;
         }
-    }
-
-    internal static void GetNewTimerInterval( in DateTimeOffset timestamp, in TimeSpan configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset nextTickTimestamp )
-    {
-        GetNextTickTimestamp( in timestamp, in configuredTimerInterval, out nextTickTimestamp );
-        calculatedTimerInterval = nextTickTimestamp - timestamp;
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
@@ -825,11 +875,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 
-    internal static int GetGreatestCommonFrequentIntervalFactor( Dictionary<string, TemplateSettings> templates )
-    {
-        return templates.Values.Select( static t => t.SnapshotTiming.FrequentPeriod ).ToImmutableSortedSet( ).GreatestCommonFactor( );
-    }
-
     private void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
     {
         DateTimeOffset lastRunTimeSnappedToFrequentPeriod = timestamp.Subtract( new TimeSpan( 0, 0, timestamp.Minute % greatestCommonFrequentIntervalMinutes, timestamp.Second, timestamp.Millisecond, timestamp.Microsecond ) );
@@ -842,34 +887,8 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     public sealed record CheckZfsPropertiesSchemaResult( ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities, bool MissingPropertiesFound );
 
     // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-    private readonly ISnapshotOperationsObserver _snapshotOperationsObserver;
-    private readonly IApplicationStateObserver _stateObserver;
+    private readonly ISnapshotOperationsObserver? _snapshotOperationsObserver;
+
+    private readonly IApplicationStateObserver? _stateObserver;
     // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
-
-    /// <inheritdoc />
-    public event EventHandler<DateTimeOffset>? BeginPruningSnapshots;
-
-    /// <inheritdoc />
-    public event EventHandler<DateTimeOffset>? BeginTakingSnapshots;
-
-    /// <inheritdoc />
-    public event EventHandler<DateTimeOffset>? EndPruningSnapshots;
-
-    /// <inheritdoc />
-    public event EventHandler<DateTimeOffset>? EndTakingSnapshots;
-
-    /// <inheritdoc />
-    public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed;
-
-    /// <inheritdoc />
-    public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotSucceeded;
-
-    /// <inheritdoc />
-    public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotFailed;
-
-    /// <inheritdoc />
-    public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
-
-    /// <inheritdoc />
-    public event EventHandler<long>? NextRunTimeChanged;
 }
