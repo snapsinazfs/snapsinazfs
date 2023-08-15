@@ -1005,7 +1005,49 @@ which means taking the yearly snapshot at midnight on YearlyDay of YearlyMonth.\
 .RE
 .RE
 (End of Template Object Properties)
+.
+.
+.TQ
+.B /Monitoring
+.RS
+.TP
+Type: object
+.IP
+This section defines monitoring settings.\&
+.IP
+This object contains \*[SIAZ]\-specific settings,
+as well as a \(dqKestrel\(kq section,
+which is for configuration options relevant to the Kestrel web server,
+if HTTP\-based monitoring is enabled.\&
+.RS
+.TP
+.B /Monitoring/EnableHttp
+.RS
+.TP
+Type: boolean
+.IP
+This setting enables or disables HTTP\-based monitoring for \*[SIAZ].\&
+.IP
+If this setting is \fBtrue\fP, monitoring via the Kestrel web server will be enabled,
+using the configuration specified in the \fB/Monitoring/Kestrel\fP section.\&
+.IP
+If this setting is \fBfalse\fP,
+the Kestrel web server will not be loaded and monitoring functionality will not be available.\&
 .RE
+.TQ
+.B /Monitoring/Kestrel
+.RS
+.TP
+Type: object
+.IP
+This section is the configuration for the Kestrel web server,
+which will be used if \fB/Monitoring/EnableHttp\fP is \fBtrue\fP.\&
+.IP
+See Microsoft documentation for available Kestrel configuration options.\&
+.RE
+.RE
+.RE
+(End of Monitoring Section)
 .PP
 (End of Configuration File Schema)
 .SH EXAMPLES
@@ -1030,12 +1072,12 @@ Nodes beginning with the $ symbol are metadata and are not parsed by \*[SIAZ] an
   "DryRun": false,
   "LocalSystemName": "StandaloneSiazSystem",
   "Monitoring": {
-    "Nagios": {
-      "$comments": "Nagios-specific monitoring options",
-      "MonitorType": "Nagios",
-      "Capacity": false,
-      "Health": false,
-      "Snapshots": false
+    "EnableHttp": false,
+    "Kestrel": {
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60
+      }
     }
   },
   "Templates": {
@@ -1083,12 +1125,21 @@ Nodes beginning with the $ symbol are metadata and are not parsed by \*[SIAZ] an
   "LocalSystemName": "StandaloneSiazSystem",
   "Daemonize": false,
   "Monitoring": {
-    "Nagios": {
-      "$comments": "Nagios-specific monitoring options",
-      "MonitorType": "Nagios",
-      "Capacity": false,
-      "Health": false,
-      "Snapshots": false
+    "EnableHttp": false,
+    "Kestrel": {
+      "AllowedHosts": "*",
+      "Endpoints": {
+        "TcpMonitoringEndpoint": {
+          "Url": "http://*:60763"
+        }
+        //"UnixSocketMonitoringEndpoint": {
+        //  "Url": "http://unix:/run/SnapsInAZfs.sock"
+        //}
+      },
+      "Limits": {
+        "MaxConcurrentConnections": 20,
+        "KeepAliveTimeout": 60
+      }
     }
   },
   "Templates": {
