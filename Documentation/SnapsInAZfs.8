@@ -16,6 +16,7 @@
 .OP \-\-dry-run|\-\-dryrun
 .OP \-\-no-prune-snapshots|\-\-prune-snapshots
 .OP \-\-no-take-snapshots|\-\-take-snapshots
+.OP \-\-monitor|\-\-no\-monitor
 .hy
 .PP
 .SY \*[SIAZB]
@@ -250,6 +251,37 @@ or for troubleshooting with different options,
 all without needing to stop the systemd service or change your running configuration.\&
 .RE
 .RE
+.
+.
+.TQ
+.B \-\-monitor
+.RS
+.RS
+Unconditionally enable the HTTP\-basd monitoring functionality.
+.LP
+This option forces \*[SIAZB] to load the Kestrel web server,
+for HTTP\-based monitoring.\&
+.LP
+For this to work as expected,
+you must have at least one endpoint configured in the Kestrel section of the monitoring configuration.\&
+.RE
+.RE
+.
+.
+.TQ
+.B \-\-no\-monitor
+.RS
+.RS
+Opposite of \-\-monitor \- Unconditionally disable HTTP\-based monitoring functionality.\&
+.LP
+This option forces \*[SIAZB] to skip loading the Kestrel web server.\&
+.LP
+If this option is specified,
+no monitoring functionality will be available.\&
+.RE
+.RE
+.
+.
 .TP
 \fB\-\-prune\-snapshots\fP
 .RS
