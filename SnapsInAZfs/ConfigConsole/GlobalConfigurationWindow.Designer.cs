@@ -31,6 +31,10 @@ namespace SnapsInAZfs.ConfigConsole {
 
         internal Terminal.Gui.RadioGroup pruneSnapshotsRadioGroup;
         
+        private Terminal.Gui.Label httpMonitoringLabel;
+
+        internal Terminal.Gui.RadioGroup httpMonitoringRadioGroup;
+        
         private Terminal.Gui.Label localSystemNameLabel;
 
         internal Terminal.Gui.TextField localSystemNameTextBox;
@@ -57,6 +61,8 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pruneSnapshotsLabel = new Terminal.Gui.Label();
             this.takeSnapshotsRadioGroup = new Terminal.Gui.RadioGroup();
             this.takeSnapshotsLabel = new Terminal.Gui.Label();
+            this.httpMonitoringLabel = new Terminal.Gui.Label();
+            this.httpMonitoringRadioGroup = new Terminal.Gui.RadioGroup();
             this.dryRunRadioGroup = new Terminal.Gui.RadioGroup();
             this.dryRunLabel = new Terminal.Gui.Label();
             this.whiteOnBlue = new Terminal.Gui.ColorScheme();
@@ -72,7 +78,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
             this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
             this.Width = 68;
-            this.Height = 12;
+            this.Height = 13;
             this.X = Pos.Center();
             this.Y = Pos.Center();
             this.ColorScheme = this.whiteOnBlue;
@@ -119,7 +125,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.takeSnapshotsRadioGroup.Y = 2;
             this.takeSnapshotsRadioGroup.ColorScheme = this.whiteOnBlue;
             this.takeSnapshotsRadioGroup.Data = "takeSnapshotsRadioGroup";
-            this.takeSnapshotsRadioGroup.Text = "Dry Run";
+            this.takeSnapshotsRadioGroup.Text = "Take Snapshots";
             this.takeSnapshotsRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.takeSnapshotsRadioGroup.RadioLabels = new NStack.ustring[] {
                     "true",
@@ -140,17 +146,38 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pruneSnapshotsRadioGroup.Y = 3;
             this.pruneSnapshotsRadioGroup.ColorScheme = this.whiteOnBlue;
             this.pruneSnapshotsRadioGroup.Data = "pruneSnapshotsRadioGroup";
-            this.pruneSnapshotsRadioGroup.Text = "Dry Run";
+            this.pruneSnapshotsRadioGroup.Text = "Prune Snapshots";
             this.pruneSnapshotsRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
             this.pruneSnapshotsRadioGroup.RadioLabels = new NStack.ustring[] {
                     "true",
                     "false"};
             this.pruneSnapshotsRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
             this.Add(this.pruneSnapshotsRadioGroup);
+            this.httpMonitoringLabel.Width = 14;
+            this.httpMonitoringLabel.Height = 1;
+            this.httpMonitoringLabel.X = 3;
+            this.httpMonitoringLabel.Y = 4;
+            this.httpMonitoringLabel.Data = "httpMonitoringLabel";
+            this.httpMonitoringLabel.Text = "Enable HTTP Monitoring";
+            this.httpMonitoringLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.Add(this.httpMonitoringLabel);
+            this.httpMonitoringRadioGroup.Width = 15;
+            this.httpMonitoringRadioGroup.Height = 1;
+            this.httpMonitoringRadioGroup.X = 28;
+            this.httpMonitoringRadioGroup.Y = 4;
+            this.httpMonitoringRadioGroup.ColorScheme = this.whiteOnBlue;
+            this.httpMonitoringRadioGroup.Data = "httpMonitoringRadioGroup";
+            this.httpMonitoringRadioGroup.Text = "Enable HTTP Monitoring";
+            this.httpMonitoringRadioGroup.TextAlignment = Terminal.Gui.TextAlignment.Left;
+            this.httpMonitoringRadioGroup.RadioLabels = new NStack.ustring[] {
+                    "true",
+                    "false"};
+            this.httpMonitoringRadioGroup.DisplayMode = Terminal.Gui.DisplayModeLayout.Horizontal;
+            this.Add(this.httpMonitoringRadioGroup);
             this.localSystemNameLabel.Width = 4;
             this.localSystemNameLabel.Height = 1;
             this.localSystemNameLabel.X = 3;
-            this.localSystemNameLabel.Y = 4;
+            this.localSystemNameLabel.Y = 5;
             this.localSystemNameLabel.Data = "localSystemNameLabel";
             this.localSystemNameLabel.Text = "Local System Name";
             this.localSystemNameLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -158,7 +185,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.localSystemNameTextBox.Width = 35;
             this.localSystemNameTextBox.Height = 1;
             this.localSystemNameTextBox.X = 28;
-            this.localSystemNameTextBox.Y = 4;
+            this.localSystemNameTextBox.Y = 5;
             this.localSystemNameTextBox.ColorScheme = this.tgDefault;
             this.localSystemNameTextBox.Secret = false;
             this.localSystemNameTextBox.Data = "localSystemNameTextBox";
@@ -168,7 +195,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZfsLabel.Width = 18;
             this.pathToZfsLabel.Height = 1;
             this.pathToZfsLabel.X = 3;
-            this.pathToZfsLabel.Y = 5;
+            this.pathToZfsLabel.Y = 6;
             this.pathToZfsLabel.Data = "pathToZfsLabel";
             this.pathToZfsLabel.Text = "Path to zfs Utility";
             this.pathToZfsLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -176,7 +203,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZfsTextField.Width = 35;
             this.pathToZfsTextField.Height = 1;
             this.pathToZfsTextField.X = 28;
-            this.pathToZfsTextField.Y = 5;
+            this.pathToZfsTextField.Y = 6;
             this.pathToZfsTextField.ColorScheme = this.tgDefault;
             this.pathToZfsTextField.Secret = false;
             this.pathToZfsTextField.Data = "pathToZfsTextField";
@@ -186,7 +213,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZpoolLabel.Width = 4;
             this.pathToZpoolLabel.Height = 1;
             this.pathToZpoolLabel.X = 3;
-            this.pathToZpoolLabel.Y = 6;
+            this.pathToZpoolLabel.Y = 7;
             this.pathToZpoolLabel.Data = "pathToZpoolLabel";
             this.pathToZpoolLabel.Text = "Path to zpool Utility";
             this.pathToZpoolLabel.TextAlignment = Terminal.Gui.TextAlignment.Left;
@@ -194,7 +221,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.pathToZpoolTextField.Width = 35;
             this.pathToZpoolTextField.Height = 1;
             this.pathToZpoolTextField.X = 28;
-            this.pathToZpoolTextField.Y = 6;
+            this.pathToZpoolTextField.Y = 7;
             this.pathToZpoolTextField.ColorScheme = this.tgDefault;
             this.pathToZpoolTextField.Secret = false;
             this.pathToZpoolTextField.Data = "pathToZpoolTextField";

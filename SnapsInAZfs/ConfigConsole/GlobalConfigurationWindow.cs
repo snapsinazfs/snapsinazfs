@@ -39,6 +39,7 @@ public sealed partial class GlobalConfigurationWindow
         && ( Program.Settings!.DryRun != dryRunRadioGroup.GetSelectedBooleanFromLabel( )
              || Program.Settings.TakeSnapshots != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
              || Program.Settings.PruneSnapshots != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
+             || Program.Settings.Monitoring.EnableHttp != httpMonitoringRadioGroup.GetSelectedBooleanFromLabel( )
              || Program.Settings.LocalSystemName != localSystemNameTextBox.Text.ToString( )!
              || Program.Settings.ZfsPath != pathToZfsTextField.Text.ToString( )!
              || Program.Settings.ZpoolPath != pathToZpoolTextField.Text.ToString( )! );
@@ -99,6 +100,7 @@ public sealed partial class GlobalConfigurationWindow
         dryRunRadioGroup.SelectedItem = Program.Settings!.DryRun ? 0 : 1;
         takeSnapshotsRadioGroup.SelectedItem = Program.Settings.TakeSnapshots ? 0 : 1;
         pruneSnapshotsRadioGroup.SelectedItem = Program.Settings.PruneSnapshots ? 0 : 1;
+        httpMonitoringRadioGroup.SelectedItem = Program.Settings.Monitoring.EnableHttp ? 0 : 1;
         localSystemNameTextBox.Text = Program.Settings.LocalSystemName;
         pathToZfsTextField.Text = Program.Settings.ZfsPath;
         pathToZpoolTextField.Text = Program.Settings.ZpoolPath;

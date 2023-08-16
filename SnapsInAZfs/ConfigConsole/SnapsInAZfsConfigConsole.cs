@@ -239,6 +239,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                 Templates = Program.Settings!.Templates,
                 Monitoring = Program.Settings.Monitoring
             };
+            newSettingsToSave.Monitoring.EnableHttp = _globalConfigurationWindow.httpMonitoringRadioGroup.GetSelectedBooleanFromLabel( );
 
             ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
 
