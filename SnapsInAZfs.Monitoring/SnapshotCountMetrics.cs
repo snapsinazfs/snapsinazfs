@@ -12,6 +12,8 @@
 
 #endregion
 
+using System.Text.Json.Serialization;
+
 namespace SnapsInAZfs.Monitoring;
 
 public sealed class SnapshotCountMetrics
@@ -32,12 +34,27 @@ public sealed class SnapshotCountMetrics
         SnapshotsTakenSucceededSinceStart = snapshotsTakenSucceededSinceStart;
     }
 
+    [JsonPropertyOrder( 1 )]
     public uint SnapshotsPrunedFailedLastExecution { get; set; }
+
+    [JsonPropertyOrder( 2 )]
     public uint SnapshotsPrunedFailedSinceStart { get; set; }
+
+    [JsonPropertyOrder( 3 )]
     public uint SnapshotsPrunedSucceededLastExecution { get; set; }
+
+    [JsonPropertyOrder( 4 )]
     public uint SnapshotsPrunedSucceededSinceStart { get; set; }
+
+    [JsonPropertyOrder( 5 )]
     public uint SnapshotsTakenFailedLastExecution { get; set; }
+
+    [JsonPropertyOrder( 6 )]
     public uint SnapshotsTakenFailedSinceStart { get; set; }
+
+    [JsonPropertyOrder( 7 )]
     public uint SnapshotsTakenSucceededLastExecution { get; set; }
+
+    [JsonPropertyOrder( 8 )]
     public uint SnapshotsTakenSucceededSinceStart { get; set; }
 }

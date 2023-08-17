@@ -1,0 +1,293 @@
+.ds SIAZB \fBSnapsInAZfs\fP
+.ds SIAZ SnapsInAZfs
+.ds SIAZLC snapsinazfs
+.TH \*[SIAZB]\-monitoring 3 "August 16, 2023" "\*[SIAZB] HTTP Monitoring Endpoints Manual"
+.SH NAME
+.PP
+\fB\*[SIAZB]\-monitoring\fP \- HTTP Monitoring Endpoints for \*[SIAZ]
+.PP
+.
+.
+.SH SYNOPSIS
+.PP
+.SY http://host/
+.SY http://host/state
+.SY http://host/fullstate
+.SY http://host/nextruntime
+.SY http://host/servicestarttime
+.SY http://host/version
+.SY http://host/workingset
+.SY http://host/snapshots
+.SY http://host/snapshots/allcounts
+.SY http://host/snapshots/lastsnapshottakentime
+.SY http://host/snapshots/prunedfailedlastruncount
+.SY http://host/snapshots/prunedfailedlastrunnames
+.SY http://host/snapshots/prunedfailedsincestartcount
+.SY http://host/snapshots/prunedsucceededlastruncount
+.SY http://host/snapshots/prunedsucceededsincestartcount
+.SY http://host/snapshots/takenfailedlastruncount
+.SY http://host/snapshots/takenfailedlastrunnames
+.SY http://host/snapshots/takenfailedsincestartcount
+.SY http://host/snapshots/takensucceededlastruncount
+.SY http://host/snapshots/takensucceededsincestartcount
+.
+.
+.SH DESCRIPTION
+.PP
+If HTTP monitoring is enabled (\fB\*[SIAZLC](5)\fP),
+and appropriate endpoints are defined in the \fBKestrel\fP section of the configuration,
+HTTP GET requests can be made to any of them and they will return JSON\-formatted responses of their associated functions,
+which are documented below.\&
+.PP
+Endpoint configuration in the configuration files will determine the correct form of the \(dqhost\(dq portion of the URL.\&
+The default configuration included with a new install contains a TCP endpoint on port 60763,
+as well as a Unix socket endpoint at /run/\*[SIAZ].sock,
+which is commented out by default and thus not enabled.\&
+.
+.
+.SH RETURN VALUE
+.PP
+All endpoints return HTTP status 200 on success.\&
+The bodies of their responses are described below:\&
+.SS http://host/\fR and \fPhttp://host/state
+.PP
+These endpoints return the current execution state of the service,
+as one of the following string values,
+which correspond to the elements of the \fBApplicationState\fP enum:
+.TP 4
+.B Init
+The service is still initializing and hasn't started its execution timer or performed its first execution yet.\&
+This status should be extremely rare in practice.\&
+.TQ
+.B Idle
+The service is currently not executing any ZFS operations and is waiting for the next run time.\&
+.TQ
+.B GettingDataFromZfs
+The service has started execution of the main loop and is retrieving the current state of datasets and snapshots from ZFS.\&
+.TQ
+.B TakingSnapshots
+The service is currently taking snapshots of datasets,
+as configured.\&
+.TQ
+.B PruningSnapshots
+The service is currently pruning snapshots that are eligible for pruning,
+as configured.\&
+.TQ
+.B CheckingZfsPropertySchema
+The service is currently checking for existence of required ZFS user properties on all ZFS root file\-systems.\&
+.TQ
+.B Executing
+The service is executing its main loop.\&
+This status is returned when a more specific defined state is not appropriate.\&
+.TQ
+.B UpdatingZfsPropertySchema
+The service is adding required missing ZFS user properties to ZFS root file\-systems.\&
+This status cannot be returned when running as a daemon,
+as this operation is only performed when the \-\-prepare\-zfs\-properties option is specified,
+which is mutually exclusive with running as a daemon.\&
+.TQ
+.B UpdatingZfsPropertySchemaCompleted
+The service has finished adding required missing ZFS user properties to ZFS root file\-systems.\&
+This status cannot be returned when running as a daemon,
+as this operation is only performed when the \-\-prepare\-zfs\-properties option is specified,
+which is mutually exclusive with running as a daemon.\&
+.TQ
+.B Terminating
+The service is currently shutting down.\&
+.
+.
+.SS http://host/fullstate
+.PP
+This endpoint returns a JSON object containing values from all other endpoints within the root path.\&
+.PP
+For example:
+.EX
+{
+    "nextRunTime": "2023-08-16T19:35:00-07:00",
+    "serviceStartTime": "2023-08-16T00:56:30.4112105-07:00",
+    "state": "Idle",
+    "version": "1.1.0-Beta6"
+    "workingSet": 111945216
+}
+.EE
+.PP
+Case of property names is not guaranteed,
+and may be camelCase or PascalCase.\&
+.PP
+Order of the properties is static and is alphabetical by property name.\&
+.SS http://host/nextruntime
+.PP
+This endpoint returns the next time the main loop will execute,
+as an ISO8601 time string.\&
+.SS http://host/servicestarttime
+.PP
+This endpoint returns the time the service component was started,
+as an ISO8601 time string.\&
+.PP
+The value returned by this endpoint may be \fIslightly\fP different from the time the process was launched,
+as it is the time the service code itself was first executed.\&
+.SS http://host/version
+.PP
+This endpoint returns the version of the \*[SIAZ] executable that is being monitored,
+as a string.\&
+.PP
+The value returned by this endpoint is the same as the output of \fB\*[SIAZ] \-\-version\fP.
+.SS http://host/workingset
+.PP
+This endpoint returns the working set (memory usage),
+in bytes,
+of the entire \*[SIAZ] application,
+including the monitoring components,
+as a 64\-bit integer.\&
+.SS http://host/snapshots\fR and \fPhttp://host/snapshots/allcounts
+.PP
+These endpoints both return all of the snapshot count metrics that would be returned by the other snapshot count endpoints,
+in a single JSON object.\&
+.PP
+For example:
+.EX
+{
+    "snapshotsPrunedFailedLastExecution": 0,
+    "snapshotsPrunedFailedSinceStart": 0,
+    "snapshotsPrunedSucceededLastExecution": 10,
+    "snapshotsPrunedSucceededSinceStart": 7548,
+    "snapshotsTakenFailedLastExecution": 0,
+    "snapshotsTakenFailedSinceStart": 0,
+    "snapshotsTakenSucceededLastExecution": 5,
+    "snapshotsTakenSucceededSinceStart": 6423
+}
+.EE
+.PP
+Case of property names is not guaranteed,
+and may be camelCase or PascalCase.\&
+.PP
+Order of the properties is static and is alphabetical by property name.\&
+.SS http://host/snapshots/lastsnapshottakentime
+.PP
+This endpoint returns the time that the most recent snapshot creation operation completed,
+as an ISO8601 date string.\&
+.SS http://host/snapshots/prunedfailedlastruncount
+.PP
+This endpoint returns the count of snapshot prune operations that failed for any reason during the most recent execution of the main loop,
+as an unsigned 32-bit integer.\&
+.PP
+Non\-zero values indicate a problem,
+and it is advisable to check logs for information on failures.\&
+.SS http://host/snapshots/prunedfailedlastrunnames
+.PP
+This endpoint returns the names of snapshots that \*[SIAZ] attempted to prune,
+during the most recent execution of the main loop,
+but which failed to be pruned for any reason,
+as a JSON array of strings.\&
+.PP
+For example:
+.EX
+[
+    "testpool/fs1@autosnap_2023-08-15_00:00:00_daily",
+    "testpool/fs1@autosnap_2023-08-16_00:00:00_daily"
+]
+.EE
+.PP
+If no failures occurred,
+an empty list will be returned:\&
+.EX
+[]
+.EE
+.SS http://host/snapshots/prunedfailedsincestartcount
+.PP
+This endpoint returns the count of snapshot prune operations that failed for any reason during all executions of the main loop,
+since the service was started,
+as an unsigned 32-bit integer.\&
+.PP
+Non\-zero values indicate a problem,
+and it is advisable to check logs for information on failures.\&
+.SS http://host/snapshots/prunedsucceededlastruncount
+.PP
+This endpoint returns the count of snapshot prune operations that succeeded during the most recent execution of the main loop,
+as an unsigned 32-bit integer.\&
+.SS http://host/snapshots/prunedsucceededsincestartcount
+.PP
+This endpoint returns the count of snapshot prune operations that succeeded during all executions of the main loop,
+since the service was started,
+as an unsigned 32-bit integer.\&
+.SS http://host/snapshots/takenfailedlastruncount
+.PP
+This endpoint returns the count of snapshot creation operations that failed for any reason during the most recent execution of the main loop,
+as an unsigned 32-bit integer.\&
+.PP
+Non\-zero values indicate a problem,
+and it is advisable to check logs for information on failures.\&
+.SS http://host/snapshots/takenfailedlastrunnames
+.PP
+This endpoint returns the names of snapshots that \*[SIAZ] attempted to create,
+during the most recent execution of the main loop,
+but which failed to be created for any reason,
+as a JSON array of strings.\&
+.PP
+For example:
+.EX
+[
+    "testpool/fs1@autosnap_2023-08-15_00:00:00_daily",
+    "testpool/fs1@autosnap_2023-08-16_00:00:00_daily"
+]
+.EE
+.PP
+If no failures occurred,
+an empty list will be returned:\&
+.EX
+[]
+.EE
+.SS http://host/snapshots/takenfailedsincestartcount
+.PP
+This endpoint returns the count of snapshot creation operations that failed for any reason during all executions of the main loop,
+since the service was started,
+as an unsigned 32-bit integer.\&
+.PP
+Non\-zero values indicate a problem,
+and it is advisable to check logs for information on failures.\&
+.SS http://host/snapshots/takensucceededlastruncount
+.PP
+This endpoint returns the count of snapshots that were successfully created during the most recent execution of the main loop,
+as an unsigned 32-bit integer.\&
+.SS http://host/snapshots/takensucceededsincestartcount
+.PP
+This endpoint returns the count of snapshots that were successfully created during all executions of the main loop,
+since the service was started,
+as an unsigned 32-bit integer.\&
+.
+.
+.SH ERRORS
+.PP
+All endpoints return HTTP status 200 on success.\&
+.PP
+If a request is made to an endpoint that requires that the monitor object is registered with a monitorable object,
+but that registration has not been completed,
+endpoints will return HTTP status 503.\&
+.PP
+For all other unexpected error conditions,
+endpoints will return HTTP status 500.\&
+.
+.
+.SH REPORTING BUGS
+.PP
+The source code and issue tracker for \*[SIAZ] are hosted on GitHub, at
+.UR https://github.com/snapsinazfs/snapsinazfs
+.UE
+.SH COPYRIGHT
+.PP
+Copyright 2023 Brandon Thetford
+.PP
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \(dqSoftware\(dq), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+.PP
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+.PP
+THE SOFTWARE IS PROVIDED \(dqAS IS\dq, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+.SH SEE ALSO
+.TP
+.B \*[SIAZ](8)
+.TQ
+.B \*[SIAZ](5)
+.TQ
+.B \*[SIAZ]\-zfsprops(7)
+.TQ
+.B \*[SIAZ]\-config\-console(8)
