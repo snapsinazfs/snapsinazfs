@@ -184,7 +184,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                 }
 
                 SnapsInAZfsSettings copyOfCurrentSettings = Program.Settings! with { };
-                (bool status, string reasonOrFile) copyConfigResult = ContinueWithSave( copyOfCurrentSettings );
+                (bool status, string reasonOrFile) copyConfigResult = ShowSaveDialog( copyOfCurrentSettings );
                 if ( copyConfigResult.status )
                 {
                     Logger.Info( "Copy of existing configuration saved to {0}", copyConfigResult.reasonOrFile );
@@ -241,7 +241,7 @@ public sealed partial class SnapsInAZfsConfigConsole
             };
             newSettingsToSave.Monitoring.EnableHttp = _globalConfigurationWindow.httpMonitoringRadioGroup.GetSelectedBooleanFromLabel( );
 
-            ( bool status, string reasonOrFile ) = ContinueWithSave( newSettingsToSave );
+            ( bool status, string reasonOrFile ) = ShowSaveDialog( newSettingsToSave );
 
             if ( status )
             {
@@ -267,7 +267,7 @@ public sealed partial class SnapsInAZfsConfigConsole
             EnableEventHandlers( );
         }
 
-        static (bool, string) ContinueWithSave( SnapsInAZfsSettings settings )
+        static (bool, string) ShowSaveDialog( SnapsInAZfsSettings settings )
         {
             using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
             {
