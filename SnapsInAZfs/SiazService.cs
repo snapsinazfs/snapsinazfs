@@ -184,19 +184,19 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             switch ( args )
             {
                 case { CheckZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    Logger.Warn( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( static kvp => !kvp.Value ).KeysToCommaSeparatedSingleLineString( true ) );
                     continue;
                 case { CheckZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
                     continue;
                 case { PrepareZfsProperties: true } when missingPropertiesFoundForPool:
-                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    Logger.Info( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( static kvp => !kvp.Value ).KeysToCommaSeparatedSingleLineString( true ) );
                     continue;
                 case { PrepareZfsProperties: true } when !missingPropertiesFoundForPool:
                     Logger.Info( "No missing properties in pool {0}", poolName );
                     continue;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when missingPropertiesFoundForPool:
-                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToCommaSeparatedSingleLineString( true ) );
+                    Logger.Fatal( "Pool {0} is missing the following properties: {1}", poolName, propertyValidities.Where( static kvp => !kvp.Value ).KeysToCommaSeparatedSingleLineString( true ) );
                     continue;
                 case { PrepareZfsProperties: false, CheckZfsProperties: false } when !missingPropertiesFoundForPool:
                     Logger.Debug( "No missing properties in pool {0}", poolName );
