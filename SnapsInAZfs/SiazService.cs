@@ -341,12 +341,12 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    internal async Task<Errno> PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
+    internal async Task PruneAllConfiguredSnapshotsAsync( IZfsCommandRunner commandRunner, SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
         if ( !SnapshotAutoResetEvent.WaitOne( 30000 ) )
         {
             Logger.Error( "Timed out waiting to prune snapshots. Another operation is in progress." );
-            return Errno.EBUSY;
+            return;
         }
 
         Logger.Info( "Begin pruning snapshots for all configured datasets" );
@@ -357,7 +357,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         Logger.Info( "Finished pruning snapshots" );
         SnapshotAutoResetEvent.Set( );
 
-        return Errno.EOK;
+        return;
 
         async Task PruneSnapshotsForDatasetAsync( ZfsRecord ds )
         {

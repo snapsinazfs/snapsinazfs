@@ -47,6 +47,9 @@ internal static class ZfsTasks
                     Increment:
                         Interlocked.Increment( ref successfulOperations );
                         break;
+                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+                    case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
+                    case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
                     case ZfsCommandRunnerOperationStatus.Failure:
                         Logger.Trace( "Failure result received from ZFS inherit operation" );
                         goto default;
