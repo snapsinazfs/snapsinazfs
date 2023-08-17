@@ -449,24 +449,24 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
 
     /// <summary>
     ///     Creates a new <see cref="Snapshot" /> from the given <paramref name="period" /> and <paramref name="timestamp" />,
-    ///     using <paramref name="template" /> to generate its name.
+    ///     using <paramref name="formattingSettings" /> to generate its name.
     /// </summary>
     /// <param name="period">The period for the new <see cref="Snapshot" /></param>
     /// <param name="timestamp">The timestamp for the new <see cref="Snapshot" /></param>
-    /// <param name="template"></param>
+    /// <param name="formattingSettings"></param>
     /// <param name="sourceSystem"></param>
     /// <returns>
     ///     A reference to the created <see cref="Snapshot" />
     /// </returns>
     [MustUseReturnValue]
-    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in TemplateSettings template, in ZfsProperty<string> sourceSystem )
+    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in FormattingSettings formattingSettings, in ZfsProperty<string> sourceSystem )
     {
         Logger.Trace( "Creating {0} snapshot for {1} {2}", period, Kind, Name );
         if ( string.IsNullOrWhiteSpace( sourceSystem.Value ) )
         {
             throw new ArgumentException( "sourceSystem must have a non-null, non-whitespace-only Value", nameof( sourceSystem ) );
         }
-        string snapName = template.GenerateFullSnapshotName( Name, in period.Kind, in timestamp );
+        string snapName = formattingSettings.GenerateFullSnapshotName( Name, in period.Kind, in timestamp );
         Snapshot snap = new( snapName, in period.Kind, in sourceSystem, in timestamp, this );
         return snap;
     }

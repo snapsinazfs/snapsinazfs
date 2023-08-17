@@ -648,7 +648,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         Logger.Trace( "{0} {1} will have a {2} snapshot taken with these settings: {3}", ds.Kind, ds.Name, period, JsonSerializer.Serialize( new { ds.Template, ds.Recursion } ) );
 
-        ZfsCommandRunnerOperationStatus zfsCommandRunnerStatus = _zfsCommandRunner.TakeSnapshot( ds, period, timestamp, _settings, template, out snapshot );
+        ZfsCommandRunnerOperationStatus zfsCommandRunnerStatus = _zfsCommandRunner.TakeSnapshot( ds, period, in timestamp, _settings, template.Formatting, out snapshot );
         switch ( zfsCommandRunnerStatus )
         {
             case ZfsCommandRunnerOperationStatus.DryRun:

@@ -64,7 +64,7 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot(ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot)
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot(ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot)
     {
         throw new NotImplementedException();
     }
