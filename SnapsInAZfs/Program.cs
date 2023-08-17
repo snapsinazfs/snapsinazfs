@@ -14,6 +14,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -191,6 +192,7 @@ internal class Program
         return true;
     }
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
     {
         if ( args.Debug )
@@ -268,6 +270,7 @@ internal class Program
         return new( settings, zfsCommandRunner );
     }
 
+    [MethodImpl( MethodImplOptions.AggressiveInlining )]
     private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
     {
         // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
