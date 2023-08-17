@@ -19,5 +19,8 @@
             "additionalProperties": true 
         } 
     },
-    "additionalProperties": false
+    "additionalProperties": false,
+    "required": [
+        "EnableHttp"
+    ] 
 }
