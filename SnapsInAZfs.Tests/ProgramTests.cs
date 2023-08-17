@@ -122,6 +122,8 @@ public class ProgramTests
     }
 
     [Test]
+    [NonParallelizable]
+    [RequiresThread( ApartmentState.MTA )]
     public void TryGetZfsCommandRunner_CanGetSingleton( )
     {
         SnapsInAZfsSettings initialSettings = new( );
