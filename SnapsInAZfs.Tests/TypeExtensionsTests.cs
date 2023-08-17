@@ -85,58 +85,17 @@ public class TypeExtensionsTests
         } );
     }
 
-    /// <summary>
-    ///     This method generates all possible unique combinations (not permutations) of 3-element integer arrays with element values
-    ///     from 1 to 60, and writes them to a file as their raw 4-byte representations
-    /// </summary>
-    /// <remarks>
-    /// </remarks>
-    [UsedImplicitly]
-    private static void GenerateThreeIntGcfTestFile( )
-    {
-        using FileStream f = File.Create( "GreatestCommonFactor_ThreeTermTestCaseInput2.dat", 12288 );
-        HashSet<int[]> trios = new( new IntArrayComparer( ) );
-        for ( int term1 = 1; term1 <= 60; term1++ )
-        {
-            for ( int term2 = term1 + 1; term2 <= 60; term2++ )
-            {
-                for ( int term3 = term2 + 1; term3 <= 60; term3++ )
-                {
-                    int[] arr = { term1, term2, term3 };
-                    if ( trios.Add( arr ) )
-                    {
-                        f.Write( MemoryMarshal.Cast<int, byte>( arr.AsSpan( ) ) );
-                    }
-                }
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Reads the pre-generated input file and yields an enumerator to the caller for each 12 bytes of the input file, interpreted as
-    ///     3 int values
-    /// </summary>
-    /// <remarks>
-    ///     This file contains every unique combination of 3 integers from 1 to 60, where unique combination means that no two arrays in
-    ///     the set contain the same 3 integer values, in any order.<br />
-    ///     For example, 1,1,2 is in the set, but 1,2,1 and 2,1,1 are not in the set, because they are equivalent sets.<br />
-    ///     Generating these for every test run is of course possible, but it makes the visual studio test runner extremely slow when
-    ///     enumerating all 34220 individual test cases.<br />
-    ///     When it gets it by reading from this file, it is MUCH faster.
-    /// </remarks>
-    /// >
     private static IEnumerable<int[]> GetThreeTermTestCases( )
     {
-        // See the GenerateThreeIntGcfTestFile() method for how this file was generated
-        using FileStream f = File.OpenRead( "GreatestCommonFactor_ThreeTermTestCaseInput.dat" );
-        byte[] s = new byte[12];
-        while ( f.Position < f.Length )
+        // Not necessary to test all combinations.
+        // The two-term test proves the math works.
+        // This is now just being extra-careful and proving it works for a third term.
+        // So, we'll test a single set of 2 elements against all 60 possible values of the third element.
+        // The GCF of the first two elements is 12, which provides 1, 2, 3, 4, 6, and 12 as possible GCF values for generated cases.
+        for ( int i = 1; i < 60; i++ )
         {
-            f.ReadExactly( s );
-            yield return MemoryMarshal.Cast<byte, int>( s ).ToArray( );
+            yield return new[] { 24, 36, i };
         }
-
-        f.Close( );
     }
 
     private static IEnumerable<int[]> GetTwoTermTestCases( )

@@ -71,10 +71,4 @@
       <ProjectReference Include="..\SnapsInAZfs\SnapsInAZfs.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Update="GreatestCommonFactor_ThreeTermTestCaseInput.dat">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
