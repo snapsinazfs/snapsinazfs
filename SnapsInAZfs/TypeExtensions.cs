@@ -44,7 +44,7 @@ internal static class TypeExtensions
 
     public static string KeysToCommaSeparatedSingleLineString( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
     {
-        collection.Where( static kvp => !kvp.Value ).Select( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString( withSpaces );
+        return collection.Where( static kvp => !kvp.Value ).Select( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString( withSpaces );
     }
 
     private static void GreatestCommonFactor( ref int left, int right )
