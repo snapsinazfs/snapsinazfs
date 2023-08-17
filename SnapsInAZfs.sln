@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 	ProjectSection(SolutionItems) = preProject
 		Documentation\install.8 = Documentation\install.8
 		Documentation\SnapsInAZfs-config-console.8 = Documentation\SnapsInAZfs-config-console.8
+		Documentation\SnapsInAZfs-monitoring.3 = Documentation\SnapsInAZfs-monitoring.3
 		Documentation\SnapsInAZfs-zfsprops.7 = Documentation\SnapsInAZfs-zfsprops.7
 		Documentation\SnapsInAZfs.5 = Documentation\SnapsInAZfs.5
 		Documentation\SnapsInAZfs.8 = Documentation\SnapsInAZfs.8
