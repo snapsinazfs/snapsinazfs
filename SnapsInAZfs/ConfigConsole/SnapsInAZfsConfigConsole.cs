@@ -294,8 +294,16 @@ public sealed partial class SnapsInAZfsConfigConsole
                     }
                 }
 
-                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
-                return ( true, path );
+                try
+                {
+                    File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+                    return ( true, path );
+                }
+                catch ( Exception e )
+                {
+                    Logger.Error( e, "Error saving settings to requested path {0}", path );
+                    return ( false, "error" );
+                }
             }
         }
     }
