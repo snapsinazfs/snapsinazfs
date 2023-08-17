@@ -43,7 +43,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.t;
         zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
         zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.z;
-        saveMenuItem.Action = ShowSaveDialog;
+        saveMenuItem.Action = SaveGlobalConfiguration;
         Application.RootKeyEvent += ApplicationRootKeyEvent;
         // ReSharper restore HeapView.ObjectAllocation.Possible
         // ReSharper restore HeapView.DelegateAllocation
@@ -160,7 +160,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         }
     }
 
-    private void ShowSaveDialog( )
+    private void SaveGlobalConfiguration( )
     {
         try
         {
