@@ -233,49 +233,6 @@ public sealed partial class SnapsInAZfsConfigConsole
         {
             EnableEventHandlers( );
         }
-
-        static (bool, string) ShowSaveDialog( SnapsInAZfsSettings settings )
-        {
-            using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
-            {
-                globalConfigSaveDialog.DirectoryPath = "/etc/SnapsInAZfs";
-                globalConfigSaveDialog.AllowsOtherFileTypes = true;
-                globalConfigSaveDialog.CanCreateDirectories = true;
-                globalConfigSaveDialog.Modal = true;
-                Application.Run( globalConfigSaveDialog );
-                if ( globalConfigSaveDialog.Canceled )
-                {
-                    return ( false, "canceled" );
-                }
-
-                if ( globalConfigSaveDialog.FileName.IsEmpty )
-                {
-                    return ( false, "no file name" );
-                }
-
-                string path = globalConfigSaveDialog.FilePath.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" );
-
-                if ( File.Exists( path ) )
-                {
-                    int overwriteResult = MessageBox.ErrorQuery( "Overwrite Existing File?", $"The file '{path}' already exists. Continue saving and overwrite this file?", "Cancel", "Overwrite" );
-                    if ( overwriteResult == 0 )
-                    {
-                        return ( false, "canceled" );
-                    }
-                }
-
-                try
-                {
-                    File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
-                    return ( true, path );
-                }
-                catch ( Exception e )
-                {
-                    Logger.Error( e, "Error saving settings to requested path {0}", path );
-                    return ( false, "error" );
-                }
-            }
-        }
     }
 
     private void ShowGlobalConfigurationWindow( )
@@ -305,6 +262,49 @@ public sealed partial class SnapsInAZfsConfigConsole
         {
             Remove( _globalConfigurationWindow );
             Logger.Error( "Unable to show global configuration window" );
+        }
+    }
+
+    private static (bool, string) ShowSaveDialog( SnapsInAZfsSettings settings )
+    {
+        using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+        {
+            globalConfigSaveDialog.DirectoryPath = "/etc/SnapsInAZfs";
+            globalConfigSaveDialog.AllowsOtherFileTypes = true;
+            globalConfigSaveDialog.CanCreateDirectories = true;
+            globalConfigSaveDialog.Modal = true;
+            Application.Run( globalConfigSaveDialog );
+            if ( globalConfigSaveDialog.Canceled )
+            {
+                return ( false, "canceled" );
+            }
+
+            if ( globalConfigSaveDialog.FileName.IsEmpty )
+            {
+                return ( false, "no file name" );
+            }
+
+            string path = globalConfigSaveDialog.FilePath.ToString( ) ?? throw new InvalidOperationException( "Null string provided for save file name" );
+
+            if ( File.Exists( path ) )
+            {
+                int overwriteResult = MessageBox.ErrorQuery( "Overwrite Existing File?", $"The file '{path}' already exists. Continue saving and overwrite this file?", "Cancel", "Overwrite" );
+                if ( overwriteResult == 0 )
+                {
+                    return ( false, "canceled" );
+                }
+            }
+
+            try
+            {
+                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+                return ( true, path );
+            }
+            catch ( Exception e )
+            {
+                Logger.Error( e, "Error saving settings to requested path {0}", path );
+                return ( false, "error" );
+            }
         }
     }
 
