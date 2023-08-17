@@ -19,7 +19,7 @@ namespace SnapsInAZfs;
 /// <summary>
 /// Dummy command runner used for testing when running on windows or wherever zfs isn't installed
 /// </summary>
-public class DummyZfsCommandRunner : ZfsCommandRunnerBase
+public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
     // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
     private readonly string _zfsPath;

@@ -1064,7 +1064,7 @@ public sealed partial class ZfsConfigurationWindow
         EnableEventHandlers( );
     }
 
-    private record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
+    private sealed record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
 
-    private record ListViewWithSourceViewData( string PropertyName, TextField SourceTextField );
+    private sealed record ListViewWithSourceViewData( string PropertyName, TextField SourceTextField );
 }
