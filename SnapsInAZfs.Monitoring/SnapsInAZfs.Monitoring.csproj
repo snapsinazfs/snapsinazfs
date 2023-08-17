@@ -13,7 +13,7 @@
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <VersionSuffix>Beta5</VersionSuffix>
   </PropertyGroup>
 
