@@ -171,6 +171,9 @@ install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZLC)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/siaz-zfsprops.7
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZ)-monitoring.3
+	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZLC)-monitoring.3
+	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/siaz-monitoring.3
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).5
 	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).5
 	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/siaz.5
@@ -213,6 +216,9 @@ uninstall-doc:
 	rm -fv $(MAN7DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
 	rm -fv $(MAN7DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
 	rm -fv $(MAN7DIR)/siaz-zfsprops.7 2>/dev/null
+	rm -fv $(MAN3DIR)/$(SIAZ)-monitoring.3 2>/dev/null
+	rm -fv $(MAN3DIR)/$(SIAZLC)-monitoring.3 2>/dev/null
+	rm -fv $(MAN3DIR)/siaz-monitoring.3 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZ).5 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZLC).5 2>/dev/null
 	rm -fv $(MAN5DIR)/siaz.5 2>/dev/null
