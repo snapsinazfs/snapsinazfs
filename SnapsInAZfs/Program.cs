@@ -325,19 +325,20 @@ internal class Program
 
         RouteGroupBuilder snapshotsGroup = svc.MapGroup( "/snapshots" );
         snapshotsGroup.MapGet( "/", ServiceObserver.GetAllSnapshotCountsAsync );
+
         snapshotsGroup.MapGet( "/allcounts", ServiceObserver.GetAllSnapshotCountsAsync );
-        snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCountAsync );
-        snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCountAsync );
-        snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCountAsync );
-        snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCountAsync );
-        snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCountAsync );
-        snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCountAsync );
-        snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCountAsync );
-        snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCountAsync );
-        snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNamesAsync );
-        snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNamesAsync );
-        snapshotsGroup.MapGet( "/lastsnapshottakentime", ServiceObserver.GetLastSnapshotTakenTimeAsync );
         snapshotsGroup.MapGet( "/lastsnapshotprunedtime", ServiceObserver.GetLastSnapshotPrunedTimeAsync );
+        snapshotsGroup.MapGet( "/lastsnapshottakentime", ServiceObserver.GetLastSnapshotTakenTimeAsync );
+        snapshotsGroup.MapGet( "/prunedfailedlastruncount", ServiceObserver.GetSnapshotsPrunedFailedLastRunCountAsync );
+        snapshotsGroup.MapGet( "/prunedfailedlastrunnames", ServiceObserver.GetSnapshotsPrunedFailedLastRunNamesAsync );
+        snapshotsGroup.MapGet( "/prunedfailedsincestartcount", ServiceObserver.GetSnapshotsPrunedFailedSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/prunedsucceededlastruncount", ServiceObserver.GetSnapshotsPrunedSucceededLastRunCountAsync );
+        snapshotsGroup.MapGet( "/prunedsucceededsincestartcount", ServiceObserver.GetSnapshotsPrunedSucceededSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/takenfailedlastruncount", ServiceObserver.GetSnapshotsTakenFailedLastRunCountAsync );
+        snapshotsGroup.MapGet( "/takenfailedlastrunnames", ServiceObserver.GetSnapshotsTakenFailedLastRunNamesAsync );
+        snapshotsGroup.MapGet( "/takenfailedsincestartcount", ServiceObserver.GetSnapshotsTakenFailedSinceStartCountAsync );
+        snapshotsGroup.MapGet( "/takensucceededlastruncount", ServiceObserver.GetSnapshotsTakenSucceededLastRunCountAsync );
+        snapshotsGroup.MapGet( "/takensucceededsincestartcount", ServiceObserver.GetSnapshotsTakenSucceededSinceStartCountAsync );
         // ReSharper restore HeapView.DelegateAllocation
         using CancellationTokenSource tokenSource = new( );
         CancellationToken masterToken = tokenSource.Token;
