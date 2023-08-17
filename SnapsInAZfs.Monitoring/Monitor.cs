@@ -530,6 +530,7 @@ public sealed class Monitor : IMonitor
 
     private void ServiceOnNextRunTimeChanged( object? sender, long e )
     {
+        Logger.Trace( "Received NextRunTimeChanged event from {0} with value {1:D}", sender?.GetType( ).Name, e );
         Interlocked.Exchange( ref _nextRunTime, e );
     }
 
