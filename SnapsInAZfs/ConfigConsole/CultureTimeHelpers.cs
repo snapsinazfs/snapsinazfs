@@ -28,7 +28,7 @@ public static class CultureTimeHelpers
     ///     Gets a <see cref="List{T}" /> of string values for all full day names for the current culture of the executing
     ///     thread
     /// </summary>
-    public static List<string> DayNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
+    public static List<string> DayNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.DayNames.Where( static m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
 
     /// <summary>
     ///     Gets a <see cref="List{T}" /> of string values for all full and standard abbreviated day names for the current
@@ -40,7 +40,7 @@ public static class CultureTimeHelpers
     ///     Gets a <see cref="List{T}" /> of string values for all full month names for the current culture of the executing
     ///     thread
     /// </summary>
-    public static List<string> MonthNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.MonthNames.Where( m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
+    public static List<string> MonthNamesLong { get; } = DateTimeFormatInfo.CurrentInfo.MonthNames.Where( static m => !string.IsNullOrWhiteSpace( m ) ).ToList( );
 
     /// <summary>
     ///     Gets a <see cref="List{T}" /> of string values for all full and standard abbreviated month names for the current

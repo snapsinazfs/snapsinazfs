@@ -510,7 +510,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
             if ( propsToSet.Any( ) )
             {
-                Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, propsToSet.Select( p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString( ) );
+                Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, propsToSet.Select( static p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString( ) );
                 ZfsCommandRunnerOperationStatus setPropertiesResult = await _zfsCommandRunner.SetZfsPropertiesAsync( _settings.DryRun, ds.Name, propsToSet.ToArray( ) ).ConfigureAwait( true );
                 switch ( setPropertiesResult )
                 {
@@ -680,7 +680,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
             // It's not a nullable type...
             // ReSharper disable once ExceptionNotDocumentedOptional
-            string[] propertyArray = propertiesToAdd.Where( kvp => !kvp.Value ).Select( kvp => kvp.Key ).ToArray( );
+            string[] propertyArray = propertiesToAdd.Where( static kvp => !kvp.Value ).Select( static kvp => kvp.Key ).ToArray( );
 
             if ( propertyArray.Length == 0 )
             {

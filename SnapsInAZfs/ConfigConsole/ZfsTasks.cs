@@ -84,7 +84,7 @@ internal static class ZfsTasks
         {
             List<ITreeNode> treeRootNodes = new( );
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, baseSnapshots ).ConfigureAwait( true );
-            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
+            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( static kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
 
             foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedSetOfPoolRoots )
             {

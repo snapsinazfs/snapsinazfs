@@ -342,7 +342,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         if ( ZfsConfigurationWindowDisabledDueToError )
         {
             MessageBox.ErrorQuery( "ZFS Configuration Disabled", "ZFS Configuration Window has been disabled due to errors in configuration.\nResolve any reported errors and run the Configuration Console again.", "Bummer" );
-            zfsConfigMenuItem.CanExecute = ( ) => false;
+            zfsConfigMenuItem.CanExecute = static ( ) => false;
             zfsConfigMenuItem.Action = null;
             return;
         }
