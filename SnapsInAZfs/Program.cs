@@ -70,6 +70,7 @@ internal class Program
         if ( args.Version )
         {
             // ReSharper disable once ExceptionNotDocumented
+            // ReSharper disable once HeapView.ObjectAllocation
             string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion}";
             Console.WriteLine( versionString );
             Logger.Debug( versionString );
