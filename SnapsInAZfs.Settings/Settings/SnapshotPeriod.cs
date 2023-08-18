@@ -83,13 +83,13 @@ public sealed class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparabl
     /// </exception>
     public int CompareTo( SnapshotPeriod? other )
     {
-        return other is null ? -1 : Kind.CompareTo( other.Kind );
+        return other is null ? -1 : CompareTo( other.Kind );
     }
 
     /// <inheritdoc />
     public int CompareTo( SnapshotPeriodKind other )
     {
-        return Kind.CompareTo( other );
+        return Kind > other ? -1 : Kind == other ? 0 : 1;
     }
 
     public static int Compare( SnapshotPeriod? x, SnapshotPeriod? y )
