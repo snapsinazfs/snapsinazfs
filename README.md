@@ -57,6 +57,8 @@
  built on. The Makefile will not modify your PATH variable, as it shouldn't be necessary on most distros, since 
  SnapsInAZfs is installed in a common binary path. If `/usr/local/sbin` is not in your PATH, you should add it at
  least for the users intended to run it, or system-wide, if you so desire.
+
+ Invoke SnapsInAZfs with `SnapsInAZfs`, `snapsinazfs`, or `siaz` (all are hard-linked to the same executable).
  
  ## Dependencies
 
@@ -78,6 +80,7 @@
  - snapsinazfs(5)
  - snapsinazfs-zfsprops(7)
  - snapsinazfs-config-console(8)
+ - snapsinazfs-monitoring(3)
  
  If you find a bug or odd behavior in SIAZ, issues can be filed here. Note, however, that this is not a technical
  support board and SIAZ is not a commercial product, and there are no warranties, implied or otherwise. This
