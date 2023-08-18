@@ -15,7 +15,6 @@
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <VersionPrefix>1.1.0</VersionPrefix>
     <VersionSuffix>RC2</VersionSuffix>
-    <PathMap>$(SolutionDir)=./</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -33,6 +32,7 @@
     <DebugType>embedded</DebugType>
     <TieredCompilation>False</TieredCompilation>
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
@@ -48,6 +48,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebugType>embedded</DebugType>
+    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <ItemGroup>
