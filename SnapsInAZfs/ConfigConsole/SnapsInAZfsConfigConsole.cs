@@ -38,13 +38,12 @@ public sealed partial class SnapsInAZfsConfigConsole
         Ready += SnapsInAZfsConfigConsoleOnReady;
         InitializeComponent( );
         globalConfigMenuItem.Action = ShowGlobalConfigurationWindow;
-        globalConfigMenuItem.Shortcut = Key.CtrlMask | Key.g;
+        globalConfigMenuItem.Shortcut = Key.CtrlMask | Key.G;
         templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
-        templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.t;
+        templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.T;
         zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
-        zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.z;
+        zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.AltMask | Key.Z;
         saveMenuItem.Action = SaveGlobalConfiguration;
-        Application.RootKeyEvent += ApplicationRootKeyEvent;
         // ReSharper restore HeapView.ObjectAllocation.Possible
         // ReSharper restore HeapView.DelegateAllocation
     }
@@ -58,33 +57,6 @@ public sealed partial class SnapsInAZfsConfigConsole
     private bool _zfsConfigurationWindowShown;
 
     public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
-
-    private bool ApplicationRootKeyEvent( KeyEvent e )
-    {
-        if ( !e.IsCtrl )
-        {
-            return false;
-        }
-
-        // ReSharper disable once SwitchStatementMissingSomeEnumCasesNoDefault
-        switch ( e.Key & Key.CharMask )
-        {
-            case Key.g:
-            case Key.G:
-                globalConfigMenuItem.Action( );
-                return true;
-            case Key.t:
-            case Key.T:
-                templateConfigMenuItem.Action( );
-                return true;
-            case Key.z:
-            case Key.Z:
-                zfsConfigMenuItem.Action( );
-                return true;
-        }
-
-        return false;
-    }
 
     private void DisableEventHandlers( )
     {
@@ -249,20 +221,11 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _globalConfigurationWindow ??= new( );
         Add( _globalConfigurationWindow );
-        if ( ShowChild( _globalConfigurationWindow ) )
-        {
-            LayoutSubviews( );
-            _globalConfigurationWindowShown = true;
-            _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
-            Logger.Debug( "Showing global configuration window" );
-            globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
-            globalConfigMenuItem.Title = "Hide _Global Configuration Window";
-        }
-        else
-        {
-            Remove( _globalConfigurationWindow );
-            Logger.Error( "Unable to show global configuration window" );
-        }
+        _globalConfigurationWindowShown = true;
+        _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
+        Logger.Debug( "Showing global configuration window" );
+        globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
+        globalConfigMenuItem.Title = "Hide _Global Configuration Window";
     }
 
     private static (bool, string) ShowSaveDialog( SnapsInAZfsSettings settings )
@@ -322,19 +285,11 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _templateConfigurationWindow ??= new( );
         Add( _templateConfigurationWindow );
-        if ( ShowChild( _templateConfigurationWindow ) )
-        {
-            LayoutSubviews( );
-            _templateConfigurationWindowShown = true;
-            _templateConfigurationWindow.templateListView.SetFocus( );
-            Logger.Debug( "Showing template configuration window" );
-            templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
-            templateConfigMenuItem.Title = "Hide _Template Configuration Window";
-        }
-        else
-        {
-            Logger.Error( "Unable to show template configuration window" );
-        }
+        _templateConfigurationWindowShown = true;
+        _templateConfigurationWindow.templateListView.SetFocus( );
+        Logger.Debug( "Showing template configuration window" );
+        templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
+        templateConfigMenuItem.Title = "Hide _Template Configuration Window";
     }
 
     private void ShowZfsConfigurationWindow( )
@@ -359,19 +314,11 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _zfsConfigurationWindow ??= new( );
         Add( _zfsConfigurationWindow );
-        if ( ShowChild( _zfsConfigurationWindow ) )
-        {
-            LayoutSubviews( );
-            _zfsConfigurationWindowShown = true;
-            _zfsConfigurationWindow.zfsTreeView.SetFocus( );
-            Logger.Debug( "Showing ZFS configuration window" );
-            zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
-            zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
-        }
-        else
-        {
-            Logger.Error( "Unable to show ZFS configuration window" );
-        }
+        _zfsConfigurationWindowShown = true;
+        _zfsConfigurationWindow.zfsTreeView.SetFocus( );
+        Logger.Debug( "Showing ZFS configuration window" );
+        zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
+        zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
     }
 
     private void SnapsInAZfsConfigConsoleOnInitialized( object? sender, EventArgs e )
@@ -379,7 +326,6 @@ public sealed partial class SnapsInAZfsConfigConsole
         Logger.Trace( "Configuration console main window initialized. Setting global quit hotkey" );
         AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
         quitMenuItem.Action = Application.Top.RequestStop;
-        IsMdiContainer = true;
     }
 
     private void SnapsInAZfsConfigConsoleOnReady( )
