@@ -19,7 +19,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebugType>embedded</DebugType>
-    <DefineConstants>$(DefineConstants)</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
@@ -31,6 +31,7 @@
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
     <DebugType>embedded</DebugType>
     <TieredCompilation>False</TieredCompilation>
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
