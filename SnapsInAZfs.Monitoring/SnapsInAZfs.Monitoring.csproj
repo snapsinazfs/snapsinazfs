@@ -15,6 +15,7 @@
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <VersionPrefix>1.1.0</VersionPrefix>
     <VersionSuffix>RC2</VersionSuffix>
+    <PathMap>$(SolutionDir)=.\</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

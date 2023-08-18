@@ -22,6 +22,7 @@
     <Platforms>x64</Platforms>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <EnableDefaultContentItems>False</EnableDefaultContentItems>
+    <PathMap>$(SolutionDir)=.\</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
