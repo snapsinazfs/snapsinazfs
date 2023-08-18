@@ -95,6 +95,9 @@ public sealed record FormattingSettings
     /// </summary>
     public string GenerateShortSnapshotName( in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp )
     {
+        // String interpolation of all string values is the most efficient way to do this.
+        // This warning is only relevant if something in the interpolation isn't a string by the time it is evaluated.
+        // ReSharper disable once HeapView.ObjectAllocation
         return $"{Prefix}{ComponentSeparator}{timestamp.ToString( TimestampFormatString )}{ComponentSeparator}{periodKind switch
         {
             SnapshotPeriodKind.Frequent => FrequentSuffix,
