@@ -35,6 +35,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
         IsLocal = isLocal;
     }
 
+    // ReSharper disable once HeapView.ObjectAllocation
     public readonly string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
 
     [JsonIgnore]
@@ -95,6 +96,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     {
         true => ZfsPropertySourceConstants.Local,
         false when Owner is null => ZfsPropertySourceConstants.None,
+        // ReSharper disable once HeapView.ObjectAllocation
         false when Owner.ParentDataset[ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
         false => Owner.ParentDataset[ Name ].Source
     };
@@ -115,6 +117,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     };
 
     [JsonIgnore]
+    // ReSharper disable once HeapView.ObjectAllocation
     public readonly string SetString => $"{Name}={ValueString}";
 
     public string Name { get; init; }
@@ -442,6 +445,8 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
             return false;
         }
 
+        // Keeping this one as-is for consistency with the rest of the method
+        // ReSharper disable once InvertIf
         if ( rawZfsObject.Kind != ZfsPropertyValueConstants.Snapshot && !long.TryParse( rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, out bytesUsed ) )
         {
             Logger.Debug( "{0} value {1} not valid for {2} {3} - skipping object", ZfsNativePropertyNames.Used, rawZfsObject.Properties[ ZfsNativePropertyNames.Used ].Value, rawZfsObject.Kind, dsName );

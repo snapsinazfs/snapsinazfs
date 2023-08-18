@@ -61,6 +61,7 @@ public static class TypeExtensions
             :
             // This is a non-root dataset, snapshot, or bookmark
             // Return its parent dataset name
+            // ReSharper disable once HeapView.ObjectAllocation
             value[ ..endIndex ];
     }
 

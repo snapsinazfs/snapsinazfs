@@ -483,8 +483,11 @@ public sealed class Monitor : IMonitor
         return _applicationStateObservable switch
         {
             null => "Not Registered",
+            // This warning is obsolete on .net7, as the implementation now caches the strings on first use
+            // ReSharper disable HeapView.BoxingAllocation
             not null when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
             _ => _applicationStateObservable.State.ToString( "G" )
+            // ReSharper restore HeapView.BoxingAllocation
         };
     }
 

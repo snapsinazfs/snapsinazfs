@@ -128,6 +128,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.EnabledPropertyName:
@@ -150,6 +151,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
@@ -181,6 +183,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.RecursionPropertyName:
