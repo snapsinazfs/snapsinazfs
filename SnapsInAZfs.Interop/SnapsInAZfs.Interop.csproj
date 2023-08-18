@@ -8,7 +8,7 @@
     <Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
-    <PathMap>$(SolutionDir)=.\</PathMap>
+    <PathMap>$(SolutionDir)=./</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
