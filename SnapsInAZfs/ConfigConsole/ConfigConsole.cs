@@ -54,6 +54,7 @@ internal static class ConfigConsole
 
         CommandRunner = commandRunner;
 
+        Application.Init();
         Application.Run<SnapsInAZfsConfigConsole>( ErrorHandler );
         Application.Shutdown( );
 
@@ -80,9 +81,9 @@ internal static class ConfigConsole
     /// </returns>
     private static bool ErrorHandler( Exception ex )
     {
-        // Swallow this particular exception
+        // Application wasn't initialized
         if ( ex is ArgumentException { Message: "End must be balanced with calls to Begin" } )
-            return true;
+            return false;
         Logger.Error( ex, "Unhandled exception encoutered in configuration console. Please report this" );
         return true;
     }
