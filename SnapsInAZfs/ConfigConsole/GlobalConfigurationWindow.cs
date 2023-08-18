@@ -62,6 +62,7 @@ public sealed partial class GlobalConfigurationWindow
             return;
         }
 
+        // ReSharper disable once HeapView.ObjectAllocation.Possible
         resetGlobalConfigButton.Clicked -= ResetButtonOnClicked;
 
         _eventsEnabled = false;
