@@ -497,7 +497,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
+                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ).ToString( ) );
                 return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
@@ -510,7 +510,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 catch ( Exception ex )
                 {
-                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
+                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ).ToString( ) );
                     return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
                 }
             }

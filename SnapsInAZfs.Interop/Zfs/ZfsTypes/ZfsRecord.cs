@@ -999,7 +999,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
         Logger.Trace( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString( true ) );
         if ( snapshotsSetForPruning.Count <= retentionValue )
         {
-            Logger.Trace( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod, Name, snapshotsSetForPruning.Count, retentionValue );
+            Logger.Trace( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod.ToString( ), Name, snapshotsSetForPruning.Count.ToString( ), retentionValue.ToString( ) );
             return;
         }
 
