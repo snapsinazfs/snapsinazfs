@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -24,62 +24,28 @@
     <EnableDefaultContentItems>False</EnableDefaultContentItems>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE</DefineConstants>
-    <Optimize>True</Optimize>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <PublishReadyToRun>True</PublishReadyToRun>
-    <PublishSingleFile>True</PublishSingleFile>
-    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-    <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
-    <DebugType>embedded</DebugType>
-    <TieredCompilation>False</TieredCompilation>
-    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-    <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
-    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
-    <DebugType>embedded</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;TRACE</DefineConstants>
-    <DebugType>embedded</DebugType>
-    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="DummyZfsCommandRunner.cs" />
-    <None Include="DummyZfsCommandRunner.cs" />
-  </ItemGroup>
-  <ItemGroup Condition="$(DefineConstants.Contains('DEBUG'))">
-    <None Remove="DummyZfsCommandRunner.cs" />
-    <Compile Include="DummyZfsCommandRunner.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
-    <None Remove="appsettings.json" />
-  </ItemGroup>
+    <Compile Remove="DummyZfsCommandRunner.cs" />
+    <None Remove="fullZfsGet.txt" />
+    <None Remove="poolroots-withproperties.txt" />
 
-  <ItemGroup>
-    <Content Include="appsettings.Development.json" Condition="$(DefineConstants.Contains('DEBUG'))">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Content Include="SnapsInAZfs.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
     <Content Include="SnapsInAZfs.local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.nlog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -90,21 +56,6 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
     <Content Include="SnapsInAZfs.monitoring.schema.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="SnapsInAZfs.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-    </Content>
-    <Content Include="SnapsInAZfs.nlog.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
-    <Content Include="SnapsInAZfs.schema.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -134,19 +85,73 @@
     <PackageReference Include="PowerArgs" Version="4.0.2" />
     <PackageReference Include="Terminal.Gui" Version="1.13.5" />
   </ItemGroup>
+  <Choose>
+    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
 
-  <ItemGroup>
-    <None Remove="poolroots-withproperties.txt" />
-    <None Remove="fullZfsGet.txt" />
-  </ItemGroup>
-  <ItemGroup Condition="$(DefineConstants.Contains('DEBUG'))">
-    <None Include="poolroots-withproperties.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="fullZfsGet.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <DefineConstants>$(DefineConstants);DEBUG;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+        <DebugType>embedded</DebugType>
+      </PropertyGroup>
+
+      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+        <DebugType>embedded</DebugType>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <Content Include="appsettings.Development.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+
+        <Content Include="fullZfsGet.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+
+        <Content Include="poolroots-withproperties.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+      </ItemGroup>
+
+      <ItemGroup Condition="'$(Configuration)'=='Debug-Windows'">
+        <Compile Include="DummyZfsCommandRunner.cs" />
+      </ItemGroup>
+
+    </When>
+
+    <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+        <DebugType>embedded</DebugType>
+        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+      </PropertyGroup>
+
+    </When>
+
+    <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
+
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants)</DefineConstants>
+        <Optimize>True</Optimize>
+        <PublishReadyToRun>True</PublishReadyToRun>
+        <PublishSingleFile>True</PublishSingleFile>
+        <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
+        <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+        <DebugType>embedded</DebugType>
+        <TieredCompilation>False</TieredCompilation>
+        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+      </PropertyGroup>
+
+    </When>
+
+  </Choose>
 
   <ItemGroup>
     <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
@@ -158,7 +163,7 @@
     <Using Include="NLog" />
     <Using Include="JetBrains.Annotations" />
   </ItemGroup>
-<ItemGroup>
-  <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
-</ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
+  </ItemGroup>
 </Project>
