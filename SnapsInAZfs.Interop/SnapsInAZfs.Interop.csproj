@@ -38,58 +38,14 @@
 
   <ItemGroup>
     <Compile Remove="Zfs\Structs\**" />
-    <EmbeddedResource Remove="Zfs\Structs\**" />
-    <None Remove="Zfs\Structs\**" />
-  </ItemGroup>
-
-
-
-  <ItemGroup>
-    <Compile Remove="Libc\bits\PthreadTypes.cs" />
-    <Compile Remove="Libc\bits\Types.cs" />
-    <Compile Remove="Libc\bits\Typesizes.cs" />
-    <Compile Remove="Libc\Enums\PthreadEnums.cs" />
-    <Compile Remove="Libc\Enums\UnixFileFlags.cs" />
-    <Compile Remove="Libc\Enums\UnixFileTestMode.cs" />
-    <Compile Remove="Libc\NativeMethods.cs" />
-    <Compile Remove="Libc\Structs\StatFs64.cs" />
-    <Compile Remove="Zfs\Native\Enums\LibZfsError.cs" />
-    <Compile Remove="Zfs\Native\Enums\ZfsBoolean.cs" />
-    <Compile Remove="Zfs\Native\Enums\zfs_type_t.cs" />
-    <Compile Remove="Zfs\Native\libuutil\libuutil_impl\uu_avl.cs" />
-    <Compile Remove="Zfs\Native\libuutil\libuutil_impl\uu_avl_pool.cs" />
-    <Compile Remove="Zfs\Native\libuutil\libuutil_impl\uu_avl_walk.cs" />
-    <Compile Remove="Zfs\Native\libuutil\libuutil_impl\uu_compare_fn_t.cs" />
-    <Compile Remove="Zfs\Native\libzfs\libzfs_impl\libzfs_handle.cs" />
-    <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zfs_handle.cs" />
-    <Compile Remove="Zfs\Native\libzfs\libzfs_impl\zpool_handle.cs" />
-  </ItemGroup>
-
-
-
-  <ItemGroup>
-    <None Include="Libc\Enums\UnixFileFlags.cs" />
+    <Compile Remove="Zfs\Native\**" />
+    <Compile Remove="Libc\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="Libc\bits\PthreadTypes.cs" />
-    <None Include="Libc\bits\Types.cs" />
-    <None Include="Libc\bits\Typesizes.cs" />
-    <None Include="Libc\Enums\PthreadEnums.cs" />
-    <None Include="Libc\Enums\UnixFileTestMode.cs" />
-    <None Include="Libc\NativeMethods.cs" />
-    <None Include="Libc\Structs\StatFs64.cs" />
-    <None Include="Zfs\Native\Enums\LibZfsError.cs" />
-    <None Include="Zfs\Native\Enums\ZfsBoolean.cs" />
-    <None Include="Zfs\Native\Enums\zfs_type_t.cs" />
-    <None Include="Zfs\Native\libuutil\libuutil_impl\uu_avl.cs" />
-    <None Include="Zfs\Native\libuutil\libuutil_impl\uu_avl_pool.cs" />
-    <None Include="Zfs\Native\libuutil\libuutil_impl\uu_avl_walk.cs" />
-    <None Include="Zfs\Native\libuutil\libuutil_impl\uu_compare_fn_t.cs" />
-    <None Include="Zfs\Native\libzfs\libzfs_impl\libzfs_handle.cs" />
-    <None Include="Zfs\Native\libzfs\libzfs_impl\zfs_handle.cs" />
-    <None Include="Zfs\Native\libzfs\libzfs_impl\zpool_handle.cs" />
+    <Compile Include="Libc\Enums\Errno.cs" />
   </ItemGroup>
+
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
