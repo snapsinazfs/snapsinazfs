@@ -33,7 +33,11 @@ public class SnapshotPeriodTests
     [Test]
     public void Compare_ProperlyOrdersValues( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod item1, [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod item2 )
     {
-        Assert.That( SnapshotPeriod.Compare( item1, item2 ), Is.EqualTo( item1.Kind.CompareTo( item2.Kind ) ) );
+        int testCompareResult = SnapshotPeriod.Compare( item1, item2 );
+        int kindCompareResult = item1.Kind.CompareTo( item2.Kind );
+        int testSign = int.Sign( testCompareResult );
+        int kindSign = int.Sign( kindCompareResult );
+        Assert.That( testSign, Is.EqualTo( kindSign ) );
     }
 
     [Test]
