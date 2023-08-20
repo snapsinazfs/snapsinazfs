@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
@@ -96,7 +96,6 @@
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
         <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-        <DebugType>embedded</DebugType>
       </PropertyGroup>
 
       <ItemGroup>
@@ -129,7 +128,6 @@
 
       <PropertyGroup>
         <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
-        <DebugType>embedded</DebugType>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>
 
@@ -144,7 +142,6 @@
         <PublishSingleFile>True</PublishSingleFile>
         <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-        <DebugType>embedded</DebugType>
         <TieredCompilation>False</TieredCompilation>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>

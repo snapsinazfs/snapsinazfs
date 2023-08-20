@@ -18,7 +18,6 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DebugType>embedded</DebugType>
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
@@ -29,7 +28,6 @@
     <PublishSingleFile>True</PublishSingleFile>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
-    <DebugType>embedded</DebugType>
     <TieredCompilation>False</TieredCompilation>
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
@@ -38,16 +36,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
     <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebugType>embedded</DebugType>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
