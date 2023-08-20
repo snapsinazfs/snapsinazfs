@@ -17,8 +17,6 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
-#nullable enable
-
 using System.Collections.Concurrent;
 using NStack;
 using SnapsInAZfs.Settings.Settings;
@@ -292,6 +290,7 @@ public sealed partial class TemplateConfigurationWindow
                 string errorMessage = $"Failed to remove template {templateName} from UI dictionary";
                 TemplateRemovalException ex = new( errorMessage );
                 Logger.Fatal( ex, errorMessage );
+                Environment.FailFast( errorMessage, ex );
                 throw ex;
             }
 
