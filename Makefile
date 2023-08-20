@@ -19,8 +19,6 @@ SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
 ETCDIR ?= /etc
 SIAZLOCALCONFIGFILENAME ?= SnapsInAZfs.local.json
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
-VERSIONSUFFIXFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)/VersionSuffix
-VERSIONSUFFIX := $(shell cat ${VERSIONSUFFIXFILE})
 # Variables above this line generally should not be changed
 
 # For help on common and recommended build procedures,
@@ -136,11 +134,11 @@ build:	build-release
 
 build-debug:
 	mkdir -p $(DEBUGDIR)
-	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 reinstall:	uninstall	clean	install
 
@@ -194,7 +192,7 @@ install-service:
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -p:VersionSuffix=$(VERSIONSUFFIX) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 

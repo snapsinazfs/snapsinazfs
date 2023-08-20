@@ -11,6 +11,7 @@
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text.Json.Nodes;
 using NStack;
@@ -232,56 +233,6 @@ public static class TypeExtensions
         {
             return fallbackValue;
         }
-    }
-
-    /// <summary>
-    ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int?" /> version of it
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>
-    ///     For valid integer strings: An <see langword="int" /> value parsed from the string.<br />
-    ///     For all other values, including null: A <see langword="null" /> reference.
-    /// </returns>
-    [Pure]
-    public static int? ToNullableInt32( this ustring value )
-    {
-        if ( value.IsEmpty )
-        {
-            return null;
-        }
-
-        return value.ToString( ) switch
-        {
-            // This case is checking if it's a non-null string, and if it can be parsed as an integer
-            // All other conditions will throw an ArgumentOutOfRangeException for value
-            { Length: > 0 } stringValue when stringValue.Trim( ) is { Length: > 0 } trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
-            _ => null
-        };
-    }
-
-    /// <summary>
-    ///     Attempts to parse this <see cref="ustring" /> and return a <see cref="TimeOnly" />? version of it
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>
-    ///     For valid time strings: A <see cref="TimeOnly" /> value parsed from the string.<br />
-    ///     For all other values, including null: A <see langword="null" /> reference.
-    /// </returns>
-    [Pure]
-    public static TimeOnly? ToNullableTimeOnly( this ustring value )
-    {
-        if ( value.IsEmpty )
-        {
-            return null;
-        }
-
-        return value.ToString( ) switch
-        {
-            // This case is checking if it's a non-null string at least 5 characters long
-            // All other conditions will throw an ArgumentOutOfRangeException for value
-            { Length: > 4 } stringValue when stringValue.Trim( ) is { Length: > 4 } trimmedValue && TimeOnly.TryParse( trimmedValue, out TimeOnly timeOnlyValue ) => timeOnlyValue,
-            _ => null
-        };
     }
 
     /// <summary>

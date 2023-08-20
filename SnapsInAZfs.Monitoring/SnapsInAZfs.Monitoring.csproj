@@ -13,12 +13,13 @@
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
     <VersionPrefix>1.1.0</VersionPrefix>
     <VersionSuffix>RC2</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DebugType>embedded</DebugType>
     <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
@@ -29,25 +30,21 @@
     <PublishSingleFile>True</PublishSingleFile>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
     <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
-    <DebugType>embedded</DebugType>
     <TieredCompilation>False</TieredCompilation>
     <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-    <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG</DefineConstants>
-    <DebugType>embedded</DebugType>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DebugType>embedded</DebugType>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
