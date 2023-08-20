@@ -221,6 +221,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _globalConfigurationWindow ??= new( );
         Add( _globalConfigurationWindow );
+        LayoutSubviews( );
         _globalConfigurationWindowShown = true;
         _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
         Logger.Debug( "Showing global configuration window" );
@@ -285,6 +286,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _templateConfigurationWindow ??= new( );
         Add( _templateConfigurationWindow );
+        LayoutSubviews( );
         _templateConfigurationWindowShown = true;
         _templateConfigurationWindow.templateListView.SetFocus( );
         Logger.Debug( "Showing template configuration window" );
@@ -314,6 +316,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
         _zfsConfigurationWindow ??= new( );
         Add( _zfsConfigurationWindow );
+        LayoutSubviews( );
         _zfsConfigurationWindowShown = true;
         _zfsConfigurationWindow.zfsTreeView.SetFocus( );
         Logger.Debug( "Showing ZFS configuration window" );
