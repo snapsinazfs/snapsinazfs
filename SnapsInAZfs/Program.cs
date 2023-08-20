@@ -13,6 +13,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -273,14 +274,10 @@ internal class Program
     private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
     {
         // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
-    #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER
-        zfsCommandRunner = Environment.OSVersion.Platform switch
-        {
-            PlatformID.Unix => new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath ),
-            _ => new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath )
-        };
+    #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER || WINDOWS
+            zfsCommandRunner = new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath );
     #else
-            zfsCommandRunner = new ZfsCommandRunner( settings!.ZfsPath, settings.ZpoolPath );
+            zfsCommandRunner = new ZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath );
     #endif
     }
 

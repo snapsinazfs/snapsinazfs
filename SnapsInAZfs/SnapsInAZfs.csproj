@@ -7,23 +7,35 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net7.0</TargetFramework>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <Platforms>x64</Platforms>
     <LangVersion>11</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
-    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-    <DebugType>embedded</DebugType>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <VersionPrefix>1.1.0</VersionPrefix>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <Configurations>Debug;Release;Release-R2R;Debug-Windows</Configurations>
+    <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
+    <DebugType>embedded</DebugType>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
-    <Platforms>x64</Platforms>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <EnableDefaultContentItems>False</EnableDefaultContentItems>
+    <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
+    <ResponseFile>CommonCompilerFlags.rsp</ResponseFile>
+    <UTF8OutPut>True</UTF8OutPut>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
+    <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
+    <Description>SnapsInAZfs - Snapshot manager for ZFS on Linux</Description>
+    <Product>SnapsInAZfs</Product>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionSuffix>RC2</VersionSuffix>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <Compile Remove="DummyZfsCommandRunner.cs" />
@@ -67,6 +79,17 @@
     </Content>
   </ItemGroup>
 
+  <Choose>
+    <When Condition="$(Configuration)=='Debug-NoZFS' Or $(Configuration)=='Debug-Windows'">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup>
+        <Compile Include="DummyZfsCommandRunner.cs" />
+      </ItemGroup>      
+    </When>
+  </Choose>
+
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
@@ -89,12 +112,11 @@
     <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <DefineConstants>$(DefineConstants);DEBUG;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
-        <DebugType>embedded</DebugType>
+        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
       </PropertyGroup>
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
       </PropertyGroup>
 
@@ -118,15 +140,12 @@
         </Content>
       </ItemGroup>
 
-      <ItemGroup Condition="'$(Configuration)'=='Debug-Windows'">
-        <Compile Include="DummyZfsCommandRunner.cs" />
-      </ItemGroup>
-
     </When>
 
     <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 
       <PropertyGroup>
+        <AnalysisLevel>7-minimum</AnalysisLevel>
         <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>
@@ -136,14 +155,16 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
 
       <PropertyGroup>
+        <AnalysisLevel>7-minimum</AnalysisLevel>
+        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
         <DefineConstants>$(DefineConstants)</DefineConstants>
         <Optimize>True</Optimize>
         <PublishReadyToRun>True</PublishReadyToRun>
-        <PublishSingleFile>True</PublishSingleFile>
         <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
+        <PublishSingleFile>True</PublishSingleFile>
+        <ResponseFile>Release-R2R.rsp</ResponseFile>
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
         <TieredCompilation>False</TieredCompilation>
-        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>
 
     </When>
@@ -158,7 +179,6 @@
 
   <ItemGroup>
     <Using Include="NLog" />
-    <Using Include="JetBrains.Annotations" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
