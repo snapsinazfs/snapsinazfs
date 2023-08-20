@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -36,13 +36,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-    <DefineConstants>$(DefineConstants);WINDOWS;ALLOW_ADJACENT_CONFIG_FILE;DEBUG;DEBUG_WINDOWS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DefineConstants>$(DefineConstants);ALLOW_ADJACENT_CONFIG_FILE;DEBUG</DefineConstants>
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
     <DebugType>embedded</DebugType>
   </PropertyGroup>
 
