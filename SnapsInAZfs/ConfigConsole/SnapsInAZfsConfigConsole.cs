@@ -96,7 +96,7 @@ public sealed partial class SnapsInAZfsConfigConsole
     {
         Remove( _zfsConfigurationWindow );
         zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
-        zfsConfigMenuItem.Title = "Show _Template Configuration Window";
+        zfsConfigMenuItem.Title = "Show ZFS Configuration Window";
         _zfsConfigurationWindowShown = false;
     }
 
