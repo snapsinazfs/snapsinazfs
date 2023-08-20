@@ -807,8 +807,12 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 return SiazExecutionResultCode.CancelledByToken;
             }
 
-            ConcurrentDictionary<string, ZfsRecord> datasets = new( );
-            ConcurrentDictionary<string, Snapshot> snapshots = new( );
+            // To avoid wasted allocations when there are not exactly 31 elements (the default size of a ConcurrentDictionary),
+            // let's set the initial capacity of the datasets collection to the number we found in the schema check,
+            // and set initial capacity of the snapshots collection to 4x that.
+            int initialDsDictionaryCapacity = schemaCheckResult.PoolRootsWithPropertyValidities.Sum( static pair => pair.Value.Count );
+            ConcurrentDictionary<string, ZfsRecord> datasets = new( Environment.ProcessorCount, initialDsDictionaryCapacity );
+            ConcurrentDictionary<string, Snapshot> snapshots = new( Environment.ProcessorCount, initialDsDictionaryCapacity * 4 );
 
             Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
             State = ApplicationState.GettingDataFromZfs;
