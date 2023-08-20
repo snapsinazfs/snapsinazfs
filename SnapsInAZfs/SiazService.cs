@@ -93,7 +93,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     public ApplicationState State
     {
         get => _state;
-        internal set
+        private set
         {
             if ( _state != value )
             {
@@ -150,14 +150,20 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 if ( !IZfsProperty.DefaultDatasetProperties.ContainsKey( propName ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Not interested in property {0} for pool root schema check", propName );
+                #endif
                     continue;
                 }
 
+            #if DEBUG
                 Logger.Trace( "Checking validity of property {0} in pool root {1}", propName, poolName );
+            #endif
                 if ( propValue )
                 {
+                #if DEBUG
                     Logger.Trace( "Pool root {0} has property {1} with a valid value", poolName, propName );
+                #endif
                     continue;
                 }
 
@@ -253,7 +259,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 TimeSpan differenceBetweenCurrentAndConfiguredInterval = timerInterval.Subtract( _daemonTimerInterval ).Duration( );
                 if ( differenceBetweenCurrentAndConfiguredInterval.TotalMilliseconds > maxDriftMilliseconds )
                 {
+                #if DEBUG
                     Logger.Debug( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
+                #endif
                     daemonRunTimer.Dispose( );
                     daemonRunTimer = new( _daemonTimerInterval );
                     timerInterval = _daemonTimerInterval;
@@ -262,7 +270,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 try
                 {
                     Timestamp = DateTimeOffset.Now;
+                #if DEBUG
                     Logger.Debug( "Timer ticked at {0:O} - Interval: {1:G}", Timestamp, timerInterval );
+                #endif
                     TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration( );
                     GetNextTickTimestamp( in Timestamp, in _daemonTimerInterval, out expectedTickTimestamp );
                     if ( drift.TotalMilliseconds > maxDriftMilliseconds )
@@ -593,7 +603,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case SnapshotPeriodKind.Frequent:
                 if ( ds.SnapshotRetentionFrequent.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
+                #endif
                     return false;
                 }
 
@@ -601,7 +613,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case SnapshotPeriodKind.Hourly:
                 if ( ds.SnapshotRetentionHourly.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
+                #endif
                     return false;
                 }
 
@@ -609,7 +623,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case SnapshotPeriodKind.Daily:
                 if ( ds.SnapshotRetentionDaily.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
+                #endif
                     return false;
                 }
 
@@ -617,15 +633,19 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case SnapshotPeriodKind.Weekly:
                 if ( ds.SnapshotRetentionWeekly.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
-                    return false;
+                 #endif
+                   return false;
                 }
 
                 break;
             case SnapshotPeriodKind.Monthly:
                 if ( ds.SnapshotRetentionMonthly.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
+                 #endif
                     return false;
                 }
 
@@ -633,7 +653,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case SnapshotPeriodKind.Yearly:
                 if ( ds.SnapshotRetentionYearly.IsNotWanted( ) )
                 {
+                #if DEBUG
                     Logger.Trace( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
+                 #endif
                     return false;
                 }
 
@@ -740,7 +762,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             CheckZfsPropertiesSchemaResult schemaCheckResult = await CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
             State = ApplicationState.Executing;
 
-            Logger.Debug( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
+            Logger.Trace( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
 
             if ( cancellationToken.IsCancellationRequested )
             {
