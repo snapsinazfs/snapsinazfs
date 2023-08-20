@@ -42,7 +42,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         templateConfigMenuItem.Action = ShowTemplateConfigurationWindow;
         templateConfigMenuItem.Shortcut = Key.CtrlMask | Key.T;
         zfsConfigMenuItem.Action = ShowZfsConfigurationWindow;
-        zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.AltMask | Key.Z;
+        zfsConfigMenuItem.Shortcut = Key.CtrlMask | Key.D;
         saveMenuItem.Action = SaveGlobalConfiguration;
         // ReSharper restore HeapView.ObjectAllocation.Possible
         // ReSharper restore HeapView.DelegateAllocation
