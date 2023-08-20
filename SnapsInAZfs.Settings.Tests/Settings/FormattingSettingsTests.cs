@@ -29,6 +29,7 @@ public class FormattingSettingsTests
         string shortName = testFormattingSettings.GenerateShortSnapshotName( in period, in timestamp );
         Assert.That( shortName, Is.Not.Null );
         Assert.That( shortName, Is.Not.Empty );
+#pragma warning disable CS8509 // We don't care about the NotSet value for this test
         Assert.That( shortName, Is.EqualTo( $"{testFormattingSettings.Prefix}{testFormattingSettings.ComponentSeparator}{timestamp.ToString( testFormattingSettings.TimestampFormatString )}{testFormattingSettings.ComponentSeparator}{period switch
         {
             SnapshotPeriodKind.Frequent => testFormattingSettings.FrequentSuffix,
@@ -38,6 +39,7 @@ public class FormattingSettingsTests
             SnapshotPeriodKind.Monthly => testFormattingSettings.MonthlySuffix,
             SnapshotPeriodKind.Yearly => testFormattingSettings.YearlySuffix
         }}" ) );
+#pragma warning restore CS8509 // We don't care about the NotSet value for this test
     }
 
     [Test]

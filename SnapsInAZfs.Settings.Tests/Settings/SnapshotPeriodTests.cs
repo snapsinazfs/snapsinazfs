@@ -43,13 +43,13 @@ public class SnapshotPeriodTests
     [Test]
     public void Compare_RightItemGreater_IfOnlyLeftItemIsNull( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod rightPeriod )
     {
-        Assert.That( SnapshotPeriod.Compare( null, rightPeriod ), Is.EqualTo( -1 ) );
+        Assert.That( SnapshotPeriod.Compare( null, rightPeriod ), Is.Negative );
     }
 
     [Test]
     public void CompareTo_Null_IsLessThanNotNull( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod left )
     {
-        Assert.That( left.CompareTo( null ), Is.EqualTo( -1 ) );
+        Assert.That( left.CompareTo( null ), Is.Positive );
     }
 
     [Test]
