@@ -43,18 +43,15 @@ public sealed partial class TemplateConfigurationWindow
     internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
     private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( static tvf => tvf.Field.IsValid );
     private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
-
-    internal static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
+    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
 
     private const string ComponentSeparator = "Component Separator";
     private const string DailySuffixTitleCase = "Daily Suffix";
     private const string DailyTimeTitleCase = "Daily Time";
-
     private const string FrequentPeriodTitleCase = "Frequent Period";
     private const string FrequentSuffixTitleCase = "Frequent Suffix";
     private const string HourlyMinuteTitleCase = "Hourly Minute";
     private const string HourlySuffixTitleCase = "Hourly Suffix";
-
     private const string InvalidFieldValueDialogTitleString = "Invalid Field Value";
     private const string MonthlyDayTitleCase = "Monthly Day";
     private const string MonthlySuffixTitleCase = "Monthly Suffix";
