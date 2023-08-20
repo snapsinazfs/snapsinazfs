@@ -58,7 +58,7 @@ public class SnapshotPeriodTests
         SnapshotPeriodKind leftKind = left.Kind;
         SnapshotPeriodKind rightKind = right.Kind;
 
-        Assert.That( left.CompareTo( right ), Is.EqualTo( leftKind.CompareTo( rightKind ) ) );
+        Assert.That( int.Sign( left.CompareTo( right ) ), Is.EqualTo( int.Sign( leftKind.CompareTo( rightKind ) ) ) );
     }
 
     [Test]
@@ -66,7 +66,7 @@ public class SnapshotPeriodTests
     {
         SnapshotPeriodKind leftKind = left.Kind;
 
-        Assert.That( left.CompareTo( right ), Is.EqualTo( leftKind.CompareTo( right ) ) );
+        Assert.That( int.Sign( left.CompareTo( right ) ), Is.EqualTo( int.Sign( leftKind.CompareTo( right ) ) ) );
     }
 
     [Test]
