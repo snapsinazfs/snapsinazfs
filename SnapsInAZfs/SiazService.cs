@@ -136,7 +136,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     /// <inheritdoc />
     public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
-    public async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
+    private static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync( IZfsCommandRunner zfsCommandRunner, CommandLineArguments args )
     {
         Logger.Debug( "Checking zfs properties schema" );
 
