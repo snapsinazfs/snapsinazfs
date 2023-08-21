@@ -134,7 +134,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                 switch ( copyConfigResult.reasonOrFile )
                 {
                     case "canceled":
-                        Logger.Debug( "Canceled configuration save dialog" );
+                        Logger.ConditionalDebug( "Canceled configuration save dialog" );
                         return;
                     case "no file name":
                         Logger.Error( "No file name provided in save dialog. Configuration copy not saved." );
@@ -222,7 +222,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         LayoutSubviews( );
         _globalConfigurationWindowShown = true;
         _globalConfigurationWindow.dryRunRadioGroup.SetFocus( );
-        Logger.Debug( "Showing global configuration window" );
+        Logger.ConditionalDebug( "Showing global configuration window" );
         globalConfigMenuItem.Action = HideGlobalConfigurationWindow;
         globalConfigMenuItem.Title = "Hide _Global Configuration Window";
     }
@@ -287,7 +287,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         LayoutSubviews( );
         _templateConfigurationWindowShown = true;
         _templateConfigurationWindow.templateListView.SetFocus( );
-        Logger.Debug( "Showing template configuration window" );
+        Logger.ConditionalDebug( "Showing template configuration window" );
         templateConfigMenuItem.Action = HideTemplateConfigurationWindow;
         templateConfigMenuItem.Title = "Hide _Template Configuration Window";
     }
@@ -317,21 +317,21 @@ public sealed partial class SnapsInAZfsConfigConsole
         LayoutSubviews( );
         _zfsConfigurationWindowShown = true;
         _zfsConfigurationWindow.zfsTreeView.SetFocus( );
-        Logger.Debug( "Showing ZFS configuration window" );
+        Logger.ConditionalDebug( "Showing ZFS configuration window" );
         zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
         zfsConfigMenuItem.Title = "Hide ZFS Configuration Window";
     }
 
     private void SnapsInAZfsConfigConsoleOnInitialized( object? sender, EventArgs e )
     {
-        Logger.Trace( "Configuration console main window initialized. Setting global quit hotkey" );
+        Logger.ConditionalTrace( "Configuration console main window initialized. Setting global quit hotkey" );
         AddKeyBinding( Key.CtrlMask | Key.q, Command.QuitToplevel );
         quitMenuItem.Action = Application.Top.RequestStop;
     }
 
     private void SnapsInAZfsConfigConsoleOnReady( )
     {
-        Logger.Trace( "Configuration console main window ready" );
+        Logger.ConditionalTrace( "Configuration console main window ready" );
         EnableEventHandlers( );
     }
 }
