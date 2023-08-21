@@ -458,7 +458,6 @@ public partial record ZfsRecord : IComparable<ZfsRecord>
     /// <returns>
     ///     A reference to the created <see cref="Snapshot" />
     /// </returns>
-    [MustUseReturnValue]
     public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in FormattingSettings formattingSettings, in ZfsProperty<string> sourceSystem )
     {
         Logger.Trace( "Creating {0} snapshot for {1} {2}", period, Kind, Name );

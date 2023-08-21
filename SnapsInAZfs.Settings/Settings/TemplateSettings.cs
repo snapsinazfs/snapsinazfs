@@ -19,7 +19,6 @@ namespace SnapsInAZfs.Settings.Settings;
 /// <summary>
 ///     Settings definitions for templates
 /// </summary>
-[UsedImplicitly( ImplicitUseKindFlags.Access, ImplicitUseTargetFlags.WithMembers )]
 public sealed record TemplateSettings
 {
     /// <summary>
