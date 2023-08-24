@@ -572,7 +572,9 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     private bool TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, out Snapshot? snapshot )
     {
+    #if DEBUG
         Logger.Trace( "TakeSnapshot called for {0} with period {1}", ds.Name, period );
+    #endif
         snapshot = null;
 
         switch ( ds )
