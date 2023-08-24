@@ -690,6 +690,11 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 TakeSnapshotSucceeded?.Invoke( this, new( snapshot!.Name, in timestamp ) );
                 Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
                 return true;
+            case ZfsCommandRunnerOperationStatus.Failure:
+            case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+            case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
+            case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
+            case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
             default:
                 TakeSnapshotFailed?.Invoke( this, new( ds.Name, in timestamp ) );
                 Logger.Error( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
