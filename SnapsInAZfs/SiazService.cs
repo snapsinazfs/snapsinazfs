@@ -577,10 +577,14 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         switch ( ds )
         {
             case { Enabled.Value: false }:
+            #if DEBUG
                 Logger.Trace( "Dataset {0} is not enabled. Skipping", ds.Name );
+            #endif
                 return false;
             case { TakeSnapshots.Value: false }:
+            #if DEBUG
                 Logger.Trace( "Dataset {0} is not configured to take snapshots. Skipping", ds.Name );
+            #endif
                 return false;
             case { IsPoolRoot: false, Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion, ParentDataset.Recursion.Value: ZfsPropertyValueConstants.ZfsRecursion }:
                 Logger.Debug( "Ancestor {1} of dataset {0} is already configured for zfs native recursion. Skipping", ds.Name, ds.ParentDataset.Name );
