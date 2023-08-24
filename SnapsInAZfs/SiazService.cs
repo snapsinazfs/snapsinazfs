@@ -560,6 +560,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                     propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), in timestamp ) );
                     return ( true, snapshot );
                 case false when _settings.DryRun:
+                    Logger.Debug( "DRY RUN: Pretending {0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
                     propsToSet.Add( ds.UpdateProperty( period.GetMostRecentSnapshotZfsPropertyName( ), in timestamp ) );
                     return ( true, null );
                 default:
