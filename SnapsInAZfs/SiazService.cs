@@ -774,7 +774,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             CheckZfsPropertiesSchemaResult schemaCheckResult = await CheckZfsPoolRootPropertiesSchemaAsync( zfsCommandRunner, args ).ConfigureAwait( true );
             State = ApplicationState.Executing;
 
-            Logger.Trace( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
+            Logger.ConditionalTrace( "Result of schema check is: {0}", JsonSerializer.Serialize( schemaCheckResult ) );
 
             if ( cancellationToken.IsCancellationRequested )
             {
