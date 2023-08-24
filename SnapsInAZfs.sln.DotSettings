@@ -393,6 +393,7 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002EMonitor_003BServiceOnTakeSnapshotSucceeded/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002ESnapshotCountMetrics_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EMonitoring_003B_002A_003BSnapsInAZfs_002EMonitoring_002ESnapshotOperationEventArgs_003B_002A/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_003B_002A_003BSnapsInAZfs_002ECheckZfsPropertiesSchemaResult_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_003B_002A_003BSnapsInAZfs_002ECommandLineArguments_003B_002A_005FCheckZfsProperties/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_003B_002A_003BSnapsInAZfs_002ECommandLineArguments_003B_002A_005FConfigConsole/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_003B_002A_003BSnapsInAZfs_002ECommandLineArguments_003B_002A_005FDebug/@EntryIndexedValue">True</s:Boolean>
