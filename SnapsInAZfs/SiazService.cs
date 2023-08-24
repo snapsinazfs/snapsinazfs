@@ -816,7 +816,8 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
             Logger.Debug( "Getting remaining datasets and all snapshots from ZFS" );
             State = ApplicationState.GettingDataFromZfs;
-            await GetDatasetsAndSnapshotsFromZfsAsync( _settings, zfsCommandRunner, datasets, snapshots ).ConfigureAwait( true );
+
+            await zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( _settings, datasets, snapshots ).ConfigureAwait( true );
             State = ApplicationState.Executing;
 
             Logger.Debug( "Finished getting datasets and snapshots from ZFS" );
@@ -894,11 +895,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         {
             State = ApplicationState.Idle;
         }
-    }
-
-    private static Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, IZfsCommandRunner zfsCommandRunner, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
-    {
-        return zfsCommandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, datasets, snapshots );
     }
 
     private void SetNextRunTime( in int greatestCommonFrequentIntervalMinutes, in DateTimeOffset timestamp, in DateTimeOffset lastRunTime, out DateTimeOffset nextRunTime )
