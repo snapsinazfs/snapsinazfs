@@ -105,8 +105,8 @@ public class ZfsRecordTests
     public void CreateSnapshot_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
-        TemplateSettings templateSettings = new( );
-        Assert.That( ( ) => { gen1Ds.CreateSnapshot( SnapshotPeriod.Frequent, DateTimeOffset.Now, in templateSettings, gen1Ds.SourceSystem with { Value = sourceSystem } ); }, Throws.ArgumentException );
+        FormattingSettings formattingSettings = FormattingSettings.GetDefault( );
+        Assert.That( ( ) => { gen1Ds.CreateSnapshot( SnapshotPeriod.Frequent, DateTimeOffset.Now, in formattingSettings, gen1Ds.SourceSystem with { Value = sourceSystem } ); }, Throws.ArgumentException );
     }
 
     [Test]

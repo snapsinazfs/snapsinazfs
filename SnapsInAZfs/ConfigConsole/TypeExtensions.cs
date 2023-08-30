@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2023 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,10 +8,10 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text.Json.Nodes;
 using NStack;
@@ -234,56 +233,6 @@ public static class TypeExtensions
         {
             return fallbackValue;
         }
-    }
-
-    /// <summary>
-    ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int?" /> version of it
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>
-    ///     For valid integer strings: An <see langword="int" /> value parsed from the string.<br />
-    ///     For all other values, including null: A <see langword="null" /> reference.
-    /// </returns>
-    [Pure]
-    public static int? ToNullableInt32( this ustring value )
-    {
-        if ( value.IsEmpty )
-        {
-            return null;
-        }
-
-        return value.ToString( ) switch
-        {
-            // This case is checking if it's a non-null string, and if it can be parsed as an integer
-            // All other conditions will throw an ArgumentOutOfRangeException for value
-            { Length: > 0 } stringValue when stringValue.Trim( ) is { Length: > 0 } trimmedValue && int.TryParse( trimmedValue, out int intValue ) => intValue,
-            _ => null
-        };
-    }
-
-    /// <summary>
-    ///     Attempts to parse this <see cref="ustring" /> and return a <see cref="TimeOnly" />? version of it
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns>
-    ///     For valid time strings: A <see cref="TimeOnly" /> value parsed from the string.<br />
-    ///     For all other values, including null: A <see langword="null" /> reference.
-    /// </returns>
-    [Pure]
-    public static TimeOnly? ToNullableTimeOnly( this ustring value )
-    {
-        if ( value.IsEmpty )
-        {
-            return null;
-        }
-
-        return value.ToString( ) switch
-        {
-            // This case is checking if it's a non-null string at least 5 characters long
-            // All other conditions will throw an ArgumentOutOfRangeException for value
-            { Length: > 4 } stringValue when stringValue.Trim( ) is { Length: > 4 } trimmedValue && TimeOnly.TryParse( trimmedValue, out TimeOnly timeOnlyValue ) => timeOnlyValue,
-            _ => null
-        };
     }
 
     /// <summary>

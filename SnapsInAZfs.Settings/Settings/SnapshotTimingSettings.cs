@@ -12,8 +12,8 @@
 
 #endregion
 
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 
 namespace SnapsInAZfs.Settings.Settings;
 
@@ -40,7 +40,7 @@ public sealed record SnapshotTimingSettings
     /// <summary>
     ///     Gets or sets the minute of the hour that hourly snapshots are taken
     /// </summary>
-    [ValueRange( 0, 59 )]
+    [Range( 0, 59 )]
     [JsonPropertyOrder( 2 )]
     public required int HourlyMinute { get; init; }
 
@@ -51,7 +51,7 @@ public sealed record SnapshotTimingSettings
     ///     If the current month has fewer days than the specified value, monthly snapshots will be taken on the last day of
     ///     the month
     /// </remarks>
-    [ValueRange( 1, 31 )]
+    [Range( 1, 31 )]
     [JsonPropertyOrder( 6 )]
     public required int MonthlyDay { get; init; }
 
@@ -80,14 +80,14 @@ public sealed record SnapshotTimingSettings
     ///     If the current month has fewer days than the specified value, yearly snapshots will be taken on the last day of
     ///     <see cref="YearlyMonth" />
     /// </remarks>
-    [ValueRange( 1, 31 )]
+    [Range( 1, 31 )]
     [JsonPropertyOrder( 9 )]
     public required int YearlyDay { get; init; }
 
     /// <summary>
     ///     Gets or sets the month of the year in which yearly snapshots will be taken
     /// </summary>
-    [ValueRange( 1, 12 )]
+    [Range( 1,12 )]
     [JsonPropertyOrder( 8 )]
     public required int YearlyMonth { get; init; }
 

@@ -88,7 +88,7 @@ namespace SnapsInAZfs.ConfigConsole {
             this.templateConfigMenuItem.Title = "Show _Template Configuration Window";
             this.templateConfigMenuItem.Data = "templateConfigMenuItem";
             this.zfsConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.zfsConfigMenuItem.Title = "Show _ZFS Configuration Window";
+            this.zfsConfigMenuItem.Title = "Show ZFS Configuration Window";
             this.zfsConfigMenuItem.Data = "zfsConfigMenuItem";
             this.windowMenu.Children = new Terminal.Gui.MenuItem[] {
                     this.globalConfigMenuItem,

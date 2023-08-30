@@ -1,12 +1,14 @@
-﻿// LICENSE:
-// 
+﻿#region MIT LICENSE
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+#endregion
 
 using System.Collections.Concurrent;
 using NLog.Config;
@@ -26,7 +28,7 @@ internal static class ConfigConsole
     internal static IZfsCommandRunner? CommandRunner { get; private set; }
     internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = new( );
     // ReSharper disable HeapView.ObjectAllocation
-    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
+    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( static kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? new( );
     // ReSharper restore HeapView.ObjectAllocation
     internal static readonly ConcurrentDictionary<string, ZfsRecord> BaseDatasets = new( );
 
@@ -54,6 +56,7 @@ internal static class ConfigConsole
 
         CommandRunner = commandRunner;
 
+        Application.Init();
         Application.Run<SnapsInAZfsConfigConsole>( ErrorHandler );
         Application.Shutdown( );
 
@@ -80,9 +83,6 @@ internal static class ConfigConsole
     /// </returns>
     private static bool ErrorHandler( Exception ex )
     {
-        // Swallow this particular exception
-        if ( ex is ArgumentException { Message: "End must be balanced with calls to Begin" } )
-            return true;
         Logger.Error( ex, "Unhandled exception encoutered in configuration console. Please report this" );
         return true;
     }

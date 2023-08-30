@@ -1,12 +1,14 @@
-// LICENSE:
-// 
+#region MIT LICENSE
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+#endregion
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -35,7 +37,9 @@ internal static class ZfsTasks
         {
             zfsInheritTasks.Add( commandRunner.InheritZfsPropertyAsync( dryRun, zfsPath, property ).ContinueWith( async inheritTask =>
             {
+            #if DEBUG
                 Logger.Trace( "ZFS inherit operation continuation received" );
+            #endif
                 ZfsCommandRunnerOperationStatus inheritResult = await inheritTask.ConfigureAwait( false );
                 switch ( inheritResult )
                 {
@@ -47,6 +51,9 @@ internal static class ZfsTasks
                     Increment:
                         Interlocked.Increment( ref successfulOperations );
                         break;
+                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+                    case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
+                    case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
                     case ZfsCommandRunnerOperationStatus.Failure:
                         Logger.Trace( "Failure result received from ZFS inherit operation" );
                         goto default;
@@ -84,7 +91,7 @@ internal static class ZfsTasks
         {
             List<ITreeNode> treeRootNodes = new( );
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, baseSnapshots ).ConfigureAwait( true );
-            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
+            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( static kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
 
             foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedSetOfPoolRoots )
             {

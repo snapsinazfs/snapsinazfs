@@ -19,8 +19,6 @@ SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
 ETCDIR ?= /etc
 SIAZLOCALCONFIGFILENAME ?= SnapsInAZfs.local.json
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
-VERSIONSUFFIXFILE ?= $(SNAPSINAZFS_SOLUTION_ROOT)/VersionSuffix
-VERSIONSUFFIX := $(shell cat ${VERSIONSUFFIXFILE})
 # Variables above this line generally should not be changed
 
 # For help on common and recommended build procedures,
@@ -136,11 +134,11 @@ build:	build-release
 
 build-debug:
 	mkdir -p $(DEBUGDIR)
-	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 -p:VersionSuffix=$(VERSIONSUFFIX) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 reinstall:	uninstall	clean	install
 
@@ -171,6 +169,9 @@ install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZLC)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/siaz-zfsprops.7
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZ)-monitoring.3
+	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZLC)-monitoring.3
+	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/siaz-monitoring.3
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).5
 	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).5
 	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/siaz.5
@@ -191,7 +192,7 @@ install-service:
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -p:VersionSuffix=$(VERSIONSUFFIX) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
@@ -213,6 +214,9 @@ uninstall-doc:
 	rm -fv $(MAN7DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
 	rm -fv $(MAN7DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
 	rm -fv $(MAN7DIR)/siaz-zfsprops.7 2>/dev/null
+	rm -fv $(MAN3DIR)/$(SIAZ)-monitoring.3 2>/dev/null
+	rm -fv $(MAN3DIR)/$(SIAZLC)-monitoring.3 2>/dev/null
+	rm -fv $(MAN3DIR)/siaz-monitoring.3 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZ).5 2>/dev/null
 	rm -fv $(MAN5DIR)/$(SIAZLC).5 2>/dev/null
 	rm -fv $(MAN5DIR)/siaz.5 2>/dev/null

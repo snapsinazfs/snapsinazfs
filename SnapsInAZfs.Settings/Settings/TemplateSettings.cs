@@ -19,7 +19,6 @@ namespace SnapsInAZfs.Settings.Settings;
 /// <summary>
 ///     Settings definitions for templates
 /// </summary>
-[UsedImplicitly( ImplicitUseKindFlags.Access, ImplicitUseTargetFlags.WithMembers )]
 public sealed record TemplateSettings
 {
     /// <summary>
@@ -31,10 +30,4 @@ public sealed record TemplateSettings
     ///     Gets or sets the snapshot timing settings sub-section
     /// </summary>
     public SnapshotTimingSettings SnapshotTiming { get; set; } = SnapshotTimingSettings.GetDefault( );
-
-    /// <inheritdoc cref="FormattingSettings.GenerateFullSnapshotName" />
-    public string GenerateFullSnapshotName( string datasetName, in SnapshotPeriodKind periodKind, in DateTimeOffset timestamp )
-    {
-        return Formatting.GenerateFullSnapshotName( datasetName, in periodKind, in timestamp );
-    }
 }

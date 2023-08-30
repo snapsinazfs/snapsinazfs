@@ -128,6 +128,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.EnabledPropertyName:
@@ -150,6 +151,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
@@ -181,6 +183,7 @@ public partial record ZfsRecord
             throw new InvalidOperationException( "A pool root cannot inherit a property" );
         }
 
+        // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.RecursionPropertyName:
@@ -477,7 +480,7 @@ public partial record ZfsRecord
 
     protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
-        Logger.Trace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
             {
                 ZfsPropertyNames.RecursionPropertyName => _recursion.IsInherited,
@@ -511,7 +514,7 @@ public partial record ZfsRecord
 
     private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
-        Logger.Trace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
             {
                 ZfsPropertyNames.EnabledPropertyName => _enabled.IsInherited,
@@ -526,7 +529,7 @@ public partial record ZfsRecord
 
     private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> updatedProperty )
     {
-        Logger.Trace( "{2} received int property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace( "{2} received int property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
             {
                 ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => _snapshotRetentionFrequent.IsInherited,

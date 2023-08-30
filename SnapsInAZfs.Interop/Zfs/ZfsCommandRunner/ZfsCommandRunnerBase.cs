@@ -25,7 +25,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
-    public abstract ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset dateTimeOffset, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot );
+    public abstract ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset dateTimeOffset, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot );
 
     /// <inheritdoc />
     public abstract Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );

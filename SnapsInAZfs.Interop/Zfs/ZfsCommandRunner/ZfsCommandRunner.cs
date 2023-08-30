@@ -76,12 +76,12 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     private string PathToZpoolUtility { get; }
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, TemplateSettings datasetTemplate, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
         Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
         ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
-        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetTemplate, in snapshotSourceSystem );
+        snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetFormattingSettings, in snapshotSourceSystem );
         try
         {
             // This exception is only thrown if kind is invalid. We're passing a known good value.
@@ -497,7 +497,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             }
             catch ( InvalidOperationException ioex )
             {
-                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
+                Logger.Error( ioex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ).ToString( ) );
                 return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
             }
 
@@ -510,7 +510,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                 }
                 catch ( Exception ex )
                 {
-                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ) );
+                    Logger.Error( ex, "Error running zfs set operation. Exit status was {0}", Marshal.GetLastSystemError( ).ToString( ) );
                     return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
                 }
             }

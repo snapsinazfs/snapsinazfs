@@ -11,7 +11,7 @@
 		<RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
 		<DebugType>embedded</DebugType>
 		<VersionPrefix>1.1.0</VersionPrefix>
-		<VersionSuffix>Beta3</VersionSuffix>
+		<VersionSuffix>RC4</VersionSuffix>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -20,6 +20,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 		<DebugType>embedded</DebugType>
+		<ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
@@ -30,6 +31,7 @@
 		<DebugType>embedded</DebugType>
 		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
 		<TieredCompilation>False</TieredCompilation>
+		<ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
@@ -38,7 +40,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="2023.2.0" />
 		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="NLog" Version="5.2.3" />
 	</ItemGroup>

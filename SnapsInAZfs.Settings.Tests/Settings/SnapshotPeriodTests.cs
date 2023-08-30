@@ -1,6 +1,16 @@
-﻿// LICENSE:
+﻿#region MIT LICENSE
+
+// Copyright 2023 Brandon Thetford
 // 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using SnapsInAZfs.Settings.Settings;
 
@@ -15,9 +25,31 @@ public class SnapshotPeriodTests
     private static readonly string[] AllSnapshotPeriodStrings = { SnapshotPeriod.NotSetString, SnapshotPeriod.FrequentString, SnapshotPeriod.HourlyString, SnapshotPeriod.DailyString, SnapshotPeriod.WeeklyString, SnapshotPeriod.MonthlyString, SnapshotPeriod.YearlyString };
 
     [Test]
+    public void Compare_ItemsEqual_IfBothNull( )
+    {
+        Assert.That( SnapshotPeriod.Compare( null, null ), Is.Zero );
+    }
+
+    [Test]
+    public void Compare_ProperlyOrdersValues( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod item1, [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod item2 )
+    {
+        int testCompareResult = SnapshotPeriod.Compare( item1, item2 );
+        int kindCompareResult = item1.Kind.CompareTo( item2.Kind );
+        int testSign = int.Sign( testCompareResult );
+        int kindSign = int.Sign( kindCompareResult );
+        Assert.That( testSign, Is.EqualTo( kindSign ) );
+    }
+
+    [Test]
+    public void Compare_RightItemGreater_IfOnlyLeftItemIsNull( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod rightPeriod )
+    {
+        Assert.That( SnapshotPeriod.Compare( null, rightPeriod ), Is.Negative );
+    }
+
+    [Test]
     public void CompareTo_Null_IsLessThanNotNull( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod left )
     {
-        Assert.That( left.CompareTo( null ), Is.EqualTo( -1 ) );
+        Assert.That( left.CompareTo( null ), Is.Positive );
     }
 
     [Test]
@@ -26,7 +58,7 @@ public class SnapshotPeriodTests
         SnapshotPeriodKind leftKind = left.Kind;
         SnapshotPeriodKind rightKind = right.Kind;
 
-        Assert.That( left.CompareTo( right ), Is.EqualTo( leftKind.CompareTo( rightKind ) ) );
+        Assert.That( int.Sign( left.CompareTo( right ) ), Is.EqualTo( int.Sign( leftKind.CompareTo( rightKind ) ) ) );
     }
 
     [Test]
@@ -34,7 +66,7 @@ public class SnapshotPeriodTests
     {
         SnapshotPeriodKind leftKind = left.Kind;
 
-        Assert.That( left.CompareTo( right ), Is.EqualTo( leftKind.CompareTo( right ) ) );
+        Assert.That( int.Sign( left.CompareTo( right ) ), Is.EqualTo( int.Sign( leftKind.CompareTo( right ) ) ) );
     }
 
     [Test]
@@ -94,9 +126,22 @@ public class SnapshotPeriodTests
     }
 
     [Test]
+    [Sequential]
+    public void StringToSnapshotPeriodKind_ReturnsExpectedValues( [ValueSource( nameof( AllSnapshotPeriodStrings ) )] string periodString, [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod period )
+    {
+        Assert.That( ( ) => SnapshotPeriod.StringToSnapshotPeriodKind( periodString ), Is.EqualTo( period.Kind ) );
+    }
+
+    [Test]
+    public void StringToSnapshotPeriodKind_ThrowsFormatException_OnBadPeriod( )
+    {
+        Assert.That( static ( ) => SnapshotPeriod.StringToSnapshotPeriodKind( "BogusValue" ), Throws.TypeOf<FormatException>( ) );
+    }
+
+    [Test]
     public void ToString_AsExpected( [ValueSource( nameof( AllSnapshotPeriods ) )] SnapshotPeriod period )
     {
-    #pragma warning disable CS8524
+#pragma warning disable CS8524
         string periodString = period.Kind switch
         {
             SnapshotPeriodKind.Frequent => SnapshotPeriod.FrequentString,
@@ -105,9 +150,9 @@ public class SnapshotPeriodTests
             SnapshotPeriodKind.Weekly => SnapshotPeriod.WeeklyString,
             SnapshotPeriodKind.Monthly => SnapshotPeriod.MonthlyString,
             SnapshotPeriodKind.Yearly => SnapshotPeriod.YearlyString,
-            SnapshotPeriodKind.NotSet => SnapshotPeriod.NotSetString,
+            SnapshotPeriodKind.NotSet => SnapshotPeriod.NotSetString
         };
         Assert.That( period.ToString( ), Is.EqualTo( periodString ) );
-    #pragma warning restore CS8524
+#pragma warning restore CS8524
     }
 }

@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2023 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Settings.Settings;
@@ -75,21 +73,15 @@ public sealed class SnapshotPeriod : IComparable<SnapshotPeriodKind>, IComparabl
     public const string YearlyString = "yearly";
 
     /// <inheritdoc />
-    /// <exception cref="ArgumentException"><paramref name="other" /> and this instance are not the same type.</exception>
-    /// <exception cref="InvalidOperationException">
-    ///     This instance is not type <see cref="SByte" />, <see cref="Int16" />,
-    ///     <see cref="Int32" />, <see cref="Int64" />, <see cref="Byte" />, <see cref="UInt16" />, <see cref="UInt32" />, or
-    ///     <see cref="UInt64" />.
-    /// </exception>
     public int CompareTo( SnapshotPeriod? other )
     {
-        return other is null ? -1 : Kind.CompareTo( other.Kind );
+        return other is null ? 1 : CompareTo( other.Kind );
     }
 
     /// <inheritdoc />
     public int CompareTo( SnapshotPeriodKind other )
     {
-        return Kind.CompareTo( other );
+        return Kind - other;
     }
 
     public static int Compare( SnapshotPeriod? x, SnapshotPeriod? y )
