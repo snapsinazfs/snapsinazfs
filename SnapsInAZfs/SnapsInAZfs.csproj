@@ -158,6 +158,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
     <ProjectReference Include="..\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
+    <ProjectReference Include="..\SnapsInAZfs.Replication\SnapsInAZfs.Replication.csproj" />
     <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
   </ItemGroup>
 

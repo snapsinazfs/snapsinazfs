@@ -1,0 +1,63 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <Platforms>x64</Platforms>
+    <LangVersion>11</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
+    <DebugType>embedded</DebugType>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <AssemblyTitle>SnapsInAZfs.Replication - Replication library for SnapsInAZfs</AssemblyTitle>
+    <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
+    <Description>SnapsInAZfs.Replication - Replication library for SnapsInAZfs</Description>
+    <Product>SnapsInAZfs.Replication</Product>
+    <AssemblyVersion>1.2.0</AssemblyVersion>
+    <FileVersion>1.2.0</FileVersion>
+    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionSuffix>Alpha1</VersionSuffix>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
+    <Optimize>True</Optimize>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <PublishReadyToRun>True</PublishReadyToRun>
+    <PublishSingleFile>True</PublishSingleFile>
+    <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+    <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
+    <TieredCompilation>False</TieredCompilation>
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
+    <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NLog" Version="5.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SnapsInAZfs.Replication.Tests" />
+  </ItemGroup>
+
+</Project>
