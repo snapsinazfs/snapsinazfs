@@ -8,6 +8,10 @@
     <Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionSuffix>RC4</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
