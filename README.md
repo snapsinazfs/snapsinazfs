@@ -8,15 +8,15 @@
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
  Current stable release version: 1.0.0-Stable\
- Current development branch: siaz-1.1
+ Current development branch: siaz-1.2
 
- Stable and pre-release versions are available on GitHub.
+ Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local builds is only recommended from release-\* tags.
 
  Please report any issues in the issue tracker, with as much detail as you can provide. Detailed logs are greatly appreciated and do not reveal secret information beyond the names of your ZFS datasets and snapshots.
 
  ## Building/Installing From Source
  
- After cloning this repository, execute the following commands to build and install SnapsInAZfs using `make`:
+ After cloning this repository or extracting a release archive, execute the following commands to build and install SnapsInAZfs using `make`:
 
      make
      make install
