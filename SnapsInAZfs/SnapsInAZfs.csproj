@@ -33,7 +33,7 @@
     <AssemblyVersion>1.1.0</AssemblyVersion>
     <FileVersion>1.1.0</FileVersion>
     <VersionPrefix>1.1.0</VersionPrefix>
-    <VersionSuffix>RC4</VersionSuffix>
+    <VersionSuffix></VersionSuffix>
   </PropertyGroup>
   
   <ItemGroup>
