@@ -1,10 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <Platforms>x64</Platforms>
     <LangVersion>11</LangVersion>
+    <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -54,10 +55,15 @@
 
   <ItemGroup>
     <PackageReference Include="NLog" Version="5.2.3" />
+    <PackageReference Include="CoreWCF.NetTcp" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Replication.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
   </ItemGroup>
 
 </Project>
