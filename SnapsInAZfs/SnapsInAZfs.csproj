@@ -5,15 +5,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
-    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
-    <Platforms>x64</Platforms>
-    <LangVersion>11</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
-    <DebugType>embedded</DebugType>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
@@ -27,13 +19,6 @@
   
   <PropertyGroup>
     <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
-    <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
-    <Description>SnapsInAZfs - Snapshot manager for ZFS on Linux</Description>
-    <Product>SnapsInAZfs</Product>
-    <AssemblyVersion>1.1.0</AssemblyVersion>
-    <FileVersion>1.1.0</FileVersion>
-    <VersionPrefix>1.1.0</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
   </PropertyGroup>
   
   <ItemGroup>
