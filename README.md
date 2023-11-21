@@ -8,7 +8,7 @@
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
  Current stable release version: 1.1.0\
- Current development branch: siaz-2.0.0
+ Current development branch: siaz-2.0
 
  Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local builds is only recommended from release-\* tags.
 
