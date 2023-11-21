@@ -380,10 +380,12 @@ public class ZfsPropertyTests
     [TestCase( "a" )]
     [TestCase( "" )]
     [TestCase( " " )]
-    [TestCase( null )]
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
     public void TryParse_Bool_ReturnsFalseOnBadInput( string? value )
     {
+#pragma warning disable CS8604 // Possible null reference argument - Intentional
         RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
+#pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
         Assert.Multiple( ( ) =>
         {
@@ -417,10 +419,12 @@ public class ZfsPropertyTests
     [TestCase( "!" )]
     [TestCase( " " )]
     [TestCase( "" )]
-    [TestCase( null )]
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
     public void TryParse_DateTimeOffset_ReturnsFalseOnBadInput( string? value )
     {
+#pragma warning disable CS8604 // Possible null reference argument - Intentional
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
+#pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
         Assert.Multiple( ( ) =>
         {
@@ -456,10 +460,12 @@ public class ZfsPropertyTests
     [TestCase( "!" )]
     [TestCase( " " )]
     [TestCase( "" )]
-    [TestCase( null )]
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
     public void TryParse_Int_ReturnsFalseOnBadInput( string? value )
     {
+#pragma warning disable CS8604 // Possible null reference argument - Intentional
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
+#pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
         Assert.Multiple( ( ) =>
         {
