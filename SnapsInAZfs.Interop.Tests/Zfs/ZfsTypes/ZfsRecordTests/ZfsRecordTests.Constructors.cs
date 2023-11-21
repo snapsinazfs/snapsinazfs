@@ -29,7 +29,7 @@ public class ZfsRecordTests_Constructors
     [TestCase( "\n" )]
     [TestCase( "\r" )]
     [TestCase( null )]
-    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         Assert.That( ( ) =>
         {

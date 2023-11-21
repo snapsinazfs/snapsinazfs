@@ -86,7 +86,7 @@ public class ZfsRecordTests
     [TestCase( "\n" )]
     [TestCase( "\r" )]
     [TestCase( null )]
-    public void CreateChildDataset_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    public void CreateChildDataset_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
         Assert.That( ( ) => { gen1Ds.CreateChildDataset( "badChild", ZfsPropertyValueConstants.FileSystem, sourceSystem ); }, Throws.ArgumentNullException );
@@ -102,7 +102,7 @@ public class ZfsRecordTests
     [TestCase( "\n" )]
     [TestCase( "\r" )]
     [TestCase( null )]
-    public void CreateSnapshot_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    public void CreateSnapshot_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
         FormattingSettings formattingSettings = FormattingSettings.GetDefault( );

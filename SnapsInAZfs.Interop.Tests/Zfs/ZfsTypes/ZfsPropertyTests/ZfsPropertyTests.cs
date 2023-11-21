@@ -381,7 +381,7 @@ public class ZfsPropertyTests
     [TestCase( "" )]
     [TestCase( " " )]
     [TestCase( null )]
-    public void TryParse_Bool_ReturnsFalseOnBadInput( string value )
+    public void TryParse_Bool_ReturnsFalseOnBadInput( string? value )
     {
         RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
@@ -418,7 +418,7 @@ public class ZfsPropertyTests
     [TestCase( " " )]
     [TestCase( "" )]
     [TestCase( null )]
-    public void TryParse_DateTimeOffset_ReturnsFalseOnBadInput( string value )
+    public void TryParse_DateTimeOffset_ReturnsFalseOnBadInput( string? value )
     {
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
@@ -457,7 +457,7 @@ public class ZfsPropertyTests
     [TestCase( " " )]
     [TestCase( "" )]
     [TestCase( null )]
-    public void TryParse_Int_ReturnsFalseOnBadInput( string value )
+    public void TryParse_Int_ReturnsFalseOnBadInput( string? value )
     {
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
