@@ -2,24 +2,10 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<Nullable>enable</Nullable>
-		<Configurations>Debug;Release;Debug-Windows;Release-R2R</Configurations>
 		<DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-		<Platforms>x64</Platforms>
-		<RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
-		<DebugType>embedded</DebugType>
-		<VersionPrefix>1.1.0</VersionPrefix>
-		<VersionSuffix></VersionSuffix>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<DebugType>embedded</DebugType>
 		<ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
@@ -28,20 +14,18 @@
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
 		<PublishReadyToRun>True</PublishReadyToRun>
 		<PublishSingleFile>True</PublishSingleFile>
-		<DebugType>embedded</DebugType>
 		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
 		<TieredCompilation>False</TieredCompilation>
 		<ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-		<DebugType>embedded</DebugType>
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
-		<PackageReference Include="NLog" Version="5.2.3" />
+		<PackageReference Include="NLog" Version="5.2.6" />
 	</ItemGroup>
 
 </Project>

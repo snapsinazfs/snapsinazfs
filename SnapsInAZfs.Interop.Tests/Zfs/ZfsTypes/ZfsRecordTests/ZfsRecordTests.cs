@@ -85,11 +85,13 @@ public class ZfsRecordTests
     [TestCase( "\t" )]
     [TestCase( "\n" )]
     [TestCase( "\r" )]
-    [TestCase( null )]
-    public void CreateChildDataset_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
+    public void CreateChildDataset_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
+#pragma warning disable CS8604 // Possible null reference argument - Intentional
         Assert.That( ( ) => { gen1Ds.CreateChildDataset( "badChild", ZfsPropertyValueConstants.FileSystem, sourceSystem ); }, Throws.ArgumentNullException );
+#pragma warning restore CS8604 // Possible null reference argument - Intentional
     }
 
     [Test]
@@ -101,12 +103,14 @@ public class ZfsRecordTests
     [TestCase( "\t" )]
     [TestCase( "\n" )]
     [TestCase( "\r" )]
-    [TestCase( null )]
-    public void CreateSnapshot_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
+    public void CreateSnapshot_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem( "gen1" );
         FormattingSettings formattingSettings = FormattingSettings.GetDefault( );
+#pragma warning disable CS8601 // Possible null reference assignment - Intentional
         Assert.That( ( ) => { gen1Ds.CreateSnapshot( SnapshotPeriod.Frequent, DateTimeOffset.Now, in formattingSettings, gen1Ds.SourceSystem with { Value = sourceSystem } ); }, Throws.ArgumentException );
+#pragma warning restore CS8601 // Possible null reference assignment - Intentional
     }
 
     [Test]

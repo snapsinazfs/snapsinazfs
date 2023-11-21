@@ -28,12 +28,14 @@ public class ZfsRecordTests_Constructors
     [TestCase( "\t" )]
     [TestCase( "\n" )]
     [TestCase( "\r" )]
-    [TestCase( null )]
-    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string sourceSystem )
+    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
+    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
     {
         Assert.That( ( ) =>
         {
+#pragma warning disable CS8604 // Possible null reference argument - Intentional
             ZfsRecord badRecord = new( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem );
+#pragma warning restore CS8604 // Possible null reference argument - Intentional
         }, Throws.ArgumentNullException );
     }
 
