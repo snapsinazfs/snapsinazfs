@@ -28,21 +28,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		Documentation\SnapsInAZfs.8 = Documentation\SnapsInAZfs.8
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs", "SnapsInAZfs\SnapsInAZfs.csproj", "{9E62331B-EE99-45B8-916F-04DA39EB3829}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs", "Applications\SnapsInAZfs\SnapsInAZfs.csproj", "{9E62331B-EE99-45B8-916F-04DA39EB3829}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop", "SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj", "{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop", "Libraries\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj", "{172C9DDB-CCFE-4E31-9F6D-A58A484D561E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings", "SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj", "{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings", "Libraries\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj", "{ED58EE5B-D58A-44FB-84DB-01EBED1F93BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop.Tests", "SnapsInAZfs.Interop.Tests\SnapsInAZfs.Interop.Tests.csproj", "{527FCFD8-6D39-429F-B067-EDFB6A98AC97}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Interop.Tests", "Tests\SnapsInAZfs.Interop.Tests\SnapsInAZfs.Interop.Tests.csproj", "{527FCFD8-6D39-429F-B067-EDFB6A98AC97}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings.Tests", "SnapsInAZfs.Settings.Tests\SnapsInAZfs.Settings.Tests.csproj", "{1B2C893E-BB15-443C-886C-2C4212E03F11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Settings.Tests", "Tests\SnapsInAZfs.Settings.Tests\SnapsInAZfs.Settings.Tests.csproj", "{1B2C893E-BB15-443C-886C-2C4212E03F11}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring", "SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj", "{68209F8D-FE0F-4B75-B098-D2B9293F7201}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring", "Libraries\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj", "{68209F8D-FE0F-4B75-B098-D2B9293F7201}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring.Tests", "SnapsInAZfs.Monitoring.Tests\SnapsInAZfs.Monitoring.Tests.csproj", "{78494ECB-D883-49BA-A5E2-23D75C1BF59C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Monitoring.Tests", "Tests\SnapsInAZfs.Monitoring.Tests\SnapsInAZfs.Monitoring.Tests.csproj", "{78494ECB-D883-49BA-A5E2-23D75C1BF59C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Tests", "SnapsInAZfs.Tests\SnapsInAZfs.Tests.csproj", "{7EA459FB-0977-49E1-92C8-2DA47C1294BB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SnapsInAZfs.Tests", "Tests\SnapsInAZfs.Tests\SnapsInAZfs.Tests.csproj", "{7EA459FB-0977-49E1-92C8-2DA47C1294BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

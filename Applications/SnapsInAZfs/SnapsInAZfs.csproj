@@ -156,9 +156,9 @@
   </Choose>
 
   <ItemGroup>
-    <ProjectReference Include="..\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
-    <ProjectReference Include="..\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
-    <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
   </ItemGroup>
 
   <ItemGroup>

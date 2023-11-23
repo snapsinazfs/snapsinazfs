@@ -4,7 +4,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
   </PropertyGroup>
