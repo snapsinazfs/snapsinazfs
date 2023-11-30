@@ -64,7 +64,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\SnapsInAZfs\SnapsInAZfs.csproj" />
+      <ProjectReference Include="..\..\Applications\SnapsInAZfs\SnapsInAZfs.csproj" />
     </ItemGroup>
 
 </Project>

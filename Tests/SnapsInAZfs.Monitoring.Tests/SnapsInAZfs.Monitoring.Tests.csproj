@@ -4,6 +4,14 @@
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
+    <Platforms>x64</Platforms>
+    <DebugType>embedded</DebugType>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
   </ItemGroup>
 
 </Project>

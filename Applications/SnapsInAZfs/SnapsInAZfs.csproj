@@ -4,8 +4,16 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
+    <Platforms>x64</Platforms>
+    <DebugType>embedded</DebugType>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
