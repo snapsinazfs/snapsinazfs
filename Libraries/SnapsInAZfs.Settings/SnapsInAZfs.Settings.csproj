@@ -33,7 +33,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NETCore.Platforms" Version="7.0.4" />
 		<PackageReference Include="NLog" Version="5.2.6" />
 	</ItemGroup>
 
