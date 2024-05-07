@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -25,7 +25,7 @@ public class TypeExtensionsTests
     [Test]
     public void GreatestCommonFactor_OneTerm_ReturnsInput( [Range( 1, 1, 60 )] int term )
     {
-        int[] terms = { term };
+        int[] terms = [ term ];
         Assert.That( terms.GreatestCommonFactor( ), Is.EqualTo( term ) );
     }
 
@@ -35,7 +35,7 @@ public class TypeExtensionsTests
     [TestCaseSource( nameof( GetThreeTermTestCases ) )]
     public void GreatestCommonFactor_ThreeTerms_ReturnsCorrectResult( int term1, int term2, int term3 )
     {
-        int[] terms = { term1, term2, term3 };
+        int[] terms = [term1, term2, term3];
         int result = terms.GreatestCommonFactor( );
         Assert.Multiple( ( ) =>
         {
@@ -65,7 +65,7 @@ public class TypeExtensionsTests
     [TestCaseSource( nameof( GetTwoTermTestCases ) )]
     public void GreatestCommonFactor_TwoTerms_ReturnsCorrectResult( int term1, int term2 )
     {
-        int[] terms = { term1, term2 };
+        int[] terms = [term1, term2];
         int result = terms.GreatestCommonFactor( );
         Assert.Multiple( ( ) =>
         {
@@ -94,7 +94,7 @@ public class TypeExtensionsTests
         // The GCF of the first two elements is 12, which provides 1, 2, 3, 4, 6, and 12 as possible GCF values for generated cases.
         for ( int i = 1; i < 60; i++ )
         {
-            yield return new[] { 24, 36, i };
+            yield return [24, 36, i];
         }
     }
 
@@ -105,7 +105,7 @@ public class TypeExtensionsTests
         {
             for ( int term2 = term1; term2 < 60; term2++ )
             {
-                int[] ints = { term1, term2 };
+                int[] ints = [term1, term2];
                 if ( pairs.Add( ints ) )
                 {
                     yield return ints;
@@ -118,7 +118,7 @@ public class TypeExtensionsTests
     {
         public bool Equals( int[]? x, int[]? y )
         {
-            return !x?.Except( y ?? Array.Empty<int>( ) ).Any( ) ?? false;
+            return !x?.Except( y ?? [] ).Any( ) ?? false;
         }
 
         /// <inheritdoc />

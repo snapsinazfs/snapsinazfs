@@ -229,7 +229,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
     private static (bool, string) ShowSaveDialog( SnapsInAZfsSettings settings )
     {
-        using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", new( ) { ".json" } ) )
+        using ( SaveDialog globalConfigSaveDialog = new( "Save Global Configuration", "Select file to save global configuration", [".json"] ) )
         {
             globalConfigSaveDialog.DirectoryPath = "/etc/SnapsInAZfs";
             globalConfigSaveDialog.AllowsOtherFileTypes = true;

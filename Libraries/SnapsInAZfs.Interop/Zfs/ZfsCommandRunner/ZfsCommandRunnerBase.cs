@@ -58,7 +58,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         Logger.Trace( "Checking all dataset last snapshot times" );
         foreach ( ZfsRecord ds in datasets.Values )
         {
-            List<IZfsProperty> propertiesToSet = new( );
+            List<IZfsProperty> propertiesToSet = [];
             if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
             {
                 propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp ) );

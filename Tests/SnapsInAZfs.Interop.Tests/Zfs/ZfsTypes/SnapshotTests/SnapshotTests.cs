@@ -13,7 +13,7 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 [TestOf( typeof( Snapshot ) )]
 public class SnapshotTests
 {
-    private static SnapshotPeriodKind[] GetRelevantSnapshotPeriodKinds( ) => new[] { SnapshotPeriodKind.Frequent, SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily, SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly };
+    private static SnapshotPeriodKind[] GetRelevantSnapshotPeriodKinds( ) => [SnapshotPeriodKind.Frequent, SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily, SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly];
 
     [Test]
     [Combinatorial]

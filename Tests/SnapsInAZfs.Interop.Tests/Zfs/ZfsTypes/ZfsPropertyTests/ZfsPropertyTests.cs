@@ -506,8 +506,8 @@ public class ZfsPropertyTests
 
     private static TestCaseData[] BoolEqualityTestCaseData( )
     {
-        return new[]
-        {
+        return
+        [
             new TestCaseData( "nameString", true, true ) { ExpectedResult = true, HasExpectedResult = true },
             new TestCaseData( "nameString", true, false ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", true, "same string" ) { ExpectedResult = false, HasExpectedResult = true },
@@ -530,15 +530,15 @@ public class ZfsPropertyTests
             new TestCaseData( "nameString", false, ZfsProperty<DateTimeOffset>.CreateWithoutParent( "nameString", DateTimeOffset.UnixEpoch ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", false, ZfsProperty<bool>.CreateWithoutParent( "nameString", true ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", false, ZfsProperty<bool>.CreateWithoutParent( "nameString", false ) ) { ExpectedResult = true, HasExpectedResult = true }
-        };
+        ];
     }
 
     private static TestCaseData[] DateTimeOffsetEqualityTestCaseData( )
     {
         DateTimeOffset today = DateTimeOffset.Now;
         today = today.Subtract( today.TimeOfDay );
-        return new[]
-        {
+        return
+        [
             new TestCaseData( "trueCase", DateTimeOffset.UnixEpoch, true ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "falseCase", DateTimeOffset.UnixEpoch, false ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "stringCase", DateTimeOffset.UnixEpoch, "string" ) { ExpectedResult = false, HasExpectedResult = true },
@@ -551,13 +551,13 @@ public class ZfsPropertyTests
             new TestCaseData( "unixEpochZfsPropertyCase", DateTimeOffset.UnixEpoch, ZfsProperty<DateTimeOffset>.CreateWithoutParent( "unixEpochZfsPropertyCase", DateTimeOffset.UnixEpoch ) ) { ExpectedResult = true, HasExpectedResult = true },
             new TestCaseData( "todayZfsPropertyCase", DateTimeOffset.UnixEpoch, ZfsProperty<DateTimeOffset>.CreateWithoutParent( "nowZfsPropertyCase", today ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "integerZfsPropertyCase", DateTimeOffset.UnixEpoch, ZfsProperty<int>.CreateWithoutParent( "integerZfsPropertyCase", 1234 ) ) { ExpectedResult = false, HasExpectedResult = true }
-        };
+        ];
     }
 
     private static TestCaseData[] IntEqualityTestCaseData( )
     {
-        return new[]
-        {
+        return
+        [
             new TestCaseData( "nameString", 12345, 12345 ) { ExpectedResult = true, HasExpectedResult = true },
             new TestCaseData( "nameString", 12345, ZfsProperty<int>.CreateWithoutParent( "nameString", 12345 ) ) { ExpectedResult = true, HasExpectedResult = true },
 
@@ -574,13 +574,13 @@ public class ZfsPropertyTests
             new TestCaseData( "nameString", 12345, ZfsProperty<bool>.CreateWithoutParent( "nameString", true ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", 12345, false ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", 12345, ZfsProperty<bool>.CreateWithoutParent( "nameString", false ) ) { ExpectedResult = false, HasExpectedResult = true }
-        };
+        ];
     }
 
     private static TestCaseData[] StringEqualityTestCaseData( )
     {
-        return new[]
-        {
+        return
+        [
             new TestCaseData( "nameString", "string", true ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", "string", false ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", "string", "string" ) { ExpectedResult = true, HasExpectedResult = true },
@@ -593,7 +593,7 @@ public class ZfsPropertyTests
             new TestCaseData( "nameString", "string", ZfsProperty<DateTimeOffset>.CreateWithoutParent( "nameString", DateTimeOffset.UnixEpoch ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", "string", ZfsProperty<bool>.CreateWithoutParent( "nameString", true ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( "nameString", "string", ZfsProperty<bool>.CreateWithoutParent( "nameString", false ) ) { ExpectedResult = false, HasExpectedResult = true }
-        };
+        ];
     }
 
     private static bool WarnOnBadTypeAndReturnFalse( )

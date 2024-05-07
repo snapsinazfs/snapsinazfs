@@ -443,7 +443,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             }
 #pragma warning restore CS8600
 
-            List<IZfsProperty> propsToSet = new( );
+            List<IZfsProperty> propsToSet = [];
             if ( ds is not { TakeSnapshots.Value: true } )
             {
                 Logger.Debug( "Dataset {0} not configured to take snapshots - skipping", ds.Name );

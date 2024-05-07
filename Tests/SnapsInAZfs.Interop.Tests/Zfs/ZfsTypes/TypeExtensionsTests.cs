@@ -74,24 +74,24 @@ public class TypeExtensionsTests
 
     private static TestCaseData[] AsTrueFalseRadioButtonIndexTestCaseValues( )
     {
-        return new[]
-        {
+        return
+        [
             new TestCaseData( ZfsProperty<bool>.CreateWithoutParent( "trueProperty", true ) ) { ExpectedResult = 0, HasExpectedResult = true },
             new TestCaseData( ZfsProperty<bool>.CreateWithoutParent( "falseProperty", false ) ) { ExpectedResult = 1, HasExpectedResult = true }
-        };
+        ];
     }
 
     private static SnapshotPeriod[] GetMostRecentSnapshotZfsPropertyNameValues( )
     {
-        return new[] { SnapshotPeriod.NotSet, SnapshotPeriod.Frequent, SnapshotPeriod.Hourly, SnapshotPeriod.Daily, SnapshotPeriod.Weekly, SnapshotPeriod.Monthly, SnapshotPeriod.Yearly };
+        return [SnapshotPeriod.NotSet, SnapshotPeriod.Frequent, SnapshotPeriod.Hourly, SnapshotPeriod.Daily, SnapshotPeriod.Weekly, SnapshotPeriod.Monthly, SnapshotPeriod.Yearly];
     }
 
     private static TestCaseData[] IntPropertyIsWantedTestCaseValues( )
     {
-        return new[]
-        {
+        return
+        [
             new TestCaseData( ZfsProperty<int>.CreateWithoutParent( "0Property", 0 ) ) { ExpectedResult = false, HasExpectedResult = true },
             new TestCaseData( ZfsProperty<int>.CreateWithoutParent( "1Property", 1 ) ) { ExpectedResult = true, HasExpectedResult = true }
-        };
+        ];
     }
 }

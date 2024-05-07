@@ -51,7 +51,7 @@ public static class TypeExtensions
 
     public static string GetZfsPathParent( this string value )
     {
-        int endIndex = value.LastIndexOfAny( new[] { '/', '@', '#' } );
+        int endIndex = value.LastIndexOfAny( ['/', '@', '#'] );
 
         return endIndex == -1
             ?

@@ -25,9 +25,9 @@ namespace SnapsInAZfs.Monitoring;
 public sealed partial class Monitor : IMonitor
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private readonly List<string> _snapshotsPrunedFailedLastRunNames = new( );
+    private readonly List<string> _snapshotsPrunedFailedLastRunNames = [];
     private readonly object _snapshotsPrunedFailedLastRunNamesLock = new( );
-    private readonly List<string> _snapshotsTakenFailedLastRunNames = new( );
+    private readonly List<string> _snapshotsTakenFailedLastRunNames = [];
     private readonly object _snapshotsTakenFailedLastRunNamesLock = new( );
     private ApplicationState _applicationState;
     private IApplicationStateObservable? _applicationStateObservable;

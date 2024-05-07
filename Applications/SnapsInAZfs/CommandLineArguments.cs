@@ -41,7 +41,7 @@ public sealed class CommandLineArguments
     [ArgShortcut( "--config" )]
     [ArgShortcut( "--config-file" )]
     [ArgShortcut( "--config-files" )]
-    public string[] ConfigFiles { get; set; } = Array.Empty<string>( );
+    public string[] ConfigFiles { get; set; } = [];
 
     [ArgDescription( "Create snapshots and prune expired snapshots. Equivalent to --take-snapshots --prune-snapshots" )]
     [ArgShortcut( "--cron" )]

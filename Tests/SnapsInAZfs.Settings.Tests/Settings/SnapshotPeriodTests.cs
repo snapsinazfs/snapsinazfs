@@ -21,8 +21,8 @@ namespace SnapsInAZfs.Settings.Tests.Settings;
 [TestOf( typeof( SnapshotPeriod ) )]
 public class SnapshotPeriodTests
 {
-    private static readonly SnapshotPeriod[] AllSnapshotPeriods = { SnapshotPeriod.NotSet, SnapshotPeriod.Frequent, SnapshotPeriod.Hourly, SnapshotPeriod.Daily, SnapshotPeriod.Weekly, SnapshotPeriod.Monthly, SnapshotPeriod.Yearly };
-    private static readonly string[] AllSnapshotPeriodStrings = { SnapshotPeriod.NotSetString, SnapshotPeriod.FrequentString, SnapshotPeriod.HourlyString, SnapshotPeriod.DailyString, SnapshotPeriod.WeeklyString, SnapshotPeriod.MonthlyString, SnapshotPeriod.YearlyString };
+    private static readonly SnapshotPeriod[] AllSnapshotPeriods = [SnapshotPeriod.NotSet, SnapshotPeriod.Frequent, SnapshotPeriod.Hourly, SnapshotPeriod.Daily, SnapshotPeriod.Weekly, SnapshotPeriod.Monthly, SnapshotPeriod.Yearly];
+    private static readonly string[] AllSnapshotPeriodStrings = [SnapshotPeriod.NotSetString, SnapshotPeriod.FrequentString, SnapshotPeriod.HourlyString, SnapshotPeriod.DailyString, SnapshotPeriod.WeeklyString, SnapshotPeriod.MonthlyString, SnapshotPeriod.YearlyString];
 
     [Test]
     public void Compare_ItemsEqual_IfBothNull( )

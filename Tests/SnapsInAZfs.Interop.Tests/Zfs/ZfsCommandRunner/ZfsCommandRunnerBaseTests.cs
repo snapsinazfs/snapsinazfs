@@ -71,115 +71,115 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetBooleanPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName };
-        (string, bool)[] propertyValues = { ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName];
+        (string, bool)[] propertyValues = [( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetDateTimeOffsetPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", true ), ( "0", false ), ( "1", false ), ( "100", false ), ( int.MaxValue.ToString( ), false ), ( "-1", false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", true ), ( "0", false ), ( "1", false ), ( "100", false ), ( int.MaxValue.ToString( ), false ), ( "-1", false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetNativeLongPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsNativePropertyNames.Available, ZfsNativePropertyNames.Used };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), true ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsNativePropertyNames.Available, ZfsNativePropertyNames.Used];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), true )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetNativeTypePropertyTestCases( )
     {
-        string[] propertyNames = { ZfsNativePropertyNames.Type };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.FileSystem, true ), ( ZfsPropertyValueConstants.Volume, true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsNativePropertyNames.Type];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.FileSystem, true ), ( ZfsPropertyValueConstants.Volume, true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetRecursionPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.RecursionPropertyName };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.RecursionPropertyName];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetRestrictedPositiveIntPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), false ), ( "-1", false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), false ), ( "-1", false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static IEnumerable<string[]> GetShortLineTokenArrays( )
     {
-        yield return new[] { "testPool" };
-        yield return new[] { "testPool", "testProperty" };
-        yield return new[] { "testPool", "testProperty", "testValue" };
+        yield return ["testPool"];
+        yield return ["testPool", "testProperty"];
+        yield return ["testPool", "testProperty", "testValue"];
     }
 
     private static List<TestCaseData> GetUnformattedStringPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem };
-        (string, bool)[] propertyValues = { ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", true ), ( "1970-01-01T00:00:00Z", true ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ), ( "\t", false ), ( " ", false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem];
+        (string, bool)[] propertyValues = [( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", true ), ( "1970-01-01T00:00:00Z", true ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ), ( "\t", false ), ( " ", false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static List<TestCaseData> GetUnrestrictedPositiveIntPropertyTestCases( )
     {
-        string[] propertyNames = { ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName };
-        (string, bool)[] propertyValues = { ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), true ), ( "-1", false ) };
-        (string, bool)[] propertySources = { ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) };
+        string[] propertyNames = [ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName];
+        (string, bool)[] propertyValues = [( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), true ), ( "-1", false )];
+        (string, bool)[] propertySources = [( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true )];
         return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
     }
 
     private static IEnumerable<string[]> GetValidZfsPoolRootLineTokenArrays( )
     {
-        yield return new[] { "testRootA", "snapsinazfs.com:enabled", "false", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:prunesnapshots", "false", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:recursion", "siaz", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:daily", "7", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:frequent", "4", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:hourly", "6", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:monthly", "12", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:prunedeferral", "0", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:weekly", "5", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:retention:yearly", "1", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:takesnapshots", "false", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:template", "default", "local" };
-        yield return new[] { "testRootA", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:enabled", "false", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:prunesnapshots", "false", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:recursion", "siaz", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:daily", "7", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:frequent", "4", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:hourly", "6", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:monthly", "12", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:prunedeferral", "0", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:weekly", "5", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:retention:yearly", "1", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:takesnapshots", "false", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:template", "default", "local" };
-        yield return new[] { "testRootB", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local" };
+        yield return ["testRootA", "snapsinazfs.com:enabled", "false", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootA", "snapsinazfs.com:prunesnapshots", "false", "local"];
+        yield return ["testRootA", "snapsinazfs.com:recursion", "siaz", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:daily", "7", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:frequent", "4", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:hourly", "6", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:monthly", "12", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:prunedeferral", "0", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:weekly", "5", "local"];
+        yield return ["testRootA", "snapsinazfs.com:retention:yearly", "1", "local"];
+        yield return ["testRootA", "snapsinazfs.com:takesnapshots", "false", "local"];
+        yield return ["testRootA", "snapsinazfs.com:template", "default", "local"];
+        yield return ["testRootA", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local"];
+        yield return ["testRootB", "snapsinazfs.com:enabled", "false", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lastdailysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lastfrequentsnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lasthourlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lastmonthlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lastweeklysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:lastyearlysnapshottimestamp", "1970-01-01T00:00:00.0000000+00:00", "local"];
+        yield return ["testRootB", "snapsinazfs.com:prunesnapshots", "false", "local"];
+        yield return ["testRootB", "snapsinazfs.com:recursion", "siaz", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:daily", "7", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:frequent", "4", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:hourly", "6", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:monthly", "12", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:prunedeferral", "0", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:weekly", "5", "local"];
+        yield return ["testRootB", "snapsinazfs.com:retention:yearly", "1", "local"];
+        yield return ["testRootB", "snapsinazfs.com:takesnapshots", "false", "local"];
+        yield return ["testRootB", "snapsinazfs.com:template", "default", "local"];
+        yield return ["testRootB", "snapsinazfs.com:sourcesystem", "host.domain.tld", "local"];
     }
 }
 

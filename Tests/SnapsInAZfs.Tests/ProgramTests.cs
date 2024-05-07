@@ -68,7 +68,7 @@ public class ProgramTests
 
         Assume.That( pi.GetValue( initialSettings ), Is.EqualTo( pi.GetValue( possiblyChangedSettings ) ) );
 
-        CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( Array.Empty<string>( ) );
+        CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( [] );
         Program.ApplyCommandLineArgumentOverrides( in testArgs, possiblyChangedSettings );
         Assert.That( pi.GetValue( initialSettings ), Is.EqualTo( pi.GetValue( possiblyChangedSettings ) ) );
     }
@@ -93,8 +93,8 @@ public class ProgramTests
     }
 
     [Test]
-    [TestCase( new object[] { "SnapsInAZfs.json", "SnapsInAZfs.local.json", "fakeMonitoringSettingsForRoundTripTest.json" } )]
-    [TestCase( new object[] { "CombinedConfigurationForRoundTripTest.json" } )]
+    [TestCase( ["SnapsInAZfs.json", "SnapsInAZfs.local.json", "fakeMonitoringSettingsForRoundTripTest.json"] )]
+    [TestCase( ["CombinedConfigurationForRoundTripTest.json"] )]
     public void LoadConfigurationFromConfigurationFiles_RoundTripSafe( params string[] filePaths )
     {
         Assume.That( filePaths.Length > 0 );

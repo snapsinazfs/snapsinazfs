@@ -38,7 +38,7 @@ public static class TypeExtensions
     /// </remarks>
     public static string GetLastPathElement( this string path )
     {
-        int startIndex = 1 + path.LastIndexOfAny( new[] { '/', '@', '#' } );
+        int startIndex = 1 + path.LastIndexOfAny( ['/', '@', '#'] );
         // ReSharper disable once HeapView.ObjectAllocation
         return startIndex == 0 ? path : path[ startIndex.. ];
     }
@@ -75,7 +75,7 @@ public static class TypeExtensions
             throw new InvalidOperationException( "Invalid AbbreviatedDayNames collection in DateTimeFormatInfo object" );
         }
 
-        List<string> dayNamesList = new( value.DayNames );
+        List<string> dayNamesList = [..value.DayNames];
         dayNamesList.AddRange( value.AbbreviatedDayNames );
         return dayNamesList;
     }
@@ -103,7 +103,7 @@ public static class TypeExtensions
     {
         ArgumentNullException.ThrowIfNull( value );
 
-        List<string> monthNamesList = new( value.MonthNames );
+        List<string> monthNamesList = [..value.MonthNames];
         monthNamesList.AddRange( value.AbbreviatedMonthNames );
         monthNamesList.AddRange( value.MonthGenitiveNames );
         monthNamesList.AddRange( value.AbbreviatedMonthGenitiveNames );
@@ -139,7 +139,7 @@ public static class TypeExtensions
         {
             if ( childSection.Path.EndsWith( ":0" ) )
             {
-                JsonArray arrayNode = new( );
+                JsonArray arrayNode = [];
 
                 foreach ( IConfigurationSection arrayNodeChild in nodeChildren )
                 {

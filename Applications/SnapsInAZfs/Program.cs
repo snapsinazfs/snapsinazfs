@@ -147,7 +147,7 @@ internal class Program
         Logger.Debug( "Getting base configuration from files" );
         ConfigurationBuilder configBuilder = new( );
 
-        IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0 ? args.ConfigFiles : new[] { "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" };
+        IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0 ? args.ConfigFiles : ["/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json"];
         foreach ( string filePath in requestedFiles )
         {
             if ( !File.Exists( filePath ) )

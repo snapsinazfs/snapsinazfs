@@ -56,74 +56,74 @@ public class ZfsRecordTests_Snapshots
         // Disable this because the filter it with an assumption in the test itself, above
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         DateTimeOffset lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = DateTimeOffset.MinValue;
-        DateTimeOffset[] otherLastObservedSnapshotTimestampsAfterAddSnapshot = { DateTimeOffset.MinValue };
+        DateTimeOffset[] otherLastObservedSnapshotTimestampsAfterAddSnapshot = [DateTimeOffset.MinValue];
         switch ( periodKind )
         {
             case SnapshotPeriodKind.Frequent:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedFrequentSnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedHourlySnapshotTimestamp,
                     childDs.LastObservedDailySnapshotTimestamp,
                     childDs.LastObservedWeeklySnapshotTimestamp,
                     childDs.LastObservedMonthlySnapshotTimestamp,
                     childDs.LastObservedYearlySnapshotTimestamp
-                };
+                ];
                 break;
             case SnapshotPeriodKind.Hourly:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedHourlySnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedFrequentSnapshotTimestamp,
                     childDs.LastObservedDailySnapshotTimestamp,
                     childDs.LastObservedWeeklySnapshotTimestamp,
                     childDs.LastObservedMonthlySnapshotTimestamp,
                     childDs.LastObservedYearlySnapshotTimestamp
-                };
+                ];
                 break;
             case SnapshotPeriodKind.Daily:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedDailySnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedFrequentSnapshotTimestamp,
                     childDs.LastObservedHourlySnapshotTimestamp,
                     childDs.LastObservedWeeklySnapshotTimestamp,
                     childDs.LastObservedMonthlySnapshotTimestamp,
                     childDs.LastObservedYearlySnapshotTimestamp
-                };
+                ];
                 break;
             case SnapshotPeriodKind.Weekly:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedWeeklySnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedFrequentSnapshotTimestamp,
                     childDs.LastObservedHourlySnapshotTimestamp,
                     childDs.LastObservedDailySnapshotTimestamp,
                     childDs.LastObservedMonthlySnapshotTimestamp,
                     childDs.LastObservedYearlySnapshotTimestamp
-                };
+                ];
                 break;
             case SnapshotPeriodKind.Monthly:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedMonthlySnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedFrequentSnapshotTimestamp,
                     childDs.LastObservedHourlySnapshotTimestamp,
                     childDs.LastObservedDailySnapshotTimestamp,
                     childDs.LastObservedWeeklySnapshotTimestamp,
                     childDs.LastObservedYearlySnapshotTimestamp
-                };
+                ];
                 break;
             case SnapshotPeriodKind.Yearly:
                 lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot = childDs.LastObservedYearlySnapshotTimestamp;
-                otherLastObservedSnapshotTimestampsAfterAddSnapshot = new[]
-                {
+                otherLastObservedSnapshotTimestampsAfterAddSnapshot =
+                [
                     childDs.LastObservedFrequentSnapshotTimestamp,
                     childDs.LastObservedHourlySnapshotTimestamp,
                     childDs.LastObservedDailySnapshotTimestamp,
                     childDs.LastObservedWeeklySnapshotTimestamp,
                     childDs.LastObservedMonthlySnapshotTimestamp
-                };
+                ];
                 break;
         }
 

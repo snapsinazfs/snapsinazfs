@@ -26,7 +26,7 @@ public sealed partial class TemplateConfigurationWindow
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
-    private readonly HashSet<string> _modifiedProperties = new( );
+    private readonly HashSet<string> _modifiedProperties = [];
     private readonly HashSet<string> _namingProperties = new( new[] { ComponentSeparator, PrefixTitleCase, TimestampFormatTitleCase, FrequentSuffixTitleCase, HourlySuffixTitleCase, DailySuffixTitleCase, WeeklySuffixTitleCase, MonthlySuffixTitleCase, YearlySuffixTitleCase } );
     private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
     private readonly HashSet<string> _timingProperties = new( new[] { FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase } );
@@ -43,7 +43,7 @@ public sealed partial class TemplateConfigurationWindow
     internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
     private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( static tvf => tvf.Field.IsValid );
     private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
-    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = new( ) { 5, 10, 15, 20, 30 };
+    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = [5, 10, 15, 20, 30];
 
     private const string ComponentSeparator = "Component Separator";
     private const string DailySuffixTitleCase = "Daily Suffix";

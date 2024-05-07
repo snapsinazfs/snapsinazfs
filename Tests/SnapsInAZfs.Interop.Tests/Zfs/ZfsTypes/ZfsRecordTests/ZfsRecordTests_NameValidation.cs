@@ -2,6 +2,7 @@
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
+using System.Diagnostics.CodeAnalysis;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
@@ -112,6 +113,7 @@ public class ZfsRecordTests_NameValidation
         Assert.That( ( ) => { ZfsRecord.ValidateName( ZfsPropertyValueConstants.FileSystem, path ); }, Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
+    [SuppressMessage( "ReSharper", "UseCollectionExpression", Justification = "NUnit doesn't understand it if it's just a collection expression here")]
     [Test]
     [TestCaseSource( typeof( ZfsRecordTestHelpers ), nameof( ZfsRecordTestHelpers.GetValidSnapshotCases ), new object?[] { 8, 12, 5 } )]
     [TestCaseSource( typeof( ZfsRecordTestHelpers ), nameof( ZfsRecordTestHelpers.GetIllegalSnapshotCases ), new object?[] { 8, 12, 5 } )]

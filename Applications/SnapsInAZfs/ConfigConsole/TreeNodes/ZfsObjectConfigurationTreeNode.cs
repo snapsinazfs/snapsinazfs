@@ -57,7 +57,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
         {
             lock ( _childrenLock )
             {
-                List<ITreeNode> list = new( );
+                List<ITreeNode> list = [];
                 foreach ( ( string childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
                 {
                     if ( !BaseDataset.GetChild( childName, out ZfsRecord? baseDataset ) )

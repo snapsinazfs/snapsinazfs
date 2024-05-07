@@ -32,7 +32,7 @@ internal static class ZfsTasks
     public static async Task<ZfsCommandRunnerOperationStatus> InheritPropertiesForDatasetAsync( bool dryRun, string zfsPath, List<IZfsProperty> inheritedProperties, IZfsCommandRunner commandRunner )
     {
         int successfulOperations = 0;
-        List<Task> zfsInheritTasks = new( );
+        List<Task> zfsInheritTasks = [];
         foreach ( IZfsProperty property in inheritedProperties )
         {
             zfsInheritTasks.Add( commandRunner.InheritZfsPropertyAsync( dryRun, zfsPath, property ).ContinueWith( async inheritTask =>
@@ -89,7 +89,7 @@ internal static class ZfsTasks
         Logger.Debug( "Getting zfs objects for tree view" );
         try
         {
-            List<ITreeNode> treeRootNodes = new( );
+            List<ITreeNode> treeRootNodes = [];
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync( settings, baseDatasets, baseSnapshots ).ConfigureAwait( true );
             ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where( static kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
 

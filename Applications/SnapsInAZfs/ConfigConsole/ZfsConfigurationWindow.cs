@@ -618,7 +618,7 @@ public sealed partial class ZfsConfigurationWindow
             string zfsObjectPath = SelectedTreeNode.TreeDataset.Name;
             bool areAnyPropertiesModified = SelectedTreeNode.IsLocallyModified;
             bool areAnyPropertiesInherited = SelectedTreeNode.GetInheritedZfsProperties( out List<IZfsProperty>? inheritedZfsProperties );
-            List<string> pendingCommands = new( );
+            List<string> pendingCommands = [];
             if ( areAnyPropertiesModified )
             {
                 SelectedTreeNode.GetModifiedZfsProperties( out List<IZfsProperty>? modifiedZfsProperties );
