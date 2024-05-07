@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -45,14 +45,16 @@
     <Compile Include="Libc\Enums\Errno.cs" />
   </ItemGroup>
 
-
   <ItemGroup>
     <PackageReference Include="NLog" Version="5.3.2" />
   </ItemGroup>
 
-
   <ItemGroup>
     <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="SnapsInAZfs.Settings.Tests" />
   </ItemGroup>
 
 </Project>
