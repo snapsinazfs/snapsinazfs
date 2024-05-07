@@ -45,16 +45,19 @@ public class TypeExtensionsTests
             Assert.That( result, Is.LessThanOrEqualTo( term1 ).And.LessThanOrEqualTo( term2 ).And.LessThanOrEqualTo( term3 ) );
 
             // Next, check that all terms are evenly divisible by the result
-            Assert.That( term1 % result, Is.Zero );
-            Assert.That( term2 % result, Is.Zero );
-            Assert.That( term3 % result, Is.Zero );
+            Assert.Multiple( ( ) =>
+            {
+                Assert.That( Math.DivRem( term1, result ).Remainder, Is.Zero );
+                Assert.That( Math.DivRem( term2, result ).Remainder, Is.Zero );
+                Assert.That( Math.DivRem( term3, result ).Remainder, Is.Zero );
+            } );
 
             // Now, prove, by brute force, that all integers greater than result are not factors of at least one of the terms
             for ( int biggerNumber = result + 1; biggerNumber < 60; biggerNumber++ )
             {
                 Assert.That( ( term1 % biggerNumber ) + ( term2 % biggerNumber ) + ( term3 % biggerNumber ), Is.Not.Zero );
                 int number = biggerNumber;
-                Assert.That( terms.Select( t => t % number ), Has.Some.Positive );
+                Assert.That( terms.Select( t => Math.DivRem( t, number ).Remainder ), Has.Some.Positive );
             }
         } );
     }
