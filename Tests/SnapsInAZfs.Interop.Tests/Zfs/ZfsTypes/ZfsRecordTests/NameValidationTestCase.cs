@@ -4,14 +4,8 @@
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
-public class NameValidationTestCase
+public sealed class NameValidationTestCase( string name, bool valid )
 {
-    public NameValidationTestCase(string name, bool valid )
-    {
-        this.Name = name;
-        this.Valid = valid;
-    }
-
-    public string Name { get; set; }
-    public bool Valid { get; set; }
+    public string Name { get; set; } = name;
+    public bool Valid { get; set; } = valid;
 }
