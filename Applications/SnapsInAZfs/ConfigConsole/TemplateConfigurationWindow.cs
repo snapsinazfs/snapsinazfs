@@ -1,5 +1,6 @@
 #region MIT LICENSE
-// Copyright 2023 Brandon Thetford
+
+// Copyright 2024 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
@@ -8,6 +9,7 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
+
 #endregion
 
 using System.Collections.Concurrent;
@@ -25,12 +27,13 @@ public sealed partial class TemplateConfigurationWindow
     private static readonly ustring InvalidFieldValueDialogTitle = ustring.Make( InvalidFieldValueDialogTitleString );
 
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = [5, 10, 15, 20, 30];
 
     private readonly HashSet<string> _modifiedProperties = [];
-    private readonly HashSet<string> _namingProperties = new( new[] { ComponentSeparator, PrefixTitleCase, TimestampFormatTitleCase, FrequentSuffixTitleCase, HourlySuffixTitleCase, DailySuffixTitleCase, WeeklySuffixTitleCase, MonthlySuffixTitleCase, YearlySuffixTitleCase } );
-    private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = new( );
-    private readonly HashSet<string> _timingProperties = new( new[] { FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase } );
-    private static ConcurrentDictionary<string, TemplateSettings> _templates = new( );
+    private readonly HashSet<string> _namingProperties = [ComponentSeparator, PrefixTitleCase, TimestampFormatTitleCase, FrequentSuffixTitleCase, HourlySuffixTitleCase, DailySuffixTitleCase, WeeklySuffixTitleCase, MonthlySuffixTitleCase, YearlySuffixTitleCase];
+    private readonly List<TextValidateFieldSettings> _templateConfigurationTextValidateFieldList = [];
+    private readonly HashSet<string> _timingProperties = [FrequentPeriodTitleCase, HourlyMinuteTitleCase, DailyTimeTitleCase, WeeklyDayTitleCase, WeeklyTimeTitleCase, MonthlyDayTitleCase, MonthlyTimeTitleCase, YearlyMonthTitleCase, YearlyDayTitleCase, YearlyTimeTitleCase];
+    private static ConcurrentDictionary<string, TemplateSettings> _templates = [];
 
     public TemplateConfigurationWindow( )
     {
@@ -43,7 +46,6 @@ public sealed partial class TemplateConfigurationWindow
     internal TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems[ templateListView.SelectedItem ];
     private bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll( static tvf => tvf.Field.IsValid );
     private bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
-    private static readonly List<int> TemplateConfigurationFrequentPeriodOptions = [5, 10, 15, 20, 30];
 
     private const string ComponentSeparator = "Component Separator";
     private const string DailySuffixTitleCase = "Daily Suffix";
