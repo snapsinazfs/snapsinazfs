@@ -47,7 +47,7 @@ public sealed partial class ZfsConfigurationWindow
     }
 
     private bool _eventsEnabled;
-    private ZfsObjectConfigurationTreeNode SelectedTreeNode => (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject;
+    private ZfsObjectConfigurationTreeNode? SelectedTreeNode => zfsTreeView?.SelectedObject as ZfsObjectConfigurationTreeNode;
 
     private void ClearAllPropertyFields( bool manageEventHandlers = false )
     {
