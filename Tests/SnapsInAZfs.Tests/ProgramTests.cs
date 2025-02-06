@@ -255,7 +255,7 @@ public class ProgramTests
 
     private static void ResetNLogToNoOutput( )
     {
-        if ( LogManager.Configuration is not null )
+        if ( LogManager.Configuration is { } )
         {
             LogManager.Shutdown( );
         }

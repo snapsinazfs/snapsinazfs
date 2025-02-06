@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -83,7 +83,7 @@ public sealed partial class Monitor : IMonitor
     [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
     public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true )
     {
-        if ( _applicationStateObservable is not null && !ReferenceEquals( _applicationStateObservable, observableObject ) )
+        if ( _applicationStateObservable is { } && !ReferenceEquals( _applicationStateObservable, observableObject ) )
         {
             throw new InvalidOperationException( "Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object." );
         }
@@ -116,12 +116,12 @@ public sealed partial class Monitor : IMonitor
     [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
     public void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject )
     {
-        if ( _snapshotOperationsObservable is not null && !ReferenceEquals( _snapshotOperationsObservable, observableObject ) )
+        if ( _snapshotOperationsObservable is { } && !ReferenceEquals( _snapshotOperationsObservable, observableObject ) )
         {
             throw new InvalidOperationException( "Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object." );
         }
 
-        if ( _snapshotOperationsObservable is not null )
+        if ( _snapshotOperationsObservable is { } )
         {
             return;
         }
@@ -144,7 +144,7 @@ public sealed partial class Monitor : IMonitor
             null => "Not Registered",
             // This warning is obsolete on .net7, as the implementation now caches the strings on first use
             // ReSharper disable HeapView.BoxingAllocation
-            not null when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
+            { } when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
             _ => _applicationStateObservable.State.ToString( "G" )
             // ReSharper restore HeapView.BoxingAllocation
         };
