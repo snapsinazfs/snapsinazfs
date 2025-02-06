@@ -53,34 +53,34 @@ public sealed partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        nameTextField.Clear( );
-        typeTextField.Clear( );
-        enabledRadioGroup.Clear( );
-        enabledSourceTextField.Clear( );
-        takeSnapshotsRadioGroup.Clear( );
-        takeSnapshotsSourceTextField.Clear( );
-        pruneSnapshotsRadioGroup.Clear( );
-        pruneSnapshotsSourceTextField.Clear( );
-        recursionRadioGroup.Clear( );
-        recursionSourceTextField.Clear( );
-        templateSourceTextField.Clear( );
-        retentionFrequentTextField.Clear( );
-        retentionHourlyTextField.Clear( );
-        retentionDailyTextField.Clear( );
-        retentionWeeklyTextField.Clear( );
-        retentionMonthlyTextField.Clear( );
-        retentionYearlyTextField.Clear( );
-        retentionPruneDeferralTextField.Clear( );
-        recentFrequentTextField.Clear( );
-        recentHourlyTextField.Clear( );
-        recentDailyTextField.Clear( );
-        recentWeeklyTextField.Clear( );
-        recentMonthlyTextField.Clear( );
-        recentYearlyTextField.Clear( );
+        nameTextField.Clear ( );
+        typeTextField.Clear ( );
+        enabledRadioGroup.Clear ( );
+        enabledSourceTextField.Clear ( );
+        takeSnapshotsRadioGroup.Clear ( );
+        takeSnapshotsSourceTextField.Clear ( );
+        pruneSnapshotsRadioGroup.Clear ( );
+        pruneSnapshotsSourceTextField.Clear ( );
+        recursionRadioGroup.Clear ( );
+        recursionSourceTextField.Clear ( );
+        templateSourceTextField.Clear ( );
+        retentionFrequentTextField.Clear ( );
+        retentionHourlyTextField.Clear ( );
+        retentionDailyTextField.Clear ( );
+        retentionWeeklyTextField.Clear ( );
+        retentionMonthlyTextField.Clear ( );
+        retentionYearlyTextField.Clear ( );
+        retentionPruneDeferralTextField.Clear ( );
+        recentFrequentTextField.Clear ( );
+        recentHourlyTextField.Clear ( );
+        recentDailyTextField.Clear ( );
+        recentWeeklyTextField.Clear ( );
+        recentMonthlyTextField.Clear ( );
+        recentYearlyTextField.Clear ( );
 
         if ( manageEventHandlers )
         {
-            EnableEventHandlers( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -129,34 +129,36 @@ public sealed partial class ZfsConfigurationWindow
 
     private void EnabledInheritButtonClick( )
     {
-        int queryResult = MessageBox.Query( "Inherit Enabled Setting", $"Inherit Enabled setting {SelectedTreeNode.TreeDataset.ParentDataset.Enabled.Value.ToString( )} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Enabled Setting", $"Inherit Enabled setting {SelectedTreeNode?.TreeDataset.ParentDataset.Enabled.Value.ToString( )} from {SelectedTreeNode?.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+
         switch ( queryResult )
         {
             case 0:
                 return;
-            case 1:
-                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.EnabledPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+            case 1 when SelectedTreeNode is { }:
+                SelectedTreeNode.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
+
                 return;
         }
     }
 
-    private void EnabledRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+    private void EnabledRadioGroupSelectedItemChanged ( SelectedItemChangedArgs args )
     {
-        UpdateSelectedItemBooleanRadioGroupProperty( enabledRadioGroup );
+        UpdateSelectedItemBooleanRadioGroupProperty ( enabledRadioGroup );
         UpdateButtonState( );
         UpdateFieldsForSelectedZfsTreeNode( );
     }
 
-    private void EnableEventHandlers( )
+    private void EnableEventHandlers ( )
     {
         if ( _eventsEnabled )
         {
             return;
         }
 
-        Logger.Debug( "Enabling event handlers for zfs configuration fields" );
+        Logger.Debug ( "Enabling event handlers for zfs configuration fields" );
 
         // ReSharper disable HeapView.ObjectAllocation.Possible
         refreshButton.Clicked += RefreshZfsTreeViewFromZfs;
@@ -187,31 +189,34 @@ public sealed partial class ZfsConfigurationWindow
         retentionPruneDeferralTextField.Leave += RetentionPruneDeferralTextFieldOnLeave;
         retentionPruneDeferralInheritButton.Clicked += RetentionPruneDeferralInheritButtonClick;
         saveCurrentButton.Clicked += SaveCurrentButtonOnClicked;
+
         // ReSharper enable HeapView.ObjectAllocation.Possible
         _eventsEnabled = true;
-        Logger.Debug( "Event handlers for zfs configuration fields enabled" );
+        Logger.Debug ( "Event handlers for zfs configuration fields enabled" );
     }
 
     private void PruneSnapshotsInheritButtonClick( )
     {
-        int queryResult = MessageBox.Query( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {SelectedTreeNode.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString( )} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {SelectedTreeNode?.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString( )} from {SelectedTreeNode?.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+
         switch ( queryResult )
         {
             case 0:
                 return;
-            case 1:
-                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.PruneSnapshotsPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+            case 1 when SelectedTreeNode is { }:
+                SelectedTreeNode.InheritPropertyFromParent ( ZfsPropertyNames.PruneSnapshotsPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
+
                 return;
         }
     }
 
-    private void PruneSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+    private void PruneSnapshotsRadioGroupSelectedItemChanged ( SelectedItemChangedArgs args )
     {
-        UpdateSelectedItemBooleanRadioGroupProperty( pruneSnapshotsRadioGroup );
-        UpdateButtonState( );
-        UpdateFieldsForSelectedZfsTreeNode( );
+        UpdateSelectedItemBooleanRadioGroupProperty ( pruneSnapshotsRadioGroup );
+        UpdateButtonState ( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
     }
 
     private void RecursionInheritButtonClick( )
@@ -221,7 +226,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.RecursionPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -304,7 +309,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionDailyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -347,7 +352,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -390,7 +395,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -433,7 +438,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -476,7 +481,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -519,7 +524,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -562,7 +567,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -833,7 +838,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TakeSnapshotsPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -855,7 +860,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             case 0:
                 return;
-            case 1:
+            case 1 when SelectedTreeNode is { }:
                 SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.TemplatePropertyName );
                 UpdateFieldsForSelectedZfsTreeNode( );
                 UpdateButtonState( );
@@ -904,9 +909,8 @@ public sealed partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is not null )
+        if ( SelectedTreeNode?.TreeDataset is { } treeDataset )
         {
-            ZfsRecord treeDataset = SelectedTreeNode.TreeDataset;
             nameTextField.Text = treeDataset.Name;
             typeTextField.Text = treeDataset.Kind;
             UpdateEnabledPropertyFields( treeDataset );
