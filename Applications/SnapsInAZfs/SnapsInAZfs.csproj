@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
@@ -6,7 +6,7 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <LangVersion>13</LangVersion>
+    <LangVersion>12</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>

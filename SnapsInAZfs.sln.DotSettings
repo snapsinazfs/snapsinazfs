@@ -612,4 +612,15 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=whcboe/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=workingset/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=zpool/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=zvol/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=zvol/@EntryIndexedValue">True</s:Boolean>
+  
+  	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Name/@EntryValue">Performance</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;PERFORMANCE|PERF): *(?&lt;Message&gt;[\S].*)$</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/TodoIconStyle/@EntryValue">Warning</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Color/@EntryValue">#FFFF6200</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/CaseSensitive/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/MatchComments/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/MatchStrings/@EntryValue">True</s:Boolean>
+
+</wpf:ResourceDictionary>

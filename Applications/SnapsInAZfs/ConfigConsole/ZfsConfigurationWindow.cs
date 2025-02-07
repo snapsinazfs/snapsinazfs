@@ -29,11 +29,14 @@ using Terminal.Gui.Trees;
 
 namespace SnapsInAZfs.ConfigConsole;
 
+using JetBrains.Annotations;
+
+[MustDisposeResource]
 public sealed partial class ZfsConfigurationWindow
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (ZfsConfigurationWindow)}" )!;
 
-    private readonly ConcurrentDictionary<string, ZfsRecord> _treeDatasets = new( );
+    private readonly ConcurrentDictionary<string, ZfsRecord> _treeDatasets = [];
 
     public ZfsConfigurationWindow( )
     {
@@ -904,7 +907,7 @@ public sealed partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is not null )
+        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is { } )
         {
             ZfsRecord treeDataset = SelectedTreeNode.TreeDataset;
             nameTextField.Text = treeDataset.Name;

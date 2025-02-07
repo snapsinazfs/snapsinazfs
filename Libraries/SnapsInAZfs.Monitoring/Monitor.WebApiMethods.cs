@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -27,8 +27,8 @@ public sealed partial class Monitor
         {
             return await Task.FromResult<Results<Ok<string>, StatusCodeHttpResult>>( _applicationStateObservable switch
             {
-                not null => TypedResults.Ok( GetApplicationState( ) ),
-                _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+                { } => TypedResults.Ok( GetApplicationState( ) ),
+                _                                                                            => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
             } ).ConfigureAwait( false );
         }
         catch ( Exception e )
@@ -45,8 +45,8 @@ public sealed partial class Monitor
         {
             return await Task.FromResult<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>>( _applicationStateObservable switch
             {
-                not null => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Environment.WorkingSet, Version ?? "Unknown" ) ),
-                _ => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
+                { } => TypedResults.Ok( new ApplicationStateMetrics( GetApplicationState( ), ServiceStartTime, NextRunTime, Environment.WorkingSet, Version ?? "Unknown" ) ),
+                _                                                                                             => TypedResults.StatusCode( (int)HttpStatusCode.ServiceUnavailable )
             } ).ConfigureAwait( false );
         }
         catch ( Exception e )

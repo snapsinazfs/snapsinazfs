@@ -172,7 +172,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             using ( Process? zfsDestroyProcess = Process.Start( zfsDestroyStartInfo ) )
             {
                 Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
-                if ( zfsDestroyProcess is not null )
+                if ( zfsDestroyProcess is { } )
                 {
                     await zfsDestroyProcess.WaitForExitAsync( ).ConfigureAwait( true );
                     if ( zfsDestroyProcess.ExitCode == 0 )
@@ -254,14 +254,14 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync ( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
-        ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait( true );
-        SortedDictionary<string, RawZfsObject> rawObjects = new( );
-        await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
-        ProcessRawObjects( rawObjects, datasets, snapshots );
-        CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
+        string                                      propertiesString = IZfsProperty.AllKnownProperties.ToCommaSeparatedSingleLineString ( );
+        ConfiguredCancelableAsyncEnumerable<string> lineProvider     = ZfsExecEnumeratorAsync ( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait ( true );
+        SortedDictionary<string, RawZfsObject>      rawObjects       = new ( );
+        await GetRawZfsObjectsAsync ( lineProvider, rawObjects ).ConfigureAwait ( true );
+        ProcessRawObjects ( rawObjects, datasets, snapshots );
+        CheckAndUpdateLastSnapshotTimesForDatasets ( settings, datasets );
     }
 
     /// <summary>

@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -562,13 +562,13 @@ public class RawZfsObjectTests
         } );
     }
 
-    private static TestCaseData[] GetAddRawProperty_TestCases( )
+    private static TestCaseData [] GetAddRawProperty_TestCases ( )
     {
-        return IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).Select( kp => new TestCaseData( kp, $"{kp} value", ZfsPropertySourceConstants.Local ) )
-                           .Prepend( new( "type", ZfsPropertyValueConstants.FileSystem, ZfsPropertySourceConstants.None ) )
-                           .Append( new( "available", "54321", ZfsPropertySourceConstants.None ) )
-                           .Append( new( "used", "12345", ZfsPropertySourceConstants.None ) )
-                           .ToArray( );
+        return IZfsProperty.AllKnownProperties.Select ( static kp => new TestCaseData ( kp, $"{kp} value", ZfsPropertySourceConstants.Local ) )
+                           .Prepend ( new ( "type", ZfsPropertyValueConstants.FileSystem, ZfsPropertySourceConstants.None ) )
+                           .Append ( new ( "available", "54321", ZfsPropertySourceConstants.None ) )
+                           .Append ( new ( "used", "12345", ZfsPropertySourceConstants.None ) )
+                           .ToArray ( );
     }
 
     private static ZfsRecord GetTestRootRecord( )

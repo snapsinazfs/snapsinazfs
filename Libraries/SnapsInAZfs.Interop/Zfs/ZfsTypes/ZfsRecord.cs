@@ -2,11 +2,11 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ìSoftwareî), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the ‚ÄúSoftware‚Äù), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED ìAS ISî, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED ‚ÄúAS IS‚Äù, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
@@ -47,7 +47,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
             ZfsPropertyValueConstants.Snapshot => ZfsIdentifierRegexes.SnapshotNameRegex( ),
             _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
         };
-        if ( parent is not null && inheritProperties )
+        if ( parent is { } && inheritProperties )
         {
             _enabled = parent.Enabled with { IsLocal = false, Owner = this };
             _lastDailySnapshotTimestamp = parent.LastDailySnapshotTimestamp with { Value = DateTimeOffset.UnixEpoch, IsLocal = true, Owner = this };
@@ -113,7 +113,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
             _ => throw new InvalidOperationException( "Unknown type of object specified for ZfsIdentifierValidator." )
         };
         bool notASnapshot = Kind != ZfsPropertyValueConstants.Snapshot;
-        bool isASnapshot = parent is not null && Kind == ZfsPropertyValueConstants.Snapshot;
+        bool isASnapshot  = parent is { } && Kind == ZfsPropertyValueConstants.Snapshot;
 
         if ( forcePropertyOwnership || isASnapshot )
         {
@@ -123,7 +123,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
             _lastFrequentSnapshotTimestamp = notASnapshot && lastFrequentSnapshotTimestamp.IsLocal
                 ? lastFrequentSnapshotTimestamp with { Owner = this }
-                : new( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                : new( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
 
             _lastHourlySnapshotTimestamp = notASnapshot && lastHourlySnapshotTimestamp.IsLocal
                 ? lastHourlySnapshotTimestamp with { Owner = this }
@@ -247,8 +247,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     {
         // Returning equality of value properties alphabetically
         return
-            other is not null
-            && BytesAvailable == other.BytesAvailable
+            other is { }
+         && BytesAvailable == other.BytesAvailable
             && BytesUsed == other.BytesUsed
             && Enabled == other.Enabled
             && IsPoolRoot == other.IsPoolRoot
