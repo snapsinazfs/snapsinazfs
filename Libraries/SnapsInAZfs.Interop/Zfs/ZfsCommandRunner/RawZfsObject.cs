@@ -24,9 +24,9 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 public sealed class RawZfsObject
 {
     private static readonly Logger          Logger                      = LogManager.GetCurrentClassLogger( );
-    private static readonly HashSet<string> MandatorySnapshotProperties = Enumerable.Union ( IZfsProperty.AllKnownProperties, ["type", "used"] ).ToHashSet ( );
+    private static readonly HashSet<string> MandatorySnapshotProperties = IZfsProperty.KnownSnapshotProperties.Union ( ["type", "used"], StringComparer.OrdinalIgnoreCase ).ToHashSet ( );
 
-    private static readonly HashSet<string> MandatoryZfsRecordProperties = Enumerable.Union ( IZfsProperty.KnownDatasetProperties, ["type", "used", "available"] ).ToHashSet ( );
+    private static readonly HashSet<string> MandatoryZfsRecordProperties = IZfsProperty.KnownDatasetProperties.Union(["type", "used", "available"], StringComparer.OrdinalIgnoreCase).ToHashSet ( );
 
     /// <summary>
     ///     Creates a new instance of a <see cref="RawZfsObject" />

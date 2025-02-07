@@ -57,7 +57,7 @@ public interface IZfsProperty
                                                   ZfsPropertyNames.PruneSnapshotsPropertyName
                                               ] );
 
-        AllKnownProperties = Enumerable.Union ( KnownDatasetProperties, KnownSnapshotProperties ).ToImmutableSortedSet ( );
+        AllKnownProperties = KnownDatasetProperties.Union ( KnownSnapshotProperties, StringComparer.OrdinalIgnoreCase ).ToImmutableSortedSet ( );
     }
 
     /// <summary>
