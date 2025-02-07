@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 // Copyright 2023 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -24,9 +24,10 @@ namespace SnapsInAZfs.ConfigConsole;
 
 internal static class ConfigConsole
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    internal static IZfsCommandRunner? CommandRunner { get; private set; }
-    internal static ConcurrentDictionary<string, Snapshot> Snapshots { get; } = [];
+    internal const          string                                 ConfigConsoleNamespace = "SnapsInAZfs.ConfigConsole";
+    private static readonly Logger                                 Logger                 = LogManager.GetLogger ( $"{ConfigConsoleNamespace}.{nameof (ConfigConsole)}" )!;
+    internal static         IZfsCommandRunner?                     CommandRunner { get; private set; }
+    internal static         ConcurrentDictionary<string, Snapshot> Snapshots     { get; } = [];
     // ReSharper disable HeapView.ObjectAllocation
     internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select( static kvp => new TemplateConfigurationListItem( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? [];
     // ReSharper restore HeapView.ObjectAllocation
