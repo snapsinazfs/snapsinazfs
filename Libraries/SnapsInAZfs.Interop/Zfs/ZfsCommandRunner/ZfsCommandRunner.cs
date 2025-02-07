@@ -254,14 +254,14 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override async Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override async Task GetDatasetsAndSnapshotsFromZfsAsync ( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
-        ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait( true );
-        SortedDictionary<string, RawZfsObject> rawObjects = new( );
-        await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
-        ProcessRawObjects( rawObjects, datasets, snapshots );
-        CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
+        string                                      propertiesString = Enumerable.Union ( IZfsProperty.KnownDatasetProperties, IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString ( );
+        ConfiguredCancelableAsyncEnumerable<string> lineProvider     = ZfsExecEnumeratorAsync ( "get", $"type,{propertiesString},available,used -H -p -r -t filesystem,volume,snapshot" ).ConfigureAwait ( true );
+        SortedDictionary<string, RawZfsObject>      rawObjects       = new ( );
+        await GetRawZfsObjectsAsync ( lineProvider, rawObjects ).ConfigureAwait ( true );
+        ProcessRawObjects ( rawObjects, datasets, snapshots );
+        CheckAndUpdateLastSnapshotTimesForDatasets ( settings, datasets );
     }
 
     /// <summary>
