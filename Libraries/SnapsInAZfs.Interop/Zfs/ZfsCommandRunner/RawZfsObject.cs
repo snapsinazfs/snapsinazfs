@@ -23,10 +23,10 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 /// </summary>
 public sealed class RawZfsObject
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private static readonly HashSet<string> MandatorySnapshotProperties = IZfsProperty.AllKnownProperties.Union( new[] { "type", "used" } ).ToHashSet( );
+    private static readonly Logger          Logger                      = LogManager.GetCurrentClassLogger( );
+    private static readonly HashSet<string> MandatorySnapshotProperties = Enumerable.Union ( IZfsProperty.AllKnownProperties, ["type", "used"] ).ToHashSet ( );
 
-    private static readonly HashSet<string> MandatoryZfsRecordProperties = IZfsProperty.KnownDatasetProperties.Union( new[] { "type", "used", "available" } ).ToHashSet( );
+    private static readonly HashSet<string> MandatoryZfsRecordProperties = Enumerable.Union ( IZfsProperty.KnownDatasetProperties, ["type", "used", "available"] ).ToHashSet ( );
 
     /// <summary>
     ///     Creates a new instance of a <see cref="RawZfsObject" />
@@ -37,8 +37,8 @@ public sealed class RawZfsObject
         Kind = kind;
     }
 
-    public bool HasAllMandatorySnapshotProperties => !MandatorySnapshotProperties.Except( Properties.Keys ).Any( );
-    public bool HasAllMandatoryZfsRecordProperties => !MandatoryZfsRecordProperties.Except( Properties.Keys ).Any( );
+    public bool HasAllMandatorySnapshotProperties  => !MandatorySnapshotProperties.Except ( Properties.Keys ).Any ( );
+    public bool HasAllMandatoryZfsRecordProperties => !MandatoryZfsRecordProperties.Except ( Properties.Keys ).Any ( );
 
     /// <summary>The string corresponding to the 'type' attribute of a ZFS object</summary>
     public string Kind { get; }

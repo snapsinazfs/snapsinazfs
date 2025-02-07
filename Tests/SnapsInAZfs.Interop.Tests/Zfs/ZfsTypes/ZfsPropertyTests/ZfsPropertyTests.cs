@@ -1,4 +1,4 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
 
@@ -502,6 +502,14 @@ public class ZfsPropertyTests
     {
         ZfsProperty<string> zfsProperty = ZfsProperty<string>.CreateWithoutParent( "someName", testValue );
         Assert.That( zfsProperty.ValueString, Is.EqualTo( testValue ) );
+    }
+
+    [Test]
+    public void AllKnownProperties_ContainsOnlyUniqueValues ( )
+    {
+        Assume.That ( IZfsProperty.KnownDatasetProperties,  Is.Unique );
+        Assume.That ( IZfsProperty.KnownSnapshotProperties, Is.Unique );
+        Assert.That ( IZfsProperty.AllKnownProperties, Is.Unique );
     }
 
     private static TestCaseData[] BoolEqualityTestCaseData( )
