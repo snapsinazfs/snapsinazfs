@@ -123,7 +123,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
             _lastFrequentSnapshotTimestamp = notASnapshot && lastFrequentSnapshotTimestamp.IsLocal
                 ? lastFrequentSnapshotTimestamp with { Owner = this }
-                : new( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                : new( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
 
             _lastHourlySnapshotTimestamp = notASnapshot && lastHourlySnapshotTimestamp.IsLocal
                 ? lastHourlySnapshotTimestamp with { Owner = this }
