@@ -904,7 +904,7 @@ public sealed partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is not null )
+        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is { } )
         {
             ZfsRecord treeDataset = SelectedTreeNode.TreeDataset;
             nameTextField.Text = treeDataset.Name;

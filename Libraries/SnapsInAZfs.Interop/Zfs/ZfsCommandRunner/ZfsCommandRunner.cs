@@ -172,7 +172,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             using ( Process? zfsDestroyProcess = Process.Start( zfsDestroyStartInfo ) )
             {
                 Logger.Debug( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
-                if ( zfsDestroyProcess is not null )
+                if ( zfsDestroyProcess is { } )
                 {
                     await zfsDestroyProcess.WaitForExitAsync( ).ConfigureAwait( true );
                     if ( zfsDestroyProcess.ExitCode == 0 )
