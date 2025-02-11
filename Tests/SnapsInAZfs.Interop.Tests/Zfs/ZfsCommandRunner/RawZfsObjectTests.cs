@@ -479,45 +479,49 @@ public class RawZfsObjectTests
     }
 
     [Test]
-    public void ConvertToSnapshotAndAddToCollections_OnRootFileSystemMissingFileSystemProperties_ThrowsInvalidOperationException( )
+    public void ConvertToSnapshotAndAddToCollections_OnRootFileSystemMissingFileSystemProperties_ReturnsFalse ( )
     {
-        ZfsRecord rootRecord = GetTestRootRecord( );
-        RawZfsObject testObject = new( ZfsPropertyValueConstants.Snapshot );
-        testObject.AddRawProperty( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Hourly, ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-        testObject.AddRawProperty( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-        testObject.AddRawProperty( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-        const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
-        ConcurrentDictionary<string, ZfsRecord> datasets = new( )
-        {
-            [ rootRecord.Name ] = rootRecord
-        };
-        ConcurrentDictionary<string, Snapshot> snapshots = new( );
+        RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
+        testObject.AddRawProperty ( ZfsNativePropertyNames.Type,                            ZfsPropertyValueConstants.Snapshot,    ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName,                   "true",                                "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName,             "true",                                "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName,            "true",                                ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName,                 ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName,            SnapshotPeriod.Hourly,                 ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName,         "1970-01-01T00:00:00Z",                ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName,                  ZfsPropertyValueConstants.Default,     "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6",                                   "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,   "5",                                   "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName,    "4",                                   "inherited from testRoot" );
 
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( ( ) => testObject.ConvertToSnapshotAndAddToCollections( snapName, datasets, snapshots ), Throws.InvalidOperationException );
-            Assert.That( snapshots, Does.Not.ContainKey( snapName ) );
-            Assert.That( rootRecord.Snapshots[ SnapshotPeriodKind.Hourly ], Does.Not.ContainKey( snapName ) );
-        } );
+        // Weekly property intentionally missing as the condition of the test
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,             "2",                    "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,              "1",                    "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName,       "0",                    "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,   "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,    "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,   "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,  "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,   "1970-01-01T00:00:00Z", "inherited from testRoot" );
+        testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem,                                     "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
+        testObject.AddRawProperty ( ZfsNativePropertyNames.Used,                                       "12345",                "inherited from testRoot" );
+        const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+
+        Assert.Multiple (
+                         ( ) =>
+                         {
+                             ZfsRecord rootRecord = GetTestRootRecord ( );
+
+                             ConcurrentDictionary<string, ZfsRecord> datasets = new ( )
+                                                                                {
+                                                                                    [ rootRecord.Name ] = rootRecord
+                                                                                };
+                             ConcurrentDictionary<string, Snapshot> snapshots = [ ];
+                             Assert.That ( ( ) => testObject.ConvertToSnapshotAndAddToCollections ( snapName, datasets, snapshots ), Is.False );
+                             Assert.That ( snapshots,                                                                                Does.Not.ContainKey ( snapName ) );
+                             Assert.That ( rootRecord.Snapshots [ SnapshotPeriodKind.Hourly ],                                       Does.Not.ContainKey ( snapName ) );
+                         } );
     }
 
     [Test]
