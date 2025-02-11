@@ -52,6 +52,10 @@
   <ItemGroup>
     <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <Using Include="SnapsInAZfs.Settings.Settings" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Settings.Tests" />

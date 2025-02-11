@@ -17,7 +17,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 using System.Runtime.CompilerServices;
 
-public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<int>>, IEquatable<ZfsProperty<bool>>, IEquatable<ZfsProperty<string>>, IEquatable<ZfsProperty<DateTimeOffset>> where T : notnull
+public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<int>>, IEquatable<ZfsProperty<bool>>, IEquatable<ZfsProperty<string>>, IEquatable<ZfsProperty<DateTimeOffset>> where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
@@ -104,7 +104,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     };
 
     [JsonIgnore]
-    public ZfsRecord? Owner { get; set; }
+    public ZfsRecord? Owner { get; init; }
 
     /// <summary>
     ///     Gets a string representation of the Value property, in an appropriate form for its type
