@@ -2,17 +2,19 @@
 MAKEFLAGS := $(filter-out -j,$(MAKEFLAGS))
 MAKEFLAGS := $(filter-out -jobs,$(MAKEFLAGS))
 SNAPSINAZFS_SOLUTION_ROOT ?= .
+SIAZ_APPLICATIONS_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Applications
+SIAZ_LIBRARIES_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Libraries
 SIAZ ?= SnapsInAZfs
 SIAZLC ?= snapsinazfs
 SIAZ_INTEROP ?= $(SIAZ).Interop
 SIAZ_SETTINGS ?= $(SIAZ).Settings
-SIAZ_PROJECT_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/$(SIAZ)
+SIAZ_PROJECT_DIRECTORY ?= $(SIAZ_APPLICATIONS_DIRECTORY)/$(SIAZ)
 SIAZ_PROJECT_FILE_NAME ?= $(SIAZ).csproj
 SIAZ_PROJECT_FILE_PATH ?= $(SIAZ_PROJECT_DIRECTORY)/$(SIAZ_PROJECT_FILE_NAME)
-SIAZ_INTEROP_PROJECT_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/$(SIAZ_INTEROP)
+SIAZ_INTEROP_PROJECT_DIRECTORY ?= $(SIAZ_LIBRARIES_DIRECTORY)/$(SIAZ_INTEROP)
 SIAZ_INTEROP_PROJECT_FILE_NAME ?= $(SIAZ_INTEROP).csproj
 SIAZ_INTEROP_PROJECT_FILE_PATH ?= $(SIAZ_INTEROP_PROJECT_DIRECTORY)/$(SIAZ_INTEROP_PROJECT_FILE_NAME)
-SIAZ_SETTINGS_PROJECT_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/$(SIAZ_SETTINGS)
+SIAZ_SETTINGS_PROJECT_DIRECTORY ?= $(SIAZ_LIBRARIES_DIRECTORY)/$(SIAZ_SETTINGS)
 SIAZ_SETTINGS_PROJECT_FILE_NAME ?= $(SIAZ_SETTINGS).csproj
 SIAZ_SETTINGS_PROJECT_FILE_PATH ?= $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/$(SIAZ_SETTINGS_PROJECT_FILE_NAME)
 SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
@@ -88,18 +90,18 @@ clean-debug:
 	dotnet clean --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
 	[ -d $(DEBUGDIR) ] && rm -rvf $(DEBUGDIR) || true
 	rmdir -v $(BUILDDIR) || true
-	rm -rfv SnapsInAZfs/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs/bin || true
-	rmdir -v SnapsInAZfs/obj || true
-	rm -rfv SnapsInAZfs.Interop/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Interop/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Interop/bin || true
-	rmdir -v SnapsInAZfs.Interop/obj || true
-	rm -rfv SnapsInAZfs.Settings/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Settings/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Settings/bin || true
-	rmdir -v SnapsInAZfs.Settings/obj || true
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/obj || true
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_INTpEROP_PROJECT_DIRECTORY)/obj || true
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj || true
 
 clean-release:
 	dotnet clean --configuration $(RELEASECONFIG) -o $(RELEASEDIR) 2>/dev/null
@@ -108,26 +110,26 @@ clean-release:
 	[ -d $(PUBLISHROOT) ]  && rm -rvf $(PUBLISHROOT) || true
 	rmdir -v $(PUBLISHROOT) || true
 	rmdir -v $(BUILDDIR) || true
-	rm -rfv SnapsInAZfs/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs/bin || true
-	rmdir -v SnapsInAZfs/obj || true
-	rm -rfv SnapsInAZfs.Interop/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Interop/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Interop/bin || true
-	rmdir -v SnapsInAZfs.Interop/obj || true
-	rm -rfv SnapsInAZfs.Settings/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv SnapsInAZfs.Settings/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v SnapsInAZfs.Settings/bin || true
-	rmdir -v SnapsInAZfs.Settings/obj || true
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/obj || true
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj || true
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin || true
+	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj || true
 
 extraclean:	clean-debug	clean-release
-	rm -rfv SnapsInAZfs/bin 2>/dev/null
-	rm -rfv SnapsInAZfs/obj 2>/dev/null
-	rm -rfv SnapsInAZfs.Interop/bin 2>/dev/null
-	rm -rfv SnapsInAZfs.Interop/obj 2>/dev/null
-	rm -rfv SnapsInAZfs.Settings/bin 2>/dev/null
-	rm -rfv SnapsInAZfs.Settings/obj 2>/dev/null
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin 2>/dev/null
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj 2>/dev/null
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin 2>/dev/null
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj 2>/dev/null
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin 2>/dev/null
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj 2>/dev/null
 
 
 build:	build-release

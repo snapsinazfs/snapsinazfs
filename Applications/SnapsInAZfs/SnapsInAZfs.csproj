@@ -1,0 +1,177 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
+    <Platforms>x64</Platforms>
+    <DebugType>embedded</DebugType>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <StartupObject>SnapsInAZfs.Program</StartupObject>
+    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <EnableDefaultContentItems>False</EnableDefaultContentItems>
+    <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
+    <ResponseFile>CommonCompilerFlags.rsp</ResponseFile>
+    <UTF8OutPut>True</UTF8OutPut>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Remove="appsettings.Development.json" />
+    <Compile Remove="DummyZfsCommandRunner.cs" />
+    <None Remove="fullZfsGet.txt" />
+    <None Remove="poolroots-withproperties.txt" />
+
+    <Content Include="SnapsInAZfs.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.nlog.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.local.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.monitoring.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="SnapsInAZfs.template.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Choose>
+    <When Condition="$(Configuration)=='Debug-NoZFS' Or $(Configuration)=='Debug-Windows'">
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup>
+        <Compile Include="DummyZfsCommandRunner.cs" />
+      </ItemGroup>      
+    </When>
+  </Choose>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.10" />
+    <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
+    <PackageReference Include="PowerArgs" Version="4.0.3" />
+    <PackageReference Include="Terminal.Gui" Version="1.16.0" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
+
+      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+      </PropertyGroup>
+
+      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
+        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+      </PropertyGroup>
+
+      <ItemGroup>
+        <Content Include="appsettings.Development.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+
+        <Content Include="fullZfsGet.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+
+        <Content Include="poolroots-withproperties.txt">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+          <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+      </ItemGroup>
+
+    </When>
+
+    <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+
+      <PropertyGroup>
+        <AnalysisLevel>7-minimum</AnalysisLevel>
+        <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
+        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+      </PropertyGroup>
+
+    </When>
+
+    <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
+
+      <PropertyGroup>
+        <AnalysisLevel>7-minimum</AnalysisLevel>
+        <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
+        <DefineConstants>$(DefineConstants)</DefineConstants>
+        <Optimize>True</Optimize>
+        <PublishReadyToRun>True</PublishReadyToRun>
+        <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
+        <PublishSingleFile>True</PublishSingleFile>
+        <ResponseFile>Release-R2R.rsp</ResponseFile>
+        <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+        <TieredCompilation>False</TieredCompilation>
+      </PropertyGroup>
+
+    </When>
+
+  </Choose>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Interop\SnapsInAZfs.Interop.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Monitoring\SnapsInAZfs.Monitoring.csproj" />
+    <ProjectReference Include="..\..\Libraries\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NLog" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
+  </ItemGroup>
+</Project>
