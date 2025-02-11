@@ -80,8 +80,8 @@ public sealed class RawZfsObject
                                                                           out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp,
                                                                           out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp,
                                                                           out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp,
-                                                                          out ZfsProperty<string> recursion,
-                                                                          out ZfsProperty<string> template,
+                                                                          out ZfsProperty<string>? recursion,
+                                                                          out ZfsProperty<string>? template,
                                                                           out ZfsProperty<int>? retentionFrequent,
                                                                           out ZfsProperty<int>? retentionHourly,
                                                                           out ZfsProperty<int>? retentionDaily,
@@ -89,7 +89,7 @@ public sealed class RawZfsObject
                                                                           out ZfsProperty<int>? retentionMonthly,
                                                                           out ZfsProperty<int>? retentionYearly,
                                                                           out ZfsProperty<int>? retentionPruneDeferral,
-                                                                          out ZfsProperty<string> sourceSystem,
+                                                                          out ZfsProperty<string>? sourceSystem,
                                                                           out long bytesAvailable,
                                                                           out long bytesUsed ) )
         {
@@ -110,8 +110,8 @@ public sealed class RawZfsObject
                                                                      lastWeeklySnapshotTimestamp.Value,
                                                                      lastMonthlySnapshotTimestamp.Value,
                                                                      lastYearlySnapshotTimestamp.Value,
-                                                                     recursion,
-                                                                     template,
+                                                                     recursion.Value,
+                                                                     template.Value,
                                                                      retentionFrequent.Value,
                                                                      retentionHourly.Value,
                                                                      retentionDaily.Value,
@@ -119,7 +119,7 @@ public sealed class RawZfsObject
                                                                      retentionMonthly.Value,
                                                                      retentionYearly.Value,
                                                                      retentionPruneDeferral.Value,
-                                                                     sourceSystem,
+                                                                     sourceSystem.Value,
                                                                      bytesAvailable,
                                                                      bytesUsed,
                                                                      isRootDs ? null : datasets[ parentName ] );
@@ -156,7 +156,7 @@ public sealed class RawZfsObject
             throw new InvalidOperationException( "Cannot convert to Snapshot - Missing one or more properties" );
         }
 
-        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject( snapName, this, out ZfsProperty<bool>? enabled, out ZfsProperty<bool>? takeSnapshots, out ZfsProperty<bool>? pruneSnapshots, out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string> recursion, out ZfsProperty<string> template, out ZfsProperty<int>? retentionFrequent, out ZfsProperty<int>? retentionHourly, out ZfsProperty<int>? retentionDaily, out ZfsProperty<int>? retentionWeekly, out ZfsProperty<int>? retentionMonthly, out ZfsProperty<int>? retentionYearly, out ZfsProperty<int>? retentionPruneDeferral, out ZfsProperty<string> sourceSystem, out _, out _ ) )
+        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject( snapName, this, out ZfsProperty<bool>? enabled, out ZfsProperty<bool>? takeSnapshots, out ZfsProperty<bool>? pruneSnapshots, out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string>? recursion, out ZfsProperty<string>? template, out ZfsProperty<int>? retentionFrequent, out ZfsProperty<int>? retentionHourly, out ZfsProperty<int>? retentionDaily, out ZfsProperty<int>? retentionWeekly, out ZfsProperty<int>? retentionMonthly, out ZfsProperty<int>? retentionYearly, out ZfsProperty<int>? retentionPruneDeferral, out ZfsProperty<string>? sourceSystem, out _, out _ ) )
         {
             Logger.Warn( "Failed parsing snapshot {0} - Possibly not a SIAZ snapshot - Skipping object", snapName );
             return false;
@@ -180,8 +180,8 @@ public sealed class RawZfsObject
                                                               lastWeeklySnapshotTimestamp.Value,
                                                               lastMonthlySnapshotTimestamp.Value,
                                                               lastYearlySnapshotTimestamp.Value,
-                                                              in recursion,
-                                                              in template,
+                                                              recursion.Value,
+                                                              template.Value,
                                                               retentionFrequent.Value,
                                                               retentionHourly.Value,
                                                               retentionDaily.Value,
@@ -190,7 +190,7 @@ public sealed class RawZfsObject
                                                               retentionYearly.Value,
                                                               retentionPruneDeferral.Value,
                                                               Properties[ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value,
-                                                              in sourceSystem,
+                                                              sourceSystem.Value,
                                                               in snapshotTimestamp,
                                                               dataset );
         Logger.Trace( "Snapshot object {0} added to {1} collection and parent {2}", snapName, nameof( snapshots ), parentName );
