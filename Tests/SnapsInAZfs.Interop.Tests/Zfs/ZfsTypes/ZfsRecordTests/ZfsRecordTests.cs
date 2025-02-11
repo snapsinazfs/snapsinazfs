@@ -2,11 +2,11 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the â€œSoftwareâ€), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED â€œAS ISâ€, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System.Globalization;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
@@ -280,28 +280,29 @@ public class ZfsRecordTests
         if ( newTestCaseProperty == originalBoolProperty )
         {
             Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedBoolProperty, Is.EqualTo( originalBoolProperty ) );
-                Assert.That( updatedBoolProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedBoolProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedBoolProperty.Value, Is.EqualTo( propertyValue ) );
-                Assert.That( updatedBoolProperty.IsLocal, Is.EqualTo( isLocal ) );
+                             {
+                                 Assert.That ( updatedBoolProperty, Is.EqualTo ( originalBoolProperty ).Using<ZfsProperty<bool>> ( BoolPropertyComparer_Force_op_Equality ) );
+                Assert.That ( updatedBoolProperty,                  Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<bool>> ( BoolPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedBoolProperty.Name,              Is.EqualTo( propertyName ) );
+                Assert.That( updatedBoolProperty.Value,             Is.EqualTo( propertyValue ) );
+                Assert.That( updatedBoolProperty.IsLocal,           Is.EqualTo( isLocal ) );
 
                 Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
             } );
         }
         else
         {
-            Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedBoolProperty, Is.Not.EqualTo( originalBoolProperty ) );
-                Assert.That( updatedBoolProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedBoolProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedBoolProperty.Value, Is.EqualTo( propertyValue ) );
-                Assert.That( updatedBoolProperty.IsLocal, Is.EqualTo( isLocal ) );
+            Assert.Multiple (
+                             ( ) =>
+                             {
+                                 Assert.That ( updatedBoolProperty,         Is.Not.EqualTo ( originalBoolProperty ).Using<ZfsProperty<bool>> ( BoolPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedBoolProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<bool>> ( BoolPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedBoolProperty.Name,    Is.EqualTo ( propertyName ) );
+                                 Assert.That ( updatedBoolProperty.Value,   Is.EqualTo ( propertyValue ) );
+                                 Assert.That ( updatedBoolProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
-                Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
-            } );
+                                 Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
+                             } );
         }
 
         if ( !isLocal )
@@ -316,55 +317,58 @@ public class ZfsRecordTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_DateTimeOffset( [Values( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName )] string propertyName, [ValueSource( nameof( UpdateProperty_DateTimeOffset_Values ) )] string propertyValueString, [Values] bool isLocal )
+    public void UpdateProperty_DateTimeOffset ( [Values ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName )] string propertyName, [ValueSource ( nameof (UpdateProperty_DateTimeOffset_Values) )] string propertyValueString, [Values] bool isLocal )
     {
-        DateTimeOffset propertyValue = DateTimeOffset.ParseExact( propertyValueString, "O", DateTimeFormatInfo.CurrentInfo );
-        ZfsRecord originalParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
-        ZfsRecord originalRecord = originalParent.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
-        ZfsRecord updatedParent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
-        ZfsRecord updatedRecord = updatedParent.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
-        ZfsProperty<DateTimeOffset> newTestCaseProperty = new( originalRecord, propertyName, propertyValue, isLocal );
-        ZfsProperty<DateTimeOffset> originalDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)originalRecord[ propertyName ];
+        DateTimeOffset              propertyValue                  = DateTimeOffset.ParseExact ( propertyValueString, "O", DateTimeFormatInfo.CurrentInfo );
+        ZfsRecord                   originalParent                 = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( );
+        ZfsRecord                   originalRecord                 = originalParent.CreateChildDataset ( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
+        ZfsRecord                   updatedParent                  = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( );
+        ZfsRecord                   updatedRecord                  = updatedParent.CreateChildDataset ( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
+        ZfsProperty<DateTimeOffset> newTestCaseProperty            = new ( originalRecord, propertyName, propertyValue, isLocal );
+        ZfsProperty<DateTimeOffset> originalDateTimeOffsetProperty = (ZfsProperty<DateTimeOffset>)originalRecord [ propertyName ];
 
-        Assume.That( updatedRecord, Is.EqualTo( originalRecord ), "Both records must be identical for this test to be valid" );
-        Assume.That( updatedRecord, Is.Not.SameAs( originalRecord ) );
+        Assume.That ( updatedRecord, Is.EqualTo ( originalRecord ), "Both records must be identical for this test to be valid" );
+        Assume.That ( updatedRecord, Is.Not.SameAs ( originalRecord ) );
 
-        ZfsProperty<DateTimeOffset> updatedDateTimeOffsetProperty = updatedRecord.UpdateProperty( propertyName, propertyValue, isLocal );
+        ZfsProperty<DateTimeOffset> updatedDateTimeOffsetProperty = updatedRecord.UpdateProperty ( propertyName, propertyValue, isLocal );
 
         if ( newTestCaseProperty == originalDateTimeOffsetProperty )
         {
-            Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedDateTimeOffsetProperty, Is.EqualTo( originalDateTimeOffsetProperty ) );
-                Assert.That( updatedDateTimeOffsetProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedDateTimeOffsetProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedDateTimeOffsetProperty.Value, Is.EqualTo( propertyValue ) );
-                Assert.That( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo( isLocal ) );
+            Assert.Multiple (
+                             ( ) =>
+                             {
+                                 Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( originalDateTimeOffsetProperty ).Using<ZfsProperty<DateTimeOffset>> ( DateTimeOffsetPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<DateTimeOffset>> ( DateTimeOffsetPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.Name,    Is.EqualTo ( propertyName ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.Value,   Is.EqualTo ( propertyValue ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
-                Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
-            } );
+                                 Assert.That ( updatedRecord, Is.EqualTo ( originalRecord ) );
+                             } );
         }
         else
         {
-            Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedDateTimeOffsetProperty, Is.Not.EqualTo( originalDateTimeOffsetProperty ) );
-                Assert.That( updatedDateTimeOffsetProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedDateTimeOffsetProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedDateTimeOffsetProperty.Value, Is.EqualTo( propertyValue ) );
-                Assert.That( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo( isLocal ) );
+            Assert.Multiple (
+                             ( ) =>
+                             {
+                                 Assert.That ( updatedDateTimeOffsetProperty,         Is.Not.EqualTo ( originalDateTimeOffsetProperty ).Using<ZfsProperty<DateTimeOffset>> ( DateTimeOffsetPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<DateTimeOffset>> ( DateTimeOffsetPropertyComparer_Force_op_Equality ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.Name,    Is.EqualTo ( propertyName ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.Value,   Is.EqualTo ( propertyValue ) );
+                                 Assert.That ( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
-                Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
-            } );
+                                 Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
+                             } );
         }
 
         if ( !isLocal )
         {
-            Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "IsLocal" ).False );
-                Assert.That( updatedRecord[ propertyName ], Has.Property( "Source" ).EqualTo( $"inherited from {updatedParent.Name}" ) );
-            } );
+            Assert.Multiple (
+                             ( ) =>
+                             {
+                                 Assert.That ( updatedRecord [ propertyName ], Has.Property ( "IsLocal" ).False );
+                                 Assert.That ( updatedRecord [ propertyName ], Has.Property ( "Source" ).EqualTo ( $"inherited from {updatedParent.Name}" ) );
+                             } );
         }
     }
 
@@ -388,10 +392,10 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedIntProperty, Is.EqualTo( originalIntProperty ) );
-                Assert.That( updatedIntProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedIntProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedIntProperty.Value, Is.EqualTo( propertyValue ) );
+                Assert.That( updatedIntProperty,         Is.EqualTo( originalIntProperty ).Using<ZfsProperty<int>> ( IntPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedIntProperty,         Is.EqualTo( newTestCaseProperty ).Using<ZfsProperty<int>> ( IntPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedIntProperty.Name,    Is.EqualTo( propertyName ) );
+                Assert.That( updatedIntProperty.Value,   Is.EqualTo( propertyValue ) );
                 Assert.That( updatedIntProperty.IsLocal, Is.EqualTo( isLocal ) );
 
                 Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
@@ -401,10 +405,10 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedIntProperty, Is.Not.EqualTo( originalIntProperty ) );
-                Assert.That( updatedIntProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedIntProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedIntProperty.Value, Is.EqualTo( propertyValue ) );
+                Assert.That( updatedIntProperty,         Is.Not.EqualTo( originalIntProperty ).Using<ZfsProperty<int>> ( IntPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedIntProperty,         Is.EqualTo( newTestCaseProperty ).Using<ZfsProperty<int>> ( IntPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedIntProperty.Name,    Is.EqualTo( propertyName ) );
+                Assert.That( updatedIntProperty.Value,   Is.EqualTo( propertyValue ) );
                 Assert.That( updatedIntProperty.IsLocal, Is.EqualTo( isLocal ) );
 
                 Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
@@ -440,12 +444,12 @@ public class ZfsRecordTests
         if ( newTestCaseProperty == originalStringProperty )
         {
             Assert.Multiple( ( ) =>
-            {
-                Assert.That( updatedStringProperty, Is.EqualTo( originalStringProperty ) );
-                Assert.That( updatedStringProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedStringProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedStringProperty.Value, Is.EqualTo( propertyValue ) );
-                Assert.That( updatedStringProperty.IsLocal, Is.EqualTo( isLocal ) );
+                             {
+                                 Assert.That ( updatedStringProperty, Is.EqualTo ( originalStringProperty ).Using<ZfsProperty<string>> ( StringPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedStringProperty,                   Is.EqualTo( newTestCaseProperty ).Using<ZfsProperty<string>> ( StringPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedStringProperty.Name,              Is.EqualTo( propertyName ) );
+                Assert.That( updatedStringProperty.Value,             Is.EqualTo( propertyValue ) );
+                Assert.That( updatedStringProperty.IsLocal,           Is.EqualTo( isLocal ) );
 
                 Assert.That( updatedRecord, Is.EqualTo( originalRecord ) );
             } );
@@ -454,10 +458,10 @@ public class ZfsRecordTests
         {
             Assert.Multiple( ( ) =>
             {
-                Assert.That( updatedStringProperty, Is.Not.EqualTo( originalStringProperty ) );
-                Assert.That( updatedStringProperty, Is.EqualTo( newTestCaseProperty ) );
-                Assert.That( updatedStringProperty.Name, Is.EqualTo( propertyName ) );
-                Assert.That( updatedStringProperty.Value, Is.EqualTo( propertyValue ) );
+                Assert.That( updatedStringProperty,         Is.Not.EqualTo( originalStringProperty ).Using<ZfsProperty<string>> ( StringPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedStringProperty,         Is.EqualTo( newTestCaseProperty ).Using<ZfsProperty<string>> ( StringPropertyComparer_Force_op_Equality ) );
+                Assert.That( updatedStringProperty.Name,    Is.EqualTo( propertyName ) );
+                Assert.That( updatedStringProperty.Value,   Is.EqualTo( propertyValue ) );
                 Assert.That( updatedStringProperty.IsLocal, Is.EqualTo( isLocal ) );
 
                 Assert.That( updatedRecord, Is.Not.EqualTo( originalRecord ) );
@@ -474,8 +478,9 @@ public class ZfsRecordTests
         }
     }
 
-    private static ZfsProperty<bool> GetBoolPropertyByValueFromDataset( ZfsRecord dataset, string propertyName )
-    {
-        return (ZfsProperty<bool>)dataset[ propertyName ];
-    }
+    private static ZfsProperty<bool> GetBoolPropertyByValueFromDataset ( ZfsRecord dataset, string propertyName ) => (ZfsProperty<bool>)dataset [ propertyName ];
+    private static bool DateTimeOffsetPropertyComparer_Force_op_Equality ( ZfsProperty<DateTimeOffset> left, ZfsProperty<DateTimeOffset> right ) => left == right;
+    private static bool BoolPropertyComparer_Force_op_Equality ( ZfsProperty<bool>                     left, ZfsProperty<bool>           right ) => left == right;
+    private static bool IntPropertyComparer_Force_op_Equality ( ZfsProperty<int>                       left, ZfsProperty<int>            right ) => left == right;
+    private static bool StringPropertyComparer_Force_op_Equality ( ZfsProperty<string>                 left, ZfsProperty<string>         right ) => left == right;
 }
