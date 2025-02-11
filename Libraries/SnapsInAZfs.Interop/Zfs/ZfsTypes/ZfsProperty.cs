@@ -38,63 +38,63 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     }
 
     // ReSharper disable once HeapView.ObjectAllocation
-    public readonly string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
+    public string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
 
     [JsonIgnore]
-    public readonly bool IsInherited => !IsLocal;
+    public bool IsInherited => !IsLocal;
 
     public T Value { get; init; }
 
     /// <inheritdoc />
-    public readonly bool Equals( bool other )
+    public bool Equals( bool other )
     {
         return Value is bool v && v == other;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( DateTimeOffset other )
+    public bool Equals( DateTimeOffset other )
     {
         return Value is DateTimeOffset v && v == other;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( int other )
+    public bool Equals( int other )
     {
         return Value is int v && v == other;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( string? other )
+    public bool Equals( string? other )
     {
         return Value is string v && v == other;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<bool> other )
+    public bool Equals( ZfsProperty<bool> other )
     {
         return Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<DateTimeOffset> other )
+    public bool Equals( ZfsProperty<DateTimeOffset> other )
     {
         return Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<int> other )
+    public bool Equals( ZfsProperty<int> other )
     {
         return Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
     }
 
     /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<string> other )
+    public bool Equals( ZfsProperty<string> other )
     {
         return Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
     }
 
     [JsonIgnore]
-    public readonly string Source => IsLocal switch
+    public string Source => IsLocal switch
     {
         true => ZfsPropertySourceConstants.Local,
         false when Owner is null => ZfsPropertySourceConstants.None,
@@ -110,7 +110,7 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     ///     Gets a string representation of the Value property, in an appropriate form for its type
     /// </summary>
     [JsonIgnore]
-    public readonly string ValueString => Value switch
+    public string ValueString => Value switch
     {
         int intValue => intValue.ToString( ),
         string value => value,
@@ -120,7 +120,7 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
 
     [JsonIgnore]
     // ReSharper disable once HeapView.ObjectAllocation
-    public readonly string SetString => $"{Name}={ValueString}";
+    public string SetString => $"{Name}={ValueString}";
 
     public string Name { get; init; }
     public bool IsLocal { get; init; }
@@ -152,7 +152,7 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     public static ZfsProperty<T> DefaultProperty( ) => new( );
 
     /// <inheritdoc />
-    public readonly override int GetHashCode( )
+    public override int GetHashCode( )
     {
         return HashCode.Combine( Value, Name, IsLocal );
     }
