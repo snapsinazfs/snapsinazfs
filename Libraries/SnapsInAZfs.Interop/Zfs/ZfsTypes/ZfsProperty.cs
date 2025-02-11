@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<int>>, IEquatable<ZfsProperty<bool>>, IEquatable<ZfsProperty<string>>, IEquatable<ZfsProperty<DateTimeOffset>> where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" )!;
 
     private ZfsProperty ( string name, in T value, bool isLocal = true )
     {
