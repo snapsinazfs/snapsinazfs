@@ -1148,12 +1148,12 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         new (
              new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
              {
-                 { SnapshotPeriodKind.Frequent, new ( ) },
-                 { SnapshotPeriodKind.Hourly, new ( ) },
-                 { SnapshotPeriodKind.Daily, new ( ) },
-                 { SnapshotPeriodKind.Weekly, new ( ) },
-                 { SnapshotPeriodKind.Monthly, new ( ) },
-                 { SnapshotPeriodKind.Yearly, new ( ) }
+                 { SnapshotPeriodKind.Frequent, [ ] },
+                 { SnapshotPeriodKind.Hourly, [ ] },
+                 { SnapshotPeriodKind.Daily, [ ] },
+                 { SnapshotPeriodKind.Weekly, [ ] },
+                 { SnapshotPeriodKind.Monthly, [ ] },
+                 { SnapshotPeriodKind.Yearly, [ ] }
              } );
 
     private void GetSnapshotsToPruneForPeriod ( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
