@@ -100,6 +100,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         }
     }
 
+    /// <summary>(Protected) Creates a new instance of a <see cref="ZfsRecord"/> from all supplied properties.</summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
     protected ZfsRecord (
         string                         name,
@@ -314,6 +315,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
      && SnapshotCount                         == other.SnapshotCount
      && ChildDatasetCount                     == other.ChildDatasetCount;
 
+    /// <summary>
+    ///     Adds a <see cref="ZfsRecord"/> as an immediate descendant of the current <see cref="ZfsRecord"/> and subscribes the
+    ///     descendant to events published by the current <see cref="ZfsRecord"/>.
+    /// </summary>
     /// <exception cref="ArgumentException">
     ///     If the <see cref="ParentDataset"/> property of <paramref name="childDataset"/> does not reference this
     ///     <see cref="ZfsRecord"/> instance.
@@ -329,6 +334,13 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         _childDatasets [ childDataset.Name ] = childDataset;
     }
 
+    /// <summary>
+    ///     Adds a <see cref="Snapshot"/> as an immediate descendant of the current <see cref="ZfsRecord"/> and subscribes the
+    ///     descendant to events published by the current <see cref="ZfsRecord"/>.
+    /// </summary>
+    /// <returns>
+    ///     The same <see cref="Snapshot"/> reference that was supplied to this method in <paramref name="snap"/>.
+    /// </returns>
     public Snapshot AddSnapshot ( Snapshot snap )
     {
         Logger.Trace ( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
@@ -452,6 +464,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return snap;
     }
 
+    /// <summary>
+    ///     Convenience method that creates a descendant <see cref="ZfsRecord"/> from the provided parameters and calls
+    ///     <see cref="AddDataset"/> to add it to the current <see cref="ZfsRecord"/>.
+    /// </summary>
     /// <exception cref="ArgumentNullException">
     ///     <paramref name="sourceSystem"/> is <see langword="null"/>, empty, or only whitespace
     /// </exception>
@@ -502,6 +518,9 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return newDs;
     }
 
+    /// <summary>
+    ///     Factory method that creates a new <see cref="ZfsRecord"/> via the protected constructor.
+    /// </summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
     public static ZfsRecord CreateInstanceFromAllProperties (
         string                         name,
@@ -1046,6 +1065,13 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return Snapshots [ snapshot.Period.Value.ToSnapshotPeriodKind ( ) ].TryRemove ( snapshot.Name, out _ );
     }
 
+    /// <summary>
+    ///     Validates a supplied <see cref="String"/> value against naming rules for ZFS objects supported by <see cref="ZfsRecord"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <paramref name="name"/> is validated as non-null, non-whitespace, no longer than 255 codepoints, and matching a
+    ///     <see cref="Regex"/> according to the supplied <paramref name="kind"/>.
+    /// </remarks>
     /// <exception cref="ArgumentNullException">
     ///     name must be a non-null, non-empty, non-whitespace string <paramref name="name"/>
     /// </exception>
