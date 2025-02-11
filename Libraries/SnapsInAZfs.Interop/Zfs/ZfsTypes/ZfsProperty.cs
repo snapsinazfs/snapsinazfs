@@ -19,9 +19,10 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
-public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<int>>, IEquatable<ZfsProperty<bool>>, IEquatable<ZfsProperty<string>>, IEquatable<ZfsProperty<DateTimeOffset>> where T : notnull
+public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" )!;
@@ -50,6 +51,12 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     public T Value { get; init; }
 
     /// <inheritdoc/>
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<T> right ) => left.Equals ( right );
+
+    /// <inheritdoc/>
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<T> right ) => !left.Equals ( right );
+
+    /// <inheritdoc/>
     public bool Equals ( bool other ) => Value is bool v && v == other;
 
     /// <inheritdoc/>
@@ -72,6 +79,13 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
 
     /// <inheritdoc/>
     public bool Equals ( ZfsProperty<string> other ) => Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<T> other ) =>
+        EqualityComparer<T>.Default
+                           .Equals ( Value, other.Value )
+     && Equals ( Owner, other.Owner )
+     && Name == other.Name;
 
     [JsonIgnore]
     public string Source => IsLocal switch
@@ -136,6 +150,22 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     }
 
     public static ZfsProperty<T> DefaultProperty ( ) => new ( );
+
+    /// <inheritdoc/>
+    public override bool Equals ( object? obj )
+    {
+        return obj switch
+               {
+                   ZfsProperty<int> other            => Equals ( other ),
+                   ZfsProperty<bool> other           => Equals ( other ),
+                   ZfsProperty<DateTimeOffset> other => Equals ( other ),
+                   ZfsProperty<string> other         => Equals ( other ),
+                   ZfsProperty<T> other              => Equals ( other ),
+                   null                              => false,
+                   IZfsProperty other                => other.Equals ( this ),
+                   _                                 => false
+               };
+    }
 
     /// <inheritdoc/>
     public override int GetHashCode ( ) => HashCode.Combine ( Value, Name, IsLocal );
