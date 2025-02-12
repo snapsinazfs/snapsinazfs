@@ -16,9 +16,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 

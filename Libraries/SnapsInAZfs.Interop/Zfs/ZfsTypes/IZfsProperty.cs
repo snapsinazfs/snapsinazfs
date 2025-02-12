@@ -1,27 +1,25 @@
 #region MIT LICENSE
 
-// Copyright 2023 Brandon Thetford
+// Copyright 2025 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
 
 #endregion
 
+using System.Collections.Frozen;
 using System.Collections.Immutable;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-using System.Collections.Frozen;
-
 public interface IZfsProperty
 {
-    static IZfsProperty( )
+    static IZfsProperty ( )
     {
         KnownDatasetProperties =
             ImmutableSortedSet<string>.Empty
@@ -61,7 +59,7 @@ public interface IZfsProperty
     }
 
     /// <summary>
-    ///     Gets the union of <see cref="KnownDatasetProperties" /> and <see cref="KnownSnapshotProperties" />
+    ///     Gets the union of <see cref="KnownDatasetProperties"/> and <see cref="KnownSnapshotProperties"/>
     /// </summary>
     public static ImmutableSortedSet<string> AllKnownProperties { get; }
 
@@ -90,21 +88,19 @@ public interface IZfsProperty
               { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ) }
           }.ToFrozenDictionary ( );
 
-    public static ImmutableSortedDictionary<string, IZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, IZfsProperty>.Empty.AddRange( new Dictionary<string, IZfsProperty>
-    {
-        { ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet ) },
-        { ZfsPropertyNames.SnapshotTimestampPropertyName, ZfsProperty<DateTimeOffset>.CreateWithoutParent( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) }
-    } );
+    public static ImmutableSortedDictionary<string, IZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, IZfsProperty>.Empty.AddRange (
+                                                                                                                                                                       new Dictionary<string, IZfsProperty>
+                                                                                                                                                                       {
+                                                                                                                                                                           { ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet ) },
+                                                                                                                                                                           { ZfsPropertyNames.SnapshotTimestampPropertyName, ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) }
+                                                                                                                                                                       } );
 
-    public bool IsLocal { get; init; }
-    public static ImmutableSortedSet<string> KnownDatasetProperties { get; }
-
+    bool                                     IsLocal                 { get; init; }
+    public static ImmutableSortedSet<string> KnownDatasetProperties  { get; }
     public static ImmutableSortedSet<string> KnownSnapshotProperties { get; }
-
-    string Name { get; }
-
-    public ZfsRecord? Owner { get; set; }
-    string SetString { get; }
-    string Source { get; }
-    string ValueString { get; }
+    string                                   Name                    { get; }
+    public ZfsRecord?                        Owner                   { get; init; }
+    string                                   SetString               { get; }
+    string                                   Source                  { get; }
+    string                                   ValueString             { get; }
 }

@@ -230,4 +230,8 @@ public class ZfsRecordTestHelpers
         return TestContext.CurrentContext.Random.GetString( pathComponentLength, AllowedIdentifierComponentCharacters );
     }
 #pragma warning restore NUnit1028
+    public static bool BoolPropertyComparer_Force_op_Equality ( ZfsProperty<bool>                     left, ZfsProperty<bool>           right ) => left == right;
+    public static bool DateTimeOffsetPropertyComparer_Force_op_Equality ( ZfsProperty<DateTimeOffset> left, ZfsProperty<DateTimeOffset> right ) => left == right;
+    public static bool IntPropertyComparer_Force_op_Equality ( ZfsProperty<int>                       left, ZfsProperty<int>            right ) => left == right;
+    public static bool StringPropertyComparer_Force_op_Equality ( ZfsProperty<string>                 left, ZfsProperty<string>         right ) => left == right;
 }
