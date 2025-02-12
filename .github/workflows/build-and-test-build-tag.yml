@@ -11,7 +11,7 @@ jobs:
         os: [ubuntu-latest, centos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4.2.2
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4.3.0
       with:
