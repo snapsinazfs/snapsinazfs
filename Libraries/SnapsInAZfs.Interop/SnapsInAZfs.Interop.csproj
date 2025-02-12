@@ -54,6 +54,7 @@
   </ItemGroup>
   
   <ItemGroup>
+    <Using Include="NLog" />
     <Using Include="SnapsInAZfs.Settings.Settings" />
   </ItemGroup>
 
