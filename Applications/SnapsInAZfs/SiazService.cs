@@ -176,7 +176,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
             foreach ( ( string propName, _ ) in IZfsProperty.DefaultDatasetProperties )
             {
-                if ( !propName.StartsWith( ZfsPropertyNames.SiazNamespace ) || propertyValidities.ContainsKey( propName ) )
+                if ( !propName.StartsWith( ZfsPropertyNames.SiazZfsPropNamespace ) || propertyValidities.ContainsKey( propName ) )
                 {
                     continue;
                 }
