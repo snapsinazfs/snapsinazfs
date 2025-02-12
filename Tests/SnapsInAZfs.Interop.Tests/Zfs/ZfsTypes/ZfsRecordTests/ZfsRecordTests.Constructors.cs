@@ -2,11 +2,11 @@
 // 
 // Copyright 2023 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the â€œSoftwareâ€), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED â€œAS ISâ€, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
@@ -14,29 +14,39 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
 [TestFixture]
-[TestOf( typeof( ZfsRecord ) )]
-[Category( "General" )]
-[Parallelizable( ParallelScope.Self )]
+[TestOf ( typeof (ZfsRecord) )]
+[Category ( "General" )]
+[Parallelizable ( ParallelScope.Self )]
 public class ZfsRecordTests_Constructors
 {
     [Test]
-    [Category( "General" )]
-    [Category( "TypeChecks" )]
-    [TestCase( "" )]
-    [TestCase( " " )]
-    [TestCase( "  " )]
-    [TestCase( "\t" )]
-    [TestCase( "\n" )]
-    [TestCase( "\r" )]
-    [TestCase( null, Description = "Test what happens if an external caller does not respect nullability context and gives us a null value anyway")]
-    public void Constructor_ThrowsOnSourceSystemNullEmptyOrWhitespace( string? sourceSystem )
+    [Category ( "General" )]
+    [Category ( "TypeChecks" )]
+    [TestCase ( "" )]
+    [TestCase ( " " )]
+    [TestCase ( "  " )]
+    [TestCase ( "\t" )]
+    [TestCase ( "\n" )]
+    [TestCase ( "\r" )]
+    public void Constructor_ThrowsArgumentException_OnSourceSystemEmptyOrWhitespace ( string? sourceSystem )
     {
-        Assert.That( ( ) =>
-        {
-#pragma warning disable CS8604 // Possible null reference argument - Intentional
-            ZfsRecord badRecord = new( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem );
-#pragma warning restore CS8604 // Possible null reference argument - Intentional
-        }, Throws.ArgumentNullException );
+        Assert.That (
+                     ( ) =>
+                     {
+                         ZfsRecord badRecord = new ( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem );
+                     },
+                     Throws.ArgumentException );
+    }
+
+    [Test]
+    public void Constructor_ThrowsArgumentNullException_OnSourceSystemNull ( )
+    {
+        Assert.That (
+                     static ( ) =>
+                     {
+                         ZfsRecord badRecord = new ( "badRecord", ZfsPropertyValueConstants.FileSystem, null! );
+                     },
+                     Throws.ArgumentNullException );
     }
 
     [Test]
