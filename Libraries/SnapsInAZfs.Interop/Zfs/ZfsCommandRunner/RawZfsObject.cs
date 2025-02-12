@@ -13,7 +13,6 @@
 #endregion
 
 using System.Collections.Concurrent;
-using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;

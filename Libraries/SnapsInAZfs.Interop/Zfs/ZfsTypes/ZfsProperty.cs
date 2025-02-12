@@ -1,264 +1,229 @@
-// LICENSE:
+#region MIT LICENSE
+
+// Copyright 2025 Brandon Thetford
 // 
-// Copyright 2023 Brandon Thetford
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
+
+#endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-using System.Runtime.CompilerServices;
 
-public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<int>>, IEquatable<ZfsProperty<bool>>, IEquatable<ZfsProperty<string>>, IEquatable<ZfsProperty<DateTimeOffset>> where T : notnull
+public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" )!;
 
     private ZfsProperty ( string name, in T value, bool isLocal = true )
     {
-        Name = name;
-        Value = value;
+        Name    = name;
+        Value   = value;
         IsLocal = isLocal;
     }
 
     public ZfsProperty ( ZfsRecord owner, string name, in T value, bool isLocal = true )
     {
-        Owner = owner;
-        Name = name;
-        Value = value;
+        Owner   = owner;
+        Name    = name;
+        Value   = value;
         IsLocal = isLocal;
     }
 
     // ReSharper disable once HeapView.ObjectAllocation
-    public readonly string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source[ 15.. ];
+    public string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source [ 15.. ];
 
     [JsonIgnore]
-    public readonly bool IsInherited => !IsLocal;
+    public bool IsInherited => !IsLocal;
 
     public T Value { get; init; }
 
-    /// <inheritdoc />
-    public readonly bool Equals( bool other )
-    {
-        return Value is bool v && v == other;
-    }
+    /// <inheritdoc/>
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<T> right ) => left.Equals ( right );
 
-    /// <inheritdoc />
-    public readonly bool Equals( DateTimeOffset other )
-    {
-        return Value is DateTimeOffset v && v == other;
-    }
+    /// <inheritdoc/>
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<T> right ) => !left.Equals ( right );
 
-    /// <inheritdoc />
-    public readonly bool Equals( int other )
-    {
-        return Value is int v && v == other;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( bool other ) => Value is bool v && v == other;
 
-    /// <inheritdoc />
-    public readonly bool Equals( string? other )
-    {
-        return Value is string v && v == other;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( DateTimeOffset other ) => Value is DateTimeOffset v && v == other;
 
-    /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<bool> other )
-    {
-        return Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( int other ) => Value is int v && v == other;
 
-    /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<DateTimeOffset> other )
-    {
-        return Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( string? other ) => Value is string v && v == other;
 
-    /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<int> other )
-    {
-        return Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<bool> other ) => Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
 
-    /// <inheritdoc />
-    public readonly bool Equals( ZfsProperty<string> other )
-    {
-        return Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
-    }
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<DateTimeOffset> other ) => Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<int> other ) => Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<string> other ) => Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+
+    /// <inheritdoc/>
+    public bool Equals ( ZfsProperty<T> other ) =>
+        EqualityComparer<T>.Default
+                           .Equals ( Value, other.Value )
+     && Equals ( Owner, other.Owner )
+     && Name == other.Name;
 
     [JsonIgnore]
-    public readonly string Source => IsLocal switch
-    {
-        true => ZfsPropertySourceConstants.Local,
-        false when Owner is null => ZfsPropertySourceConstants.None,
-        // ReSharper disable once HeapView.ObjectAllocation
-        false when Owner.ParentDataset[ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
-        false => Owner.ParentDataset[ Name ].Source
-    };
+    public string Source => IsLocal switch
+                            {
+                                true                     => ZfsPropertySourceConstants.Local,
+                                false when Owner is null => ZfsPropertySourceConstants.None,
+
+                                // ReSharper disable once HeapView.ObjectAllocation
+                                false when Owner.ParentDataset [ Name ].IsLocal => $"inherited from {Owner.ParentDataset.Name}",
+                                false                                           => Owner.ParentDataset [ Name ].Source
+                            };
 
     [JsonIgnore]
-    public ZfsRecord? Owner { get; set; }
+    public ZfsRecord? Owner { get; init; }
 
     /// <summary>
     ///     Gets a string representation of the Value property, in an appropriate form for its type
     /// </summary>
     [JsonIgnore]
-    public readonly string ValueString => Value switch
-    {
-        int intValue => intValue.ToString( ),
-        string value => value,
-        bool boolValue => boolValue.ToString( ).ToLowerInvariant( ),
-        DateTimeOffset dtoValue => dtoValue.ToString( "O" )
-    };
+    public string ValueString => Value switch
+                                 {
+                                     int intValue            => intValue.ToString ( ),
+                                     string value            => value,
+                                     bool boolValue          => boolValue.ToString ( ).ToLowerInvariant ( ),
+                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" )
+                                 };
 
     [JsonIgnore]
+
     // ReSharper disable once HeapView.ObjectAllocation
-    public readonly string SetString => $"{Name}={ValueString}";
+    public string SetString => $"{Name}={ValueString}";
 
-    public string Name { get; init; }
-    public bool IsLocal { get; init; }
+    public string Name    { get; init; }
+    public bool   IsLocal { get; init; }
 
-    public static ZfsProperty<bool> CreateWithoutParent( string name, in bool value, bool isLocal = true )
+    public static ZfsProperty<bool> CreateWithoutParent ( string name, in bool value, bool isLocal = true )
     {
-        Logger.Trace( "Creating ZfsProperty<bool> {0} without parent dataset", name );
-        return new( name, in value, isLocal );
+        Logger.Trace ( "Creating ZfsProperty<bool> {0} without parent dataset", name );
+
+        return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<int> CreateWithoutParent( string name, in int value, bool isLocal = true )
+    public static ZfsProperty<int> CreateWithoutParent ( string name, in int value, bool isLocal = true )
     {
-        Logger.Trace( "Creating ZfsProperty<int> {0} without parent dataset", name );
-        return new( name, in value, isLocal );
+        Logger.Trace ( "Creating ZfsProperty<int> {0} without parent dataset", name );
+
+        return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
+    public static ZfsProperty<string> CreateWithoutParent ( string name, string value, bool isLocal = true )
     {
-        Logger.Trace( "Creating ZfsProperty<string> {0} without parent dataset", name );
-        return new( name, in value, isLocal );
+        Logger.Trace ( "Creating ZfsProperty<string> {0} without parent dataset", name );
+
+        return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, in DateTimeOffset value, bool isLocal = true )
+    public static ZfsProperty<DateTimeOffset> CreateWithoutParent ( string name, in DateTimeOffset value, bool isLocal = true )
     {
-        Logger.Trace( "Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name );
-        return new( name, in value, isLocal );
+        Logger.Trace ( "Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name );
+
+        return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<T> DefaultProperty( ) => new( );
+    public static ZfsProperty<T> DefaultProperty ( ) => new ( );
 
-    /// <inheritdoc />
-    public readonly override int GetHashCode( )
+    /// <inheritdoc/>
+    public override bool Equals ( object? obj )
     {
-        return HashCode.Combine( Value, Name, IsLocal );
+        return obj switch
+               {
+                   ZfsProperty<int> other            => Equals ( other ),
+                   ZfsProperty<bool> other           => Equals ( other ),
+                   ZfsProperty<DateTimeOffset> other => Equals ( other ),
+                   ZfsProperty<string> other         => Equals ( other ),
+                   ZfsProperty<T> other              => Equals ( other ),
+                   null                              => false,
+                   IZfsProperty other                => other.Equals ( this ),
+                   _                                 => false
+               };
     }
 
-    public static bool operator ==( ZfsProperty<T> left, bool right )
-    {
-        return left.Equals( right );
-    }
+    /// <inheritdoc/>
+    public override int GetHashCode ( ) => HashCode.Combine ( Value, Name, IsLocal );
 
-    public static bool operator ==( ZfsProperty<T> left, int right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, bool right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, string right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, int right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, DateTimeOffset right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, string right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<bool> right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, DateTimeOffset right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<int> right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<bool> right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<string> right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<int> right ) => left.Equals ( right );
 
-    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right )
-    {
-        return left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<string> right ) => left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, bool right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right ) => left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, int right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, bool right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, string right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, int right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, DateTimeOffset right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, string right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<bool> right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, DateTimeOffset right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<int> right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<bool> right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<string> right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<int> right ) => !left.Equals ( right );
 
-    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right )
-    {
-        return !left.Equals( right );
-    }
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<string> right ) => !left.Equals ( right );
+
+    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right ) => !left.Equals ( right );
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see langword="bool" />) equivalent
+    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see langword="bool"/>) equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
+    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}" /> (<see langword="bool" />), if successful
+    ///     The parsed <see cref="ZfsProperty{T}"/> (<see langword="bool"/>), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
+    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
-    ///     <paramref name="property" /> is always <see langword="null" />
+    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
+    ///     <paramref name="property"/> is always <see langword="null"/>
     /// </remarks>
-    public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<bool>? property )
+    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<bool>? property )
     {
         property = null;
 
         // ReSharper disable once InvertIf
-        if ( bool.TryParse( input.Value, out bool result ) )
+        if ( bool.TryParse ( input.Value, out bool result ) )
         {
-            property = ZfsProperty<bool>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<bool>.CreateWithoutParent ( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+
             return true;
         }
 
@@ -266,55 +231,59 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     }
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see langword="int" />) equivalent
+    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see langword="int"/>) equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
+    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}" /> (<see langword="int" />), if successful
+    ///     The parsed <see cref="ZfsProperty{T}"/> (<see langword="int"/>), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
+    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
-    ///     <paramref name="property" /> is always <see langword="null" />
+    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
+    ///     <paramref name="property"/> is always <see langword="null"/>
     /// </remarks>
-    public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<int>? property )
+    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<int>? property )
     {
-        if ( int.TryParse( input.Value, out int result ) )
+        if ( int.TryParse ( input.Value, out int result ) )
         {
-            property = ZfsProperty<int>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<int>.CreateWithoutParent ( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+
             return true;
         }
 
         property = null;
+
         return false;
     }
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see cref="DateTimeOffset" />)
+    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see cref="DateTimeOffset"/>)
     ///     equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
+    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}" /> (<see cref="DateTimeOffset" />), if successful
+    ///     The parsed <see cref="ZfsProperty{T}"/> (<see cref="DateTimeOffset"/>), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
+    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
-    ///     <paramref name="property" /> is always <see langword="null" />
+    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
+    ///     <paramref name="property"/> is always <see langword="null"/>
     /// </remarks>
-    public static bool TryParse( RawProperty input, [NotNullWhen( true )] out ZfsProperty<DateTimeOffset>? property )
+    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<DateTimeOffset>? property )
     {
-        if ( DateTimeOffset.TryParse( input.Value, out DateTimeOffset result ) )
+        if ( DateTimeOffset.TryParse ( input.Value, out DateTimeOffset result ) )
         {
-            property = ZfsProperty<DateTimeOffset>.CreateWithoutParent( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+            property = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( input.Name, result, input.Source == ZfsPropertySourceConstants.Local );
+
             return true;
         }
 
         property = null;
+
         return false;
     }
 
@@ -345,7 +314,7 @@ public struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>
     )
     {
         bytesAvailable = 0;
-        bytesUsed = 0;
+        bytesUsed      = 0;
         Unsafe.SkipInit ( out enabled );
         Unsafe.SkipInit ( out takeSnapshots );
         Unsafe.SkipInit ( out pruneSnapshots );
