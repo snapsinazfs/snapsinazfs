@@ -349,51 +349,32 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         switch ( periodKind )
         {
-            case SnapshotPeriodKind.Frequent:
-                if ( LastObservedFrequentSnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedFrequentSnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.Hourly:
-                if ( LastObservedHourlySnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedHourlySnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.Daily:
-                if ( LastObservedDailySnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedDailySnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.Weekly:
-                if ( LastObservedWeeklySnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedWeeklySnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.Monthly:
-                if ( LastObservedMonthlySnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedMonthlySnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.Yearly:
-                if ( LastObservedYearlySnapshotTimestamp < snap.Timestamp.Value )
-                {
-                    LastObservedYearlySnapshotTimestamp = snap.Timestamp.Value;
-                }
-
-                break;
-            case SnapshotPeriodKind.NotSet:
-            default:
+            case < SnapshotPeriodKind.Frequent or > SnapshotPeriodKind.Yearly:
                 throw new InvalidOperationException ( "Invalid Snapshot Period specified" );
+            case SnapshotPeriodKind.Frequent when LastObservedFrequentSnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedFrequentSnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
+            case SnapshotPeriodKind.Hourly when LastObservedHourlySnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedHourlySnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
+            case SnapshotPeriodKind.Daily when LastObservedDailySnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedDailySnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
+            case SnapshotPeriodKind.Weekly when LastObservedWeeklySnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedWeeklySnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
+            case SnapshotPeriodKind.Monthly when LastObservedMonthlySnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedMonthlySnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
+            case SnapshotPeriodKind.Yearly when LastObservedYearlySnapshotTimestamp < snap.Timestamp.Value:
+                LastObservedYearlySnapshotTimestamp = snap.Timestamp.Value;
+
+                break;
         }
 
         SubscribeSnapshotToPropertyEvents ( snap );
