@@ -19,7 +19,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;

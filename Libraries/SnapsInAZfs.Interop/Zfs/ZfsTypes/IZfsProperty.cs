@@ -12,12 +12,10 @@
 
 #endregion
 
+using System.Collections.Frozen;
 using System.Collections.Immutable;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
-using System.Collections.Frozen;
 
 public interface IZfsProperty
 {

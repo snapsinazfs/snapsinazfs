@@ -13,14 +13,13 @@
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
-using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-using System.Numerics;
-using System.Runtime.CompilerServices;
 
 public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
 {
