@@ -36,10 +36,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     /// </exception>
     public ZfsRecord ( string Name, string Kind, string sourceSystem = "", bool inheritProperties = true, ZfsRecord? parent = null )
     {
-        if ( string.IsNullOrWhiteSpace ( sourceSystem ) )
-        {
-            throw new ArgumentNullException ( nameof (sourceSystem) );
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace ( sourceSystem, nameof (sourceSystem) );
 
         this.Name     = Name;
         IsPoolRoot    = parent is null;
@@ -100,7 +97,9 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         }
     }
 
-    /// <summary>(Protected) Creates a new instance of a <see cref="ZfsRecord"/> from all supplied properties.</summary>
+    /// <summary>
+    ///     (Protected) Creates a new instance of a <see cref="ZfsRecord"/> from all supplied properties.
+    /// </summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
     protected ZfsRecord (
         string                         name,
@@ -335,8 +334,9 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Adds a <see cref="Snapshot"/> as an immediate descendant of the current <see cref="ZfsRecord"/> and subscribes the
-    ///     descendant to events published by the current <see cref="ZfsRecord"/>.
+    ///     Adds a <see cref="Snapshot"/> as an immediate descendant of the current <see cref="ZfsRecord"/>, subscribes the
+    ///     descendant to events published by the current <see cref="ZfsRecord"/>, and updates the corresponding latest snapshot period
+    ///     timestamp on the current object if it is newer than the current value.
     /// </summary>
     /// <returns>
     ///     The same <see cref="Snapshot"/> reference that was supplied to this method in <paramref name="snap"/>.
@@ -401,6 +401,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return snap;
     }
 
+    /// <summary>
+    ///     Creates a new <see cref="Snapshot"/> from the supplied parameters, adds it as a descendant of the current
+    ///     <see cref="ZfsRecord"/> via <see cref="AddSnapshot"/>, and returns a reference to the new <see cref="Snapshot"/> instance.
+    /// </summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
     public Snapshot CreateAndAddSnapshot (
         string                         snapName,
