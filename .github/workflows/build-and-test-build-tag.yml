@@ -8,10 +8,11 @@ jobs:
   build-and-test:
     strategy:
       matrix:
-        os: [ubuntu-latest, centos-latest]
+        os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v4.2.2
+    - name: Checkout tag
+      uses: actions/checkout@v4.2.2
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4.3.0
       with:
