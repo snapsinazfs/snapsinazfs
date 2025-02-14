@@ -34,7 +34,7 @@ public class ZfsRecordTests_Constructors
     [TestCase ( "\t" )]
     [TestCase ( "\n" )]
     [TestCase ( "\r" )]
-    public void Constructor_ThrowsArgumentException_OnSourceSystemEmptyOrWhitespace ( string? sourceSystem )
+    public void Constructor_ThrowsArgumentException_OnSourceSystemEmptyOrWhitespace ( string sourceSystem )
     {
         Assert.That (
                      ( ) =>
