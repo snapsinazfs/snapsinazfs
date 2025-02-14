@@ -7,7 +7,7 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- Current stable release version: 2.0.0\
+ Current stable release version: 2.0.1\
  Current development branch: siaz-2.0
 
  Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local builds is only recommended from release-\* tags.
@@ -35,13 +35,14 @@
    - If you are using a pre-built version of SIAZ (not yet provided here), the .net 8.0 runtime is sufficient
    - If you are building from source, the .net 8.0 SDK is required. `make` is an optional dependency for a simplified build workflow familiar to Linux users.
    - If you are using a pre-built AOT-compiled version of SIAZ or a pre-build framework-independent version of SIAZ (not yet provided here), you do not need ANY .net components installed, but it is your responsibility to ensure binary compatibility with the target system.
- - ZFS version 2.0 or higher
+ - ZFS version 2.1 or higher
    - Some features may require higher ZFS versions. That is and will be documented when relevant. It is your responsibility to ensure ZFS compatibility, in the version of the kernel module, the userspace utilities, and in the necessary feature flags on pools/datasets, where relevant.
+   - Live testing against ZFS is performed against version 2.2 and 2.3, at present, so I suggest 2.2 or higher.
  - For use as a daemon, systemd is supported, with a minimum version of that which is distributed via your distribution's official package repositories
    - While it may be possible to use SIAZ as a daemon in other systems, the startup code in SIAZ will consider itself to be running as a console application, so you're on your own and will have to force daemon mode (read the manpages)
  - A command line terminal, if directly invoking SIAZ manually, or to use the SIAZ Configuration Console, which is a TUI similar to the Network Manager nmtui utility.
    - If you want to use the mouse capabilities of the configuration console (which even works over SSH), you of course will need a mouse and proper ssh/sshd/server-side configurations to allow that (has worked out of the box on all supported versions of linux I've tried it on)
-   - I've tested it in the Gnome Terminal app, a linux local console, KDE Konsole, PuTTY, and the Windows 11 Console Host (as Windows Terminal, PowerShell, and cmd.exe), and all work with equivalent features.
+   - I've tested it in the Gnome Terminal app, a linux local console, KDE Konsole, PuTTY, and Windows 11 under Windows Terminal and the legacy console host, and all work with equivalent features.
    - Advanced functionality of the config console may or may not work on "minimal" installs of supported distros, as that is not a configuration I have tested. Please report if you run into such issues.
  - Documentation is provided as GROFF-formatted text files intended to be consumed by `man`. Thus, the `mandb` command must be available and executable by the installing user to install or uninstall the manpages.
  - Write permissions to the destination deployment paths, during installation or uninstallation. These include various directories under /usr, /etc, and /var/log, by default (see installation documentation or the Makefile)
@@ -198,5 +199,4 @@
  indespensible tool in my professional life and my nerdy home tech life.
 
  The original Sanoid project, written in PERL, is located at https://github.com/jimsalterjrs/sanoid/
-
- Jim also is a very helpful resource for all things ZFS and is a moderator in the [reddit zfs community](https://www.reddit.com/r/zfs/).
+ 
