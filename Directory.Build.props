@@ -11,10 +11,8 @@
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyVersion>2.0.1</AssemblyVersion>
-    <FileVersion>2.0.1</FileVersion>
-    <VersionPrefix>2.0.1</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <VersionPrefix>2.0.2</VersionPrefix>
+    <VersionSuffix>RC2</VersionSuffix>
   </PropertyGroup>
   <PropertyGroup>
     <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
