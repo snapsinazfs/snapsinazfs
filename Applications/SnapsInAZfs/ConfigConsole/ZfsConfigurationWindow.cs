@@ -516,6 +516,13 @@ public sealed partial class ZfsConfigurationWindow
 
     private void RetentionPruneDeferralTextFieldOnLeave ( FocusEventArgs e )
     {
+        if ( SelectedTreeNode is not { } node )
+        {
+            Logger.Warn ( $"Unexpected call to {nameof (RetentionPruneDeferralTextFieldOnLeave)} without selected node." );
+
+            return;
+        }
+
         try
         {
             DisableEventHandlers ( );
@@ -524,14 +531,14 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField.Text, min, max );
+                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField.Text ?? "(null)", min, max );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString ( );
+                retentionPruneDeferralTextField.Text = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString ( );
 
                 return;
             }
 
-            if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value )
+            if ( fieldIntValue != node.TreeDataset.SnapshotRetentionPruneDeferral.Value )
             {
                 UpdateSelectedItemIntProperty ( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, fieldIntValue );
             }
@@ -546,14 +553,21 @@ public sealed partial class ZfsConfigurationWindow
 
     private void RetentionWeeklyInheritButtonClick ( )
     {
-        int queryResult = MessageBox.Query ( "Inherit Weekly Retention Setting", $"Inherit Weekly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionWeekly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        if ( SelectedTreeNode is not { } node )
+        {
+            Logger.Warn ( $"Unexpected call to {nameof (RetentionWeeklyInheritButtonClick)} without selected node." );
+
+            return;
+        }
+
+        int queryResult = MessageBox.Query ( "Inherit Weekly Retention Setting", $"Inherit Weekly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionWeekly.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
             case 0:
                 return;
             case 1 when SelectedTreeNode is { }:
-                SelectedTreeNode.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -563,6 +577,13 @@ public sealed partial class ZfsConfigurationWindow
 
     private void RetentionWeeklyTextFieldOnLeave ( FocusEventArgs e )
     {
+        if ( SelectedTreeNode is not { } node )
+        {
+            Logger.Warn ( $"Unexpected call to {nameof (RetentionWeeklyTextFieldOnLeave)} without selected node." );
+
+            return;
+        }
+
         try
         {
             DisableEventHandlers ( );
@@ -573,12 +594,12 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, retentionWeeklyTextField.Text, min, max );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value.ToString ( );
+                retentionWeeklyTextField.Text = node.TreeDataset.SnapshotRetentionWeekly.Value.ToString ( );
 
                 return;
             }
 
-            if ( fieldIntValue != SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value )
+            if ( fieldIntValue != node.TreeDataset.SnapshotRetentionWeekly.Value )
             {
                 UpdateSelectedItemIntProperty ( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, fieldIntValue );
             }
