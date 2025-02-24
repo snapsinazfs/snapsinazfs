@@ -1035,16 +1035,30 @@ public sealed partial class ZfsConfigurationWindow
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
-    private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue )
+    private void UpdateSelectedItemIntProperty ( TextValidateField field, string propertyName, int propertyValue )
     {
-        ZfsProperty<int> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( propertyName, propertyValue );
+        if ( SelectedTreeNode is not { } node )
+        {
+            throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
+        }
+
+        ref readonly ZfsProperty<int> newProperty = ref node.UpdateTreeNodeProperty ( propertyName, propertyValue );
         field.ColorScheme = newProperty.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
-    private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup )
+    private void UpdateSelectedItemStringRadioGroupProperty ( RadioGroup radioGroup )
     {
-        RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
+        if ( radioGroup.Data is not RadioGroupWithSourceViewData viewData )
+        {
+            throw new ArgumentException ( "Invalid or missing data when updating string value for radio group.", nameof (radioGroup) );
+        }
+
+        if ( SelectedTreeNode is not { } node )
+        {
+            throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
+        }
+
+        ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedLabelString ( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
