@@ -215,19 +215,19 @@ public static class TypeExtensions
     ///     Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue" />
     /// </remarks>
     [Pure]
-    [SuppressMessage( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
-    public static int ToInt32( this ustring value, in int fallbackValue )
+    [SuppressMessage ( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
+    public static int ToInt32 ( this ustring? value, in int fallbackValue )
     {
         try
         {
-            if ( value.IsEmpty )
+            if ( value is not { } || value.IsEmpty )
             {
                 return fallbackValue;
             }
 
-            string stringValue = value.ToString( )!;
+            string stringValue = value.ToString ( )!;
 
-            return int.TryParse( stringValue, out int intValue ) ? intValue : fallbackValue;
+            return int.TryParse ( stringValue, out int intValue ) ? intValue : fallbackValue;
         }
         catch
         {

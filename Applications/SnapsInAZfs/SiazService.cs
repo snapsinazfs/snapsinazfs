@@ -462,6 +462,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 Logger.Debug( "Frequent snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Frequent, propsToSet );
+
                 if ( success && snapshot is { } )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
@@ -472,6 +473,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 Logger.Debug( "Hourly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Hourly, propsToSet );
+
                 if ( success && snapshot is { } )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
@@ -492,6 +494,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 Logger.Debug( "Weekly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Weekly, propsToSet );
+
                 if ( success && snapshot is { } )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
@@ -502,6 +505,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 Logger.Debug( "Monthly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Monthly, propsToSet );
+
                 if ( success && snapshot is { } )
                 {
                     snapshots[ snapshot.Name ] = snapshot;
@@ -512,6 +516,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             {
                 Logger.Debug( "Yearly snapshot needed for dataset {0}", ds.Name );
                 ( bool success, Snapshot? snapshot ) = TakeSnapshotKind( ds, SnapshotPeriod.Yearly, propsToSet );
+
                 if ( success && snapshot is { } )
                 {
                     snapshots[ snapshot.Name ] = snapshot;

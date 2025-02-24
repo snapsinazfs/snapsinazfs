@@ -4,11 +4,11 @@
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
-// See https://opensource.org/license/MIT/
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #endregion
 
@@ -68,8 +68,8 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
                 retentionYearly,
                 retentionPruneDeferral,
                 sourceSystem,
-                0,
-                0,
+                0L,
+                0L,
                 parent,
                 true )
     {
@@ -243,12 +243,12 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     ///     Performs a deep copy of this <see cref="Snapshot"/>
     /// </summary>
     /// <param name="parent">
-    ///     A reference to the parent of the new <see cref="Snapshot"/>
+    ///     A reference to the parent of the new <see cref="Snapshot"/>. Must not be another <see cref="Snapshot"/>.
     /// </param>
     /// <returns>
     ///     A new instance of a <see cref="ZfsRecord"/>, with all properties, both reference and value, cloned to new instances
     /// </returns>
-    /// <exception cref="ArgumentException"><paramref name="parent"/> is any type other than <see cref="ZfsRecord"/></exception>
+    /// <exception cref="ArgumentException"><paramref name="parent"/> is of type <see cref="Snapshot"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="parent"/> is null</exception>
     public override Snapshot DeepCopyClone ( ZfsRecord? parent = null )
     {
@@ -256,37 +256,34 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
         {
             case null:
                 throw new ArgumentNullException ( nameof (parent), "A snapshot must have a parent. Be sure to assign the cloned snapshot to the correct parent." );
-            case { } when parent.GetType ( ) != typeof (ZfsRecord):
-                throw new ArgumentException ( "A Snapshot must have a ZfsRecord parent.", nameof (parent) );
+            case Snapshot:
+                throw new ArgumentException ( $"Unable to clone Snapshot {Name}", nameof (parent), new NotSupportedException ( "Snapshots with parents of type Snapshot are not supported." ) );
         }
 
-        // Pass the original references, because the constructor will copy them and set ownership appropriately.
-        Snapshot newSnapshot = new (
-                                    new ( Name ),
-                                    Enabled,
-                                    TakeSnapshots,
-                                    PruneSnapshots,
-                                    LastFrequentSnapshotTimestamp,
-                                    LastHourlySnapshotTimestamp,
-                                    LastDailySnapshotTimestamp,
-                                    LastWeeklySnapshotTimestamp,
-                                    LastMonthlySnapshotTimestamp,
-                                    LastYearlySnapshotTimestamp,
-                                    Recursion,
-                                    Template,
-                                    SnapshotRetentionFrequent,
-                                    SnapshotRetentionHourly,
-                                    SnapshotRetentionDaily,
-                                    SnapshotRetentionWeekly,
-                                    SnapshotRetentionMonthly,
-                                    SnapshotRetentionYearly,
-                                    SnapshotRetentionPruneDeferral,
-                                    SourceSystem,
-                                    Period.Value,
-                                    Timestamp.Value,
-                                    parent );
-
-        return newSnapshot;
+        return new (
+                    Name,
+                    Enabled,
+                    TakeSnapshots,
+                    PruneSnapshots,
+                    LastFrequentSnapshotTimestamp,
+                    LastHourlySnapshotTimestamp,
+                    LastDailySnapshotTimestamp,
+                    LastWeeklySnapshotTimestamp,
+                    LastMonthlySnapshotTimestamp,
+                    LastYearlySnapshotTimestamp,
+                    Recursion,
+                    Template,
+                    SnapshotRetentionFrequent,
+                    SnapshotRetentionHourly,
+                    SnapshotRetentionDaily,
+                    SnapshotRetentionWeekly,
+                    SnapshotRetentionMonthly,
+                    SnapshotRetentionYearly,
+                    SnapshotRetentionPruneDeferral,
+                    SourceSystem,
+                    Period.Value,
+                    Timestamp.Value,
+                    parent );
     }
 
     public bool Equals ( Snapshot other )
