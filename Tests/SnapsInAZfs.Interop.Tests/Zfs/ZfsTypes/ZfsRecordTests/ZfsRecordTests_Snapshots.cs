@@ -167,6 +167,46 @@ public class ZfsRecordTests_Snapshots
     }
 
     [Test]
+    public void DeepCopyClone_ThrowsArgumentNullExceptionOnNullParent ( )
+    {
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( );
+        Snapshot  snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent ( SnapshotPeriodKind.Daily, DateTimeOffset.UnixEpoch, parentDs );
+        parentDs.AddSnapshot ( snapshot );
+
+        Assume.That ( parentDs,                                                          Is.Not.Null.And.TypeOf<ZfsRecord> ( ) );
+        Assume.That ( snapshot,                                                          Is.Not.Null.And.TypeOf<Snapshot> ( ) );
+        Assume.That ( snapshot.ParentDataset,                                            Is.Not.Null.And.SameAs ( parentDs ) );
+        Assume.That ( parentDs.Snapshots,                                                Is.Not.Null.And.Not.Empty );
+        Assume.That ( parentDs.Snapshots,                                                Does.ContainKey ( SnapshotPeriodKind.Daily ) );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ],                   Is.Not.Null.And.Not.Empty );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ],                   Does.ContainKey ( snapshot.Name ) );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ] [ snapshot.Name ], Is.Not.Null );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ] [ snapshot.Name ], Is.SameAs ( snapshot ) );
+
+        Assert.That ( ( ) => snapshot.DeepCopyClone ( ), Throws.ArgumentNullException );
+    }
+
+    [Test]
+    public void DeepCopyClone_ThrowsArgumentExceptionOnSnapshotParent ( )
+    {
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( );
+        Snapshot  snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent ( SnapshotPeriodKind.Daily, DateTimeOffset.UnixEpoch, parentDs );
+        parentDs.AddSnapshot ( snapshot );
+
+        Assume.That ( parentDs,                                                          Is.Not.Null.And.TypeOf<ZfsRecord> ( ) );
+        Assume.That ( snapshot,                                                          Is.Not.Null.And.TypeOf<Snapshot> ( ) );
+        Assume.That ( snapshot.ParentDataset,                                            Is.Not.Null.And.SameAs ( parentDs ) );
+        Assume.That ( parentDs.Snapshots,                                                Is.Not.Null.And.Not.Empty );
+        Assume.That ( parentDs.Snapshots,                                                Does.ContainKey ( SnapshotPeriodKind.Daily ) );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ],                   Is.Not.Null.And.Not.Empty );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ],                   Does.ContainKey ( snapshot.Name ) );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ] [ snapshot.Name ], Is.Not.Null );
+        Assume.That ( parentDs.Snapshots [ SnapshotPeriodKind.Daily ] [ snapshot.Name ], Is.SameAs ( snapshot ) );
+
+        Assert.That ( ( ) => snapshot.DeepCopyClone ( snapshot ), Throws.ArgumentException.With.InnerException.InstanceOf<NotSupportedException> ( ) );
+    }
+
+    [Test]
     [Parallelizable]
     public void GetSnapshotsToPrune_NoSnapshotsInDataset( )
     {
