@@ -8,15 +8,15 @@
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
  Current stable release version: 2.0.2\
- Current development branch: siaz-2.0
+ Current development branch: siaz-2.1
 
- Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local builds is only recommended from release-\* tags.
+ Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local production builds is only recommended from release-2.x.y tags with no hyphenated text after the version number, which indicates pre-release).
 
  Please report any issues in the issue tracker, with as much detail as you can provide. Detailed logs are greatly appreciated and do not reveal secret information beyond the names of your ZFS datasets and snapshots.
 
  ## Requirements
 
- SIAZ is built in c\# on .net 8, and strives to require no other external dependencies to be manually installed other than the .net 8 runtim or .net 8 SDK (to build from source), and a supported version of ZFS (currently 2.0 and up).\
+ SIAZ is built in c\# on .net 8, and strives to require no other external dependencies to be manually installed other than the .net 8 runtim or .net 8 SDK (to build from source), and a supported version of ZFS (currently 2.1 and up).\
  Building SIAZ also requires standard command-line utilities that typically exist on any supported Linux distribution, such as `install`, `cp`, and the like.
 
  SIAZ will likely build and run on any modern Linux system that supports the required .NET version and ZFS on Linux version.\
@@ -38,16 +38,17 @@
  - ZFS version 2.1 or higher
    - Some features may require higher ZFS versions. That is and will be documented when relevant. It is your responsibility to ensure ZFS compatibility, in the version of the kernel module, the userspace utilities, and in the necessary feature flags on pools/datasets, where relevant.
    - Live testing against ZFS is performed against version 2.2 and 2.3, at present, so I suggest 2.2 or higher.
- - For use as a daemon, systemd is supported, with a minimum version of that which is distributed via your distribution's official package repositories
-   - While it may be possible to use SIAZ as a daemon in other systems, the startup code in SIAZ will consider itself to be running as a console application, so you're on your own and will have to force daemon mode (read the manpages)
+   - While basic operation of SIAZ is likely compatible with earlier ZFS versions, such compatibility could change with any new SIAZ release and is NOT guaranteed or supported.
+ - For use as a daemon, systemd is supported, with a minimum version of that which is distributed via your distribution's official package repositories.
+   - While it should generally be possible to use SIAZ as a daemon under other init systems, the startup code in SIAZ will consider itself to be running as a console application, so you're on your own and will have to force daemon mode either in configuration or with a command line argument (read the manpages).
  - A command line terminal, if directly invoking SIAZ manually, or to use the SIAZ Configuration Console, which is a TUI similar to the Network Manager nmtui utility.
    - If you want to use the mouse capabilities of the configuration console (which even works over SSH), you of course will need a mouse and proper ssh/sshd/server-side configurations to allow that (has worked out of the box on all supported versions of linux I've tried it on)
    - I've tested it in the Gnome Terminal app, a linux local console, KDE Konsole, PuTTY, and Windows 11 under Windows Terminal and the legacy console host, and all work with equivalent features.
    - Advanced functionality of the config console may or may not work on "minimal" installs of supported distros, as that is not a configuration I have tested. Please report if you run into such issues.
- - Documentation is provided as GROFF-formatted text files intended to be consumed by `man`. Thus, the `mandb` command must be available and executable by the installing user to install or uninstall the manpages.
- - Write permissions to the destination deployment paths, during installation or uninstallation. These include various directories under /usr, /etc, and /var/log, by default (see installation documentation or the Makefile)
+ - Documentation is provided as GROFF-formatted text files intended to be consumed by `man`. Thus, the `mandb` command must be available and executable by the installing user to install or uninstall the manpages via the provided Makefile recipes.
 
  ### File System Permissions
+ - (Installation time only) Write permissions to the destination deployment paths, during installation or uninstallation. These include various directories under /usr, /etc, and /var/log, by default (see installation documentation or the Makefile)
  - Execute permissions for the `zfs` and `zpool` utilities for the user or service account executing SIAZ.
  - Write permissions for the user or service account executing SIAZ, to the configured log directory (/var/log/SnapsInAZfs by default)
  - Write permissions to the location specified by the user when saving a configuration JSON file via the configuration console.
@@ -60,13 +61,17 @@
  - Relevant permissions to do all of the above.
  - Relevant permissions to open Unix sockets or other network sockets for listening or as outgoing connections, as defined in your configuration, if monitoring or other network-enabled functionality is in use.
  - Relevant permissions to allow SIAZ to launch the `zfs` and `zpool` utilities as child processes by SIAZ.
- - Relevant permissions for SIAZ to write to any logging targets defined in your SIAZ nlog configuration (file and stdout are the default targets on a new install)
+ - Relevant permissions for SIAZ to read, write, delete, and create files for any file-based logging targets defined in your SIAZ nlog configuration (file and stdout are the default targets on a new install).
+ - Relevant permissions for SIAZ to write to the system journal, syslog, etc., for any such configured logging targets defined in your SIAZ nlog configuration.
 
  ### ZFS Permissions
  SIAZ directly launches the `zfs` and `zpool` utilities to carry out its ZFS-related operations.\
- Thus, if you are using ZFS permissions (set via the `zfs allow` or `zfs deny` commands), you need all of the above as well as the following:
+ Thus, if you are using ZFS permissions (set via the `zfs allow` or `zfs deny` commands), you need all of the above as well as the following (additive, as you go down the list):
  - ZFS permissions allowing get, set, and list operations on all pools SIAZ is configured to use, for the account executing SIAZ.
- - ZFS permissions allowing get, set, inherit, list, snapshot, destroy, rollback, send, and receive operations on all datasets (explicitly set or inherited) for the account executing SIAZ, including the configuration console.
+ - ZFS permissions allowing get, set, inherit, and list operations for all datasets in the above pools, including the pool roots and all datasets SIAZ is intended to "see," for the account executing SIAZ.
+ - All of the above for any user using the configuration console to configure settings stored as ZFS user properties by SIAZ (which is everything but templates and service-level configuration)
+ - ZFS permissions allowing snapshot and destroy operations for all datasets for which SIAZ has been configured to create or prune snapshots.
+ - For replication only: rollback, send, and receive operations on all datasets being replicated, and create on the parent dataset of the destination path on the receiving system, for initial replication.
 
  ### Network Configuration/Permissions
  If any network-enabled functionality of SIAZ is used, your system must have a properly-configured/working network configuration for those features.\
@@ -89,7 +94,7 @@
  
  Hardware requirements beyond CPU aren't listed because there aren't really any beyond that. SIAZ itself does not require specific CPU features/SIMD instruction sets (at this time), and memory requirements are entirely dependent on your configuration (though, just to throw out a number that is in no way a lower or upper bound, release builds with minimal configuration running as a systemd daemon often clock in at (sometimes significantly) less than 64MB while executing snapshot operations (not including memory used by ZFS utilities).
 
- Compile-time dependencies are included as project references in the dotnet projects, and will be retrieved by the dotnet SDK, from the public NuGet repository, upon build. Thus, an internet connection is necessary during the build process, any time NuGet package references are changed in the SIAZ project files or if they do not exist in the build directories, where the dotnet SDK expects to see them.
+ Compile-time dependencies are included as project references in the dotnet projects, and will be retrieved by the dotnet SDK, from the public NuGet repository, upon build. Thus, an internet connection or appropriately-configured local NuGet package cache is necessary during the build process, any time NuGet package references are changed in the SIAZ project files or if they do not exist in the build directories, where the dotnet SDK expects to see them.
 
  ## Building/Installing From Source
  
@@ -108,7 +113,7 @@
  including descriptions of all Makefile recipes, build configurations, and other relevant details,
  run `make help` from the repository root directory.
 
- The man page displayed by that make recipe is the authoritative installation guide and supercedes anything that may appear in this document, if discrepancies exist.
+ The man page displayed by that make recipe is the authoritative installation guide and supersedes anything that may appear in this document, if discrepancies exist.
 
  ## Uninstalling
 
@@ -144,7 +149,7 @@
 
  ## Getting Help
 
- SIAZ comes with man pages that are installed when you run `make install`.\
+ SIAZ comes with man pages that are installed when you run `make install` or `make install-doc`\
  These man pages are:
  - snapsinazfs(8)
  - snapsinazfs(5)
