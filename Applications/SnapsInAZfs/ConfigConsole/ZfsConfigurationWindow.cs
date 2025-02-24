@@ -871,16 +871,24 @@ public sealed partial class ZfsConfigurationWindow
         }
     }
 
-    private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
+    private void TemplateListViewOnSelectedItemChanged ( ListViewItemEventArgs? args )
     {
-        ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+        ArgumentNullException.ThrowIfNull ( args, nameof (args) );
 
-        ListViewWithSourceViewData viewData = (ListViewWithSourceViewData)templateListView.Data;
+        if ( templateListView.Data is not ListViewWithSourceViewData viewData )
+        {
+            throw new InvalidOperationException ( "Invalid or missing data when updating template data." );
+        }
 
-        ZfsProperty<string> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, ConfigConsole.TemplateListItems[ args.Item ].TemplateName );
+        if ( SelectedTreeNode is not { } node )
+        {
+            throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
+        }
+
+        ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, ConfigConsole.TemplateListItems [ args.Item ].TemplateName );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
-        UpdateFieldsForSelectedZfsTreeNode( );
-        UpdateButtonState( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
+        UpdateButtonState ( );
     }
 
     private void UpdateButtonState( )
