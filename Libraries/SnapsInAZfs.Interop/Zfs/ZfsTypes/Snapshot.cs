@@ -68,8 +68,8 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
                 retentionYearly,
                 retentionPruneDeferral,
                 sourceSystem,
-                0,
-                0,
+                0L,
+                0L,
                 parent,
                 true )
     {

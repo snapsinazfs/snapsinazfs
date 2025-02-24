@@ -122,8 +122,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         in ZfsProperty<int>            retentionYearly,
         in ZfsProperty<int>            retentionPruneDeferral,
         in ZfsProperty<string>         sourceSystem,
-        in long                        bytesAvailable,
-        in long                        bytesUsed,
+        long                           bytesAvailable,
+        long                           bytesUsed,
         ZfsRecord?                     parent                 = null,
         bool                           forcePropertyOwnership = false
     )
@@ -528,8 +528,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         in ZfsProperty<int>            retentionYearly,
         in ZfsProperty<int>            retentionPruneDeferral,
         in ZfsProperty<string>         sourceSystem,
-        in long                        bytesAvailable,
-        in long                        bytesUsed,
+        long                           bytesAvailable,
+        long                           bytesUsed,
         ZfsRecord?                     parent = null
     )
     {
@@ -560,8 +560,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                     in retentionYearly,
                     in retentionPruneDeferral,
                     in sourceSystem,
-                    in bytesAvailable,
-                    in bytesUsed,
+                    bytesAvailable,
+                    bytesUsed,
                     parent,
                     true );
     }
@@ -614,8 +614,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public virtual ZfsRecord DeepCopyClone ( ZfsRecord? parent = null )
     {
         ZfsRecord newRecord = new (
-                                   new ( Name ),
-                                   new ( Kind ),
+                                   Name,
+                                   Kind,
                                    Enabled,
                                    TakeSnapshots,
                                    PruneSnapshots,
