@@ -1019,10 +1019,19 @@ public sealed partial class ZfsConfigurationWindow
         pruneSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, PruneSnapshots.IsLocal: true };
     }
 
-    private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup )
+    private void UpdateSelectedItemBooleanRadioGroupProperty ( RadioGroup radioGroup )
     {
-        RadioGroupWithSourceViewData viewData = (RadioGroupWithSourceViewData)radioGroup.Data;
-        ZfsProperty<bool> newProperty = SelectedTreeNode.UpdateTreeNodeProperty( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
+        if ( radioGroup.Data is not RadioGroupWithSourceViewData viewData )
+        {
+            throw new ArgumentException ( "Invalid or missing data when updating boolean value for radio group.", nameof (radioGroup) );
+        }
+
+        if ( SelectedTreeNode is not { } node )
+        {
+            throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
+        }
+
+        ref readonly ZfsProperty<bool> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel ( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
