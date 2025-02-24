@@ -614,8 +614,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public virtual ZfsRecord DeepCopyClone ( ZfsRecord? parent = null )
     {
         ZfsRecord newRecord = new (
-                                   new ( Name ),
-                                   new ( Kind ),
+                                   Name,
+                                   Kind,
                                    Enabled,
                                    TakeSnapshots,
                                    PruneSnapshots,
