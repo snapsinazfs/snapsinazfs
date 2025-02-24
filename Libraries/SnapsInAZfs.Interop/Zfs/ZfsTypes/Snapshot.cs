@@ -243,50 +243,47 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     ///     Performs a deep copy of this <see cref="Snapshot"/>
     /// </summary>
     /// <param name="parent">
-    ///     A reference to the parent of the new <see cref="Snapshot"/>
+    ///     A reference to the parent of the new <see cref="Snapshot"/>. Must not be another <see cref="Snapshot"/>.
     /// </param>
     /// <returns>
     ///     A new instance of a <see cref="ZfsRecord"/>, with all properties, both reference and value, cloned to new instances
     /// </returns>
-    /// <exception cref="ArgumentException"><paramref name="parent"/> is any type other than <see cref="ZfsRecord"/></exception>
+    /// <exception cref="ArgumentException"><paramref name="parent"/> is of type <see cref="Snapshot"/>.</exception>
     /// <exception cref="ArgumentNullException"><paramref name="parent"/> is null</exception>
     public override Snapshot DeepCopyClone ( ZfsRecord? parent = null )
     {
         switch ( parent )
         {
             case null:
-                throw new ArgumentNullException( nameof( parent ), "A snapshot must have a parent. Be sure to assign the cloned snapshot to the correct parent." );
-            case { } when parent.GetType( ) != typeof( ZfsRecord ):
-                throw new ArgumentException( "A Snapshot must have a ZfsRecord parent.", nameof( parent ) );
+                throw new ArgumentNullException ( nameof (parent), "A snapshot must have a parent. Be sure to assign the cloned snapshot to the correct parent." );
+            case Snapshot:
+                throw new ArgumentException ( $"Unable to clone Snapshot {Name}", nameof (parent), new NotSupportedException ( "Snapshots with parents of type Snapshot are not supported." ) );
         }
 
-        // Pass the original references, because the constructor will copy them and set ownership appropriately.
-        Snapshot newSnapshot = new (
-                                    new ( Name ),
-                                    Enabled,
-                                    TakeSnapshots,
-                                    PruneSnapshots,
-                                    LastFrequentSnapshotTimestamp,
-                                    LastHourlySnapshotTimestamp,
-                                    LastDailySnapshotTimestamp,
-                                    LastWeeklySnapshotTimestamp,
-                                    LastMonthlySnapshotTimestamp,
-                                    LastYearlySnapshotTimestamp,
-                                    Recursion,
-                                    Template,
-                                    SnapshotRetentionFrequent,
-                                    SnapshotRetentionHourly,
-                                    SnapshotRetentionDaily,
-                                    SnapshotRetentionWeekly,
-                                    SnapshotRetentionMonthly,
-                                    SnapshotRetentionYearly,
-                                    SnapshotRetentionPruneDeferral,
-                                    SourceSystem,
-                                    Period.Value,
-                                    Timestamp.Value,
-                                    parent );
-
-        return newSnapshot;
+        return new (
+                    Name,
+                    Enabled,
+                    TakeSnapshots,
+                    PruneSnapshots,
+                    LastFrequentSnapshotTimestamp,
+                    LastHourlySnapshotTimestamp,
+                    LastDailySnapshotTimestamp,
+                    LastWeeklySnapshotTimestamp,
+                    LastMonthlySnapshotTimestamp,
+                    LastYearlySnapshotTimestamp,
+                    Recursion,
+                    Template,
+                    SnapshotRetentionFrequent,
+                    SnapshotRetentionHourly,
+                    SnapshotRetentionDaily,
+                    SnapshotRetentionWeekly,
+                    SnapshotRetentionMonthly,
+                    SnapshotRetentionYearly,
+                    SnapshotRetentionPruneDeferral,
+                    SourceSystem,
+                    Period.Value,
+                    Timestamp.Value,
+                    parent );
     }
 
     public bool Equals ( Snapshot other )
