@@ -1071,18 +1071,40 @@ public sealed partial class ZfsConfigurationWindow
         takeSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, TakeSnapshots.IsLocal: true };
     }
 
-    private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
+    private async void ZfsConfigurationWindowOnInitialized ( object? sender, EventArgs e )
     {
-        Logger.Trace( "Zfs Configuration Window initialized" );
-        ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait( true );
-        templateListView.SetSource( ConfigConsole.TemplateListItems );
-        SetCanFocusStates( );
-        SetTagsForPropertyFields( );
-        SetTabStops( );
-        SetReadOnlyStates( );
-        await zfsRefreshTask;
-        UpdateButtonState( );
-        EnableEventHandlers( );
+        try
+        {
+            Logger.Trace ( "Zfs Configuration Window initialized" );
+            ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync ( ).ConfigureAwait ( true );
+            templateListView.SetSource ( ConfigConsole.TemplateListItems );
+            SetCanFocusStates ( );
+            SetTagsForPropertyFields ( );
+            SetTabStops ( );
+            SetReadOnlyStates ( );
+            await zfsRefreshTask;
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
+        }
+        catch ( Exception ex )
+        {
+            Logger.Error ( ex, $"Error in {nameof (ZfsConfigurationWindow)} initialization." );
+            int dialogResult = MessageBox.ErrorQuery ( $"Error initializing {nameof (ZfsConfigurationWindow)}", $"Error initializing {nameof (ZfsConfigurationWindow)}.\r\nIt is recommended that you exit now.", 0, "Exit", "Continue (not recommended)" );
+
+            switch ( dialogResult )
+            {
+                case 0:
+                    Logger.Info ( $"User exited as suggested after {nameof (ZfsConfigurationWindow)} initialization error." );
+
+                    return;
+                case 1:
+                    Logger.Warn ( $"User chose to continue after {nameof (ZfsConfigurationWindow)} initialization error." );
+
+                    Environment.FailFast ( null );
+
+                    break;
+            }
+        }
     }
 
     private void zfsTreeViewOnSelectionChanged( object? sender, SelectionChangedEventArgs<ITreeNode> e )
