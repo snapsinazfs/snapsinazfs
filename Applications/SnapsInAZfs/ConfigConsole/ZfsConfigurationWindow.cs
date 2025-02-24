@@ -563,17 +563,24 @@ public sealed partial class ZfsConfigurationWindow
         }
     }
 
-    private void RetentionYearlyInheritButtonClick( )
+    private void RetentionYearlyInheritButtonClick ( )
     {
-        int queryResult = MessageBox.Query( "Inherit Yearly Retention Setting", $"Inherit Yearly Snapshot Retention setting {SelectedTreeNode.TreeDataset.ParentDataset.SnapshotRetentionYearly.Value} from {SelectedTreeNode.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        if ( SelectedTreeNode is not { } node )
+        {
+            throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
+        }
+
+        int queryResult = MessageBox.Query ( "Inherit Yearly Retention Setting", $"Inherit Yearly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionYearly.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+
         switch ( queryResult )
         {
             case 0:
                 return;
-            case 1 when SelectedTreeNode is { }:
-                SelectedTreeNode.InheritPropertyFromParent( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+            case 1:
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
+
                 return;
         }
     }
