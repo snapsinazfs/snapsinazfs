@@ -35,4 +35,12 @@
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SnapsInAZfs.Settings\SnapsInAZfs.Settings.csproj" />
+  </ItemGroup>
+
 </Project>
