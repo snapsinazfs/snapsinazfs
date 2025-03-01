@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -15,7 +15,6 @@
 using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 

@@ -5,7 +5,6 @@
 using System.Collections.Concurrent;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 

@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using NLog;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
+
 #pragma warning disable CS1998
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;

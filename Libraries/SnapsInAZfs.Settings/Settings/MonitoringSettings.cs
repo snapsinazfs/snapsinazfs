@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -14,7 +14,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SnapsInAZfs.Settings.Settings;
+namespace SnapsInAZfs.Settings;
 
 public sealed class MonitoringSettings
 {

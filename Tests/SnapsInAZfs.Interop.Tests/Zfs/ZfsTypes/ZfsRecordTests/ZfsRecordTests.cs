@@ -15,7 +15,6 @@
 using System.Globalization;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 

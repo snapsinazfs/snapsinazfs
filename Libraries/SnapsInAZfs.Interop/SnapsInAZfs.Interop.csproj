@@ -11,6 +11,7 @@
     <DebugType>embedded</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <RootNamespace>SnapsInAZfs</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -36,13 +37,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Zfs\Structs\**" />
-    <Compile Remove="Zfs\Native\**" />
-    <Compile Remove="Libc\**" />
+    <Compile Remove="Interop\Zfs\Structs\**" />
+    <Compile Remove="Interop\Zfs\Native\**" />
+    <Compile Remove="Interop\Libc\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Libc\Enums\Errno.cs" />
+    <Compile Include="Interop\Libc\Enums\Errno.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,7 +56,7 @@
   
   <ItemGroup>
     <Using Include="NLog" />
-    <Using Include="SnapsInAZfs.Settings.Settings" />
+    <Using Include="SnapsInAZfs.Settings" />
   </ItemGroup>
 
   <ItemGroup>

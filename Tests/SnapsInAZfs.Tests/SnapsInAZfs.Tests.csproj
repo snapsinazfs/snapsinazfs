@@ -66,4 +66,8 @@
       <ProjectReference Include="..\..\Applications\SnapsInAZfs\SnapsInAZfs.csproj" />
     </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="SnapsInAZfs.Settings" />
+  </ItemGroup>
+
 </Project>

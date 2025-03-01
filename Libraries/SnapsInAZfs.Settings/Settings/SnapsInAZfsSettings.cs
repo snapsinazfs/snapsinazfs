@@ -14,7 +14,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SnapsInAZfs.Settings.Settings;
+namespace SnapsInAZfs.Settings;
 
 /// <summary>
 ///     Settings class for use with the .net IConfiguration binder

@@ -26,7 +26,6 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Monitoring;
 using SnapsInAZfs.Settings.Logging;
-using SnapsInAZfs.Settings.Settings;
 using LogLevel = NLog.LogLevel;
 using Monitor = SnapsInAZfs.Monitoring.Monitor;
 

@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -12,7 +12,6 @@
 
 #endregion
 
-using NLog;
 using NLog.Config;
 using LogLevel = NLog.LogLevel;
 
