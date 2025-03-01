@@ -533,6 +533,10 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/HideAutoProperties/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/Hierarchy/Build/SolBuilderDuo/UseMsbuildSolutionBuilder/@EntryValue">NewVersion</s:String>
 	<s:String x:Key="/Default/Environment/Hierarchy/PsiConfigurationSettingsKey/LocationType/@EntryValue">SOLUTION_FOLDER</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=CC4762246221F04599C1D3DE4C6CB7BF/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=CC4762246221F04599C1D3DE4C6CB7BF/RelativePath/@EntryValue">..\SnapsInAZfs.sln.Dictionary.DotSettings</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileCC4762246221F04599C1D3DE4C6CB7BF/@KeyIndexDefined">True</s:Boolean>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileCC4762246221F04599C1D3DE4C6CB7BF/RelativePriority/@EntryValue">1</s:Double>
 	<s:String x:Key="/Default/Environment/InlayHints/CSharpOtherInlayHintsOptions/ShowResourcesDisposePoints/@EntryValue">Default</s:String>
 	<s:Boolean x:Key="/Default/Environment/InlayHints/CSharpParameterNameHintsOptions/HideIfMethodIsAnnotatedAsStringFormatMethod/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InlayHints/GeneralVirtualIndentingOptions/FixAlignmentForInlayHints/@EntryValue">True</s:Boolean>
@@ -575,50 +579,7 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:String x:Key="/Default/Housekeeping/VsHighlighting/VsLightBulbDisplayMode/@EntryValue">MergeVsActionsIntoResharperMenu</s:String>
 	<s:Boolean x:Key="/Default/PredictiveDebugger/PredictiveDebuggerEnabled/@EntryValue">True</s:Boolean>
 	<s:Int64 x:Key="/Default/SubsystemManager/ActiveProfileInTimeline/@EntryValue">1</s:Int64>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Daemonize/@EntryIndexedValue">True</s:Boolean>
-	
-	
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Dataset/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Datasets/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Endian/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=ENOATTR/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=ENOENT/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=EPERM/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=EWOULDBLOCK/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=FQDN/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=hourlies/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=ints/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=ioex/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=journald/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Libc/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Nagios/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=nlog/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=NONINFRINGEMENT/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=prunesnapshots/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=pthread/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Regexes/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Resharper/@EntryIndexedValue">True</s:Boolean>
-	
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=s/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Siaz/@EntryIndexedValue">True</s:Boolean>
-	
-	
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=snapshotname/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=snapshotperiod/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=snapshottimestamp/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=snapsinazfs/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Thetford/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=unistd/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=unsynchronized/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=ustring/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=Validities/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=VDEV/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=whcboe/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=workingset/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=zpool/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/UserDictionary/Words/=zvol/@EntryIndexedValue">True</s:Boolean>
-  
-  	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Name/@EntryValue">Performance</s:String>
+ 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Name/@EntryValue">Performance</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;PERFORMANCE|PERF): *(?&lt;Message&gt;[\S].*)$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/TodoIconStyle/@EntryValue">Warning</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Color/@EntryValue">#FFFF6200</s:String>
