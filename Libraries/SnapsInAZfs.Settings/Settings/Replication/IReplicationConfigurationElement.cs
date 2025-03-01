@@ -35,16 +35,22 @@ public interface IReplicationConfigurationElement
     ///     An immutable unique identifier for the <see cref="IReplicationConfigurationElement"/>.
     /// </summary>
     /// <remarks>
-    ///     Values having the first 4 bytes set to all-zeros (00000000-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for internal use by SIAZ
-    ///     as identifiers for common objects that are always expected to exist and for unknown objects.<br/>
-    ///     Values having the first 4 bytes set to all-ones (FFFFFFFF-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for user-defined
-    ///     purposes, with all remaining bytes available for any arbitrary definition (suggestions: WWNs, MAC addresses, etc).<br/>
-    ///     SIAZ will discard randomly-generated GUID values that have the first 4 bytes set to all-ones or all-zeros to ensure that
-    ///     those ranges are protected against the unlikely case of random collisions.<br/>
-    ///     Values in the reserved internal range configured as identifiers for user-specified objects will be rejected and result in an
-    ///     appropriate exception.< br/>
-    ///     The all-zeros value, as it is the default value of a GUID, shall always be interpreted internally by SIAZ as
-    ///     unknown/unspecified, and may result in a random GUID being generated, when necessary.
+    ///     <para>
+    ///         Values having the first 4 bytes set to all-zeros (00000000-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for internal use by
+    ///         SIAZ as identifiers for common objects that are always expected to exist and for unknown objects.<br/>
+    ///         Values having the first 4 bytes set to all-ones (FFFFFFFF-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for user-defined
+    ///         purposes, with all remaining bytes available for any arbitrary definition (suggestions: WWNs, MAC addresses, etc).<br/>
+    ///         SIAZ will discard randomly-generated GUID values that have the first 4 bytes set to all-ones or all-zeros to ensure that
+    ///         those ranges are protected against the unlikely case of random collisions.
+    ///     </para>
+    ///     <para>
+    ///         Values in the reserved internal range configured as identifiers for user-specified objects will be rejected and result in
+    ///         an appropriate exception.
+    ///     </para>
+    ///     <para>
+    ///         The all-zeros value, as it is the default value of a GUID, shall always be interpreted internally by SIAZ as
+    ///         unknown/unspecified, and may result in a random GUID being generated, when necessary.
+    ///     </para>
     /// </remarks>
     Guid Id { get; init; }
 }
