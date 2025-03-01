@@ -15,7 +15,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace SnapsInAZfs.Settings.Settings;
+namespace SnapsInAZfs.Settings;
 
 /// <summary>
 ///     Snapshot timing policies

@@ -10,7 +10,7 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.Settings.Settings;
+namespace SnapsInAZfs.Settings;
 
 /// <summary>
 ///     A class for extra convenience when dealing with the <see cref="SnapshotPeriodKind" /> enum

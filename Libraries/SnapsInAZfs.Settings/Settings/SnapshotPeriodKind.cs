@@ -12,7 +12,7 @@
 
 #endregion
 
-namespace SnapsInAZfs.Settings.Settings;
+namespace SnapsInAZfs.Settings;
 
 /// <summary>
 ///     An enumeration of possible snapshot periods

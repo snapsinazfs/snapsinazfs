@@ -19,7 +19,6 @@ using NLog;
 using PowerArgs;
 using SnapsInAZfs.ConfigConsole;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Tests;
 

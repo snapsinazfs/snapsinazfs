@@ -18,7 +18,6 @@ using SnapsInAZfs.Interop.Libc.Enums;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Monitoring;
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs;
 

@@ -7,7 +7,6 @@ using System.Net.NetworkInformation;
 
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Settings.Settings;
 
 // These necessarily have non-private accessibility because this is a helper class..
 #pragma warning disable NUnit1028

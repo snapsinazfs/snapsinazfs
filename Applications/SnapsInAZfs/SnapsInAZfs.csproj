@@ -170,6 +170,7 @@
 
   <ItemGroup>
     <Using Include="NLog" />
+    <Using Include="SnapsInAZfs.Settings" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Tests" />

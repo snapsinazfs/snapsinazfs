@@ -66,6 +66,7 @@
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
+    <Using Include="SnapsInAZfs.Settings" />
   </ItemGroup>
 
 </Project>

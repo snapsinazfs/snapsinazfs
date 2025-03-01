@@ -1,8 +1,6 @@
-﻿// LICENSE:
+// LICENSE:
 // 
 // This software is licensed for use under the Free Software Foundation's GPL v3.0 license
-
-using SnapsInAZfs.Settings.Settings;
 
 namespace SnapsInAZfs.Settings.Tests.Settings;
 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
@@ -11,6 +11,7 @@
 		<DebugType>embedded</DebugType>
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
 		<RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <RootNamespace>SnapsInAZfs</RootNamespace>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -35,5 +36,9 @@
 	<ItemGroup>
 		<PackageReference Include="NLog" Version="5.4.0" />
 	</ItemGroup>
+  
+  <ItemGroup>
+    <Using Include="NLog" />
+  </ItemGroup>
 
 </Project>

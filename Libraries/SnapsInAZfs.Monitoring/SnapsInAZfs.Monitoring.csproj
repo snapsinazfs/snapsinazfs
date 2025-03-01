@@ -15,6 +15,7 @@
     <DebugType>embedded</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <RootNamespace>SnapsInAZfs</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
