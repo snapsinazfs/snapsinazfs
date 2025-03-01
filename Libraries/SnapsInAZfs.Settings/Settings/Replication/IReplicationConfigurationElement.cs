@@ -29,7 +29,7 @@ public interface IReplicationConfigurationElement
     ///     May not be serialized in configuration files by all implementing types and, if absent, will be <see langword="false"/>.
     /// </para>
     [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingDefault )]
-    bool Enabled { get; }
+    bool Enabled { get; set; }
 
     /// <summary>
     ///     An immutable unique identifier for the <see cref="IReplicationConfigurationElement"/>.
