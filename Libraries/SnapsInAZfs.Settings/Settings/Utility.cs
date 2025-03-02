@@ -97,7 +97,13 @@ public static class Utility
             throw new ApplicationException ( "PATH environment variable is empty or is not defined for the current process." );
         }
 
-        ReadOnlySpan<char> pathVarSpan = pathVar.AsSpan ( );
+        ReadOnlySpan<char> pathVarSpan             = pathVar.AsSpan ( );
+
+    #if WINDOWS
+        const char         pathVarElementSeparator = ';';
+    #else
+        const char         pathVarElementSeparator = ':';
+    #endif
 
         switch ( program )
         {
@@ -105,7 +111,7 @@ public static class Utility
             case "zpool":
             {
                 // PATH is defined - look for allowedProgram in each element
-                foreach ( Range basePathRange in pathVarSpan.Split ( ':' ) )
+                foreach ( Range basePathRange in pathVarSpan.Split ( pathVarElementSeparator ) )
                 {
                     string programPathCandidate = Path.Combine ( new ( pathVarSpan [ basePathRange ] ), program );
 
