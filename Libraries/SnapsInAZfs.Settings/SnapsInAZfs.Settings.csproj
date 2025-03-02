@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+		<DefineConstants>$(DefineConstants)</DefineConstants>
 		<LangVersion>12</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -27,17 +27,23 @@
 		<TieredCompilation>False</TieredCompilation>
 		<ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
 	</PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+  </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+    <DefineConstants>$(DefineConstants);WINDOWS;JETBRAINS_ANNOTATIONS</DefineConstants>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="JetBrains.Annotations" Version="[2024.3.0,)" />
 		<PackageReference Include="NLog" Version="5.4.0" />
 	</ItemGroup>
   
   <ItemGroup>
+    <Using Include="JetBrains.Annotations" />
     <Using Include="NLog" />
   </ItemGroup>
 
