@@ -107,7 +107,7 @@ public static class Utility
                 // PATH is defined - look for allowedProgram in each element
                 foreach ( Range basePathRange in pathVarSpan.Split ( ':' ) )
                 {
-                    string programPathCandidate = Path.Combine ( new ( pathVarSpan [ basePathRange ] ), "zfs" );
+                    string programPathCandidate = Path.Combine ( new ( pathVarSpan [ basePathRange ] ), program );
 
                     // Check if path plus allowedProgram exists
                     if ( !File.Exists ( programPathCandidate ) )
