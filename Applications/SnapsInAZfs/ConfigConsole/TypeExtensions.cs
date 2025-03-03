@@ -117,18 +117,40 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup"/>
+    ///     Gets the boolean value parsed from the label of the currently selected item of a <see cref="RadioGroup"/>.
     /// </summary>
-    /// <param name="group">The <see cref="RadioGroup"/> to get the currently selected label string from</param>
-    /// <returns></returns>
-    public static bool GetSelectedBooleanFromLabel ( this RadioGroup group ) => bool.Parse ( group.RadioLabels [ group.SelectedItem ].ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" ) );
+    /// <param name="group">
+    ///     The <see cref="RadioGroup"/> for which the selected item's label will be parsed as a boolean.
+    /// </param>
+    /// <returns>The parsed boolean value of the selected item of <paramref name="group"/>.</returns>
+    public static bool GetSelectedBooleanFromLabel ( this RadioGroup group )
+    {
+        ArgumentNullException.ThrowIfNull ( group );
+
+        if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
+        {
+            return bool.Parse ( labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" ) );
+        }
+
+        throw new InvalidOperationException ( "Failed getting radio group boolean value" );
+    }
 
     /// <summary>
     ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup"/>
     /// </summary>
     /// <param name="group">The <see cref="RadioGroup"/> to get the currently selected label string from</param>
     /// <returns></returns>
-    public static string GetSelectedLabelString ( this RadioGroup group ) => group.RadioLabels [ group.SelectedItem ].ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
+    public static string GetSelectedLabelString ( this RadioGroup group )
+    {
+        ArgumentNullException.ThrowIfNull ( group );
+
+        if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
+        {
+            return labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
+        }
+
+        throw new InvalidOperationException ( "Failed getting radio group selected label string" );
+    }
 
     public static JsonNode? SerializeToJson ( this IConfiguration configSection )
     {
@@ -138,6 +160,7 @@ public static class TypeExtensions
 
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
+            // INTENT: This is clearly aimed at collections, but I'm not sure what my original intent was
             if ( childSection.Path.EndsWith ( ":0" ) )
             {
                 JsonArray arrayNode = [ ];
