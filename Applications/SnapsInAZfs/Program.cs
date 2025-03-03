@@ -210,27 +210,27 @@ internal class Program
     {
         if ( args.Debug )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Debug );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Debug! );
         }
 
         if ( args.Quiet )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Warn );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Warn! );
         }
 
         if ( args.ReallyQuiet )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Off );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Off! );
         }
 
         if ( args.Trace )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Trace );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Trace! );
         }
 
         if ( args.Verbose )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Info );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Info! );
         }
     }
 
