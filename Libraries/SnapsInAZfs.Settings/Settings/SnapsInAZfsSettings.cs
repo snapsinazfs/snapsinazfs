@@ -23,6 +23,11 @@ using System.Text.Json.Serialization;
 [PublicAPI]
 public sealed record SnapsInAZfsSettings
 {
+    public SnapsInAZfsSettings ()
+    {
+        LocalSystemName ??= Utility.GetFullyQualifiedDomainName ( );
+    }
+
     // ReSharper disable once CommentTypo
 
     [JsonPropertyOrder ( 5 )]
@@ -52,7 +57,7 @@ public sealed record SnapsInAZfsSettings
     ///     If this value is invalid upon startup, SnapsInAZfs will log an error and terminate.
     /// </remarks>
     [JsonPropertyOrder ( 4 )]
-    public required string LocalSystemName { get; set; } = string.Empty;
+    public string? LocalSystemName { get; set; }
 
     [JsonPropertyOrder ( 10 )]
     public MonitoringSettings Monitoring { get; set; } = new ( ) { EnableHttp = false };
