@@ -83,14 +83,22 @@ public sealed record SnapsInAZfsSettings
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new ( );
 
     /// <summary>
-    ///     Gets or sets the path to the zfs utility
+    ///     Gets or sets the path to the zfs utility, as a fully-qualified path or the special value `auto`, which triggers built-in
+    ///     auto-detection functionality.
     /// </summary>
+    /// <remarks>
+    ///     While this type does not implicitly validate this property, SIAZ will perform at least basic validation of it at startup.
+    /// </remarks>
     [JsonPropertyOrder ( 7 )]
-    public string? ZfsPath { get; set; }
+    public string ZfsPath { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets the path to the zpool utility
+    ///     Gets or sets the path to the zpool utility, as a fully-qualified path or the special value `auto`, which triggers built-in
+    ///     auto-detection functionality.
     /// </summary>
+    /// <remarks>
+    ///     While this type does not implicitly validate this property, SIAZ will perform at least basic validation of it at startup.
+    /// </remarks>
     [JsonPropertyOrder ( 8 )]
-    public string? ZpoolPath { get; set; }
+    public string ZpoolPath { get; set; } = string.Empty;
 }
