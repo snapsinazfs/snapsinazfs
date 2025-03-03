@@ -23,13 +23,6 @@ using System.Text.Json.Serialization;
 [PublicAPI]
 public sealed record SnapsInAZfsSettings
 {
-    public SnapsInAZfsSettings ()
-    {
-        LocalSystemName ??= Utility.GetFullyQualifiedDomainName ( );
-    }
-
-    // ReSharper disable once CommentTypo
-
     [JsonPropertyOrder ( 5 )]
     public bool Daemonize { get; set; }
 
@@ -47,17 +40,42 @@ public sealed record SnapsInAZfsSettings
     public bool DryRun { get; set; }
 
     /// <summary>
-    ///     Gets or sets the local system name SnapsInAZfs will use
+    ///     Gets or sets the local system name SnapsInAZfs will use.
     /// </summary>
     /// <remarks>
-    ///     This is used for operations involving the snapsinazfs.com:sourcesystem property.<br/>
-    ///     This setting is mandatory and cannot be an empty or all-whitespace string.<br/>
-    ///     This setting SHOULD be unique among all systems involved in replicating snapshots managed by SnapsInAZfs, and the recommended
-    ///     value is the FQDN of the local system.<br/>
-    ///     If this value is invalid upon startup, SnapsInAZfs will log an error and terminate.
+    ///     <para>
+    ///         This setting is mandatory ***(EVEN IF NOT USING REPLICATION)*** and cannot be an empty or all-whitespace string.
+    ///     </para>
+    ///     <para>
+    ///         This value is critical for proper operation of SIAZ, whether replication is currently or ever has been in use or not, as
+    ///         it is part of the logic used to determine if a snapshot is eligible for pruning or not, and is written explicitly to
+    ///         every snapshot SIAZ creates.<br/>
+    ///         Snapshots missing this property MAY be ignored by SIAZ entirely, for any or all purposes.
+    ///     </para>
+    ///     <para>
+    ///         In addition to its definition in this property, this value WILL be stored in ZFS properties of snapshots created by SIAZ
+    ///         and MAY be stored in one or more additional places, such as configuration files and other ZFS properties, as needed.
+    ///     </para>
+    ///     <para>
+    ///         In replication configurations, this setting SHOULD be unique between each pair of systems using SIAZ to manage snapshots,
+    ///         whether replication is performed using SIAZ or another method, or else SIAZ will not be able to properly differentiate
+    ///         locally-created snapshots from snapshots received from another system, as well as other potentially unwanted or undefined
+    ///         behaviors.
+    ///     </para>
+    ///     <para>
+    ///         The recommended value for this property is the fully-qualified DNS name of the local system formatted in accordance with
+    ///         RFC8499 for the "Global DNS", with or without the terminating root dot namespace octet.
+    ///     </para>
+    ///     <para>
+    ///         Valid values must validate against the following .net regular expression: `([0-9A-Za-z_-]+)+\.?`.
+    ///     </para>
+    ///     <para>
+    ///         While SIAZ MAY terminate if invalid values are encountered in operation, that behavior is not guaranteed for any value,
+    ///         and deviation from the recommended FQDN setting is unsupported, undefined, and is at your own risk.
+    ///     </para>
     /// </remarks>
     [JsonPropertyOrder ( 4 )]
-    public string? LocalSystemName { get; set; }
+    public string LocalSystemName { get; set; } = string.Empty;
 
     [JsonPropertyOrder ( 10 )]
     public MonitoringSettings Monitoring { get; set; } = new ( ) { EnableHttp = false };
