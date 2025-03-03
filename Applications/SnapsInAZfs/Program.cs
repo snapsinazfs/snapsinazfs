@@ -19,6 +19,7 @@ namespace SnapsInAZfs;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using ConfigConsole;
 using Interop.Libc.Enums;
 using Interop.Zfs.ZfsCommandRunner;
@@ -34,7 +35,7 @@ using PowerArgs;
 using Settings.Logging;
 
 [UsedImplicitly]
-internal class Program
+internal partial class Program
 {
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
@@ -83,6 +84,10 @@ internal class Program
         }
 
         ApplyCommandLineArgumentOverrides ( in args, Settings );
+
+        // TODO: Validate critical settings before continuing.
+        // Only need to validate before running config console.
+        // But need to terminate if not running config console.
 
         if ( args.ConfigConsole )
         {
@@ -396,4 +401,53 @@ internal class Program
 
         return SiazService.ExitStatus;
     }
+
+    private static int ValidateOrSetCriticalSettings ( SnapsInAZfsSettings settings )
+    {
+        ArgumentNullException.ThrowIfNull ( settings );
+
+        // Flags with values >= 0 being OK and negative values indicating an error.
+        int       statusFlags                       = 0;
+        const int errorMask                         = int.MinValue; //leftmost bit set
+        const int localSystemNameInvalidMask        = 1 | errorMask;
+        const int zfsPathInvalidMask                = 2 | errorMask;
+        const int zpoolPathInvalidMask              = 4 | errorMask;
+        const int localSystemNameAutoConfiguredMask = 8;
+
+        if ( string.IsNullOrWhiteSpace ( settings.LocalSystemName ) )
+        {
+            Logger.Fatal ( "Missing, empty, or all-whitespace value for LocalSystemName in JSON configuration. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
+            statusFlags |= localSystemNameInvalidMask;
+        }
+        else if ( settings.LocalSystemName == "auto" )
+        {
+            string localSystemFqdn = Utility.GetFullyQualifiedDomainName ( );
+            statusFlags              |= localSystemNameAutoConfiguredMask;
+            settings.LocalSystemName =  localSystemFqdn;
+            Logger.Info ( $"Using auto-detected FQDN value `{localSystemFqdn}` for  {nameof (settings.LocalSystemName)} during this instance of SnapsInAZfs." );
+        }
+        else if ( settings.LocalSystemName.Length > 255 )
+        {
+            Logger.Fatal ( "LocalSystemName is longer than the maximum length of 255 characters. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
+            statusFlags |= localSystemNameInvalidMask;
+        }
+
+        if ( !LocalSystemNameRegex ( ).IsMatch ( settings.LocalSystemName ) )
+        {
+            statusFlags |= localSystemNameInvalidMask;
+            Logger.Fatal ( "Invalid value for LocalSystemName. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
+        }
+
+        // TODO: Finish validating.
+        // Need to check ZfsPath and ZpoolPath
+        // Should probably also either ditch the status flags (most likely - kinda redundant if it's already logged) or define them more formally as a type or something
+
+        return statusFlags;
+    }
+
+    /// <summary>
+    /// Source-generated regex for validating the <see cref="SnapsInAZfsSettings.LocalSystemName"/> property value.
+    /// </summary>
+    [GeneratedRegex ( @"^(?:[a-zA-Z0-9_-]+\.)*[a-zA-Z0-9_-]+\.?$", RegexOptions.Singleline| RegexOptions.CultureInvariant )]
+    private static partial Regex LocalSystemNameRegex ( );
 }
