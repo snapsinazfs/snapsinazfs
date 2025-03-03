@@ -67,8 +67,6 @@ public sealed record ReplicationSettings
     /// </remarks>
     public bool EnableOutbound { get; set; }
 
-    public ConcurrentDictionary<Guid, IReplicationConfigurationElement> LocalDestinations { get; } = new ( );
-
     /// <summary>
     ///     A priority-ordered collection of <see cref="NetworkAccessControlEntry"/> items which define the remote network addresses
     ///     allowed to send replication streams to a SIAZ process running on the local system.
