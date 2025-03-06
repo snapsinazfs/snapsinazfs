@@ -70,6 +70,7 @@ dotnet_diagnostic.CA1805.severity = warning
 dotnet_diagnostic.IDE0004.severity = suggestion
 dotnet_diagnostic.IDE0008.severity = warning
 csharp_style_prefer_readonly_struct_member = true:suggestion
+csharp_style_prefer_primary_constructors = true:suggestion
 
 [*.{cs,vb}]
 #### Naming styles ####
