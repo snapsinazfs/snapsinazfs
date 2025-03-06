@@ -12,14 +12,12 @@
 
 #endregion
 
-using LogLevel = NLog.LogLevel;
-
 namespace SnapsInAZfs;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 using ConfigConsole;
 using Interop.Libc.Enums;
 using Interop.Zfs.ZfsCommandRunner;
@@ -33,28 +31,27 @@ using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
 using Settings.Logging;
+using LogLevel = NLog.LogLevel;
 
 [UsedImplicitly]
-internal partial class Program
+internal static class Program
 {
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
-    private static readonly  Logger               Logger = LogManager.GetCurrentClassLogger ( );
-    private static           IConfigurationRoot?  _configurationRoot;
-    internal static readonly IMonitor             ServiceObserver = new Monitor ( );
-    internal static          SnapsInAZfsSettings? Settings;
+    private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" )!;
+    private static readonly IMonitor             ServiceObserver = new Monitor ( );
+    private static          IConfigurationRoot?  _configurationRoot;
+    internal static         SnapsInAZfsSettings? Settings;
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
     [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
     public static async Task<int> Main ( string [] argv )
     {
-        CommandLineArguments? args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
+        CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
 
-        // The nullability context in PowerArgs is wrong, so this absolutely can be null
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if ( args is null || args.Help )
+        // Implicit null check here is important.
+        if ( args is not { Help: false } )
         {
             LogManager.Shutdown ( );
 
@@ -85,10 +82,6 @@ internal partial class Program
 
         ApplyCommandLineArgumentOverrides ( in args, Settings );
 
-        // TODO: Validate critical settings before continuing.
-        // Only need to validate before running config console.
-        // But need to terminate if not running config console.
-
         if ( args.ConfigConsole )
         {
             try
@@ -110,6 +103,14 @@ internal partial class Program
 
             return 0;
         }
+
+        if ( ValidateSettings ( in Settings ) is not Errno.EOK and var badResult )
+        {
+            return (int)badResult;
+        }
+
+        Logger.Debug ( "Settings passed basic validation checks." );
+        Logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
 
         return Settings.Monitoring.EnableHttp switch
                {
@@ -322,7 +323,7 @@ internal partial class Program
         // ReSharper disable once AccessToDisposedClosure
         serviceBuilder.Host
                       .UseSystemd ( )
-                      .ConfigureServices ( ( _, services ) => { services.AddHostedService ( _ => serviceInstance ); } );
+                      .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) );
 
         serviceBuilder.WebHost
                       .UseConfiguration (
@@ -339,7 +340,6 @@ internal partial class Program
                                     } );
         WebApplication svc = serviceBuilder.Build ( );
 
-        // ReSharper disable HeapView.DelegateAllocation
         RouteGroupBuilder statusGroup = svc.MapGroup ( "/" );
         statusGroup.MapGet ( "/",                 ServiceObserver.GetApplicationStateAsync );
         statusGroup.MapGet ( "/state",            ServiceObserver.GetApplicationStateAsync );
@@ -392,7 +392,7 @@ internal partial class Program
         // ReSharper disable once AccessToDisposedClosure
         IHost serviceHost = Host.CreateDefaultBuilder ( )
                                 .UseSystemd ( )
-                                .ConfigureServices ( ( _, services ) => { services.AddHostedService ( _ => serviceInstance ); } )
+                                .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) )
                                 .Build ( );
         using CancellationTokenSource tokenSource = new ( );
         CancellationToken             masterToken = tokenSource.Token;
@@ -402,52 +402,54 @@ internal partial class Program
         return SiazService.ExitStatus;
     }
 
-    private static int ValidateOrSetCriticalSettings ( SnapsInAZfsSettings settings )
+    private static Errno ValidateSettings ( ref readonly SnapsInAZfsSettings settings )
     {
-        ArgumentNullException.ThrowIfNull ( settings );
+        SettingsValidator validator = SettingsValidator.Validate ( in settings );
 
-        // Flags with values >= 0 being OK and negative values indicating an error.
-        int       statusFlags                       = 0;
-        const int errorMask                         = int.MinValue; //leftmost bit set
-        const int localSystemNameInvalidMask        = 1 | errorMask;
-        const int zfsPathInvalidMask                = 2 | errorMask;
-        const int zpoolPathInvalidMask              = 4 | errorMask;
-        const int localSystemNameAutoConfiguredMask = 8;
+        if ( validator.IsSettingsObjectNull )
+        {
+            Logger.Fatal ( "Failed to validate settings. Settings null. SnapsInAZfs will now terminate." );
 
-        if ( string.IsNullOrWhiteSpace ( settings.LocalSystemName ) )
-        {
-            Logger.Fatal ( "Missing, empty, or all-whitespace value for LocalSystemName in JSON configuration. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
-            statusFlags |= localSystemNameInvalidMask;
-        }
-        else if ( settings.LocalSystemName == "auto" )
-        {
-            string localSystemFqdn = Utility.GetFullyQualifiedDomainName ( );
-            statusFlags              |= localSystemNameAutoConfiguredMask;
-            settings.LocalSystemName =  localSystemFqdn;
-            Logger.Info ( $"Using auto-detected FQDN value `{localSystemFqdn}` for  {nameof (settings.LocalSystemName)} during this instance of SnapsInAZfs." );
-        }
-        else if ( settings.LocalSystemName.Length > 255 )
-        {
-            Logger.Fatal ( "LocalSystemName is longer than the maximum length of 255 characters. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
-            statusFlags |= localSystemNameInvalidMask;
+            return Errno.EFTYPE;
         }
 
-        if ( !LocalSystemNameRegex ( ).IsMatch ( settings.LocalSystemName ) )
+        bool autoDetectionInvoked = false;
+
+        if ( validator is { IsAutoConfigureLocalSystemNameRequested: true } )
         {
-            statusFlags |= localSystemNameInvalidMask;
-            Logger.Fatal ( "Invalid value for LocalSystemName. This setting is required and must be valid. SIAZ will terminate. See documentation for requirements." );
+            settings.AutoDetectAndSetLocalSystemName ( );
+            autoDetectionInvoked = true;
         }
 
-        // TODO: Finish validating.
-        // Need to check ZfsPath and ZpoolPath
-        // Should probably also either ditch the status flags (most likely - kinda redundant if it's already logged) or define them more formally as a type or something
+        if ( validator is { IsAutoConfigureZfsPathRequested: true } )
+        {
+            settings.AutoDetectAndSetZfsPath ( );
+            autoDetectionInvoked = true;
+        }
 
-        return statusFlags;
+        if ( validator is { IsAutoConfigureZpoolPathRequested: true } )
+        {
+            settings.AutoDetectAndSetZpoolPath ( );
+            autoDetectionInvoked = true;
+        }
+
+        if ( autoDetectionInvoked )
+        {
+            Logger.Debug ( "Re-validating configuration after one or more auto-detected settings altered." );
+            SettingsValidator.Validate ( in settings, validator );
+        }
+
+        if ( !validator.IsInvalid )
+        {
+            return Errno.EOK;
+        }
+
+        Logger.Fatal ( "Failed to validate settings." );
+        Logger.Debug ( $"{validator.ValidationErrors} errors found in validation." );
+        Logger.Debug ( $"Validation status: {JsonSerializer.Serialize ( validator )}" );
+        Logger.Debug ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
+        Logger.Fatal ( "SnapsInAZfs will now terminate." );
+
+        return Errno.EFTYPE;
     }
-
-    /// <summary>
-    /// Source-generated regex for validating the <see cref="SnapsInAZfsSettings.LocalSystemName"/> property value.
-    /// </summary>
-    [GeneratedRegex ( @"^(?:[a-zA-Z0-9_-]+\.)*[a-zA-Z0-9_-]+\.?$", RegexOptions.Singleline| RegexOptions.CultureInvariant )]
-    private static partial Regex LocalSystemNameRegex ( );
 }

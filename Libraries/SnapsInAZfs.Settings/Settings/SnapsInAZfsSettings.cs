@@ -101,7 +101,7 @@ public sealed record SnapsInAZfsSettings
     public Dictionary<string, TemplateSettings> Templates { get; set; } = new ( );
 
     /// <summary>
-    ///     Gets or sets the path to the zfs utility, as a fully-qualified path or the special value `auto`, which triggers built-in
+    ///     Gets or sets the path to the zfs utility, as a fully-qualified path or the special value `*`, which triggers built-in
     ///     auto-detection functionality.
     /// </summary>
     /// <remarks>
@@ -111,7 +111,7 @@ public sealed record SnapsInAZfsSettings
     public string ZfsPath { get; set; } = string.Empty;
 
     /// <summary>
-    ///     Gets or sets the path to the zpool utility, as a fully-qualified path or the special value `auto`, which triggers built-in
+    ///     Gets or sets the path to the zpool utility, as a fully-qualified path or the special value `*`, which triggers built-in
     ///     auto-detection functionality.
     /// </summary>
     /// <remarks>
@@ -119,4 +119,29 @@ public sealed record SnapsInAZfsSettings
     /// </remarks>
     [JsonPropertyOrder ( 8 )]
     public string ZpoolPath { get; set; } = string.Empty;
+
+    public const string AutoDetectSpecifier = "*";
+
+    /// <summary>
+    ///     Sets <see cref="LocalSystemName"/> to the value returned by the <see cref="Utility.GetFullyQualifiedDomainName()"/> method.
+    /// </summary>
+    /// <remarks>
+    ///     The returned value depends on platform configuration and should not be relied on for normal operation.<br/>
+    ///     Configure the <see cref="LocalSystemName"/> property explicitly instead of letting auto-detection run for every instance of
+    ///     SIAZ or bad things could happen potentially including data loss due to improper snapshot pruning based on unintended matches
+    ///     due to improper or counter-indicated use of <see cref="LocalSystemName"/>.
+    /// </remarks>
+    public void AutoDetectAndSetLocalSystemName ( ) { LocalSystemName = Utility.GetFullyQualifiedDomainName ( ); }
+
+    /// <summary>
+    ///     Sets <see cref="ZfsPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     "zfs"
+    /// </summary>
+    public void AutoDetectAndSetZfsPath ( ) { LocalSystemName = Utility.Which ( "zfs" ); }
+
+    /// <summary>
+    ///     Sets <see cref="ZpoolPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     "zpool"
+    /// </summary>
+    public void AutoDetectAndSetZpoolPath ( ) { LocalSystemName = Utility.Which ( "zpool" ); }
 }
