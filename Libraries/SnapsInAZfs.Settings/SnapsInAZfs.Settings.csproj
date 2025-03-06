@@ -47,6 +47,7 @@
 	</ItemGroup>
   
   <ItemGroup>
+    <Using Include="System.Runtime.Versioning" />
     <Using Include="JetBrains.Annotations" />
     <Using Include="NLog" />
   </ItemGroup>

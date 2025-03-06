@@ -15,7 +15,6 @@
 namespace SnapsInAZfs.Settings;
 
 using System.Net.NetworkInformation;
-using System.Runtime.Versioning;
 
 /// <summary>
 ///     Extension methods and utility methods relevant to functionality in the SnapsInAZfs.Settings library.
@@ -38,8 +37,10 @@ public static class Utility
     ///     </para>
     ///     <para>This method is not supported by .net on IllumOS or Solaris platforms.</para>
     /// </remarks>
+#if NET9_0_OR_GREATER
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
+#endif
     public static string GetFullyQualifiedDomainName ( this IPGlobalProperties host ) => $"{host.HostName}.{host.DomainName}";
 
     /// <summary>
@@ -56,8 +57,10 @@ public static class Utility
     ///     </para>
     ///     <para>This method is not supported by .net on IllumOS or Solaris platforms.</para>
     /// </remarks>
+#if NET9_0_OR_GREATER
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
+#endif
     public static string GetFullyQualifiedDomainName ( ) => IPGlobalProperties.GetIPGlobalProperties ( ).GetFullyQualifiedDomainName ( );
 
     /// <summary>
