@@ -9,6 +9,9 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-latest ]
+        netsdkver:
+          - 8.0.x
+          - 9.0.x
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout tag
@@ -16,10 +19,10 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4.3.0
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: ${{ matrix.netsdkver }}
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore --ucr
     - name: Build
-      run: dotnet build --no-restore --configuration Release-R2R
+      run: dotnet build --no-restore --configuration Release-R2R --ucr
     - name: Test
       run: dotnet test --no-restore --configuration Release-R2R --verbosity minimal
