@@ -100,12 +100,12 @@ public static class Utility
             throw new ApplicationException ( "PATH environment variable is empty or is not defined for the current process." );
         }
 
-        ReadOnlySpan<char> pathVarSpan             = pathVar.AsSpan ( );
+        ReadOnlySpan<char> pathVarSpan = pathVar.AsSpan ( );
 
     #if WINDOWS
         const char         pathVarElementSeparator = ';';
     #else
-        const char         pathVarElementSeparator = ':';
+        const char pathVarElementSeparator = ':';
     #endif
 
         switch ( program )
