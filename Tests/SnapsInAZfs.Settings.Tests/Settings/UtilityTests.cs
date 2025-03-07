@@ -56,14 +56,14 @@ public class UtilityTests
         try
         {
             DirectoryInfo testWorkDirectory = new ( TestContext.CurrentContext.WorkDirectory );
-            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilities" );
+            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilities_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitiesDirectory.Exists );
 
             FileInfo fakeUtilityFile = new ( Path.Combine ( fakeUtilitiesDirectory.FullName, $"{input}_realFile" ) );
             Assume.That ( fakeUtilityFile, Does.Not.Exist );
             CreateAndCheckFakeUtilityNormalFile ( fakeUtilityFile );
 
-            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilitySymlinks" );
+            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilitySymlinks_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitySymlinksDirectory.Exists );
 
             FileInfo fakeUtilitySymlink = new ( Path.Combine ( fakeUtilitySymlinksDirectory.FullName, input ) );
@@ -116,14 +116,14 @@ public class UtilityTests
         try
         {
             DirectoryInfo testWorkDirectory = new ( TestContext.CurrentContext.WorkDirectory );
-            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilities" );
+            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilities_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitiesDirectory.Exists );
 
-            FileInfo fakeUtilityFile = new ( Path.Combine ( fakeUtilitiesDirectory.FullName, $"{input}_realFile" ) );
+            FileInfo fakeUtilityFile = new ( Path.Combine ( fakeUtilitiesDirectory.FullName, $"{input}" ) );
             Assume.That ( fakeUtilityFile, Does.Not.Exist );
             CreateAndCheckFakeUtilityNormalFile ( fakeUtilityFile );
 
-            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilitySymlinks" );
+            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilitySymlinks_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitySymlinksDirectory.Exists );
 
             EnvironmentPathVariableLock.EnterWriteLock ( );
@@ -225,13 +225,13 @@ public class UtilityTests
         try
         {
             DirectoryInfo testWorkDirectory = new ( TestContext.CurrentContext.WorkDirectory );
-            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilities" );
+            fakeUtilitiesDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilities_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitiesDirectory.Exists );
 
             FileInfo fakeUtilityFile = new ( Path.Combine ( fakeUtilitiesDirectory.FullName, $"{input}_realFile" ) );
             Assume.That ( fakeUtilityFile, Does.Not.Exist );
 
-            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( "fakeUtilitySymlinks" );
+            fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilitySymlinks_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitySymlinksDirectory.Exists );
 
             FileInfo fakeUtilitySymlink = new ( Path.Combine ( fakeUtilitySymlinksDirectory.FullName, input ) );
