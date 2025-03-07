@@ -15,19 +15,19 @@
 // @formatter:place_simple_method_on_single_line false
 namespace SnapsInAZfs.Settings.Tests.Settings;
 
+using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework.Internal;
 
 [TestFixture ( Category = "Utilities", TestOf = typeof (Utility) )]
 [Parallelizable ( ParallelScope.All )]
-[FixtureLifeCycle ( LifeCycle.InstancePerTestCase )]
 public class UtilityTests
 {
-    private static          string?              _originalPathEnvVar;
     private static readonly ReaderWriterLockSlim EnvironmentPathVariableLock      = new ( );
     private static readonly char                 EnvironmentPathVariableSeparator = OSPlatform.CurrentPlatform.IsWindows ? ';' : ':';
+    private static          string?              _originalPathEnvVar;
 
     [OneTimeTearDown]
-    public void ResetPathEnvironmentVariable ( )
+    public static void ResetPathEnvironmentVariable ( )
     {
         EnvironmentPathVariableLock.EnterWriteLock ( );
         Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar, EnvironmentVariableTarget.Process );
@@ -35,10 +35,11 @@ public class UtilityTests
     }
 
     [OneTimeSetUp]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage ( "Parallelization",
-                                                       "ParallelChecker:Issue: #0 Data race on SnapsInAZfs.Settings.Tests.Settings.UtilityTests._originalPathEnvVar",
-                                                       Justification = "This race does not exist." )]
-    public void SaveOriginalPathEnvironmentVariable ( )
+    [SuppressMessage (
+                         "Parallelization",
+                         "ParallelChecker:Issue: #0 Data race on SnapsInAZfs.Settings.Tests.Settings.UtilityTests._originalPathEnvVar",
+                         Justification = "This race does not exist." )]
+    public static void SaveOriginalPathEnvironmentVariable ( )
     {
         EnvironmentPathVariableLock.EnterReadLock ( );
         _originalPathEnvVar ??= Environment.GetEnvironmentVariable ( "PATH", EnvironmentVariableTarget.Process ) ?? string.Empty;
@@ -49,7 +50,7 @@ public class UtilityTests
     [Description ( "Creates a real file and a symlink to it, then expects that the method returns the path of the real file when given only the file name." )]
     public void Which_ReturnsQualifiedPathForSymLinkWithValidRealFileTarget ( [Values ( "zfs", "zpool" )] string input )
     {
-        DirectoryInfo? fakeUtilitiesDirectory = null;
+        DirectoryInfo? fakeUtilitiesDirectory       = null;
         DirectoryInfo? fakeUtilitySymlinksDirectory = null;
 
         try
@@ -133,9 +134,11 @@ public class UtilityTests
             Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar );
             EnvironmentPathVariableLock.ExitWriteLock ( );
 
-            // Validate the string itself as a valid *path* string
-            Assert.That ( testFile.FullName,   Is.SamePath ( fakeUtilityFile.FullName ) );
-            Assert.That ( testFile.LinkTarget, Is.Null );
+            Assert.Multiple ( ( ) =>
+                              {
+                                  Assert.That ( testFile.FullName,   Is.SamePath ( fakeUtilityFile.FullName ) );
+                                  Assert.That ( testFile.LinkTarget, Is.Null );
+                              } );
         }
         finally
         {
@@ -157,8 +160,6 @@ public class UtilityTests
     }
 
     [Test]
-    [NonParallelizable]
-    [RequiresThread]
     [Category ( "Exceptions" )]
     public void Which_ThrowsApplicationExceptionIfEnvironmentPathVariableEmpty ( [Values ( "zfs", "zpool" )] string input )
     {
@@ -218,7 +219,7 @@ public class UtilityTests
     [Category ( "Exceptions" )]
     public void Which_ThrowsFileNotFoundIfNotFound ( [Values ( "zfs", "zpool" )] string input )
     {
-        DirectoryInfo? fakeUtilitiesDirectory = null;
+        DirectoryInfo? fakeUtilitiesDirectory       = null;
         DirectoryInfo? fakeUtilitySymlinksDirectory = null;
 
         try
