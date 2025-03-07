@@ -35,12 +35,11 @@ public static class Utility
     ///         <br/>
     ///         This is a valid FQDN but may not be resolvable from other hosts, depending on the environment.
     ///     </para>
-    ///     <para>This method is not supported by .net on IllumOS or Solaris platforms.</para>
+    ///     <para>This method is not supported by .net on Illumos or Solaris platforms.</para>
     /// </remarks>
-#if NET9_0_OR_GREATER
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
-#endif
+    [Pure]
     public static string GetFullyQualifiedDomainName ( this IPGlobalProperties host ) => $"{host.HostName}.{host.DomainName}";
 
     /// <summary>
@@ -57,10 +56,8 @@ public static class Utility
     ///     </para>
     ///     <para>This method is not supported by .net on IllumOS or Solaris platforms.</para>
     /// </remarks>
-#if NET9_0_OR_GREATER
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
-#endif
     public static string GetFullyQualifiedDomainName ( ) => IPGlobalProperties.GetIPGlobalProperties ( ).GetFullyQualifiedDomainName ( );
 
     /// <summary>
@@ -102,11 +99,7 @@ public static class Utility
 
         ReadOnlySpan<char> pathVarSpan = pathVar.AsSpan ( );
 
-    #if WINDOWS
-        const char         pathVarElementSeparator = ';';
-    #else
-        const char pathVarElementSeparator = ':';
-    #endif
+        char pathVarElementSeparator = OperatingSystem.IsWindows ( ) ? ';' : ':';
 
         switch ( program )
         {
@@ -116,6 +109,13 @@ public static class Utility
                 // PATH is defined - look for allowedProgram in each element
                 foreach ( Range basePathRange in pathVarSpan.Split ( pathVarElementSeparator ) )
                 {
+                    if ( basePathRange.Start.Equals ( basePathRange.End ) )
+                    {
+                        // Zero length is always invalid, and is most likely from multiple adjacent separators in PATH.
+                        // In any case, we can skip immediately.
+                        continue;
+                    }
+
                     string programPathCandidate = Path.Combine ( new ( pathVarSpan [ basePathRange ] ), program );
 
                     // Check if path plus allowedProgram exists
