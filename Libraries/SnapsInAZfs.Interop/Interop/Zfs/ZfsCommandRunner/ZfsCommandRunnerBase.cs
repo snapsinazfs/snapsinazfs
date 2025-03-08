@@ -137,7 +137,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
             "used" => long.TryParse( value, out _ ),
             "available" => long.TryParse( value, out _ ),
-            _ => throw new ArgumentOutOfRangeException( nameof( name ) )
+            _ => throw new ArgumentOutOfRangeException( nameof (name) )
         };
     }
 
