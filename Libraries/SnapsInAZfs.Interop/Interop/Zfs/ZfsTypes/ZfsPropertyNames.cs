@@ -25,6 +25,8 @@ public static class ZfsPropertyNames
     public const   string EnabledPropertyName                              = $"{SiazZfsPropNamespace}:enabled";
     public const   string PruneSnapshotsPropertyName                       = $"{SiazZfsPropNamespace}:prunesnapshots";
     public const   string RecursionPropertyName                            = $"{SiazZfsPropNamespace}:recursion";
+    public const   string ReplicationEnabledPropertyName                   = $"{SiazReplicationZfsPropNamespace}:enabled";
+    public const   string SiazReplicationZfsPropNamespace                  = $"{SiazZfsPropNamespace}:replication";
     public const   string SnapshotPeriodPropertyName                       = $"{SiazZfsPropNamespace}:snapshot:period";
     public const   string SnapshotRetentionDailyPropertyName               = $"{SiazZfsPropNamespace}:retention:daily";
     public const   string SnapshotRetentionFrequentPropertyName            = $"{SiazZfsPropNamespace}:retention:frequent";
