@@ -12,16 +12,16 @@
 
 namespace SnapsInAZfs.Settings.Tests.Settings;
 
-[TestFixture ( TestOf = typeof (FormattingSettings) )]
+[TestFixture ( TestOf = typeof( FormattingSettings ) )]
 [Category ( "Settings" )]
 [Category ( "Formatting" )]
 [Parallelizable ( ParallelScope.All )]
 public class FormattingSettingsTests
 {
     [Test]
-    public void GenerateShortSnapshotName_ReturnsExpectedValue ( [Values ( SnapshotPeriodKind.Frequent, SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily, SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly )] SnapshotPeriodKind period, [ValueSource ( nameof (GetTimestampsForFormatTests) )] DateTimeOffset timestamp )
+    public void GenerateShortSnapshotName_ReturnsExpectedValue( [Values ( SnapshotPeriodKind.Frequent, SnapshotPeriodKind.Hourly, SnapshotPeriodKind.Daily, SnapshotPeriodKind.Weekly, SnapshotPeriodKind.Monthly, SnapshotPeriodKind.Yearly )] SnapshotPeriodKind period, [ValueSource ( nameof (GetTimestampsForFormatTests) )] DateTimeOffset timestamp )
     {
-        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault ( );
+        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault( );
         string             shortName              = testFormattingSettings.GenerateShortSnapshotName ( in period, in timestamp );
         Assert.That ( shortName, Is.Not.Null );
         Assert.That ( shortName, Is.Not.Empty );
@@ -37,7 +37,9 @@ public class FormattingSettingsTests
                                                                                                                                                                                                                                   SnapshotPeriodKind.Weekly   => testFormattingSettings.WeeklySuffix,
                                                                                                                                                                                                                                   SnapshotPeriodKind.Monthly  => testFormattingSettings.MonthlySuffix,
                                                                                                                                                                                                                                   SnapshotPeriodKind.Yearly   => testFormattingSettings.YearlySuffix
-                                                                                                                                                                                                                              }}" ) );
+                                                                                                                                                                                                                              }}"
+                                )
+                    );
 #pragma warning restore CS8509 // We don't care about the NotSet value for this test
     }
 
@@ -45,21 +47,21 @@ public class FormattingSettingsTests
     [Category ( "Exceptions" )]
     public void GenerateShortSnapshotName_ThrowsOnBadTimestampFormatString ( )
     {
-        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault ( ) with { TimestampFormatString = "a" };
-        Assert.That ( ( ) => testFormattingSettings.GenerateShortSnapshotName ( SnapshotPeriodKind.Frequent, DateTimeOffset.UnixEpoch ), Throws.TypeOf<FormatException> ( ) );
+        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault( ) with { TimestampFormatString = "a" };
+        Assert.That ( ( ) => testFormattingSettings.GenerateShortSnapshotName ( SnapshotPeriodKind.Frequent, DateTimeOffset.UnixEpoch ), Throws.TypeOf<FormatException>( ) );
     }
 
     [Test]
     [Category ( "Exceptions" )]
     public void GenerateShortSnapshotName_ThrowsOnInvalidPeriod ( )
     {
-        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault ( );
-        Assert.That ( ( ) => testFormattingSettings.GenerateShortSnapshotName ( SnapshotPeriodKind.NotSet, DateTimeOffset.UnixEpoch ), Throws.TypeOf<ArgumentOutOfRangeException> ( ) );
+        FormattingSettings testFormattingSettings = FormattingSettings.GetDefault( );
+        Assert.That ( ( ) => testFormattingSettings.GenerateShortSnapshotName ( SnapshotPeriodKind.NotSet, DateTimeOffset.UnixEpoch ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
     private static IEnumerable<DateTimeOffset> GetTimestampsForFormatTests ( )
     {
         yield return DateTimeOffset.UnixEpoch;
-        yield return new ( 2023, 8, 1, 1, 0, 0, TimeZoneInfo.Local.BaseUtcOffset );
+        yield return new DateTimeOffset ( 2023, 8, 1, 1, 0, 0, TimeZoneInfo.Local.BaseUtcOffset );
     }
 }

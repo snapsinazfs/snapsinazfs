@@ -16,7 +16,7 @@ namespace SnapsInAZfs.Settings.Tests.Settings;
 using System.Diagnostics.CodeAnalysis;
 using NUnit.Framework.Internal;
 
-[TestFixture ( Category = "Utilities", TestOf = typeof (Utility) )]
+[TestFixture ( Category = "Utilities", TestOf = typeof( Utility ) )]
 [Parallelizable ( ParallelScope.All )]
 public class UtilityTests
 {
@@ -27,26 +27,27 @@ public class UtilityTests
     [OneTimeTearDown]
     public static void ResetPathEnvironmentVariable ( )
     {
-        EnvironmentPathVariableLock.EnterWriteLock ( );
+        EnvironmentPathVariableLock.EnterWriteLock( );
         Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar, EnvironmentVariableTarget.Process );
-        EnvironmentPathVariableLock.ExitWriteLock ( );
+        EnvironmentPathVariableLock.ExitWriteLock( );
     }
 
     [OneTimeSetUp]
     [SuppressMessage (
                          "Parallelization",
                          "ParallelChecker:Issue: #0 Data race on SnapsInAZfs.Settings.Tests.Settings.UtilityTests._originalPathEnvVar",
-                         Justification = "This race does not exist." )]
+                         Justification = "This race does not exist."
+                     )]
     public static void SaveOriginalPathEnvironmentVariable ( )
     {
-        EnvironmentPathVariableLock.EnterReadLock ( );
+        EnvironmentPathVariableLock.EnterReadLock( );
         _originalPathEnvVar ??= Environment.GetEnvironmentVariable ( "PATH", EnvironmentVariableTarget.Process ) ?? string.Empty;
-        EnvironmentPathVariableLock.ExitReadLock ( );
+        EnvironmentPathVariableLock.ExitReadLock( );
     }
 
     [Test]
     [Description ( "Creates a real file and a symlink to it, then expects that the method returns the path of the real file when given only the file name." )]
-    public void Which_ReturnsQualifiedPathForSymLinkWithValidRealFileTarget ( [Values ( "zfs", "zpool" )] string input )
+    public void Which_ReturnsQualifiedPathForSymLinkWithValidRealFileTarget( [Values ( "zfs", "zpool" )] string input )
     {
         DirectoryInfo? fakeUtilitiesDirectory       = null;
         DirectoryInfo? fakeUtilitySymlinksDirectory = null;
@@ -71,25 +72,26 @@ public class UtilityTests
             Assume.That ( fakeUtilitySymlink.Exists );
             Assume.That ( fakeUtilitySymlink.LinkTarget, Is.SamePath ( fakeUtilityFile.FullName ) );
 
-            EnvironmentPathVariableLock.EnterWriteLock ( );
+            EnvironmentPathVariableLock.EnterWriteLock( );
             Environment.SetEnvironmentVariable ( "PATH", string.Join ( EnvironmentPathVariableSeparator, fakeUtilitiesDirectory.FullName, fakeUtilitySymlinksDirectory.FullName ) );
 
             FileInfo testFile = new ( Utility.Which ( input ) );
 
             Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar );
-            EnvironmentPathVariableLock.ExitWriteLock ( );
+            EnvironmentPathVariableLock.ExitWriteLock( );
 
             Assert.Multiple ( ( ) =>
                               {
                                   Assert.That ( testFile.FullName,   Is.SamePath ( fakeUtilityFile.FullName ) );
                                   Assert.That ( testFile.LinkTarget, Is.Null );
-                              } );
+                              }
+                            );
         }
         finally
         {
             if ( EnvironmentPathVariableLock.IsWriteLockHeld )
             {
-                EnvironmentPathVariableLock.ExitWriteLock ( );
+                EnvironmentPathVariableLock.ExitWriteLock( );
             }
 
             if ( fakeUtilitySymlinksDirectory is { Exists: true } )
@@ -106,7 +108,7 @@ public class UtilityTests
 
     [Test]
     [Description ( "Creates a real file and then expects that the method returns the same path when given only the file name." )]
-    public void Which_ReturnsQualifiedPathForValidRealFileInput ( [Values ( "zfs", "zpool" )] string input )
+    public void Which_ReturnsQualifiedPathForValidRealFileInput( [Values ( "zfs", "zpool" )] string input )
     {
         DirectoryInfo? fakeUtilitiesDirectory       = null;
         DirectoryInfo? fakeUtilitySymlinksDirectory = null;
@@ -124,25 +126,26 @@ public class UtilityTests
             fakeUtilitySymlinksDirectory = testWorkDirectory.CreateSubdirectory ( $"fakeUtilitySymlinks_{TestContext.CurrentContext.Test.MethodName}_{input}" );
             Assume.That ( fakeUtilitySymlinksDirectory.Exists );
 
-            EnvironmentPathVariableLock.EnterWriteLock ( );
+            EnvironmentPathVariableLock.EnterWriteLock( );
             Environment.SetEnvironmentVariable ( "PATH", string.Join ( EnvironmentPathVariableSeparator, fakeUtilitiesDirectory.FullName, fakeUtilitySymlinksDirectory.FullName ) );
 
             FileInfo testFile = new ( Utility.Which ( input ) );
 
             Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar );
-            EnvironmentPathVariableLock.ExitWriteLock ( );
+            EnvironmentPathVariableLock.ExitWriteLock( );
 
             Assert.Multiple ( ( ) =>
                               {
                                   Assert.That ( testFile.FullName,   Is.SamePath ( fakeUtilityFile.FullName ) );
                                   Assert.That ( testFile.LinkTarget, Is.Null );
-                              } );
+                              }
+                            );
         }
         finally
         {
             if ( EnvironmentPathVariableLock.IsWriteLockHeld )
             {
-                EnvironmentPathVariableLock.ExitWriteLock ( );
+                EnvironmentPathVariableLock.ExitWriteLock( );
             }
 
             if ( fakeUtilitySymlinksDirectory is { Exists: true } )
@@ -159,42 +162,42 @@ public class UtilityTests
 
     [Test]
     [Category ( "Exceptions" )]
-    public void Which_ThrowsApplicationExceptionIfEnvironmentPathVariableEmpty ( [Values ( "zfs", "zpool" )] string input )
+    public void Which_ThrowsApplicationExceptionIfEnvironmentPathVariableEmpty( [Values ( "zfs", "zpool" )] string input )
     {
         try
         {
-            EnvironmentPathVariableLock.EnterWriteLock ( );
+            EnvironmentPathVariableLock.EnterWriteLock( );
             Environment.SetEnvironmentVariable ( "PATH", string.Empty, EnvironmentVariableTarget.Process );
 
             Assume.That ( Environment.GetEnvironmentVariable ( "PATH" ), Is.Null );
 
-            Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<ApplicationException> ( ) );
+            Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<ApplicationException>( ) );
             Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar, EnvironmentVariableTarget.Process );
-            EnvironmentPathVariableLock.ExitWriteLock ( );
+            EnvironmentPathVariableLock.ExitWriteLock( );
         }
         finally
         {
             if ( EnvironmentPathVariableLock.IsWriteLockHeld )
             {
-                EnvironmentPathVariableLock.ExitWriteLock ( );
+                EnvironmentPathVariableLock.ExitWriteLock( );
             }
         }
     }
 
     [Test]
     [Category ( "Exceptions" )]
-    public void Which_ThrowsArgumentExceptionForEmptyOrWhitespaceInput ( [ValueSource ( typeof (TestHelpers), nameof (TestHelpers.StandardEmptyAndWhitespaceStringTestInputs) )] string inputComponent1, [ValueSource ( typeof (TestHelpers), nameof (TestHelpers.StandardEmptyAndWhitespaceStringTestInputs) )] string inputComponent2 )
+    public void Which_ThrowsArgumentExceptionForEmptyOrWhitespaceInput( [ValueSource ( typeof( TestHelpers ), nameof (TestHelpers.StandardEmptyAndWhitespaceStringTestInputs) )] string inputComponent1, [ValueSource ( typeof( TestHelpers ), nameof (TestHelpers.StandardEmptyAndWhitespaceStringTestInputs) )] string inputComponent2 )
     {
         try
         {
-            EnvironmentPathVariableLock.EnterReadLock ( );
+            EnvironmentPathVariableLock.EnterReadLock( );
             Assert.That ( ( ) => Utility.Which ( $"{inputComponent1}{inputComponent2}" ), Throws.ArgumentException );
         }
         finally
         {
             if ( EnvironmentPathVariableLock.IsReadLockHeld )
             {
-                EnvironmentPathVariableLock.ExitReadLock ( );
+                EnvironmentPathVariableLock.ExitReadLock( );
             }
         }
     }
@@ -208,14 +211,14 @@ public class UtilityTests
 
     [Test]
     [Category ( "Exceptions" )]
-    public void Which_ThrowsArgumentOutOfRangeExceptionForIllegalNonEmptyInput ( [Values ( "bash", "rm", "cat", ".", "/", ";", "#" )] string input )
+    public void Which_ThrowsArgumentOutOfRangeExceptionForIllegalNonEmptyInput( [Values ( "bash", "rm", "cat", ".", "/", ";", "#" )] string input )
     {
-        Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<ArgumentOutOfRangeException> ( ) );
+        Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
     }
 
     [Test]
     [Category ( "Exceptions" )]
-    public void Which_ThrowsFileNotFoundIfNotFound ( [Values ( "zfs", "zpool" )] string input )
+    public void Which_ThrowsFileNotFoundIfNotFound( [Values ( "zfs", "zpool" )] string input )
     {
         DirectoryInfo? fakeUtilitiesDirectory       = null;
         DirectoryInfo? fakeUtilitySymlinksDirectory = null;
@@ -235,19 +238,19 @@ public class UtilityTests
             FileInfo fakeUtilitySymlink = new ( Path.Combine ( fakeUtilitySymlinksDirectory.FullName, input ) );
             Assume.That ( fakeUtilitySymlink, Does.Not.Exist );
 
-            EnvironmentPathVariableLock.EnterWriteLock ( );
+            EnvironmentPathVariableLock.EnterWriteLock( );
             Environment.SetEnvironmentVariable ( "PATH", string.Join ( EnvironmentPathVariableSeparator, fakeUtilitiesDirectory.FullName, fakeUtilitySymlinksDirectory.FullName ) );
 
-            Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<FileNotFoundException> ( ) );
+            Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<FileNotFoundException>( ) );
 
             Environment.SetEnvironmentVariable ( "PATH", _originalPathEnvVar );
-            EnvironmentPathVariableLock.ExitWriteLock ( );
+            EnvironmentPathVariableLock.ExitWriteLock( );
         }
         finally
         {
             if ( EnvironmentPathVariableLock.IsWriteLockHeld )
             {
-                EnvironmentPathVariableLock.ExitWriteLock ( );
+                EnvironmentPathVariableLock.ExitWriteLock( );
             }
 
             if ( fakeUtilitySymlinksDirectory is { Exists: true } )
@@ -266,11 +269,11 @@ public class UtilityTests
     ///     Creates the fake utility file specified, sets permissions, writes the content, and then checks that it worked using an Assume
     /// </summary>
     /// <param name="fakeUtilityFile">The file to create</param>
-    private static void CreateAndCheckFakeUtilityNormalFile ( FileInfo fakeUtilityFile )
+    private static void CreateAndCheckFakeUtilityNormalFile( FileInfo fakeUtilityFile )
     {
-        using ( StreamWriter fakeUtility = fakeUtilityFile.CreateText ( ) )
+        using ( StreamWriter fakeUtility = fakeUtilityFile.CreateText( ) )
         {
-            if ( !OperatingSystem.IsWindows ( ) )
+            if ( !OperatingSystem.IsWindows( ) )
             {
                 // Setting file mode 0770
                 fakeUtilityFile.UnixFileMode = UnixFileMode.UserRead
@@ -289,7 +292,7 @@ public class UtilityTests
         Assume.That ( fakeUtilityFile,            Does.Exist.IgnoreDirectories );
         Assume.That ( fakeUtilityFile.LinkTarget, Is.Null );
 
-        if ( !OperatingSystem.IsWindows ( ) )
+        if ( !OperatingSystem.IsWindows( ) )
         {
             Assume.That (
                          fakeUtilityFile.UnixFileMode,
@@ -299,7 +302,9 @@ public class UtilityTests
                                    | UnixFileMode.UserExecute
                                    | UnixFileMode.GroupRead
                                    | UnixFileMode.GroupWrite
-                                   | UnixFileMode.GroupExecute ) );
+                                   | UnixFileMode.GroupExecute
+                                    )
+                        );
         }
     }
 }

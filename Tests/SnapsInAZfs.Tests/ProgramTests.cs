@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.Tests;
 
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Interop.Zfs.ZfsCommandRunner;
 using Microsoft.Extensions.Configuration;
@@ -21,12 +22,12 @@ using PowerArgs;
 using SnapsInAZfs.ConfigConsole;
 
 [TestFixture]
-[TestOf ( typeof (Program) )]
+[TestOf ( typeof( Program ) )]
 public class ProgramTests
 {
     [Test]
     [TestCaseSource ( nameof (GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied) )]
-    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied<T> ( PropertyInfo argPropertyInfo, string [] argStrings, T argValue, PropertyInfo settingsPropertyInfo, T initialSettingValue, T expectedFinalSettingValue )
+    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied<T>( PropertyInfo argPropertyInfo, string[] argStrings, T argValue, PropertyInfo settingsPropertyInfo, T initialSettingValue, T expectedFinalSettingValue )
     {
         SnapsInAZfsSettings initialSettings         = new ( );
         SnapsInAZfsSettings possiblyChangedSettings = new ( );
@@ -44,7 +45,7 @@ public class ProgramTests
     }
 
     [Test]
-    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied_DryRun ( [Values] bool initialValue )
+    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied_DryRun( [Values] bool initialValue )
     {
         SnapsInAZfsSettings settingsObject = new ( )
                                              {
@@ -58,21 +59,21 @@ public class ProgramTests
     }
 
     [Test]
-    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied_NoArgsSpecified ( [ValueSource ( nameof (GetSnapsInAZfsSettingsPropertyInfos) )] PropertyInfo pi )
+    public void ApplyCommandLineArgumentOverrides_ExpectedChangesApplied_NoArgsSpecified( [ValueSource ( nameof (GetSnapsInAZfsSettingsPropertyInfos) )] PropertyInfo pi )
     {
         SnapsInAZfsSettings initialSettings         = new ( );
         SnapsInAZfsSettings possiblyChangedSettings = new ( );
 
         Assume.That ( pi.GetValue ( initialSettings ), Is.EqualTo ( pi.GetValue ( possiblyChangedSettings ) ) );
 
-        CommandLineArguments testArgs = Args.Parse<CommandLineArguments> ( );
+        CommandLineArguments testArgs = Args.Parse<CommandLineArguments>( );
         Program.ApplyCommandLineArgumentOverrides ( in testArgs, possiblyChangedSettings );
         Assert.That ( pi.GetValue ( initialSettings ), Is.EqualTo ( pi.GetValue ( possiblyChangedSettings ) ) );
     }
 
     [Test]
     [TestCaseSource ( nameof (GetCasesForApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied) )]
-    public void ApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied ( PropertyInfo argPropertyInfo, string [] argStrings, bool argValue, PropertyInfo settingsPropertyInfo, bool initialSettingValue, bool expectedFinalSettingValue )
+    public void ApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied( PropertyInfo argPropertyInfo, string[] argStrings, bool argValue, PropertyInfo settingsPropertyInfo, bool initialSettingValue, bool expectedFinalSettingValue )
     {
         SnapsInAZfsSettings initialSettings         = new ( );
         SnapsInAZfsSettings possiblyChangedSettings = new ( );
@@ -92,7 +93,7 @@ public class ProgramTests
     [Test]
     [TestCase ( [ "SnapsInAZfs.json", "SnapsInAZfs.local.json", "fakeMonitoringSettingsForRoundTripTest.json" ] )]
     [TestCase ( [ "CombinedConfigurationForRoundTripTest.json" ] )]
-    public void LoadConfigurationFromConfigurationFiles_RoundTripSafe ( params string [] filePaths )
+    public void LoadConfigurationFromConfigurationFiles_RoundTripSafe( params string[] filePaths )
     {
         Assume.That ( filePaths.Length > 0 );
 
@@ -105,8 +106,8 @@ public class ProgramTests
         builder.AddJsonFile ( "SnapsInAZfs.json",                            true, false );
         builder.AddJsonFile ( "SnapsInAZfs.local.json",                      true, false );
         builder.AddJsonFile ( "fakeMonitoringSettingsForRoundTripTest.json", true, false );
-        IConfigurationRoot configurationRoot = builder.Build ( );
-        string             serializedJson    = configurationRoot.SerializeToJson ( )!.ToJsonString ( new ( ) { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } );
+        IConfigurationRoot configurationRoot = builder.Build( );
+        string             serializedJson    = configurationRoot.SerializeToJson( )!.ToJsonString ( new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } );
         string             expectedJson      = File.ReadAllText ( "CombinedConfigurationForRoundTripTest.json" );
         Assert.That ( serializedJson, Is.EqualTo ( expectedJson ) );
     }
@@ -116,7 +117,7 @@ public class ProgramTests
     {
         Program.Settings                  = null;
         Program.ZfsCommandRunnerSingleton = null;
-        ResetNLogToNoOutput ( );
+        ResetNLogToNoOutput( );
     }
 
     [Test]
@@ -136,7 +137,8 @@ public class ProgramTests
                               Assert.That ( getSingletonResult, Is.True );
                               Assert.That ( zfsCommandRunnerB,  Is.SameAs ( zfsCommandRunnerA ) );
                               Assert.That ( zfsCommandRunnerB,  Is.SameAs ( Program.ZfsCommandRunnerSingleton ) );
-                          } );
+                          }
+                        );
     }
 
     [Test]
@@ -151,7 +153,8 @@ public class ProgramTests
                           {
                               Assert.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
                               Assert.That ( zfsCommandRunnerA,                 Is.Not.Null );
-                          } );
+                          }
+                        );
         bool getSingletonResult = Program.TryGetZfsCommandRunner ( initialSettings, out IZfsCommandRunner? zfsCommandRunnerB, false );
 
         Assert.Multiple ( ( ) =>
@@ -160,11 +163,12 @@ public class ProgramTests
                               Assert.That ( zfsCommandRunnerB,                 Is.Not.Null );
                               Assert.That ( zfsCommandRunnerB,                 Is.Not.SameAs ( zfsCommandRunnerA ) );
                               Assert.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
-                          } );
+                          }
+                        );
     }
 
     [Test]
-    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZfsPaths ( [Values ( "", " ", "\t", "\n", "\r" )] string zfsPath )
+    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZfsPaths( [Values ( "", " ", "\t", "\n", "\r" )] string zfsPath )
     {
         SnapsInAZfsSettings initialSettings = new ( )
                                               {
@@ -176,7 +180,7 @@ public class ProgramTests
     }
 
     [Test]
-    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZpoolPaths ( [Values ( "", " ", "\t", "\n", "\r" )] string zpoolPath )
+    public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZpoolPaths( [Values ( "", " ", "\t", "\n", "\r" )] string zpoolPath )
     {
         SnapsInAZfsSettings initialSettings = new ( )
                                               {
@@ -189,76 +193,79 @@ public class ProgramTests
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_ExpectedChangesApplied ( )
     {
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, new [] { "--cron" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, new [] { "--cron" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, new [] { "--cron" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, new [] { "--cron" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Cron" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DryRun" )!, new [] { "--dry-run" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "DryRun" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DryRun" )!, new [] { "--dry-run" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "DryRun" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DryRun" )!, new [] { "--dry-run" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "DryRun" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DryRun" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "DryRun" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DryRun" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "DryRun" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Daemonize" )!, new [] { "--daemonize" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Daemonize" )!, new [] { "--daemonize" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Daemonize" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Daemonize" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoDaemonize" )!, new [] { "--no-daemonize" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), true, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoDaemonize" )!, new [] { "--no-daemonize" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoDaemonize" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoDaemonize" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "Daemonize" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "TakeSnapshots" )!, new [] { "--take-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "TakeSnapshots" )!, new [] { "--take-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "TakeSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "TakeSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoTakeSnapshots" )!, new [] { "--no-take-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoTakeSnapshots" )!, new [] { "--no-take-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoTakeSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoTakeSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "TakeSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "PruneSnapshots" )!, new [] { "--prune-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "PruneSnapshots" )!, new [] { "--prune-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "PruneSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "PruneSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoPruneSnapshots" )!, new [] { "--no-prune-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoPruneSnapshots" )!, new [] { "--no-prune-snapshots" }, true, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoPruneSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoPruneSnapshots" )!, Array.Empty<string> ( ), false, typeof (SnapsInAZfsSettings).GetProperty ( "PruneSnapshots" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=0" }, 0u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 10u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=0" }, 0u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 10u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=10" }, 10u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 10u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=10" }, 10u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 10u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=20" }, 20u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 20u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=20" }, 20u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 20u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=61" }, 61u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 60u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, new [] { "--daemon-timer-interval=61" }, 61u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 60u );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "DaemonTimerInterval" )!, Array.Empty<string> ( ), 0u, typeof (SnapsInAZfsSettings).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u, 10u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                new[] { "--cron" },                     true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                new[] { "--cron" },                     true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                new[] { "--cron" },                     true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                new[] { "--cron" },                     true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Cron" )!,                Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DryRun" )!,              new[] { "--dry-run" },                  true,  typeof( SnapsInAZfsSettings ).GetProperty ( "DryRun" ),                     true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DryRun" )!,              new[] { "--dry-run" },                  true,  typeof( SnapsInAZfsSettings ).GetProperty ( "DryRun" ),                     true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DryRun" )!,              new[] { "--dry-run" },                  true,  typeof( SnapsInAZfsSettings ).GetProperty ( "DryRun" ),                     false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DryRun" )!,              Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "DryRun" ),                     true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DryRun" )!,              Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "DryRun" ),                     false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Daemonize" )!,           new[] { "--daemonize" },                true,  typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Daemonize" )!,           new[] { "--daemonize" },                true,  typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Daemonize" )!,           Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Daemonize" )!,           Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoDaemonize" )!,         new[] { "--no-daemonize" },             true,  typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  true,  false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoDaemonize" )!,         new[] { "--no-daemonize" },             true,  typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoDaemonize" )!,         Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoDaemonize" )!,         Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "Daemonize" ),                  false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "TakeSnapshots" )!,       new[] { "--take-snapshots" },           true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "TakeSnapshots" )!,       new[] { "--take-snapshots" },           true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "TakeSnapshots" )!,       Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "TakeSnapshots" )!,       Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoTakeSnapshots" )!,     new[] { "--no-take-snapshots" },        true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoTakeSnapshots" )!,     new[] { "--no-take-snapshots" },        true,  typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoTakeSnapshots" )!,     Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoTakeSnapshots" )!,     Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "TakeSnapshots" ),              false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "PruneSnapshots" )!,      new[] { "--prune-snapshots" },          true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "PruneSnapshots" )!,      new[] { "--prune-snapshots" },          true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "PruneSnapshots" )!,      Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "PruneSnapshots" )!,      Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoPruneSnapshots" )!,    new[] { "--no-prune-snapshots" },       true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoPruneSnapshots" )!,    new[] { "--no-prune-snapshots" },       true,  typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoPruneSnapshots" )!,    Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoPruneSnapshots" )!,    Array.Empty<string>( ),                 false, typeof( SnapsInAZfsSettings ).GetProperty ( "PruneSnapshots" ),             false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=0" },  0u,    typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   10u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=0" },  0u,    typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   10u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=10" }, 10u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   10u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=10" }, 10u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   10u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=20" }, 20u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   20u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=20" }, 20u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   20u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=61" }, 61u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   60u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, new[] { "--daemon-timer-interval=61" }, 61u,   typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   60u );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "DaemonTimerInterval" )!, Array.Empty<string>( ),                 0u,    typeof( SnapsInAZfsSettings ).GetProperty ( "DaemonTimerIntervalSeconds" ), 10u,   10u );
     }
 
     private static IEnumerable<TestCaseData> GetCasesForApplyCommandLineArgumentOverrides_Monitor_ExpectedChangesApplied ( )
     {
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Monitor" )!, new [] { "--monitor" }, true, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Monitor" )!, new [] { "--monitor" }, true, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), false, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Monitor" )!, Array.Empty<string> ( ), false, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "Monitor" )!, Array.Empty<string> ( ), false, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoMonitor" )!, new [] { "--no-monitor" }, true, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), true, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoMonitor" )!, new [] { "--no-monitor" }, true, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), false, false );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoMonitor" )!, Array.Empty<string> ( ), false, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), true, true );
-        yield return new ( typeof (CommandLineArguments).GetProperty ( "NoMonitor" )!, Array.Empty<string> ( ), false, typeof (MonitoringSettings).GetProperty ( "EnableHttp" ), false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Monitor" )!,   new[] { "--monitor" },    true,  typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Monitor" )!,   new[] { "--monitor" },    true,  typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), false, true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Monitor" )!,   Array.Empty<string>( ),   false, typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "Monitor" )!,   Array.Empty<string>( ),   false, typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoMonitor" )!, new[] { "--no-monitor" }, true,  typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), true,  false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoMonitor" )!, new[] { "--no-monitor" }, true,  typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), false, false );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoMonitor" )!, Array.Empty<string>( ),   false, typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), true,  true );
+        yield return new TestCaseData ( typeof( CommandLineArguments ).GetProperty ( "NoMonitor" )!, Array.Empty<string>( ),   false, typeof( MonitoringSettings ).GetProperty ( "EnableHttp" ), false, false );
     }
 
-    private static PropertyInfo [] GetSnapsInAZfsSettingsPropertyInfos ( ) { return typeof (SnapsInAZfsSettings).GetProperties ( ).Where ( pi => pi.Name is not nameof (SnapsInAZfsSettings.Templates) and not nameof (SnapsInAZfsSettings.Monitoring) ).ToArray ( ); }
+    private static PropertyInfo[] GetSnapsInAZfsSettingsPropertyInfos ( )
+    {
+        return typeof( SnapsInAZfsSettings ).GetProperties( ).Where ( pi => pi.Name is not nameof (SnapsInAZfsSettings.Templates) and not nameof (SnapsInAZfsSettings.Monitoring) ).ToArray( );
+    }
 
     private static void ResetNLogToNoOutput ( )
     {
-        if ( LogManager.Configuration is { } )
+        if ( LogManager.Configuration is not null )
         {
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
         }
 
-        LogManager.Setup ( ).LoadConfiguration ( builder => { builder.ForLogger ( ).FilterLevels ( LogLevel.Trace, LogLevel.Off ).WriteToNil ( ); } );
+        LogManager.Setup( ).LoadConfiguration ( builder => { builder.ForLogger( ).FilterLevels ( LogLevel.Trace, LogLevel.Off ).WriteToNil( ); } );
         LogManager.ReconfigExistingLoggers ( true );
     }
 }

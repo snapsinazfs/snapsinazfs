@@ -14,7 +14,7 @@ namespace SnapsInAZfs.Settings.Tests.Settings;
 
 [TestFixture]
 [Category ( "Settings" )]
-[TestOf ( typeof (SnapsInAZfsSettings) )]
+[TestOf ( typeof( SnapsInAZfsSettings ) )]
 public class SnapsInAZfsSettingsTests
 {
     [Test ( ExpectedResult = 10U )]
@@ -23,7 +23,7 @@ public class SnapsInAZfsSettingsTests
     public uint Constructor_DaemonTimerIntervalSeconds_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.DaemonTimerIntervalSeconds;
     }
@@ -34,7 +34,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_LocalSystemName_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.LocalSystemName;
     }
@@ -45,7 +45,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_ZfsPath_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.ZfsPath;
     }
@@ -56,7 +56,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_ZpoolPath_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.ZpoolPath;
     }
