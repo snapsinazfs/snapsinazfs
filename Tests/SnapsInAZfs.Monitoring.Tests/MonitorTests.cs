@@ -51,13 +51,13 @@ public partial class MonitorTests
         SnapshotOperationsObservableMock observable  = new ( );
 
         // Use reflection to set the fields to non-zero values, since we don't want to expose setters on the properties
-        FieldInfo snapshotsPrunedSucceededLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsPrunedSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsPrunedSucceededLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsPrunedSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsPrunedSucceededLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsPrunedFailedLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsPrunedFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsPrunedFailedLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsPrunedFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsPrunedFailedLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsTakenSucceededLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsTakenSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsTakenSucceededLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsTakenSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsTakenSucceededLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsTakenFailedLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsTakenFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsTakenFailedLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsTakenFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsTakenFailedLastRunFieldInfo.SetValue ( testMonitor, 1u );
 
         Assume.That ( testMonitor.SnapshotsPrunedSucceededLastRun, Is.EqualTo ( 1u ) );
