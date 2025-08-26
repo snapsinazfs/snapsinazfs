@@ -294,9 +294,9 @@ internal static class Program
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
     {
-        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed.
     #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER || WINDOWS
-            zfsCommandRunner = new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath );
+            zfsCommandRunner = new DummyZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
     #else
         zfsCommandRunner = new ZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
     #endif
