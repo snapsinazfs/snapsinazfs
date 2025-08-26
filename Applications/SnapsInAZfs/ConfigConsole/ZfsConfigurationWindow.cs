@@ -362,7 +362,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionDailyPropertyName, retentionDailyTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDailyPropertyName}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Daily snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionDailyTextField.Text = node.TreeDataset.SnapshotRetentionDaily.Value.ToString( );
 
@@ -419,7 +419,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, retentionFrequentTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequentPropertyName}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
 
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Frequent snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionFrequentTextField.Text = node.TreeDataset.SnapshotRetentionFrequent.Value.ToString( );
@@ -477,7 +477,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, retentionHourlyTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourlyPropertyName}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionHourlyTextField.Text = node.TreeDataset.SnapshotRetentionHourly.Value.ToString( );
 
@@ -534,7 +534,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, retentionMonthlyTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionMonthlyTextField.Text = node.TreeDataset.SnapshotRetentionMonthly.Value.ToString( );
 
@@ -593,7 +593,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionPruneDeferralTextField.Text = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString( );
 
@@ -654,7 +654,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, retentionWeeklyTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionWeeklyTextField.Text = node.TreeDataset.SnapshotRetentionWeekly.Value.ToString( );
 
@@ -711,7 +711,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, retentionYearlyTextField.Text ?? "(null)", min, max );
+                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearlyPropertyName}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
                 retentionYearlyTextField.Text = node.TreeDataset.SnapshotRetentionYearly.Value.ToString( );
 
@@ -775,35 +775,35 @@ public sealed partial class ZfsConfigurationWindow
             switch ( dialogResult )
             {
                 case 0:
-                    Logger.Debug ( "User canceled save confirmation for ZFS object {0}", zfsObjectPath );
+                    Logger.Debug ( $"User canceled save confirmation for ZFS object {zfsObjectPath}" );
 
                     return;
                 case 1:
-                    Logger.Debug ( "User confirmed the pending zfs set operation {0}", pendingCommands.ToNewlineSeparatedString( ) );
+                    Logger.Debug ( $"User confirmed the pending zfs set operation {pendingCommands.ToNewlineSeparatedString( )}" );
 
                     break;
             }
 
-            Logger.Info ( "Saving changes to {0}", zfsObjectPath );
+            Logger.Info ( $"Saving changes to {zfsObjectPath}" );
 
             if ( areAnyPropertiesModified )
             {
                 node.GetModifiedZfsProperties ( out List<IZfsProperty>? modifiedZfsProperties );
                 ZfsCommandRunnerOperationStatus setPropertiesResult = await ZfsTasks.SetPropertiesForDatasetAsync ( Program.Settings!.DryRun, zfsObjectPath, modifiedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait ( true );
-                Logger.Trace ( "Set properties result was {0}", setPropertiesResult );
+                Logger.Trace ( $"Set properties result was {setPropertiesResult}" );
 
                 switch ( setPropertiesResult )
                 {
                     case ZfsCommandRunnerOperationStatus.Success:
-                        Logger.Debug ( "Set properties operation successful for {0}", zfsObjectPath );
+                        Logger.Debug ( $"Set properties operation successful for {zfsObjectPath}" );
 
                         break;
                     case ZfsCommandRunnerOperationStatus.DryRun:
-                        Logger.Info ( "DRY RUN: Pretending set properties operation was successful for {0}", zfsObjectPath );
+                        Logger.Info ( $"DRY RUN: Pretending set properties operation was successful for {zfsObjectPath}" );
 
                         break;
                     default:
-                        Logger.Error ( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                        Logger.Error ( $"Setting ZFS properties for ZFS object {zfsObjectPath} failed" );
 
                         break;
                 }
@@ -816,21 +816,21 @@ public sealed partial class ZfsConfigurationWindow
                 switch ( inheritPropertiesResult )
                 {
                     case ZfsCommandRunnerOperationStatus.Success:
-                        Logger.Info ( "DRY RUN: Pretending all requested properties were inherited successfully for {0}", zfsObjectPath );
+                        Logger.Info ( $"DRY RUN: Pretending all requested properties were inherited successfully for {zfsObjectPath}" );
 
                         break;
                     case ZfsCommandRunnerOperationStatus.DryRun:
-                        Logger.Info ( "DRY RUN: Pretending all requested properties were inherited successfully for {0}", zfsObjectPath );
+                        Logger.Info ( $"DRY RUN: Pretending all requested properties were inherited successfully for {zfsObjectPath}" );
 
                         break;
                     default:
-                        Logger.Error ( "Inheriting ZFS properties for ZFS object {0} failed", zfsObjectPath );
+                        Logger.Error ( $"Inheriting ZFS properties for ZFS object {zfsObjectPath} failed" );
 
                         break;
                 }
             }
 
-            Logger.Debug ( "Applying inheritable properties to children of {0} in tree", zfsObjectPath );
+            Logger.Debug ( $"Applying inheritable properties to children of {zfsObjectPath} in tree" );
             node.CopyTreeDatasetPropertiesToBaseDataset( );
         }
         finally
