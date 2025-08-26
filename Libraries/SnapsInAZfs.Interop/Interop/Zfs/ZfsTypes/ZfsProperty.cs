@@ -61,7 +61,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     public ZfsRecord? Owner { get; init; }
 
     /// <summary>
-    ///     Gets a string representation of the Value property, in an appropriate form for its type
+    ///     Gets a string representation of the Value property, in an appropriate form for its type.
     /// </summary>
     [JsonIgnore]
     public string ValueString => Value switch
@@ -69,7 +69,8 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
                                      int intValue            => intValue.ToString( ),
                                      string value            => value,
                                      bool boolValue          => boolValue.ToString( ).ToLowerInvariant( ),
-                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" )
+                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" ),
+                                     _                       => Value?.ToString( ) ?? ""
                                  };
 
     [JsonIgnore]
