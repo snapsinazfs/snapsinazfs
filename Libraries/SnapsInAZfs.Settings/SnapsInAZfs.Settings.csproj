@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net9.0</TargetFrameworks>
 		<DefineConstants>$(DefineConstants)</DefineConstants>
-		<LangVersion>12</LangVersion>
+		<LangVersion>13</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
@@ -38,8 +38,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="JetBrains.Annotations" Version="[2024.3.0,)" />
-		<PackageReference Include="NLog" Version="5.4.0" />
+		<PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
+		<PackageReference Include="NLog" Version="6.0.3" />
 		<PackageReference Include="Polyfill" Version="[7.20.0,)" Condition="'$(TargetFramework)' == 'net8.0'">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

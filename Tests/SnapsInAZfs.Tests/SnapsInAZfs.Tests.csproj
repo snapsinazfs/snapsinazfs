@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <Platforms>x64</Platforms>
@@ -49,11 +49,14 @@
   </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="[17.13.0,)" />
-      <PackageReference Include="NUnit" Version="4.3.2" />
+      <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+      <PackageReference Include="NLog" Version="6.0.3" />
+      <PackageReference Include="NLog.Extensions.Logging" Version="6.0.3" />
+      <PackageReference Include="NUnit" Version="4.4.0" />
       <PackageReference Include="NUnit.Extension.VSProjectLoader" Version="3.9.0" />
-      <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
-      <PackageReference Include="NUnit.Analyzers" Version="4.6.0">
+      <PackageReference Include="NUnit3TestAdapter" Version="5.1.0" />
+      <PackageReference Include="NUnit.Analyzers" Version="4.10.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -67,6 +70,10 @@
 
   <ItemGroup>
     <Using Include="SnapsInAZfs.Settings" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2025.2.0" />
   </ItemGroup>
 
 </Project>

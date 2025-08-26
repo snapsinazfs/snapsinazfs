@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
@@ -20,20 +18,19 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-
 public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" );
 
-    private ZfsProperty ( string name, in T value, bool isLocal = true )
+    private ZfsProperty( string name, in T value, bool isLocal = true )
     {
         Name    = name;
         Value   = value;
         IsLocal = isLocal;
     }
 
-    public ZfsProperty ( ZfsRecord owner, string name, in T value, bool isLocal = true )
+    public ZfsProperty( ZfsRecord owner, string name, in T value, bool isLocal = true )
     {
         Owner   = owner;
         Name    = name;
@@ -64,15 +61,16 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     public ZfsRecord? Owner { get; init; }
 
     /// <summary>
-    ///     Gets a string representation of the Value property, in an appropriate form for its type
+    ///     Gets a string representation of the Value property, in an appropriate form for its type.
     /// </summary>
     [JsonIgnore]
     public string ValueString => Value switch
                                  {
-                                     int intValue            => intValue.ToString ( ),
+                                     int intValue            => intValue.ToString( ),
                                      string value            => value,
-                                     bool boolValue          => boolValue.ToString ( ).ToLowerInvariant ( ),
-                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" )
+                                     bool boolValue          => boolValue.ToString( ).ToLowerInvariant( ),
+                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" ),
+                                     _                       => Value?.ToString( ) ?? ""
                                  };
 
     [JsonIgnore]
@@ -83,51 +81,54 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     public string Name    { get; init; }
     public bool   IsLocal { get; init; }
 
-    public static ZfsProperty<bool> CreateWithoutParent ( string name, in bool value, bool isLocal = true )
+    public static ZfsProperty<bool> CreateWithoutParent( string name, in bool value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<bool> {0} without parent dataset", name );
 
         return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<int> CreateWithoutParent ( string name, in int value, bool isLocal = true )
+    public static ZfsProperty<int> CreateWithoutParent( string name, in int value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<int> {0} without parent dataset", name );
 
         return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<string> CreateWithoutParent ( string name, string value, bool isLocal = true )
+    public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<string> {0} without parent dataset", name );
 
         return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<DateTimeOffset> CreateWithoutParent ( string name, in DateTimeOffset value, bool isLocal = true )
+    public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, in DateTimeOffset value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name );
 
         return new ( name, in value, isLocal );
     }
 
-    public static ZfsProperty<T> DefaultProperty ( ) => new ( );
+    public static ZfsProperty<T> DefaultProperty ( )
+    {
+        return new ( );
+    }
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see langword="bool"/>) equivalent
+    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see langword="bool" />) equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
+    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}"/> (<see langword="bool"/>), if successful
+    ///     The parsed <see cref="ZfsProperty{T}" /> (<see langword="bool" />), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
+    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
-    ///     <paramref name="property"/> is always <see langword="null"/>
+    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
+    ///     <paramref name="property" /> is always <see langword="null" />
     /// </remarks>
-    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<bool>? property )
+    public static bool TryParse( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<bool>? property )
     {
         property = null;
 
@@ -143,20 +144,20 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     }
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see langword="int"/>) equivalent
+    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see langword="int" />) equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
+    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}"/> (<see langword="int"/>), if successful
+    ///     The parsed <see cref="ZfsProperty{T}" /> (<see langword="int" />), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
+    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
-    ///     <paramref name="property"/> is always <see langword="null"/>
+    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
+    ///     <paramref name="property" /> is always <see langword="null" />
     /// </remarks>
-    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<int>? property )
+    public static bool TryParse( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<int>? property )
     {
         if ( int.TryParse ( input.Value, out int result ) )
         {
@@ -171,21 +172,21 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     }
 
     /// <summary>
-    ///     Attempts to parse a <see cref="RawProperty"/> as its <see cref="ZfsProperty{T}"/> (<see cref="DateTimeOffset"/>)
+    ///     Attempts to parse a <see cref="RawProperty" /> as its <see cref="ZfsProperty{T}" /> (<see cref="DateTimeOffset" />)
     ///     equivalent
     /// </summary>
-    /// <param name="input">The <see cref="RawProperty"/> to parse</param>
+    /// <param name="input">The <see cref="RawProperty" /> to parse</param>
     /// <param name="property">
-    ///     The parsed <see cref="ZfsProperty{T}"/> (<see cref="DateTimeOffset"/>), if successful
+    ///     The parsed <see cref="ZfsProperty{T}" /> (<see cref="DateTimeOffset" />), if successful
     /// </param>
     /// <returns>
-    ///     <see langword="true"/> if <paramref name="input"/> was parsed successfully; otherwise <see langword="false"/>
+    ///     <see langword="true" /> if <paramref name="input" /> was parsed successfully; otherwise <see langword="false" />
     /// </returns>
     /// <remarks>
-    ///     <paramref name="property"/> is never null when this method returns <see langword="true"/>; otherwise,
-    ///     <paramref name="property"/> is always <see langword="null"/>
+    ///     <paramref name="property" /> is never null when this method returns <see langword="true" />; otherwise,
+    ///     <paramref name="property" /> is always <see langword="null" />
     /// </remarks>
-    public static bool TryParse ( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<DateTimeOffset>? property )
+    public static bool TryParse( RawProperty input, [NotNullWhen ( true )] out ZfsProperty<DateTimeOffset>? property )
     {
         if ( DateTimeOffset.TryParse ( input.Value, out DateTimeOffset result ) )
         {
@@ -199,7 +200,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         return false;
     }
 
-    public static bool TryParseDatasetPropertiesFromRawZfsObject (
+    public static bool TryParseDatasetPropertiesFromRawZfsObject(
         string                                                  dsName,
         RawZfsObject                                            rawZfsObject,
         [NotNullWhen ( true )] out ZfsProperty<bool>?           enabled,
@@ -247,6 +248,8 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         Unsafe.SkipInit ( out retentionPruneDeferral );
         Unsafe.SkipInit ( out sourceSystem );
 
+        // TODO: This can likely be done more cleanly and efficiently.
+        // Just remember that the point is it bails as soon as any parse fails. It can't just be a simple switch.
         if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.EnabledPropertyName, rawZfsObject, out enabled ) )
         {
             return false;
@@ -354,7 +357,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         return true;
     }
 
-    private static bool TryParsePropertyByName ( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<bool>? parsedProperty )
+    private static bool TryParsePropertyByName( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<bool>? parsedProperty )
     {
         Unsafe.SkipInit ( out parsedProperty );
 
@@ -373,7 +376,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         return false;
     }
 
-    private static bool TryParsePropertyByName ( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<DateTimeOffset>? parsedProperty )
+    private static bool TryParsePropertyByName( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<DateTimeOffset>? parsedProperty )
     {
         Unsafe.SkipInit ( out parsedProperty );
 
@@ -392,7 +395,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         return false;
     }
 
-    private static bool TryParsePropertyByName ( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<int>? parsedProperty )
+    private static bool TryParsePropertyByName( string objectName, string propertyName, RawZfsObject rawZfsObject, [NotNullWhen ( true )] out ZfsProperty<int>? parsedProperty )
     {
         Unsafe.SkipInit ( out parsedProperty );
 

@@ -1,6 +1,5 @@
 ﻿#region MIT LICENSE
-
-// Copyright 2023 Brandon Thetford
+// Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using System.Text.Json.Serialization;
@@ -20,28 +18,28 @@ public sealed class ApplicationStateMetrics
 {
     public ApplicationStateMetrics( string state, DateTimeOffset serviceStartTime, DateTimeOffset nextRunTime, long workingSet, string version )
     {
-        Version = version;
-        State = state;
+        Version          = version;
+        State            = state;
         ServiceStartTime = serviceStartTime.ToLocalTime( );
-        NextRunTime = nextRunTime.ToLocalTime( );
-        WorkingSet = workingSet;
+        NextRunTime      = nextRunTime.ToLocalTime( );
+        WorkingSet       = workingSet;
     }
 
-    [JsonPropertyOrder( 3 )]
+    [JsonPropertyOrder ( 3 )]
     public DateTimeOffset NextRunTime { get; set; }
 
-    [JsonPropertyOrder( 2 )]
+    [JsonPropertyOrder ( 2 )]
     public DateTimeOffset ServiceStartTime { get; set; }
 
-    [JsonPropertyOrder( 1 )]
+    [JsonPropertyOrder ( 1 )]
     public string? State { get; set; }
 
-    [JsonPropertyOrder( 4 )]
+    [JsonPropertyOrder ( 4 )]
     public string? Version { get; set; }
 
-    [JsonPropertyOrder( 5 )]
+    [JsonPropertyOrder ( 5 )]
     public long WorkingSet { get; set; }
 
     [JsonIgnore]
-    internal static ApplicationStateMetrics Empty => new( string.Empty, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, 0L, string.Empty );
+    internal static ApplicationStateMetrics Empty => new ( string.Empty, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, 0L, string.Empty );
 }

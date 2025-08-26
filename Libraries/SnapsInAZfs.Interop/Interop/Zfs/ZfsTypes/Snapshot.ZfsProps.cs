@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,14 +8,13 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public sealed partial record Snapshot
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (Snapshot)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (Snapshot)}" );
 
     private readonly    ZfsProperty<string>         _period;
     private readonly    ZfsProperty<DateTimeOffset> _timestamp;
@@ -24,12 +22,12 @@ public sealed partial record Snapshot
     public ref readonly ZfsProperty<DateTimeOffset> Timestamp => ref _timestamp;
 
     /// <summary>
-    ///     Updates the property with the specified <paramref name="propertyName"/> and returns a <see langword="ref"/> to the updated
+    ///     Updates the property with the specified <paramref name="propertyName" /> and returns a <see langword="ref" /> to the updated
     ///     property.
     /// </summary>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
     /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the Timestamp or Period properties</exception>
-    public override ref readonly ZfsProperty<string> UpdateProperty ( string propertyName, string propertyValue, bool isLocal = true )
+    public override ref readonly ZfsProperty<string> UpdateProperty( string propertyName, string propertyValue, bool isLocal = true )
     {
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
@@ -42,11 +40,11 @@ public sealed partial record Snapshot
     }
 
     /// <summary>
-    ///     Updates the property with the specified <paramref name="propertyName"/> and returns a <see langword="ref"/> to the updated
+    ///     Updates the property with the specified <paramref name="propertyName" /> and returns a <see langword="ref" /> to the updated
     ///     property.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">If an attempt is made to change the Timestamp property</exception>
-    public override ref readonly ZfsProperty<DateTimeOffset> UpdateProperty ( string propertyName, in DateTimeOffset propertyValue, bool isLocal = true )
+    public override ref readonly ZfsProperty<DateTimeOffset> UpdateProperty( string propertyName, in DateTimeOffset propertyValue, bool isLocal = true )
     {
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
@@ -58,9 +56,9 @@ public sealed partial record Snapshot
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    protected override void OnParentUpdatedStringProperty ( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
+    protected override void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
         Logger.Trace ( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
 

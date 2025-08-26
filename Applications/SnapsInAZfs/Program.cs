@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs;
@@ -38,29 +36,29 @@ internal static class Program
 {
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
-    private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" )!;
-    private static readonly IMonitor             ServiceObserver = new Monitor ( );
+    private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" );
+    private static readonly IMonitor             ServiceObserver = new Monitor( );
     private static          IConfigurationRoot?  _configurationRoot;
     internal static         SnapsInAZfsSettings? Settings;
 
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
     [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
-    public static async Task<int> Main ( string [] argv )
+    public static async Task<int> Main( string[] argv )
     {
         CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
 
         // Implicit null check here is important.
         if ( args is not { Help: false } )
         {
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return (int)Errno.ECANCELED;
         }
 
         if ( !LoadConfigurationFromConfigurationFiles ( ref Settings, out _configurationRoot, in args ) )
         {
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return (int)Errno.EFTYPE;
         }
@@ -71,11 +69,11 @@ internal static class Program
         {
             // ReSharper disable once ExceptionNotDocumented
             // ReSharper disable once HeapView.ObjectAllocation
-            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly ( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute> ( )?.InformationalVersion}";
+            string versionString = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion}";
             Console.WriteLine ( versionString );
             Logger.Debug ( versionString );
             Logger.Trace ( "Version argument provided. Exiting." );
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return (int)Errno.ECANCELED;
         }
@@ -94,12 +92,12 @@ internal static class Program
             catch ( Exception e )
             {
                 Logger.Fatal ( e, "Error in configuration console - Exiting" );
-                LogManager.Shutdown ( );
+                LogManager.Shutdown( );
 
                 return (int)Errno.GenericError;
             }
 
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return 0;
         }
@@ -125,9 +123,9 @@ internal static class Program
     /// </summary>
     /// <param name="args"></param>
     /// <param name="programSettings">
-    ///     A reference to an instance of a <see cref="SnapsInAZfsSettings"/> object to modify
+    ///     A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
     /// </param>
-    internal static void ApplyCommandLineArgumentOverrides ( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
+    internal static void ApplyCommandLineArgumentOverrides( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
     {
         Logger.Debug ( "Overriding settings using arguments from command line." );
 
@@ -143,7 +141,7 @@ internal static class Program
         }
     }
 
-    internal static bool LoadConfigurationFromConfigurationFiles ( [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen ( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
+    internal static bool LoadConfigurationFromConfigurationFiles( [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen ( true )] out IConfigurationRoot? rootConfiguration, in CommandLineArguments args )
     {
         // Configuration is built in the following order from various sources.
         // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
@@ -183,23 +181,23 @@ internal static class Program
             return false;
         }
 
-        rootConfiguration = configBuilder.Build ( );
+        rootConfiguration = configBuilder.Build( );
 
         Logger.Trace ( "Building settings objects from IConfiguration" );
 
         try
         {
-            settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
+            settings = rootConfiguration.Get<SnapsInAZfsSettings>( ) ?? throw new InvalidOperationException( );
             IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( "Kestrel" );
 
-            if ( kestrelSection.Exists ( ) )
+            if ( kestrelSection.Exists( ) )
             {
-                IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren ( );
-                settings.Monitoring.Kestrel = kestrelSettings.ToDictionary ( static k => k.Key, static v => v.SerializeToJson ( ) );
+                IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren( );
+                settings.Monitoring.Kestrel = kestrelSettings.ToDictionary ( static k => k.Key, static v => v.SerializeToJson( ) );
             }
 
             IConfigurationSection nlogConfigSection = rootConfiguration.GetSection ( "NLog" );
-            LogManager.Configuration = nlogConfigSection.Exists ( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration ( );
+            LogManager.Configuration = nlogConfigSection.Exists( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration( );
         }
         catch ( Exception ex )
         {
@@ -212,35 +210,35 @@ internal static class Program
     }
 
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    internal static void SetCommandLineLoggingOverride ( CommandLineArguments args )
+    internal static void SetCommandLineLoggingOverride( CommandLineArguments args )
     {
         if ( args.Debug )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Debug! );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Debug );
         }
 
         if ( args.Quiet )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Warn! );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Warn );
         }
 
         if ( args.ReallyQuiet )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Off! );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Off );
         }
 
         if ( args.Trace )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Trace! );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Trace );
         }
 
         if ( args.Verbose )
         {
-            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Info! );
+            LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Info );
         }
     }
 
-    internal static bool TryGetZfsCommandRunner ( SnapsInAZfsSettings settings, [NotNullWhen ( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
+    internal static bool TryGetZfsCommandRunner( SnapsInAZfsSettings settings, [NotNullWhen ( true )] out IZfsCommandRunner? zfsCommandRunner, bool reuseSingleton = true )
     {
         if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
         {
@@ -278,7 +276,7 @@ internal static class Program
         return true;
     }
 
-    private static SiazService? GetSiazServiceInstance ( SnapsInAZfsSettings settings )
+    private static SiazService? GetSiazServiceInstance( SnapsInAZfsSettings settings )
     {
         if ( !TryGetZfsCommandRunner ( settings, out IZfsCommandRunner? zfsCommandRunner ) )
         {
@@ -287,24 +285,24 @@ internal static class Program
 
         if ( settings.Monitoring.EnableHttp )
         {
-            return new ( settings, zfsCommandRunner, ServiceObserver, ServiceObserver );
+            return new SiazService ( settings, zfsCommandRunner, ServiceObserver, ServiceObserver );
         }
 
-        return new ( settings, zfsCommandRunner );
+        return new SiazService ( settings, zfsCommandRunner );
     }
 
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    private static void GetZfsCommandRunner ( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
+    private static void GetZfsCommandRunner( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
     {
-        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed
+        // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed.
     #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER || WINDOWS
-            zfsCommandRunner = new DummyZfsCommandRunner( settings.ZfsPath, settings.ZpoolPath );
+            zfsCommandRunner = new DummyZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
     #else
         zfsCommandRunner = new ZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
     #endif
     }
 
-    private static async Task<int> RunWithKestrelAsync ( SnapsInAZfsSettings settings, IConfigurationRoot configurationRoot )
+    private static async Task<int> RunWithKestrelAsync( SnapsInAZfsSettings settings, IConfigurationRoot configurationRoot )
     {
         SiazService.Timestamp = DateTimeOffset.Now;
         using SiazService? serviceInstance = GetSiazServiceInstance ( settings );
@@ -312,33 +310,36 @@ internal static class Program
         if ( serviceInstance is null )
         {
             Logger.Fatal ( "Failed to create service instance - exiting" );
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return (int)Errno.ENOATTR;
         }
 
-        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder ( );
+        WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
 
         // Disposal happens after service shutdown, so this inspection can be ignored here
         // ReSharper disable once AccessToDisposedClosure
         serviceBuilder.Host
-                      .UseSystemd ( )
+                      .UseSystemd( )
                       .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) );
 
         serviceBuilder.WebHost
                       .UseConfiguration (
                                          configurationRoot
                                             .GetRequiredSection ( "Monitoring" )
-                                            .GetSection ( "Kestrel" ) )
+                                            .GetSection ( "Kestrel" )
+                                        )
                       .UseKestrel ( ( _, kestrelOptions ) =>
                                     {
                                         kestrelOptions.Configure (
                                                                   configurationRoot
                                                                      .GetRequiredSection ( "Monitoring" )
-                                                                     .GetSection ( "Kestrel" ) )
-                                                      .Load ( );
-                                    } );
-        WebApplication svc = serviceBuilder.Build ( );
+                                                                     .GetSection ( "Kestrel" )
+                                                                 )
+                                                      .Load( );
+                                    }
+                                  );
+        WebApplication svc = serviceBuilder.Build( );
 
         RouteGroupBuilder statusGroup = svc.MapGroup ( "/" );
         statusGroup.MapGet ( "/",                 ServiceObserver.GetApplicationStateAsync );
@@ -375,7 +376,7 @@ internal static class Program
         return SiazService.ExitStatus;
     }
 
-    private static async Task<int> RunWithoutKestrelAsync ( SnapsInAZfsSettings settings )
+    private static async Task<int> RunWithoutKestrelAsync( SnapsInAZfsSettings settings )
     {
         SiazService.Timestamp = DateTimeOffset.Now;
         using SiazService? serviceInstance = GetSiazServiceInstance ( settings );
@@ -383,17 +384,17 @@ internal static class Program
         if ( serviceInstance is null )
         {
             Logger.Fatal ( "Failed to create service instance - exiting" );
-            LogManager.Shutdown ( );
+            LogManager.Shutdown( );
 
             return (int)Errno.ENOATTR;
         }
 
         // Disposal happens after service shutdown, so this inspection can be ignored here
         // ReSharper disable once AccessToDisposedClosure
-        IHost serviceHost = Host.CreateDefaultBuilder ( )
-                                .UseSystemd ( )
+        IHost serviceHost = Host.CreateDefaultBuilder( )
+                                .UseSystemd( )
                                 .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) )
-                                .Build ( );
+                                .Build( );
         using CancellationTokenSource tokenSource = new ( );
         CancellationToken             masterToken = tokenSource.Token;
         await serviceHost.StartAsync ( masterToken ).ConfigureAwait ( true );
@@ -402,7 +403,7 @@ internal static class Program
         return SiazService.ExitStatus;
     }
 
-    private static Errno ValidateSettings ( ref readonly SnapsInAZfsSettings settings )
+    private static Errno ValidateSettings( ref readonly SnapsInAZfsSettings settings )
     {
         SettingsValidator validator = SettingsValidator.Validate ( in settings );
 
@@ -417,19 +418,19 @@ internal static class Program
 
         if ( validator is { IsAutoConfigureLocalSystemNameRequested: true } )
         {
-            settings.AutoDetectAndSetLocalSystemName ( );
+            settings.AutoDetectAndSetLocalSystemName( );
             autoDetectionInvoked = true;
         }
 
         if ( validator is { IsAutoConfigureZfsPathRequested: true } )
         {
-            settings.AutoDetectAndSetZfsPath ( );
+            settings.AutoDetectAndSetZfsPath( );
             autoDetectionInvoked = true;
         }
 
         if ( validator is { IsAutoConfigureZpoolPathRequested: true } )
         {
-            settings.AutoDetectAndSetZpoolPath ( );
+            settings.AutoDetectAndSetZpoolPath( );
             autoDetectionInvoked = true;
         }
 

@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Settings;
@@ -23,10 +21,10 @@ using System.Text.RegularExpressions;
 /// </summary>
 /// <remarks>
 ///     This type is not versioned and may not be binary-compatible between different SIAZ versions. It should not be serialized
-///     except for logging.<br/>
-///     Note that the default state of this type has <see cref="ValidationErrors"/> = 1 and <see cref="IsSettingsObjectNull"/> =
-///     <see langword="true"/>, which are handled appropriately by normal logic once validation is performed against a non-null
-///     instance of <see cref="SnapsInAZfsSettings"/>.
+///     except for logging.<br />
+///     Note that the default state of this type has <see cref="ValidationErrors" /> = 1 and <see cref="IsSettingsObjectNull" /> =
+///     <see langword="true" />, which are handled appropriately by normal logic once validation is performed against a non-null
+///     instance of <see cref="SnapsInAZfsSettings" />.
 /// </remarks>
 [ComponentGuarantees ( ComponentGuaranteesOptions.None )]
 public partial record SettingsValidator
@@ -42,47 +40,48 @@ public partial record SettingsValidator
     private int  _validationErrorCount = 1;
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.LocalSystemName"/>
-    ///     setting was set to '*', indicating that auto-detection and configuration of <see cref="SnapsInAZfsSettings.LocalSystemName"/>
+    ///     Gets or sets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.LocalSystemName" />
+    ///     setting was set to '*', indicating that auto-detection and configuration of
+    ///     <see cref="SnapsInAZfsSettings.LocalSystemName" />
     ///     based on the local system's fully qualified domain name has been requested.
     /// </summary>
     /// <remarks>
-    ///     If this property is <see langword="true"/> after validation, the
-    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetLocalSystemName"/> method should be called on the settings object and then
-    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.LocalSystemName"/> value for normal
+    ///     If this property is <see langword="true" /> after validation, the
+    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetLocalSystemName" /> method should be called on the settings object and then
+    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.LocalSystemName" /> value for normal
     ///     operation.
     /// </remarks>
     public bool IsAutoConfigureLocalSystemNameRequested { get; private set; }
 
     /// <summary>
-    ///     Gets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZfsPath"/>
-    ///     setting was set to '*', indicating that auto-detection and configuration of <see cref="SnapsInAZfsSettings.ZfsPath"/>
+    ///     Gets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZfsPath" />
+    ///     setting was set to '*', indicating that auto-detection and configuration of <see cref="SnapsInAZfsSettings.ZfsPath" />
     ///     based on the local system's fully qualified domain name has been requested.
     /// </summary>
     /// <remarks>
-    ///     If this property is <see langword="true"/> after validation, the
-    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetZfsPath"/> method should be called on the settings object and then
-    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.ZfsPath"/> value for normal
+    ///     If this property is <see langword="true" /> after validation, the
+    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetZfsPath" /> method should be called on the settings object and then
+    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.ZfsPath" /> value for normal
     ///     operation.
     /// </remarks>
     public bool IsAutoConfigureZfsPathRequested { get; private set; }
 
     /// <summary>
-    ///     Gets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZpoolPath"/>
-    ///     setting was set to '*', indicating that auto-detection and configuration of <see cref="SnapsInAZfsSettings.ZpoolPath"/>
+    ///     Gets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZpoolPath" />
+    ///     setting was set to '*', indicating that auto-detection and configuration of <see cref="SnapsInAZfsSettings.ZpoolPath" />
     ///     based on the local system's fully qualified domain name has been requested.
     /// </summary>
     /// <remarks>
-    ///     If this property is <see langword="true"/> after validation, the
-    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetZpoolPath"/> method should be called on the settings object and then
-    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.ZpoolPath"/> value for normal
+    ///     If this property is <see langword="true" /> after validation, the
+    ///     <see cref="SnapsInAZfsSettings.AutoDetectAndSetZpoolPath" /> method should be called on the settings object and then
+    ///     validation should be performed again before using the <see cref="SnapsInAZfsSettings.ZpoolPath" /> value for normal
     ///     operation.
     /// </remarks>
     public bool IsAutoConfigureZpoolPathRequested { get; private set; }
 
     /// <summary>
-    ///     Gets a boolean indicating if the count of validation errors is 0 (<see langword="false"/>) or non-zero
-    ///     (<see langword="true"/>).
+    ///     Gets a boolean indicating if the count of validation errors is 0 (<see langword="false" />) or non-zero
+    ///     (<see langword="true" />).
     /// </summary>
     /// <remarks>
     ///     If the error count is negative, another property has a bug.
@@ -90,7 +89,7 @@ public partial record SettingsValidator
     public bool IsInvalid => ValidationErrors != 0;
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.LocalSystemName"/>
+    ///     Gets or sets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.LocalSystemName" />
     ///     setting is invalid.
     /// </summary>
     public bool IsLocalSystemNameInvalid
@@ -117,7 +116,7 @@ public partial record SettingsValidator
     }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value indicating if the <see cref="SnapsInAZfsSettings"/> reference was NOT a null
+    ///     Gets or sets a <see cref="Boolean" /> value indicating if the <see cref="SnapsInAZfsSettings" /> reference was NOT a null
     ///     reference.
     /// </summary>
     public bool IsSettingsObjectNull
@@ -144,7 +143,7 @@ public partial record SettingsValidator
     }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZfsPath"/>
+    ///     Gets or sets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZfsPath" />
     ///     setting is invalid.
     /// </summary>
     public bool IsZfsPathInvalid
@@ -171,7 +170,7 @@ public partial record SettingsValidator
     }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZpoolPath"/>
+    ///     Gets or sets a <see cref="Boolean" /> value indicating if the value of the <see cref="SnapsInAZfsSettings.ZpoolPath" />
     ///     setting is invalid.
     /// </summary>
     public bool IsZpoolPathInvalid
@@ -199,11 +198,11 @@ public partial record SettingsValidator
 
     public int ValidationErrors => _validationErrorCount;
 
-    public void AutoDetectAndSetLocalSystemName ( ref readonly SnapsInAZfsSettings settings )
+    public void AutoDetectAndSetLocalSystemName( ref readonly SnapsInAZfsSettings settings )
     {
         if ( IsAutoConfigureLocalSystemNameRequested )
         {
-            settings.AutoDetectAndSetLocalSystemName ( );
+            settings.AutoDetectAndSetLocalSystemName( );
             Logger.Info ( $"Using auto-detected FQDN value `{settings.LocalSystemName}` for {nameof (SnapsInAZfsSettings.LocalSystemName)} during this instance of SnapsInAZfs." );
 
             return;
@@ -213,24 +212,24 @@ public partial record SettingsValidator
     }
 
     /// <summary>
-    ///     Performs validation of the properties exposed by this type, using the provided <paramref name="settings"/> reference as the
+    ///     Performs validation of the properties exposed by this type, using the provided <paramref name="settings" /> reference as the
     ///     configuration to validate
     /// </summary>
-    /// <param name="settings">The <see cref="SnapsInAZfsSettings"/> instance to validate.</param>
+    /// <param name="settings">The <see cref="SnapsInAZfsSettings" /> instance to validate.</param>
     /// <param name="previousValidator">
     ///     Optional parameter which, if not null, causes the IsAutoConfigureXRequested values to be copied to the returned validator
     ///     before returning, to preserve auto-detect information.
     /// </param>
     /// <returns>
-    ///     A new <see cref="SettingsValidator"/> object with all <see cref="Boolean"/> values set according to defined validation
+    ///     A new <see cref="SettingsValidator" /> object with all <see cref="Boolean" /> values set according to defined validation
     ///     logic.
     /// </returns>
     /// <remarks>
-    ///     Does not modify <paramref name="settings"/>.<br/>
+    ///     Does not modify <paramref name="settings" />.<br />
     ///     Logs specific errors for each validation issue encountered and validates all properties for which this type has an IsXValid
     ///     flag, before returning.
     /// </remarks>
-    public static SettingsValidator Validate ( ref readonly SnapsInAZfsSettings settings, SettingsValidator? previousValidator = null )
+    public static SettingsValidator Validate( ref readonly SnapsInAZfsSettings settings, SettingsValidator? previousValidator = null )
     {
         Logger.Trace ( $"Clean validation of {nameof (SnapsInAZfsSettings)} instance requested." );
 
@@ -250,7 +249,7 @@ public partial record SettingsValidator
         validator.ValidateZfsPath ( nonNullSettings.ZfsPath );
         validator.ValidateZpoolPath ( nonNullSettings.ZpoolPath );
 
-        if ( previousValidator is { } )
+        if ( previousValidator is not null )
         {
             validator.IsAutoConfigureLocalSystemNameRequested = previousValidator.IsAutoConfigureLocalSystemNameRequested;
             validator.IsAutoConfigureZfsPathRequested         = previousValidator.IsAutoConfigureZfsPathRequested;
@@ -261,7 +260,7 @@ public partial record SettingsValidator
     }
 
     /// <summary>
-    ///     Source-generated regex for validating the <see cref="SnapsInAZfsSettings.LocalSystemName"/> property value.
+    ///     Source-generated regex for validating the <see cref="SnapsInAZfsSettings.LocalSystemName" /> property value.
     /// </summary>
     [GeneratedRegex ( @"^(?:[a-zA-Z0-9_-]+\.)*[a-zA-Z0-9_-]+\.?$", RegexOptions.Singleline | RegexOptions.CultureInvariant )]
     private static partial Regex LocalSystemNameRegex ( );
@@ -271,13 +270,13 @@ public partial record SettingsValidator
     ///     to be invalid.
     /// </summary>
     /// <param name="localSystemName">
-    ///     The string to validate against the rules for the <see cref="SnapsInAZfsSettings.LocalSystemName"/> setting.
+    ///     The string to validate against the rules for the <see cref="SnapsInAZfsSettings.LocalSystemName" /> setting.
     /// </param>
     /// <returns>
-    ///     <see langword="true"/>, if the string is invalid for the <see cref="SnapsInAZfsSettings.LocalSystemName"/> setting;
-    ///     <see langword="false"/>, otherwise.
+    ///     <see langword="true" />, if the string is invalid for the <see cref="SnapsInAZfsSettings.LocalSystemName" /> setting;
+    ///     <see langword="false" />, otherwise.
     /// </returns>
-    private void ValidateLocalSystemName ( [NotNullWhen ( false )] string? localSystemName )
+    private void ValidateLocalSystemName( [NotNullWhen ( false )] string? localSystemName )
     {
         if ( string.IsNullOrWhiteSpace ( localSystemName ) )
         {
@@ -300,7 +299,7 @@ public partial record SettingsValidator
                 IsLocalSystemNameInvalid = true;
 
                 return;
-            case { } when LocalSystemNameRegex ( ).IsMatch ( localSystemName ):
+            case not null when LocalSystemNameRegex( ).IsMatch ( localSystemName ):
                 Logger.Debug ( $"{nameof (SnapsInAZfsSettings.LocalSystemName)} value \"{localSystemName}\" does not appear to be invalid." );
                 IsLocalSystemNameInvalid = false;
 
@@ -313,7 +312,7 @@ public partial record SettingsValidator
         }
     }
 
-    private void ValidateZfsPath ( string zfsPath )
+    private void ValidateZfsPath( string zfsPath )
     {
         if ( string.IsNullOrWhiteSpace ( zfsPath ) )
         {
@@ -331,7 +330,7 @@ public partial record SettingsValidator
                 IsZfsPathInvalid                = false;
 
                 return;
-            case { } when File.Exists ( zfsPath ):
+            case not null when File.Exists ( zfsPath ):
                 Logger.Debug ( $"{nameof (SnapsInAZfsSettings.ZfsPath)} value \"{zfsPath}\" does not appear to be invalid." );
                 IsZfsPathInvalid = false;
 
@@ -344,7 +343,7 @@ public partial record SettingsValidator
         }
     }
 
-    private void ValidateZpoolPath ( string zpoolPath )
+    private void ValidateZpoolPath( string zpoolPath )
     {
         if ( string.IsNullOrWhiteSpace ( zpoolPath ) )
         {
@@ -362,7 +361,7 @@ public partial record SettingsValidator
                 IsZpoolPathInvalid                = false;
 
                 return;
-            case { } when File.Exists ( zpoolPath ):
+            case not null when File.Exists ( zpoolPath ):
                 Logger.Debug ( $"{nameof (SnapsInAZfsSettings.ZpoolPath)} value \"{zpoolPath}\" does not appear to be invalid." );
                 IsZpoolPathInvalid = false;
 

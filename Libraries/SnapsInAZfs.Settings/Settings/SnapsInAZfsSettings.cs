@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Settings;
@@ -19,7 +17,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 ///     Settings class for use with the .net IConfiguration binder
 /// </summary>
-[JsonSerializable ( typeof (SnapsInAZfsSettings) )]
+[JsonSerializable ( typeof( SnapsInAZfsSettings ) )]
 [PublicAPI]
 public sealed record SnapsInAZfsSettings
 {
@@ -49,7 +47,7 @@ public sealed record SnapsInAZfsSettings
     ///     <para>
     ///         This value is critical for proper operation of SIAZ, whether replication is currently or ever has been in use or not, as
     ///         it is part of the logic used to determine if a snapshot is eligible for pruning or not, and is written explicitly to
-    ///         every snapshot SIAZ creates.<br/>
+    ///         every snapshot SIAZ creates.<br />
     ///         Snapshots missing this property MAY be ignored by SIAZ entirely, for any or all purposes.
     ///     </para>
     ///     <para>
@@ -123,25 +121,34 @@ public sealed record SnapsInAZfsSettings
     public const string AutoDetectSpecifier = "*";
 
     /// <summary>
-    ///     Sets <see cref="LocalSystemName"/> to the value returned by the <see cref="Utility.GetFullyQualifiedDomainName()"/> method.
+    ///     Sets <see cref="LocalSystemName" /> to the value returned by the <see cref="Utility.GetFullyQualifiedDomainName()" /> method.
     /// </summary>
     /// <remarks>
-    ///     The returned value depends on platform configuration and should not be relied on for normal operation.<br/>
-    ///     Configure the <see cref="LocalSystemName"/> property explicitly instead of letting auto-detection run for every instance of
+    ///     The returned value depends on platform configuration and should not be relied on for normal operation.<br />
+    ///     Configure the <see cref="LocalSystemName" /> property explicitly instead of letting auto-detection run for every instance of
     ///     SIAZ or bad things could happen potentially including data loss due to improper snapshot pruning based on unintended matches
-    ///     due to improper or counter-indicated use of <see cref="LocalSystemName"/>.
+    ///     due to improper or counter-indicated use of <see cref="LocalSystemName" />.
     /// </remarks>
-    public void AutoDetectAndSetLocalSystemName ( ) { LocalSystemName = Utility.GetFullyQualifiedDomainName ( ); }
+    public void AutoDetectAndSetLocalSystemName ( )
+    {
+        LocalSystemName = Utility.GetFullyQualifiedDomainName( );
+    }
 
     /// <summary>
-    ///     Sets <see cref="ZfsPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     Sets <see cref="ZfsPath" /> to the value returned by the <see cref="Utility.Which(string)" /> method, with parameter value
     ///     "zfs"
     /// </summary>
-    public void AutoDetectAndSetZfsPath ( ) { LocalSystemName = Utility.Which ( "zfs" ); }
+    public void AutoDetectAndSetZfsPath ( )
+    {
+        LocalSystemName = Utility.Which ( "zfs" );
+    }
 
     /// <summary>
-    ///     Sets <see cref="ZpoolPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     Sets <see cref="ZpoolPath" /> to the value returned by the <see cref="Utility.Which(string)" /> method, with parameter value
     ///     "zpool"
     /// </summary>
-    public void AutoDetectAndSetZpoolPath ( ) { LocalSystemName = Utility.Which ( "zpool" ); }
+    public void AutoDetectAndSetZpoolPath ( )
+    {
+        LocalSystemName = Utility.Which ( "zpool" );
+    }
 }

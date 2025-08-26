@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,14 +8,13 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Settings.Tests.Settings;
 
 [TestFixture]
 [Category ( "Settings" )]
-[TestOf ( typeof (SnapsInAZfsSettings) )]
+[TestOf ( typeof( SnapsInAZfsSettings ) )]
 public class SnapsInAZfsSettingsTests
 {
     [Test ( ExpectedResult = 10U )]
@@ -25,7 +23,7 @@ public class SnapsInAZfsSettingsTests
     public uint Constructor_DaemonTimerIntervalSeconds_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.DaemonTimerIntervalSeconds;
     }
@@ -36,7 +34,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_LocalSystemName_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.LocalSystemName;
     }
@@ -47,7 +45,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_ZfsPath_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.ZfsPath;
     }
@@ -58,7 +56,7 @@ public class SnapsInAZfsSettingsTests
     public string Constructor_ZpoolPath_DefaultValueAsExpected ( )
     {
         SnapsInAZfsSettings testObject = new ( );
-        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings> ( ) );
+        Assume.That ( testObject, Is.Not.Null.And.InstanceOf<SnapsInAZfsSettings>( ) );
 
         return testObject.ZpoolPath;
     }

@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using System.Collections.Frozen;
@@ -44,7 +42,8 @@ public interface IZfsProperty
                                                   ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
                                                   ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,
                                                   ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName
-                                              ] );
+                                              ]
+                                             );
 
         KnownSnapshotProperties =
             ImmutableSortedSet<string>.Empty
@@ -53,13 +52,14 @@ public interface IZfsProperty
                                                   ZfsPropertyNames.SnapshotPeriodPropertyName,
                                                   ZfsPropertyNames.SnapshotTimestampPropertyName,
                                                   ZfsPropertyNames.PruneSnapshotsPropertyName
-                                              ] );
+                                              ]
+                                             );
 
-        AllKnownProperties = KnownDatasetProperties.Union ( KnownSnapshotProperties, StringComparer.OrdinalIgnoreCase ).ToImmutableSortedSet ( );
+        AllKnownProperties = KnownDatasetProperties.Union ( KnownSnapshotProperties, StringComparer.OrdinalIgnoreCase ).ToImmutableSortedSet( );
     }
 
     /// <summary>
-    ///     Gets the union of <see cref="KnownDatasetProperties"/> and <see cref="KnownSnapshotProperties"/>
+    ///     Gets the union of <see cref="KnownDatasetProperties" /> and <see cref="KnownSnapshotProperties" />
     /// </summary>
     public static ImmutableSortedSet<string> AllKnownProperties { get; }
 
@@ -86,14 +86,15 @@ public interface IZfsProperty
               { ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,             6 ) },
               { ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,               0 ) },
               { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ) }
-          }.ToFrozenDictionary ( );
+          }.ToFrozenDictionary( );
 
     public static ImmutableSortedDictionary<string, IZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, IZfsProperty>.Empty.AddRange (
                                                                                                                                                                        new Dictionary<string, IZfsProperty>
                                                                                                                                                                        {
                                                                                                                                                                            { ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet ) },
                                                                                                                                                                            { ZfsPropertyNames.SnapshotTimestampPropertyName, ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) }
-                                                                                                                                                                       } );
+                                                                                                                                                                       }
+                                                                                                                                                                      );
 
     bool                                     IsLocal                 { get; init; }
     public static ImmutableSortedSet<string> KnownDatasetProperties  { get; }

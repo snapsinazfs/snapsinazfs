@@ -1,15 +1,13 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-// 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// 
+// See https://opensource.org/license/MIT/
 #endregion
 
 using System.Collections.Concurrent;
@@ -25,15 +23,15 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<ZfsRecord, ZfsRecord, bool>
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsRecord)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsRecord)}" );
 
     /// <summary>
     ///     Represents a node in the ZFS hierarchy.
     /// </summary>
     /// <exception cref="ArgumentNullException">
-    ///     <paramref name="sourceSystem"/> is <see langword="null"/>, empty, or only whitespace
+    ///     <paramref name="sourceSystem" /> is <see langword="null" />, empty, or only whitespace.
     /// </exception>
-    public ZfsRecord ( string Name, string Kind, string sourceSystem = "", bool inheritProperties = true, ZfsRecord? parent = null )
+    public ZfsRecord( string Name, string Kind, string sourceSystem = "", bool inheritProperties = true, ZfsRecord? parent = null )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace ( sourceSystem, nameof (sourceSystem) );
 
@@ -44,13 +42,13 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         NameValidatorRegex = Kind switch
                              {
-                                 ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                                 ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                                 ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex ( ),
+                                 ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                                 ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                                 ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex( ),
                                  _                                    => throw new InvalidOperationException ( "Unknown type of object specified for ZfsIdentifierValidator." )
                              };
 
-        if ( parent is { } && inheritProperties )
+        if ( parent is not null && inheritProperties )
         {
             _enabled                        = parent.Enabled with { IsLocal = false, Owner = this };
             _lastDailySnapshotTimestamp     = parent.LastDailySnapshotTimestamp with { Value = DateTimeOffset.UnixEpoch, IsLocal = true, Owner = this };
@@ -97,10 +95,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     (Protected) Creates a new instance of a <see cref="ZfsRecord"/> from all supplied properties.
+    ///     (Protected) Creates a new instance of a <see cref="ZfsRecord" /> from all supplied properties.
     /// </summary>
-    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
-    protected ZfsRecord (
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value.</exception>
+    protected ZfsRecord(
         string                         name,
         string                         kind,
         in ZfsProperty<bool>           enabled,
@@ -130,7 +128,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     {
         if ( string.IsNullOrWhiteSpace ( sourceSystem.Value ) )
         {
-            throw new ArgumentException ( "sourceSystem must have a non-null, non-whitespace-only Value", nameof (sourceSystem) );
+            throw new ArgumentException ( "sourceSystem must have a non-null, non-whitespace-only Value.", nameof (sourceSystem) );
         }
 
         Name          = name;
@@ -140,13 +138,13 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         NameValidatorRegex = kind switch
                              {
-                                 ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                                 ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                                 ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex ( ),
+                                 ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                                 ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                                 ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex( ),
                                  _                                    => throw new InvalidOperationException ( "Unknown type of object specified for ZfsIdentifierValidator." )
                              };
         bool notASnapshot = Kind != ZfsPropertyValueConstants.Snapshot;
-        bool isASnapshot  = parent is { } && Kind == ZfsPropertyValueConstants.Snapshot;
+        bool isASnapshot  = parent is not null && Kind == ZfsPropertyValueConstants.Snapshot;
 
         if ( forcePropertyOwnership || isASnapshot )
         {
@@ -199,7 +197,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
             _takeSnapshots       = takeSnapshots;
             _pruneSnapshotsField = pruneSnapshots;
 
-            // If local, take what we were given. Otherwise, construct a default property, as this should NEVER be inherited
+            // If local, take what we were given. Otherwise, construct a default property, as this should NEVER be inherited.
             _lastFrequentSnapshotTimestamp = lastFrequentSnapshotTimestamp.IsLocal ? lastFrequentSnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
             _lastHourlySnapshotTimestamp   = lastHourlySnapshotTimestamp.IsLocal ? lastHourlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
             _lastDailySnapshotTimestamp    = lastDailySnapshotTimestamp.IsLocal ? lastDailySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
@@ -228,7 +226,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public long BytesAvailable { get; init; }
     public long BytesUsed      { get; init; }
 
-    public int            ChildDatasetCount                     => _childDatasets.Count;
+    public int            ChildDatasetCount                     => ChildDatasets.Count;
     public bool           IsPoolRoot                            { get; }
     public string         Kind                                  { get; }
     public DateTimeOffset LastObservedDailySnapshotTimestamp    { get; private set; } = DateTimeOffset.UnixEpoch;
@@ -244,22 +242,22 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
     public int SnapshotCount => Snapshots.Values.Sum ( static d => d.Count );
 
-    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = GetNewSnapshotCollection ( );
+    public ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> Snapshots { get; } = GetNewSnapshotCollection( );
 
     public bool SubscribedToParentPropertyChangeEvents { get; private set; }
 
     [JsonIgnore]
     internal Regex NameValidatorRegex { get; }
 
-    private SortedDictionary<string, ZfsRecord> _childDatasets { get; } = new ( );
+    private SortedDictionary<string, ZfsRecord> ChildDatasets { get; } = new ( );
 
     [JsonIgnore]
     private long PercentBytesUsed => BytesUsed * 100 / BytesAvailable;
 
-    /// <inheritdoc/>
-    public int CompareTo ( ZfsRecord? other )
+    /// <inheritdoc />
+    public int CompareTo( ZfsRecord? other )
     {
-        // If the other snapshot is null, consider this record earlier rank
+        // If the other snapshot is null, consider this record earlier rank.
         if ( other is null )
         {
             return -1;
@@ -268,60 +266,60 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return string.Compare ( Name, other.Name, StringComparison.Ordinal );
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <remarks>
     ///     The default generated record equality causes stack overflow due to the self-reference in root datasets,
-    ///     so it is excluded from equality comparison.<br/>
+    ///     so it is excluded from equality comparison.<br />
     ///     This equality method ONLY checks value properties and does not check the content of collections or references to other
-    ///     <see cref="ZfsRecord"/>s.<br/>
-    ///     It does, however, check <see cref="SnapshotCount"/> and <see cref="ChildDatasetCount"/>.
+    ///     <see cref="ZfsRecord" />s.<br />
+    ///     It does, however, check <see cref="SnapshotCount" /> and <see cref="ChildDatasetCount" />.
     /// </remarks>
-    public virtual bool Equals ( ZfsRecord? other ) =>
-
+    public virtual bool Equals( ZfsRecord? other )
+    {
         // Returning equality of value properties alphabetically
-        other is { }
-     && BytesAvailable                        == other.BytesAvailable
-     && BytesUsed                             == other.BytesUsed
-     && Enabled                               == other.Enabled
-     && IsPoolRoot                            == other.IsPoolRoot
-     && Kind                                  == other.Kind
-     && LastDailySnapshotTimestamp            == other.LastDailySnapshotTimestamp
-     && LastFrequentSnapshotTimestamp         == other.LastFrequentSnapshotTimestamp
-     && LastHourlySnapshotTimestamp           == other.LastHourlySnapshotTimestamp
-     && LastMonthlySnapshotTimestamp          == other.LastMonthlySnapshotTimestamp
-     && LastObservedDailySnapshotTimestamp    == other.LastObservedDailySnapshotTimestamp
-     && LastObservedFrequentSnapshotTimestamp == other.LastObservedFrequentSnapshotTimestamp
-     && LastObservedHourlySnapshotTimestamp   == other.LastObservedHourlySnapshotTimestamp
-     && LastObservedWeeklySnapshotTimestamp   == other.LastObservedWeeklySnapshotTimestamp
-     && LastObservedMonthlySnapshotTimestamp  == other.LastObservedMonthlySnapshotTimestamp
-     && LastObservedYearlySnapshotTimestamp   == other.LastObservedYearlySnapshotTimestamp
-     && LastWeeklySnapshotTimestamp           == other.LastWeeklySnapshotTimestamp
-     && LastYearlySnapshotTimestamp           == other.LastYearlySnapshotTimestamp
-     && Name                                  == other.Name
-     && PruneSnapshots                        == other.PruneSnapshots
-     && Recursion                             == other.Recursion
-     && SnapshotRetentionDaily                == other.SnapshotRetentionDaily
-     && SnapshotRetentionFrequent             == other.SnapshotRetentionFrequent
-     && SnapshotRetentionHourly               == other.SnapshotRetentionHourly
-     && SnapshotRetentionMonthly              == other.SnapshotRetentionMonthly
-     && SnapshotRetentionPruneDeferral        == other.SnapshotRetentionPruneDeferral
-     && SnapshotRetentionWeekly               == other.SnapshotRetentionWeekly
-     && SnapshotRetentionYearly               == other.SnapshotRetentionYearly
-     && SourceSystem                          == other.SourceSystem
-     && TakeSnapshots                         == other.TakeSnapshots
-     && Template                              == other.Template
-     && SnapshotCount                         == other.SnapshotCount
-     && ChildDatasetCount                     == other.ChildDatasetCount;
+        return other is not null && BytesAvailable                        == other.BytesAvailable
+                                 && BytesUsed                             == other.BytesUsed
+                                 && Enabled                               == other.Enabled
+                                 && IsPoolRoot                            == other.IsPoolRoot
+                                 && Kind                                  == other.Kind
+                                 && LastDailySnapshotTimestamp            == other.LastDailySnapshotTimestamp
+                                 && LastFrequentSnapshotTimestamp         == other.LastFrequentSnapshotTimestamp
+                                 && LastHourlySnapshotTimestamp           == other.LastHourlySnapshotTimestamp
+                                 && LastMonthlySnapshotTimestamp          == other.LastMonthlySnapshotTimestamp
+                                 && LastObservedDailySnapshotTimestamp    == other.LastObservedDailySnapshotTimestamp
+                                 && LastObservedFrequentSnapshotTimestamp == other.LastObservedFrequentSnapshotTimestamp
+                                 && LastObservedHourlySnapshotTimestamp   == other.LastObservedHourlySnapshotTimestamp
+                                 && LastObservedWeeklySnapshotTimestamp   == other.LastObservedWeeklySnapshotTimestamp
+                                 && LastObservedMonthlySnapshotTimestamp  == other.LastObservedMonthlySnapshotTimestamp
+                                 && LastObservedYearlySnapshotTimestamp   == other.LastObservedYearlySnapshotTimestamp
+                                 && LastWeeklySnapshotTimestamp           == other.LastWeeklySnapshotTimestamp
+                                 && LastYearlySnapshotTimestamp           == other.LastYearlySnapshotTimestamp
+                                 && Name                                  == other.Name
+                                 && PruneSnapshots                        == other.PruneSnapshots
+                                 && Recursion                             == other.Recursion
+                                 && SnapshotRetentionDaily                == other.SnapshotRetentionDaily
+                                 && SnapshotRetentionFrequent             == other.SnapshotRetentionFrequent
+                                 && SnapshotRetentionHourly               == other.SnapshotRetentionHourly
+                                 && SnapshotRetentionMonthly              == other.SnapshotRetentionMonthly
+                                 && SnapshotRetentionPruneDeferral        == other.SnapshotRetentionPruneDeferral
+                                 && SnapshotRetentionWeekly               == other.SnapshotRetentionWeekly
+                                 && SnapshotRetentionYearly               == other.SnapshotRetentionYearly
+                                 && SourceSystem                          == other.SourceSystem
+                                 && TakeSnapshots                         == other.TakeSnapshots
+                                 && Template                              == other.Template
+                                 && SnapshotCount                         == other.SnapshotCount
+                                 && ChildDatasetCount                     == other.ChildDatasetCount;
+    }
 
     /// <summary>
-    ///     Adds a <see cref="ZfsRecord"/> as an immediate descendant of the current <see cref="ZfsRecord"/> and subscribes the
-    ///     descendant to events published by the current <see cref="ZfsRecord"/>.
+    ///     Adds a <see cref="ZfsRecord" /> as an immediate descendant of the current <see cref="ZfsRecord" /> and subscribes the
+    ///     descendant to events published by the current <see cref="ZfsRecord" />.
     /// </summary>
     /// <exception cref="ArgumentException">
-    ///     If the <see cref="ParentDataset"/> property of <paramref name="childDataset"/> does not reference this
-    ///     <see cref="ZfsRecord"/> instance.
+    ///     If the <see cref="ParentDataset" /> property of <paramref name="childDataset" /> does not reference this
+    ///     <see cref="ZfsRecord" /> instance.
     /// </exception>
-    public void AddDataset ( ZfsRecord childDataset )
+    public void AddDataset( ZfsRecord childDataset )
     {
         if ( !ReferenceEquals ( childDataset.ParentDataset, this ) )
         {
@@ -329,21 +327,21 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         }
 
         SubscribeChildToPropertyEvents ( childDataset );
-        _childDatasets [ childDataset.Name ] = childDataset;
+        ChildDatasets [ childDataset.Name ] = childDataset;
     }
 
     /// <summary>
-    ///     Adds a <see cref="Snapshot"/> as an immediate descendant of the current <see cref="ZfsRecord"/>, subscribes the
-    ///     descendant to events published by the current <see cref="ZfsRecord"/>, and updates the corresponding latest snapshot period
+    ///     Adds a <see cref="Snapshot" /> as an immediate descendant of the current <see cref="ZfsRecord" />, subscribes the
+    ///     descendant to events published by the current <see cref="ZfsRecord" />, and updates the corresponding latest snapshot period
     ///     timestamp on the current object if it is newer than the current value.
     /// </summary>
     /// <returns>
-    ///     The same <see cref="Snapshot"/> reference that was supplied to this method in <paramref name="snap"/>.
+    ///     The same <see cref="Snapshot" /> reference that was supplied to this method in <paramref name="snap" />.
     /// </returns>
-    public Snapshot AddSnapshot ( Snapshot snap )
+    public Snapshot AddSnapshot( Snapshot snap )
     {
         Logger.Trace ( "Adding snapshot {0} to {1} {2}", snap.Name, Kind, Name );
-        SnapshotPeriodKind periodKind = snap.Period.Value.ToSnapshotPeriodKind ( );
+        SnapshotPeriodKind periodKind = snap.Period.Value.ToSnapshotPeriodKind( );
         Snapshots [ periodKind ] [ snap.Name ] = snap;
 
         switch ( periodKind )
@@ -382,11 +380,11 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Creates a new <see cref="Snapshot"/> from the supplied parameters, adds it as a descendant of the current
-    ///     <see cref="ZfsRecord"/> via <see cref="AddSnapshot"/>, and returns a reference to the new <see cref="Snapshot"/> instance.
+    ///     Creates a new <see cref="Snapshot" /> from the supplied parameters, adds it as a descendant of the current
+    ///     <see cref="ZfsRecord" /> via <see cref="AddSnapshot" />, and returns a reference to the new <see cref="Snapshot" /> instance.
     /// </summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
-    public Snapshot CreateAndAddSnapshot (
+    public Snapshot CreateAndAddSnapshot(
         string                         snapName,
         in ZfsProperty<bool>           enabled,
         in ZfsProperty<bool>           takeSnapshots,
@@ -442,20 +440,21 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                              sourceSystem,
                              periodString,
                              snapshotTimestamp,
-                             dataset );
+                             dataset
+                            );
         AddSnapshot ( snap );
 
         return snap;
     }
 
     /// <summary>
-    ///     Convenience method that creates a descendant <see cref="ZfsRecord"/> from the provided parameters and calls
-    ///     <see cref="AddDataset"/> to add it to the current <see cref="ZfsRecord"/>.
+    ///     Convenience method that creates a descendant <see cref="ZfsRecord" /> from the provided parameters and calls
+    ///     <see cref="AddDataset" /> to add it to the current <see cref="ZfsRecord" />.
     /// </summary>
     /// <exception cref="ArgumentNullException">
-    ///     <paramref name="sourceSystem"/> is <see langword="null"/>, empty, or only whitespace
+    ///     <paramref name="sourceSystem" /> is <see langword="null" />, empty, or only whitespace
     /// </exception>
-    public ZfsRecord CreateChildDataset ( string name, string kind, string sourceSystem = "", bool inheritProperties = true, long bytesAvailable = -1, long bytesUsed = -1 )
+    public ZfsRecord CreateChildDataset( string name, string kind, string sourceSystem = "", bool inheritProperties = true, long bytesAvailable = -1, long bytesUsed = -1 )
     {
         if ( string.IsNullOrWhiteSpace ( sourceSystem ) )
         {
@@ -490,8 +489,9 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                                      bytesAvailable,
                                      bytesUsed,
                                      this,
-                                     true )
-                              : new ( name, kind, sourceSystem, false, this )
+                                     true
+                                    )
+                              : new ZfsRecord ( name, kind, sourceSystem, false, this )
                                 {
                                     BytesAvailable = bytesAvailable,
                                     BytesUsed      = bytesUsed
@@ -503,10 +503,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Factory method that creates a new <see cref="ZfsRecord"/> via the protected constructor.
+    ///     Factory method that creates a new <see cref="ZfsRecord" /> via the protected constructor.
     /// </summary>
     /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
-    public static ZfsRecord CreateInstanceFromAllProperties (
+    public static ZfsRecord CreateInstanceFromAllProperties(
         string                         name,
         string                         kind,
         in ZfsProperty<bool>           enabled,
@@ -563,21 +563,22 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                     bytesAvailable,
                     bytesUsed,
                     parent,
-                    true );
+                    true
+                   );
     }
 
     /// <summary>
-    ///     Creates a new <see cref="Snapshot"/> from the given <paramref name="period"/> and <paramref name="timestamp"/>,
-    ///     using <paramref name="formattingSettings"/> to generate its name.
+    ///     Creates a new <see cref="Snapshot" /> from the given <paramref name="period" /> and <paramref name="timestamp" />,
+    ///     using <paramref name="formattingSettings" /> to generate its name.
     /// </summary>
-    /// <param name="period">The period for the new <see cref="Snapshot"/></param>
-    /// <param name="timestamp">The timestamp for the new <see cref="Snapshot"/></param>
+    /// <param name="period">The period for the new <see cref="Snapshot" /></param>
+    /// <param name="timestamp">The timestamp for the new <see cref="Snapshot" /></param>
     /// <param name="formattingSettings"></param>
     /// <param name="sourceSystem"></param>
     /// <returns>
-    ///     A reference to the created <see cref="Snapshot"/>
+    ///     A reference to the created <see cref="Snapshot" />
     /// </returns>
-    public Snapshot CreateSnapshot ( in SnapshotPeriod period, in DateTimeOffset timestamp, in FormattingSettings formattingSettings, in ZfsProperty<string> sourceSystem )
+    public Snapshot CreateSnapshot( in SnapshotPeriod period, in DateTimeOffset timestamp, in FormattingSettings formattingSettings, in ZfsProperty<string> sourceSystem )
     {
         Logger.Trace ( "Creating {0} snapshot for {1} {2}", period, Kind, Name );
 
@@ -593,25 +594,25 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Performs a deep copy of this <see cref="ZfsRecord"/>
+    ///     Performs a deep copy of this <see cref="ZfsRecord" />
     /// </summary>
     /// <param name="parent">
-    ///     A reference to the parent of the new <see cref="ZfsRecord"/> or <see langword="null"/>, if the record to be cloned should
+    ///     A reference to the parent of the new <see cref="ZfsRecord" /> or <see langword="null" />, if the record to be cloned should
     ///     be a pool root
     /// </param>
     /// <remarks>
     ///     The default copy constructor generated by the compiler performs a shallow copy and is unaware of the tree structure, which
-    ///     would mean that the <see cref="Snapshots"/> and <see cref="_childDatasets"/>
-    ///     collections would contain references to the original record<br/>
-    ///     This method loops over both collections, calling <see cref="DeepCopyClone"/> for every element of
-    ///     <see cref="_childDatasets"/> and <see cref="Snapshot.DeepCopyClone"/> for every <see cref="Snapshot"/> in
-    ///     <see cref="Snapshots"/>.<br/>
+    ///     would mean that the <see cref="Snapshots" /> and <see cref="ChildDatasets" />
+    ///     collections would contain references to the original record<br />
+    ///     This method loops over both collections, calling <see cref="DeepCopyClone" /> for every element of
+    ///     <see cref="ChildDatasets" /> and <see cref="Snapshot.DeepCopyClone" /> for every <see cref="Snapshot" /> in
+    ///     <see cref="Snapshots" />.<br />
     ///     THIS WILL RESULT IN A CLONE OF THE ENTIRE TREE FROM THIS NODE, INCLUDING ALL EVENT SUBSCRIPTIONS.
     /// </remarks>
     /// <returns>
-    ///     A new instance of a <see cref="ZfsRecord"/>, with all properties, both reference and value, cloned to new instances
+    ///     A new instance of a <see cref="ZfsRecord" />, with all properties, both reference and value, cloned to new instances
     /// </returns>
-    public virtual ZfsRecord DeepCopyClone ( ZfsRecord? parent = null )
+    public virtual ZfsRecord DeepCopyClone( ZfsRecord? parent = null )
     {
         ZfsRecord newRecord = new (
                                    Name,
@@ -638,7 +639,8 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                                    BytesAvailable,
                                    BytesUsed,
                                    parent,
-                                   true )
+                                   true
+                                  )
                               {
                                   LastObservedFrequentSnapshotTimestamp = LastObservedFrequentSnapshotTimestamp,
                                   LastObservedHourlySnapshotTimestamp   = LastObservedHourlySnapshotTimestamp,
@@ -648,7 +650,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                                   LastObservedYearlySnapshotTimestamp   = LastObservedYearlySnapshotTimestamp
                               };
 
-        foreach ( ( string _, ZfsRecord childDs ) in _childDatasets )
+        foreach ( ( string _, ZfsRecord childDs ) in ChildDatasets )
         {
             newRecord.AddDataset ( childDs.DeepCopyClone ( newRecord ) );
         }
@@ -665,19 +667,22 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets a child <see cref="ZfsRecord"/> from this <see cref="ZfsRecord"/>, by name, or <see langword="null"/>, if no such
+    ///     Gets a child <see cref="ZfsRecord" /> from this <see cref="ZfsRecord" />, by name, or <see langword="null" />, if no such
     ///     child exists.
     /// </summary>
-    /// <param name="childName">The fully-qualified name of the <see cref="ZfsRecord"/> to retrieve</param>
+    /// <param name="childName">The fully-qualified name of the <see cref="ZfsRecord" /> to retrieve</param>
     /// <param name="child">
-    ///     An <see langword="out"/> reference to the child <see cref="ZfsRecord"/>, if found
+    ///     An <see langword="out" /> reference to the child <see cref="ZfsRecord" />, if found
     /// </param>
     /// <returns>
-    ///     If <paramref name="childName"/> is found, <see langword="true"/>; Otherwise, <see langword="false"/>
+    ///     If <paramref name="childName" /> is found, <see langword="true" />; Otherwise, <see langword="false" />
     /// </returns>
-    public bool GetChild ( string childName, [NotNullWhen ( true )] out ZfsRecord? child ) => _childDatasets.TryGetValue ( childName, out child );
+    public bool GetChild( string childName, [NotNullWhen ( true )] out ZfsRecord? child )
+    {
+        return ChildDatasets.TryGetValue ( childName, out child );
+    }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     /// <remarks>
     ///     Uses name and kind only, since they are the only truly immutable properties relevant to this function
     /// </remarks>
@@ -687,7 +692,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         hashCode.Add ( Kind, StringComparer.CurrentCulture );
         hashCode.Add ( Name, StringComparer.CurrentCulture );
 
-        return hashCode.ToHashCode ( );
+        return hashCode.ToHashCode( );
     }
 
     public List<Snapshot> GetSnapshotsToPrune ( )
@@ -735,36 +740,39 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets and caches a sorted dictionary of the child datasets of this <see cref="ZfsRecord"/>
+    ///     Gets and caches a sorted dictionary of the child datasets of this <see cref="ZfsRecord" />
     /// </summary>
     /// <returns></returns>
-    public ImmutableSortedDictionary<string, ZfsRecord> GetSortedChildDatasets ( ) { return _sortedChildDatasets ??= _childDatasets.ToImmutableSortedDictionary ( ); }
+    public ImmutableSortedDictionary<string, ZfsRecord> GetSortedChildDatasets ( )
+    {
+        return _sortedChildDatasets ??= ChildDatasets.ToImmutableSortedDictionary( );
+    }
 
     /// <summary>
-    ///     Gets whether a daily snapshot is needed, according to the <paramref name="timestamp"/> and the properties defined
+    ///     Gets whether a daily snapshot is needed, according to the <paramref name="timestamp" /> and the properties defined
     ///     on the object
     /// </summary>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether ALL of the following conditions are met:
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
     ///             <description>Snapshot retention settings define daily greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp"/> is either more than one day ahead of the last daily
+    ///                 <paramref name="timestamp" /> is either more than one day ahead of the last daily
     ///                 snapshot OR the last daily snapshot is not in the same day of the year
     ///             </description>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsDailySnapshotNeeded ( in DateTimeOffset timestamp )
+    public bool IsDailySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no dailies
-        if ( !SnapshotRetentionDaily.IsWanted ( ) )
+        if ( !SnapshotRetentionDaily.IsWanted( ) )
         {
             return false;
         }
@@ -790,33 +798,33 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets whether a frequent snapshot is needed, according to the provided <see cref="SnapshotTimingSettings"/> and
-    ///     <paramref name="timestamp"/>
+    ///     Gets whether a frequent snapshot is needed, according to the provided <see cref="SnapshotTimingSettings" /> and
+    ///     <paramref name="timestamp" />
     /// </summary>
     /// <param name="template">
-    ///     The <see cref="SnapshotTimingSettings"/> object to check status against.
+    ///     The <see cref="SnapshotTimingSettings" /> object to check status against.
     /// </param>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether ALL of the following conditions are met:
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
     ///             <description>Template snapshot retention settings define frequent greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp"/> is either more than FrequentPeriod minutes ahead of the last frequent
+    ///                 <paramref name="timestamp" /> is either more than FrequentPeriod minutes ahead of the last frequent
     ///                 snapshot OR the last frequent snapshot is not in the same period of the hour
     ///             </description>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsFrequentSnapshotNeeded ( SnapshotTimingSettings template, in DateTimeOffset timestamp )
+    public bool IsFrequentSnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no frequent
-        if ( !SnapshotRetentionFrequent.IsWanted ( ) )
+        if ( !SnapshotRetentionFrequent.IsWanted( ) )
         {
             return false;
         }
@@ -840,29 +848,29 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets whether an hourly snapshot is needed, according to the provided <paramref name="timestamp"/>
+    ///     Gets whether an hourly snapshot is needed, according to the provided <paramref name="timestamp" />
     /// </summary>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether ALL of the following conditions are met:
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
     ///             <description>Snapshot retention settings define hourly greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp"/> is either more than one hour ahead of the last hourly
+    ///                 <paramref name="timestamp" /> is either more than one hour ahead of the last hourly
     ///                 snapshot OR the last hourly snapshot is not in the same hour
     ///             </description>
     ///         </item>
     ///     </list>
     /// </returns>
-    public bool IsHourlySnapshotNeeded ( in DateTimeOffset timestamp )
+    public bool IsHourlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no hourlies
-        if ( !SnapshotRetentionHourly.IsWanted ( ) )
+        if ( !SnapshotRetentionHourly.IsWanted( ) )
         {
             return false;
         }
@@ -891,17 +899,17 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     ///     Gets whether a monthly snapshot is needed
     /// </summary>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether ALL of the following conditions are met:
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
     ///             <description>Snapshot retention settings define monthly greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp"/> is either in a different month than the last monthly snapshot OR the last
+    ///                 <paramref name="timestamp" /> is either in a different month than the last monthly snapshot OR the last
     ///                 monthly snapshot is in a different year
     ///             </description>
     ///         </item>
@@ -910,10 +918,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     /// <remarks>
     ///     Uses culture-aware definitions of months, using the executing user's culture.
     /// </remarks>
-    public bool IsMonthlySnapshotNeeded ( in DateTimeOffset timestamp )
+    public bool IsMonthlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !SnapshotRetentionMonthly.IsWanted ( ) )
+        if ( !SnapshotRetentionMonthly.IsWanted( ) )
         {
             return false;
         }
@@ -942,24 +950,24 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets whether a weekly snapshot is needed, according to the provided <see cref="SnapshotTimingSettings"/> and
-    ///     <paramref name="timestamp"/>
+    ///     Gets whether a weekly snapshot is needed, according to the provided <see cref="SnapshotTimingSettings" /> and
+    ///     <paramref name="timestamp" />
     /// </summary>
     /// <param name="template">
-    ///     The <see cref="SnapshotTimingSettings"/> object to check status against.
+    ///     The <see cref="SnapshotTimingSettings" /> object to check status against.
     /// </param>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether ALL of the following conditions are met:
+    ///     A <see langword="bool" /> indicating whether ALL of the following conditions are met:
     ///     <list type="bullet">
     ///         <item>
     ///             <description>Snapshot retention settings define weekly greater than 0</description>
     ///         </item>
     ///         <item>
     ///             <description>
-    ///                 <paramref name="timestamp"/> is either more than 7 days ahead of the last weekly
+    ///                 <paramref name="timestamp" /> is either more than 7 days ahead of the last weekly
     ///                 snapshot OR the last weekly snapshot is not in the same week of the year
     ///             </description>
     ///         </item>
@@ -969,10 +977,10 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     ///     Uses culture-aware definitions of week numbers, using the executing user's culture, and treating the day of the
     ///     week specified in settings for weekly snapshots as the "first" day of the week, for week numbering purposes
     /// </remarks>
-    public bool IsWeeklySnapshotNeeded ( SnapshotTimingSettings template, in DateTimeOffset timestamp )
+    public bool IsWeeklySnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no weeklies
-        if ( !SnapshotRetentionWeekly.IsWanted ( ) )
+        if ( !SnapshotRetentionWeekly.IsWanted( ) )
         {
             Logger.Debug ( "Weekly snapshot not wanted for {0} {1}", Kind, Name );
 
@@ -1001,23 +1009,23 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     }
 
     /// <summary>
-    ///     Gets whether a yearly snapshot is needed, according to the <paramref name="timestamp"/> and properties defined on
-    ///     the <see cref="ZfsRecord"/>
+    ///     Gets whether a yearly snapshot is needed, according to the <paramref name="timestamp" /> and properties defined on
+    ///     the <see cref="ZfsRecord" />
     /// </summary>
     /// <param name="timestamp">
-    ///     The <see cref="DateTimeOffset"/> value to check against the last known snapshot of this type
+    ///     The <see cref="DateTimeOffset" /> value to check against the last known snapshot of this type
     /// </param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether the last yearly snapshot is in the same year as
-    ///     <paramref name="timestamp"/>
+    ///     A <see langword="bool" /> indicating whether the last yearly snapshot is in the same year as
+    ///     <paramref name="timestamp" />
     /// </returns>
     /// <remarks>
     ///     Uses culture-aware definitions of years, using the executing user's culture.
     /// </remarks>
-    public bool IsYearlySnapshotNeeded ( in DateTimeOffset timestamp )
+    public bool IsYearlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !SnapshotRetentionYearly.IsWanted ( ) )
+        if ( !SnapshotRetentionYearly.IsWanted( ) )
         {
             return false;
         }
@@ -1041,26 +1049,26 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return yearlySnapshotNeeded;
     }
 
-    public bool RemoveSnapshot ( Snapshot snapshot )
+    public bool RemoveSnapshot( Snapshot snapshot )
     {
         Logger.Debug ( "Removing snapshot {0} from {1}", snapshot.Name, Name );
         UnsubscribeSnapshotFromPropertyEvents ( snapshot );
 
-        return Snapshots [ snapshot.Period.Value.ToSnapshotPeriodKind ( ) ].TryRemove ( snapshot.Name, out _ );
+        return Snapshots [ snapshot.Period.Value.ToSnapshotPeriodKind( ) ].TryRemove ( snapshot.Name, out _ );
     }
 
     /// <summary>
-    ///     Validates a supplied <see cref="String"/> value against naming rules for ZFS objects supported by <see cref="ZfsRecord"/>.
+    ///     Validates a supplied <see cref="String" /> value against naming rules for ZFS objects supported by <see cref="ZfsRecord" />.
     /// </summary>
     /// <remarks>
-    ///     <paramref name="name"/> is validated as non-null, non-whitespace, no longer than 255 codepoints, and matching a
-    ///     <see cref="Regex"/> according to the supplied <paramref name="kind"/>.
+    ///     <paramref name="name" /> is validated as non-null, non-whitespace, no longer than 255 codepoints, and matching a
+    ///     <see cref="Regex" /> according to the supplied <paramref name="kind" />.
     /// </remarks>
     /// <exception cref="ArgumentNullException">
-    ///     name must be a non-null, non-empty, non-whitespace string <paramref name="name"/>
+    ///     name must be a non-null, non-empty, non-whitespace string <paramref name="name" />
     /// </exception>
-    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="name"/> is longer than 255 characters (ZFS limit)</exception>
-    public static bool ValidateName ( string kind, string name, Regex? validatorRegex = null )
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="name" /> is longer than 255 characters (ZFS limit)</exception>
+    public static bool ValidateName( string kind, string name, Regex? validatorRegex = null )
     {
         Logger.Debug ( "Validating name \"{0}\"", name );
 
@@ -1078,9 +1086,9 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         // ReSharper disable once SwitchExpressionHandlesSomeKnownEnumValuesWithExceptionInDefault
         validatorRegex ??= kind switch
                            {
-                               ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                               ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex ( ),
-                               ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex ( ),
+                               ZfsPropertyValueConstants.FileSystem => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                               ZfsPropertyValueConstants.Volume     => ZfsIdentifierRegexes.DatasetNameRegex( ),
+                               ZfsPropertyValueConstants.Snapshot   => ZfsIdentifierRegexes.SnapshotNameRegex( ),
                                _                                    => throw new ArgumentOutOfRangeException ( nameof (kind), "Unknown type of object specified to ValidateName." )
                            };
 
@@ -1116,45 +1124,54 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         return true;
     }
 
-    protected internal bool ValidateName ( string name ) => ValidateName ( Kind, name, NameValidatorRegex );
+    protected internal bool ValidateName( string name )
+    {
+        return ValidateName ( Kind, name, NameValidatorRegex );
+    }
 
-    protected internal bool ValidateName ( ) => ValidateName ( Name );
+    protected internal bool ValidateName ( )
+    {
+        return ValidateName ( Name );
+    }
 
     /// <summary>
-    ///     Gets the collection of <see cref="Snapshot"/>s, groups by <see cref="SnapshotPeriodKind"/>
+    ///     Gets the collection of <see cref="Snapshot" />s, groups by <see cref="SnapshotPeriodKind" />
     /// </summary>
     /// <remarks>
-    ///     Note that this is a reference type, as are the values of this collection.<br/>
-    ///     Thus, when cloning a <see cref="ZfsRecord"/> using the <see langword="with"/> operator, this collection
+    ///     Note that this is a reference type, as are the values of this collection.<br />
+    ///     Thus, when cloning a <see cref="ZfsRecord" /> using the <see langword="with" /> operator, this collection
     ///     needs to be re-created and all of its values deep-copied manually, if unique references are needed.
     /// </remarks>
-    private static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection ( ) =>
-        new (
-             new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
-             {
-                 { SnapshotPeriodKind.Frequent, [ ] },
-                 { SnapshotPeriodKind.Hourly, [ ] },
-                 { SnapshotPeriodKind.Daily, [ ] },
-                 { SnapshotPeriodKind.Weekly, [ ] },
-                 { SnapshotPeriodKind.Monthly, [ ] },
-                 { SnapshotPeriodKind.Yearly, [ ] }
-             } );
-
-    private void GetSnapshotsToPruneForPeriod ( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
+    private static ConcurrentDictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>> GetNewSnapshotCollection ( )
     {
-        List<Snapshot> snapshotsSetForPruning = Snapshots [ snapshotPeriod.Kind ].Where ( static kvp => kvp.Value.PruneSnapshots.Value ).Select ( static kvp => kvp.Value ).ToList ( );
+        return new (
+                    new Dictionary<SnapshotPeriodKind, ConcurrentDictionary<string, Snapshot>>
+                    {
+                        { SnapshotPeriodKind.Frequent, [ ] },
+                        { SnapshotPeriodKind.Hourly, [ ] },
+                        { SnapshotPeriodKind.Daily, [ ] },
+                        { SnapshotPeriodKind.Weekly, [ ] },
+                        { SnapshotPeriodKind.Monthly, [ ] },
+                        { SnapshotPeriodKind.Yearly, [ ] }
+                    }
+                   );
+    }
+
+    private void GetSnapshotsToPruneForPeriod( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
+    {
+        List<Snapshot> snapshotsSetForPruning = Snapshots [ snapshotPeriod.Kind ].Where ( static kvp => kvp.Value.PruneSnapshots.Value ).Select ( static kvp => kvp.Value ).ToList( );
         Logger.Trace ( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString ( true ) );
 
         if ( snapshotsSetForPruning.Count <= retentionValue )
         {
-            Logger.Trace ( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod.ToString ( ), Name, snapshotsSetForPruning.Count.ToString ( ), retentionValue.ToString ( ) );
+            Logger.Trace ( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod.ToString( ), Name, snapshotsSetForPruning.Count.ToString( ), retentionValue.ToString( ) );
 
             return;
         }
 
         int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
         Logger.Debug ( "Need to prune oldest {0} {1} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
-        snapshotsSetForPruning.Sort ( );
+        snapshotsSetForPruning.Sort( );
 
         for ( int i = 0; i < numberToPrune; i++ )
         {

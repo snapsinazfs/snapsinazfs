@@ -1,15 +1,13 @@
 #region MIT LICENSE
-
-// Copyright 2023 Brandon Thetford
+// Copyright 2025 Brandon Thetford
 // 
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 // 
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using System.Collections.Concurrent;
@@ -43,7 +41,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     public abstract IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args );
 
     /// <inheritdoc />
-    public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( );
+    public abstract Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync ( );
 
     /// <inheritdoc />
     public abstract Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
@@ -53,45 +51,45 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
     protected void CheckAndUpdateLastSnapshotTimesForDatasets( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
-        Logger.Trace( "Checking all dataset last snapshot times" );
+        Logger.Trace ( "Checking all dataset last snapshot times" );
         foreach ( ZfsRecord ds in datasets.Values )
         {
-            List<IZfsProperty> propertiesToSet = [];
+            List<IZfsProperty> propertiesToSet = [ ];
             if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp ) );
             }
 
             if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp ) );
             }
 
             if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp ) );
             }
 
             if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp ) );
             }
 
             if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp ) );
             }
 
             if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
             {
-                propertiesToSet.Add( ds.UpdateProperty( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp ) );
+                propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp ) );
             }
 
             // ReSharper disable once InvertIf
             if ( propertiesToSet.Count > 0 )
             {
-                Logger.Debug( "Timestamps are out of sync for {0} - updating properties", ds.Name );
-                SetZfsPropertiesAsync( settings.DryRun, ds.Name, propertiesToSet );
+                Logger.Debug ( "Timestamps are out of sync for {0} - updating properties", ds.Name );
+                SetZfsPropertiesAsync ( settings.DryRun, ds.Name, propertiesToSet );
             }
         }
     }
@@ -114,41 +112,41 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
         }
 
         return name switch
-        {
-            "type" => !string.IsNullOrWhiteSpace( value ) && value is ZfsPropertyValueConstants.FileSystem or ZfsPropertyValueConstants.Volume,
-            ZfsPropertyNames.EnabledPropertyName => bool.TryParse( value, out _ ),
-            ZfsPropertyNames.TakeSnapshotsPropertyName => bool.TryParse( value, out _ ),
-            ZfsPropertyNames.PruneSnapshotsPropertyName => bool.TryParse( value, out _ ),
-            ZfsPropertyNames.RecursionPropertyName => !string.IsNullOrWhiteSpace( value ) && value is ZfsPropertyValueConstants.SnapsInAZfs or ZfsPropertyValueConstants.ZfsRecursion,
-            ZfsPropertyNames.TemplatePropertyName => !string.IsNullOrWhiteSpace( value ),
-            ZfsPropertyNames.SourceSystem => !string.IsNullOrWhiteSpace( value ),
-            ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionDailyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => int.TryParse( value, out int intValue ) && intValue >= 0,
-            ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => int.TryParse( value, out int intValue ) && intValue is >= 0 and <= 100,
-            ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => DateTimeOffset.TryParse( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-            "used" => long.TryParse( value, out _ ),
-            "available" => long.TryParse( value, out _ ),
-            _ => throw new ArgumentOutOfRangeException( nameof (name) )
-        };
+               {
+                   "type"                                                            => !string.IsNullOrWhiteSpace ( value ) && value is ZfsPropertyValueConstants.FileSystem or ZfsPropertyValueConstants.Volume,
+                   ZfsPropertyNames.EnabledPropertyName                              => bool.TryParse ( value, out _ ),
+                   ZfsPropertyNames.TakeSnapshotsPropertyName                        => bool.TryParse ( value, out _ ),
+                   ZfsPropertyNames.PruneSnapshotsPropertyName                       => bool.TryParse ( value, out _ ),
+                   ZfsPropertyNames.RecursionPropertyName                            => !string.IsNullOrWhiteSpace ( value ) && value is ZfsPropertyValueConstants.SnapsInAZfs or ZfsPropertyValueConstants.ZfsRecursion,
+                   ZfsPropertyNames.TemplatePropertyName                             => !string.IsNullOrWhiteSpace ( value ),
+                   ZfsPropertyNames.SourceSystem                                     => !string.IsNullOrWhiteSpace ( value ),
+                   ZfsPropertyNames.SnapshotRetentionFrequentPropertyName            => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionHourlyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionDailyPropertyName               => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName             => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionYearlyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+                   ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName       => int.TryParse ( value, out int intValue )                       && intValue is >= 0 and <= 100,
+                   ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName    => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName  => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+                   "used"                                                            => long.TryParse ( value, out _ ),
+                   "available"                                                       => long.TryParse ( value, out _ ),
+                   _                                                                 => throw new ArgumentOutOfRangeException ( nameof (name) )
+               };
     }
 
     protected async Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync( string zfsGetArgs )
     {
-        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new( );
+        ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties = new ( );
 
-        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync( "get", zfsGetArgs ).ConfigureAwait( true ) )
+        await foreach ( string zfsGetLine in ZfsExecEnumeratorAsync ( "get", zfsGetArgs ).ConfigureAwait ( true ) )
         {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
-            ParseAndValidatePoolRootZfsGetLine( lineTokens, ref rootsAndTheirProperties );
+            string[] lineTokens = zfsGetLine.Split ( '\t', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries );
+            ParseAndValidatePoolRootZfsGetLine ( lineTokens, ref rootsAndTheirProperties );
         }
 
         return rootsAndTheirProperties;
@@ -170,18 +168,19 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     {
         await foreach ( string zfsGetLine in lineProvider )
         {
-            string[] lineTokens = zfsGetLine.Split( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
+            string[] lineTokens = zfsGetLine.Split ( '\t', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries );
 
-            string objectName = lineTokens[ 0 ];
-            string propertyValue = lineTokens[ 2 ];
-            if ( !rawObjects.TryGetValue( objectName, out RawZfsObject? obj ) )
+            string objectName    = lineTokens [ 0 ];
+            string propertyValue = lineTokens [ 2 ];
+            if ( !rawObjects.TryGetValue ( objectName, out RawZfsObject? obj ) )
             {
-                rawObjects.Add( objectName, new( propertyValue ) );
-                rawObjects[ objectName ].AddRawProperty( in lineTokens[ 1 ], in propertyValue, in lineTokens[ 3 ] );
+                rawObjects.Add ( objectName, new RawZfsObject ( propertyValue ) );
+                rawObjects [ objectName ].AddRawProperty ( in lineTokens [ 1 ], in propertyValue, in lineTokens [ 3 ] );
+
                 continue;
             }
 
-            obj.AddRawProperty( in lineTokens[ 1 ], in propertyValue, in lineTokens[ 3 ] );
+            obj.AddRawProperty ( in lineTokens [ 1 ], in propertyValue, in lineTokens [ 3 ] );
         }
     }
 
@@ -192,26 +191,28 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             return false;
         }
 
-        ref string poolName = ref lineTokens[ 0 ];
-        string propName = lineTokens[ 1 ];
-        string propValue = lineTokens[ 2 ];
-        string propSource = lineTokens[ 3 ];
-        rootsAndTheirProperties.AddOrUpdate( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
+        ref string poolName   = ref lineTokens [ 0 ];
+        string     propName   = lineTokens [ 1 ];
+        string     propValue  = lineTokens [ 2 ];
+        string     propSource = lineTokens [ 3 ];
+        rootsAndTheirProperties.AddOrUpdate ( poolName, AddNewDatasetWithProperty, AddPropertyToExistingDs );
 
         return true;
 
         ConcurrentDictionary<string, bool> AddNewDatasetWithProperty( string key )
         {
-            ConcurrentDictionary<string, bool> newDs = new( )
-            {
-                [ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource )
-            };
+            ConcurrentDictionary<string, bool> newDs = new ( )
+                                                       {
+                                                           [ propName ] = CheckIfPropertyIsValid ( propName, propValue, propSource )
+                                                       };
+
             return newDs;
         }
 
         ConcurrentDictionary<string, bool> AddPropertyToExistingDs( string key, ConcurrentDictionary<string, bool> properties )
         {
-            properties[ propName ] = CheckIfPropertyIsValid( propName, propValue, propSource );
+            properties [ propName ] = CheckIfPropertyIsValid ( propName, propValue, propSource );
+
             return properties;
         }
     }
@@ -224,10 +225,12 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
             {
                 case ZfsPropertyValueConstants.FileSystem:
                 case ZfsPropertyValueConstants.Volume:
-                    obj.ConvertToDatasetAndAddToCollection( objName, datasets );
+                    obj.ConvertToDatasetAndAddToCollection ( objName, datasets );
+
                     break;
                 case ZfsPropertyValueConstants.Snapshot:
-                    obj.ConvertToSnapshotAndAddToCollections( objName, datasets, snapshots );
+                    obj.ConvertToSnapshotAndAddToCollections ( objName, datasets, snapshots );
+
                     break;
             }
         }

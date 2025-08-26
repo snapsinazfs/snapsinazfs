@@ -4,9 +4,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net9.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
-    <LangVersion>12</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
@@ -15,6 +15,7 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <DefineTrace>True</DefineTrace>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -23,15 +24,17 @@
     <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
     <ResponseFile>CommonCompilerFlags.rsp</ResponseFile>
     <UTF8OutPut>True</UTF8OutPut>
+    <WarningLevel>8</WarningLevel>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <Compile Remove="DummyZfsCommandRunner.cs" />
+    <None Remove="DummyZfsCommandRunner.cs" />
     <None Remove="fullZfsGet.txt" />
     <None Remove="poolroots-withproperties.txt" />
 
@@ -79,36 +82,37 @@
       </PropertyGroup>
       <ItemGroup>
         <Compile Include="DummyZfsCommandRunner.cs" />
-      </ItemGroup>      
+      </ItemGroup>
     </When>
   </Choose>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2" />
-    <PackageReference Include="NLog" Version="5.4.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.8" />
+    <PackageReference Include="NLog" Version="6.0.3" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.0.3" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="PowerArgs" Version="4.0.3" />
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
   </ItemGroup>
   <Choose>
-    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
+    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug-NoZFS'">
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+        <DefineDebug>True</DefineDebug>
       </PropertyGroup>
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG_WINDOWS</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+        <DefineDebug>True</DefineDebug>
       </PropertyGroup>
 
       <ItemGroup>
@@ -136,8 +140,6 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 
       <PropertyGroup>
-        <AnalysisLevel>7-minimum</AnalysisLevel>
-        <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>
 
@@ -146,16 +148,13 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
 
       <PropertyGroup>
-        <AnalysisLevel>7-minimum</AnalysisLevel>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
-        <DefineConstants>$(DefineConstants)</DefineConstants>
         <Optimize>True</Optimize>
         <PublishReadyToRun>True</PublishReadyToRun>
         <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
         <PublishSingleFile>True</PublishSingleFile>
         <ResponseFile>Release-R2R.rsp</ResponseFile>
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-        <TieredCompilation>False</TieredCompilation>
       </PropertyGroup>
 
     </When>
@@ -174,5 +173,8 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2025.2.0" />
   </ItemGroup>
 </Project>

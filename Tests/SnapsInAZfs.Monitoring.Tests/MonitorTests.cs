@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.Monitoring.Tests;
@@ -17,7 +15,7 @@ namespace SnapsInAZfs.Monitoring.Tests;
 using System.Reflection;
 
 [TestFixture]
-[TestOf ( typeof (Monitor) )]
+[TestOf ( typeof( Monitor ) )]
 [Category ( "Monitoring" )]
 public partial class MonitorTests
 {
@@ -27,7 +25,7 @@ public partial class MonitorTests
     {
         Monitor testMonitor = new ( );
 
-        foreach ( PropertyInfo propertyInfo in testMonitor.GetType ( ).GetProperties ( ).Where ( propertyInfo => propertyInfo.PropertyType == typeof (DateTimeOffset) ) )
+        foreach ( PropertyInfo propertyInfo in testMonitor.GetType( ).GetProperties( ).Where ( propertyInfo => propertyInfo.PropertyType == typeof( DateTimeOffset ) ) )
         {
             Assert.That ( propertyInfo.GetValue ( testMonitor ), Is.EqualTo ( DateTimeOffset.UnixEpoch ) );
         }
@@ -39,7 +37,7 @@ public partial class MonitorTests
     {
         Monitor testMonitor = new ( );
 
-        foreach ( PropertyInfo propertyInfo in testMonitor.GetType ( ).GetProperties ( ).Where ( propertyInfo => propertyInfo.PropertyType == typeof (uint) ) )
+        foreach ( PropertyInfo propertyInfo in testMonitor.GetType( ).GetProperties( ).Where ( propertyInfo => propertyInfo.PropertyType == typeof( uint ) ) )
         {
             Assert.That ( propertyInfo.GetValue ( testMonitor ), Is.Zero );
         }
@@ -53,13 +51,13 @@ public partial class MonitorTests
         SnapshotOperationsObservableMock observable  = new ( );
 
         // Use reflection to set the fields to non-zero values, since we don't want to expose setters on the properties
-        FieldInfo snapshotsPrunedSucceededLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsPrunedSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsPrunedSucceededLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsPrunedSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsPrunedSucceededLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsPrunedFailedLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsPrunedFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsPrunedFailedLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsPrunedFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsPrunedFailedLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsTakenSucceededLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsTakenSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsTakenSucceededLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsTakenSucceededLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsTakenSucceededLastRunFieldInfo.SetValue ( testMonitor, 1u );
-        FieldInfo snapshotsTakenFailedLastRunFieldInfo = typeof (Monitor).GetField ( "_snapshotsTakenFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
+        FieldInfo snapshotsTakenFailedLastRunFieldInfo = typeof( Monitor ).GetField ( "_snapshotsTakenFailedLastRun", BindingFlags.Instance | BindingFlags.NonPublic )!;
         snapshotsTakenFailedLastRunFieldInfo.SetValue ( testMonitor, 1u );
 
         Assume.That ( testMonitor.SnapshotsPrunedSucceededLastRun, Is.EqualTo ( 1u ) );
@@ -78,11 +76,11 @@ public partial class MonitorTests
         Assume.That ( observable.IsTakeSnapshotFailedRegistered,     Is.True );
         Assume.That ( observable.IsTakeSnapshotSucceededRegistered,  Is.True );
 
-        observable.RaiseBeginPruningSnapshotsEvent ( );
+        observable.RaiseBeginPruningSnapshotsEvent( );
         Assert.That ( testMonitor.SnapshotsPrunedSucceededLastRun, Is.Zero );
         Assert.That ( testMonitor.SnapshotsPrunedFailedLastRun,    Is.Zero );
 
-        observable.RaiseBeginTakingSnapshotsEvent ( );
+        observable.RaiseBeginTakingSnapshotsEvent( );
         Assert.That ( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
         Assert.That ( testMonitor.SnapshotsTakenFailedLastRun,    Is.Zero );
     }
@@ -114,15 +112,15 @@ public partial class MonitorTests
         Assume.That ( observable.IsTakeSnapshotFailedRegistered,     Is.True );
         Assume.That ( observable.IsTakeSnapshotSucceededRegistered,  Is.True );
 
-        observable.RaiseEndPruningSnapshotsEvent ( );
+        observable.RaiseEndPruningSnapshotsEvent( );
         Assert.That ( testMonitor.SnapshotsPrunedLastEnded, Is.EqualTo ( now ).Within ( 5 ).Seconds );
 
-        observable.RaiseEndTakingSnapshotsEvent ( );
+        observable.RaiseEndTakingSnapshotsEvent( );
         Assert.That ( testMonitor.SnapshotsTakenLastEnded, Is.EqualTo ( now ).Within ( 5 ).Seconds );
     }
 
     [Test]
-    public void RegisterApplicationStateObservable_NotSubscribedIfSecondParameterFalse ( [Values] bool isSubscribedInitially )
+    public void RegisterApplicationStateObservable_NotSubscribedIfSecondParameterFalse( [Values] bool isSubscribedInitially )
     {
         ApplicationStateObservableMock observable  = new ( );
         Monitor                        testMonitor = new ( );
@@ -149,7 +147,8 @@ public partial class MonitorTests
                           {
                               Assert.That ( observable.IsApplicationStateChangedSubscribed, Is.True );
                               Assert.That ( observable.IsNextRunTimeChangedSubscribed,      Is.True );
-                          } );
+                          }
+                        );
     }
 
     [Test]
@@ -196,7 +195,8 @@ public partial class MonitorTests
                               Assert.That ( observable.DidPruneSnapshotSucceededRegisterMultiple, Is.False );
                               Assert.That ( observable.DidTakeSnapshotFailedRegisterMultiple,     Is.False );
                               Assert.That ( observable.DidTakeSnapshotSucceededRegisterMultiple,  Is.False );
-                          } );
+                          }
+                        );
     }
 
     [Test]
@@ -224,7 +224,8 @@ public partial class MonitorTests
                               Assert.That ( observable.IsPruneSnapshotSucceededRegistered, Is.True );
                               Assert.That ( observable.IsTakeSnapshotFailedRegistered,     Is.True );
                               Assert.That ( observable.IsTakeSnapshotSucceededRegistered,  Is.True );
-                          } );
+                          }
+                        );
     }
 
     [Test]
@@ -276,7 +277,8 @@ public partial class MonitorTests
                               Assert.That ( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededLastRun,     Is.Zero );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededSinceStart,  Is.Zero );
-                          } );
+                          }
+                        );
 
         observable.RaiseTakeSnapshotFailedEvent ( "snapshot name", in now );
 
@@ -290,7 +292,8 @@ public partial class MonitorTests
                               Assert.That ( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededLastRun,     Is.Zero );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededSinceStart,  Is.Zero );
-                          } );
+                          }
+                        );
 
         observable.RaisePruneSnapshotSucceededEvent ( "snapshot name", in now );
 
@@ -304,7 +307,8 @@ public partial class MonitorTests
                               Assert.That ( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo ( 1 ) );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededLastRun,     Is.Zero );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededSinceStart,  Is.Zero );
-                          } );
+                          }
+                        );
 
         observable.RaiseTakeSnapshotSucceededEvent ( "snapshot name", in now );
 
@@ -318,7 +322,8 @@ public partial class MonitorTests
                               Assert.That ( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo ( 1 ) );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededLastRun,     Is.EqualTo ( 1 ) );
                               Assert.That ( testMonitor.SnapshotsTakenSucceededSinceStart,  Is.EqualTo ( 1 ) );
-                          } );
+                          }
+                        );
     }
 
     private sealed class ApplicationStateObservableMock : IApplicationStateObservable
@@ -336,14 +341,14 @@ public partial class MonitorTests
             {
                 if ( _state != value )
                 {
-                    _applicationStateChanged?.Invoke ( this, new ( _state, value ) );
+                    _applicationStateChanged?.Invoke ( this, new ApplicationStateChangedEventArgs ( _state, value ) );
                 }
 
                 _state = value;
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
         public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged
@@ -360,7 +365,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<long>? NextRunTimeChanged
         {
             add
@@ -375,8 +380,15 @@ public partial class MonitorTests
             }
         }
 
-        public void RaiseApplicationStateChangedEvent ( ApplicationState state ) { State = state; }
-        public void RaiseNextRunTimeChangedEvent ( in DateTimeOffset timestamp ) { _nextRunTimeChanged?.Invoke ( this, timestamp.ToUnixTimeMilliseconds ( ) ); }
+        public void RaiseApplicationStateChangedEvent( ApplicationState state )
+        {
+            State = state;
+        }
+
+        public void RaiseNextRunTimeChangedEvent( in DateTimeOffset timestamp )
+        {
+            _nextRunTimeChanged?.Invoke ( this, timestamp.ToUnixTimeMilliseconds( ) );
+        }
 
         private event EventHandler<ApplicationStateChangedEventArgs>? _applicationStateChanged;
 
@@ -402,7 +414,7 @@ public partial class MonitorTests
         public bool IsTakeSnapshotFailedRegistered            { get; private set; }
         public bool IsTakeSnapshotSucceededRegistered         { get; private set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<DateTimeOffset>? BeginPruningSnapshots
         {
             add
@@ -418,7 +430,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<DateTimeOffset>? BeginTakingSnapshots
         {
             add
@@ -434,7 +446,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<DateTimeOffset>? EndPruningSnapshots
         {
             add
@@ -450,7 +462,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<DateTimeOffset>? EndTakingSnapshots
         {
             add
@@ -466,7 +478,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotFailed
         {
             add
@@ -482,7 +494,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotFailed
         {
             add
@@ -498,7 +510,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<SnapshotOperationEventArgs>? PruneSnapshotSucceeded
         {
             add
@@ -514,7 +526,7 @@ public partial class MonitorTests
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded
         {
             add
@@ -530,21 +542,45 @@ public partial class MonitorTests
             }
         }
 
-        public void RaiseBeginPruningSnapshotsEvent ( ) { _beginPruningSnapshots?.Invoke ( this, DateTimeOffset.Now ); }
+        public void RaiseBeginPruningSnapshotsEvent ( )
+        {
+            _beginPruningSnapshots?.Invoke ( this, DateTimeOffset.Now );
+        }
 
-        public void RaiseBeginTakingSnapshotsEvent ( ) { _beginTakingSnapshots?.Invoke ( this, DateTimeOffset.Now ); }
+        public void RaiseBeginTakingSnapshotsEvent ( )
+        {
+            _beginTakingSnapshots?.Invoke ( this, DateTimeOffset.Now );
+        }
 
-        public void RaiseEndPruningSnapshotsEvent ( ) { _endPruningSnapshots?.Invoke ( this, DateTimeOffset.Now ); }
+        public void RaiseEndPruningSnapshotsEvent ( )
+        {
+            _endPruningSnapshots?.Invoke ( this, DateTimeOffset.Now );
+        }
 
-        public void RaiseEndTakingSnapshotsEvent ( ) { _endTakingSnapshots?.Invoke ( this, DateTimeOffset.Now ); }
+        public void RaiseEndTakingSnapshotsEvent ( )
+        {
+            _endTakingSnapshots?.Invoke ( this, DateTimeOffset.Now );
+        }
 
-        public void RaisePruneSnapshotFailedEvent ( string name, in DateTimeOffset timestamp ) { _pruneSnapshotFailed?.Invoke ( this, new ( name, in timestamp ) ); }
+        public void RaisePruneSnapshotFailedEvent( string name, in DateTimeOffset timestamp )
+        {
+            _pruneSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( name, in timestamp ) );
+        }
 
-        public void RaisePruneSnapshotSucceededEvent ( string name, in DateTimeOffset timestamp ) { _pruneSnapshotSucceeded?.Invoke ( this, new ( name, in timestamp ) ); }
+        public void RaisePruneSnapshotSucceededEvent( string name, in DateTimeOffset timestamp )
+        {
+            _pruneSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( name, in timestamp ) );
+        }
 
-        public void RaiseTakeSnapshotFailedEvent ( string name, in DateTimeOffset timestamp ) { _takeSnapshotFailed?.Invoke ( this, new ( name, in timestamp ) ); }
+        public void RaiseTakeSnapshotFailedEvent( string name, in DateTimeOffset timestamp )
+        {
+            _takeSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( name, in timestamp ) );
+        }
 
-        public void RaiseTakeSnapshotSucceededEvent ( string name, in DateTimeOffset timestamp ) { _takeSnapshotSucceeded?.Invoke ( this, new ( name, in timestamp ) ); }
+        public void RaiseTakeSnapshotSucceededEvent( string name, in DateTimeOffset timestamp )
+        {
+            _takeSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( name, in timestamp ) );
+        }
 
         private event EventHandler<DateTimeOffset>? _beginPruningSnapshots;
 

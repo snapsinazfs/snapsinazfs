@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 using LogLevel = NLog.LogLevel;
@@ -27,12 +25,12 @@ using Terminal.Gui;
 
 internal static class ConfigConsole
 {
-    private static readonly Logger                                 Logger = LogManager.GetLogger ( $"{ConfigConsoleNamespace}.{nameof (ConfigConsole)}" )!;
+    private static readonly Logger                                 Logger = LogManager.GetLogger ( $"{ConfigConsoleNamespace}.{nameof (ConfigConsole)}" );
     internal static         IZfsCommandRunner?                     CommandRunner { get; private set; }
     internal static         ConcurrentDictionary<string, Snapshot> Snapshots     { get; } = [ ];
 
     // ReSharper disable HeapView.ObjectAllocation
-    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select ( static kvp => new TemplateConfigurationListItem ( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList ( ) ?? [ ];
+    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select ( static kvp => new TemplateConfigurationListItem ( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? [ ];
 
     // ReSharper restore HeapView.ObjectAllocation
     internal const           string                                  ConfigConsoleNamespace = "SnapsInAZfs.ConfigConsole";
@@ -40,11 +38,11 @@ internal static class ConfigConsole
 
     /// <summary>
     ///     Suspends console logging and runs the <see cref="SnapsInAZfsConfigConsole">SnapsInAZfs Configuration Console</see>.
-    ///     <br/>
-    ///     Resumes console logging after shutdown of the TUI.
+    ///     <br />
+    ///     Resumes console logging after shutting down the TUI.
     /// </summary>
-    /// <param name="commandRunner">An <see cref="IZfsCommandRunner"/> to use when performing ZFS operations</param>
-    public static void RunConsoleInterface ( IZfsCommandRunner commandRunner )
+    /// <param name="commandRunner">An <see cref="IZfsCommandRunner" /> to use when performing ZFS operations</param>
+    public static void RunConsoleInterface( IZfsCommandRunner commandRunner )
     {
         Logger.Info ( "Config Console requested. \"Console\" logging rule will be suspended until exit" );
 
@@ -55,39 +53,39 @@ internal static class ConfigConsole
 
         if ( consoleRule != null )
         {
-            minConsoleLogLevel = consoleRule.Levels.Min ( );
+            minConsoleLogLevel = consoleRule.Levels.Min( );
             consoleRule.DisableLoggingForLevels ( LogLevel.Trace, LogLevel.Off );
-            LogManager.ReconfigExistingLoggers ( );
+            LogManager.ReconfigExistingLoggers( );
         }
 
         CommandRunner = commandRunner;
 
-        Application.Init ( );
+        Application.Init( );
         Application.Run<SnapsInAZfsConfigConsole> ( ErrorHandler );
-        Application.Shutdown ( );
+        Application.Shutdown( );
 
         if ( consoleRule != null )
         {
             Logger.Info ( "Setting \"Console\" logging rule to {0}", minConsoleLogLevel ?? LogLevel.Info );
             consoleRule.EnableLoggingForLevels ( minConsoleLogLevel                     ?? LogLevel.Info, LogLevel.Fatal );
-            LogManager.ReconfigExistingLoggers ( );
+            LogManager.ReconfigExistingLoggers( );
         }
 
         Logger.Info ( "Exited Config Console" );
     }
 
     /// <summary>
-    ///     An error handler function that the <see cref="Application"/> calls for some cases of unhandled exceptions within
+    ///     An error handler function that the <see cref="Application" /> calls for some cases of unhandled exceptions within
     ///     the currently running <see href="https://github.com/gui-cs/Terminal.Gui">Terminal.Gui</see>
     ///     <see href="https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui/Terminal.Gui.Application.html">Application</see>,
-    ///     if passed in a call to <see cref="Application.Run(Func{System.Exception,bool})"/>
+    ///     if passed in a call to <see cref="Application.Run(Func{System.Exception,bool})" />
     /// </summary>
     /// <param name="ex"></param>
     /// <returns>
-    ///     A <see langword="bool"/> indicating whether <see cref="Exception"/> <paramref name="ex"/> should be
-    ///     swallowed (<see langword="true"/>) or re-thrown (<see langword="false"/>)
+    ///     A <see langword="bool" /> indicating whether <see cref="Exception" /> <paramref name="ex" /> should be
+    ///     swallowed (<see langword="true" />) or re-thrown (<see langword="false" />)
     /// </returns>
-    private static bool ErrorHandler ( Exception ex )
+    private static bool ErrorHandler( Exception ex )
     {
         Logger.Error ( ex, "Unhandled exception encountered in configuration console. Please report this" );
 
