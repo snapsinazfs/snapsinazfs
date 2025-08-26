@@ -12,47 +12,81 @@
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
+using System.Runtime.CompilerServices;
+
 public readonly partial struct ZfsProperty<T>
 {
-    /// <inheritdoc/>
-    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<T> right ) => left.Equals ( right );
+    /// <inheritdoc />
+    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<T> right )
+    {
+        return left.Equals ( right );
+    }
 
-    /// <inheritdoc/>
-    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<T> right ) => !left.Equals ( right );
+    /// <inheritdoc />
+    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<T> right )
+    {
+        return !left.Equals ( right );
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( bool other ) => Value is bool v && v == other;
+    /// <inheritdoc />
+    public bool Equals( bool other )
+    {
+        return Value is bool v && v == other;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( DateTimeOffset other ) => Value is DateTimeOffset v && v == other;
+    /// <inheritdoc />
+    public bool Equals( DateTimeOffset other )
+    {
+        return Value is DateTimeOffset v && v == other;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( int other ) => Value is int v && v == other;
+    /// <inheritdoc />
+    public bool Equals( int other )
+    {
+        return Value is int v && v == other;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( string? other ) => Value is string v && v == other;
+    /// <inheritdoc />
+    public bool Equals( string? other )
+    {
+        return Value is string v && v == other;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( ZfsProperty<bool> other ) => Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    /// <inheritdoc />
+    public bool Equals( ZfsProperty<T> other )
+    {
+        return EqualityComparer<T>.Default
+                                  .Equals ( Value, other.Value )
+            && Equals ( Owner, other.Owner )
+            && Name == other.Name;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( ZfsProperty<DateTimeOffset> other ) => Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    /// <inheritdoc cref="ZfsProperty{T}.Equals(object?)" />
+    public bool Equals( ZfsProperty<bool> other )
+    {
+        return Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( ZfsProperty<int> other ) => Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    /// <inheritdoc cref="ZfsProperty{T}.Equals(object?)" />
+    public bool Equals( ZfsProperty<DateTimeOffset> other )
+    {
+        return Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( ZfsProperty<string> other ) => Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    /// <inheritdoc cref="ZfsProperty{T}.Equals(object?)" />
+    public bool Equals( ZfsProperty<int> other )
+    {
+        return Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    }
 
-    /// <inheritdoc/>
-    public bool Equals ( ZfsProperty<T> other ) =>
-        EqualityComparer<T>.Default
-                           .Equals ( Value, other.Value )
-     && Equals ( Owner, other.Owner )
-     && Name == other.Name;
+    /// <inheritdoc cref="ZfsProperty{T}.Equals(object?)" />
+    public bool Equals( ZfsProperty<string> other )
+    {
+        return Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
+    }
 
-    /// <inheritdoc/>
-    public override bool Equals ( object? obj )
+    /// <inheritdoc />
+    public override bool Equals( object? obj )
     {
         return obj switch
                {
@@ -62,28 +96,101 @@ public readonly partial struct ZfsProperty<T>
                    ZfsProperty<string> other         => Equals ( other ),
                    ZfsProperty<T> other              => Equals ( other ),
                    null                              => false,
-                   IZfsProperty other                => other.Equals ( this ),
+                   IZfsProperty other                => LogTypeMismatchAndReturnFalse ( this, other ),
                    _                                 => false
                };
+
+        static bool LogTypeMismatchAndReturnFalse( in ZfsProperty<T> currentProperty, in IZfsProperty other )
+        {
+            Logger.Warn ( $"Type mismatch comparing equality of {currentProperty} and {other}" );
+
+            return false;
+        }
     }
 
-    /// <inheritdoc/>
-    public override int GetHashCode ( ) => HashCode.Combine ( Value, Name, IsLocal );
+    /// <inheritdoc />
+    public override int GetHashCode ( )
+    {
+        return HashCode.Combine ( Value, Name, IsLocal );
+    }
 
-    public static bool operator == ( ZfsProperty<T> left, bool                        right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, int                         right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, string                      right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, DateTimeOffset              right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<bool>           right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<int>            right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<string>         right ) => left.Equals ( right );
-    public static bool operator == ( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right ) => left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, bool                        right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, int                         right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, string                      right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, DateTimeOffset              right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<bool>           right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<int>            right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<string>         right ) => !left.Equals ( right );
-    public static bool operator != ( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right ) => !left.Equals ( right );
+    public static bool operator ==( ZfsProperty<T> left, bool right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, int right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, string right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, DateTimeOffset right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<bool> right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<int> right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<string> right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator ==( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right )
+    {
+        return left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, bool right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, int right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, string right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, DateTimeOffset right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<bool> right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<int> right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<string> right )
+    {
+        return !left.Equals ( right );
+    }
+
+    public static bool operator !=( ZfsProperty<T> left, ZfsProperty<DateTimeOffset> right )
+    {
+        return !left.Equals ( right );
+    }
 }
