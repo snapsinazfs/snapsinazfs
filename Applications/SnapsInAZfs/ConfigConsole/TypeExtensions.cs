@@ -1,5 +1,4 @@
 #region MIT LICENSE
-
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -9,7 +8,6 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // 
 // See https://opensource.org/license/MIT/
-
 #endregion
 
 namespace SnapsInAZfs.ConfigConsole;
@@ -31,14 +29,14 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="path">A path to operate on</param>
     /// <returns>
-    ///     The last component of the given ZFS path, as a new <see langword="string"/> instance, with a value equal to the substring of
-    ///     <paramref name="path"/>, starting from the first character after the last instance of '/','@',or '#', up to the end of the
+    ///     The last component of the given ZFS path, as a new <see langword="string" /> instance, with a value equal to the substring of
+    ///     <paramref name="path" />, starting from the first character after the last instance of '/','@',or '#', up to the end of the
     ///     string, or the <b>original string reference</b>, if none of those characters are found.
     /// </returns>
     /// <remarks>
     ///     If the given path does not contain '/','@',or '#', the original string reference will be returned.
     /// </remarks>
-    public static string GetLastPathElement ( this string path )
+    public static string GetLastPathElement( this string path )
     {
         int startIndex = 1 + path.LastIndexOfAny ( [ '/', '@', '#' ] );
 
@@ -49,23 +47,23 @@ public static class TypeExtensions
     /// <summary>
     ///     Gets a list of strings containing day names
     /// </summary>
-    /// <param name="value">A <see cref="DateTimeFormatInfo"/> object to get day names for</param>
+    /// <param name="value">A <see cref="DateTimeFormatInfo" /> object to get day names for</param>
     /// <returns>
-    ///     A <see cref="List{T}"/> of <see langword="string"/>s representing all long and standard abbreviated forms
-    ///     of the names of the days of the week, in the culture of this <see cref="DateTimeFormatInfo"/>,
+    ///     A <see cref="List{T}" /> of <see langword="string" />s representing all long and standard abbreviated forms
+    ///     of the names of the days of the week, in the culture of this <see cref="DateTimeFormatInfo" />,
     ///     in culture-specific order.
     /// </returns>
     /// <exception cref="ArgumentNullException">
-    ///     <paramref name="value"/> or any of its required members are <see langword="null"/>.
+    ///     <paramref name="value" /> or any of its required members are <see langword="null" />.
     /// </exception>
     /// <exception cref="InvalidOperationException">
-    ///     If the <see cref="DateTimeFormatInfo.DayNames"/> or
-    ///     <see cref="DateTimeFormatInfo.AbbreviatedDayNames"/> properties of <paramref name="value"/> are not 7-element
-    ///     <see langword="string"/> arrays
+    ///     If the <see cref="DateTimeFormatInfo.DayNames" /> or
+    ///     <see cref="DateTimeFormatInfo.AbbreviatedDayNames" /> properties of <paramref name="value" /> are not 7-element
+    ///     <see langword="string" /> arrays
     /// </exception>
     [Pure]
     [SuppressMessage ( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The only other exceptions that can be thrown here are for setters that we do not use" )]
-    public static List<string> GetLongAndAbbreviatedDayNames ( this DateTimeFormatInfo value )
+    public static List<string> GetLongAndAbbreviatedDayNames( this DateTimeFormatInfo value )
     {
         ArgumentNullException.ThrowIfNull ( value );
 
@@ -88,23 +86,23 @@ public static class TypeExtensions
     /// <summary>
     ///     Gets a list of strings containing day names
     /// </summary>
-    /// <param name="value">A <see cref="DateTimeFormatInfo"/> object to get day names for</param>
+    /// <param name="value">A <see cref="DateTimeFormatInfo" /> object to get day names for</param>
     /// <returns>
-    ///     A <see cref="List{T}"/> of <see langword="string"/>s representing all long and standard abbreviated forms
-    ///     of the names of the days of the week, in the culture of this <see cref="DateTimeFormatInfo"/>,
+    ///     A <see cref="List{T}" /> of <see langword="string" />s representing all long and standard abbreviated forms
+    ///     of the names of the days of the week, in the culture of this <see cref="DateTimeFormatInfo" />,
     ///     in culture-specific order.
     /// </returns>
     /// <exception cref="ArgumentNullException">
-    ///     <paramref name="value"/> or any of its required members are <see langword="null"/>.
+    ///     <paramref name="value" /> or any of its required members are <see langword="null" />.
     /// </exception>
     /// <exception cref="InvalidOperationException">
-    ///     If the <see cref="DateTimeFormatInfo.DayNames"/> or
-    ///     <see cref="DateTimeFormatInfo.AbbreviatedDayNames"/> properties of <paramref name="value"/> are not 7-element
-    ///     <see langword="string"/> arrays
+    ///     If the <see cref="DateTimeFormatInfo.DayNames" /> or
+    ///     <see cref="DateTimeFormatInfo.AbbreviatedDayNames" /> properties of <paramref name="value" /> are not 7-element
+    ///     <see langword="string" /> arrays
     /// </exception>
     [Pure]
     [SuppressMessage ( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The only other exceptions that can be thrown here are for setters that we do not use" )]
-    public static List<string> GetMonthNames ( this DateTimeFormatInfo value )
+    public static List<string> GetMonthNames( this DateTimeFormatInfo value )
     {
         ArgumentNullException.ThrowIfNull ( value );
 
@@ -117,46 +115,46 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Gets the boolean value parsed from the label of the currently selected item of a <see cref="RadioGroup"/>.
+    ///     Gets the boolean value parsed from the label of the currently selected item of a <see cref="RadioGroup" />.
     /// </summary>
     /// <param name="group">
-    ///     The <see cref="RadioGroup"/> for which the selected item's label will be parsed as a boolean.
+    ///     The <see cref="RadioGroup" /> for which the selected item's label will be parsed as a boolean.
     /// </param>
-    /// <returns>The parsed boolean value of the selected item of <paramref name="group"/>.</returns>
-    public static bool GetSelectedBooleanFromLabel ( this RadioGroup group )
+    /// <returns>The parsed boolean value of the selected item of <paramref name="group" />.</returns>
+    public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
     {
         ArgumentNullException.ThrowIfNull ( group );
 
         if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
         {
-            return bool.Parse ( labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" ) );
+            return bool.Parse ( labels [ group.SelectedItem ]?.ToString( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" ) );
         }
 
         throw new InvalidOperationException ( "Failed getting radio group boolean value" );
     }
 
     /// <summary>
-    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup"/>
+    ///     Gets the string value of the label of the currently selected item of a <see cref="RadioGroup" />
     /// </summary>
-    /// <param name="group">The <see cref="RadioGroup"/> to get the currently selected label string from</param>
+    /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
     /// <returns></returns>
-    public static string GetSelectedLabelString ( this RadioGroup group )
+    public static string GetSelectedLabelString( this RadioGroup group )
     {
         ArgumentNullException.ThrowIfNull ( group );
 
         if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
         {
-            return labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
+            return labels [ group.SelectedItem ]?.ToString( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
         }
 
         throw new InvalidOperationException ( "Failed getting radio group selected label string" );
     }
 
-    public static JsonNode? SerializeToJson ( this IConfiguration configSection )
+    public static JsonNode? SerializeToJson( this IConfiguration configSection )
     {
         JsonObject obj = new ( );
 
-        IConfigurationSection [] nodeChildren = configSection.GetChildren ( ).ToArray ( );
+        IConfigurationSection[] nodeChildren = configSection.GetChildren( ).ToArray( );
 
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
@@ -176,7 +174,7 @@ public static class TypeExtensions
             obj.Add ( childSection.Key, SerializeToJson ( childSection ) );
         }
 
-        if ( obj.Any ( ) || configSection is not IConfigurationSection section )
+        if ( obj.Any( ) || configSection is not IConfigurationSection section )
         {
             return obj;
         }
@@ -200,15 +198,15 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Attempts to parse this <see cref="ustring"/> and return the <see langword="int"/> version of it
+    ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int" /> version of it
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    /// <exception cref="ArgumentException">If <paramref name="value"/> is empty</exception>
+    /// <exception cref="ArgumentException">If <paramref name="value" /> is empty</exception>
     /// <exception cref="ArgumentOutOfRangeException">If the value cannot be parsed as an integer</exception>
-    /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <see langword="null"/></exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="value" /> is <see langword="null" /></exception>
     [Pure]
-    public static int ToInt32 ( this ustring value )
+    public static int ToInt32( this ustring value )
     {
         ArgumentNullException.ThrowIfNull ( value, nameof (value) );
 
@@ -217,7 +215,7 @@ public static class TypeExtensions
             throw new ArgumentException ( "Empty ustring cannot be converted to int", nameof (value) );
         }
 
-        return value.ToString ( ) switch
+        return value.ToString( ) switch
                {
                    // This case is checking if it's a non-null string, and if it can be parsed as an integer
                    // All other conditions will throw an ArgumentOutOfRangeException for value
@@ -227,30 +225,30 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Attempts to parse this <see cref="ustring"/> and return the <see langword="int"/> version of it, with the
+    ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int" /> version of it, with the
     ///     specified fallback value
     /// </summary>
     /// <param name="value"></param>
     /// <param name="fallbackValue"></param>
     /// <returns>
-    ///     If the <paramref name="value"/> is a valid integer, the <see langword="int"/> representation of
-    ///     <paramref name="value"/><br/>For all other cases, <paramref name="fallbackValue"/>
+    ///     If the <paramref name="value" /> is a valid integer, the <see langword="int" /> representation of
+    ///     <paramref name="value" /><br />For all other cases, <paramref name="fallbackValue" />
     /// </returns>
     /// <remarks>
-    ///     Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue"/>
+    ///     Does not throw exceptions. In case of any exception, returns <paramref name="fallbackValue" />
     /// </remarks>
     [Pure]
     [SuppressMessage ( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
-    public static int ToInt32 ( this ustring? value, in int fallbackValue )
+    public static int ToInt32( this ustring? value, in int fallbackValue )
     {
         try
         {
-            if ( value is not { } || value.IsEmpty )
+            if ( value is null || value.IsEmpty )
             {
                 return fallbackValue;
             }
 
-            string stringValue = value.ToString ( )!;
+            string stringValue = value.ToString( )!;
 
             return int.TryParse ( stringValue, out int intValue ) ? intValue : fallbackValue;
         }
@@ -261,11 +259,14 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     A shortcut to calling <see cref="TimeOnly.FromTimeSpan"/> on <paramref name="value"/>
+    ///     A shortcut to calling <see cref="TimeOnly.FromTimeSpan" /> on <paramref name="value" />
     /// </summary>
     /// <param name="value"></param>
-    /// <returns>The time portion of <paramref name="value"/></returns>
+    /// <returns>The time portion of <paramref name="value" /></returns>
     [Pure]
     [ExcludeFromCodeCoverage ( Justification = "Just a proxy method to framework functionality" )]
-    public static TimeOnly ToTimeOnly ( this TimeSpan value ) => TimeOnly.FromTimeSpan ( value );
+    public static TimeOnly ToTimeOnly( this TimeSpan value )
+    {
+        return TimeOnly.FromTimeSpan ( value );
+    }
 }
