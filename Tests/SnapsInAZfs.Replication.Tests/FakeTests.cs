@@ -16,5 +16,8 @@ namespace SnapsInAZfs.Replication.Tests;
 public class FakeTests
 {
     [Test]
-    public void BogusTestForCommandLineBuildsAlwaysPasses ( ) { Assert.Pass ( "THIS NEEDS TO BE REMOVED" ); }
+    public void BogusTestForCommandLineBuildsAlwaysPasses ( )
+    {
+        Assert.Pass ( "THIS NEEDS TO BE REMOVED" );
+    }
 }

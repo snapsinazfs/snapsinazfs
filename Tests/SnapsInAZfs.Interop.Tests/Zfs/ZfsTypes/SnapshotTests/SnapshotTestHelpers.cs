@@ -19,14 +19,15 @@ internal static class SnapshotTestHelpers
 {
     internal static Snapshot GetStandardTestSnapshot( SnapshotPeriod period, DateTimeOffset timestamp, string parentName = "testRoot" )
     {
-        ZfsRecord parent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( parentName );
-        return GetStandardTestSnapshotForParent( period, timestamp, parent );
+        ZfsRecord parent = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( parentName );
+
+        return GetStandardTestSnapshotForParent ( period, timestamp, parent );
     }
 
     internal static Snapshot GetStandardTestSnapshotForParent( SnapshotPeriod period, DateTimeOffset timestamp, ZfsRecord parent )
     {
 #pragma warning disable CA2000
-        return parent.AddSnapshot( new( $"{parent.Name}@autosnap_{timestamp:s}_{period}", in period.Kind, in parent.SourceSystem, in timestamp, parent ) );
+        return parent.AddSnapshot ( new Snapshot ( $"{parent.Name}@autosnap_{timestamp:s}_{period}", in period.Kind, in parent.SourceSystem, in timestamp, parent ) );
 #pragma warning restore CA2000
     }
 }
