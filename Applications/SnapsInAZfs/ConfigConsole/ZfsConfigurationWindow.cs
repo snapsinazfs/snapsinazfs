@@ -26,7 +26,7 @@ using TreeNodes;
 [MustDisposeResource]
 public sealed partial class ZfsConfigurationWindow
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (ZfsConfigurationWindow)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (ZfsConfigurationWindow)}" );
 
     private readonly ConcurrentDictionary<string, ZfsRecord> _treeDatasets = [ ];
 

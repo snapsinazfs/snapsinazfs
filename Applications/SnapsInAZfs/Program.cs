@@ -38,7 +38,7 @@ internal static class Program
 {
     // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
     // Desired logging parameters should be set in SnapsInAZfs.nlog.json
-    private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" )!;
+    private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" );
     private static readonly IMonitor             ServiceObserver = new Monitor ( );
     private static          IConfigurationRoot?  _configurationRoot;
     internal static         SnapsInAZfsSettings? Settings;

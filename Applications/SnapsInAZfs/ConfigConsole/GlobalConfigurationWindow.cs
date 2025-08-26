@@ -14,7 +14,7 @@ namespace SnapsInAZfs.ConfigConsole;
 
 public sealed partial class GlobalConfigurationWindow
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (GlobalConfigurationWindow)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (GlobalConfigurationWindow)}" );
 
     public GlobalConfigurationWindow ( )
     {
