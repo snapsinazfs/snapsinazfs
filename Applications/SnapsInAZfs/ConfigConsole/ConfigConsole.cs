@@ -27,7 +27,7 @@ using Terminal.Gui;
 
 internal static class ConfigConsole
 {
-    private static readonly Logger                                 Logger = LogManager.GetLogger ( $"{ConfigConsoleNamespace}.{nameof (ConfigConsole)}" )!;
+    private static readonly Logger                                 Logger = LogManager.GetLogger ( $"{ConfigConsoleNamespace}.{nameof (ConfigConsole)}" );
     internal static         IZfsCommandRunner?                     CommandRunner { get; private set; }
     internal static         ConcurrentDictionary<string, Snapshot> Snapshots     { get; } = [ ];
 
