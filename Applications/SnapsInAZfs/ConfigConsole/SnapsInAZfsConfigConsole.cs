@@ -115,37 +115,7 @@ public sealed partial class SnapsInAZfsConfigConsole
             bool bothWindowsNotNullAndNoChanges        = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
             if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
             {
-                Logger.Warn ( "Save configuration requested when no changes were made." );
-                int messageBoxResult = MessageBox.Query ( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
-                if ( messageBoxResult == 0 )
-                {
-                    return;
-                }
-
-                SnapsInAZfsSettings                copyOfCurrentSettings = Program.Settings! with { };
-                (bool status, string reasonOrFile) copyConfigResult      = ShowSaveDialog ( copyOfCurrentSettings );
-                if ( copyConfigResult.status )
-                {
-                    Logger.Info ( "Copy of existing configuration saved to {0}", copyConfigResult.reasonOrFile );
-
-                    return;
-                }
-
-                switch ( copyConfigResult.reasonOrFile )
-                {
-                    case "canceled":
-                        Logger.ConditionalDebug ( "Canceled configuration save dialog" );
-
-                        return;
-                    case "no file name":
-                        Logger.Error ( "No file name provided in save dialog. Configuration copy not saved." );
-
-                        return;
-                    default:
-                        Logger.Error ( "Failed to save copy of configuration." );
-
-                        return;
-                }
+                SaveWithNoChangesMade( );
             }
 
             switch ( globalWindowNull )
@@ -211,6 +181,41 @@ public sealed partial class SnapsInAZfsConfigConsole
         finally
         {
             EnableEventHandlers( );
+        }
+    }
+
+    private static void SaveWithNoChangesMade ( )
+    {
+        Logger.Warn ( "Save configuration requested when no changes were made." );
+        int messageBoxResult = MessageBox.Query ( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
+        if ( messageBoxResult == 0 )
+        {
+            return;
+        }
+
+        SnapsInAZfsSettings                copyOfCurrentSettings = Program.Settings! with { };
+        (bool status, string reasonOrFile) copyConfigResult      = ShowSaveDialog ( copyOfCurrentSettings );
+        if ( copyConfigResult.status )
+        {
+            Logger.Info ( "Copy of existing configuration saved to {0}", copyConfigResult.reasonOrFile );
+
+            return;
+        }
+
+        switch ( copyConfigResult.reasonOrFile )
+        {
+            case "canceled":
+                Logger.ConditionalDebug ( "Canceled configuration save dialog" );
+
+                return;
+            case "no file name":
+                Logger.Error ( "No file name provided in save dialog. Configuration copy not saved." );
+
+                return;
+            default:
+                Logger.Error ( "Failed to save copy of configuration." );
+
+                return;
         }
     }
 
