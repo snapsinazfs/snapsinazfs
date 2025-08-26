@@ -48,7 +48,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NLog" Version="5.4.0" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.0" />
+    <PackageReference Include="NLog" Version="6.0.3" />
   </ItemGroup>
 
   <ItemGroup>
