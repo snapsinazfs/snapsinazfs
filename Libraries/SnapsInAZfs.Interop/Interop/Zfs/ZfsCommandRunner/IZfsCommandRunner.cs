@@ -121,7 +121,7 @@ public interface IZfsCommandRunner
     /// </returns>
     ImmutableSortedSet<string> ZfsListAll ( )
     {
-        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union ( new[] { "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" } );
+        ImmutableSortedSet<string> dataSets = ImmutableSortedSet<string>.Empty.Union ( [ "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" ] );
         LogManager.GetCurrentClassLogger( ).Warn ( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize ( dataSets ) );
 
         return dataSets;
