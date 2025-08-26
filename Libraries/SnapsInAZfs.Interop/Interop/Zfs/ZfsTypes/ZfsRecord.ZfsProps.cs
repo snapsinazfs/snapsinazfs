@@ -18,25 +18,25 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public partial record ZfsRecord
 {
-    private ZfsProperty<bool> _enabled;
+    private ZfsProperty<bool>           _enabled;
     private ZfsProperty<DateTimeOffset> _lastDailySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastFrequentSnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastHourlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastMonthlySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastWeeklySnapshotTimestamp;
     private ZfsProperty<DateTimeOffset> _lastYearlySnapshotTimestamp;
-    private ZfsProperty<bool> _pruneSnapshotsField;
-    private ZfsProperty<string> _recursion;
-    private ZfsProperty<int> _snapshotRetentionDaily;
-    private ZfsProperty<int> _snapshotRetentionFrequent;
-    private ZfsProperty<int> _snapshotRetentionHourly;
-    private ZfsProperty<int> _snapshotRetentionMonthly;
-    private ZfsProperty<int> _snapshotRetentionPruneDeferral;
-    private ZfsProperty<int> _snapshotRetentionWeekly;
-    private ZfsProperty<int> _snapshotRetentionYearly;
-    private ZfsProperty<string> _sourceSystem;
-    private ZfsProperty<bool> _takeSnapshots;
-    private ZfsProperty<string> _template;
+    private ZfsProperty<bool>           _pruneSnapshotsField;
+    private ZfsProperty<string>         _recursion;
+    private ZfsProperty<int>            _snapshotRetentionDaily;
+    private ZfsProperty<int>            _snapshotRetentionFrequent;
+    private ZfsProperty<int>            _snapshotRetentionHourly;
+    private ZfsProperty<int>            _snapshotRetentionMonthly;
+    private ZfsProperty<int>            _snapshotRetentionPruneDeferral;
+    private ZfsProperty<int>            _snapshotRetentionWeekly;
+    private ZfsProperty<int>            _snapshotRetentionYearly;
+    private ZfsProperty<string>         _sourceSystem;
+    private ZfsProperty<bool>           _takeSnapshots;
+    private ZfsProperty<string>         _template;
 
     public ref readonly ZfsProperty<bool> Enabled => ref _enabled;
 
@@ -44,51 +44,52 @@ public partial record ZfsRecord
     {
         get
         {
-            ArgumentException.ThrowIfNullOrEmpty( propName );
+            ArgumentException.ThrowIfNullOrEmpty ( propName );
+
             return propName switch
-            {
-                ZfsPropertyNames.EnabledPropertyName => Enabled,
-                ZfsPropertyNames.TakeSnapshotsPropertyName => TakeSnapshots,
-                ZfsPropertyNames.PruneSnapshotsPropertyName => PruneSnapshots,
-                ZfsPropertyNames.RecursionPropertyName => Recursion,
-                ZfsPropertyNames.TemplatePropertyName => Template,
-                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => SnapshotRetentionFrequent,
-                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => SnapshotRetentionHourly,
-                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => SnapshotRetentionDaily,
-                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => SnapshotRetentionWeekly,
-                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => SnapshotRetentionMonthly,
-                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => SnapshotRetentionYearly,
-                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => SnapshotRetentionPruneDeferral,
-                ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName => LastHourlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName => LastDailySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName => LastWeeklySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName => LastMonthlySnapshotTimestamp,
-                ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName => LastYearlySnapshotTimestamp,
-                ZfsPropertyNames.SourceSystem => SourceSystem,
-                _ => throw new ArgumentOutOfRangeException( nameof( propName ) )
-            };
+                   {
+                       ZfsPropertyNames.EnabledPropertyName                              => Enabled,
+                       ZfsPropertyNames.TakeSnapshotsPropertyName                        => TakeSnapshots,
+                       ZfsPropertyNames.PruneSnapshotsPropertyName                       => PruneSnapshots,
+                       ZfsPropertyNames.RecursionPropertyName                            => Recursion,
+                       ZfsPropertyNames.TemplatePropertyName                             => Template,
+                       ZfsPropertyNames.SnapshotRetentionFrequentPropertyName            => SnapshotRetentionFrequent,
+                       ZfsPropertyNames.SnapshotRetentionHourlyPropertyName              => SnapshotRetentionHourly,
+                       ZfsPropertyNames.SnapshotRetentionDailyPropertyName               => SnapshotRetentionDaily,
+                       ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName              => SnapshotRetentionWeekly,
+                       ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName             => SnapshotRetentionMonthly,
+                       ZfsPropertyNames.SnapshotRetentionYearlyPropertyName              => SnapshotRetentionYearly,
+                       ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName       => SnapshotRetentionPruneDeferral,
+                       ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => LastFrequentSnapshotTimestamp,
+                       ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName   => LastHourlySnapshotTimestamp,
+                       ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName    => LastDailySnapshotTimestamp,
+                       ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName   => LastWeeklySnapshotTimestamp,
+                       ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName  => LastMonthlySnapshotTimestamp,
+                       ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName   => LastYearlySnapshotTimestamp,
+                       ZfsPropertyNames.SourceSystem                                     => SourceSystem,
+                       _                                                                 => throw new ArgumentOutOfRangeException ( nameof (propName) )
+                   };
         }
     }
 
-    public ref readonly ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp => ref _lastDailySnapshotTimestamp;
-    public ref readonly ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp => ref _lastFrequentSnapshotTimestamp;
-    public ref readonly ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp => ref _lastHourlySnapshotTimestamp;
-    public ref readonly ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp => ref _lastMonthlySnapshotTimestamp;
-    public ref readonly ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp => ref _lastWeeklySnapshotTimestamp;
-    public ref readonly ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp => ref _lastYearlySnapshotTimestamp;
-    public ref readonly ZfsProperty<bool> PruneSnapshots => ref _pruneSnapshotsField;
-    public ref readonly ZfsProperty<string> Recursion => ref _recursion;
-    public ref readonly ZfsProperty<int> SnapshotRetentionDaily => ref _snapshotRetentionDaily;
-    public ref readonly ZfsProperty<int> SnapshotRetentionFrequent => ref _snapshotRetentionFrequent;
-    public ref readonly ZfsProperty<int> SnapshotRetentionHourly => ref _snapshotRetentionHourly;
-    public ref readonly ZfsProperty<int> SnapshotRetentionMonthly => ref _snapshotRetentionMonthly;
-    public ref readonly ZfsProperty<int> SnapshotRetentionPruneDeferral => ref _snapshotRetentionPruneDeferral;
-    public ref readonly ZfsProperty<int> SnapshotRetentionWeekly => ref _snapshotRetentionWeekly;
-    public ref readonly ZfsProperty<int> SnapshotRetentionYearly => ref _snapshotRetentionYearly;
-    public ref readonly ZfsProperty<string> SourceSystem => ref _sourceSystem;
-    public ref readonly ZfsProperty<bool> TakeSnapshots => ref _takeSnapshots;
-    public ref readonly ZfsProperty<string> Template => ref _template;
+    public ref readonly ZfsProperty<DateTimeOffset> LastDailySnapshotTimestamp     => ref _lastDailySnapshotTimestamp;
+    public ref readonly ZfsProperty<DateTimeOffset> LastFrequentSnapshotTimestamp  => ref _lastFrequentSnapshotTimestamp;
+    public ref readonly ZfsProperty<DateTimeOffset> LastHourlySnapshotTimestamp    => ref _lastHourlySnapshotTimestamp;
+    public ref readonly ZfsProperty<DateTimeOffset> LastMonthlySnapshotTimestamp   => ref _lastMonthlySnapshotTimestamp;
+    public ref readonly ZfsProperty<DateTimeOffset> LastWeeklySnapshotTimestamp    => ref _lastWeeklySnapshotTimestamp;
+    public ref readonly ZfsProperty<DateTimeOffset> LastYearlySnapshotTimestamp    => ref _lastYearlySnapshotTimestamp;
+    public ref readonly ZfsProperty<bool>           PruneSnapshots                 => ref _pruneSnapshotsField;
+    public ref readonly ZfsProperty<string>         Recursion                      => ref _recursion;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionDaily         => ref _snapshotRetentionDaily;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionFrequent      => ref _snapshotRetentionFrequent;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionHourly        => ref _snapshotRetentionHourly;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionMonthly       => ref _snapshotRetentionMonthly;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionPruneDeferral => ref _snapshotRetentionPruneDeferral;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionWeekly        => ref _snapshotRetentionWeekly;
+    public ref readonly ZfsProperty<int>            SnapshotRetentionYearly        => ref _snapshotRetentionYearly;
+    public ref readonly ZfsProperty<string>         SourceSystem                   => ref _sourceSystem;
+    public ref readonly ZfsProperty<bool>           TakeSnapshots                  => ref _takeSnapshots;
+    public ref readonly ZfsProperty<string>         Template                       => ref _template;
 
     /// <summary>
     ///     An <see langword="event" /> fired when any <see cref="ZfsProperty{T}" /> <see langword="bool" /> properties are updated on
@@ -97,7 +98,7 @@ public partial record ZfsRecord
     public event BoolPropertyChangedEventHandler? BoolPropertyChanged;
 
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="propertyName" /> is not a supported int property</exception>
-    [SuppressMessage( "ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Switch expressions cannot be ref return" )]
+    [SuppressMessage ( "ReSharper", "ConvertSwitchStatementToSwitchExpression", Justification = "Switch expressions cannot be ref return" )]
     public ref readonly ZfsProperty<int> GetIntProperty( string propertyName )
     {
         switch ( propertyName )
@@ -117,7 +118,7 @@ public partial record ZfsRecord
             case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
                 return ref _snapshotRetentionPruneDeferral;
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), $"{propertyName} is not a supported int property" );
         }
     }
 
@@ -127,20 +128,20 @@ public partial record ZfsRecord
     {
         if ( IsPoolRoot )
         {
-            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+            throw new InvalidOperationException ( "A pool root cannot inherit a property" );
         }
 
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.EnabledPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.Enabled.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.Enabled.Value, false );
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.TakeSnapshots.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.TakeSnapshots.Value, false );
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.PruneSnapshots.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.PruneSnapshots.Value, false );
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), "Invalid property specified" );
         }
     }
 
@@ -150,28 +151,28 @@ public partial record ZfsRecord
     {
         if ( IsPoolRoot )
         {
-            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+            throw new InvalidOperationException ( "A pool root cannot inherit a property" );
         }
 
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionFrequent.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionFrequent.Value, false );
             case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionHourly.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionHourly.Value, false );
             case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionDaily.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionDaily.Value, false );
             case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionWeekly.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionWeekly.Value, false );
             case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionMonthly.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionMonthly.Value, false );
             case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionYearly.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionYearly.Value, false );
             case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.SnapshotRetentionPruneDeferral.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.SnapshotRetentionPruneDeferral.Value, false );
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), "Invalid property specified" );
         }
     }
 
@@ -182,18 +183,18 @@ public partial record ZfsRecord
     {
         if ( IsPoolRoot )
         {
-            throw new InvalidOperationException( "A pool root cannot inherit a property" );
+            throw new InvalidOperationException ( "A pool root cannot inherit a property" );
         }
 
         // ReSharper disable once ConvertSwitchStatementToSwitchExpression
         switch ( propertyName )
         {
             case ZfsPropertyNames.RecursionPropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.Recursion.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.Recursion.Value, false );
             case ZfsPropertyNames.TemplatePropertyName:
-                return ref UpdateProperty( propertyName, ParentDataset.Template.Value, false );
+                return ref UpdateProperty ( propertyName, ParentDataset.Template.Value, false );
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), "Invalid property specified" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), "Invalid property specified" );
         }
     }
 
@@ -215,15 +216,19 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.EnabledPropertyName:
                 boolProperty = _enabled;
+
                 return true;
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 boolProperty = _takeSnapshots;
+
                 return true;
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 boolProperty = _pruneSnapshotsField;
+
                 return true;
             default:
                 boolProperty = ZfsProperty<bool>.DefaultProperty( );
+
                 return false;
         }
     }
@@ -236,18 +241,21 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.TemplatePropertyName:
                 _template = _template with { Value = propertyValue, IsLocal = isLocal };
-                StringPropertyChanged?.Invoke( this, ref _template );
+                StringPropertyChanged?.Invoke ( this, ref _template );
+
                 return ref _template;
             case ZfsPropertyNames.RecursionPropertyName:
                 _recursion = _recursion with { Value = propertyValue, IsLocal = isLocal };
-                StringPropertyChanged?.Invoke( this, ref _recursion );
+                StringPropertyChanged?.Invoke ( this, ref _recursion );
+
                 return ref _recursion;
             case ZfsPropertyNames.SourceSystem:
                 _sourceSystem = _sourceSystem with { Value = propertyValue, IsLocal = isLocal };
-                StringPropertyChanged?.Invoke( this, ref _sourceSystem );
+                StringPropertyChanged?.Invoke ( this, ref _sourceSystem );
+
                 return ref _sourceSystem;
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported property" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), $"{propertyName} is not a supported property" );
         }
     }
 
@@ -290,18 +298,21 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.EnabledPropertyName:
                 _enabled = _enabled with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke( this, ref _enabled );
+                BoolPropertyChanged?.Invoke ( this, ref _enabled );
+
                 return ref _enabled;
             case ZfsPropertyNames.TakeSnapshotsPropertyName:
                 _takeSnapshots = _takeSnapshots with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke( this, ref _takeSnapshots );
+                BoolPropertyChanged?.Invoke ( this, ref _takeSnapshots );
+
                 return ref _takeSnapshots;
             case ZfsPropertyNames.PruneSnapshotsPropertyName:
                 _pruneSnapshotsField = _pruneSnapshotsField with { Value = propertyValue, IsLocal = isLocal };
-                BoolPropertyChanged?.Invoke( this, ref _pruneSnapshotsField );
+                BoolPropertyChanged?.Invoke ( this, ref _pruneSnapshotsField );
+
                 return ref _pruneSnapshotsField;
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported boolean property" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), $"{propertyName} is not a supported boolean property" );
         }
     }
 
@@ -358,24 +369,30 @@ public partial record ZfsRecord
         {
             case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
                 _lastFrequentSnapshotTimestamp = LastFrequentSnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastFrequentSnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
                 _lastHourlySnapshotTimestamp = LastHourlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastHourlySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
                 _lastDailySnapshotTimestamp = LastDailySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastDailySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
                 _lastWeeklySnapshotTimestamp = LastWeeklySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastWeeklySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
                 _lastMonthlySnapshotTimestamp = LastMonthlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastMonthlySnapshotTimestamp;
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
                 _lastYearlySnapshotTimestamp = LastYearlySnapshotTimestamp with { Value = propertyValue, IsLocal = isLocal };
+
                 return ref _lastYearlySnapshotTimestamp;
             default:
-                throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported DateTimeOffset property" );
+                throw new ArgumentOutOfRangeException ( nameof (propertyName), $"{propertyName} is not a supported DateTimeOffset property" );
         }
     }
 
@@ -439,34 +456,41 @@ public partial record ZfsRecord
             {
                 case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
                     _snapshotRetentionFrequent = SnapshotRetentionFrequent with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionFrequent );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionFrequent );
+
                     return ref _snapshotRetentionFrequent;
                 case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
                     _snapshotRetentionHourly = SnapshotRetentionHourly with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionHourly );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionHourly );
+
                     return ref _snapshotRetentionHourly;
                 case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
                     _snapshotRetentionDaily = SnapshotRetentionDaily with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionDaily );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionDaily );
+
                     return ref _snapshotRetentionDaily;
                 case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
                     _snapshotRetentionWeekly = SnapshotRetentionWeekly with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionWeekly );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionWeekly );
+
                     return ref _snapshotRetentionWeekly;
                 case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
                     _snapshotRetentionMonthly = SnapshotRetentionMonthly with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionMonthly );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionMonthly );
+
                     return ref _snapshotRetentionMonthly;
                 case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
                     _snapshotRetentionYearly = SnapshotRetentionYearly with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionYearly );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionYearly );
+
                     return ref _snapshotRetentionYearly;
                 case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
                     _snapshotRetentionPruneDeferral = SnapshotRetentionPruneDeferral with { Value = propertyValue, IsLocal = isLocal };
-                    IntPropertyChanged?.Invoke( this, ref _snapshotRetentionPruneDeferral );
+                    IntPropertyChanged?.Invoke ( this, ref _snapshotRetentionPruneDeferral );
+
                     return ref _snapshotRetentionPruneDeferral;
                 default:
-                    throw new ArgumentOutOfRangeException( nameof( propertyName ), $"{propertyName} is not a supported int property" );
+                    throw new ArgumentOutOfRangeException ( nameof (propertyName), $"{propertyName} is not a supported int property" );
             }
         }
         catch ( ArgumentOutOfRangeException )
@@ -475,22 +499,23 @@ public partial record ZfsRecord
         }
         catch ( Exception ex )
         {
-            Logger.Error( ex, "Error updating {0} on {1} {2}", propertyName, Kind, Name );
+            Logger.Error ( ex, "Error updating {0} on {1} {2}", propertyName, Kind, Name );
+
             throw;
         }
     }
 
     protected virtual void OnParentUpdatedStringProperty( ZfsRecord sender, ref ZfsProperty<string> updatedProperty )
     {
-        Logger.ConditionalTrace( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace ( "{2} received string property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
-            {
-                ZfsPropertyNames.RecursionPropertyName => _recursion.IsInherited,
-                ZfsPropertyNames.TemplatePropertyName => _template.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating string property", updatedProperty.Name )
-            } )
+             {
+                 ZfsPropertyNames.RecursionPropertyName => _recursion.IsInherited,
+                 ZfsPropertyNames.TemplatePropertyName  => _template.IsInherited,
+                 _                                      => throw new ArgumentOutOfRangeException ( nameof (updatedProperty), "Unsupported property name {0} when updating string property", updatedProperty.Name )
+             } )
         {
-            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
+            UpdateProperty ( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 
@@ -501,50 +526,50 @@ public partial record ZfsRecord
             return;
         }
 
-        IntPropertyChanged -= child.OnParentUpdatedIntProperty;
-        BoolPropertyChanged -= child.OnParentUpdatedBoolProperty;
-        StringPropertyChanged -= child.OnParentUpdatedStringProperty;
-        child.SubscribedToParentPropertyChangeEvents = false;
+        IntPropertyChanged                           -= child.OnParentUpdatedIntProperty;
+        BoolPropertyChanged                          -= child.OnParentUpdatedBoolProperty;
+        StringPropertyChanged                        -= child.OnParentUpdatedStringProperty;
+        child.SubscribedToParentPropertyChangeEvents =  false;
     }
 
     internal void UnsubscribeSnapshotFromPropertyEvents( Snapshot snap )
     {
-        IntPropertyChanged -= snap.OnParentUpdatedIntProperty;
-        BoolPropertyChanged -= snap.OnParentUpdatedBoolProperty;
+        IntPropertyChanged    -= snap.OnParentUpdatedIntProperty;
+        BoolPropertyChanged   -= snap.OnParentUpdatedBoolProperty;
         StringPropertyChanged -= snap.OnParentUpdatedStringProperty;
     }
 
     private void OnParentUpdatedBoolProperty( ZfsRecord sender, ref ZfsProperty<bool> updatedProperty )
     {
-        Logger.ConditionalTrace( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace ( "{2} received boolean property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
-            {
-                ZfsPropertyNames.EnabledPropertyName => _enabled.IsInherited,
-                ZfsPropertyNames.TakeSnapshotsPropertyName => _takeSnapshots.IsInherited,
-                ZfsPropertyNames.PruneSnapshotsPropertyName => _pruneSnapshotsField.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating boolean property", updatedProperty.Name )
-            } )
+             {
+                 ZfsPropertyNames.EnabledPropertyName        => _enabled.IsInherited,
+                 ZfsPropertyNames.TakeSnapshotsPropertyName  => _takeSnapshots.IsInherited,
+                 ZfsPropertyNames.PruneSnapshotsPropertyName => _pruneSnapshotsField.IsInherited,
+                 _                                           => throw new ArgumentOutOfRangeException ( nameof (updatedProperty), "Unsupported property name {0} when updating boolean property", updatedProperty.Name )
+             } )
         {
-            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
+            UpdateProperty ( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 
     private void OnParentUpdatedIntProperty( ZfsRecord sender, ref ZfsProperty<int> updatedProperty )
     {
-        Logger.ConditionalTrace( "{2} received int property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
+        Logger.ConditionalTrace ( "{2} received int property change event for {0} from {1}", updatedProperty.Name, sender.Name, Name );
         if ( updatedProperty.Name switch
-            {
-                ZfsPropertyNames.SnapshotRetentionFrequentPropertyName => _snapshotRetentionFrequent.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionHourlyPropertyName => _snapshotRetentionHourly.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionDailyPropertyName => _snapshotRetentionDaily.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName => _snapshotRetentionWeekly.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName => _snapshotRetentionMonthly.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionYearlyPropertyName => _snapshotRetentionYearly.IsInherited,
-                ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => _snapshotRetentionPruneDeferral.IsInherited,
-                _ => throw new ArgumentOutOfRangeException( nameof( updatedProperty ), "Unsupported property name {0} when updating int property", updatedProperty.Name )
-            } )
+             {
+                 ZfsPropertyNames.SnapshotRetentionFrequentPropertyName      => _snapshotRetentionFrequent.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionHourlyPropertyName        => _snapshotRetentionHourly.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionDailyPropertyName         => _snapshotRetentionDaily.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName        => _snapshotRetentionWeekly.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName       => _snapshotRetentionMonthly.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionYearlyPropertyName        => _snapshotRetentionYearly.IsInherited,
+                 ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName => _snapshotRetentionPruneDeferral.IsInherited,
+                 _                                                           => throw new ArgumentOutOfRangeException ( nameof (updatedProperty), "Unsupported property name {0} when updating int property", updatedProperty.Name )
+             } )
         {
-            UpdateProperty( updatedProperty.Name, updatedProperty.Value, false );
+            UpdateProperty ( updatedProperty.Name, updatedProperty.Value, false );
         }
     }
 
@@ -552,18 +577,18 @@ public partial record ZfsRecord
     {
         if ( child.SubscribedToParentPropertyChangeEvents )
         {
-            UnsubscribeChildFromPropertyEvents( child );
+            UnsubscribeChildFromPropertyEvents ( child );
         }
 
-        IntPropertyChanged += child.OnParentUpdatedIntProperty;
-        BoolPropertyChanged += child.OnParentUpdatedBoolProperty;
-        StringPropertyChanged += child.OnParentUpdatedStringProperty;
-        child.SubscribedToParentPropertyChangeEvents = true;
+        IntPropertyChanged                           += child.OnParentUpdatedIntProperty;
+        BoolPropertyChanged                          += child.OnParentUpdatedBoolProperty;
+        StringPropertyChanged                        += child.OnParentUpdatedStringProperty;
+        child.SubscribedToParentPropertyChangeEvents =  true;
     }
 
     private void SubscribeSnapshotToPropertyEvents( Snapshot snap )
     {
-        BoolPropertyChanged += snap.OnParentUpdatedBoolProperty;
+        BoolPropertyChanged   += snap.OnParentUpdatedBoolProperty;
         StringPropertyChanged += snap.OnParentUpdatedStringProperty;
     }
 

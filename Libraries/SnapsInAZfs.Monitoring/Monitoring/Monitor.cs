@@ -22,39 +22,39 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public sealed partial class Monitor : IMonitor
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private readonly List<string> _snapshotsPrunedFailedLastRunNames = [];
-    private readonly object _snapshotsPrunedFailedLastRunNamesLock = new( );
-    private readonly List<string> _snapshotsTakenFailedLastRunNames = [];
-    private readonly object _snapshotsTakenFailedLastRunNamesLock = new( );
-    private ApplicationState _applicationState;
-    private IApplicationStateObservable? _applicationStateObservable;
-    private bool _applicationStateObservableEventSubscribed;
-    private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds( );
-    private ISnapshotOperationsObservable? _snapshotOperationsObservable;
-    private uint _snapshotsPrunedFailedLastRun;
-    private uint _snapshotsPrunedFailedSinceStart;
-    private uint _snapshotsPrunedSucceededLastRun;
-    private uint _snapshotsPrunedSucceededSinceStart;
-    private uint _snapshotsTakenFailedLastRun;
-    private uint _snapshotsTakenFailedSinceStart;
-    private uint _snapshotsTakenSucceededLastRun;
-    private uint _snapshotsTakenSucceededSinceStart;
-    public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
-    public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
-    public DateTimeOffset SnapshotsPrunedLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
-    public uint SnapshotsPrunedSucceededLastRun => _snapshotsPrunedSucceededLastRun;
-    public uint SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
-    public uint SnapshotsTakenFailedLastRun => _snapshotsTakenFailedLastRun;
-    public uint SnapshotsTakenFailedSinceStart => _snapshotsTakenFailedSinceStart;
-    public DateTimeOffset SnapshotsTakenLastEnded { get; set; } = DateTimeOffset.UnixEpoch;
-    public uint SnapshotsTakenSucceededLastRun => _snapshotsTakenSucceededLastRun;
-    public uint SnapshotsTakenSucceededSinceStart => _snapshotsTakenSucceededSinceStart;
-    internal DateTimeOffset NextRunTime => DateTimeOffset.FromUnixTimeMilliseconds( Interlocked.Read( ref _nextRunTime ) );
-    internal DateTimeOffset ServiceStartTime => _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
+    private static readonly Logger                         Logger                                 = LogManager.GetCurrentClassLogger( );
+    private readonly        List<string>                   _snapshotsPrunedFailedLastRunNames     = [ ];
+    private readonly        object                         _snapshotsPrunedFailedLastRunNamesLock = new ( );
+    private readonly        List<string>                   _snapshotsTakenFailedLastRunNames      = [ ];
+    private readonly        object                         _snapshotsTakenFailedLastRunNamesLock  = new ( );
+    private                 ApplicationState               _applicationState;
+    private                 IApplicationStateObservable?   _applicationStateObservable;
+    private                 bool                           _applicationStateObservableEventSubscribed;
+    private                 long                           _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds( );
+    private                 ISnapshotOperationsObservable? _snapshotOperationsObservable;
+    private                 uint                           _snapshotsPrunedFailedLastRun;
+    private                 uint                           _snapshotsPrunedFailedSinceStart;
+    private                 uint                           _snapshotsPrunedSucceededLastRun;
+    private                 uint                           _snapshotsPrunedSucceededSinceStart;
+    private                 uint                           _snapshotsTakenFailedLastRun;
+    private                 uint                           _snapshotsTakenFailedSinceStart;
+    private                 uint                           _snapshotsTakenSucceededLastRun;
+    private                 uint                           _snapshotsTakenSucceededSinceStart;
+    public                  uint                           SnapshotsPrunedFailedLastRun       => _snapshotsPrunedFailedLastRun;
+    public                  uint                           SnapshotsPrunedFailedSinceStart    => _snapshotsPrunedFailedSinceStart;
+    public                  DateTimeOffset                 SnapshotsPrunedLastEnded           { get; set; } = DateTimeOffset.UnixEpoch;
+    public                  uint                           SnapshotsPrunedSucceededLastRun    => _snapshotsPrunedSucceededLastRun;
+    public                  uint                           SnapshotsPrunedSucceededSinceStart => _snapshotsPrunedSucceededSinceStart;
+    public                  uint                           SnapshotsTakenFailedLastRun        => _snapshotsTakenFailedLastRun;
+    public                  uint                           SnapshotsTakenFailedSinceStart     => _snapshotsTakenFailedSinceStart;
+    public                  DateTimeOffset                 SnapshotsTakenLastEnded            { get; set; } = DateTimeOffset.UnixEpoch;
+    public                  uint                           SnapshotsTakenSucceededLastRun     => _snapshotsTakenSucceededLastRun;
+    public                  uint                           SnapshotsTakenSucceededSinceStart  => _snapshotsTakenSucceededSinceStart;
+    internal                DateTimeOffset                 NextRunTime                        => DateTimeOffset.FromUnixTimeMilliseconds ( Interlocked.Read ( ref _nextRunTime ) );
+    internal                DateTimeOffset                 ServiceStartTime                   => _applicationStateObservable?.ServiceStartTime ?? DateTimeOffset.UnixEpoch;
 
     private static string? Version => Assembly.GetEntryAssembly( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute>( )?.InformationalVersion;
-    private const string ErrorGettingSnapshotCount = "Error getting snapshot count";
+    private const  string  ErrorGettingSnapshotCount = "Error getting snapshot count";
 
     /// <summary>
     ///     Registers an <see cref="IApplicationStateObservable" /> object with this <see cref="Monitor" /> instance by subscribing to
@@ -77,13 +77,13 @@ public sealed partial class Monitor : IMonitor
     /// <exception cref="InvalidOperationException">
     ///     Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object.
     /// </exception>
-    [SuppressMessage( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
-    [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
+    [SuppressMessage ( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
+    [SuppressMessage ( "ReSharper", "HeapView.DelegateAllocation",        Justification = "Event subscription" )]
     public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true )
     {
-        if ( _applicationStateObservable is { } && !ReferenceEquals( _applicationStateObservable, observableObject ) )
+        if ( _applicationStateObservable is not null && !ReferenceEquals ( _applicationStateObservable, observableObject ) )
         {
-            throw new InvalidOperationException( "Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object." );
+            throw new InvalidOperationException ( "Monitor object has already registered an IApplicationStateObservable instance. Only one is allowed per Monitor object." );
         }
 
         _applicationStateObservable ??= observableObject;
@@ -91,13 +91,15 @@ public sealed partial class Monitor : IMonitor
         {
             case true when !_applicationStateObservableEventSubscribed:
                 _applicationStateObservable.ApplicationStateChanged += ServiceOnApplicationStateChanged;
-                _applicationStateObservable.NextRunTimeChanged += ServiceOnNextRunTimeChanged;
-                _applicationStateObservableEventSubscribed = true;
+                _applicationStateObservable.NextRunTimeChanged      += ServiceOnNextRunTimeChanged;
+                _applicationStateObservableEventSubscribed          =  true;
+
                 break;
             case false when _applicationStateObservableEventSubscribed:
                 _applicationStateObservable.ApplicationStateChanged -= ServiceOnApplicationStateChanged;
-                _applicationStateObservable.NextRunTimeChanged -= ServiceOnNextRunTimeChanged;
-                _applicationStateObservableEventSubscribed = false;
+                _applicationStateObservable.NextRunTimeChanged      -= ServiceOnNextRunTimeChanged;
+                _applicationStateObservableEventSubscribed          =  false;
+
                 break;
         }
     }
@@ -110,41 +112,41 @@ public sealed partial class Monitor : IMonitor
     /// <exception cref="InvalidOperationException">
     ///     Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object.
     /// </exception>
-    [SuppressMessage( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
-    [SuppressMessage( "ReSharper", "HeapView.DelegateAllocation", Justification = "Event subscription" )]
+    [SuppressMessage ( "ReSharper", "HeapView.ObjectAllocation.Possible", Justification = "Event subscription" )]
+    [SuppressMessage ( "ReSharper", "HeapView.DelegateAllocation",        Justification = "Event subscription" )]
     public void RegisterSnapshotOperationsObservable( ISnapshotOperationsObservable observableObject )
     {
-        if ( _snapshotOperationsObservable is { } && !ReferenceEquals( _snapshotOperationsObservable, observableObject ) )
+        if ( _snapshotOperationsObservable is not null && !ReferenceEquals ( _snapshotOperationsObservable, observableObject ) )
         {
-            throw new InvalidOperationException( "Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object." );
+            throw new InvalidOperationException ( "Monitor object has already registered an ISnapshotOperationsObservable instance. Only one is allowed per Monitor object." );
         }
 
-        if ( _snapshotOperationsObservable is { } )
+        if ( _snapshotOperationsObservable is not null )
         {
             return;
         }
 
-        _snapshotOperationsObservable = observableObject;
-        observableObject.BeginTakingSnapshots += ServiceOnBeginTakingSnapshots;
-        observableObject.TakeSnapshotSucceeded += ServiceOnTakeSnapshotSucceeded;
-        observableObject.TakeSnapshotFailed += ServiceOnTakeSnapshotFailed;
-        observableObject.EndTakingSnapshots += ServiceOnEndTakingSnapshots;
-        observableObject.BeginPruningSnapshots += ServiceOnBeginPruningSnapshots;
+        _snapshotOperationsObservable           =  observableObject;
+        observableObject.BeginTakingSnapshots   += ServiceOnBeginTakingSnapshots;
+        observableObject.TakeSnapshotSucceeded  += ServiceOnTakeSnapshotSucceeded;
+        observableObject.TakeSnapshotFailed     += ServiceOnTakeSnapshotFailed;
+        observableObject.EndTakingSnapshots     += ServiceOnEndTakingSnapshots;
+        observableObject.BeginPruningSnapshots  += ServiceOnBeginPruningSnapshots;
         observableObject.PruneSnapshotSucceeded += ServiceOnPruneSnapshotSucceeded;
-        observableObject.PruneSnapshotFailed += ServiceOnPruneSnapshotFailed;
-        observableObject.EndPruningSnapshots += ServiceOnEndPruningSnapshots;
+        observableObject.PruneSnapshotFailed    += ServiceOnPruneSnapshotFailed;
+        observableObject.EndPruningSnapshots    += ServiceOnEndPruningSnapshots;
     }
 
-    private string GetApplicationState( )
+    private string GetApplicationState ( )
     {
         return _applicationStateObservable switch
-        {
-            null => "Not Registered",
-            // This warning is obsolete on .net7, as the implementation now caches the strings on first use
-            // ReSharper disable HeapView.BoxingAllocation
-            { } when _applicationStateObservableEventSubscribed => _applicationState.ToString( "G" ),
-            _ => _applicationStateObservable.State.ToString( "G" )
-            // ReSharper restore HeapView.BoxingAllocation
-        };
+               {
+                   null => "Not Registered",
+                   // This warning is obsolete on .net7, as the implementation now caches the strings on first use
+                   // ReSharper disable HeapView.BoxingAllocation
+                   not null when _applicationStateObservableEventSubscribed => _applicationState.ToString ( "G" ),
+                   _                                                        => _applicationStateObservable.State.ToString ( "G" )
+                   // ReSharper restore HeapView.BoxingAllocation
+               };
     }
 }

@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -14,14 +14,14 @@ namespace SnapsInAZfs.Monitoring;
 
 public enum ApplicationState
 {
-    Init = 0,
-    Idle = 1,
-    GettingDataFromZfs = 2,
-    TakingSnapshots = 3,
-    PruningSnapshots = 4,
-    CheckingZfsPropertySchema = 5,
-    Executing = 6,
-    UpdatingZfsPropertySchema = 7,
+    Init                               = 0,
+    Idle                               = 1,
+    GettingDataFromZfs                 = 2,
+    TakingSnapshots                    = 3,
+    PruningSnapshots                   = 4,
+    CheckingZfsPropertySchema          = 5,
+    Executing                          = 6,
+    UpdatingZfsPropertySchema          = 7,
     UpdatingZfsPropertySchemaCompleted = 8,
-    Terminating = 9
+    Terminating                        = 9
 }

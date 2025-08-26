@@ -1,4 +1,4 @@
-#region MIT LICENSE
+﻿#region MIT LICENSE
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -17,9 +17,9 @@ namespace SnapsInAZfs.Monitoring;
 /// </summary>
 public interface IApplicationStateObservable
 {
-    DateTimeOffset ServiceStartTime { get; }
-    ApplicationState State { get; }
+    DateTimeOffset   ServiceStartTime { get; }
+    ApplicationState State            { get; }
 
     event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
-    event EventHandler<long>? NextRunTimeChanged;
+    event EventHandler<long>?                             NextRunTimeChanged;
 }

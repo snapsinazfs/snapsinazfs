@@ -16,16 +16,15 @@ using System.Collections.Frozen;
 
 public static class ZfsPropertyValueConstants
 {
-    public const string Default              = "default";
-    public const string FileSystem           = "filesystem";
-    public const string None                 = "-";
-    public const string Snapshot             = "snapshot";
-    public const string SnapsInAZfs          = "siaz";
-    public const string StandaloneSiazSystem = "StandaloneSiazSystem";
-    public const string Volume               = "volume";
-    public const string ZfsRecursion         = "zfs";
-
-    private static readonly (int, int) ZeroToIntMax = ( 0, int.MaxValue );
+    private static readonly (int, int) ZeroToIntMax         = ( 0, int.MaxValue );
+    public const            string     Default              = "default";
+    public const            string     FileSystem           = "filesystem";
+    public const            string     None                 = "-";
+    public const            string     Snapshot             = "snapshot";
+    public const            string     SnapsInAZfs          = "siaz";
+    public const            string     StandaloneSiazSystem = "StandaloneSiazSystem";
+    public const            string     Volume               = "volume";
+    public const            string     ZfsRecursion         = "zfs";
 
     public static readonly FrozenDictionary<string, (int Min, int Max)> IntPropertyRanges =
         new Dictionary<string, (int Min, int Max)>
@@ -36,6 +35,6 @@ public static class ZfsPropertyValueConstants
             { ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZeroToIntMax },
             { ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZeroToIntMax },
             { ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, new ( 0, 100 ) }
-        }.ToFrozenDictionary ( );
+            { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, new ValueTuple<int, int> ( 0, 100 ) }
+        }.ToFrozenDictionary( );
 }
