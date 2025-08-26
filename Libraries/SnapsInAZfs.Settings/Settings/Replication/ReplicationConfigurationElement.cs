@@ -27,42 +27,43 @@ using System.Text.Json.Serialization;
                                  IgnoreReadOnlyProperties = false,
                                  PropertyNameCaseInsensitive = true,
                                  PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
-                                 WriteIndented = true )]
-[JsonSerializable ( typeof (ReplicationConfigurationElement) )]
+                                 WriteIndented = true
+                             )]
+[JsonSerializable ( typeof( ReplicationConfigurationElement ) )]
 public abstract record ReplicationConfigurationElement : IReplicationConfigurationElement
 {
     /// <summary>
-    ///     Creates a new instance of a <see cref="ReplicationConfigurationElement"/> with the provided <paramref name="Id"/> and
-    ///     <paramref name="Enabled"/> values.
+    ///     Creates a new instance of a <see cref="ReplicationConfigurationElement" /> with the provided <paramref name="Id" /> and
+    ///     <paramref name="Enabled" /> values.
     /// </summary>
     /// <param name="Id">
-    ///     A unique identifier for the <see cref="ReplicationConfigurationElement"/> or a new random value if unspecified or equal to
-    ///     <see cref="Guid.Empty"/> (all-zeros).
+    ///     A unique identifier for the <see cref="ReplicationConfigurationElement" /> or a new random value if unspecified or equal to
+    ///     <see cref="Guid.Empty" /> (all-zeros).
     /// </param>
     /// <param name="Enabled">
-    ///     Whether this <see cref="ReplicationConfigurationElement"/> should be enabled for processing or not. Default is
-    ///     <see langword="false"/> if omitted.
+    ///     Whether this <see cref="ReplicationConfigurationElement" /> should be enabled for processing or not. Default is
+    ///     <see langword="false" /> if omitted.
     /// </param>
     /// <remarks>
-    ///     Derived types are strongly encouraged to supply an explicit and valid value for <paramref name="Id"/>, if possible, when
+    ///     Derived types are strongly encouraged to supply an explicit and valid value for <paramref name="Id" />, if possible, when
     ///     constructing new elements, rather than relying on default behavior, to guard against potential future changes.
     /// </remarks>
-    protected ReplicationConfigurationElement ( Guid Id = default, bool Enabled = false )
+    protected ReplicationConfigurationElement( Guid Id = default, bool Enabled = false )
     {
         this.Enabled = Enabled;
-        this.Id      = Id == Guid.Empty ? Guid.NewGuid ( ) : Id;
+        this.Id      = Id == Guid.Empty ? Guid.NewGuid( ) : Id;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool Enabled { get; set; }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     [JsonRequired]
     public required Guid Id { get; init; }
 
     [SuppressMessage ( "ReSharper", "ParameterHidesMember", Justification = "This is a deconstructor." )]
     [SuppressMessage ( "ReSharper", "InconsistentNaming",   Justification = "This is a deconstructor." )]
-    public void Deconstruct ( out bool Enabled, out Guid Id )
+    public void Deconstruct( out bool Enabled, out Guid Id )
     {
         Enabled = this.Enabled;
         Id      = this.Id;

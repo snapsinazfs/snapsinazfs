@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <LangVersion>13</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
@@ -15,13 +15,9 @@
     <VersionSuffix>alpha01</VersionSuffix>
   </PropertyGroup>
   <PropertyGroup>
-    <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
+    <Copyright>2025 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
     <Description>SnapsInAZfs - Snapshot manager for ZFS on Linux</Description>
     <Product>SnapsInAZfs</Product>
   </PropertyGroup>
   
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
-  </ItemGroup>
-
 </Project>

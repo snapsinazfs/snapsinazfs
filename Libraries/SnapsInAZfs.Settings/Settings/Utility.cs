@@ -21,16 +21,16 @@ using System.Net.NetworkInformation;
 public static class Utility
 {
     /// <summary>
-    ///     Gets the fully-qualified domain name of the <paramref name="host"/> system.
+    ///     Gets the fully-qualified domain name of the <paramref name="host" /> system.
     /// </summary>
-    /// <param name="host">An <see cref="IPGlobalProperties"/> instance for which to return the FQDN.</param>
+    /// <param name="host">An <see cref="IPGlobalProperties" /> instance for which to return the FQDN.</param>
     /// <returns>
-    ///     A <see cref="string"/> containing the fully-qualified domain name of the <paramref name="host"/>, as seen by the runtime.
+    ///     A <see cref="string" /> containing the fully-qualified domain name of the <paramref name="host" />, as seen by the runtime.
     /// </returns>
     /// <remarks>
     ///     <para>
-    ///         If the <paramref name="host"/> does not have a domain name configured, the hostname followed by a dot will be returned.
-    ///         <br/>
+    ///         If the <paramref name="host" /> does not have a domain name configured, the hostname followed by a dot will be returned.
+    ///         <br />
     ///         This is a valid FQDN but may not be resolvable from other hosts, depending on the environment.
     ///     </para>
     ///     <para>This method is not supported by .net on Illumos or Solaris platforms.</para>
@@ -38,53 +38,60 @@ public static class Utility
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
     [Pure]
-    public static string GetFullyQualifiedDomainName ( this IPGlobalProperties host ) => $"{host.HostName}.{host.DomainName}";
+    public static string GetFullyQualifiedDomainName( this IPGlobalProperties host )
+    {
+        return $"{host.HostName}.{host.DomainName}";
+    }
 
     /// <summary>
     ///     Gets the fully-qualified domain name of the local system.
     /// </summary>
     /// <returns>
-    ///     A <see cref="string"/> containing the fully-qualified domain name of the local system, as seen by the runtime.
+    ///     A <see cref="string" /> containing the fully-qualified domain name of the local system, as seen by the runtime.
     /// </returns>
     /// <remarks>
     ///     <para>
     ///         If the local system does not have a domain name configured, the hostname followed by a dot will be returned.
-    ///         <br/>
+    ///         <br />
     ///         This is a valid FQDN but may not be resolvable from other hosts, depending on the environment.
     ///     </para>
     ///     <para>This method is not supported by .net on IllumOS or Solaris platforms.</para>
     /// </remarks>
     [UnsupportedOSPlatform ( "illumos" )]
     [UnsupportedOSPlatform ( "solaris" )]
-    public static string GetFullyQualifiedDomainName ( ) => IPGlobalProperties.GetIPGlobalProperties ( ).GetFullyQualifiedDomainName ( );
+    public static string GetFullyQualifiedDomainName ( )
+    {
+        return IPGlobalProperties.GetIPGlobalProperties( ).GetFullyQualifiedDomainName( );
+    }
 
     /// <summary>
-    ///     Searches locations in the PATH environment variable for <paramref name="program"/>, if whitelisted, and returns a
+    ///     Searches locations in the PATH environment variable for <paramref name="program" />, if whitelisted, and returns a
     ///     fully-qualified path, if found.
     /// </summary>
     /// <param name="program">
     ///     A program name to attempt to resolve. Restricted to a whitelisted set of values of programs used by SIAZ.
     /// </param>
     /// <returns>
-    ///     The fully-qualified and resolved path to a normal file for <paramref name="program"/>, if found, or throws
-    ///     <see cref="FileNotFoundException"/> if not found.
+    ///     The fully-qualified and resolved path to a normal file for <paramref name="program" />, if found, or throws
+    ///     <see cref="FileNotFoundException" /> if not found.
     /// </returns>
     /// <exception cref="ApplicationException">If the PATH environment variable is undefined or empty.</exception>
-    /// <exception cref="ArgumentException">If <paramref name="program"/> is an empty string or all-whitespace.</exception>
-    /// <exception cref="ArgumentNullException">If <paramref name="program"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="program"/> is not one of the whitelisted values.</exception>
-    /// <exception cref="FileNotFoundException">If <paramref name="program"/> was not found in any locations in PATH.</exception>
+    /// <exception cref="ArgumentException">If <paramref name="program" /> is an empty string or all-whitespace.</exception>
+    /// <exception cref="ArgumentNullException">If <paramref name="program" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="program" /> is not one of the whitelisted values.</exception>
+    /// <exception cref="FileNotFoundException">If <paramref name="program" /> was not found in any locations in PATH.</exception>
     /// <remarks>
     ///     <para>
-    ///         If <paramref name="program"/> is found in PATH and is a symbolic link, the link target will be resolved to ensure the
-    ///         target exists. If a symbolic link target does not exist, the result is the same as if <paramref name="program"/> were not
+    ///         If <paramref name="program" /> is found in PATH and is a symbolic link, the link target will be resolved to ensure the
+    ///         target exists. If a symbolic link target does not exist, the result is the same as if <paramref name="program" /> were
+    ///         not
     ///         found.
     ///     </para>
     ///     <para>
-    ///         Allowed values for <paramref name="program"/> are currently `zfs` and `zpool`.
+    ///         Allowed values for <paramref name="program" /> are currently `zfs` and `zpool`.
     ///     </para>
     /// </remarks>
-    public static string Which ( string program )
+    public static string Which( string program )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace ( program, nameof (program) );
 
@@ -95,9 +102,9 @@ public static class Utility
             throw new ApplicationException ( "PATH environment variable is empty or is not defined for the current process." );
         }
 
-        ReadOnlySpan<char> pathVarSpan = pathVar.AsSpan ( );
+        ReadOnlySpan<char> pathVarSpan = pathVar.AsSpan( );
 
-        char pathVarElementSeparator = OperatingSystem.IsWindows ( ) ? ';' : ':';
+        char pathVarElementSeparator = OperatingSystem.IsWindows( ) ? ';' : ':';
 
         switch ( program )
         {
@@ -114,7 +121,7 @@ public static class Utility
                         continue;
                     }
 
-                    string programPathCandidate = Path.Combine ( new ( pathVarSpan [ basePathRange ] ), program );
+                    string programPathCandidate = Path.Combine ( new string ( pathVarSpan [ basePathRange ] ), program );
 
                     // Check if path plus allowedProgram exists
                     if ( !File.Exists ( programPathCandidate ) )
@@ -137,7 +144,7 @@ public static class Utility
                     }
                 }
 
-                throw new FileNotFoundException ( $"Unable to locate {program} on the local system or it is a broken symbolic link. Check that {program} is installed and that the PATH environment variable for the principal executing SIAZ contains the parent directory of {program}. PATH was: {new ( pathVarSpan )}" );
+                throw new FileNotFoundException ( $"Unable to locate {program} on the local system or it is a broken symbolic link. Check that {program} is installed and that the PATH environment variable for the principal executing SIAZ contains the parent directory of {program}. PATH was: {new string ( pathVarSpan )}" );
             }
 
             default:

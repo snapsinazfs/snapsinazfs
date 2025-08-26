@@ -17,7 +17,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 ///     Settings class for use with the .net IConfiguration binder
 /// </summary>
-[JsonSerializable ( typeof (SnapsInAZfsSettings) )]
+[JsonSerializable ( typeof( SnapsInAZfsSettings ) )]
 [PublicAPI]
 public sealed record SnapsInAZfsSettings
 {
@@ -47,7 +47,7 @@ public sealed record SnapsInAZfsSettings
     ///     <para>
     ///         This value is critical for proper operation of SIAZ, whether replication is currently or ever has been in use or not, as
     ///         it is part of the logic used to determine if a snapshot is eligible for pruning or not, and is written explicitly to
-    ///         every snapshot SIAZ creates.<br/>
+    ///         every snapshot SIAZ creates.<br />
     ///         Snapshots missing this property MAY be ignored by SIAZ entirely, for any or all purposes.
     ///     </para>
     ///     <para>
@@ -121,25 +121,34 @@ public sealed record SnapsInAZfsSettings
     public const string AutoDetectSpecifier = "*";
 
     /// <summary>
-    ///     Sets <see cref="LocalSystemName"/> to the value returned by the <see cref="Utility.GetFullyQualifiedDomainName()"/> method.
+    ///     Sets <see cref="LocalSystemName" /> to the value returned by the <see cref="Utility.GetFullyQualifiedDomainName()" /> method.
     /// </summary>
     /// <remarks>
-    ///     The returned value depends on platform configuration and should not be relied on for normal operation.<br/>
-    ///     Configure the <see cref="LocalSystemName"/> property explicitly instead of letting auto-detection run for every instance of
+    ///     The returned value depends on platform configuration and should not be relied on for normal operation.<br />
+    ///     Configure the <see cref="LocalSystemName" /> property explicitly instead of letting auto-detection run for every instance of
     ///     SIAZ or bad things could happen potentially including data loss due to improper snapshot pruning based on unintended matches
-    ///     due to improper or counter-indicated use of <see cref="LocalSystemName"/>.
+    ///     due to improper or counter-indicated use of <see cref="LocalSystemName" />.
     /// </remarks>
-    public void AutoDetectAndSetLocalSystemName ( ) { LocalSystemName = Utility.GetFullyQualifiedDomainName ( ); }
+    public void AutoDetectAndSetLocalSystemName ( )
+    {
+        LocalSystemName = Utility.GetFullyQualifiedDomainName( );
+    }
 
     /// <summary>
-    ///     Sets <see cref="ZfsPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     Sets <see cref="ZfsPath" /> to the value returned by the <see cref="Utility.Which(string)" /> method, with parameter value
     ///     "zfs"
     /// </summary>
-    public void AutoDetectAndSetZfsPath ( ) { LocalSystemName = Utility.Which ( "zfs" ); }
+    public void AutoDetectAndSetZfsPath ( )
+    {
+        LocalSystemName = Utility.Which ( "zfs" );
+    }
 
     /// <summary>
-    ///     Sets <see cref="ZpoolPath"/> to the value returned by the <see cref="Utility.Which(string)"/> method, with parameter value
+    ///     Sets <see cref="ZpoolPath" /> to the value returned by the <see cref="Utility.Which(string)" /> method, with parameter value
     ///     "zpool"
     /// </summary>
-    public void AutoDetectAndSetZpoolPath ( ) { LocalSystemName = Utility.Which ( "zpool" ); }
+    public void AutoDetectAndSetZpoolPath ( )
+    {
+        LocalSystemName = Utility.Which ( "zpool" );
+    }
 }

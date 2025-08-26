@@ -21,23 +21,23 @@ using System.Text.Json.Serialization;
 public interface IReplicationConfigurationElement
 {
     /// <summary>
-    ///     Whether this <see cref="IReplicationConfigurationElement"/> is enabled for future replication activities.
+    ///     Whether this <see cref="IReplicationConfigurationElement" /> is enabled for future replication activities.
     /// </summary>
     /// <para>
-    ///     May not be serialized in configuration files by all implementing types and, if absent, will be <see langword="false"/>.
+    ///     May not be serialized in configuration files by all implementing types and, if absent, will be <see langword="false" />.
     /// </para>
     [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingDefault )]
     bool Enabled { get; set; }
 
     /// <summary>
-    ///     An immutable unique identifier for the <see cref="IReplicationConfigurationElement"/>.
+    ///     An immutable unique identifier for the <see cref="IReplicationConfigurationElement" />.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         Values having the first 4 bytes set to all-zeros (00000000-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for internal use by
-    ///         SIAZ as identifiers for common objects that are always expected to exist and for unknown objects.<br/>
+    ///         SIAZ as identifiers for common objects that are always expected to exist and for unknown objects.<br />
     ///         Values having the first 4 bytes set to all-ones (FFFFFFFF-XXXX-XXXX-XXXX-XXXXXXXXXXXX) are reserved for user-defined
-    ///         purposes, with all remaining bytes available for any arbitrary definition (suggestions: WWNs, MAC addresses, etc).<br/>
+    ///         purposes, with all remaining bytes available for any arbitrary definition (suggestions: WWNs, MAC addresses, etc).<br />
     ///         SIAZ will discard randomly-generated GUID values that have the first 4 bytes set to all-ones or all-zeros to ensure that
     ///         those ranges are protected against the unlikely case of random collisions.
     ///     </para>

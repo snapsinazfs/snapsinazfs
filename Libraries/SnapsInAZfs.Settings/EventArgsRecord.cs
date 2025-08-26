@@ -15,12 +15,12 @@ namespace SnapsInAZfs;
 using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
-///     A record type intended for use in place of <see cref="EventArgs"/>, to enable record type behaviors and inheritance by
+///     A record type intended for use in place of <see cref="EventArgs" />, to enable record type behaviors and inheritance by
 ///     records.
 /// </summary>
 /// <remarks>
-///     Just like <see cref="EventArgs"/>, this type is empty, but is not abstract, for consistency of usage patterns.<br/>
-///     The <see cref="Empty"/> field is a singleton and is <see langword="readonly"/> to prevent ref-reassignment.
+///     Just like <see cref="EventArgs" />, this type is empty, but is not abstract, for consistency of usage patterns.<br />
+///     The <see cref="Empty" /> field is a singleton and is <see langword="readonly" /> to prevent ref-reassignment.
 /// </remarks>
 [PublicAPI]
 [UsedImplicitly]

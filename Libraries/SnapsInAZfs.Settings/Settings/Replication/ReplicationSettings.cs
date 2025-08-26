@@ -16,57 +16,58 @@ using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
 
 [PublicAPI]
-[JsonSerializable ( typeof (ReplicationSettings) )]
+[JsonSerializable ( typeof( ReplicationSettings ) )]
 public sealed record ReplicationSettings
 {
     private IList<NetworkAccessControlEntry>? _networkAccessControlList;
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value controlling whether replication functionality is enabled or disabled at
+    ///     Gets or sets a <see cref="Boolean" /> value controlling whether replication functionality is enabled or disabled at
     ///     application startup.
-    ///     If <see langword="false"/>, all replication activity is disabled and the values of <see cref="EnableLocal"/>,
-    ///     <see cref="EnableInbound"/>, and <see cref="EnableOutbound"/> are ignored.
+    ///     If <see langword="false" />, all replication activity is disabled and the values of <see cref="EnableLocal" />,
+    ///     <see cref="EnableInbound" />, and <see cref="EnableOutbound" /> are ignored.
     /// </summary>
     /// <remarks>
-    ///     All enablement flags default to <see langword="false"/> if not set.
+    ///     All enablement flags default to <see langword="false" /> if not set.
     /// </remarks>
     public bool Enabled { get; set; }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value controlling whether the inbound socket will listen for incoming replication
-    ///     connections from remote systems.<br/>
-    ///     If <see langword="false"/>, the socket will not be listening and inbound replication will not be available.
+    ///     Gets or sets a <see cref="Boolean" /> value controlling whether the inbound socket will listen for incoming replication
+    ///     connections from remote systems.<br />
+    ///     If <see langword="false" />, the socket will not be listening and inbound replication will not be available.
     ///     application startup.
     /// </summary>
     /// <remarks>
-    ///     All enablement flags default to <see langword="false"/> if not set.
+    ///     All enablement flags default to <see langword="false" /> if not set.
     /// </remarks>
     public bool EnableInbound { get; set; }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value controlling whether scheduled replication tasks having both source and destination
-    ///     set to local ZFS locations will be launched as scheduled.<br/>
-    ///     If <see langword="false"/>, local scheduled ZFS-to-ZFS replication operations will not run.<br/>
+    ///     Gets or sets a <see cref="Boolean" /> value controlling whether scheduled replication tasks having both source and
+    ///     destination
+    ///     set to local ZFS locations will be launched as scheduled.<br />
+    ///     If <see langword="false" />, local scheduled ZFS-to-ZFS replication operations will not run.<br />
     ///     Manual invocation of local replication tasks is always allowed, regardless of this setting.
     /// </summary>
     /// <remarks>
-    ///     All enablement flags default to <see langword="false"/> if not set.
+    ///     All enablement flags default to <see langword="false" /> if not set.
     /// </remarks>
     public bool EnableLocal { get; set; }
 
     /// <summary>
-    ///     Gets or sets a <see cref="Boolean"/> value controlling whether scheduled replication tasks with remote destinations will be
-    ///     launched as scheduled.<br/>
-    ///     If <see langword="false"/>, scheduled ZFS-to-remote endpoint replication operations will not run.<br/>
+    ///     Gets or sets a <see cref="Boolean" /> value controlling whether scheduled replication tasks with remote destinations will be
+    ///     launched as scheduled.<br />
+    ///     If <see langword="false" />, scheduled ZFS-to-remote endpoint replication operations will not run.<br />
     ///     Manual invocation of outbound replication tasks is always allowed, regardless of this setting.
     /// </summary>
     /// <remarks>
-    ///     All enablement flags default to <see langword="false"/> if not set.
+    ///     All enablement flags default to <see langword="false" /> if not set.
     /// </remarks>
     public bool EnableOutbound { get; set; }
 
     /// <summary>
-    ///     A priority-ordered collection of <see cref="NetworkAccessControlEntry"/> items which define the remote network addresses
+    ///     A priority-ordered collection of <see cref="NetworkAccessControlEntry" /> items which define the remote network addresses
     ///     allowed to send replication streams to a SIAZ process running on the local system.
     /// </summary>
     /// <remarks>
@@ -74,16 +75,16 @@ public sealed record ReplicationSettings
     ///         Entries are processed top-down, as they appear in the collection, before any replication activities are started.
     ///     </para>
     ///     <para>
-    ///         Entries with <see cref="NetworkAccessControlEntry.Enabled"/> set to <see langword="false"/> are skipped without being
+    ///         Entries with <see cref="NetworkAccessControlEntry.Enabled" /> set to <see langword="false" /> are skipped without being
     ///         considered, continuing with the next entry as if the disabled entry were not in the list at all.
     ///     </para>
     ///     <para>
     ///         The first enabled entry that matches stops the search and the session will be permitted or denied continuation of the
-    ///         session according to the value of <see cref="NetworkAccessControlEntry.Permit"/>.
+    ///         session according to the value of <see cref="NetworkAccessControlEntry.Permit" />.
     ///     </para>
     ///     <para>
     ///         If no match is found, the session will be terminated as if there were an implicit match-all entry at the end of the list
-    ///         with <see cref="NetworkAccessControlEntry.Permit"/> == <see langword="false"/>.
+    ///         with <see cref="NetworkAccessControlEntry.Permit" /> == <see langword="false" />.
     ///     </para>
     /// </remarks>
     public IList<NetworkAccessControlEntry>? NetworkAccessControlList

@@ -16,10 +16,10 @@ namespace SnapsInAZfs.Settings;
 
 public sealed class MonitoringSettings
 {
-    [JsonPropertyOrder( 1 )]
+    [JsonPropertyOrder ( 1 )]
     public required bool EnableHttp { get; set; }
 
-    [JsonPropertyOrder( 2 )]
-    [JsonIgnore( Condition = JsonIgnoreCondition.WhenWritingNull )]
+    [JsonPropertyOrder ( 2 )]
+    [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingNull )]
     public object? Kestrel { get; set; }
 }
