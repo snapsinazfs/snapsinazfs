@@ -25,7 +25,7 @@ using Terminal.Gui;
 public static class TypeExtensions
 {
     /// <summary>
-    ///     Gets the last path component of a ZFS path name, starting from the last instance of '/','@',or '#'
+    ///     Gets the last path component of a ZFS path name, starting from the last instance of '/','@',or '#'.
     /// </summary>
     /// <param name="path">A path to operate on</param>
     /// <returns>
@@ -118,7 +118,7 @@ public static class TypeExtensions
     ///     Gets the boolean value parsed from the label of the currently selected item of a <see cref="RadioGroup" />.
     /// </summary>
     /// <param name="group">
-    ///     The <see cref="RadioGroup" /> for which the selected item's label will be parsed as a boolean.
+    ///     The <see cref="RadioGroup" /> for which the selected item's label will be parsed as a boolean value.
     /// </param>
     /// <returns>The parsed boolean value of the selected item of <paramref name="group" />.</returns>
     public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
@@ -158,7 +158,7 @@ public static class TypeExtensions
 
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
-            // INTENT: This is clearly aimed at collections, but I'm not sure what my original intent was
+            // INTENT: This is clearly aimed at collections, but I'm not sure what my original intent was.
             if ( childSection.Path.EndsWith ( ":0" ) )
             {
                 JsonArray arrayNode = [ ];
@@ -174,7 +174,7 @@ public static class TypeExtensions
             obj.Add ( childSection.Key, SerializeToJson ( childSection ) );
         }
 
-        if ( obj.Any( ) || configSection is not IConfigurationSection section )
+        if ( obj.Count != 0 || configSection is not IConfigurationSection section )
         {
             return obj;
         }
@@ -189,12 +189,10 @@ public static class TypeExtensions
             return JsonValue.Create ( real );
         }
 
-        if ( long.TryParse ( section.Value, out long integer ) )
-        {
-            return JsonValue.Create ( integer );
-        }
-
-        return JsonValue.Create ( section.Value );
+        return
+            long.TryParse ( section.Value, out long integer )
+                ? JsonValue.Create ( integer )
+                : JsonValue.Create ( section.Value );
     }
 
     /// <summary>
@@ -218,7 +216,7 @@ public static class TypeExtensions
         return value.ToString( ) switch
                {
                    // This case is checking if it's a non-null string, and if it can be parsed as an integer
-                   // All other conditions will throw an ArgumentOutOfRangeException for value
+                   // All other conditions will throw an ArgumentOutOfRangeException for value.
                    { } stringValue when int.TryParse ( stringValue, out int intValue ) => intValue,
                    _                                                                   => throw new ArgumentOutOfRangeException ( nameof (value), "ustring does not represent a valid Int32 value" )
                };
@@ -226,7 +224,7 @@ public static class TypeExtensions
 
     /// <summary>
     ///     Attempts to parse this <see cref="ustring" /> and return the <see langword="int" /> version of it, with the
-    ///     specified fallback value
+    ///     specified fallback value.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="fallbackValue"></param>
