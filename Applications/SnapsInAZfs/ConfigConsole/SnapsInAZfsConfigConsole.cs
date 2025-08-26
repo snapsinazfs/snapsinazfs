@@ -336,7 +336,7 @@ public sealed partial class SnapsInAZfsConfigConsole
         Add ( _zfsConfigurationWindow );
         LayoutSubviews( );
         _zfsConfigurationWindowShown = true;
-        _zfsConfigurationWindow.zfsTreeView.SetFocus( );
+        _zfsConfigurationWindow.zfsTreeView?.SetFocus( );
         Logger.ConditionalDebug ( "Showing ZFS configuration window" );
         zfsConfigMenuItem.Action = HideZfsConfigurationWindow;
         zfsConfigMenuItem.Title  = "Hide ZFS Configuration Window";
