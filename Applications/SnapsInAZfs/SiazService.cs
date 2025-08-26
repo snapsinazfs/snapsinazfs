@@ -333,9 +333,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                         PruneSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( snapshot.Name, snapshot.Timestamp.Value ) );
 
                         continue;
-                    case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
-                    case ZfsCommandRunnerOperationStatus.Failure:
-                    case ZfsCommandRunnerOperationStatus.NameValidationFailed:
                     default:
                         PruneSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, snapshot.Timestamp.Value ) );
                         Logger.Error ( "Failed to destroy snapshot {0}", snapshot.Name );
@@ -916,7 +913,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 }
 
                 break;
-            case SnapshotPeriodKind.NotSet:
             default:
             {
                 TakeSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, in timestamp ) );
@@ -942,11 +938,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 Logger.Info ( "Snapshot {0} successfully taken", snapshot!.Name );
 
                 return true;
-            case ZfsCommandRunnerOperationStatus.Failure:
-            case ZfsCommandRunnerOperationStatus.NameValidationFailed:
-            case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
-            case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
-            case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
             default:
                 TakeSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, in timestamp ) );
                 Logger.Error ( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
