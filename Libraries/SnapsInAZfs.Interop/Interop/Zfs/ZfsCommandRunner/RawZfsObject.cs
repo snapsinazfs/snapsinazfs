@@ -21,9 +21,9 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 public sealed class RawZfsObject
 {
     private static readonly Logger          Logger                      = LogManager.GetCurrentClassLogger( );
-    private static readonly HashSet<string> MandatorySnapshotProperties = IZfsProperty.KnownSnapshotProperties.Union ( ["type", "used"], StringComparer.OrdinalIgnoreCase ).ToHashSet ( );
+    private static readonly HashSet<string> MandatorySnapshotProperties = IZfsProperty.KnownSnapshotProperties.Union ( [ "type", "used" ], StringComparer.OrdinalIgnoreCase ).ToHashSet( );
 
-    private static readonly HashSet<string> MandatoryZfsRecordProperties = IZfsProperty.KnownDatasetProperties.Union(["type", "used", "available"], StringComparer.OrdinalIgnoreCase).ToHashSet ( );
+    private static readonly HashSet<string> MandatoryZfsRecordProperties = IZfsProperty.KnownDatasetProperties.Union ( [ "type", "used", "available" ], StringComparer.OrdinalIgnoreCase ).ToHashSet( );
 
     /// <summary>
     ///     Creates a new instance of a <see cref="RawZfsObject" />
@@ -34,8 +34,8 @@ public sealed class RawZfsObject
         Kind = kind;
     }
 
-    public bool HasAllMandatorySnapshotProperties  => !MandatorySnapshotProperties.Except ( Properties.Keys ).Any ( );
-    public bool HasAllMandatoryZfsRecordProperties => !MandatoryZfsRecordProperties.Except ( Properties.Keys ).Any ( );
+    public bool HasAllMandatorySnapshotProperties  => !MandatorySnapshotProperties.Except ( Properties.Keys ).Any( );
+    public bool HasAllMandatoryZfsRecordProperties => !MandatoryZfsRecordProperties.Except ( Properties.Keys ).Any( );
 
     /// <summary>The string corresponding to the 'type' attribute of a ZFS object</summary>
     public string Kind { get; }
@@ -43,30 +43,31 @@ public sealed class RawZfsObject
     /// <summary>
     ///     A collection of <see cref="RawProperty" /> values for a ZFS object, indexed and sorted by their 'property' name values
     /// </summary>
-    public SortedList<string, RawProperty> Properties { get; } = new( );
+    public SortedList<string, RawProperty> Properties { get; } = new ( );
 
     public void AddRawProperty( in string propertyName, in string propertyValue, in string propertySource )
     {
-        Properties.Add( propertyName, new( propertyName, propertyValue, propertySource ) );
+        Properties.Add ( propertyName, new RawProperty ( propertyName, propertyValue, propertySource ) );
     }
 
     /// <exception cref="InvalidOperationException">Cannot convert to ZfsRecord - Missing one or more properties</exception>
     /// <exception cref="ArgumentNullException">Cannot convert to ZfsRecord - Missing name <paramref name="dsName" /></exception>
     public bool ConvertToDatasetAndAddToCollection( string dsName, ConcurrentDictionary<string, ZfsRecord> datasets )
     {
-        Logger.Trace( "Parsing property values for {0} {1}", Kind, dsName );
-        if ( string.IsNullOrWhiteSpace( dsName ) )
+        Logger.Trace ( "Parsing property values for {0} {1}", Kind, dsName );
+        if ( string.IsNullOrWhiteSpace ( dsName ) )
         {
-            throw new ArgumentNullException( nameof( dsName ), "Cannot convert to ZfsRecord - Missing name" );
+            throw new ArgumentNullException ( nameof (dsName), "Cannot convert to ZfsRecord - Missing name" );
         }
 
         if ( !HasAllMandatoryZfsRecordProperties )
         {
-            throw new InvalidOperationException( "Cannot convert to ZfsRecord - Missing one or more properties" );
+            throw new InvalidOperationException ( "Cannot convert to ZfsRecord - Missing one or more properties" );
         }
 
         // Note the type parameter doesn't matter for this static method call - it just has to be something
-        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject( dsName,
+        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject (
+                                                                          dsName,
                                                                           this,
                                                                           out ZfsProperty<bool>? enabled,
                                                                           out ZfsProperty<bool>? takeSnapshots,
@@ -88,15 +89,18 @@ public sealed class RawZfsObject
                                                                           out ZfsProperty<int>? retentionPruneDeferral,
                                                                           out ZfsProperty<string>? sourceSystem,
                                                                           out long bytesAvailable,
-                                                                          out long bytesUsed ) )
+                                                                          out long bytesUsed
+                                                                         ) )
         {
-            Logger.Error( "Failed parsing object {0} from ZFS", dsName );
+            Logger.Error ( "Failed parsing object {0} from ZFS", dsName );
+
             return false;
         }
 
         string parentName = dsName.GetZfsPathParent( );
-        bool isRootDs = dsName == parentName;
-        ZfsRecord newDs = ZfsRecord.CreateInstanceFromAllProperties( dsName,
+        bool   isRootDs   = dsName == parentName;
+        ZfsRecord newDs = ZfsRecord.CreateInstanceFromAllProperties (
+                                                                     dsName,
                                                                      Kind,
                                                                      enabled.Value,
                                                                      takeSnapshots.Value,
@@ -119,11 +123,12 @@ public sealed class RawZfsObject
                                                                      sourceSystem.Value,
                                                                      bytesAvailable,
                                                                      bytesUsed,
-                                                                     isRootDs ? null : datasets[ parentName ] );
-        datasets[ dsName ] = newDs;
+                                                                     isRootDs ? null : datasets [ parentName ]
+                                                                    );
+        datasets [ dsName ] = newDs;
         if ( !isRootDs )
         {
-            datasets[ parentName ].AddDataset( newDs );
+            datasets [ parentName ].AddDataset ( newDs );
         }
 
         return true;
@@ -141,56 +146,85 @@ public sealed class RawZfsObject
     /// <param name="snapshots">The collection to add the resulting parsed <see cref="Snapshot" /> to</param>
     public bool ConvertToSnapshotAndAddToCollections( string snapName, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
     {
-        Logger.Trace( "Parsing property values for snapshot {0}", snapName );
+        Logger.Trace ( "Parsing property values for snapshot {0}", snapName );
 
-        if ( string.IsNullOrWhiteSpace( snapName ) )
+        if ( string.IsNullOrWhiteSpace ( snapName ) )
         {
-            throw new ArgumentNullException( nameof( snapName ), "Cannot convert to Snapshot - Missing name" );
+            throw new ArgumentNullException ( nameof (snapName), "Cannot convert to Snapshot - Missing name" );
         }
 
         if ( !HasAllMandatorySnapshotProperties )
         {
-            throw new InvalidOperationException( "Cannot convert to Snapshot - Missing one or more properties" );
+            throw new InvalidOperationException ( "Cannot convert to Snapshot - Missing one or more properties" );
         }
 
-        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject( snapName, this, out ZfsProperty<bool>? enabled, out ZfsProperty<bool>? takeSnapshots, out ZfsProperty<bool>? pruneSnapshots, out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp, out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp, out ZfsProperty<string>? recursion, out ZfsProperty<string>? template, out ZfsProperty<int>? retentionFrequent, out ZfsProperty<int>? retentionHourly, out ZfsProperty<int>? retentionDaily, out ZfsProperty<int>? retentionWeekly, out ZfsProperty<int>? retentionMonthly, out ZfsProperty<int>? retentionYearly, out ZfsProperty<int>? retentionPruneDeferral, out ZfsProperty<string>? sourceSystem, out _, out _ ) )
+        if ( !ZfsProperty<int>.TryParseDatasetPropertiesFromRawZfsObject (
+                                                                          snapName,
+                                                                          this,
+                                                                          out ZfsProperty<bool>? enabled,
+                                                                          out ZfsProperty<bool>? takeSnapshots,
+                                                                          out ZfsProperty<bool>? pruneSnapshots,
+                                                                          out ZfsProperty<DateTimeOffset>? lastFrequentSnapshotTimestamp,
+                                                                          out ZfsProperty<DateTimeOffset>? lastHourlySnapshotTimestamp,
+                                                                          out ZfsProperty<DateTimeOffset>? lastDailySnapshotTimestamp,
+                                                                          out ZfsProperty<DateTimeOffset>? lastWeeklySnapshotTimestamp,
+                                                                          out ZfsProperty<DateTimeOffset>? lastMonthlySnapshotTimestamp,
+                                                                          out ZfsProperty<DateTimeOffset>? lastYearlySnapshotTimestamp,
+                                                                          out ZfsProperty<string>? recursion,
+                                                                          out ZfsProperty<string>? template,
+                                                                          out ZfsProperty<int>? retentionFrequent,
+                                                                          out ZfsProperty<int>? retentionHourly,
+                                                                          out ZfsProperty<int>? retentionDaily,
+                                                                          out ZfsProperty<int>? retentionWeekly,
+                                                                          out ZfsProperty<int>? retentionMonthly,
+                                                                          out ZfsProperty<int>? retentionYearly,
+                                                                          out ZfsProperty<int>? retentionPruneDeferral,
+                                                                          out ZfsProperty<string>? sourceSystem,
+                                                                          out _,
+                                                                          out _
+                                                                         ) )
         {
-            Logger.Warn( "Failed parsing snapshot {0} - Possibly not a SIAZ snapshot - Skipping object", snapName );
+            Logger.Warn ( "Failed parsing snapshot {0} - Possibly not a SIAZ snapshot - Skipping object", snapName );
+
             return false;
         }
 
-        if ( !DateTimeOffset.TryParse( Properties[ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, out DateTimeOffset snapshotTimestamp ) )
+        if ( !DateTimeOffset.TryParse ( Properties [ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, out DateTimeOffset snapshotTimestamp ) )
         {
-            Logger.Debug( "{0} value {1} not valid for snapshot {2} - Skipping object", ZfsPropertyNames.SnapshotTimestampPropertyName, Properties[ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, snapName );
+            Logger.Debug ( "{0} value {1} not valid for snapshot {2} - Skipping object", ZfsPropertyNames.SnapshotTimestampPropertyName, Properties [ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, snapName );
+
             return false;
         }
 
-        string parentName = snapName.GetZfsPathParent( );
-        ZfsRecord dataset = datasets[ parentName ];
-        snapshots[ snapName ] = dataset.CreateAndAddSnapshot( snapName,
-                                                              enabled.Value,
-                                                              takeSnapshots.Value,
-                                                              pruneSnapshots.Value,
-                                                              lastFrequentSnapshotTimestamp.Value,
-                                                              lastHourlySnapshotTimestamp.Value,
-                                                              lastDailySnapshotTimestamp.Value,
-                                                              lastWeeklySnapshotTimestamp.Value,
-                                                              lastMonthlySnapshotTimestamp.Value,
-                                                              lastYearlySnapshotTimestamp.Value,
-                                                              recursion.Value,
-                                                              template.Value,
-                                                              retentionFrequent.Value,
-                                                              retentionHourly.Value,
-                                                              retentionDaily.Value,
-                                                              retentionWeekly.Value,
-                                                              retentionMonthly.Value,
-                                                              retentionYearly.Value,
-                                                              retentionPruneDeferral.Value,
-                                                              Properties[ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value,
-                                                              sourceSystem.Value,
-                                                              in snapshotTimestamp,
-                                                              dataset );
-        Logger.Trace( "Snapshot object {0} added to {1} collection and parent {2}", snapName, nameof( snapshots ), parentName );
+        string    parentName = snapName.GetZfsPathParent( );
+        ZfsRecord dataset    = datasets [ parentName ];
+        snapshots [ snapName ] = dataset.CreateAndAddSnapshot (
+                                                               snapName,
+                                                               enabled.Value,
+                                                               takeSnapshots.Value,
+                                                               pruneSnapshots.Value,
+                                                               lastFrequentSnapshotTimestamp.Value,
+                                                               lastHourlySnapshotTimestamp.Value,
+                                                               lastDailySnapshotTimestamp.Value,
+                                                               lastWeeklySnapshotTimestamp.Value,
+                                                               lastMonthlySnapshotTimestamp.Value,
+                                                               lastYearlySnapshotTimestamp.Value,
+                                                               recursion.Value,
+                                                               template.Value,
+                                                               retentionFrequent.Value,
+                                                               retentionHourly.Value,
+                                                               retentionDaily.Value,
+                                                               retentionWeekly.Value,
+                                                               retentionMonthly.Value,
+                                                               retentionYearly.Value,
+                                                               retentionPruneDeferral.Value,
+                                                               Properties [ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value,
+                                                               sourceSystem.Value,
+                                                               in snapshotTimestamp,
+                                                               dataset
+                                                              );
+        Logger.Trace ( "Snapshot object {0} added to {1} collection and parent {2}", snapName, nameof (snapshots), parentName );
+
         return true;
     }
 }

@@ -15,6 +15,6 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 public static class ZfsNativePropertyNames
 {
     public const string Available = "available";
-    public const string Type = "type";
-    public const string Used = "used";
+    public const string Type      = "type";
+    public const string Used      = "used";
 }

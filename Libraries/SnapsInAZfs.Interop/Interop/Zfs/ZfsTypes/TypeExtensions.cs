@@ -19,19 +19,22 @@ public static class TypeExtensions
 {
     /// <summary>
     ///     Gets an integer index for radio button groups assuming the order of true, false from this
-    ///     <see cref="ZfsProperty{T}"/>
+    ///     <see cref="ZfsProperty{T}" />
     /// </summary>
     /// <param name="property">
-    ///     The <see cref="ZfsProperty{T}"/> to convert to an integer index for radio button groups
+    ///     The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups
     /// </param>
     /// <returns>
-    ///     An <see langword="int"/> representing the index in a radio button group for this property's source<br/>
-    ///     0: true<br/>
-    ///     1: false<br/>
+    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
+    ///     0: true<br />
+    ///     1: false<br />
     /// </returns>
-    public static int AsTrueFalseRadioIndex ( this ZfsProperty<bool> property ) => property.Value ? 0 : 1;
+    public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
+    {
+        return property.Value ? 0 : 1;
+    }
 
-    public static string GetMostRecentSnapshotZfsPropertyName ( this SnapshotPeriod period )
+    public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period )
     {
         return period.Kind switch
                {
@@ -46,7 +49,7 @@ public static class TypeExtensions
                };
     }
 
-    public static string GetZfsPathParent ( this string value )
+    public static string GetZfsPathParent( this string value )
     {
         int endIndex = value.LastIndexOfAny ( [ '/', '@', '#' ] );
 
@@ -65,84 +68,108 @@ public static class TypeExtensions
     }
 
     /// <summary>
-    ///     Returns a boolean indicating whether <paramref name="retentionProperty"/> is NOT wanted, by checking if its value is 0.
+    ///     Returns a boolean indicating whether <paramref name="retentionProperty" /> is NOT wanted, by checking if its value is 0.
     /// </summary>
-    public static bool IsNotWanted ( this ZfsProperty<int> retentionProperty ) => retentionProperty.Value == 0;
+    public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value == 0;
+    }
 
     /// <summary>
-    ///     Returns a boolean indicating whether <paramref name="retentionProperty"/> IS wanted, by checking if its value is not 0.
+    ///     Returns a boolean indicating whether <paramref name="retentionProperty" /> IS wanted, by checking if its value is not 0.
     /// </summary>
-    public static bool IsWanted ( this ZfsProperty<int> retentionProperty ) => retentionProperty.Value != 0;
+    public static bool IsWanted( this ZfsProperty<int> retentionProperty )
+    {
+        return retentionProperty.Value != 0;
+    }
 
     /// <summary>
     ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})"/>
+    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
     /// </summary>
     /// <exception cref="OutOfMemoryException">
     ///     The length of the resulting string overflows the maximum allowed length (
     ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
     /// </exception>
-    public static string ToCommaSeparatedSingleLineString ( this IEnumerable<string> strings, bool withSpaces = false ) => withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
+    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings, bool withSpaces = false )
+    {
+        return withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
+    }
 
     /// <summary>
     ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})"/>
+    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
     /// </summary>
     /// <exception cref="OutOfMemoryException">
     ///     The length of the resulting string overflows the maximum allowed length (
     ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
     /// </exception>
-    public static string ToCommaSeparatedSingleLineString ( this IEnumerable<ZfsRecord> records, bool withSpaces = false ) { return ToCommaSeparatedSingleLineString ( records.Order ( ).Select ( static r => r.Name ), withSpaces ); }
+    public static string ToCommaSeparatedSingleLineString( this IEnumerable<ZfsRecord> records, bool withSpaces = false )
+    {
+        return ToCommaSeparatedSingleLineString ( records.Order( ).Select ( static r => r.Name ), withSpaces );
+    }
 
     /// <summary>
     ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})"/>
+    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
     /// </summary>
     /// <exception cref="OutOfMemoryException">
     ///     The length of the resulting string overflows the maximum allowed length (
     ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
     /// </exception>
-    public static string ToNewlineSeparatedString ( this IEnumerable<string> strings ) => string.Join ( '\n', strings );
+    public static string ToNewlineSeparatedString( this IEnumerable<string> strings )
+    {
+        return string.Join ( '\n', strings );
+    }
 
     /// <summary>
-    ///     Reflection-free conversion of string to <see cref="SnapshotPeriodKind"/>.
+    ///     Reflection-free conversion of string to <see cref="SnapshotPeriodKind" />.
     /// </summary>
-    public static SnapshotPeriodKind ToSnapshotPeriodKind ( this string input ) => SnapshotPeriod.StringToSnapshotPeriodKind ( input );
+    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
+    {
+        return SnapshotPeriod.StringToSnapshotPeriodKind ( input );
+    }
 
     /// <summary>
     ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})"/>
+    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
     /// </summary>
     /// <exception cref="OutOfMemoryException">
     ///     The length of the resulting string overflows the maximum allowed length (
     ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
     /// </exception>
-    public static string ToSpaceSeparatedSingleLineString ( this IEnumerable<string> strings ) => string.Join ( ' ', strings );
+    public static string ToSpaceSeparatedSingleLineString( this IEnumerable<string> strings )
+    {
+        return string.Join ( ' ', strings );
+    }
 
     /// <summary>
     ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})"/>
+    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
     /// </summary>
-    public static string ToStringForZfsSet ( this IEnumerable<IZfsProperty> properties ) { return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( ); }
+    public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
+    {
+        return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
+    }
 
     /// <summary>
-    ///     Gets a string of all <see cref="IZfsProperty.SetString"/> values, separated by spaces, to be used in zfs set
+    ///     Gets a string of all <see cref="IZfsProperty.SetString" /> values, separated by spaces, to be used in zfs set
     ///     operations
     /// </summary>
     /// <param name="properties">
-    ///     An <see cref="IEnumerable{T}"/> of <see cref="IZfsProperty"/> objects to get a set string
+    ///     An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string
     ///     for
     /// </param>
     /// <returns></returns>
-    public static string ToStringForZfsSet ( this List<IZfsProperty> properties )
+    public static string ToStringForZfsSet( this List<IZfsProperty> properties )
     {
         ArgumentNullException.ThrowIfNull ( properties, nameof (properties) );
 
-        if ( !properties.Any ( ) )
+        if ( !properties.Any( ) )
         {
             throw new ArgumentException ( "Empty collection provided", nameof (properties) );
         }
 
-        return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( );
+        return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
     }
 }

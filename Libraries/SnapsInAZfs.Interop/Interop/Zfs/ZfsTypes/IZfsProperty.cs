@@ -42,7 +42,8 @@ public interface IZfsProperty
                                                   ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,
                                                   ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,
                                                   ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName
-                                              ] );
+                                              ]
+                                             );
 
         KnownSnapshotProperties =
             ImmutableSortedSet<string>.Empty
@@ -51,13 +52,14 @@ public interface IZfsProperty
                                                   ZfsPropertyNames.SnapshotPeriodPropertyName,
                                                   ZfsPropertyNames.SnapshotTimestampPropertyName,
                                                   ZfsPropertyNames.PruneSnapshotsPropertyName
-                                              ] );
+                                              ]
+                                             );
 
-        AllKnownProperties = KnownDatasetProperties.Union ( KnownSnapshotProperties, StringComparer.OrdinalIgnoreCase ).ToImmutableSortedSet ( );
+        AllKnownProperties = KnownDatasetProperties.Union ( KnownSnapshotProperties, StringComparer.OrdinalIgnoreCase ).ToImmutableSortedSet( );
     }
 
     /// <summary>
-    ///     Gets the union of <see cref="KnownDatasetProperties"/> and <see cref="KnownSnapshotProperties"/>
+    ///     Gets the union of <see cref="KnownDatasetProperties" /> and <see cref="KnownSnapshotProperties" />
     /// </summary>
     public static ImmutableSortedSet<string> AllKnownProperties { get; }
 
@@ -84,14 +86,15 @@ public interface IZfsProperty
               { ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName,             6 ) },
               { ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,               0 ) },
               { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ) }
-          }.ToFrozenDictionary ( );
+          }.ToFrozenDictionary( );
 
     public static ImmutableSortedDictionary<string, IZfsProperty> DefaultSnapshotProperties { get; } = ImmutableSortedDictionary<string, IZfsProperty>.Empty.AddRange (
                                                                                                                                                                        new Dictionary<string, IZfsProperty>
                                                                                                                                                                        {
                                                                                                                                                                            { ZfsPropertyNames.SnapshotPeriodPropertyName, ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.NotSet ) },
                                                                                                                                                                            { ZfsPropertyNames.SnapshotTimestampPropertyName, ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.SnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch ) }
-                                                                                                                                                                       } );
+                                                                                                                                                                       }
+                                                                                                                                                                      );
 
     bool                                     IsLocal                 { get; init; }
     public static ImmutableSortedSet<string> KnownDatasetProperties  { get; }
