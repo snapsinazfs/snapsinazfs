@@ -16,36 +16,46 @@
 
  ## Requirements
 
- SIAZ is built in c\# on .net 8, and strives to require no other external dependencies to be manually installed other than the .net 8 runtim or .net 8 SDK (to build from source), and a supported version of ZFS (currently 2.1 and up).\
- Building SIAZ also requires standard command-line utilities that typically exist on any supported Linux distribution, such as `install`, `cp`, and the like.
+ SIAZ is built in c\# on .net 9, and strives to require no other external dependencies to be manually installed other than the .net 9 runtime or .net 9 SDK (to build from source), and a supported version of ZFS (currently 2.2 and up).\
+ Building SIAZ also requires standard command-line utilities that typically exist on any supported Linux distribution, such as `install`, `cp`, and the like, found in `coreutils`.
 
  SIAZ will likely build and run on any modern Linux system that supports the required .NET version and ZFS on Linux version.\
  However, the following list of requirements are what the project is built and tested on by me, so is all I can say with reasonable certainty should work.\
 
- - An x64 CPU
- - An x64 build of one of the following Linux distributions:
-   - Ubuntu 22.04 or higher
-     - This includes equivalent KUbuntu releases
-     - This also includes KDE Neon releases with equivalent Ubuntu versions as their upstream
-   - RHEL 8.6 or higher
-   - CentOS Stream 8.6 or higher
- - Microsoft .net 8.0 or higher
-   - x64 versions of .net are the only versions SIAZ is supported on and it will refuse to build on other platforms
-   - The releases made available in your package manager are preferred, but any properly installed .net runtime _should_ work
-   - If you are using a pre-built version of SIAZ (not yet provided here), the .net 8.0 runtime is sufficient
-   - If you are building from source, the .net 8.0 SDK is required. `make` is an optional dependency for a simplified build workflow familiar to Linux users.
-   - If you are using a pre-built AOT-compiled version of SIAZ or a pre-build framework-independent version of SIAZ (not yet provided here), you do not need ANY .net components installed, but it is your responsibility to ensure binary compatibility with the target system.
- - ZFS version 2.1 or higher
+ - An x64 CPU and an x64 operating system
+   - It may be possible to successfully change the build targets to build and run on 32-bit systems, but it is not supported and ZFS makes little sense on such platforms anyway.
+ - Microsoft .net 9.0 or higher
+   - The releases made available in your package manager are preferred, but any properly installed .net runtime _should_ work.
+   - If the output of `dotnet --list-sdks` does not include something similar to `9.0.109 [/usr/lib/dotnet/sdk]` (version and path may differ), you probably won't be able to build SIAZ from source.
+   - If you are using a pre-built version of SIAZ (not yet provided here), the .net 9.0 runtime is sufficient.
+   - If you are building from source, the .net 9.0 SDK is required. GNU `make` or a compatible equivalent is an optional dependency for a simplified build workflow familiar to Linux users.
+   - If you are using a pre-built AOT-compiled version of SIAZ or a pre-built framework-independent version of SIAZ (not yet provided here), you do not need **any** .net components installed, but it is your responsibility to ensure binary compatibility with the target system.
+ - ZFS version 2.2 or higher
    - Some features may require higher ZFS versions. That is and will be documented when relevant. It is your responsibility to ensure ZFS compatibility, in the version of the kernel module, the userspace utilities, and in the necessary feature flags on pools/datasets, where relevant.
-   - Live testing against ZFS is performed against version 2.2 and 2.3, at present, so I suggest 2.2 or higher.
-   - While basic operation of SIAZ is likely compatible with earlier ZFS versions, such compatibility could change with any new SIAZ release and is NOT guaranteed or supported.
- - For use as a daemon, systemd is supported, with a minimum version of that which is distributed via your distribution's official package repositories.
+     - Upcoming development is likely to depend on 2.3 or later, but that will be documented when it happens.
+   - Live testing against ZFS is performed against the latest patch releases of versions 2.2, 2.3 and the 2.4 release candidate, at present.
+   - Compatibility with ZFS module and utility versions not explicitly listed for a SIAZ release is not guaranteed, and it is not recommended to use unsupported versions.
+     - Earlier or later MAY work, but you're on your own and accept that anything, including application crashes, system instability, data loss, or other unhappy things could be possible.
+ - Linux Kernel version 6.8 or higher
+   - My local development and test platforms are all running 6.12 or higher, and one production system is on 6.8, but any 6.x release that can run ZFS and .net 9.0 still in support should likely work, subject to all other requirements.
+   - I'm not aware of any compatibility issues with kernels 6.8 through 6.11, but please report them, should you encounter any.
+   - Custom kernels are not supported, but are likely to work if ZFS and .net 9.0 also work on your kernel.
+ - An x64 build of one of the following Linux distributions that is currently supported by its maintainers:
+   - Ubuntu 24.04 or higher.
+     - This includes equivalent derivatives, such as KUbuntu, of the same releases.
+   - CentOS Stream 9.2 or higher and equivalent derivatives such as RHEL.
+     - Fedora will probably work too, but I don't test on it.
+   - Other linux distributions not mentioned are likely to work, as well, so long as they meet all other requirements, but they are not tested.
+ - For use as a daemon (recommended), systemd is supported, with a minimum version of that which is distributed via your distribution's official package repositories.
+   - SIAZ doesn't depend on anything that isn't supported by all systemd versions distributed with supported platforms.
    - While it should generally be possible to use SIAZ as a daemon under other init systems, the startup code in SIAZ will consider itself to be running as a console application, so you're on your own and will have to force daemon mode either in configuration or with a command line argument (read the manpages).
- - A command line terminal, if directly invoking SIAZ manually, or to use the SIAZ Configuration Console, which is a TUI similar to the Network Manager nmtui utility.
-   - If you want to use the mouse capabilities of the configuration console (which even works over SSH), you of course will need a mouse and proper ssh/sshd/server-side configurations to allow that (has worked out of the box on all supported versions of linux I've tried it on)
+   - systemd-journald is expected to be available but is not mandatory. Other logging targets can be manually reconfigured via the nlog configuration files.
+ - A command line terminal, if directly invoking SIAZ manually, or to use the SIAZ Configuration Console, which is a TUI similar to the Network Manager nmtui utility. 256-color or better ANSI terminal capabilities are recommended but the console should at least *function* with less.
+   - If you want to use the mouse capabilities of the configuration console (which also works over SSH), you of course will need a mouse and proper ssh/sshd/server-side configurations to allow that (has worked out of the box on all supported versions of linux I've tried it on, including from a Windows Terminal + OpenSSH client).
    - I've tested it in the Gnome Terminal app, a linux local console, KDE Konsole, PuTTY, and Windows 11 under Windows Terminal and the legacy console host, and all work with equivalent features.
    - Advanced functionality of the config console may or may not work on "minimal" installs of supported distros, as that is not a configuration I have tested. Please report if you run into such issues.
- - Documentation is provided as GROFF-formatted text files intended to be consumed by `man`. Thus, the `mandb` command must be available and executable by the installing user to install or uninstall the manpages via the provided Makefile recipes.
+   - SIAZ 2.1 and earlier directly invoke the `zpool` and `zfs` utilities for all interactions with ZFS, and must be able to read from their stdout streams to function.
+ - Documentation is provided as GROFF-formatted text files intended to be consumed by `man`. Thus, the `mandb` command must be available and executable by the installing user to install or uninstall the manpages via the provided Makefile recipes. These files are uncompressed.
 
  ### File System Permissions
  - (Installation time only) Write permissions to the destination deployment paths, during installation or uninstallation. These include various directories under /usr, /etc, and /var/log, by default (see installation documentation or the Makefile)
@@ -89,7 +99,7 @@
    - Monitoring service connections can be considered to be short-lived, as they are just simple JSON responses (or appropriate HTTP error codes, in error conditions). Actual size of response body varies by the requested monitoring metric and may also vary based on your configuration or, for certain error metrics, the number of errors SIAZ has available to report.
 
  ### Misc Dependency Commentary
- While it is of course possible (and likely) that various other configurations, such as other distros, other ZFS versions, etc may work, even out of the box, they are not officially supported.\
+ While it is of course possible (and likely) that various other configurations, such as other distros, other ZFS versions, or other Unices, etc. may work, even out of the box, they are not supported and I don't currently intend to expand support beyond Linux on 6.8 or higher Kernels.\
  If you encounter a problem in an unsupported configuration that I cannot duplicate on a supported configuration, you're on your own, though pull requests that address such issues are welcome.
  
  Hardware requirements beyond CPU aren't listed because there aren't really any beyond that. SIAZ itself does not require specific CPU features/SIMD instruction sets (at this time), and memory requirements are entirely dependent on your configuration (though, just to throw out a number that is in no way a lower or upper bound, release builds with minimal configuration running as a systemd daemon often clock in at (sometimes significantly) less than 64MB while executing snapshot operations (not including memory used by ZFS utilities).
