@@ -15,6 +15,7 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <DefineTrace>True</DefineTrace>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -33,6 +34,7 @@
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <Compile Remove="DummyZfsCommandRunner.cs" />
+    <None Remove="DummyZfsCommandRunner.cs" />
     <None Remove="fullZfsGet.txt" />
     <None Remove="poolroots-withproperties.txt" />
 
@@ -101,15 +103,16 @@
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
   </ItemGroup>
   <Choose>
-    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
+    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug-NoZFS'">
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+        <DefineDebug>True</DefineDebug>
       </PropertyGroup>
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG_WINDOWS</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+        <DefineDebug>True</DefineDebug>
       </PropertyGroup>
 
       <ItemGroup>
@@ -137,8 +140,6 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
 
       <PropertyGroup>
-        <AnalysisLevel>7-minimum</AnalysisLevel>
-        <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
       </PropertyGroup>
 
@@ -147,9 +148,7 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
 
       <PropertyGroup>
-        <AnalysisLevel>7-minimum</AnalysisLevel>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
-        <DefineConstants>$(DefineConstants)</DefineConstants>
         <Optimize>True</Optimize>
         <PublishReadyToRun>True</PublishReadyToRun>
         <PublishReadyToRunComposite>True</PublishReadyToRunComposite>
