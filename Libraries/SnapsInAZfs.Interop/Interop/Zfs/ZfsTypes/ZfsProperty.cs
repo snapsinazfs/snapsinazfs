@@ -85,33 +85,33 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     {
         Logger.Trace ( "Creating ZfsProperty<bool> {0} without parent dataset", name );
 
-        return new ZfsProperty<bool> ( name, in value, isLocal );
+        return new ( name, in value, isLocal );
     }
 
     public static ZfsProperty<int> CreateWithoutParent( string name, in int value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<int> {0} without parent dataset", name );
 
-        return new ZfsProperty<int> ( name, in value, isLocal );
+        return new ( name, in value, isLocal );
     }
 
     public static ZfsProperty<string> CreateWithoutParent( string name, string value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<string> {0} without parent dataset", name );
 
-        return new ZfsProperty<string> ( name, in value, isLocal );
+        return new ( name, in value, isLocal );
     }
 
     public static ZfsProperty<DateTimeOffset> CreateWithoutParent( string name, in DateTimeOffset value, bool isLocal = true )
     {
         Logger.Trace ( "Creating ZfsProperty<DateTimeOffset> {0} without parent dataset", name );
 
-        return new ZfsProperty<DateTimeOffset> ( name, in value, isLocal );
+        return new ( name, in value, isLocal );
     }
 
     public static ZfsProperty<T> DefaultProperty ( )
     {
-        return new ZfsProperty<T>( );
+        return new ( );
     }
 
     /// <summary>
@@ -248,6 +248,8 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         Unsafe.SkipInit ( out retentionPruneDeferral );
         Unsafe.SkipInit ( out sourceSystem );
 
+        // TODO: This can likely be done more cleanly and efficiently.
+        // Just remember that the point is it bails as soon as any parse fails. It can't just be a simple switch.
         if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.EnabledPropertyName, rawZfsObject, out enabled ) )
         {
             return false;
