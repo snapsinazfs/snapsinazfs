@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
@@ -155,7 +155,6 @@
         <PublishSingleFile>True</PublishSingleFile>
         <ResponseFile>Release-R2R.rsp</ResponseFile>
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-        <TieredCompilation>False</TieredCompilation>
       </PropertyGroup>
 
     </When>
