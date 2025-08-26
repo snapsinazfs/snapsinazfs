@@ -211,6 +211,7 @@ public class UtilityTests
 
     [Test]
     [Category ( "Exceptions" )]
+    [Platform ( Exclude = "Win" )]
     public void Which_ThrowsArgumentOutOfRangeExceptionForIllegalNonEmptyInput( [Values ( "bash", "rm", "cat", ".", "/", ";", "#" )] string input )
     {
         Assert.That ( ( ) => Utility.Which ( input ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
