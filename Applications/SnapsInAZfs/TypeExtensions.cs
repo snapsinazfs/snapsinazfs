@@ -1,5 +1,5 @@
-﻿#region MIT LICENSE
-// Copyright 2023 Brandon Thetford
+#region MIT LICENSE
+// Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
@@ -17,7 +17,7 @@ namespace SnapsInAZfs;
 internal static class TypeExtensions
 {
     /// <summary>
-    ///     Gets the greatest common factor of all integers in the set
+    ///     Gets the greatest common factor of all integers in the set.
     /// </summary>
     /// <param name="terms"></param>
     /// <param name="fallback">Fallback value if the collection is empty</param>
@@ -27,22 +27,21 @@ internal static class TypeExtensions
         int count = terms.Count;
         if ( count <= 1 )
         {
-            return terms.FirstOrDefault( fallback );
+            return terms.FirstOrDefault ( fallback );
         }
 
-        int result = terms[ 0 ];
+        int result = terms [ 0 ];
         for ( int termIndex = 1; termIndex < count; termIndex++ )
         {
-            GreatestCommonFactor( ref result, terms[ termIndex ] );
+            GreatestCommonFactor ( ref result, terms [ termIndex ] );
         }
 
         return result;
-        //return terms.Aggregate( GreatestCommonFactor );
     }
 
     public static string KeysToCommaSeparatedSingleLineString( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
     {
-        return collection.Where( static kvp => !kvp.Value ).Select( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString( withSpaces );
+        return collection.Where ( static kvp => !kvp.Value ).Select ( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString ( withSpaces );
     }
 
     private static void GreatestCommonFactor( ref int left, int right )
