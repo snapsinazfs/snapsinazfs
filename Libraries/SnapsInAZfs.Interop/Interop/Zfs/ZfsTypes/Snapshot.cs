@@ -17,9 +17,57 @@ using System.Numerics;
 public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqualityOperators<Snapshot, Snapshot, bool>
 {
     /// <summary>
+    ///     Creates a new snapshot with the given values and all other properties inherited from <paramref name="parentDataset" />
+    /// </summary>
+    /// <param name="name">The name of the <see cref="Snapshot" /></param>
+    /// <param name="periodKind">The <see cref="SnapshotPeriodKind" /> of the <see cref="Snapshot" /></param>
+    /// <param name="sourceSystem">
+    ///     The <see cref="ZfsRecord.SourceSystem" /> property to use for the new <see cref="Snapshot" />
+    /// </param>
+    /// <param name="timestamp">The timestamp of the <see cref="Snapshot" /></param>
+    /// <param name="parentDataset">The <see cref="ZfsRecord" /> this <see cref="Snapshot" /> belongs to</param>
+    /// <remarks>
+    ///     The <see cref="ZfsRecord.Recursion">Recursion</see> and <see cref="ZfsRecord.Template">Template</see> properties will be set
+    ///     to local.
+    /// </remarks>
+    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
+    public Snapshot( string name, in SnapshotPeriodKind periodKind, in ZfsProperty<string> sourceSystem, in DateTimeOffset timestamp, ZfsRecord parentDataset )
+        : this (
+                name,
+                parentDataset.Enabled,
+                parentDataset.TakeSnapshots,
+                parentDataset.PruneSnapshots,
+                parentDataset.LastFrequentSnapshotTimestamp,
+                parentDataset.LastHourlySnapshotTimestamp,
+                parentDataset.LastDailySnapshotTimestamp,
+                parentDataset.LastWeeklySnapshotTimestamp,
+                parentDataset.LastMonthlySnapshotTimestamp,
+                parentDataset.LastYearlySnapshotTimestamp,
+                parentDataset.Recursion,
+                parentDataset.Template,
+                parentDataset.SnapshotRetentionFrequent,
+                parentDataset.SnapshotRetentionHourly,
+                parentDataset.SnapshotRetentionDaily,
+                parentDataset.SnapshotRetentionWeekly,
+                parentDataset.SnapshotRetentionMonthly,
+                parentDataset.SnapshotRetentionYearly,
+                parentDataset.SnapshotRetentionPruneDeferral,
+                sourceSystem,
+                (SnapshotPeriod)periodKind,
+                timestamp,
+                parentDataset
+               )
+    {
+        if ( string.IsNullOrWhiteSpace ( sourceSystem.Value ) )
+        {
+            throw new ArgumentException ( "sourceSystem must have a non-null, non-whitespace-only Value", nameof (sourceSystem) );
+        }
+    }
+
+    /// <summary>
     ///     Creates a new snapshot from all properties
     /// </summary>
-    public Snapshot (
+    public Snapshot(
         string                         snapName,
         in ZfsProperty<bool>           enabled,
         in ZfsProperty<bool>           takeSnapshots,
@@ -69,7 +117,8 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
                 0L,
                 0L,
                 parent,
-                true )
+                true
+               )
     {
         if ( string.IsNullOrWhiteSpace ( sourceSystem.Value ) )
         {
@@ -81,60 +130,13 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     }
 
     /// <summary>
-    ///     Creates a new snapshot with the given values and all other properties inherited from <paramref name="parentDataset"/>
-    /// </summary>
-    /// <param name="name">The name of the <see cref="Snapshot"/></param>
-    /// <param name="periodKind">The <see cref="SnapshotPeriodKind"/> of the <see cref="Snapshot"/></param>
-    /// <param name="sourceSystem">
-    ///     The <see cref="ZfsRecord.SourceSystem"/> property to use for the new <see cref="Snapshot"/>
-    /// </param>
-    /// <param name="timestamp">The timestamp of the <see cref="Snapshot"/></param>
-    /// <param name="parentDataset">The <see cref="ZfsRecord"/> this <see cref="Snapshot"/> belongs to</param>
-    /// <remarks>
-    ///     The <see cref="ZfsRecord.Recursion">Recursion</see> and <see cref="ZfsRecord.Template">Template</see> properties will be set
-    ///     to local.
-    /// </remarks>
-    /// <exception cref="ArgumentException">sourceSystem must have a non-null, non-whitespace-only Value</exception>
-    public Snapshot ( string name, in SnapshotPeriodKind periodKind, in ZfsProperty<string> sourceSystem, in DateTimeOffset timestamp, ZfsRecord parentDataset )
-        : this (
-                name,
-                parentDataset.Enabled,
-                parentDataset.TakeSnapshots,
-                parentDataset.PruneSnapshots,
-                parentDataset.LastFrequentSnapshotTimestamp,
-                parentDataset.LastHourlySnapshotTimestamp,
-                parentDataset.LastDailySnapshotTimestamp,
-                parentDataset.LastWeeklySnapshotTimestamp,
-                parentDataset.LastMonthlySnapshotTimestamp,
-                parentDataset.LastYearlySnapshotTimestamp,
-                parentDataset.Recursion,
-                parentDataset.Template,
-                parentDataset.SnapshotRetentionFrequent,
-                parentDataset.SnapshotRetentionHourly,
-                parentDataset.SnapshotRetentionDaily,
-                parentDataset.SnapshotRetentionWeekly,
-                parentDataset.SnapshotRetentionMonthly,
-                parentDataset.SnapshotRetentionYearly,
-                parentDataset.SnapshotRetentionPruneDeferral,
-                sourceSystem,
-                (SnapshotPeriod)periodKind,
-                timestamp,
-                parentDataset )
-    {
-        if ( string.IsNullOrWhiteSpace ( sourceSystem.Value ) )
-        {
-            throw new ArgumentException ( "sourceSystem must have a non-null, non-whitespace-only Value", nameof (sourceSystem) );
-        }
-    }
-
-    /// <summary>
-    ///     Compares the current instance with another <see cref="Snapshot"/> and returns an integer that indicates
+    ///     Compares the current instance with another <see cref="Snapshot" /> and returns an integer that indicates
     ///     whether the current instance precedes, follows, or occurs in the same position in the sort order as the other
-    ///     <see cref="Snapshot"/>.
+    ///     <see cref="Snapshot" />.
     /// </summary>
-    /// <param name="other">Another <see cref="Snapshot"/> to compare with this instance.</param>
+    /// <param name="other">Another <see cref="Snapshot" /> to compare with this instance.</param>
     /// <returns>
-    ///     A value that indicates the relative order of the <see cref="Snapshot"/>s being compared. The return value
+    ///     A value that indicates the relative order of the <see cref="Snapshot" />s being compared. The return value
     ///     has
     ///     these meanings:
     ///     <list type="table">
@@ -143,17 +145,17 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     ///         </listheader>
     ///         <item>
     ///             <term> Less than zero</term>
-    ///             <description> This instance precedes <paramref name="other"/> in the sort order.</description>
+    ///             <description> This instance precedes <paramref name="other" /> in the sort order.</description>
     ///         </item>
     ///         <item>
     ///             <term> Zero</term>
     ///             <description>
-    ///                 This instance occurs in the same position in the sort order as <paramref name="other"/>.
+    ///                 This instance occurs in the same position in the sort order as <paramref name="other" />.
     ///             </description>
     ///         </item>
     ///         <item>
     ///             <term> Greater than zero</term>
-    ///             <description> This instance follows <paramref name="other"/> in the sort order.</description>
+    ///             <description> This instance follows <paramref name="other" /> in the sort order.</description>
     ///         </item>
     ///     </list>
     /// </returns>
@@ -164,39 +166,39 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     ///             <term>Condition</term><description>Result</description>
     ///         </listheader>
     ///         <item>
-    ///             <term>Other <see cref="Snapshot"/> is null or has a null <see cref="Timestamp"/></term>
+    ///             <term>Other <see cref="Snapshot" /> is null or has a null <see cref="Timestamp" /></term>
     ///             <description>
-    ///                 This <see cref="Snapshot"/> precedes <paramref name="other"/> in the sort order.
+    ///                 This <see cref="Snapshot" /> precedes <paramref name="other" /> in the sort order.
     ///             </description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Timestamp"/> of this <see cref="Snapshot"/> is null</term>
+    ///             <term><see cref="Timestamp" /> of this <see cref="Snapshot" /> is null</term>
     ///             <description>
-    ///                 This <see cref="Snapshot"/> follows <paramref name="other"/> in the sort order.
+    ///                 This <see cref="Snapshot" /> follows <paramref name="other" /> in the sort order.
     ///             </description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Timestamp"/> of each <see cref="Snapshot"/> is different</term>
+    ///             <term><see cref="Timestamp" /> of each <see cref="Snapshot" /> is different</term>
     ///             <description>
-    ///                 Sort by <see cref="Timestamp"/>, using system rules for the <see cref="DateTimeOffset"/>
+    ///                 Sort by <see cref="Timestamp" />, using system rules for the <see cref="DateTimeOffset" />
     ///                 type
     ///             </description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Period"/> of each <see cref="Snapshot"/> is different</term>
+    ///             <term><see cref="Period" /> of each <see cref="Snapshot" /> is different</term>
     ///             <description>
-    ///                 Delegate sort order to <see cref="SnapshotPeriod"/>, using <see cref="Period"/> of each
+    ///                 Delegate sort order to <see cref="SnapshotPeriod" />, using <see cref="Period" /> of each
     ///             </description>
     ///         </item>
     ///         <item>
-    ///             <term><see cref="Period"/>s of both <see cref="Snapshot"/>s are equal</term>
-    ///             <description>Sort by <see cref="ZfsRecord.Name"/></description>
+    ///             <term><see cref="Period" />s of both <see cref="Snapshot" />s are equal</term>
+    ///             <description>Sort by <see cref="ZfsRecord.Name" /></description>
     ///         </item>
     ///     </list>
     /// </remarks>
-    public int CompareTo ( Snapshot? other )
+    public int CompareTo( Snapshot? other )
     {
-        // If the other snapshot is null, consider this snapshot earlier rank
+        // If the other snapshot is null, consider this snapshot earlier rank.
         if ( other?.Timestamp is null )
         {
             return -1;
@@ -208,14 +210,14 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
             return Timestamp.Value.CompareTo ( other.Timestamp.Value );
         }
 
-        // If timestamps are different, sort on period, by its SnapshotPeriodKind equivalent
+        // If timestamps are different, sort on period, by its SnapshotPeriodKind equivalent.
         return !Period.Value.Equals ( other.Period.Value )
-                   ? Period.Value.ToSnapshotPeriodKind ( ).CompareTo ( other.Period.Value.ToSnapshotPeriodKind ( ) )
+                   ? Period.Value.ToSnapshotPeriodKind( ).CompareTo ( other.Period.Value.ToSnapshotPeriodKind( ) )
                    : string.Compare ( Name, other.Name, StringComparison.Ordinal );
     }
 
-    /// <inheritdoc/>
-    bool IEquatable<Snapshot?>.Equals ( Snapshot? other )
+    /// <inheritdoc />
+    bool IEquatable<Snapshot?>.Equals( Snapshot? other )
     {
         if ( other is null )
         {
@@ -238,17 +240,17 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
     }
 
     /// <summary>
-    ///     Performs a deep copy of this <see cref="Snapshot"/>
+    ///     Performs a deep copy of this <see cref="Snapshot" />
     /// </summary>
     /// <param name="parent">
-    ///     A reference to the parent of the new <see cref="Snapshot"/>. Must not be another <see cref="Snapshot"/>.
+    ///     A reference to the parent of the new <see cref="Snapshot" />. Must not be another <see cref="Snapshot" />.
     /// </param>
     /// <returns>
-    ///     A new instance of a <see cref="ZfsRecord"/>, with all properties, both reference and value, cloned to new instances
+    ///     A new instance of a <see cref="ZfsRecord" />, with all properties, both reference and value, cloned to new instances.
     /// </returns>
-    /// <exception cref="ArgumentException"><paramref name="parent"/> is of type <see cref="Snapshot"/>.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="parent"/> is null</exception>
-    public override Snapshot DeepCopyClone ( ZfsRecord? parent = null )
+    /// <exception cref="ArgumentException"><paramref name="parent" /> is of type <see cref="Snapshot" />.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="parent" /> is null.</exception>
+    public override Snapshot DeepCopyClone( ZfsRecord? parent = null )
     {
         switch ( parent )
         {
@@ -281,10 +283,11 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
                     SourceSystem,
                     Period.Value,
                     Timestamp.Value,
-                    parent );
+                    parent
+                   );
     }
 
-    public bool Equals ( Snapshot other )
+    public bool Equals( Snapshot other )
     {
         if ( ReferenceEquals ( this, other ) )
         {
@@ -301,11 +304,20 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
             && Template.Equals ( other.Template );
     }
 
-    /// <inheritdoc/>
-    public override int GetHashCode ( ) => HashCode.Combine ( base.GetHashCode ( ), _period, Name, _timestamp );
+    /// <inheritdoc />
+    public override int GetHashCode ( )
+    {
+        return HashCode.Combine ( base.GetHashCode( ), _period, Name, _timestamp );
+    }
 
-    public string GetSnapshotOptionsStringForZfsSnapshot ( ) => $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString} -o {SourceSystem.SetString}";
+    public string GetSnapshotOptionsStringForZfsSnapshot ( )
+    {
+        return $"-o {Period.SetString} -o {Timestamp.SetString} -o {Recursion.SetString} -o {SourceSystem.SetString}";
+    }
 
-    /// <inheritdoc/>
-    public override string ToString ( ) => $"{Name}";
+    /// <inheritdoc />
+    public override string ToString ( )
+    {
+        return $"{Name}";
+    }
 }
