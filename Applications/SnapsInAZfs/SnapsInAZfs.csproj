@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
@@ -23,12 +23,13 @@
     <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
     <ResponseFile>CommonCompilerFlags.rsp</ResponseFile>
     <UTF8OutPut>True</UTF8OutPut>
+    <WarningLevel>8</WarningLevel>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <Compile Remove="DummyZfsCommandRunner.cs" />
@@ -79,7 +80,7 @@
       </PropertyGroup>
       <ItemGroup>
         <Compile Include="DummyZfsCommandRunner.cs" />
-      </ItemGroup>      
+      </ItemGroup>
     </When>
   </Choose>
 
