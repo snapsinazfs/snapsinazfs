@@ -89,7 +89,7 @@ public sealed partial class ZfsConfigurationWindow
         // ReSharper disable HeapView.ObjectAllocation.Possible
         refreshButton.Clicked                        -= RefreshZfsTreeViewFromZfs;
         resetCurrentButton.Clicked                   -= ResetCurrentButtonOnClicked;
-        zfsTreeView.SelectionChanged                 -= zfsTreeViewOnSelectionChanged;
+        zfsTreeView?.SelectionChanged                -= zfsTreeViewOnSelectionChanged;
         enabledRadioGroup.SelectedItemChanged        -= EnabledRadioGroupSelectedItemChanged;
         enabledInheritButton.Clicked                 -= EnabledInheritButtonClick;
         takeSnapshotsRadioGroup.SelectedItemChanged  -= TakeSnapshotsRadioGroupSelectedItemChanged;
@@ -162,7 +162,7 @@ public sealed partial class ZfsConfigurationWindow
         // ReSharper disable HeapView.ObjectAllocation.Possible
         refreshButton.Clicked                        += RefreshZfsTreeViewFromZfs;
         resetCurrentButton.Clicked                   += ResetCurrentButtonOnClicked;
-        zfsTreeView.SelectionChanged                 += zfsTreeViewOnSelectionChanged;
+        zfsTreeView?.SelectionChanged                 += zfsTreeViewOnSelectionChanged;
         enabledRadioGroup.SelectedItemChanged        += EnabledRadioGroupSelectedItemChanged;
         enabledInheritButton.Clicked                 += EnabledInheritButtonClick;
         takeSnapshotsRadioGroup.SelectedItemChanged  += TakeSnapshotsRadioGroupSelectedItemChanged;
@@ -290,15 +290,15 @@ public sealed partial class ZfsConfigurationWindow
         try
         {
             Logger.Debug ( "Clearing objects from zfs configuration tree view" );
-            zfsTreeView.ClearObjects( );
+            zfsTreeView?.ClearObjects( );
             _treeDatasets.Clear( );
             ConfigConsole.BaseDatasets.Clear( );
             ConfigConsole.Snapshots.Clear( );
             Logger.Debug ( "Getting zfs objects from zfs and populating configuration tree view" );
             List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync ( Program.Settings!, ConfigConsole.BaseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait ( true );
-            zfsTreeView.AddObjects ( treeRootNodes );
+            zfsTreeView?.AddObjects ( treeRootNodes );
             UpdateButtonState( );
-            zfsTreeView.SetFocus( );
+            zfsTreeView?.SetFocus( );
         }
         catch ( Exception e )
         {
@@ -843,8 +843,8 @@ public sealed partial class ZfsConfigurationWindow
 
     private void SetCanFocusStates ( )
     {
-        zfsTreeView.Enabled                 = true;
-        zfsTreeView.CanFocus                = true;
+        zfsTreeView?.Enabled                = true;
+        zfsTreeView?.CanFocus               = true;
         enabledRadioGroup.Enabled           = true;
         enabledRadioGroup.CanFocus          = true;
         takeSnapshotsRadioGroup.Enabled     = true;
@@ -955,8 +955,8 @@ public sealed partial class ZfsConfigurationWindow
         {
             zfsConfigurationTreeFrame.TabStop  = true;
             zfsConfigurationTreeFrame.TabIndex = treeFrameIndex;
-            zfsTreeView.TabStop                = true;
-            zfsTreeView.TabIndex               = 0;
+            zfsTreeView?.TabStop                = true;
+            zfsTreeView?.TabIndex               = 0;
         }
 
         void SetTabStopsForActionsFrame( int actionsFrameIndex )
@@ -1048,7 +1048,7 @@ public sealed partial class ZfsConfigurationWindow
 
     private void UpdateButtonState ( )
     {
-        if ( zfsTreeView.Objects.Any( ) && zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
+        if ( zfsTreeView is not null && zfsTreeView.Objects.Any( ) && zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
         {
             resetCurrentButton.Enabled = saveCurrentButton.Enabled = node is { IsModified: true, IsLocallyModified: true };
         }
