@@ -99,6 +99,8 @@
 	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_FOR_WHILE/@EntryValue">Required</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BRACES_REDUNDANT/@EntryValue">False</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/BUILTIN_TYPE_APPLY_TO_NATIVE_INTEGER/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/OBJECT_CREATION_WHEN_TYPE_NOT_EVIDENT/@EntryValue">TargetTyped</s:String>
+	<s:String x:Key="/Default/CodeStyle/CodeFormatting/CSharpCodeStyle/ThisQualifier/INSTANCE_MEMBERS_QUALIFY_DECLARED_IN/@EntryValue">BaseClass</s:String>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_FIRST_ARG_BY_PAREN/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_LINQ_QUERY/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/CodeFormatting/CSharpFormat/ALIGN_MULTILINE_ARGUMENT/@EntryValue">True</s:Boolean>
@@ -591,6 +593,12 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Name/@EntryValue">Unclear Intention</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;INTENT)(\W|$)(.*)</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/TodoIconStyle/@EntryValue">Question</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Color/@EntryValue">#FFCF9D32</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/MatchComments/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Name/@EntryValue">Idea</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;IDEA)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/TodoIconStyle/@EntryValue">Normal</s:String>
 	<s:Boolean x:Key="/Default/PredictiveDebugger/PredictiveDebuggerEnabled/@EntryValue">True</s:Boolean>
 	<s:Int64 x:Key="/Default/SubsystemManager/ActiveProfileInTimeline/@EntryValue">1</s:Int64>
  	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=49F9F595ACF81E45B2F33CA1F1532FCD/Name/@EntryValue">Performance</s:String>
