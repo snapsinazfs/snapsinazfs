@@ -327,27 +327,4 @@ public static class SiazCommandLine
 
         return 0;
     }
-
-    public sealed record CommandLineCommands
-    {
-        public CommandLineCommands ( )
-        {
-            Version = new ( "version", "Outputs SnapsInAZfs version to configured logging targets and exits, making no changes." );
-            Version.Aliases.Add ( "-V" );
-            Version.Aliases.Add ( "--version" );
-
-            Siaz = new ( "SnapsInAZfs" );
-        }
-
-        public RootCommand Siaz    { get; set; }
-        public Command     Version { get; set; }
-    }
-
-    public sealed record CommandLineOptions
-    {
-        public Option<bool> Verbose { get; set; } = new ( "--verbose", "-v" )
-                                                    {
-                                                        Description = "Verbose (Info level) output logging. Change log level in SnapsInAZfs.nlog.json for normal usage."
-                                                    };
-    }
 }
