@@ -25,7 +25,8 @@ namespace SnapsInAZfs.ConfigConsole;
 
 public sealed partial class SnapsInAZfsConfigConsole
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger                Logger                            = LogManager.GetCurrentClassLogger( );
+    private static readonly JsonSerializerOptions SettingsFileJsonSerializerOptions = new ( ) { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
 
     public SnapsInAZfsConfigConsole ( )
     {
@@ -276,7 +277,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
             try
             {
-                File.WriteAllText ( path, JsonSerializer.Serialize ( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+                File.WriteAllText ( path, JsonSerializer.Serialize ( settings, SettingsFileJsonSerializerOptions ) );
 
                 return ( true, path );
             }

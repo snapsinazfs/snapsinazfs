@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.ConfigConsole;
 
 using System.Collections.Concurrent;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Interop.Zfs.ZfsCommandRunner;
 using Interop.Zfs.ZfsTypes;
@@ -128,7 +129,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit enabled setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Enabled Setting", $"Inherit Enabled setting {node.TreeDataset.ParentDataset.Enabled.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Enabled Setting", $"Inherit Enabled setting {node.TreeDataset.ParentDataset.Enabled.Value.ToString(CultureInfo.InvariantCulture.NumberFormat)} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -201,7 +202,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit prune snapshots setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {node.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {node.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString(CultureInfo.InvariantCulture.NumberFormat)} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -332,7 +333,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit daily retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Daily Retention Setting", $"Inherit Daily Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionDaily.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Daily Retention Setting", $"Inherit Daily Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionDaily.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -364,7 +365,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDailyPropertyName}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Daily snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionDailyTextField.Text = node.TreeDataset.SnapshotRetentionDaily.Value.ToString( );
+                retentionDailyTextField.Text = node.TreeDataset.SnapshotRetentionDaily.Value.ToString( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
             }
@@ -389,7 +390,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit frequent retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Frequent Retention Setting", $"Inherit Frequent Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionFrequent.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Frequent Retention Setting", $"Inherit Frequent Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionFrequent.Value.ToString( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -422,7 +423,7 @@ public sealed partial class ZfsConfigurationWindow
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequentPropertyName}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
 
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Frequent snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionFrequentTextField.Text = node.TreeDataset.SnapshotRetentionFrequent.Value.ToString( );
+                retentionFrequentTextField.Text = node.TreeDataset.SnapshotRetentionFrequent.Value.ToString( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
             }
@@ -447,7 +448,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit hourly retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Hourly Retention Setting", $"Inherit Hourly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionHourly.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Hourly Retention Setting", $"Inherit Hourly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionHourly.Value.ToString( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -479,7 +480,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourlyPropertyName}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionHourlyTextField.Text = node.TreeDataset.SnapshotRetentionHourly.Value.ToString( );
+                retentionHourlyTextField.Text = node.TreeDataset.SnapshotRetentionHourly.Value.ToString( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
             }
@@ -504,7 +505,7 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit monthly retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Monthly Retention Setting", $"Inherit Monthly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionMonthly.Value.ToString( )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query ( "Inherit Monthly Retention Setting", $"Inherit Monthly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionMonthly.Value.ToString( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
 
         switch ( queryResult )
         {
@@ -536,7 +537,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionMonthlyTextField.Text = node.TreeDataset.SnapshotRetentionMonthly.Value.ToString( );
+                retentionMonthlyTextField.Text = node.TreeDataset.SnapshotRetentionMonthly.Value.ToString(CultureInfo.InvariantCulture.NumberFormat);
 
                 return;
             }
@@ -595,7 +596,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionPruneDeferralTextField.Text = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString( );
+                retentionPruneDeferralTextField.Text = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString(CultureInfo.InvariantCulture.NumberFormat);
 
                 return;
             }
@@ -656,7 +657,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionWeeklyTextField.Text = node.TreeDataset.SnapshotRetentionWeekly.Value.ToString( );
+                retentionWeeklyTextField.Text = node.TreeDataset.SnapshotRetentionWeekly.Value.ToString(CultureInfo.InvariantCulture.NumberFormat);
 
                 return;
             }
@@ -713,7 +714,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearlyPropertyName}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
                 MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionYearlyTextField.Text = node.TreeDataset.SnapshotRetentionYearly.Value.ToString( );
+                retentionYearlyTextField.Text = node.TreeDataset.SnapshotRetentionYearly.Value.ToString(CultureInfo.InvariantCulture.NumberFormat);
 
                 return;
             }

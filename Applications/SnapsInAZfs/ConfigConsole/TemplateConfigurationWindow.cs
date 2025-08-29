@@ -18,6 +18,8 @@ using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.Templa
 
 namespace SnapsInAZfs.ConfigConsole;
 
+using System.Globalization;
+
 public sealed partial class TemplateConfigurationWindow
 {
     internal static         bool    TemplatesAddedRemovedOrModified;
@@ -161,7 +163,7 @@ public sealed partial class TemplateConfigurationWindow
         {
             SelectedTemplateItem.ViewSettings.SnapshotTiming = new SnapshotTimingSettings
                                                                {
-                                                                   FrequentPeriod = int.Parse ( frequentPeriodRadioGroup.GetSelectedLabelString( ) ),
+                                                                   FrequentPeriod = int.Parse ( frequentPeriodRadioGroup.GetSelectedLabelString( ), CultureInfo.InvariantCulture.NumberFormat ),
                                                                    HourlyMinute   = hourlyMinuteTextValidateField.Text.ToInt32( ),
                                                                    DailyTime      = dailyTimeTimeField.Time.ToTimeOnly( ),
                                                                    WeeklyDay      = (DayOfWeek)weeklyDayComboBox.SelectedItem,
@@ -415,7 +417,7 @@ public sealed partial class TemplateConfigurationWindow
             DisableEventHandlers( );
             _modifiedProperties.Remove ( FrequentPeriodTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse ( frequentPeriodRadioGroup.GetSelectedLabelString( ) ) )
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse ( frequentPeriodRadioGroup.GetSelectedLabelString( ), CultureInfo.InvariantCulture.NumberFormat ) )
             {
                 _modifiedProperties.Add ( FrequentPeriodTitleCase );
             }
@@ -476,7 +478,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse ( hourlyMinuteTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse ( hourlyMinuteTextValidateField.Text.ToString( )!, CultureInfo.InvariantCulture.NumberFormat ) )
         {
             _modifiedProperties.Add ( HourlyMinuteTitleCase );
         }
@@ -580,7 +582,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse ( monthlyDayTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse ( monthlyDayTextValidateField.Text.ToString( )!, CultureInfo.InvariantCulture.NumberFormat ) )
         {
             _modifiedProperties.Add ( MonthlyDayTitleCase );
         }
@@ -693,13 +695,13 @@ public sealed partial class TemplateConfigurationWindow
         yearlySuffixTextValidateField.Text    = ustring.Make ( item.ViewSettings.Formatting.YearlySuffix );
         timestampFormatTextField.Text         = ustring.Make ( item.ViewSettings.Formatting.TimestampFormatString );
         frequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf ( item.ViewSettings.SnapshotTiming.FrequentPeriod );
-        hourlyMinuteTextValidateField.Text    = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString ( "D2" );
+        hourlyMinuteTextValidateField.Text    = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString ( "D2", CultureInfo.InvariantCulture.NumberFormat );
         dailyTimeTimeField.Time               = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
         weeklyDayComboBox.SelectedItem        = (int)item.ViewSettings.SnapshotTiming.WeeklyDay;
         weeklyTimeTimeField.Time              = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
-        monthlyDayTextValidateField.Text      = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
+        monthlyDayTextValidateField.Text      = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString ( "D", CultureInfo.InvariantCulture.NumberFormat );
         monthlyTimeTimeField.Time             = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
-        yearlyDayTextValidateField.Text       = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
+        yearlyDayTextValidateField.Text       = item.ViewSettings.SnapshotTiming.YearlyDay.ToString ( "D", CultureInfo.InvariantCulture.NumberFormat );
         yearlyTimeTimeField.Time              = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
         yearlyMonthComboBox.SelectedItem      = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
     }
@@ -784,7 +786,7 @@ public sealed partial class TemplateConfigurationWindow
             string         timestampFormatString = timestampFormatTextField.Text.ToString( )!;
             DateTimeOffset now                   = DateTimeOffset.Now;
             char[]         buffer                = new char[128];
-            if ( !now.TryFormat ( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+            if ( !now.TryFormat ( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ), CultureInfo.InvariantCulture.DateTimeFormat ) )
             {
                 Logger.Warn ( "Invalid timestamp format string specified." );
                 const string formatDocumentationUrl = "https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings";
@@ -816,7 +818,7 @@ public sealed partial class TemplateConfigurationWindow
         string         timestampFormatString = timestampFormatTextField.Text.ToString( )!;
         DateTimeOffset now                   = DateTimeOffset.Now;
         char[]         buffer                = new char[128];
-        if ( !now.TryFormat ( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+        if ( !now.TryFormat ( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ), CultureInfo.InvariantCulture.DateTimeFormat ) )
         {
             Logger.Warn ( "Invalid timestamp format string specified." );
 
@@ -825,7 +827,7 @@ public sealed partial class TemplateConfigurationWindow
 
         string prefixString       = prefixTextValidateField.Text.ToString( )!;
         string componentSeparator = componentSeparatorValidateField.Text.ToString( )!;
-        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString ( timestampFormatString )}{componentSeparator}{periodString}";
+        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString ( timestampFormatString,CultureInfo.InvariantCulture.DateTimeFormat )}{componentSeparator}{periodString}";
     }
 
     /// <summary>
@@ -931,7 +933,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse ( yearlyDayTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse ( yearlyDayTextValidateField.Text.ToString( )!, CultureInfo.InvariantCulture.NumberFormat ) )
         {
             _modifiedProperties.Add ( YearlyDayTitleCase );
         }

@@ -138,7 +138,7 @@ public static class CommandExtensions
         }
         else if ( !skipIfNull )
         {
-            throw new NullReferenceException ( $"The {nameof (optionFactory)} produced a null option." );
+            throw new InvalidOperationException ( $"The {nameof (optionFactory)} produced a null option." );
         }
 
         return command;

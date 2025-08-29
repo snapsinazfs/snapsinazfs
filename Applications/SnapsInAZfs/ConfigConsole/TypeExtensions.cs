@@ -159,7 +159,7 @@ public static class TypeExtensions
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
             // INTENT: This is clearly aimed at collections, but I'm not sure what my original intent was.
-            if ( childSection.Path.EndsWith ( ":0" ) )
+            if ( childSection.Path.EndsWith ( ":0", StringComparison.Ordinal ) )
             {
                 JsonArray arrayNode = [ ];
 
