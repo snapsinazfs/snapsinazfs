@@ -4,6 +4,7 @@
   </ItemGroup>
 
   <PropertyGroup>
+    <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <LangVersion>preview</LangVersion>
@@ -14,7 +15,7 @@
     <DebugType>embedded</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <DefineConstants>$(DefineConstants)</DefineConstants>
     <DefineTrace>True</DefineTrace>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
@@ -24,11 +25,8 @@
     <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
     <ResponseFile>CommonCompilerFlags.rsp</ResponseFile>
     <UTF8OutPut>True</UTF8OutPut>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
     <WarningLevel>8</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
@@ -104,16 +102,15 @@
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
   </ItemGroup>
   <Choose>
-    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug-NoZFS'">
-
-      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <When Condition="$(Configuration.StartsWith('Debug'))">
+      <PropertyGroup>
         <DefineDebug>True</DefineDebug>
+        <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
       </PropertyGroup>
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
         <DefineConstants>$(DefineConstants);WINDOWS;DEBUG_WINDOWS</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-        <DefineDebug>True</DefineDebug>
       </PropertyGroup>
 
       <ItemGroup>
