@@ -448,10 +448,6 @@
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForBuiltInTypes/@EntryValue">UseExplicitType</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForOtherTypes/@EntryValue">UseExplicitType</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpVarKeywordUsage/ForSimpleTypes/@EntryValue">UseExplicitType</s:String>
-	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/EnableClangFormatSupport/@EntryValue">False</s:Boolean>
-	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/EnableEditorConfigSupport/@EntryValue">False</s:Boolean>
-	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/ShowEditorConfigStatusBarIndicator/@EntryValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/SyncToVisualStudio/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderRegionName/@EntryValue">MIT LICENSE</s:String>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">Copyright $CurrentDate.Year Brandon Thetford&#xD;
 &#xD;
@@ -475,16 +471,10 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=70345118_002D4b40_002D4ece_002D937c_002Dbbeb7a0b2e70/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Static" AccessRightKinds="Protected, ProtectedInternal, Internal, Public, PrivateProtected" Description="Static fields (not private)"&gt;&lt;ElementKinds&gt;&lt;Kind Name="FIELD" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb"&gt;&lt;ExtraRule Prefix="_" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=8b8504e3_002Df0be_002D4c14_002D9103_002Dc732f2bddc15/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Enum members"&gt;&lt;ElementKinds&gt;&lt;Kind Name="ENUM_MEMBER" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/Policy&gt;</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=a7a3339e_002D4e89_002D4319_002D9735_002Da9dc4cb74cc7/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Interfaces"&gt;&lt;ElementKinds&gt;&lt;Kind Name="INTERFACE" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" WarnAboutPrefixesAndSuffixes="True" Prefix="I" Suffix="" Style="AaBb_AaBb" /&gt;&lt;/Policy&gt;</s:String>
-	
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=c85a0503_002D4de2_002D40f1_002D9cd6_002Da4054c05d384/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Any" AccessRightKinds="Any" Description="Properties"&gt;&lt;ElementKinds&gt;&lt;Kind Name="PROPERTY" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" Prefix="" Suffix="" Style="AaBb_AaBb"&gt;&lt;ExtraRule Prefix="" Suffix="" Style="AaBb" /&gt;&lt;/Policy&gt;&lt;/Policy&gt;</s:String>
-	<s:Boolean x:Key="/Default/Debugger/DataTipsEnabled/@EntryValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Debugger/LinqDebugAdornmentsEnabled/@EntryValue">True</s:Boolean>
-	
 	<s:String x:Key="/Default/Environment/ConfigurationSense/CustomConfigurationFiles/=F300DC1B_002DE643_002D4CCB_002D80EE_002DA7F840B07500_002Ff_003ASanoid_002Esln/@EntryIndexedValue">["5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.json/l:..?Sanoid?Sanoid.json","5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.local.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.local.json/l:..?Sanoid?Sanoid.local.json","5C974F94-3FB9-43C4-BCBB-247F57BB1B7E/f:Sanoid.nlog.json","23BCE912-92ED-450C-9E0F-7DAE8BB4BCF6/f:Sanoid.nlog.json/l:..?Sanoid?Sanoid.nlog.json"]</s:String>
 	<s:String x:Key="/Default/Environment/ConfigurationSense/CustomConfigurationFiles/=F300DC1B_002DE643_002D4CCB_002D80EE_002DA7F840B07500_002Ff_003ASnapsInAZfs_002Esln/@EntryIndexedValue">["9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.json","9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.local.json","9E62331B-EE99-45B8-916F-04DA39EB3829/f:SnapsInAZfs.nlog.json","7EA459FB-0977-49E1-92C8-2DA47C1294BB/f:SnapsInAZfs.Tests.nlog.json"]</s:String>
-	<s:Boolean x:Key="/Default/Environment/Editor/UseCamelHumps/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/ExcludedFiles/FilesAndFoldersThirdParty/=172C9DDB_002DCCFE_002D4E31_002D9F6D_002DA58A484D561E_002Fd_003ALibc/@EntryIndexedValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/Feedback/SendActivityLogs/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsCommandRunner_002ERawProperty_003B_002A/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsCommandRunner_002ERawZfsObject_003B_002Ecctor/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/Filtering/ExcludeCoverageFilters/=SnapsInAZfs_002EInterop_003B_002A_003BSnapsInAZfs_002EInterop_002EZfs_002EZfsCommandRunner_002EZfsCommandRunnerBase_003B_002Ecctor/@EntryIndexedValue">True</s:Boolean>
@@ -538,34 +528,10 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/Filtering/HideAutoProperties/@EntryValue">False</s:Boolean>
 	<s:String x:Key="/Default/Environment/Hierarchy/Build/SolBuilderDuo/UseMsbuildSolutionBuilder/@EntryValue">NewVersion</s:String>
 	<s:String x:Key="/Default/Environment/Hierarchy/PsiConfigurationSettingsKey/LocationType/@EntryValue">SOLUTION_FOLDER</s:String>
-	<s:Boolean x:Key="/Default/Environment/Highlighting/HighlightingEnabled/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/Highlighting/HighlightingMode/@EntryValue">MarkersAndFullLine</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=CC4762246221F04599C1D3DE4C6CB7BF/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=CC4762246221F04599C1D3DE4C6CB7BF/RelativePath/@EntryValue">..\SnapsInAZfs.sln.Dictionary.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileCC4762246221F04599C1D3DE4C6CB7BF/@KeyIndexDefined">True</s:Boolean>
 	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileCC4762246221F04599C1D3DE4C6CB7BF/RelativePriority/@EntryValue">1</s:Double>
-	<s:String x:Key="/Default/Environment/InlayHints/CSharpOtherInlayHintsOptions/ShowResourcesDisposePoints/@EntryValue">Default</s:String>
-	<s:Boolean x:Key="/Default/Environment/InlayHints/CSharpParameterNameHintsOptions/HideIfMethodIsAnnotatedAsStringFormatMethod/@EntryValue">False</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/InlayHints/GeneralVirtualIndentingOptions/FixAlignmentForInlayHints/@EntryValue">True</s:Boolean>
-	
-	
-	
-	
-	
-	<s:Boolean x:Key="/Default/Environment/MemoryUsageIndicator/IsVisible/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=SolExp_002DTrack/@EntryIndexedValue">DO_NOTHING</s:String>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=StartPage_002DOnEnvironmentStatup/@EntryIndexedValue">DO_NOTHING</s:String>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=TextEditor_002DTrackChanges_002D2/@EntryIndexedValue">DO_NOTHING</s:String>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchBehaviour/=VCS/@EntryIndexedValue">DO_NOTHING</s:String>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=SolExp_002DTrack/@EntryIndexedValue"></s:String>
-	<s:Boolean x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=SolExp_002DTrack/@EntryIndexRemoved">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=StartPage_002DOnEnvironmentStatup/@EntryIndexedValue"></s:String>
-	<s:Boolean x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=StartPage_002DOnEnvironmentStatup/@EntryIndexRemoved">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=TextEditor_002DTrackChanges_002D2/@EntryIndexedValue"></s:String>
-	<s:Boolean x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=TextEditor_002DTrackChanges_002D2/@EntryIndexRemoved">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=VCS/@EntryIndexedValue"></s:String>
-	<s:Boolean x:Key="/Default/Environment/PerformanceGuide/SwitchConflictResolutionMode/=VCS/@EntryIndexRemoved">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EPsiFeatures_002EVisualStudio_002EBackend_002EDaemon_002EHighlightingSettingsMigrator/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EFeature_002EServices_002ECodeCleanup_002EFileHeader_002EFileHeaderSettingsMigrate/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpKeepExistingMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ECSharpPlaceEmbeddedOnSameLineMigration/@EntryIndexedValue">True</s:Boolean>
@@ -573,20 +539,9 @@ See https://opensource.org/license/MIT/</s:String>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002EMemberReordering_002EMigrations_002ECSharpFileLayoutPatternRemoveIsAttributeUpgrade/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EMigrateBlankLinesAroundFieldToBlankLinesAroundProperty/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EPsi_002ECSharp_002ECodeStyle_002ESettingsUpgrade_002EPredefinedNamingRulesToUserRulesUpgrade/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EUnitTestFramework_002EMigrations_002EEnableDisabledProvidersMigration/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/Environment/SettingsMigration/IsMigratorApplied/=JetBrains_002EReSharper_002EUnitTestFramework_002ESettings_002EMigrations_002ERemoveBuildPolicyAlwaysMigration/@EntryIndexedValue">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/StructuredLogging/PropertyNamingType/@EntryValue">CamelCase</s:String>
-	<s:Boolean x:Key="/Default/Environment/UnitTesting/DisabledProviders/=Testing_0020Platform/@EntryIndexedValue">False</s:Boolean>
-	<s:Boolean x:Key="/Default/Environment/UnitTesting/NUnitProvider/PreFilter/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/UnitTesting/NUnitProvider/TestDiscoveryFromArtifactsMethod/@EntryValue">TestRunner</s:String>
-	<s:Int64 x:Key="/Default/Environment/UnitTesting/ParallelProcessesCount/@EntryValue">8</s:Int64>
-	<s:Boolean x:Key="/Default/Environment/UnitTesting/SaveSessionState/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/Environment/UnitTesting/ShadowCopy2/@EntryValue">Native</s:String>
-	<s:String x:Key="/Default/Environment/VsInheritanceMargin/InheritanceMarginSelection/@EntryValue">KeepBoth</s:String>
-	<s:String x:Key="/Default/Housekeeping/Layout/SolBuilderDuoView/ShowBuildResultsMode/@EntryValue">ForWarningsOrErrors</s:String>
-	<s:Int64 x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionDefault/OutputLineNumberLimit/@EntryValue">224</s:Int64>
-	<s:String x:Key="/Default/Housekeeping/UnitTestingMru/UnitTestSessionDefault/TestGradationByDuration/@EntryValue">100;1000;10000;15000</s:String>
-	<s:Boolean x:Key="/Default/Housekeeping/VsActionManager/IsShortcutBrowserEnabled/@EntryValue">True</s:Boolean>
-	<s:Boolean x:Key="/Default/Housekeeping/VsHighlighting/ShowVsLightBulbActionsInSubmenu/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/Housekeeping/VsHighlighting/VsLightBulbDisplayMode/@EntryValue">MergeVsActionsIntoResharperMenu</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/MatchComments/@EntryValue">True</s:Boolean>
