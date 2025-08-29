@@ -317,8 +317,8 @@ internal static class Program
 
         WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
 
-        // Disposal happens after service shutdown, so this inspection can be ignored here
         // ReSharper disable once AccessToDisposedClosure
+        // Disposal happens after service shutdown, so this inspection can be ignored here.
         serviceBuilder.Host
                       .UseSystemd( )
                       .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) );
@@ -327,6 +327,8 @@ internal static class Program
                       .UseConfiguration (
                                          configurationRoot
                                             .GetRequiredSection ( "Monitoring" )
+                                             // ReSharper disable once SettingNotFoundInConfiguration
+                                             // Disabling because this is, in fact, in the configuration, where the code says it is.
                                             .GetSection ( "Kestrel" )
                                         )
                       .UseKestrel ( ( _, kestrelOptions ) =>
@@ -334,6 +336,8 @@ internal static class Program
                                         kestrelOptions.Configure (
                                                                   configurationRoot
                                                                      .GetRequiredSection ( "Monitoring" )
+                                                                      // ReSharper disable once SettingNotFoundInConfiguration
+                                                                      // Disabling because this is, in fact, in the configuration, where the code says it is.
                                                                      .GetSection ( "Kestrel" )
                                                                  )
                                                       .Load( );
