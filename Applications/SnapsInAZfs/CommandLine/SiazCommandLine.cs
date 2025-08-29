@@ -16,6 +16,7 @@ using System.Buffers;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Extensions;
 
 #pragma warning disable CS1591
@@ -56,16 +57,16 @@ public static class SiazCommandLine
     /// <summary>
     ///     Builds and parses the command line.
     /// </summary>
-    /// <param name="args">The raw arguments array to parse.</param>
     /// <remarks>
     ///     <para>
-    ///         This method is organized hierarchically using extension methods defined for the System.CommandLine types, so the code
-    ///         forms a tree that matches the CLI layout.
+    ///         This method is organized hierarchically using extension methods defined for the <see cref="System" />.
+    ///         <see cref="System.CommandLine" /> types, so the code forms a tree that matches the CLI layout.
     ///     </para>
     ///     <para>
-    ///         Configuration files are loaded first, regardless of order of arguments.<br />
-    ///         If no configuration file path override is specified, the default locations will be searched and applied as
-    ///         specified in the documentation.
+    ///         Configuration files should be loaded after parsing the command line, regardless of order of arguments, or else
+    ///         configuration parsing will clobber the results of the command line.<br />
+    ///         If no configuration file path override is specified, the default locations will be searched and applied as specified in
+    ///         the documentation, and then results of the command line should be applied as appropriate in context.
     ///     </para>
     /// </remarks>
     [PublicAPI]
@@ -214,13 +215,74 @@ public static class SiazCommandLine
     }
 
     /// <inheritdoc cref="ParseResult.Invoke(InvocationConfiguration?)" />
+    /// <param name="args">The string arguments to parse.</param>
+    /// <param name="parserConfiguration">The configuration on which the parser's grammar and behaviors are based.</param>
+    /// <param name="invocationConfiguration">The configuration used to define invocation behaviors.</param>
     /// <remarks>
-    ///     This method first calls <see cref="Parse" /> and then calls <see cref="ParseResult.Invoke(InvocationConfiguration?)" /> on
+    ///     This method first calls <see cref="Parse(IReadOnlyList{string}, ParserConfiguration?)" /> and then calls
+    ///     <see cref="ParseResult.Invoke(InvocationConfiguration?)" /> on
     ///     the resulting <see cref="ParseResult" />, passing the provided arguments to each method.
     /// </remarks>
-    public static int Invoke( IReadOnlyList<string> arguments, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static int Invoke( IReadOnlyList<string> args, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
     {
-        return Parse ( arguments, parserConfiguration ).Invoke ( invocationConfiguration );
+        return Parse ( args, parserConfiguration ).Invoke ( invocationConfiguration );
+    }
+
+    /// <inheritdoc cref="ParseResult.Invoke(InvocationConfiguration?)" />
+    /// <param name="args">The string arguments to parse.</param>
+    /// <param name="parserConfiguration">The configuration on which the parser's grammar and behaviors are based.</param>
+    /// <param name="invocationConfiguration">The configuration used to define invocation behaviors.</param>
+    /// <param name="rootCommand">
+    ///     Provides an <see langword="out" /> reference to the <see cref="RootCommand" /> that was created and parsed.
+    /// </param>
+    /// <remarks>
+    ///     This method first calls <see cref="Parse(IReadOnlyList{string}, out RootCommand, ParserConfiguration?)" /> and then calls
+    ///     <see cref="ParseResult.Invoke(InvocationConfiguration?)" /> on
+    ///     the resulting <see cref="ParseResult" />, passing the provided arguments to each method.
+    /// </remarks>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static int Invoke( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
+    {
+        return Parse ( args, out rootCommand, parserConfiguration ).Invoke ( invocationConfiguration );
+    }
+
+    /// <inheritdoc cref="ParseResult.Invoke(InvocationConfiguration?)" />
+    /// <param name="args">The string arguments to parse.</param>
+    /// <param name="rootCommand">
+    ///     Provides an <see langword="out" /> reference to the <see cref="RootCommand" /> returned by the call to
+    ///     <see
+    ///         cref="Parse(System.Collections.Generic.IReadOnlyList{string},out System.CommandLine.RootCommand,System.CommandLine.ParserConfiguration?)" />
+    ///     .
+    /// </param>
+    /// <param name="rootCommandParseResult">
+    ///     Provides an <see langword="out" /> reference to the <see cref="ParseResult" /> returned by the call to
+    ///     <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />
+    /// </param>
+    /// <param name="parserConfiguration">The configuration on which the parser's grammar and behaviors are based.</param>
+    /// <param name="invocationConfiguration">The configuration used to define invocation behaviors.</param>
+    /// <remarks>
+    ///     This method first calls <see cref="Parse(IReadOnlyList{string}, out RootCommand, ParserConfiguration?)" /> and then calls
+    ///     <see cref="ParseResult.Invoke(InvocationConfiguration?)" /> on
+    ///     the resulting <see cref="ParseResult" />, passing the provided arguments to each method.<br />
+    ///     This overload also produces direct references to the <see cref="RootCommand" /> and <see cref="ParseResult" /> created in the
+    ///     process. Generally, you should only call the
+    ///     <see
+    ///         cref="Invoke(System.Collections.Generic.IReadOnlyList{string},System.CommandLine.ParserConfiguration?,System.CommandLine.InvocationConfiguration?)" />
+    ///     method.
+    /// </remarks>
+    /// <returns>
+    ///     The return value from the call to <see cref="ParseResult.Invoke(InvocationConfiguration?)" />.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static int Invoke( IReadOnlyList<string> args, out RootCommand rootCommand, out ParseResult rootCommandParseResult, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
+    {
+        rootCommandParseResult = Parse ( args, out rootCommand, parserConfiguration );
+
+        return rootCommandParseResult.Invoke ( invocationConfiguration );
     }
 
     /// <inheritdoc cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />
@@ -229,9 +291,31 @@ public static class SiazCommandLine
     ///     <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" /> on the resulting <see cref="RootCommand" />, using
     ///     the provided arguments.
     /// </remarks>
-    public static ParseResult Parse( IReadOnlyList<string> arguments, ParserConfiguration? parserConfiguration = null )
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static ParseResult Parse( IReadOnlyList<string> args, ParserConfiguration? configuration = null )
     {
-        return ConfigureCommandLineTree( ).Parse ( arguments, parserConfiguration );
+        return ConfigureCommandLineTree( ).Parse ( args, configuration );
+    }
+
+    /// <inheritdoc cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />
+    /// <param name="args">The string arguments to parse.</param>
+    /// <param name="configuration">The configuration on which the parser's grammar and behaviors are based.</param>
+    /// <param name="rootCommand">
+    ///     Provides an <see langword="out" /> reference to the <see cref="RootCommand" /> that was created and parsed.
+    /// </param>
+    /// <remarks>
+    ///     This method first calls <see cref="ConfigureCommandLineTree" /> and then calls
+    ///     <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" /> on the resulting <see cref="RootCommand" />, using
+    ///     the provided arguments.
+    /// </remarks>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static ParseResult Parse( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
+    {
+        rootCommand = ConfigureCommandLineTree( );
+
+        return rootCommand.Parse ( args, configuration );
     }
 
     /// <summary>
@@ -244,6 +328,8 @@ public static class SiazCommandLine
     ///     <br />
     ///     Returns <see langword="false" /> for all other values.
     /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     private static bool ArgumentStandardBooleanValuesParser( ArgumentResult argumentResult )
     {
         return StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value );
@@ -257,12 +343,15 @@ public static class SiazCommandLine
         return Task.FromResult ( 0 );
     }
 
-    private static void SetDryRun( ParseResult parseResult )
+    private static int SetDryRun( ParseResult parseResult )
     {
         TriStateOptionValue dryRun = parseResult.GetValue<TriStateOptionValue> ( "state" );
-        SetDryRun ( parseResult, dryRun );
+
+        return SetDryRun ( parseResult, dryRun );
     }
 
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     private static int SetDryRun( ParseResult parseResult, TriStateOptionValue dryRun )
     {
         Console.WriteLine ( $"Setting DryRun to {dryRun}." );
