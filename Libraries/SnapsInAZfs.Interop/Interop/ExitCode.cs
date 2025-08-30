@@ -10,19 +10,22 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-namespace SnapsInAZfs.Interop.Libc.Enums;
+namespace SnapsInAZfs.Interop;
 
 /// <summary>
 ///     An <see langword="enum" /> of POSIX-compliant status codes used directly in SIAZ, as well as extra values for -1 and 0, for
 ///     better static analysis.
 /// </summary>
 /// <remarks>
+///     <para>
+///         Not all of these values (notably -1 and 0 at this time) are defined by POSIX, but 0 is used here by the overwhelming
+///         convention of meaning no error, and -1 is intended to be a generic unspecified error.
+///     </para>
 ///     <list type="table">
 ///         <listheader>
 ///             <description>
@@ -49,20 +52,13 @@ namespace SnapsInAZfs.Interop.Libc.Enums;
 ///             </description>
 ///         </item>
 ///     </list>
-///     While this code is free for use by the terms of <see href="https://www.gnu.org/licenses/gpl-3.0.txt">GPLv3</see>, I
-///     certainly don't recommend using it elsewhere without due diligence in ensuring the values returned by an
-///     application are known and expected to correspond to these enumeration values, or you can expect
-///     <see cref="InvalidCastException" />s and other issues.
 /// </remarks>
-// General recommendation for types used with P/Invoke is to maintain the native library's naming conventions, so
-// let's silence ReSharper against the various ways this type violates recommended C# naming conventions.
-// Also, a lot of values aren't used, but I'm leaving them here, so silencing the unused member warning, too.
-[SuppressMessage ( "ReSharper", "InconsistentNaming", Justification = "Following recommendations for types used with P/Invoke" )]
-public enum Errno
+public enum ExitCode
 {
     /// <summary>
-    ///     Unspecified status indicating error. Not actually defined in errno.h, but here for nice output and better
-    ///     static analysis.
+    ///     🤷‍<br />
+    ///     Unspecified general non-success result.<br />
+    ///     Not actually defined by POSIX.
     /// </summary>
     /// <remarks>
     ///     Generally, a P/Invoke method that returns this has set an error code that should be retrieved by a call to
@@ -73,7 +69,7 @@ public enum Errno
     GenericError = -1,
 
     /// <summary>
-    ///     No error. Not actually defined in errno.h, but here for nice output and better static analysis.
+    ///     No error. Not actually defined by POSIX , but here for nice output and better static analysis.
     /// </summary>
     /// <remarks>
     ///     Generally, a P/Invoke method that returns this is indicating it executed and exited without a critical error.<br />
@@ -81,6 +77,12 @@ public enum Errno
     ///     responsibility to deal with that.
     /// </remarks>
     EOK = 0,
+
+    /// <summary>Operation not permitted, access denied, or any number of possible meanings depending on who returned it.</summary>
+    /// <remarks>Also used as a generic error result by System.CommandLine.</remarks>
+    EPERM = 1,
+
+    /// <summary>An operation was canceled.</summary>
     ECANCELED = 125,
 
     ///<summary>Inappropriate file type or format</summary>

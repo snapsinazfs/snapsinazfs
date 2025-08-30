@@ -17,10 +17,11 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using ConfigConsole;
-using Interop.Libc.Enums;
+using Interop;
 using Interop.Zfs.ZfsCommandRunner;
 using Interop.Zfs.ZfsTypes;
 using JetBrains.Annotations;
+using LogLevel = NLog.LogLevel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -29,7 +30,6 @@ using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
 using Settings.Logging;
-using LogLevel = NLog.LogLevel;
 
 [UsedImplicitly]
 internal static class Program
@@ -53,14 +53,14 @@ internal static class Program
         {
             LogManager.Shutdown( );
 
-            return (int)Errno.ECANCELED;
+            return (int)ExitCode.ECANCELED;
         }
 
         if ( !LoadConfigurationFromConfigurationFiles ( ref Settings, out _configurationRoot, in args ) )
         {
             LogManager.Shutdown( );
 
-            return (int)Errno.EFTYPE;
+            return (int)ExitCode.EFTYPE;
         }
 
         SetCommandLineLoggingOverride ( args );
@@ -75,7 +75,7 @@ internal static class Program
             Logger.Trace ( "Version argument provided. Exiting." );
             LogManager.Shutdown( );
 
-            return (int)Errno.ECANCELED;
+            return (int)ExitCode.ECANCELED;
         }
 
         ApplyCommandLineArgumentOverrides ( in args, Settings );
@@ -94,7 +94,7 @@ internal static class Program
                 Logger.Fatal ( e, "Error in configuration console - Exiting" );
                 LogManager.Shutdown( );
 
-                return (int)Errno.GenericError;
+                return (int)ExitCode.GenericError;
             }
 
             LogManager.Shutdown( );
@@ -102,7 +102,7 @@ internal static class Program
             return 0;
         }
 
-        if ( ValidateSettings ( in Settings ) is not Errno.EOK and var badResult )
+        if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
             return (int)badResult;
         }
@@ -312,7 +312,7 @@ internal static class Program
             Logger.Fatal ( "Failed to create service instance - exiting" );
             LogManager.Shutdown( );
 
-            return (int)Errno.ENOATTR;
+            return (int)ExitCode.ENOATTR;
         }
 
         WebApplicationBuilder serviceBuilder = WebApplication.CreateBuilder( );
@@ -390,7 +390,7 @@ internal static class Program
             Logger.Fatal ( "Failed to create service instance - exiting" );
             LogManager.Shutdown( );
 
-            return (int)Errno.ENOATTR;
+            return (int)ExitCode.ENOATTR;
         }
 
         // Disposal happens after service shutdown, so this inspection can be ignored here
@@ -407,7 +407,7 @@ internal static class Program
         return SiazService.ExitStatus;
     }
 
-    private static Errno ValidateSettings( ref readonly SnapsInAZfsSettings settings )
+    private static ExitCode ValidateSettings( ref readonly SnapsInAZfsSettings settings )
     {
         SettingsValidator validator = SettingsValidator.Validate ( in settings );
 
@@ -415,7 +415,7 @@ internal static class Program
         {
             Logger.Fatal ( "Failed to validate settings. Settings null. SnapsInAZfs will now terminate." );
 
-            return Errno.EFTYPE;
+            return ExitCode.EFTYPE;
         }
 
         bool autoDetectionInvoked = false;
@@ -446,7 +446,7 @@ internal static class Program
 
         if ( !validator.IsInvalid )
         {
-            return Errno.EOK;
+            return ExitCode.EOK;
         }
 
         Logger.Fatal ( "Failed to validate settings." );
@@ -455,6 +455,6 @@ internal static class Program
         Logger.Debug ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
         Logger.Fatal ( "SnapsInAZfs will now terminate." );
 
-        return Errno.EFTYPE;
+        return ExitCode.EFTYPE;
     }
 }

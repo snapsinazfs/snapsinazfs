@@ -13,8 +13,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
+
 using PowerArgs;
-using SnapsInAZfs.Interop.Libc.Enums;
+
+using SnapsInAZfs.Interop;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Monitoring;
@@ -82,7 +84,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     /// <summary>
     ///     Gets the last exit code that was set by methods called by the service.
     /// </summary>
-    public static int ExitStatus { get; } = (int)Errno.EOK;
+    public static int ExitStatus { get; } = (int)ExitCode.EOK;
 
     internal static SiazExecutionResultCode LastExecutionResultCode = SiazExecutionResultCode.None;
 

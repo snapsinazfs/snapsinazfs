@@ -285,6 +285,65 @@ public static class SiazCommandLine
         return rootCommandParseResult.Invoke ( invocationConfiguration );
     }
 
+    /// <inheritdoc cref="ParseResult.Invoke(InvocationConfiguration?)" />
+    /// <param name="args">The string arguments to parse.</param>
+    /// <param name="rootCommand">
+    ///     Provides an <see langword="out" /> reference to the <see cref="RootCommand" /> returned by the call to
+    ///     <see
+    ///         cref="Parse(System.Collections.Generic.IReadOnlyList{string},out System.CommandLine.RootCommand,System.CommandLine.ParserConfiguration?)" />
+    ///     .
+    /// </param>
+    /// <param name="rootCommandParseResult">
+    ///     Provides an <see langword="out" /> reference to the <see cref="ParseResult" /> returned by the call to
+    ///     <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />
+    /// </param>
+    /// <param name="siazSettings">
+    ///     <para>
+    ///         An <see langword="out" /> reference to a *new* instance of <see cref="SnapsInAZfsSettings" /> which will have any
+    ///         applicable
+    ///         overrides from command line elements applied to it.
+    ///     </para>
+    ///     <para>
+    ///         This reference will always be assigned to a *new* instance of <see cref="SnapsInAZfsSettings" />, effectively ignoring
+    ///         any pre-initialized references passed to this method.
+    ///     </para>
+    ///     <para>
+    ///         You can declare but should not initialize this parameter in-line in the method call (e.g. do not call
+    ///         <c>Invoke(..., out SnapsInAZfsSettings siazSettings = new(), ...)</c>, because the original reference will be lost.
+    ///     </para>
+    ///     <para>
+    ///         The static <see cref="Program.Settings" /> is generally the most logical reference to provide, unless you're creating
+    ///         some sort of modal interactive CLI or something like that.
+    ///     </para>
+    /// </param>
+    /// <param name="parserConfiguration">The configuration on which the parser's grammar and behaviors are based.</param>
+    /// <param name="invocationConfiguration">The configuration used to define invocation behaviors.</param>
+    /// <remarks>
+    ///     This method first calls <see cref="Parse(IReadOnlyList{string}, out RootCommand, ParserConfiguration?)" /> and then calls
+    ///     <see cref="ParseResult.Invoke(InvocationConfiguration?)" /> on
+    ///     the resulting <see cref="ParseResult" />, passing the provided arguments to each method.<br />
+    ///     This overload also produces direct references to the <see cref="RootCommand" /> and <see cref="ParseResult" /> created in the
+    ///     process. Generally, you should only call the
+    ///     <see
+    ///         cref="Invoke(System.Collections.Generic.IReadOnlyList{string},System.CommandLine.ParserConfiguration?,System.CommandLine.InvocationConfiguration?)" />
+    ///     method.
+    /// </remarks>
+    /// <returns>
+    ///     The return value from the call to <see cref="ParseResult.Invoke(InvocationConfiguration?)" />.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static int Invoke( IReadOnlyList<string> args, out RootCommand rootCommand, out ParseResult rootCommandParseResult, out SnapsInAZfsSettings siazSettings, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
+    {
+        _settings = new ( );
+
+        rootCommandParseResult = Parse ( args, out rootCommand, parserConfiguration );
+        int invokeResult = rootCommandParseResult.Invoke ( invocationConfiguration );
+        siazSettings = _settings;
+
+        return invokeResult;
+    }
+
     /// <inheritdoc cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />
     /// <remarks>
     ///     This method first calls <see cref="ConfigureCommandLineTree" /> and then calls
