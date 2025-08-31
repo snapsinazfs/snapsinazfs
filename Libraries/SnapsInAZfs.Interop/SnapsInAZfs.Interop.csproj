@@ -43,7 +43,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Interop\Libc\Enums\Errno.cs" />
+    <Compile Include="Interop\Libc\bits\Types.cs" />
+    <Compile Include="Interop\Libc\Enums\UnixFileFlags.cs" />
+    <Compile Include="Interop\Libc\NativeMethods.cs" />
+    <Compile Include="Interop\Libc\Structs\Stat64.cs" />
   </ItemGroup>
 
   <ItemGroup>
