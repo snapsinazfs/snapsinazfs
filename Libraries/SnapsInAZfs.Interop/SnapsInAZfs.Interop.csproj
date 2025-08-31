@@ -59,6 +59,24 @@
     <Using Include="NLog" />
     <Using Include="SnapsInAZfs.Settings" />
   </ItemGroup>
+  
+  <!-- C stdlib typedefs -->
+  <ItemGroup>
+    <Using Alias="__uid_t" Include="System.UInt32" />
+    <Using Alias="__gid_t" Include="System.UInt32" />
+    <Using Alias="__ino_t" Include="System.UInt64" />
+    <Using Alias="__dev_t" Include="System.UInt64" />
+    <Using Alias="__ino64_t" Include="System.UInt64" />
+    <Using Alias="__nlink_t" Include="System.UInt64" />
+    <Using Alias="__blksize_t" Include="System.Int64" />
+    <Using Alias="__blkcnt_t" Include="System.Int64" />
+    <Using Alias="__blkcnt64_t" Include="System.Int64" />
+    <Using Alias="__off_t" Include="System.Int64" />
+    <Using Alias="__off64_t" Include="System.Int64" />
+    <Using Alias="__mode_t" Include="System.IO.UnixFileMode" />
+    <Using Alias="timespec" Include="System.Int64" />
+    <Using Alias="__time_t" Include="System.Int64" />
+  </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Settings.Tests" />
