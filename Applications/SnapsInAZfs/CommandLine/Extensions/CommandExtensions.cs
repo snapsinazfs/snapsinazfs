@@ -14,134 +14,54 @@ namespace SnapsInAZfs.CommandLine.Extensions;
 
 using System.CommandLine;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 /// <summary>
 ///     Extension methods for <see cref="Command" />, enabling fluent usage.
 /// </summary>
+/// <remarks>
+///     Note that <see cref="RootCommand" /> is derived from <see cref="Command" />, so these methods apply to both types.<br />
+///     Generics are used to enable explicit forcing of method resolution if/when necessary.
+/// </remarks>
 public static class CommandExtensions
 {
-    /// <inheritdoc cref="WithCommand(Command, Command)" />
+    /// <inheritdoc cref="WithCommand{TCommand}(TCommand, Command)" />
     /// <remarks>
-    ///     This method is an alias for <see cref="WithCommand(Command, Command)" />.
+    ///     This method is an alias for <see cref="WithCommand{TCommand}(TCommand, Command)" />.
     /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static Command With( this Command rootCommand, Command subCommand )
+    public static TBaseCommand With<TBaseCommand, TSubCommand>( this TBaseCommand command, TSubCommand subCommand )
+        where TBaseCommand : Command
+        where TSubCommand : Command
     {
-        return rootCommand.WithCommand ( subCommand );
+        return command.WithCommand ( subCommand );
     }
 
-    /// <summary>
-    ///     Adds an <see cref="Option{T}" /> to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
-    /// </summary>
-    /// <param name="command">The <see cref="Command" /> to which <paramref name="option" /> will be added.</param>
-    /// <param name="option">
-    ///     A reference to an instance of an <see cref="Option{T}" /> to add to the <see cref="Command" />.
-    /// </param>
-    /// <typeparam name="T">
-    ///     A non-null reference to an <see cref="Option{T}" />, where <typeparamref name="T" /> is unbounded.
-    /// </typeparam>
-    /// <returns>
-    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
-    /// </returns>
-    [PublicAPI]
-    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static Command With<T>( this Command command, Option<T> option )
-    {
-        command.Add ( option );
-
-        return command;
-    }
-
-    /// <summary>
-    ///     Adds an <see cref="Option{T}" /> to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
-    /// </summary>
-    /// <param name="optionFactoryArgs">
-    ///     An instance or value of the single argument, of type <typeparamref name="TOptionFactoryArgs" />, that will be passed to the
-    ///     <paramref name="optionFactory" /> delegate.
-    /// </param>
-    /// <returns>
-    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
-    /// </returns>
-    /// <summary>
-    ///     Adds a single <see cref="Option{TOption}" /> returned by the <paramref name="optionFactory" /> delegate to this
-    ///     <see cref="Command" /> and returns the same <see cref="Command" /> reference.
-    /// </summary>
-    /// <param name="command">
-    ///     The <see cref="Command" /> to which the <see cref="Option{TOption}" /> returned by <paramref name="optionFactory" /> will be
-    ///     added.
-    /// </param>
-    /// <param name="optionFactory">
-    ///     A delegate that accepts a single argument of type <typeparamref name="TOptionFactoryArgs" /> and returns a single non-null
-    ///     instance of an <see cref="Option{TOption}" /> to add to the <see cref="Command" /> this method was called on.
-    /// </param>
-    /// <typeparam name="TOption">
-    ///     The type of <see cref="Option{T}" /> returned by the <paramref name="optionFactory" />, where <typeparamref name="TOption" />
-    ///     is unbounded.
-    /// </typeparam>
-    /// <typeparam name="TOptionFactoryArgs">
-    ///     The type of the single argument that will be passed to the <paramref name="optionFactory" /> delegate.
-    /// </typeparam>
-    /// <returns>
-    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
-    /// </returns>
+    /// <inheritdoc cref="WithOption{TOption}(Command, string?, Func{string?, Option{TOption}?}, bool)" />
     /// <remarks>
-    ///     <paramref name="optionFactory" /> MUST return a non-null reference to a valid instance of an <see cref="Option{TOption}" />.
+    ///     This method is an alias for <see cref="WithOption{TOption}(Command, string?, Func{string?, Option{TOption}?}, bool)" />.
     /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static Command With<TOption, TOptionFactoryArgs>( this Command command, Func<TOptionFactoryArgs?, Option<TOption>> optionFactory, TOptionFactoryArgs? optionFactoryArgs )
+    public static Command With<TOption>( this Command command, string? name, Func<string?, Option<TOption>> optionFactory, bool skipIfNull = false )
     {
-        command.Add ( optionFactory ( optionFactoryArgs ) );
-
-        return command;
+        return command.WithOption ( optionFactory, name, skipIfNull );
     }
 
-    /// <summary>
-    ///     Adds a single <see cref="Option{TOption}" /> returned by the <paramref name="optionFactory" /> delegate to this
-    ///     <see cref="Command" /> and returns the same <see cref="Command" /> reference.
-    /// </summary>
-    /// <param name="command">
-    ///     The <see cref="Command" /> to which the <see cref="Option{TOption}" /> returned by <paramref name="optionFactory" /> will be
-    ///     added.
-    /// </param>
-    /// <param name="optionFactory">
-    ///     A delegate that accepts no arguments and returns a single non-null instance of an <see cref="Option{TOption}" /> to add to
-    ///     the <see cref="Command" /> this method was called on.<br />
-    ///     If the delegate is null, no action will be taken, but the <see cref="Command" /> will still be returned.
-    /// </param>
-    /// <param name="skipIfNull">
-    ///     If provided and set to <see langword="true" />, performs no action on <paramref name="command" /> if
-    ///     <paramref name="optionFactory" /> returns a null reference.<br />
-    ///     Otherwise, a <see cref="NullReferenceException" /> will be thrown if <paramref name="optionFactory" /> returns
-    ///     <see langword="null" />.
-    /// </param>
-    /// <typeparam name="TOption">
-    ///     The type of <see cref="Option{T}" /> returned by the <paramref name="optionFactory" />, where <typeparamref name="TOption" />
-    ///     is unbounded.
-    /// </typeparam>
-    /// <returns>
-    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
-    /// </returns>
+    /// <inheritdoc
+    ///     cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}}, TOptionFactoryArgs?, bool)" />
     /// <remarks>
-    ///     <paramref name="optionFactory" /> MUST return a non-null reference to a valid instance of an <see cref="Option{TOption}" />.
+    ///     This method is an alias for
+    ///     <see
+    ///         cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}}, TOptionFactoryArgs?, bool)" />
+    ///     .
     /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static Command With<TOption>( this Command command, Func<Option<TOption>?> optionFactory, bool skipIfNull = false )
+    public static Command With<TOption, TOptionFactoryArgs>( this Command command, Func<TOptionFactoryArgs?, Option<TOption>> optionFactory, TOptionFactoryArgs? optionFactoryArgs, bool skipIfNull = false )
     {
-        Option<TOption>? option = optionFactory( );
-
-        if ( option is not null )
-        {
-            command.Add ( option );
-        }
-        else if ( !skipIfNull )
-        {
-            throw new InvalidOperationException ( $"The {nameof (optionFactory)} produced a null option." );
-        }
-
-        return command;
+        return command.WithOption ( optionFactory, optionFactoryArgs, skipIfNull );
     }
 
     [PublicAPI]
@@ -180,6 +100,7 @@ public static class CommandExtensions
         return command;
     }
 
+    [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     public static Command WithAction( this Command command, Func<ParseResult, CancellationToken, Task<int>>? func )
     {
@@ -198,6 +119,30 @@ public static class CommandExtensions
     }
 
     /// <summary>
+    ///     Adds an alias to the current <see cref="Command" /> instance and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="command">The <see cref="Command" /> to which <paramref name="alias" /> will be added.</param>
+    /// <param name="alias">
+    ///     A <see langword="string" /> to add as an additional alias for the <see cref="Command" />.<br />
+    ///     See <see cref="Command.Aliases" /> and <see cref="AliasSet" />.
+    /// </param>
+    /// <returns>
+    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    /// <remarks>
+    ///     Aliases are backed by a HashSet of strings, so uniqueness is implicitly guaranteed.<br />
+    ///     Aliases must be contiguous non-null strings (ie they cannot contain any whitespace at all).
+    /// </remarks>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static Command WithAlias( this Command command, string alias )
+    {
+        command.Aliases.Add ( alias );
+
+        return command;
+    }
+
+    /// <summary>
     ///     Adds an <see cref="Argument" /> to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
     /// </summary>
     /// <param name="command">The <see cref="Command" /> to which <paramref name="argument" /> will be added.</param>
@@ -207,6 +152,8 @@ public static class CommandExtensions
     /// <returns>
     ///     A reference to the same <see cref="Command" /> instance that this method was called on.
     /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     public static Command WithArgument<T>( this Command command, Argument<T> argument )
     {
         command.Add ( argument );
@@ -227,13 +174,30 @@ public static class CommandExtensions
     /// <returns>
     ///     A reference to the same <see cref="Command" /> instance that this method was called on.
     /// </returns>
+    /// <exception cref="ArgumentException">If <paramref name="subCommand" /> is an instance of <see cref="RootCommand" />.</exception>
+    /// <remarks>
+    ///     This method explicitly checks that you are not attempting to add a <see cref="RootCommand" /> to any other type of
+    ///     <see cref="Command" /> and throws <see cref="InvalidOperationException" /> if you do.
+    /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static Command WithCommand( this Command command, Command subCommand )
+    public static TCommand WithCommand<TCommand>( this TCommand command, Command subCommand )
+        where TCommand : Command
     {
-        command.Add ( subCommand );
+        return ( command, subCommand ) switch
+               {
+                   (not null, not RootCommand) => AddSubCommandAndReturn ( command, subCommand ),
+                   (RootCommand, RootCommand)  => throw new ArgumentException ( $"Cannot add {nameof (RootCommand)} {subCommand.Name} to {nameof (RootCommand)} {command.Name}." ),
+                   (not null, RootCommand)     => throw new ArgumentException ( $"Cannot add {nameof (RootCommand)} {subCommand.Name} to {nameof (Command)} {command.Name}." ),
+                   _                           => throw new InvalidOperationException ( $"Invalid {nameof (Command)}(s) provided." )
+               };
 
-        return command;
+        static TCommand AddSubCommandAndReturn( TCommand cmd, Command sub )
+        {
+            cmd.Add ( sub );
+
+            return cmd;
+        }
     }
 
     /// <summary>
@@ -265,6 +229,144 @@ public static class CommandExtensions
     {
         subCommand = new Command ( name, description ).WithAction ( action );
         command.Add ( subCommand );
+
+        return command;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="Option{T}" /> to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="command">The <see cref="Command" /> to which <paramref name="option" /> will be added.</param>
+    /// <param name="option">
+    ///     A reference to an instance of an <see cref="Option{T}" /> to add to the <see cref="Command" />.
+    /// </param>
+    /// <typeparam name="T">
+    ///     A non-null reference to an <see cref="Option{T}" />, where <typeparamref name="T" /> is unbounded.
+    /// </typeparam>
+    /// <returns>
+    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static Command WithOption<T>( this Command command, Option<T> option )
+    {
+        command.Add ( option );
+
+        return command;
+    }
+
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static RootCommand WithOption<T>( this RootCommand command, Option<T> option )
+    {
+        command.Add ( option );
+
+        return command;
+    }
+
+    /// <summary>
+    ///     Adds a single <see cref="Option{TOption}" /> returned by the <paramref name="optionFactory" /> delegate to this
+    ///     <see cref="Command" /> and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="command">
+    ///     The <see cref="Command" /> to which the <see cref="Option{TOption}" /> returned by <paramref name="optionFactory" /> will be
+    ///     added.
+    /// </param>
+    /// <param name="name"></param>
+    /// <param name="optionFactory">
+    ///     A delegate that accepts no arguments and returns a single non-null instance of an <see cref="Option{TOption}" /> to add to
+    ///     the <see cref="Command" /> this method was called on.<br />
+    ///     If the delegate is null, no action will be taken, but the <see cref="Command" /> will still be returned.
+    /// </param>
+    /// <param name="skipIfNull">
+    ///     If provided and set to <see langword="true" />, performs no action on <paramref name="command" /> if
+    ///     <paramref name="optionFactory" /> returns a null reference.<br />
+    ///     Otherwise, a <see cref="NullReferenceException" /> will be thrown if <paramref name="optionFactory" /> returns
+    ///     <see langword="null" />.
+    /// </param>
+    /// <typeparam name="TOption">
+    ///     The type of <see cref="Option{T}" /> returned by the <paramref name="optionFactory" />, where <typeparamref name="TOption" />
+    ///     is unbounded.
+    /// </typeparam>
+    /// <returns>
+    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    /// <remarks>
+    ///     <paramref name="optionFactory" /> MUST return a non-null reference to a valid instance of an <see cref="Option{TOption}" />.
+    /// </remarks>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static Command WithOption<TOption>( this Command command, string? name, Func<string?, Option<TOption>?> optionFactory, bool skipIfNull = false )
+    {
+        Option<TOption>? option = optionFactory ( name );
+
+        if ( option is not null )
+        {
+            command.Add ( option );
+        }
+        else if ( !skipIfNull )
+        {
+            throw new InvalidOperationException ( $"The {nameof (optionFactory)} produced a null option." );
+        }
+
+        return command;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="Option{T}" /> to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="optionFactoryArgs">
+    ///     An instance or value of the single argument, of type <typeparamref name="TOptionFactoryArgs" />, that will be passed to the
+    ///     <paramref name="optionFactory" /> delegate.
+    /// </param>
+    /// <returns>
+    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    /// <summary>
+    ///     Adds a single <see cref="Option{TOption}" /> returned by the <paramref name="optionFactory" /> delegate to this
+    ///     <see cref="Command" /> and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="command">
+    ///     The <see cref="Command" /> to which the <see cref="Option{TOption}" /> returned by <paramref name="optionFactory" /> will be
+    ///     added.
+    /// </param>
+    /// <param name="optionFactory">
+    ///     A delegate that accepts a single argument of type <typeparamref name="TOptionFactoryArgs" /> and returns a single non-null
+    ///     instance of an <see cref="Option{TOption}" /> to add to the <see cref="Command" /> this method was called on.
+    /// </param>
+    /// <param name="skipIfNull">
+    ///     If provided and set to <see langword="true" />, performs no action on <paramref name="command" /> if
+    ///     <paramref name="optionFactory" /> returns a null reference.<br />
+    ///     Otherwise, a <see cref="NullReferenceException" /> will be thrown if <paramref name="optionFactory" /> returns
+    ///     <see langword="null" />.
+    /// </param>
+    /// <typeparam name="TOption">
+    ///     The type of <see cref="Option{T}" /> returned by the <paramref name="optionFactory" />, where <typeparamref name="TOption" />
+    ///     is unbounded.
+    /// </typeparam>
+    /// <typeparam name="TOptionFactoryArgs">
+    ///     The type of the single argument that will be passed to the <paramref name="optionFactory" /> delegate.
+    /// </typeparam>
+    /// <returns>
+    ///     A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    /// <remarks>
+    ///     <paramref name="optionFactory" /> MUST return a non-null reference to a valid instance of an <see cref="Option{TOption}" />.
+    /// </remarks>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public static Command WithOption<TOption, TOptionFactoryArgs>( this Command command, Func<TOptionFactoryArgs?, Option<TOption>?> optionFactory, TOptionFactoryArgs? optionFactoryArgs, bool skipIfNull = false )
+    {
+        Option<TOption>? option = optionFactory ( optionFactoryArgs );
+
+        if ( option is not null )
+        {
+            command.Add ( option );
+        }
+        else if ( !skipIfNull )
+        {
+            throw new InvalidOperationException ( $"The {nameof (optionFactory)} invoked with arguments {JsonSerializer.Serialize ( optionFactoryArgs )} produced a null option." );
+        }
 
         return command;
     }
