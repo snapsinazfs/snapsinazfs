@@ -15,15 +15,23 @@ namespace SnapsInAZfs.CommandLine;
 using System.Buffers;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using ConfigConsole;
 using Extensions;
+using Interop;
+using Interop.Zfs.ZfsTypes;
+using NLog.Config;
+using NLog.Extensions.Logging;
 
-#pragma warning disable CS1591
 /// <summary>
+///     The high-level interface to the command line functionality.
 /// </summary>
 public static class SiazCommandLine
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     private static readonly string[] StandardBooleanFalseStrings =
     [
         "0",
@@ -53,6 +61,11 @@ public static class SiazCommandLine
     ];
 
     private static readonly SearchValues<string> StandardBooleanTrueValuesSearch = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan( ), StringComparison.OrdinalIgnoreCase );
+
+    /// <summary>
+    ///     Locally-significant reference to a <see cref="SnapsInAZfsSettings" /> instance, for use across method calls.
+    /// </summary>
+    private static SnapsInAZfsSettings? _settings;
 
     /// <summary>
     ///     Builds and parses the command line.
@@ -92,24 +105,79 @@ public static class SiazCommandLine
                          Required    = false
                      }
                     )
+               .WithOption<string[]>
+                    (
+                     new ( "--config", "--config-file", "--config-files" )
+                     {
+                         Arity = ArgumentArity.OneOrMore,
+                         Description = """
+                                       One or more configuration files to REPLACE the default configuration files, for this invocation.
+                                       Configuration files at the standard paths will be ignored unless included in your list.
+                                       To add additional layers of configuration files on top of the default configuration files, see the --additional-config-file option.
+                                       See SnapsInAZfs.json(5) for details about using the --config and --additional-config options together.
+                                       """,
+                         Recursive           = true,
+                         DefaultValueFactory = static _ => [ "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" ]
+                     }
+                    )
+               .WithOption<bool>
+                    (
+                     new ( "--debug" )
+                     {
+                         Arity = ArgumentArity.ZeroOrOne,
+                         Description = """
+                                       Debug level output logging.
+                                       Change log level in SnapsInAZfs.nlog.json for normal usage.
+                                       """,
+                         Recursive = true
+                     }
+                    )
+               .WithOption<bool>
+                    (
+                     new ( "--daemonize", "-D" )
+                     {
+                         Arity       = ArgumentArity.ZeroOrOne,
+                         Description = "Run SnapsInAZfs as a daemon.",
+                         Required    = false
+                     }
+                    )
                .WithCommand
                     (
                      new Command (
                                   "config",
                                   "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
                                  )
-                        .With
+                        .WithCommand
                              (
                               new Command (
                                            "global",
-                                           "Modify global settings in the root of the JSON configuration files."
+                                           """
+                                           Modify global settings in the root of the JSON configuration files.
+                                           If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                           """
                                           )
-                                 .With
+                                 .WithOption<string> (
+                                                      new Option<string> ( "--output-file" )
+                                                      {
+                                                          Description = """
+                                                                        Absolute or relative path to the file to which changes will be written.
+                                                                        If the file already exists, it must be a JSON text file.
+                                                                        The JSON node at the path corresponding to the modified setting will be REPLACED by this operation.
+                                                                        If the file does not exist, a new JSON file will be created containing only the modified setting.
+                                                                        """,
+                                                          Recursive = true,
+                                                          Arity     = ArgumentArity.ZeroOrOne
+                                                      }
+                                                     )
+                                 .WithCommand
                                       (
                                        new Command (
                                                     "dry-run",
                                                     "Set the DryRun option, which controls whether SIAZ can make changes (false) or not (true)."
                                                    )
+                                           {
+                                               TreatUnmatchedTokensAsErrors = true
+                                           }
                                           .WithArgument
                                                (
                                                 new Argument<TriStateOptionValue> ( "state" )
@@ -120,7 +188,7 @@ public static class SiazCommandLine
                                                    .WithCustomParser ( TriStateArgumentValuesParser )
                                                    .AcceptingOnlyValuesIn ( [ ..StandardBooleanFormsSet, "default" ] )
                                                )
-                                          .WithAction ( SetDryRun )
+                                          .WithAction ( SetGlobalOption )
                                       )
                              )
                         .With
@@ -138,6 +206,8 @@ public static class SiazCommandLine
                                   "run",
                                   $"Run SIAZ, optionally specifying override options.{Environment.NewLine}Use this context when executing one-off operations or for custom service/script-based invocations."
                                  )
+                         // The --cron alias is for backward compatibility with the sanoid-compatible CLI only.
+                        .WithAlias ( "--cron" )
                         .WithAction ( RunSiaz )
                     )
                .With
@@ -225,9 +295,9 @@ public static class SiazCommandLine
     /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public static int Invoke( IReadOnlyList<string> args, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
+    public static ExitCode Invoke( IReadOnlyList<string> args, ParserConfiguration? parserConfiguration = null, InvocationConfiguration? invocationConfiguration = null )
     {
-        return Parse ( args, parserConfiguration ).Invoke ( invocationConfiguration );
+        return (ExitCode)Parse ( args, parserConfiguration ).Invoke ( invocationConfiguration );
     }
 
     /// <inheritdoc cref="ParseResult.Invoke(InvocationConfiguration?)" />
@@ -402,13 +472,6 @@ public static class SiazCommandLine
         return Task.FromResult ( 0 );
     }
 
-    private static int SetDryRun( ParseResult parseResult )
-    {
-        TriStateOptionValue dryRun = parseResult.GetValue<TriStateOptionValue> ( "state" );
-
-        return SetDryRun ( parseResult, dryRun );
-    }
-
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     private static int SetDryRun( ParseResult parseResult, TriStateOptionValue dryRun )
@@ -417,6 +480,13 @@ public static class SiazCommandLine
         Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
 
         return 0;
+    }
+
+    private static int SetGlobalOption( ParseResult parseResult )
+    {
+        TriStateOptionValue dryRun = parseResult.GetValue<TriStateOptionValue> ( "state" );
+
+        return SetDryRun ( parseResult, dryRun );
     }
 
     private static void StartConfigConsole( ParseResult parseResult )
