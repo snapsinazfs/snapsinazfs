@@ -47,6 +47,7 @@
     <Compile Include="Interop\Libc\Enums\UnixFileFlags.cs" />
     <Compile Include="Interop\Libc\NativeMethods.cs" />
     <Compile Include="Interop\Libc\Structs\Stat64.cs" />
+    <Compile Include="Interop\Libc\Structs\StatFs64.cs" />
   </ItemGroup>
 
   <ItemGroup>
