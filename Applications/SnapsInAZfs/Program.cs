@@ -12,10 +12,12 @@
 
 namespace SnapsInAZfs;
 
+using System.CommandLine;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using CommandLine;
 using ConfigConsole;
 using Interop;
 using Interop.Zfs.ZfsCommandRunner;
@@ -30,6 +32,7 @@ using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
 using Settings.Logging;
+using SCL = System.CommandLine;
 
 [UsedImplicitly]
 internal static class Program
@@ -40,13 +43,34 @@ internal static class Program
     private static readonly IMonitor             ServiceObserver = new Monitor( );
     private static          IConfigurationRoot?  _configurationRoot;
     internal static         SnapsInAZfsSettings? Settings;
-
     internal static IZfsCommandRunner? ZfsCommandRunnerSingleton;
 
     [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
     public static async Task<int> Main( string[] argv )
     {
-        CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
+        if ( !ProcessCommandLine ( argv, out SCL.ParseResult siazCliParseResult, out Settings, out _configurationRoot,out ExitCode siazCliInvocationExitCode )
+          || siazCliInvocationExitCode is not ExitCode.EOK )
+        {
+            LogManager.Shutdown( );
+
+            return (int)siazCliInvocationExitCode;
+        }
+
+        switch ( siazCliParseResult )
+        {
+            case { RootCommandResult.IdentifierToken.Value: SiazCommandLine.RunCommandName }:
+                return Settings.Monitoring.EnableHttp switch
+                       {
+                           true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
+                           _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
+                       };
+            default:
+                break;
+        }
+
+        return 0;
+
+        CommandLineArguments args           = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
 
         // Implicit null check here is important.
         if ( args is not { Help: false } )
@@ -115,6 +139,28 @@ internal static class Program
                    true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
                    _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
                };
+    }
+
+    private static bool ProcessCommandLine(
+        string[] arguments,
+        out SCL.ParseResult siazCliParseResult,
+        [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
+        [NotNullWhen ( true )] out IConfigurationRoot? configurationRoot,
+        out ExitCode exitCode
+        )
+    {
+        SiazCommandLine siazCli = new ( );
+        siazCliParseResult = siazCli.Parse ( arguments, out RootCommand _, new ( ) { EnablePosixBundling = true } );
+        exitCode = siazCli.Invoke (
+                                 arguments,
+                                 out RootCommand _,
+                                 out siazCliParseResult,
+                                 out settings,
+                                 out configurationRoot,
+                                 parserConfiguration: new ( ) { EnablePosixBundling = true }
+                                );
+
+        return exitCode == ExitCode.EOK;
     }
 
     /// <summary>
