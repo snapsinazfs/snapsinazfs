@@ -49,12 +49,19 @@ public static partial class NativeMethods
     ///     The current path will be resolved and its effective access for the executing uid and gid will be checked against this mask.
     ///     <br />
     ///     If any bits in this mask are missing in the result, -1 will be returned and <c>LastError</c> will be set to a specific POSIX
-    ///     errno exit code.
+    ///     exit code.
     /// </param>
-    /// <returns></returns>
+    /// <returns>
+    ///     0, if all bits in <paramref name="mode" /> are granted in the effective permissions of the file;<br />
+    ///     -1 otherwise.
+    /// </returns>
+    /// <remarks>
+    ///     Generally, it is better to attempt to open the file in the desired mode, instead, as test-then-open introduces a race
+    ///     condition.
+    /// </remarks>
     // ReSharper disable once StringLiteralTypo
     [LibraryImport ( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "euidaccess", SetLastError = true )]
-    public static partial int EuidAccess( string pathname, UnixFileMode mode );
+    public static partial int EuidAccess( string pathname, __mode_t mode );
 
     // ReSharper disable once StringLiteralTypo
     [LibraryImport ( "libc", StringMarshalling = StringMarshalling.Utf8, EntryPoint = "gethostname", SetLastError = true )]
