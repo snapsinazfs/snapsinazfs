@@ -11,12 +11,12 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/MatchComments/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Name/@EntryValue">Unclear Intention</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;INTENT)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;INTENT:)(\W|$)(.*)</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=ECFC03C52C651341A25E93782BA53A5F/TodoIconStyle/@EntryValue">Question</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Color/@EntryValue">#FFCF9D32</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/MatchComments/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Name/@EntryValue">Idea</s:String>
-	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;IDEA)(\W|$)(.*)</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/Pattern/@EntryValue">(?&lt;=\W|^)(?&lt;TAG&gt;IDEA:)(\W|$)(.*)</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/Todo/TodoPatterns/=F1B8D821A913704DBE47A714906078A6/TodoIconStyle/@EntryValue">Normal</s:String>
 </wpf:ResourceDictionary>
