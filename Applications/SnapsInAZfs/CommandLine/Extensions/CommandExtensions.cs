@@ -87,7 +87,8 @@ public static class CommandExtensions
     public static Command WithAction( this Command command, Func<ParseResult, int>? func )
     {
         // Need to explicitly check for null because SetAction throws on null.
-        // However, null is valid and results in getting help text unless there were other parse errors encountered.
+        // However, null is valid and results in getting help text unless there were other parse errors
+        // encountered, so we still want to be able to null it out if requested.
         if ( func is not null )
         {
             command.SetAction ( func );
