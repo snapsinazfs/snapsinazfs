@@ -12,6 +12,7 @@
 
 namespace SnapsInAZfs.CommandLine.Extensions;
 
+using System.Buffers;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 
@@ -20,6 +21,8 @@ using System.CommandLine.Parsing;
 /// </summary>
 public static class ArgumentExtensions
 {
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
     /// <inheritdoc cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />
     /// <remarks>
     ///     This method is a direct proxy for <see cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />, only
@@ -28,6 +31,36 @@ public static class ArgumentExtensions
     public static Argument<T> AcceptingOnlyValuesIn<T>( this Argument<T> argument, params string[] acceptedValues )
     {
         return argument.AcceptOnlyFromAmong ( acceptedValues );
+    }
+
+    /// <summary>
+    ///     Validates that the tokens provided for the argument represent normal files that exist and are writeable by the process.
+    /// </summary>
+    /// <param name="argument">The <see cref="Argument{T}" /> to validate.</param>
+    /// <returns>An <see cref="ArgumentResult" /> with any validation errors appended.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method combines the functionality of
+    ///         <see cref="ArgumentValidation.AcceptLegalFileNamesOnly{T}(Argument{T})" /> with an optimized implementation of
+    ///         <see cref="ArgumentValidation.AcceptExistingOnly{T}(Argument{T})" /> that uses a cached <see cref="SearchValues{T}" />
+    ///         for more efficient matching on longer or multiple inputs.<br />
+    ///         Short or single-item inputs generally achieve comparable performance as the built-in validators as well.
+    ///     </para>
+    ///     <para>
+    ///         The tests for legality of the path and existence of/access to the file are added as separate validators, with path name
+    ///         validation being before existence/access in the validation pipeline.
+    ///     </para>
+    ///     <para>
+    ///         This implementation tests access via actually attempting to open the target file(s) for more reliable results.<br />
+    ///         If this is too costly or is otherwise undesirable for your application, use the built-in validators instead.
+    ///     </para>
+    /// </remarks>
+    public static Argument<IEnumerable<string>> OnlyAcceptingLegalExistingWriteableFiles( this Argument<IEnumerable<string>> argument )
+    {
+        argument.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateLegalFilePath ) );
+        argument.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateCanWriteToPath ) );
+
+        return argument;
     }
 
     /// <summary>
@@ -49,5 +82,69 @@ public static class ArgumentExtensions
         argument.CustomParser = customParser;
 
         return argument;
+    }
+
+    public static Argument<TArgument> WithValidator<TArgument>( this Argument<TArgument> argument, Action<ArgumentResult> validator )
+    {
+        argument.Validators.Add ( validator );
+
+        return argument;
+    }
+
+    private static ArgumentResult ValidateCanWriteToPath( ArgumentResult argumentResult, Token token )
+    {
+        FileInfo file = new ( Path.GetFullPath ( token.Value ) );
+        try
+        {
+            using FileStream testFile = file.Open (
+                                                   new FileStreamOptions
+                                                   {
+                                                       Access = FileAccess.ReadWrite,
+                                                       Mode   = FileMode.Open,
+                                                       Share  = FileShare.Read | FileShare.Inheritable
+                                                   }
+                                                  );
+            testFile.Close( );
+        }
+        catch ( DirectoryNotFoundException directoryNotFoundException )
+        {
+            string message = $"Unable to open file {token.Value} for writing. The parent directory {file.Directory?.FullName ?? "(unknown)"} does not exist or is inaccessible.";
+            Logger.Warn ( directoryNotFoundException, message );
+            argumentResult.AddError ( $"{message} See log for detailed exception data." );
+        }
+        catch ( FileNotFoundException fileNotFoundException )
+        {
+            string message = $"The file {token.Value} does not exist.";
+            Logger.Warn ( fileNotFoundException, message );
+            argumentResult.AddError ( $"{message} See log for detailed exception data." );
+        }
+        catch ( UnauthorizedAccessException unauthorizedAccessException )
+        {
+            string message = $"Unable to open file {token.Value} for writing. Access is denied.";
+            Logger.Warn ( unauthorizedAccessException, message );
+            argumentResult.AddError ( $"{message} See log for detailed exception data." );
+        }
+        catch ( IOException ioException )
+        {
+            string message = $"Unable to open file {token.Value} for writing. The result was {ioException.HResult}.";
+            Logger.Warn ( ioException, message );
+            argumentResult.AddError ( $"{message} See log for detailed exception data." );
+        }
+
+        return argumentResult;
+    }
+
+    private static ArgumentResult ValidateLegalFilePath( ArgumentResult argumentResult, Token token )
+    {
+        SearchValues<char> invalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars( ) );
+
+        int invalidCharacterIndex = token.Value.IndexOfAny ( invalidPathCharValues );
+
+        if ( invalidCharacterIndex >= 0 )
+        {
+            argumentResult.AddError ( new ( token.Value [ invalidCharacterIndex ], 1 ) );
+        }
+
+        return argumentResult;
     }
 }
