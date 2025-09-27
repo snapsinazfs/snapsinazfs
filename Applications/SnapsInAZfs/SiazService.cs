@@ -13,9 +13,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
-
 using PowerArgs;
-
 using SnapsInAZfs.Interop;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -138,7 +136,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
     /// <inheritdoc />
-    protected override async Task ExecuteAsync( CancellationToken stoppingToken )
+    protected override async Task ExecuteAsync ( CancellationToken stoppingToken )
     {
         State = ApplicationState.Idle;
         // As soon as the application has started, execute the main method
