@@ -10,9 +10,9 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
 namespace SnapsInAZfs;
+
+using Interop.Zfs.ZfsTypes;
 
 internal static class TypeExtensions
 {

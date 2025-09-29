@@ -23,17 +23,85 @@ using NLog.Extensions.Logging;
 
 public partial class SiazCommandLine
 {
+    internal const string RunCommandName                  = "run";
     private const  string ConfigCommandName               = "config";
     private const  string ConfigConsoleCommandName        = "console";
     private const  string ConfigGlobalCommandName         = "global";
     private const  string ConfigGlobalDryRunCommandName   = "dry-run";
-    internal const string RunCommandName                  = "run";
+    private const  string KestrelConfigurationSectionName = "Kestrel";
     private const  string ZfsCommandName                  = "zfs";
     private const  string ZfsSchemaCheckCommandName       = "check";
     private const  string ZfsSchemaCleanCommandName       = "clean";
     private const  string ZfsSchemaCommandName            = "schema";
     private const  string ZfsSchemaInitializeCommandName  = "initialize";
-    private const  string KestrelConfigurationSectionName = "Kestrel";
+
+    private bool LoadAdditionalConfigurationFiles( ParseResult parseResult, ConfigurationBuilder builder, out OptionResult? additionalConfigResult, [NotNullWhen ( true )] out string[]? additionalRequestedFiles )
+    {
+        Unsafe.SkipInit ( out additionalRequestedFiles );
+        bool success = true;
+
+        additionalConfigResult = parseResult.CommandResult.GetResult ( AdditionalConfigOption );
+        if ( additionalConfigResult is { Implicit: true } )
+        {
+            additionalRequestedFiles = [ ];
+
+            return true;
+        }
+
+        if ( additionalConfigResult is not { Implicit: false, Tokens.Count: > 0 } )
+        {
+            return false;
+        }
+
+        additionalRequestedFiles = additionalConfigResult.GetValueOrDefault<string[]>( );
+
+        if ( additionalRequestedFiles is not { Length: > 0 } )
+        {
+            return false;
+        }
+
+        foreach ( string filePath in additionalRequestedFiles )
+        {
+            FileInfo fileInfo = new ( filePath );
+            if ( !fileInfo.Exists )
+            {
+                Logger.Warn ( $"Configuration file not found at {filePath}." );
+                success = false;
+
+                continue;
+            }
+
+            Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
+            builder.AddJsonFile ( filePath, false, false );
+        }
+
+        return success;
+    }
+
+    private bool LoadBaseConfigurationFiles( ParseResult parseResult, ConfigurationBuilder configurationBuilder, out OptionResult configResult, out string[] strings )
+    {
+        bool success = true;
+        configResult = parseResult.CommandResult.GetResult ( ConfigOption ) ?? throw new CommandLineInvocationException ( "Could not determine the set of configuration files to load." );
+        strings      = configResult.GetValueOrDefault<string[]>( );
+
+        foreach ( string filePath in strings )
+        {
+            FileInfo fileInfo = new ( filePath );
+            if ( !fileInfo.Exists )
+            {
+                Logger.Warn ( $"Configuration file not found at {filePath}." );
+
+                success = false;
+
+                continue;
+            }
+
+            Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
+            configurationBuilder.AddJsonFile ( filePath, false, false );
+        }
+
+        return success;
+    }
 
     private bool LoadConfigurationFiles( [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings, [NotNullWhen ( true )] out IConfigurationRoot? rootConfiguration, in ParseResult cliParseResult )
     {
@@ -58,7 +126,7 @@ public partial class SiazCommandLine
         // 3. Environment variables
         // 4. Command-line options passed to the current invocation of SIAZ.
         Logger.Debug ( "Getting base configuration from files" );
-        ConfigurationBuilder configBuilder  = new ( );
+        ConfigurationBuilder configBuilder = new ( );
 
         if ( !LoadBaseConfigurationFiles ( cliParseResult, configBuilder, out OptionResult baseConfigOptionResult, out string[]? requestedFiles ) )
         {
@@ -118,74 +186,6 @@ public partial class SiazCommandLine
         }
 
         return true;
-    }
-
-    private bool LoadBaseConfigurationFiles ( ParseResult parseResult, ConfigurationBuilder configurationBuilder, out OptionResult configResult, out string[] strings )
-    {
-        bool success = true;
-        configResult = parseResult.CommandResult.GetResult ( ConfigOption ) ?? throw new CommandLineInvocationException ( "Could not determine the set of configuration files to load." );
-        strings      = configResult.GetValueOrDefault<string[]>( );
-
-        foreach ( string filePath in strings )
-        {
-            FileInfo fileInfo = new ( filePath );
-            if ( !fileInfo.Exists )
-            {
-                Logger.Warn ( $"Configuration file not found at {filePath}." );
-
-                success = false;
-
-                continue;
-            }
-
-            Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
-            configurationBuilder.AddJsonFile ( filePath, false, false );
-        }
-
-        return success;
-    }
-
-    private bool LoadAdditionalConfigurationFiles( ParseResult parseResult, ConfigurationBuilder builder, out OptionResult? additionalConfigResult, [NotNullWhen ( true )] out string[]? additionalRequestedFiles )
-    {
-        Unsafe.SkipInit ( out additionalRequestedFiles );
-        bool success = true;
-
-        additionalConfigResult = parseResult.CommandResult.GetResult ( AdditionalConfigOption );
-        if ( additionalConfigResult is { Implicit: true } )
-        {
-            additionalRequestedFiles = [ ];
-
-            return true;
-        }
-
-        if ( additionalConfigResult is not { Implicit: false, Tokens.Count: > 0 } )
-        {
-            return false;
-        }
-
-        additionalRequestedFiles = additionalConfigResult.GetValueOrDefault<string[]>( );
-
-        if ( additionalRequestedFiles is not { Length: > 0 } )
-        {
-            return false;
-        }
-
-        foreach ( string filePath in additionalRequestedFiles )
-        {
-            FileInfo fileInfo = new ( filePath );
-            if ( !fileInfo.Exists )
-            {
-                Logger.Warn ( $"Configuration file not found at {filePath}." );
-                success = false;
-
-                continue;
-            }
-
-            Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
-            builder.AddJsonFile ( filePath, false, false );
-        }
-
-        return success;
     }
 
     private Task<int> RunSiaz( ParseResult parseResult, CancellationToken cancellation )

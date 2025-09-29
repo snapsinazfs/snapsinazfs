@@ -34,8 +34,8 @@ using Interop;
 ///         references to common items (to avoid re-creating them, e.g., in validators) and to objects that may be configured in
 ///         multiple passes or that may be modified by or relevant to more than one delegate, especially for use in subsequent
 ///         execution.<br />
-///         CommandName examples are the <see cref="SnapsInAZfsSettings" /> and <see cref="IConfigurationRoot" /> instances which are built
-///         from a combination of command line input and other configuration sources.
+///         CommandName examples are the <see cref="SnapsInAZfsSettings" /> and <see cref="IConfigurationRoot" /> instances which are
+///         built from a combination of command line input and other configuration sources.
 ///     </para>
 ///     <para>
 ///         In order to avoid SCL essentially owning the whole program, this class is used to set up the CLI, use it for parsing and

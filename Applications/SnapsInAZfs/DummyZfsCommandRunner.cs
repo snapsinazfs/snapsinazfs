@@ -10,12 +10,12 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+namespace SnapsInAZfs;
+
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
-namespace SnapsInAZfs;
+using Interop.Zfs.ZfsCommandRunner;
+using Interop.Zfs.ZfsTypes;
 
 /// <summary>
 ///     Dummy command runner used for testing when running on windows or wherever zfs isn't installed.

@@ -10,15 +10,8 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace SnapsInAZfs.CommandLine;
 
-using System.Collections;
 using System.CommandLine;
 
 /// <summary>

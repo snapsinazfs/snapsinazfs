@@ -10,15 +10,15 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using System.Collections.Concurrent;
-using NStack;
-using Terminal.Gui;
-using Terminal.Gui.TextValidateProviders;
 using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.TemplateConfigurationListItem;
 
 namespace SnapsInAZfs.ConfigConsole;
 
+using System.Collections.Concurrent;
 using System.Globalization;
+using NStack;
+using Terminal.Gui;
+using Terminal.Gui.TextValidateProviders;
 
 public sealed partial class TemplateConfigurationWindow
 {
@@ -112,7 +112,7 @@ public sealed partial class TemplateConfigurationWindow
         }
 
         _templates [ newTemplateName! ] = SelectedTemplateItem.ViewSettings with { };
-        ConfigConsole.TemplateListItems.Add ( new TemplateConfigurationListItem ( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
+        ConfigConsole.TemplateListItems.Add ( new ( newTemplateName!, SelectedTemplateItem.ViewSettings with { }, SelectedTemplateItem.ViewSettings with { } ) );
         TemplatesAddedRemovedOrModified = true;
         UpdateTemplateListButtonStates( );
         UpdateTemplatePropertiesButtonStates( );
@@ -145,7 +145,7 @@ public sealed partial class TemplateConfigurationWindow
 
         if ( _modifiedProperties.Overlaps ( _namingProperties ) )
         {
-            SelectedTemplateItem.ViewSettings.Formatting = new FormattingSettings
+            SelectedTemplateItem.ViewSettings.Formatting = new ( )
                                                            {
                                                                ComponentSeparator    = componentSeparatorValidateField.Text.ToString( )!,
                                                                Prefix                = prefixTextValidateField.Text.ToString( )!,
@@ -161,7 +161,7 @@ public sealed partial class TemplateConfigurationWindow
 
         if ( _modifiedProperties.Overlaps ( _timingProperties ) )
         {
-            SelectedTemplateItem.ViewSettings.SnapshotTiming = new SnapshotTimingSettings
+            SelectedTemplateItem.ViewSettings.SnapshotTiming = new ( )
                                                                {
                                                                    FrequentPeriod = int.Parse ( frequentPeriodRadioGroup.GetSelectedLabelString( ), CultureInfo.InvariantCulture.NumberFormat ),
                                                                    HourlyMinute   = hourlyMinuteTextValidateField.Text.ToInt32( ),
@@ -540,7 +540,7 @@ public sealed partial class TemplateConfigurationWindow
         DisableEventHandlers( );
         templateListView.SetSource ( ConfigConsole.TemplateListItems );
         _templates.Clear( );
-        _templates = new ConcurrentDictionary<string, TemplateSettings> ( Program.Settings!.Templates );
+        _templates = new ( Program.Settings!.Templates );
         InitializeComboBoxes( );
         SetInitialButtonState( );
         InitializeTemplatePropertiesTextValidateFieldList( );
@@ -557,17 +557,17 @@ public sealed partial class TemplateConfigurationWindow
     private void InitializeTemplatePropertiesTextValidateFieldList ( )
     {
         _templateConfigurationTextValidateFieldList.Clear( );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( componentSeparatorValidateField, true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( prefixTextValidateField,         true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( frequentSuffixTextValidateField, true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( hourlySuffixTextValidateField,   true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( dailySuffixTextValidateField,    true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( weeklySuffixTextValidateField,   true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( monthlySuffixTextValidateField,  true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( yearlySuffixTextValidateField,   true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( hourlyMinuteTextValidateField,   true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( monthlyDayTextValidateField,     true ) );
-        _templateConfigurationTextValidateFieldList.Add ( new TextValidateFieldSettings ( yearlyDayTextValidateField,      true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( componentSeparatorValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( prefixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( frequentSuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( hourlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( dailySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( weeklySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( monthlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( yearlySuffixTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( hourlyMinuteTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( monthlyDayTextValidateField, true ) );
+        _templateConfigurationTextValidateFieldList.Add ( new ( yearlyDayTextValidateField, true ) );
     }
 
     private void MonthlyDayTextValidateFieldOnLeave( FocusEventArgs obj )
@@ -827,7 +827,7 @@ public sealed partial class TemplateConfigurationWindow
 
         string prefixString       = prefixTextValidateField.Text.ToString( )!;
         string componentSeparator = componentSeparatorValidateField.Text.ToString( )!;
-        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString ( timestampFormatString,CultureInfo.InvariantCulture.DateTimeFormat )}{componentSeparator}{periodString}";
+        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString ( timestampFormatString, CultureInfo.InvariantCulture.DateTimeFormat )}{componentSeparator}{periodString}";
     }
 
     /// <summary>

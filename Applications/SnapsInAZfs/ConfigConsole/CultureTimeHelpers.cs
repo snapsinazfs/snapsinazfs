@@ -10,11 +10,11 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+namespace SnapsInAZfs.ConfigConsole;
+
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using NStack;
-
-namespace SnapsInAZfs.ConfigConsole;
 
 /// <summary>
 ///     A static class with some helpers for dealing with dates and times in a culture-aware way.

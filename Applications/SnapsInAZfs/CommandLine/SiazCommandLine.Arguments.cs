@@ -62,5 +62,5 @@ public partial class SiazCommandLine
           };
 
     private const string ConfigStateArgumentName = "state";
-    private const string PoolsArgumentName = "pools";
+    private const string PoolsArgumentName       = "pools";
 }

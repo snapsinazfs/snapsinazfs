@@ -10,14 +10,14 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+namespace SnapsInAZfs.ConfigConsole;
+
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using SnapsInAZfs.ConfigConsole.TreeNodes;
-using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using Interop.Zfs.ZfsCommandRunner;
+using Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
-
-namespace SnapsInAZfs.ConfigConsole;
+using TreeNodes;
 
 internal static class ZfsTasks
 {

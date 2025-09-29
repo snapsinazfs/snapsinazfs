@@ -10,12 +10,12 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+namespace SnapsInAZfs.ConfigConsole.TreeNodes;
+
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
-
-namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 
 /// <summary>
 ///     Represents a node in the tree of datasets in <see cref="ZfsConfigurationWindow" />

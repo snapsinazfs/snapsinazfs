@@ -10,16 +10,16 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+namespace SnapsInAZfs;
+
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using System.Text.Json;
+using Interop;
+using Interop.Zfs.ZfsCommandRunner;
+using Interop.Zfs.ZfsTypes;
+using Monitoring;
 using PowerArgs;
-using SnapsInAZfs.Interop;
-using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-using SnapsInAZfs.Monitoring;
-
-namespace SnapsInAZfs;
 
 /// <summary>
 ///     The service class for running everything but the configuration console
@@ -96,7 +96,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         {
             if ( _state != value )
             {
-                ApplicationStateChanged?.Invoke ( this, new ApplicationStateChangedEventArgs ( _state, value ) );
+                ApplicationStateChanged?.Invoke ( this, new ( _state, value ) );
             }
 
             _state = value;
@@ -136,7 +136,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     public event EventHandler<SnapshotOperationEventArgs>? TakeSnapshotSucceeded;
 
     /// <inheritdoc />
-    protected override async Task ExecuteAsync ( CancellationToken stoppingToken )
+    protected override async Task ExecuteAsync( CancellationToken stoppingToken )
     {
         State = ApplicationState.Idle;
         // As soon as the application has started, execute the main method
@@ -186,7 +186,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                     Logger.Debug ( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
                 #endif
                     daemonRunTimer.Dispose( );
-                    daemonRunTimer = new PeriodicTimer ( _daemonTimerInterval );
+                    daemonRunTimer = new ( _daemonTimerInterval );
                     timerInterval  = _daemonTimerInterval;
                 }
 
@@ -205,12 +205,12 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                         daemonRunTimer.Dispose( );
                         try
                         {
-                            daemonRunTimer = new PeriodicTimer ( timerInterval );
+                            daemonRunTimer = new ( timerInterval );
                         }
                         catch ( ArgumentOutOfRangeException ex )
                         {
                             Logger.Error ( ex, "Invalid timer period ({0:G}). Initializing timer with default period", timerInterval );
-                            daemonRunTimer = new PeriodicTimer ( _daemonTimerInterval );
+                            daemonRunTimer = new ( _daemonTimerInterval );
                         }
                     }
 
@@ -330,11 +330,11 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                             Logger.Debug ( "Unable to remove snapshot {0} from {1} {2} object", snapshot.Name, ds.Kind, ds.Name );
                         }
 
-                        PruneSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( snapshot.Name, snapshot.Timestamp.Value ) );
+                        PruneSnapshotSucceeded?.Invoke ( this, new ( snapshot.Name, snapshot.Timestamp.Value ) );
 
                         continue;
                     default:
-                        PruneSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, snapshot.Timestamp.Value ) );
+                        PruneSnapshotFailed?.Invoke ( this, new ( ds.Name, snapshot.Timestamp.Value ) );
                         Logger.Error ( "Failed to destroy snapshot {0}", snapshot.Name );
 
                         continue;
@@ -642,7 +642,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             }
         }
 
-        return new CheckZfsPropertiesSchemaResult ( poolRootsWithPropertyValidities, missingPropertiesFound );
+        return new ( poolRootsWithPropertyValidities, missingPropertiesFound );
     }
 
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
@@ -915,7 +915,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 break;
             default:
             {
-                TakeSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, in timestamp ) );
+                TakeSnapshotFailed?.Invoke ( this, new ( ds.Name, in timestamp ) );
 
                 throw new ArgumentOutOfRangeException ( nameof (period), period, $"Unexpected value received for Period for dataset {ds.Name}. Snapshot not taken." );
             }
@@ -929,17 +929,17 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             case ZfsCommandRunnerOperationStatus.DryRun:
                 ds.AddSnapshot ( snapshot! );
                 Logger.Info ( "DRY RUN: Pretending snapshot {0} was successfully taken", snapshot!.Name );
-                TakeSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( snapshot.Name, in timestamp ) );
+                TakeSnapshotSucceeded?.Invoke ( this, new ( snapshot.Name, in timestamp ) );
 
                 return false;
             case ZfsCommandRunnerOperationStatus.Success:
                 ds.AddSnapshot ( snapshot! );
-                TakeSnapshotSucceeded?.Invoke ( this, new SnapshotOperationEventArgs ( snapshot!.Name, in timestamp ) );
+                TakeSnapshotSucceeded?.Invoke ( this, new ( snapshot!.Name, in timestamp ) );
                 Logger.Info ( "Snapshot {0} successfully taken", snapshot!.Name );
 
                 return true;
             default:
-                TakeSnapshotFailed?.Invoke ( this, new SnapshotOperationEventArgs ( ds.Name, in timestamp ) );
+                TakeSnapshotFailed?.Invoke ( this, new ( ds.Name, in timestamp ) );
                 Logger.Error ( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );
 
                 return false;
