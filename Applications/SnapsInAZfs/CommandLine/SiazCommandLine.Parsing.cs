@@ -18,7 +18,6 @@ using System.Runtime.CompilerServices;
 
 public partial class SiazCommandLine
 {
-    /// <inheritdoc />
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     public ParseResult Parse( IReadOnlyList<string> args, ParserConfiguration? configuration = null )
@@ -26,7 +25,6 @@ public partial class SiazCommandLine
         return ConfigureCommandLineTree( ).Parse ( args, configuration );
     }
 
-    /// <inheritdoc />
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     public ParseResult Parse( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
@@ -69,14 +67,5 @@ public partial class SiazCommandLine
                    : StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value )
                        ? TriStateOptionValue.True
                        : TriStateOptionValue.False;
-        //return  switch
-        //       {
-        //           "1"       => true,
-        //           "true"    => true,
-        //           "True"    => true,
-        //           "enable"  => true,
-        //           "enabled" => true,
-        //           _         => false
-        //       };
     }
 }

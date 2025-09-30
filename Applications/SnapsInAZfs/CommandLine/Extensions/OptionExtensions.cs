@@ -22,12 +22,18 @@ using System.CommandLine.Parsing;
 public static class OptionExtensions
 {
     /// <summary>
-    /// Adds the provided <paramref name="validator"/> delegate to the <see cref="Option.Validators"/> collection for the current <see cref="Option{T}"/>
+    ///     Adds the provided <paramref name="validator" /> delegate to the <see cref="Option.Validators" /> collection for the current
+    ///     <see cref="Option{T}" />
     /// </summary>
     /// <typeparam name="TOption">The type of the option.</typeparam>
-    /// <param name="option">The option to which <paramref name="validator"/> will be added.</param>
-    /// <param name="validator">An <see cref="Action{T}"/> accepting an <see cref="OptionResult"/> and returning nothing, which will be called on every value of <paramref name="option"/>.</param>
-    /// <returns>A reference to <paramref name="option"/>, after appending <paramref name="validator"/>.</returns>
+    /// <param name="option">The option to which <paramref name="validator" /> will be added.</param>
+    /// <param name="validator">
+    ///     An <see cref="Action{T}" /> accepting an <see cref="OptionResult" /> and returning nothing, which will be called on every
+    ///     value of <paramref name="option" />.
+    /// </param>
+    /// <returns>
+    ///     A reference to <paramref name="option" />, after appending <paramref name="validator" />.
+    /// </returns>
     public static Option<TOption> WithValidator<TOption>( this Option<TOption> option, Action<OptionResult> validator )
     {
         option.Validators.Add ( validator );

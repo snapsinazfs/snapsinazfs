@@ -75,6 +75,14 @@ public sealed partial class SiazCommandLine
 
     private SnapsInAZfsSettings? _settings;
 
+    private Command RunCommand { get; } = new (
+                                               RunCommandName,
+                                               """
+                                               Run SIAZ, optionally specifying override options.
+                                               Use this context when executing one-off operations or for custom service/script-based invocations.
+                                               """
+                                              );
+
     public RootCommand? RootCommand { get; private set; }
 
     [PublicAPI]
@@ -110,11 +118,14 @@ public sealed partial class SiazCommandLine
     private RootCommand ConfigureCommandLineTree ( )
     {
         return RootCommand = new RootCommand ( "SnapsInAZfs" )
-                            .WithOption ( TakeSnapshotsOption )
-                            .WithOption ( PruneSnapshotsOption )
-                            .WithOption ( ConfigOption.WithValidator ( ValidateFileExistsAndIsWriteable ) )
-                            .WithOption ( DebugOption )
+                            .WithOption ( AdditionalConfigOption )
+                            .WithOption ( ConfigOption )
                             .WithOption ( DaemonizeOption )
+                            .WithOption ( DaemonTimerIntervalOption )
+                            .WithOption ( DebugOption )
+                            .WithOption ( MonitorOption )
+                            .WithOption ( PruneSnapshotsOption )
+                            .WithOption ( TakeSnapshotsOption )
                             .WithCommand
                                  (
                                   new Command (
@@ -144,7 +155,7 @@ public sealed partial class SiazCommandLine
                                                        .WithAction ( SetGlobalOption )
                                                    )
                                           )
-                                     .With
+                                     .WithCommand
                                           (
                                            new Command (
                                                         ConfigConsoleCommandName,
@@ -153,17 +164,14 @@ public sealed partial class SiazCommandLine
                                               .WithAction ( StartConfigConsole )
                                           )
                                  )
-                            .With
+                            .WithCommand
                                  (
-                                  new Command (
-                                               RunCommandName,
-                                               $"Run SIAZ, optionally specifying override options.{Environment.NewLine}Use this context when executing one-off operations or for custom service/script-based invocations."
-                                              )
+                                  RunCommand
                                       // The --cron alias is for backward compatibility with the sanoid-compatible CLI only.
                                      .WithAlias ( "--cron" )
                                      .WithAction ( RunSiaz )
                                  )
-                            .With
+                            .WithCommand
                                  (
                                   new Command (
                                                ZfsCommandName,

@@ -25,8 +25,9 @@ public partial class SiazCommandLine
                              These files are processed in the order they are specified, AFTER all base configuration files or files provided to the {ConfigOptionName} option are processed.
                              See SnapsInAZfs.json(5) for details about using the {ConfigOptionName} and {AdditionalConfigOptionName} options together.
                              """,
-              Recursive = true,
-              Required  = false
+              Recursive           = true,
+              Required            = false,
+              DefaultValueFactory = static _ => EnvironmentOrDefaultAdditionalConfigurationFiles
           };
 
     private Option<string> ConfigGlobalCommandOutputFileOption { get; }
@@ -47,14 +48,14 @@ public partial class SiazCommandLine
           {
               Arity = ArgumentArity.OneOrMore,
               Description = $"""
-                             One or more configuration files to REPLACE the default configuration files, for this invocation.
+                             One or more configuration files to REPLACE the default base configuration files, for this invocation.
                              Configuration files at the standard paths will be ignored unless included in your list.
                              To add additional layers of configuration files on top of the default configuration files, see the {AdditionalConfigOptionName} option.
                              See SnapsInAZfs.json(5) for details about using the {ConfigOptionName} and {AdditionalConfigOptionName} options together.
                              """,
               Recursive           = true,
               Required            = false,
-              DefaultValueFactory = static _ => [ "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json", "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" ]
+              DefaultValueFactory = static _ => EnvironmentOrDefaultBaseConfigurationFiles
           };
 
     private Option<bool> DaemonizeOption { get; }
@@ -65,15 +66,41 @@ public partial class SiazCommandLine
               Required    = false
           };
 
+    private Option<int> DaemonTimerIntervalOption { get; }
+        = new ( DaemonTimerIntervalOptionName )
+          {
+              Arity       = ArgumentArity.ZeroOrOne,
+              Description = "Override the configured daemon event processing timer. Specified as a whole number of seconds.",
+              Required    = false
+          };
+
     private Option<bool> DebugOption { get; }
         = new ( DebugOptionName )
           {
               Arity = ArgumentArity.ZeroOrOne,
               Description = """
-                            Debug level output logging.
+                            (DEPRECATED) Debug level output logging.
                             Change log level in SnapsInAZfs.nlog.json for normal usage.
                             """,
               Recursive = true
+          };
+
+    private static string[] EnvironmentOrDefaultAdditionalConfigurationFiles { get; }
+        = Environment.GetEnvironmentVariable ( AdditionalConfigFilesEnvVarName )
+                    ?.Split ( ':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries )
+       ?? [ "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json", "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json" ];
+
+    private static string[] EnvironmentOrDefaultBaseConfigurationFiles { get; }
+        = Environment.GetEnvironmentVariable ( BaseConfigFilesEnvVarName )
+                    ?.Split ( ':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries )
+       ?? [ "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json" ];
+
+    private Option<bool> MonitorOption { get; }
+        = new ( MonitorOptionName )
+          {
+              Arity       = ArgumentArity.ZeroOrOne,
+              Description = "Enable the monitoring endpoints.",
+              Recursive   = true
           };
 
     private Option<bool> PruneSnapshotsOption { get; }
@@ -92,11 +119,15 @@ public partial class SiazCommandLine
               Required    = false
           };
 
-    private const string AdditionalConfigOptionName = "--additional-config";
-    private const string ConfigOptionName           = "--config";
-    private const string DaemonizeOptionName        = "--daemonize";
-    private const string DebugOptionName            = "--debug";
-    private const string OutputFileOptionName       = "--output-file";
-    private const string PruneSnapshotsOptionName   = "--prune-snapshots";
-    private const string TakeSnapshotsOptionName    = "--take-snapshots";
+    private const string AdditionalConfigFilesEnvVarName = "SnapsInAZfs_AdditionalConfigFiles";
+    private const string AdditionalConfigOptionName    = "--additional-config";
+    private const string BaseConfigFilesEnvVarName     = "SnapsInAZfs_BaseConfigFiles";
+    private const string ConfigOptionName              = "--config";
+    private const string DaemonizeOptionName           = "--daemonize";
+    private const string DaemonTimerIntervalOptionName = "--daemon-timer-interval";
+    private const string DebugOptionName               = "--debug";
+    private const string MonitorOptionName             = "--monitor";
+    private const string OutputFileOptionName          = "--output-file";
+    private const string PruneSnapshotsOptionName      = "--prune-snapshots";
+    private const string TakeSnapshotsOptionName       = "--take-snapshots";
 }
