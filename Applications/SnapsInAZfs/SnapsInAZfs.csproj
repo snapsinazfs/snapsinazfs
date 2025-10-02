@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
+<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
   </ItemGroup>
 
   <PropertyGroup>
     <AssemblyTitle>SnapsInAZfs - Snapshot manager for ZFS on Linux</AssemblyTitle>
-    <TargetFrameworks>net9.0</TargetFrameworks>
+    <TargetFrameworks>net10.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <LangVersion>preview</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -13,13 +13,12 @@
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
     <DefineConstants>$(DefineConstants)</DefineConstants>
     <DefineTrace>True</DefineTrace>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
-    <GenerateDocumentationFile>False</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <EnableDefaultContentItems>False</EnableDefaultContentItems>
     <EnableDefaultNoneItems>False</EnableDefaultNoneItems>
@@ -85,15 +84,16 @@
   </Choose>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.9" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0-rc.1.25451.107" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0-rc.1.25451.107" />
     <PackageReference Include="NLog" Version="6.0.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.0.4" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
@@ -172,8 +172,5 @@
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2025.2.0" />
   </ItemGroup>
 </Project>
