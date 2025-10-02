@@ -18,9 +18,11 @@ using System.Globalization;
 
 public partial class SiazCommandLine
 {
-    protected SearchValues<char> InvalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars( ) );
+    // ReSharper disable once MemberCanBePrivate.Global
+    internal SearchValues<char> InvalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars( ) );
 
-    protected static readonly string[] StandardBooleanFalseStrings =
+    // ReSharper disable once MemberCanBePrivate.Global
+    internal static readonly string[] StandardBooleanFalseStrings =
     [
         "0",
         bool.FalseString,
@@ -31,7 +33,8 @@ public partial class SiazCommandLine
         "off"
     ];
 
-    protected static readonly string[] StandardBooleanTrueStrings =
+    // ReSharper disable once MemberCanBePrivate.Global
+    internal static readonly string[] StandardBooleanTrueStrings =
     [
         "1",
         bool.TrueString,
@@ -42,13 +45,15 @@ public partial class SiazCommandLine
         "on"
     ];
 
-    protected static readonly string[] StandardBooleanFormsSet =
+    // ReSharper disable once MemberCanBePrivate.Global
+    internal static readonly string[] StandardBooleanFormsSet =
     [
         ..StandardBooleanTrueStrings,
         ..StandardBooleanFalseStrings
     ];
 
-    protected static readonly SearchValues<string> StandardBooleanTrueValuesSearch = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan( ), StringComparison.OrdinalIgnoreCase );
+    // ReSharper disable once MemberCanBePrivate.Global
+    internal static readonly SearchValues<string> StandardBooleanTrueValuesSearch = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan( ), StringComparison.OrdinalIgnoreCase );
 
     private OptionResult ValidateCanWriteToPath( OptionResult optionResult, Token token )
     {
