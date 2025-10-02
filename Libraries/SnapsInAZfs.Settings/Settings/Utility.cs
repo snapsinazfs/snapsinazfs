@@ -10,6 +10,8 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+using System.Diagnostics.Contracts;
+
 namespace SnapsInAZfs.Settings;
 
 using System.Net.NetworkInformation;
