@@ -202,7 +202,7 @@ public partial class SiazCommandLine
 
     private static int SetGlobalOption( ParseResult parseResult )
     {
-        Console.WriteLine ( "Requested to set global option." );
+        Console.WriteLine ( $"Requested to set global option." );
         Console.WriteLine ( parseResult.CommandResult.ToString( ) );
         Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
 

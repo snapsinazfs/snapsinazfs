@@ -84,11 +84,21 @@ public static class ArgumentExtensions
         return argument;
     }
 
-    public static Argument<TArgument> WithValidator<TArgument>( this Argument<TArgument> argument, Action<ArgumentResult> validator )
+    /// <typeparam name="TArgument">The type of the argument value.</typeparam>
+    /// <param name="argument">An <see cref="Argument{T}"/> instance.</param>
+    extension<TArgument> ( Argument<TArgument> argument )
     {
-        argument.Validators.Add ( validator );
+        /// <summary>
+        /// Adds a validator to the current <see cref="Argument{T}"/> instance.
+        /// </summary>
+        /// <param name="validator">An <see cref="Action{T}"/> delegate that validates the argument value.</param>
+        /// <remarks>This is a simple proxy for the <see cref="Argument.Validators"/>.<see cref="List{T}.Add(T)">Add</see> method.</remarks>
+        public Argument<TArgument> WithValidator ( Action<ArgumentResult> validator )
+        {
+            argument.Validators.Add ( validator );
 
-        return argument;
+            return argument;
+        }
     }
 
     private static ArgumentResult ValidateCanWriteToPath( ArgumentResult argumentResult, Token token )
