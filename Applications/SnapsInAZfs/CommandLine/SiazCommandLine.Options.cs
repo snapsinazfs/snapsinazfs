@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
+using LogLevel = NLog.LogLevel;
 
 public partial class SiazCommandLine
 {
@@ -39,6 +40,17 @@ public partial class SiazCommandLine
                             The JSON node at the path corresponding to the modified setting will be REPLACED by this operation.
                             If the file does not exist, a new JSON file will be created containing only the modified setting.
                             """,
+              Recursive = true,
+              Arity     = ArgumentArity.ZeroOrOne
+          };
+
+    private Option<LogLevel> LogLevelOption { get; }
+        = new ( LogLevelOptionName )
+          {
+              Description = $"""
+                             Override global logging level.
+                             Possible values: {string.Join ( ',', LogLevel.AllLevels )}
+                             """,
               Recursive = true,
               Arity     = ArgumentArity.ZeroOrOne
           };
@@ -120,14 +132,15 @@ public partial class SiazCommandLine
           };
 
     private const string AdditionalConfigFilesEnvVarName = "SnapsInAZfs_AdditionalConfigFiles";
-    private const string AdditionalConfigOptionName    = "--additional-config";
-    private const string BaseConfigFilesEnvVarName     = "SnapsInAZfs_BaseConfigFiles";
-    private const string ConfigOptionName              = "--config";
-    private const string DaemonizeOptionName           = "--daemonize";
-    private const string DaemonTimerIntervalOptionName = "--daemon-timer-interval";
-    private const string DebugOptionName               = "--debug";
-    private const string MonitorOptionName             = "--monitor";
-    private const string OutputFileOptionName          = "--output-file";
-    private const string PruneSnapshotsOptionName      = "--prune-snapshots";
-    private const string TakeSnapshotsOptionName       = "--take-snapshots";
+    private const string AdditionalConfigOptionName      = "--additional-config";
+    private const string BaseConfigFilesEnvVarName       = "SnapsInAZfs_BaseConfigFiles";
+    private const string ConfigOptionName                = "--config";
+    private const string DaemonizeOptionName             = "--daemonize";
+    private const string DaemonTimerIntervalOptionName   = "--daemon-timer-interval";
+    private const string DebugOptionName                 = "--debug";
+    private const string MonitorOptionName               = "--monitor";
+    private const string LogLevelOptionName              = "--log-level";
+    private const string OutputFileOptionName            = "--output-file";
+    private const string PruneSnapshotsOptionName        = "--prune-snapshots";
+    private const string TakeSnapshotsOptionName         = "--take-snapshots";
 }

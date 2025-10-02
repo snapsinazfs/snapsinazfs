@@ -122,7 +122,7 @@ public sealed partial class SiazCommandLine
                             .WithOption ( ConfigOption )
                             .WithOption ( DaemonizeOption )
                             .WithOption ( DaemonTimerIntervalOption )
-                            .WithOption ( DebugOption )
+                            .WithOption ( LogLevelOption )
                             .WithOption ( MonitorOption )
                             .WithOption ( PruneSnapshotsOption )
                             .WithOption ( TakeSnapshotsOption )
