@@ -15,6 +15,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F0DF7CB3-8AC3-420F-939C-D9E9D4ED4DC2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{BF90F296-1208-445D-A45D-E11D7F00EB95}"
+	ProjectSection(SolutionItems) = preProject
+		Libraries\Directory.Build.props = Libraries\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Applications", "Applications", "{4D503858-739F-4BCE-92DA-10163F9EFA39}"
 EndProject
