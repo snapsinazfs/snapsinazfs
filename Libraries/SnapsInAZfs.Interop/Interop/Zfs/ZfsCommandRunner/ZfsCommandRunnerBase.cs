@@ -18,7 +18,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 {
-    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
     public abstract ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot );
@@ -95,15 +95,15 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
     }
 
     /// <summary>
-    ///     Performs basic parse and range checks on properties that are required to be defined on pool roots
+    ///     Performs some basic parse and range checks on properties that are required to be defined on pool roots.
     /// </summary>
     /// <param name="name">The name of the property</param>
     /// <param name="value">The raw string value of the property</param>
     /// <param name="source">The source string of the property</param>
     /// <returns>
-    ///     A boolean value indicating if the property passed basic parse and range checks, and was defined as local or inherited
+    ///     A boolean value indicating if the property passed basic parse and range checks, and was defined as local or inherited.
     /// </returns>
-    /// <exception cref="ArgumentOutOfRangeException">If the provided property name is not one of the expected values</exception>
+    /// <exception cref="ArgumentOutOfRangeException">If the provided property name is not one of the expected values.</exception>
     protected static bool CheckIfPropertyIsValid( string name, string value, string source )
     {
         if ( source == "-" )

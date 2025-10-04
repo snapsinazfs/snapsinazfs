@@ -26,15 +26,15 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 public interface IZfsCommandRunner
 {
     /// <summary>
-    ///     Destroys a zfs snapshot
+    ///     Destroys a zfs snapshot.
     /// </summary>
     /// <returns>
-    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
+    ///     A boolean value indicating whether the operation succeeded (i.e., no exceptions were thrown).
     /// </returns>
-    public Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings );
+    Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync ( Snapshot snapshot, SnapsInAZfsSettings settings );
 
     /// <summary>
-    ///     Gets everything SnapsInAZfs cares about from ZFS
+    ///     Gets everything SnapsInAZfs cares about from ZFS.
     /// </summary>
     /// <param name="settings"></param>
     /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
@@ -106,7 +106,7 @@ public interface IZfsCommandRunner
     ///     Creates a zfs snapshot
     /// </summary>
     /// <returns>
-    ///     A boolean value indicating whether the operation succeeded (ie no exceptions were thrown).
+    ///     A boolean value indicating whether the operation succeeded (i.e., no exceptions were thrown).
     /// </returns>
     public ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot );
 

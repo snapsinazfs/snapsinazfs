@@ -22,7 +22,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 /// </summary>
 public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 {
-    private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
 
     /// <summary>
     ///     Creates a new instance of the standard <see cref="ZfsCommandRunner" /> class, which uses calls zfs at the path
