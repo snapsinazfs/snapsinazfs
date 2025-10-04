@@ -10,20 +10,25 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.ConfigConsole;
-
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using Interop.Zfs.ZfsCommandRunner;
-using Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.ConfigConsole.TreeNodes;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
-using TreeNodes;
+
+namespace SnapsInAZfs.ConfigConsole;
 
 internal static class ZfsTasks
 {
-    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
 
-    public static async Task<ZfsCommandRunnerOperationStatus> InheritPropertiesForDatasetAsync( bool dryRun, string zfsPath, List<IZfsProperty> inheritedProperties, IZfsCommandRunner commandRunner )
+    public static async Task<ZfsCommandRunnerOperationStatus> InheritPropertiesForDatasetAsync (
+        bool               dryRun,
+        string             zfsPath,
+        List<IZfsProperty> inheritedProperties,
+        IZfsCommandRunner  commandRunner
+    )
     {
         int        successfulOperations = 0;
         List<Task> zfsInheritTasks      = [ ];
@@ -33,32 +38,57 @@ internal static class ZfsTasks
                                  commandRunner.InheritZfsPropertyAsync ( dryRun, zfsPath, property ).ContinueWith ( async inheritTask =>
                                                                                                                     {
                                                                                                                     #if DEBUG
-                                                                                                                        Logger.Trace ( "ZFS inherit operation continuation received" );
+                                                                                                                        Logger.Trace (
+                                                                                                                                      "ZFS inherit operation continuation received"
+                                                                                                                                     );
                                                                                                                     #endif
-                                                                                                                        ZfsCommandRunnerOperationStatus inheritResult = await inheritTask.ConfigureAwait ( false );
+                                                                                                                        ZfsCommandRunnerOperationStatus
+                                                                                                                            inheritResult
+                                                                                                                                = await inheritTask
+                                                                                                                                     .ConfigureAwait ( false );
                                                                                                                         switch ( inheritResult )
                                                                                                                         {
-                                                                                                                            case ZfsCommandRunnerOperationStatus.Success:
-                                                                                                                                Logger.Trace ( "ZFS inherit operation succeeded" );
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .Success:
+                                                                                                                                Logger.Trace (
+                                                                                                                                              "ZFS inherit operation succeeded"
+                                                                                                                                             );
 
                                                                                                                                 goto Increment;
-                                                                                                                            case ZfsCommandRunnerOperationStatus.DryRun:
-                                                                                                                                Logger.Trace ( "DRY RUN: Pretenting ZFS inherit operation succeeded" );
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .DryRun:
+                                                                                                                                Logger.Trace (
+                                                                                                                                              "DRY RUN: Pretenting ZFS inherit operation succeeded"
+                                                                                                                                             );
                                                                                                                             Increment:
-                                                                                                                                Interlocked.Increment ( ref successfulOperations );
+                                                                                                                                Interlocked.Increment (
+                                                                                                                                                       ref
+                                                                                                                                                       successfulOperations
+                                                                                                                                                      );
 
                                                                                                                                 break;
-                                                                                                                            case ZfsCommandRunnerOperationStatus.NameValidationFailed:
-                                                                                                                            case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
-                                                                                                                            case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
-                                                                                                                            case ZfsCommandRunnerOperationStatus.Failure:
-                                                                                                                                Logger.Trace ( "Failure result received from ZFS inherit operation" );
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .NameValidationFailed:
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .ZeroLengthRequest:
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .OneOrMoreOperationsFailed:
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .Failure:
+                                                                                                                                Logger.Trace (
+                                                                                                                                              "Failure result received from ZFS inherit operation"
+                                                                                                                                             );
                                                                                                                                 goto default;
-                                                                                                                            case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
-                                                                                                                                Logger.Trace ( "ZfsProcessFailure result received from ZFS inherit operation" );
+                                                                                                                            case ZfsCommandRunnerOperationStatus
+                                                                                                                               .ZfsProcessFailure:
+                                                                                                                                Logger.Trace (
+                                                                                                                                              "ZfsProcessFailure result received from ZFS inherit operation"
+                                                                                                                                             );
                                                                                                                                 goto default;
                                                                                                                             default:
-                                                                                                                                Logger.Error ( "Error inheriting property" );
+                                                                                                                                Logger.Error (
+                                                                                                                                              "Error inheriting property"
+                                                                                                                                             );
 
                                                                                                                                 break;
                                                                                                                         }
@@ -87,23 +117,35 @@ internal static class ZfsTasks
         return ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed;
     }
 
-    public static Task<ZfsCommandRunnerOperationStatus> SetPropertiesForDatasetAsync( bool dryRun, string zfsPath, List<IZfsProperty> modifiedProperties, IZfsCommandRunner commandRunner )
+    public static Task<ZfsCommandRunnerOperationStatus> SetPropertiesForDatasetAsync (
+        bool               dryRun,
+        string             zfsPath,
+        List<IZfsProperty> modifiedProperties,
+        IZfsCommandRunner  commandRunner
+    )
     {
         return commandRunner.SetZfsPropertiesAsync ( dryRun, zfsPath, modifiedProperties );
     }
 
-    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> baseDatasets, ConcurrentDictionary<string, ZfsRecord> treeDatasets, ConcurrentDictionary<string, Snapshot> baseSnapshots, IZfsCommandRunner commandRunner )
+    internal static async Task<List<ITreeNode>> GetFullZfsConfigurationTreeAsync (
+        SnapsInAZfsSettings                     settings,
+        ConcurrentDictionary<string, ZfsRecord> baseDatasets,
+        ConcurrentDictionary<string, ZfsRecord> treeDatasets,
+        ConcurrentDictionary<string, Snapshot>  baseSnapshots,
+        IZfsCommandRunner                       commandRunner
+    )
     {
         Logger.Debug ( "Getting zfs objects for tree view" );
         try
         {
             List<ITreeNode> treeRootNodes = [ ];
             await commandRunner.GetDatasetsAndSnapshotsFromZfsAsync ( settings, baseDatasets, baseSnapshots ).ConfigureAwait ( true );
-            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots = baseDatasets.Where ( static kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary( );
+            ImmutableSortedDictionary<string, ZfsRecord> sortedSetOfPoolRoots
+                = baseDatasets.Where ( static kvp => kvp.Value.IsPoolRoot ).ToImmutableSortedDictionary ( );
 
             foreach ( ( string dsName, ZfsRecord baseDataset ) in sortedSetOfPoolRoots )
             {
-                ZfsObjectConfigurationTreeNode rootNode = new ( dsName, baseDataset, baseDataset.DeepCopyClone( ) );
+                ZfsObjectConfigurationTreeNode rootNode = new ( dsName, baseDataset, baseDataset.DeepCopyClone ( ) );
                 treeRootNodes.Add ( rootNode );
                 treeDatasets [ dsName ] = rootNode.TreeDataset;
             }

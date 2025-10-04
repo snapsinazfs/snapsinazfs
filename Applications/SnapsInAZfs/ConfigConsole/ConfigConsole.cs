@@ -10,18 +10,17 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+using System.Collections.Concurrent;
+using NLog.Config;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+using Terminal.Gui;
 using LogLevel = NLog.LogLevel;
 using TemplateConfigurationListItem = SnapsInAZfs.ConfigConsole.TreeNodes.TemplateConfigurationListItem;
 
 #pragma warning disable CA2000
 
 namespace SnapsInAZfs.ConfigConsole;
-
-using System.Collections.Concurrent;
-using Interop.Zfs.ZfsCommandRunner;
-using Interop.Zfs.ZfsTypes;
-using NLog.Config;
-using Terminal.Gui;
 
 internal static class ConfigConsole
 {
@@ -30,7 +29,9 @@ internal static class ConfigConsole
     internal static         ConcurrentDictionary<string, Snapshot> Snapshots     { get; } = [ ];
 
     // ReSharper disable HeapView.ObjectAllocation
-    internal static List<TemplateConfigurationListItem> TemplateListItems { get; } = Program.Settings?.Templates.Select ( static kvp => new TemplateConfigurationListItem ( kvp.Key, kvp.Value with { }, kvp.Value with { } ) ).ToList( ) ?? [ ];
+    internal static List<TemplateConfigurationListItem> TemplateListItems { get; }
+        = Program.Settings?.Templates.Select ( static kvp => new TemplateConfigurationListItem ( kvp.Key, kvp.Value with { }, kvp.Value with { } ) )
+                 .ToList ( ) ?? [ ];
 
     // ReSharper restore HeapView.ObjectAllocation
     internal const           string                                  ConfigConsoleNamespace = "SnapsInAZfs.ConfigConsole";
@@ -42,7 +43,7 @@ internal static class ConfigConsole
     ///     Resumes console logging after shutting down the TUI.
     /// </summary>
     /// <param name="commandRunner">An <see cref="IZfsCommandRunner" /> to use when performing ZFS operations</param>
-    public static void RunConsoleInterface( IZfsCommandRunner commandRunner )
+    public static void RunConsoleInterface ( IZfsCommandRunner commandRunner )
     {
         Logger.Info ( "Config Console requested. \"Console\" logging rule will be suspended until exit" );
 
@@ -53,22 +54,22 @@ internal static class ConfigConsole
 
         if ( consoleRule != null )
         {
-            minConsoleLogLevel = consoleRule.Levels.Min( );
+            minConsoleLogLevel = consoleRule.Levels.Min ( );
             consoleRule.DisableLoggingForLevels ( LogLevel.Trace, LogLevel.Off );
-            LogManager.ReconfigExistingLoggers( );
+            LogManager.ReconfigExistingLoggers ( );
         }
 
         CommandRunner = commandRunner;
 
-        Application.Init( );
+        Application.Init ( );
         Application.Run<SnapsInAZfsConfigConsole> ( ErrorHandler );
-        Application.Shutdown( );
+        Application.Shutdown ( );
 
         if ( consoleRule != null )
         {
             Logger.Info ( "Setting \"Console\" logging rule to {0}", minConsoleLogLevel ?? LogLevel.Info );
             consoleRule.EnableLoggingForLevels ( minConsoleLogLevel                     ?? LogLevel.Info, LogLevel.Fatal );
-            LogManager.ReconfigExistingLoggers( );
+            LogManager.ReconfigExistingLoggers ( );
         }
 
         Logger.Info ( "Exited Config Console" );
@@ -85,7 +86,7 @@ internal static class ConfigConsole
     ///     A <see langword="bool" /> indicating whether <see cref="Exception" /> <paramref name="ex" /> should be
     ///     swallowed (<see langword="true" />) or re-thrown (<see langword="false" />)
     /// </returns>
-    private static bool ErrorHandler( Exception ex )
+    private static bool ErrorHandler ( Exception ex )
     {
         Logger.Error ( ex, "Unhandled exception encountered in configuration console. Please report this" );
 

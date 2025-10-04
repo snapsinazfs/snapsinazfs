@@ -21,21 +21,21 @@ public sealed partial class GlobalConfigurationWindow
         // ReSharper disable once HeapView.ObjectAllocation.Possible
         // ReSharper disable once HeapView.DelegateAllocation
         Initialized += GlobalConfigurationWindowOnInitialized;
-        InitializeComponent( );
-        EnableEventHandlers( );
+        InitializeComponent ( );
+        EnableEventHandlers ( );
     }
 
     private bool _eventsEnabled;
 
     internal bool IsConfigurationChanged =>
-        ValidateGlobalConfigValues( )
-     && ( Program.Settings!.DryRun               != dryRunRadioGroup.GetSelectedBooleanFromLabel( )
-       || Program.Settings.TakeSnapshots         != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
-       || Program.Settings.PruneSnapshots        != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel( )
-       || Program.Settings.Monitoring.EnableHttp != httpMonitoringRadioGroup.GetSelectedBooleanFromLabel( )
-       || Program.Settings.LocalSystemName       != localSystemNameTextBox.Text.ToString( )!
-       || Program.Settings.ZfsPath               != pathToZfsTextField.Text.ToString( )!
-       || Program.Settings.ZpoolPath             != pathToZpoolTextField.Text.ToString( )! );
+        ValidateGlobalConfigValues ( )
+     && ( Program.Settings!.DryRun               != dryRunRadioGroup.GetSelectedBooleanFromLabel ( )
+       || Program.Settings.TakeSnapshots         != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
+       || Program.Settings.PruneSnapshots        != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
+       || Program.Settings.Monitoring.EnableHttp != httpMonitoringRadioGroup.GetSelectedBooleanFromLabel ( )
+       || Program.Settings.LocalSystemName       != localSystemNameTextBox.Text.ToString ( )!
+       || Program.Settings.ZfsPath               != pathToZfsTextField.Text.ToString ( )!
+       || Program.Settings.ZpoolPath             != pathToZpoolTextField.Text.ToString ( )! );
 
     internal bool ValidateGlobalConfigValues ( )
     {
@@ -45,7 +45,7 @@ public sealed partial class GlobalConfigurationWindow
         }
 
         return Environment.OSVersion.Platform != PlatformID.Unix
-            || ( File.Exists ( pathToZfsTextField.Text.ToString( ) ) && File.Exists ( pathToZpoolTextField.Text.ToString( ) ) );
+            || ( File.Exists ( pathToZfsTextField.Text.ToString ( ) ) && File.Exists ( pathToZpoolTextField.Text.ToString ( ) ) );
     }
 
     private void DisableEventHandlers ( )
@@ -72,21 +72,21 @@ public sealed partial class GlobalConfigurationWindow
         _eventsEnabled                  =  true;
     }
 
-    private void GlobalConfigurationWindowOnInitialized( object? sender, EventArgs e )
+    private void GlobalConfigurationWindowOnInitialized ( object? sender, EventArgs e )
     {
         SetFieldsFromSettingsObject ( false );
     }
 
     private void ResetButtonOnClicked ( )
     {
-        SetFieldsFromSettingsObject( );
+        SetFieldsFromSettingsObject ( );
     }
 
-    private void SetFieldsFromSettingsObject( bool manageEventHandlers = true )
+    private void SetFieldsFromSettingsObject ( bool manageEventHandlers = true )
     {
         if ( manageEventHandlers )
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
         }
 
         Logger.Debug ( "Setting global configuration fields to values in Settings" );
@@ -103,7 +103,7 @@ public sealed partial class GlobalConfigurationWindow
 
         if ( manageEventHandlers )
         {
-            EnableEventHandlers( );
+            EnableEventHandlers ( );
         }
     }
 }

@@ -22,7 +22,7 @@ public sealed class TemplateRemovalException : ApplicationException
     ///     <paramref name="errorMessage" />
     /// </summary>
     /// <param name="errorMessage">An error message for display to the user</param>
-    public TemplateRemovalException( string errorMessage ) : base ( errorMessage )
+    public TemplateRemovalException ( string errorMessage ) : base ( errorMessage )
     {
     }
 }

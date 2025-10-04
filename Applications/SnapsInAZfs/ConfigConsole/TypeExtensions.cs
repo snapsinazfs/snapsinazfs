@@ -10,14 +10,14 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.ConfigConsole;
-
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text.Json.Nodes;
 using NStack;
 using Terminal.Gui;
+
+namespace SnapsInAZfs.ConfigConsole;
 
 /// <summary>
 ///     Extension methods
@@ -36,7 +36,7 @@ public static class TypeExtensions
     /// <remarks>
     ///     If the given path does not contain '/','@',or '#', the original string reference will be returned.
     /// </remarks>
-    public static string GetLastPathElement( this string path )
+    public static string GetLastPathElement ( this string path )
     {
         int startIndex = 1 + path.LastIndexOfAny ( [ '/', '@', '#' ] );
 
@@ -62,8 +62,12 @@ public static class TypeExtensions
     ///     <see langword="string" /> arrays
     /// </exception>
     [Pure]
-    [SuppressMessage ( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The only other exceptions that can be thrown here are for setters that we do not use" )]
-    public static List<string> GetLongAndAbbreviatedDayNames( this DateTimeFormatInfo value )
+    [SuppressMessage (
+                         "ReSharper",
+                         "ExceptionNotDocumentedOptional",
+                         Justification = "The only other exceptions that can be thrown here are for setters that we do not use"
+                     )]
+    public static List<string> GetLongAndAbbreviatedDayNames ( this DateTimeFormatInfo value )
     {
         ArgumentNullException.ThrowIfNull ( value );
 
@@ -101,8 +105,12 @@ public static class TypeExtensions
     ///     <see langword="string" /> arrays
     /// </exception>
     [Pure]
-    [SuppressMessage ( "ReSharper", "ExceptionNotDocumentedOptional", Justification = "The only other exceptions that can be thrown here are for setters that we do not use" )]
-    public static List<string> GetMonthNames( this DateTimeFormatInfo value )
+    [SuppressMessage (
+                         "ReSharper",
+                         "ExceptionNotDocumentedOptional",
+                         Justification = "The only other exceptions that can be thrown here are for setters that we do not use"
+                     )]
+    public static List<string> GetMonthNames ( this DateTimeFormatInfo value )
     {
         ArgumentNullException.ThrowIfNull ( value );
 
@@ -121,13 +129,15 @@ public static class TypeExtensions
     ///     The <see cref="RadioGroup" /> for which the selected item's label will be parsed as a boolean value.
     /// </param>
     /// <returns>The parsed boolean value of the selected item of <paramref name="group" />.</returns>
-    public static bool GetSelectedBooleanFromLabel( this RadioGroup group )
+    public static bool GetSelectedBooleanFromLabel ( this RadioGroup group )
     {
         ArgumentNullException.ThrowIfNull ( group );
 
         if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
         {
-            return bool.Parse ( labels [ group.SelectedItem ]?.ToString( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" ) );
+            return bool.Parse (
+                               labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group boolean value" )
+                              );
         }
 
         throw new InvalidOperationException ( "Failed getting radio group boolean value" );
@@ -138,23 +148,28 @@ public static class TypeExtensions
     /// </summary>
     /// <param name="group">The <see cref="RadioGroup" /> to get the currently selected label string from</param>
     /// <returns></returns>
-    public static string GetSelectedLabelString( this RadioGroup group )
+    public static string GetSelectedLabelString ( this RadioGroup group )
     {
         ArgumentNullException.ThrowIfNull ( group );
 
         if ( group.RadioLabels is { } labels && labels.Length > group.SelectedItem )
         {
-            return labels [ group.SelectedItem ]?.ToString( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
+            return labels [ group.SelectedItem ]?.ToString ( ) ?? throw new InvalidOperationException ( "Failed getting radio group selected label string" );
         }
 
         throw new InvalidOperationException ( "Failed getting radio group selected label string" );
     }
 
-    public static JsonNode? SerializeToJson( this IConfiguration configSection )
+    /// <summary>
+    /// Serializes an <see cref="IConfiguration"/> section and its children to a <see cref="JsonNode"/>.
+    /// </summary>
+    /// <param name="configSection"></param>
+    /// <returns></returns>
+    public static JsonNode? SerializeToJson ( this IConfiguration configSection )
     {
         JsonObject obj = new ( );
 
-        IConfigurationSection[] nodeChildren = configSection.GetChildren( ).ToArray( );
+        IConfigurationSection[] nodeChildren = configSection.GetChildren ( ).ToArray ( );
 
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
@@ -204,7 +219,7 @@ public static class TypeExtensions
     /// <exception cref="ArgumentOutOfRangeException">If the value cannot be parsed as an integer</exception>
     /// <exception cref="ArgumentNullException">If <paramref name="value" /> is <see langword="null" /></exception>
     [Pure]
-    public static int ToInt32( this ustring value )
+    public static int ToInt32 ( this ustring value )
     {
         ArgumentNullException.ThrowIfNull ( value );
 
@@ -213,12 +228,12 @@ public static class TypeExtensions
             throw new ArgumentException ( "Empty ustring cannot be converted to int", nameof (value) );
         }
 
-        return value.ToString( ) switch
+        return value.ToString ( ) switch
                {
                    // This case is checking if it's a non-null string, and if it can be parsed as an integer
                    // All other conditions will throw an ArgumentOutOfRangeException for value.
                    { } stringValue when int.TryParse ( stringValue, out int intValue ) => intValue,
-                   _                                                                   => throw new ArgumentOutOfRangeException ( nameof (value), "ustring does not represent a valid Int32 value" )
+                   _ => throw new ArgumentOutOfRangeException ( nameof (value), "ustring does not represent a valid Int32 value" )
                };
     }
 
@@ -237,7 +252,7 @@ public static class TypeExtensions
     /// </remarks>
     [Pure]
     [SuppressMessage ( "ReSharper", "CatchAllClause", Justification = "This method intentionally cannot ever throw an exception" )]
-    public static int ToInt32( this ustring? value, in int fallbackValue )
+    public static int ToInt32 ( this ustring? value, in int fallbackValue )
     {
         try
         {
@@ -246,7 +261,7 @@ public static class TypeExtensions
                 return fallbackValue;
             }
 
-            string stringValue = value.ToString( )!;
+            string stringValue = value.ToString ( )!;
 
             return int.TryParse ( stringValue, out int intValue ) ? intValue : fallbackValue;
         }
@@ -263,7 +278,7 @@ public static class TypeExtensions
     /// <returns>The time portion of <paramref name="value" /></returns>
     [Pure]
     [ExcludeFromCodeCoverage ( Justification = "Just a proxy method to framework functionality" )]
-    public static TimeOnly ToTimeOnly( this TimeSpan value )
+    public static TimeOnly ToTimeOnly ( this TimeSpan value )
     {
         return TimeOnly.FromTimeSpan ( value );
     }

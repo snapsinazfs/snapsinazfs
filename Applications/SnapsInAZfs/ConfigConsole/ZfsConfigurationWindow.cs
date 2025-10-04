@@ -10,16 +10,16 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.ConfigConsole;
-
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using Interop.Zfs.ZfsCommandRunner;
-using Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.ConfigConsole.TreeNodes;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui;
 using Terminal.Gui.Trees;
-using TreeNodes;
+
+namespace SnapsInAZfs.ConfigConsole;
 
 [MustDisposeResource]
 public sealed partial class ZfsConfigurationWindow
@@ -33,47 +33,47 @@ public sealed partial class ZfsConfigurationWindow
         // ReSharper disable once HeapView.DelegateAllocation
         // ReSharper disable once HeapView.ObjectAllocation.Possible
         Initialized += ZfsConfigurationWindowOnInitialized;
-        InitializeComponent( );
+        InitializeComponent ( );
     }
 
     private bool                            _eventsEnabled;
     private ZfsObjectConfigurationTreeNode? SelectedTreeNode => zfsTreeView?.SelectedObject as ZfsObjectConfigurationTreeNode;
 
-    private void ClearAllPropertyFields( bool manageEventHandlers = false )
+    private void ClearAllPropertyFields ( bool manageEventHandlers = false )
     {
         if ( manageEventHandlers )
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
         }
 
-        nameTextField.Clear( );
-        typeTextField.Clear( );
-        enabledRadioGroup.Clear( );
-        enabledSourceTextField.Clear( );
-        takeSnapshotsRadioGroup.Clear( );
-        takeSnapshotsSourceTextField.Clear( );
-        pruneSnapshotsRadioGroup.Clear( );
-        pruneSnapshotsSourceTextField.Clear( );
-        recursionRadioGroup.Clear( );
-        recursionSourceTextField.Clear( );
-        templateSourceTextField.Clear( );
-        retentionFrequentTextField.Clear( );
-        retentionHourlyTextField.Clear( );
-        retentionDailyTextField.Clear( );
-        retentionWeeklyTextField.Clear( );
-        retentionMonthlyTextField.Clear( );
-        retentionYearlyTextField.Clear( );
-        retentionPruneDeferralTextField.Clear( );
-        recentFrequentTextField.Clear( );
-        recentHourlyTextField.Clear( );
-        recentDailyTextField.Clear( );
-        recentWeeklyTextField.Clear( );
-        recentMonthlyTextField.Clear( );
-        recentYearlyTextField.Clear( );
+        nameTextField.Clear ( );
+        typeTextField.Clear ( );
+        enabledRadioGroup.Clear ( );
+        enabledSourceTextField.Clear ( );
+        takeSnapshotsRadioGroup.Clear ( );
+        takeSnapshotsSourceTextField.Clear ( );
+        pruneSnapshotsRadioGroup.Clear ( );
+        pruneSnapshotsSourceTextField.Clear ( );
+        recursionRadioGroup.Clear ( );
+        recursionSourceTextField.Clear ( );
+        templateSourceTextField.Clear ( );
+        retentionFrequentTextField.Clear ( );
+        retentionHourlyTextField.Clear ( );
+        retentionDailyTextField.Clear ( );
+        retentionWeeklyTextField.Clear ( );
+        retentionMonthlyTextField.Clear ( );
+        retentionYearlyTextField.Clear ( );
+        retentionPruneDeferralTextField.Clear ( );
+        recentFrequentTextField.Clear ( );
+        recentHourlyTextField.Clear ( );
+        recentDailyTextField.Clear ( );
+        recentWeeklyTextField.Clear ( );
+        recentMonthlyTextField.Clear ( );
+        recentYearlyTextField.Clear ( );
 
         if ( manageEventHandlers )
         {
-            EnableEventHandlers( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -128,7 +128,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit enabled setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Enabled Setting", $"Inherit Enabled setting {node.TreeDataset.ParentDataset.Enabled.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Enabled Setting",
+                                            $"Inherit Enabled setting {node.TreeDataset.ParentDataset.Enabled.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -136,18 +142,18 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void EnabledRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+    private void EnabledRadioGroupSelectedItemChanged ( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty ( enabledRadioGroup );
-        UpdateButtonState( );
-        UpdateFieldsForSelectedZfsTreeNode( );
+        UpdateButtonState ( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
     }
 
     private void EnableEventHandlers ( )
@@ -201,7 +207,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit prune snapshots setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Prune Snapshots Setting", $"Inherit Prune Snapshots setting {node.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Prune Snapshots Setting",
+                                            $"Inherit Prune Snapshots setting {node.TreeDataset.ParentDataset.PruneSnapshots.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -209,18 +221,18 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.PruneSnapshotsPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void PruneSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+    private void PruneSnapshotsRadioGroupSelectedItemChanged ( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty ( pruneSnapshotsRadioGroup );
-        UpdateButtonState( );
-        UpdateFieldsForSelectedZfsTreeNode( );
+        UpdateButtonState ( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
     }
 
     private void RecursionInheritButtonClick ( )
@@ -230,7 +242,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit recursion setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Recursion Setting", $"Inherit Recursion setting {node.TreeDataset.ParentDataset.Recursion.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Recursion Setting",
+                                            $"Inherit Recursion setting {node.TreeDataset.ParentDataset.Recursion.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -238,14 +256,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.RecursionPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RecursionRadioGroupSelectedItemChanged( SelectedItemChangedArgs? e )
+    private void RecursionRadioGroupSelectedItemChanged ( SelectedItemChangedArgs? e )
     {
         ArgumentNullException.ThrowIfNull ( e );
 
@@ -259,13 +277,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
         }
 
-        if ( viewData.RadioGroup.GetSelectedLabelString( ) != node.TreeDataset.Recursion.Value )
+        if ( viewData.RadioGroup.GetSelectedLabelString ( ) != node.TreeDataset.Recursion.Value )
         {
             UpdateSelectedItemStringRadioGroupProperty ( recursionRadioGroup );
         }
 
-        UpdateFieldsForSelectedZfsTreeNode( );
-        UpdateButtonState( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
+        UpdateButtonState ( );
     }
 
     private void RefreshZfsTreeViewFromZfs ( )
@@ -278,27 +296,33 @@ public sealed partial class ZfsConfigurationWindow
 #pragma warning restore CS4014
     }
 
-    private async Task RefreshZfsTreeViewFromZfsAsync( bool manageEventHandlers = false )
+    private async Task RefreshZfsTreeViewFromZfsAsync ( bool manageEventHandlers = false )
     {
         Logger.Debug ( "Refreshing zfs configuration tree view" );
 
         if ( manageEventHandlers )
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
         }
 
         try
         {
             Logger.Debug ( "Clearing objects from zfs configuration tree view" );
-            zfsTreeView?.ClearObjects( );
-            _treeDatasets.Clear( );
-            ConfigConsole.BaseDatasets.Clear( );
-            ConfigConsole.Snapshots.Clear( );
+            zfsTreeView?.ClearObjects ( );
+            _treeDatasets.Clear ( );
+            ConfigConsole.BaseDatasets.Clear ( );
+            ConfigConsole.Snapshots.Clear ( );
             Logger.Debug ( "Getting zfs objects from zfs and populating configuration tree view" );
-            List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync ( Program.Settings!, ConfigConsole.BaseDatasets, _treeDatasets, ConfigConsole.Snapshots, ConfigConsole.CommandRunner! ).ConfigureAwait ( true );
+            List<ITreeNode> treeRootNodes = await ZfsTasks.GetFullZfsConfigurationTreeAsync (
+                                                                                             Program.Settings!,
+                                                                                             ConfigConsole.BaseDatasets,
+                                                                                             _treeDatasets,
+                                                                                             ConfigConsole.Snapshots,
+                                                                                             ConfigConsole.CommandRunner!
+                                                                                            ).ConfigureAwait ( true );
             zfsTreeView?.AddObjects ( treeRootNodes );
-            UpdateButtonState( );
-            zfsTreeView?.SetFocus( );
+            UpdateButtonState ( );
+            zfsTreeView?.SetFocus ( );
         }
         catch ( Exception e )
         {
@@ -308,7 +332,7 @@ public sealed partial class ZfsConfigurationWindow
         {
             if ( manageEventHandlers )
             {
-                EnableEventHandlers( );
+                EnableEventHandlers ( );
             }
         }
 
@@ -317,12 +341,12 @@ public sealed partial class ZfsConfigurationWindow
 
     private void ResetCurrentButtonOnClicked ( )
     {
-        DisableEventHandlers( );
-        ClearAllPropertyFields( );
-        SelectedTreeNode?.CopyBaseDatasetPropertiesToTreeDataset( );
+        DisableEventHandlers ( );
+        ClearAllPropertyFields ( );
+        SelectedTreeNode?.CopyBaseDatasetPropertiesToTreeDataset ( );
         UpdateFieldsForSelectedZfsTreeNode ( false );
-        UpdateButtonState( );
-        EnableEventHandlers( );
+        UpdateButtonState ( );
+        EnableEventHandlers ( );
     }
 
     private void RetentionDailyInheritButtonClick ( )
@@ -332,7 +356,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit daily retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Daily Retention Setting", $"Inherit Daily Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionDaily.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Daily Retention Setting",
+                                            $"Inherit Daily Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionDaily.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -340,14 +370,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionDailyTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionDailyTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -356,14 +386,20 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionDailyTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDailyPropertyName}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Daily snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDailyPropertyName}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Daily snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionDailyTextField.Text = node.TreeDataset.SnapshotRetentionDaily.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -377,8 +413,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -389,7 +425,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit frequent retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Frequent Retention Setting", $"Inherit Frequent Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionFrequent.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Frequent Retention Setting",
+                                            $"Inherit Frequent Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionFrequent.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -397,14 +439,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionFrequentTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionFrequentTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -413,15 +455,21 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionFrequentTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequentPropertyName}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequentPropertyName}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
 
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Frequent snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Frequent snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionFrequentTextField.Text = node.TreeDataset.SnapshotRetentionFrequent.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -435,8 +483,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -447,7 +495,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit hourly retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Hourly Retention Setting", $"Inherit Hourly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionHourly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Hourly Retention Setting",
+                                            $"Inherit Hourly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionHourly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -455,14 +509,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionHourlyTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionHourlyTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -471,14 +525,20 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionHourlyTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourlyPropertyName}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourlyPropertyName}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionHourlyTextField.Text = node.TreeDataset.SnapshotRetentionHourly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -492,8 +552,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -504,7 +564,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit monthly retention setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Monthly Retention Setting", $"Inherit Monthly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionMonthly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Monthly Retention Setting",
+                                            $"Inherit Monthly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionMonthly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat )} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -512,14 +578,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionMonthlyTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionMonthlyTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -528,14 +594,20 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionMonthlyTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionMonthlyTextField.Text = node.TreeDataset.SnapshotRetentionMonthly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -549,8 +621,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -561,7 +633,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit prune deferral setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Prune Deferral Retention Setting", $"Inherit Prune Deferral Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionPruneDeferral.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Prune Deferral Retention Setting",
+                                            $"Inherit Prune Deferral Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionPruneDeferral.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -569,14 +647,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionPruneDeferralTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionPruneDeferralTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -587,15 +665,22 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionPruneDeferralTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionPruneDeferralTextField.Text = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
+                retentionPruneDeferralTextField.Text
+                    = node.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
             }
@@ -608,8 +693,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -622,7 +707,13 @@ public sealed partial class ZfsConfigurationWindow
             return;
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Weekly Retention Setting", $"Inherit Weekly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionWeekly.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Weekly Retention Setting",
+                                            $"Inherit Weekly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionWeekly.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -630,14 +721,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionWeeklyTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionWeeklyTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -648,14 +739,20 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionWeeklyTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionWeeklyTextField.Text = node.TreeDataset.SnapshotRetentionWeekly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -669,8 +766,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -681,7 +778,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Yearly Retention Setting", $"Inherit Yearly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionYearly.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Yearly Retention Setting",
+                                            $"Inherit Yearly Snapshot Retention setting {node.TreeDataset.ParentDataset.SnapshotRetentionYearly.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -689,14 +792,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void RetentionYearlyTextFieldOnLeave( FocusEventArgs e )
+    private void RetentionYearlyTextFieldOnLeave ( FocusEventArgs e )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -705,14 +808,20 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
             int fieldIntValue = retentionYearlyTextField.Text.ToInt32 ( -1 );
             ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
-                Logger.Warn ( $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearlyPropertyName}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}" );
-                MessageBox.ErrorQuery ( "Invalid Retention Property Value", $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
+                Logger.Warn (
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearlyPropertyName}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                            );
+                MessageBox.ErrorQuery (
+                                       "Invalid Retention Property Value",
+                                       $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.",
+                                       "OK"
+                                      );
                 retentionYearlyTextField.Text = node.TreeDataset.SnapshotRetentionYearly.Value.ToString ( CultureInfo.InvariantCulture.NumberFormat );
 
                 return;
@@ -726,8 +835,8 @@ public sealed partial class ZfsConfigurationWindow
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -740,7 +849,7 @@ public sealed partial class ZfsConfigurationWindow
 
         try
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
 
             if ( ConfigConsole.CommandRunner is null )
             {
@@ -762,7 +871,7 @@ public sealed partial class ZfsConfigurationWindow
             if ( areAnyPropertiesModified )
             {
                 node.GetModifiedZfsProperties ( out List<IZfsProperty>? modifiedZfsProperties );
-                pendingCommands.Add ( $"zfs set {modifiedZfsProperties!.ToStringForZfsSet( )} {zfsObjectPath}" );
+                pendingCommands.Add ( $"zfs set {modifiedZfsProperties!.ToStringForZfsSet ( )} {zfsObjectPath}" );
             }
 
             if ( areAnyPropertiesInherited )
@@ -770,7 +879,13 @@ public sealed partial class ZfsConfigurationWindow
                 pendingCommands.AddRange ( inheritedZfsProperties!.Select ( inheritedProperty => $"zfs inherit {inheritedProperty.Name} {zfsObjectPath}" ) );
             }
 
-            int dialogResult = MessageBox.ErrorQuery ( "Confirm Saving ZFS Object Configuration", $"The following commands will be executed:\n{pendingCommands.ToNewlineSeparatedString( )}\n\nTHIS OPERATION CANNOT BE UNDONE", 0, "Cancel", "Save" );
+            int dialogResult = MessageBox.ErrorQuery (
+                                                      "Confirm Saving ZFS Object Configuration",
+                                                      $"The following commands will be executed:\n{pendingCommands.ToNewlineSeparatedString ( )}\n\nTHIS OPERATION CANNOT BE UNDONE",
+                                                      0,
+                                                      "Cancel",
+                                                      "Save"
+                                                     );
 
             switch ( dialogResult )
             {
@@ -779,7 +894,7 @@ public sealed partial class ZfsConfigurationWindow
 
                     return;
                 case 1:
-                    Logger.Debug ( $"User confirmed the pending zfs set operation {pendingCommands.ToNewlineSeparatedString( )}" );
+                    Logger.Debug ( $"User confirmed the pending zfs set operation {pendingCommands.ToNewlineSeparatedString ( )}" );
 
                     break;
             }
@@ -789,7 +904,13 @@ public sealed partial class ZfsConfigurationWindow
             if ( areAnyPropertiesModified )
             {
                 node.GetModifiedZfsProperties ( out List<IZfsProperty>? modifiedZfsProperties );
-                ZfsCommandRunnerOperationStatus setPropertiesResult = await ZfsTasks.SetPropertiesForDatasetAsync ( Program.Settings!.DryRun, zfsObjectPath, modifiedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait ( true );
+                ZfsCommandRunnerOperationStatus setPropertiesResult
+                    = await ZfsTasks.SetPropertiesForDatasetAsync (
+                                                                   Program.Settings!.DryRun,
+                                                                   zfsObjectPath,
+                                                                   modifiedZfsProperties!,
+                                                                   ConfigConsole.CommandRunner!
+                                                                  ).ConfigureAwait ( true );
                 Logger.Trace ( $"Set properties result was {setPropertiesResult}" );
 
                 switch ( setPropertiesResult )
@@ -811,7 +932,13 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( areAnyPropertiesInherited )
             {
-                ZfsCommandRunnerOperationStatus inheritPropertiesResult = await ZfsTasks.InheritPropertiesForDatasetAsync ( Program.Settings!.DryRun, zfsObjectPath, inheritedZfsProperties!, ConfigConsole.CommandRunner! ).ConfigureAwait ( true );
+                ZfsCommandRunnerOperationStatus inheritPropertiesResult
+                    = await ZfsTasks.InheritPropertiesForDatasetAsync (
+                                                                       Program.Settings!.DryRun,
+                                                                       zfsObjectPath,
+                                                                       inheritedZfsProperties!,
+                                                                       ConfigConsole.CommandRunner!
+                                                                      ).ConfigureAwait ( true );
 
                 switch ( inheritPropertiesResult )
                 {
@@ -831,13 +958,13 @@ public sealed partial class ZfsConfigurationWindow
             }
 
             Logger.Debug ( $"Applying inheritable properties to children of {zfsObjectPath} in tree" );
-            node.CopyTreeDatasetPropertiesToBaseDataset( );
+            node.CopyTreeDatasetPropertiesToBaseDataset ( );
         }
         finally
         {
             UpdateFieldsForSelectedZfsTreeNode ( false );
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
     }
 
@@ -889,7 +1016,7 @@ public sealed partial class ZfsConfigurationWindow
         SetPropertiesForRetentionPropertiesFrame ( 2 );
         SetTabStopsForActionsFrame ( 3 );
 
-        void SetTabStopsForGeneralPropertiesFrame( int generalFrameIndex )
+        void SetTabStopsForGeneralPropertiesFrame ( int generalFrameIndex )
         {
             generalFrame.TabStop  = true;
             generalFrame.TabIndex = generalFrameIndex;
@@ -925,7 +1052,7 @@ public sealed partial class ZfsConfigurationWindow
             templateSourceTextField.TabStop       = false;
         }
 
-        void SetPropertiesForRetentionPropertiesFrame( int retentionFrameIndex )
+        void SetPropertiesForRetentionPropertiesFrame ( int retentionFrameIndex )
         {
             retentionFrame.TabStop  = true;
             retentionFrame.TabIndex = retentionFrameIndex;
@@ -951,7 +1078,7 @@ public sealed partial class ZfsConfigurationWindow
             retentionYearlyTextField.TabIndex   = 5;
         }
 
-        void SetTabStopsForTreeFrame( int treeFrameIndex )
+        void SetTabStopsForTreeFrame ( int treeFrameIndex )
         {
             zfsConfigurationTreeFrame.TabStop  = true;
             zfsConfigurationTreeFrame.TabIndex = treeFrameIndex;
@@ -959,7 +1086,7 @@ public sealed partial class ZfsConfigurationWindow
             zfsTreeView?.TabIndex              = 0;
         }
 
-        void SetTabStopsForActionsFrame( int actionsFrameIndex )
+        void SetTabStopsForActionsFrame ( int actionsFrameIndex )
         {
             zfsConfigurationActionsFrame.TabStop  = true;
             zfsConfigurationActionsFrame.TabIndex = actionsFrameIndex;
@@ -968,11 +1095,19 @@ public sealed partial class ZfsConfigurationWindow
 
     private void SetTagsForPropertyFields ( )
     {
-        enabledRadioGroup.Data        = new RadioGroupWithSourceViewData ( ZfsPropertyNames.EnabledPropertyName,        enabledRadioGroup,        enabledSourceTextField );
-        takeSnapshotsRadioGroup.Data  = new RadioGroupWithSourceViewData ( ZfsPropertyNames.TakeSnapshotsPropertyName,  takeSnapshotsRadioGroup,  takeSnapshotsSourceTextField );
-        pruneSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.PruneSnapshotsPropertyName, pruneSnapshotsRadioGroup, pruneSnapshotsSourceTextField );
-        recursionRadioGroup.Data      = new RadioGroupWithSourceViewData ( ZfsPropertyNames.RecursionPropertyName,      recursionRadioGroup,      recursionSourceTextField );
-        templateListView.Data         = new ListViewWithSourceViewData ( ZfsPropertyNames.TemplatePropertyName, templateSourceTextField );
+        enabledRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.EnabledPropertyName, enabledRadioGroup, enabledSourceTextField );
+        takeSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData (
+                                                                         ZfsPropertyNames.TakeSnapshotsPropertyName,
+                                                                         takeSnapshotsRadioGroup,
+                                                                         takeSnapshotsSourceTextField
+                                                                        );
+        pruneSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData (
+                                                                          ZfsPropertyNames.PruneSnapshotsPropertyName,
+                                                                          pruneSnapshotsRadioGroup,
+                                                                          pruneSnapshotsSourceTextField
+                                                                         );
+        recursionRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.RecursionPropertyName, recursionRadioGroup, recursionSourceTextField );
+        templateListView.Data    = new ListViewWithSourceViewData ( ZfsPropertyNames.TemplatePropertyName, templateSourceTextField );
     }
 
     private void TakeSnapshotsInheritButtonClick ( )
@@ -982,7 +1117,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit take snapshot setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Take Snapshots Setting", $"Inherit Take Snapshots setting {node.TreeDataset.ParentDataset.TakeSnapshots.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Take Snapshots Setting",
+                                            $"Inherit Take Snapshots setting {node.TreeDataset.ParentDataset.TakeSnapshots.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -990,18 +1131,18 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.TakeSnapshotsPropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void TakeSnapshotsRadioGroupSelectedItemChanged( SelectedItemChangedArgs args )
+    private void TakeSnapshotsRadioGroupSelectedItemChanged ( SelectedItemChangedArgs args )
     {
         UpdateSelectedItemBooleanRadioGroupProperty ( takeSnapshotsRadioGroup );
-        UpdateButtonState( );
-        UpdateFieldsForSelectedZfsTreeNode( );
+        UpdateButtonState ( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
     }
 
     private void TemplateInheritButtonClick ( )
@@ -1011,7 +1152,13 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to inherit template setting!" );
         }
 
-        int queryResult = MessageBox.Query ( "Inherit Template Setting", $"Inherit Template setting {node.TreeDataset.ParentDataset.Template.Value} from {node.TreeDataset.ParentDataset.Name}?", 0, "Cancel", "Inherit" );
+        int queryResult = MessageBox.Query (
+                                            "Inherit Template Setting",
+                                            $"Inherit Template setting {node.TreeDataset.ParentDataset.Template.Value} from {node.TreeDataset.ParentDataset.Name}?",
+                                            0,
+                                            "Cancel",
+                                            "Inherit"
+                                           );
 
         switch ( queryResult )
         {
@@ -1019,14 +1166,14 @@ public sealed partial class ZfsConfigurationWindow
                 return;
             case 1:
                 node.InheritPropertyFromParent ( ZfsPropertyNames.TemplatePropertyName );
-                UpdateFieldsForSelectedZfsTreeNode( );
-                UpdateButtonState( );
+                UpdateFieldsForSelectedZfsTreeNode ( );
+                UpdateButtonState ( );
 
                 return;
         }
     }
 
-    private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs? args )
+    private void TemplateListViewOnSelectedItemChanged ( ListViewItemEventArgs? args )
     {
         ArgumentNullException.ThrowIfNull ( args );
 
@@ -1040,15 +1187,16 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
         }
 
-        ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, ConfigConsole.TemplateListItems [ args.Item ].TemplateName );
+        ref readonly ZfsProperty<string> newProperty
+            = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, ConfigConsole.TemplateListItems [ args.Item ].TemplateName );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
-        UpdateFieldsForSelectedZfsTreeNode( );
-        UpdateButtonState( );
+        UpdateFieldsForSelectedZfsTreeNode ( );
+        UpdateButtonState ( );
     }
 
     private void UpdateButtonState ( )
     {
-        if ( zfsTreeView is not null && zfsTreeView.Objects.Any( ) && zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
+        if ( zfsTreeView is not null && zfsTreeView.Objects.Any ( ) && zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode node )
         {
             resetCurrentButton.Enabled = saveCurrentButton.Enabled = node is { IsModified: true, IsLocallyModified: true };
         }
@@ -1059,20 +1207,20 @@ public sealed partial class ZfsConfigurationWindow
         }
     }
 
-    private void UpdateEnabledPropertyFields( ZfsRecord treeDataset )
+    private void UpdateEnabledPropertyFields ( ZfsRecord treeDataset )
     {
-        enabledRadioGroup.SelectedItem = treeDataset.Enabled.AsTrueFalseRadioIndex( );
+        enabledRadioGroup.SelectedItem = treeDataset.Enabled.AsTrueFalseRadioIndex ( );
         enabledRadioGroup.ColorScheme  = treeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
         enabledRadioGroup.Enabled      = true;
         enabledSourceTextField.Text    = treeDataset.Enabled.InheritedFrom;
         enabledInheritButton.Enabled   = treeDataset is { IsPoolRoot: false, Enabled.IsLocal: true };
     }
 
-    private void UpdateFieldsForSelectedZfsTreeNode( bool manageEventHandlers = true )
+    private void UpdateFieldsForSelectedZfsTreeNode ( bool manageEventHandlers = true )
     {
         if ( manageEventHandlers )
         {
-            DisableEventHandlers( );
+            DisableEventHandlers ( );
         }
 
         if ( SelectedTreeNode?.TreeDataset is { } treeDataset )
@@ -1086,13 +1234,26 @@ public sealed partial class ZfsConfigurationWindow
 
             try
             {
-                recursionRadioGroup.SelectedItem = treeDataset.Recursion.Value switch { ZfsPropertyValueConstants.SnapsInAZfs => 0, ZfsPropertyValueConstants.ZfsRecursion => 1, _ => throw new InvalidOperationException ( $"Invalid recursion value {treeDataset.Recursion.Value}" ) };
-                recursionRadioGroup.ColorScheme  = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-                recursionSourceTextField.Text    = treeDataset.Recursion.InheritedFrom;
+                recursionRadioGroup.SelectedItem = treeDataset.Recursion.Value switch
+                                                   {
+                                                       ZfsPropertyValueConstants.SnapsInAZfs => 0, ZfsPropertyValueConstants.ZfsRecursion => 1,
+                                                       _ => throw new InvalidOperationException ( $"Invalid recursion value {treeDataset.Recursion.Value}" )
+                                                   };
+                recursionRadioGroup.ColorScheme
+                    = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom;
             }
             catch ( InvalidOperationException e )
             {
-                int dialogResult = MessageBox.ErrorQuery ( "Invalid ZFS Property Value", e.Message, 2, $"Set to '{ZfsPropertyValueConstants.SnapsInAZfs}'", $"Set to '{ZfsPropertyValueConstants.ZfsRecursion}'", "Do Nothing", "Exit" );
+                int dialogResult = MessageBox.ErrorQuery (
+                                                          "Invalid ZFS Property Value",
+                                                          e.Message,
+                                                          2,
+                                                          $"Set to '{ZfsPropertyValueConstants.SnapsInAZfs}'",
+                                                          $"Set to '{ZfsPropertyValueConstants.ZfsRecursion}'",
+                                                          "Do Nothing",
+                                                          "Exit"
+                                                         );
 
                 switch ( dialogResult )
                 {
@@ -1100,15 +1261,16 @@ public sealed partial class ZfsConfigurationWindow
                     case 1:
                         recursionRadioGroup.SelectedItem = dialogResult;
                         UpdateSelectedItemStringRadioGroupProperty ( recursionRadioGroup );
-                        recursionRadioGroup.ColorScheme = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-                        recursionSourceTextField.Text   = treeDataset.Recursion.InheritedFrom;
-                        UpdateButtonState( );
+                        recursionRadioGroup.ColorScheme
+                            = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+                        recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom;
+                        UpdateButtonState ( );
 
                         break;
                     case 2:
                         break;
                     case 3:
-                        Application.RequestStop( );
+                        Application.RequestStop ( );
 
                         return;
                     default:
@@ -1122,7 +1284,11 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( templateIndex == -1 )
             {
-                MessageBox.ErrorQuery ( "Template Not Found", $"The template \"{treeDataset.Template.Value}\", for {treeDataset.Kind} \"{treeDataset.Name}\", was not found in SnapsInAZfs' configuration.\nIs the template defined in one of the expected SnapsInAZfs[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.", "OK - ZFS Configuration Window will be disabled for this session" );
+                MessageBox.ErrorQuery (
+                                       "Template Not Found",
+                                       $"The template \"{treeDataset.Template.Value}\", for {treeDataset.Kind} \"{treeDataset.Name}\", was not found in SnapsInAZfs' configuration.\nIs the template defined in one of the expected SnapsInAZfs[.local].json files?\n\nEditing of ZFS properties will be disabled for this session.\nFix the template configuration and run the Config Console again.",
+                                       "OK - ZFS Configuration Window will be disabled for this session"
+                                      );
                 SnapsInAZfsConfigConsole.ZfsConfigurationWindowDisabledDueToError = true;
                 SuperView.Remove ( this );
 
@@ -1131,37 +1297,50 @@ public sealed partial class ZfsConfigurationWindow
 
             templateListView.SelectedItem = templateIndex;
             templateListView.ColorScheme  = treeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
-            templateListView.EnsureSelectedItemVisible( );
+            templateListView.EnsureSelectedItemVisible ( );
             templateListView.Enabled      = true;
             templateSourceTextField.Text  = treeDataset.Template.InheritedFrom;
             templateInheritButton.Enabled = treeDataset is { IsPoolRoot: false, Template.IsLocal: true };
 
-            retentionFrequentTextField.Text             = treeDataset.SnapshotRetentionFrequent.ValueString;
-            retentionFrequentTextField.ColorScheme      = treeDataset.SnapshotRetentionFrequent.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionFrequentTextField.Enabled          = true;
-            retentionFrequentInheritButton.Enabled      = treeDataset is { IsPoolRoot: false, SnapshotRetentionFrequent.IsLocal: true };
-            retentionHourlyTextField.Text               = treeDataset.SnapshotRetentionHourly.ValueString;
-            retentionHourlyTextField.ColorScheme        = treeDataset.SnapshotRetentionHourly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionHourlyTextField.Enabled            = true;
-            retentionHourlyInheritButton.Enabled        = treeDataset is { IsPoolRoot: false, SnapshotRetentionHourly.IsLocal: true };
-            retentionDailyTextField.Text                = treeDataset.SnapshotRetentionDaily.ValueString;
-            retentionDailyTextField.ColorScheme         = treeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionDailyTextField.Enabled             = true;
-            retentionDailyInheritButton.Enabled         = treeDataset is { IsPoolRoot: false, SnapshotRetentionDaily.IsLocal: true };
-            retentionWeeklyTextField.Text               = treeDataset.SnapshotRetentionWeekly.ValueString;
-            retentionWeeklyTextField.ColorScheme        = treeDataset.SnapshotRetentionWeekly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionWeeklyTextField.Enabled            = true;
-            retentionWeeklyInheritButton.Enabled        = treeDataset is { IsPoolRoot: false, SnapshotRetentionWeekly.IsLocal: true };
-            retentionMonthlyTextField.Text              = treeDataset.SnapshotRetentionMonthly.ValueString;
-            retentionMonthlyTextField.ColorScheme       = treeDataset.SnapshotRetentionMonthly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionMonthlyTextField.Enabled           = true;
-            retentionMonthlyInheritButton.Enabled       = treeDataset is { IsPoolRoot: false, SnapshotRetentionMonthly.IsLocal: true };
-            retentionYearlyTextField.Text               = treeDataset.SnapshotRetentionYearly.ValueString;
-            retentionYearlyTextField.ColorScheme        = treeDataset.SnapshotRetentionYearly.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
-            retentionYearlyTextField.Enabled            = true;
-            retentionYearlyInheritButton.Enabled        = treeDataset is { IsPoolRoot: false, SnapshotRetentionYearly.IsLocal: true };
-            retentionPruneDeferralTextField.Text        = treeDataset.SnapshotRetentionPruneDeferral.ValueString;
-            retentionPruneDeferralTextField.ColorScheme = treeDataset.SnapshotRetentionPruneDeferral.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionFrequentTextField.Text = treeDataset.SnapshotRetentionFrequent.ValueString;
+            retentionFrequentTextField.ColorScheme = treeDataset.SnapshotRetentionFrequent.IsInherited
+                                                         ? inheritedPropertyTextFieldColorScheme
+                                                         : localPropertyTextFieldColorScheme;
+            retentionFrequentTextField.Enabled     = true;
+            retentionFrequentInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionFrequent.IsLocal: true };
+            retentionHourlyTextField.Text          = treeDataset.SnapshotRetentionHourly.ValueString;
+            retentionHourlyTextField.ColorScheme = treeDataset.SnapshotRetentionHourly.IsInherited
+                                                       ? inheritedPropertyTextFieldColorScheme
+                                                       : localPropertyTextFieldColorScheme;
+            retentionHourlyTextField.Enabled     = true;
+            retentionHourlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionHourly.IsLocal: true };
+            retentionDailyTextField.Text         = treeDataset.SnapshotRetentionDaily.ValueString;
+            retentionDailyTextField.ColorScheme
+                = treeDataset.SnapshotRetentionDaily.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
+            retentionDailyTextField.Enabled     = true;
+            retentionDailyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionDaily.IsLocal: true };
+            retentionWeeklyTextField.Text       = treeDataset.SnapshotRetentionWeekly.ValueString;
+            retentionWeeklyTextField.ColorScheme = treeDataset.SnapshotRetentionWeekly.IsInherited
+                                                       ? inheritedPropertyTextFieldColorScheme
+                                                       : localPropertyTextFieldColorScheme;
+            retentionWeeklyTextField.Enabled     = true;
+            retentionWeeklyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionWeekly.IsLocal: true };
+            retentionMonthlyTextField.Text       = treeDataset.SnapshotRetentionMonthly.ValueString;
+            retentionMonthlyTextField.ColorScheme = treeDataset.SnapshotRetentionMonthly.IsInherited
+                                                        ? inheritedPropertyTextFieldColorScheme
+                                                        : localPropertyTextFieldColorScheme;
+            retentionMonthlyTextField.Enabled     = true;
+            retentionMonthlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionMonthly.IsLocal: true };
+            retentionYearlyTextField.Text         = treeDataset.SnapshotRetentionYearly.ValueString;
+            retentionYearlyTextField.ColorScheme = treeDataset.SnapshotRetentionYearly.IsInherited
+                                                       ? inheritedPropertyTextFieldColorScheme
+                                                       : localPropertyTextFieldColorScheme;
+            retentionYearlyTextField.Enabled     = true;
+            retentionYearlyInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionYearly.IsLocal: true };
+            retentionPruneDeferralTextField.Text = treeDataset.SnapshotRetentionPruneDeferral.ValueString;
+            retentionPruneDeferralTextField.ColorScheme = treeDataset.SnapshotRetentionPruneDeferral.IsInherited
+                                                              ? inheritedPropertyTextFieldColorScheme
+                                                              : localPropertyTextFieldColorScheme;
             retentionPruneDeferralTextField.Enabled     = true;
             retentionPruneDeferralInheritButton.Enabled = treeDataset is { IsPoolRoot: false, SnapshotRetentionPruneDeferral.IsLocal: true };
 
@@ -1175,20 +1354,21 @@ public sealed partial class ZfsConfigurationWindow
 
         if ( manageEventHandlers )
         {
-            EnableEventHandlers( );
+            EnableEventHandlers ( );
         }
     }
 
-    private void UpdatePruneSnapshotsFields( ZfsRecord treeDataset )
+    private void UpdatePruneSnapshotsFields ( ZfsRecord treeDataset )
     {
-        pruneSnapshotsRadioGroup.SelectedItem = treeDataset.PruneSnapshots.AsTrueFalseRadioIndex( );
-        pruneSnapshotsRadioGroup.ColorScheme  = treeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-        pruneSnapshotsRadioGroup.Enabled      = true;
-        pruneSnapshotsSourceTextField.Text    = treeDataset.PruneSnapshots.InheritedFrom;
-        pruneSnapshotsInheritButton.Enabled   = treeDataset is { IsPoolRoot: false, PruneSnapshots.IsLocal: true };
+        pruneSnapshotsRadioGroup.SelectedItem = treeDataset.PruneSnapshots.AsTrueFalseRadioIndex ( );
+        pruneSnapshotsRadioGroup.ColorScheme
+            = treeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+        pruneSnapshotsRadioGroup.Enabled    = true;
+        pruneSnapshotsSourceTextField.Text  = treeDataset.PruneSnapshots.InheritedFrom;
+        pruneSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, PruneSnapshots.IsLocal: true };
     }
 
-    private void UpdateSelectedItemBooleanRadioGroupProperty( RadioGroup radioGroup )
+    private void UpdateSelectedItemBooleanRadioGroupProperty ( RadioGroup radioGroup )
     {
         if ( radioGroup.Data is not RadioGroupWithSourceViewData viewData )
         {
@@ -1200,11 +1380,11 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
         }
 
-        ref readonly ZfsProperty<bool> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel( ) );
+        ref readonly ZfsProperty<bool> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel ( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
-    private void UpdateSelectedItemIntProperty( TextValidateField field, string propertyName, int propertyValue )
+    private void UpdateSelectedItemIntProperty ( TextValidateField field, string propertyName, int propertyValue )
     {
         if ( SelectedTreeNode is not { } node )
         {
@@ -1215,7 +1395,7 @@ public sealed partial class ZfsConfigurationWindow
         field.ColorScheme = newProperty.IsInherited ? inheritedPropertyTextFieldColorScheme : localPropertyTextFieldColorScheme;
     }
 
-    private void UpdateSelectedItemStringRadioGroupProperty( RadioGroup radioGroup )
+    private void UpdateSelectedItemStringRadioGroupProperty ( RadioGroup radioGroup )
     {
         if ( radioGroup.Data is not RadioGroupWithSourceViewData viewData )
         {
@@ -1227,38 +1407,45 @@ public sealed partial class ZfsConfigurationWindow
             throw new InvalidOperationException ( "Null tree node on attempt to update property!" );
         }
 
-        ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedLabelString( ) );
+        ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedLabelString ( ) );
         viewData.SourceTextField.Text = newProperty.InheritedFrom;
     }
 
-    private void UpdateTakeSnapshotFields( ZfsRecord treeDataset )
+    private void UpdateTakeSnapshotFields ( ZfsRecord treeDataset )
     {
-        takeSnapshotsRadioGroup.SelectedItem = treeDataset.TakeSnapshots.AsTrueFalseRadioIndex( );
-        takeSnapshotsRadioGroup.ColorScheme  = treeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-        takeSnapshotsRadioGroup.Enabled      = true;
-        takeSnapshotsSourceTextField.Text    = treeDataset.TakeSnapshots.InheritedFrom;
-        takeSnapshotsInheritButton.Enabled   = treeDataset is { IsPoolRoot: false, TakeSnapshots.IsLocal: true };
+        takeSnapshotsRadioGroup.SelectedItem = treeDataset.TakeSnapshots.AsTrueFalseRadioIndex ( );
+        takeSnapshotsRadioGroup.ColorScheme
+            = treeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
+        takeSnapshotsRadioGroup.Enabled    = true;
+        takeSnapshotsSourceTextField.Text  = treeDataset.TakeSnapshots.InheritedFrom;
+        takeSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, TakeSnapshots.IsLocal: true };
     }
 
-    private async void ZfsConfigurationWindowOnInitialized( object? sender, EventArgs e )
+    private async void ZfsConfigurationWindowOnInitialized ( object? sender, EventArgs e )
     {
         try
         {
             Logger.Trace ( "Zfs Configuration Window initialized" );
-            ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync( ).ConfigureAwait ( true );
+            ConfiguredTaskAwaitable zfsRefreshTask = RefreshZfsTreeViewFromZfsAsync ( ).ConfigureAwait ( true );
             templateListView.SetSource ( ConfigConsole.TemplateListItems );
-            SetCanFocusStates( );
-            SetTagsForPropertyFields( );
-            SetTabStops( );
-            SetReadOnlyStates( );
+            SetCanFocusStates ( );
+            SetTagsForPropertyFields ( );
+            SetTabStops ( );
+            SetReadOnlyStates ( );
             await zfsRefreshTask;
-            UpdateButtonState( );
-            EnableEventHandlers( );
+            UpdateButtonState ( );
+            EnableEventHandlers ( );
         }
         catch ( Exception ex )
         {
             Logger.Error ( ex, $"Error in {nameof (ZfsConfigurationWindow)} initialization." );
-            int dialogResult = MessageBox.ErrorQuery ( $"Error initializing {nameof (ZfsConfigurationWindow)}", $"Error initializing {nameof (ZfsConfigurationWindow)}.\r\nIt is recommended that you exit now.", 0, "Exit", "Continue (not recommended)" );
+            int dialogResult = MessageBox.ErrorQuery (
+                                                      $"Error initializing {nameof (ZfsConfigurationWindow)}",
+                                                      $"Error initializing {nameof (ZfsConfigurationWindow)}.\r\nIt is recommended that you exit now.",
+                                                      0,
+                                                      "Exit",
+                                                      "Continue (not recommended)"
+                                                     );
 
             switch ( dialogResult )
             {
@@ -1276,19 +1463,19 @@ public sealed partial class ZfsConfigurationWindow
         }
     }
 
-    private void zfsTreeViewOnSelectionChanged( object? sender, SelectionChangedEventArgs<ITreeNode> e )
+    private void zfsTreeViewOnSelectionChanged ( object? sender, SelectionChangedEventArgs<ITreeNode> e )
     {
         ArgumentNullException.ThrowIfNull ( sender );
-        DisableEventHandlers( );
+        DisableEventHandlers ( );
 
-        ClearAllPropertyFields( );
+        ClearAllPropertyFields ( );
 
         UpdateFieldsForSelectedZfsTreeNode ( false );
-        UpdateButtonState( );
-        EnableEventHandlers( );
+        UpdateButtonState ( );
+        EnableEventHandlers ( );
     }
 
-    private sealed record RadioGroupWithSourceViewData( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
+    private sealed record RadioGroupWithSourceViewData ( string PropertyName, RadioGroup RadioGroup, TextField SourceTextField );
 
-    private sealed record ListViewWithSourceViewData( string PropertyName, TextField SourceTextField );
+    private sealed record ListViewWithSourceViewData ( string PropertyName, TextField SourceTextField );
 }

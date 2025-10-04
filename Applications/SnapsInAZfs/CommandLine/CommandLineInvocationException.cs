@@ -15,18 +15,18 @@ namespace SnapsInAZfs.CommandLine;
 using System.CommandLine;
 
 /// <summary>
-///     The exception that is thrown when SIAZ fails to start due to errors on the command line other than those handled by
-///     <c>System.CommandLine</c>.
+///   The exception that is thrown when SIAZ fails to start due to errors on the command line other than those handled by
+///   <c>System.CommandLine</c>.
 /// </summary>
 /// <param name="message">The exception text.</param>
 /// <param name="symbols">(Optional)Symbols that led to this exception.</param>
 /// <param name="innerException">
-///     (Optional)An exception that caused this exception. This will be passed to the base <see cref="ApplicationException" />
-///     constructor.
+///   (Optional)An exception that caused this exception. This will be passed to the base <see cref="ApplicationException" />
+///   constructor.
 /// </param>
-public sealed class CommandLineInvocationException( string message, Dictionary<string, Symbol>? symbols = null, Exception? innerException = null )
-    : ApplicationException ( message, innerException )
+public sealed class CommandLineInvocationException ( string message, Dictionary<string, Symbol>? symbols = null, Exception? innerException = null )
+  : ApplicationException ( message, innerException )
 {
-    /// <summary>When not empty, contains the <see cref="Symbol" />s that led to the exception.</summary>
-    public override Dictionary<string, Symbol> Data { get; } = symbols ?? new ( );
+  /// <summary>When not empty, contains the <see cref="Symbol" />s that led to the exception.</summary>
+  public override Dictionary<string, Symbol> Data { get; } = symbols ?? new ( );
 }

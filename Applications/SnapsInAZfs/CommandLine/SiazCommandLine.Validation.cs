@@ -18,101 +18,104 @@ using System.Globalization;
 
 public partial class SiazCommandLine
 {
-    // ReSharper disable once MemberCanBePrivate.Global
-    internal SearchValues<char> InvalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars( ) );
+  // ReSharper disable once MemberCanBePrivate.Global
+  internal SearchValues<char> InvalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars ( ) );
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    internal static readonly string[] StandardBooleanFalseStrings =
-    [
-        "0",
-        bool.FalseString,
-        CultureInfo.CurrentUICulture.TextInfo.ToLower ( bool.FalseString ),
-        "disable",
-        "disabled",
-        "no",
-        "off"
-    ];
+  // ReSharper disable once MemberCanBePrivate.Global
+  internal static readonly string[] StandardBooleanFalseStrings =
+  [
+    "0",
+    bool.FalseString,
+    CultureInfo.CurrentUICulture.TextInfo.ToLower ( bool.FalseString ),
+    "disable",
+    "disabled",
+    "no",
+    "off"
+  ];
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    internal static readonly string[] StandardBooleanTrueStrings =
-    [
-        "1",
-        bool.TrueString,
-        CultureInfo.CurrentUICulture.TextInfo.ToLower ( bool.TrueString ),
-        "enable",
-        "enabled",
-        "yes",
-        "on"
-    ];
+  // ReSharper disable once MemberCanBePrivate.Global
+  internal static readonly string[] StandardBooleanTrueStrings =
+  [
+    "1",
+    bool.TrueString,
+    CultureInfo.CurrentUICulture.TextInfo.ToLower ( bool.TrueString ),
+    "enable",
+    "enabled",
+    "yes",
+    "on"
+  ];
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    internal static readonly string[] StandardBooleanFormsSet =
-    [
-        ..StandardBooleanTrueStrings,
-        ..StandardBooleanFalseStrings
-    ];
+  internal static readonly string[] StandardBooleanFormsSet =
+  [
+    ..StandardBooleanTrueStrings,
+    ..StandardBooleanFalseStrings
+  ];
 
-    // ReSharper disable once MemberCanBePrivate.Global
-    internal static readonly SearchValues<string> StandardBooleanTrueValuesSearch = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan( ), StringComparison.OrdinalIgnoreCase );
+  // ReSharper disable once MemberCanBePrivate.Global
 
-    private OptionResult ValidateCanWriteToPath( OptionResult optionResult, Token token )
+  // ReSharper disable once MemberCanBePrivate.Global
+  internal static readonly SearchValues<string> StandardBooleanTrueValuesSearch
+    = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan ( ), StringComparison.OrdinalIgnoreCase );
+
+  private OptionResult ValidateCanWriteToPath ( OptionResult optionResult, Token token )
+  {
+    FileInfo file = new ( Path.GetFullPath ( token.Value ) );
+    try
     {
-        FileInfo file = new ( Path.GetFullPath ( token.Value ) );
-        try
-        {
-            using FileStream testFile = file.Open (
-                                                   new FileStreamOptions
-                                                   {
-                                                       Access = FileAccess.ReadWrite,
-                                                       Mode   = FileMode.Open,
-                                                       Share  = FileShare.Read | FileShare.Inheritable
-                                                   }
-                                                  );
-            testFile.Close( );
-        }
-        catch ( DirectoryNotFoundException directoryNotFoundException )
-        {
-            string message = $"Unable to open file {token.Value} for writing. The parent directory {file.Directory?.FullName ?? "(unknown)"} does not exist or is inaccessible.";
-            Logger.Warn ( directoryNotFoundException, message );
-            optionResult.AddError ( $"{message} See log for detailed exception data." );
-        }
-        catch ( FileNotFoundException fileNotFoundException )
-        {
-            string message = $"The file {token.Value} does not exist.";
-            Logger.Warn ( fileNotFoundException, message );
-            optionResult.AddError ( $"{message} See log for detailed exception data." );
-        }
-        catch ( UnauthorizedAccessException unauthorizedAccessException )
-        {
-            string message = $"Unable to open file {token.Value} for writing. Access is denied.";
-            Logger.Warn ( unauthorizedAccessException, message );
-            optionResult.AddError ( $"{message} See log for detailed exception data." );
-        }
-        catch ( IOException ioException )
-        {
-            string message = $"Unable to open file {token.Value} for writing. The result was {ioException.HResult}.";
-            Logger.Warn ( ioException, message );
-            optionResult.AddError ( $"{message} See log for detailed exception data." );
-        }
-
-        return optionResult;
+      using FileStream testFile = file.Open (
+                                             new FileStreamOptions
+                                             {
+                                               Access = FileAccess.ReadWrite,
+                                               Mode   = FileMode.Open,
+                                               Share  = FileShare.Read | FileShare.Inheritable
+                                             }
+                                            );
+      testFile.Close ( );
+    }
+    catch ( DirectoryNotFoundException directoryNotFoundException )
+    {
+      string message
+        = $"Unable to open file {token.Value} for writing. The parent directory {file.Directory?.FullName ?? "(unknown)"} does not exist or is inaccessible.";
+      Logger.Warn ( directoryNotFoundException, message );
+      optionResult.AddError ( $"{message} See log for detailed exception data." );
+    }
+    catch ( FileNotFoundException fileNotFoundException )
+    {
+      string message = $"The file {token.Value} does not exist.";
+      Logger.Warn ( fileNotFoundException, message );
+      optionResult.AddError ( $"{message} See log for detailed exception data." );
+    }
+    catch ( UnauthorizedAccessException unauthorizedAccessException )
+    {
+      string message = $"Unable to open file {token.Value} for writing. Access is denied.";
+      Logger.Warn ( unauthorizedAccessException, message );
+      optionResult.AddError ( $"{message} See log for detailed exception data." );
+    }
+    catch ( IOException ioException )
+    {
+      string message = $"Unable to open file {token.Value} for writing. The result was {ioException.HResult}.";
+      Logger.Warn ( ioException, message );
+      optionResult.AddError ( $"{message} See log for detailed exception data." );
     }
 
-    private void ValidateFileExistsAndIsWriteable( OptionResult option )
+    return optionResult;
+  }
+
+  private void ValidateFileExistsAndIsWriteable ( OptionResult option )
+  {
+    option.Option.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateLegalFilePath ) );
+    option.Option.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateCanWriteToPath ) );
+  }
+
+  private OptionResult ValidateLegalFilePath ( OptionResult optionResult, Token token )
+  {
+    int invalidCharacterIndex = token.Value.IndexOfAny ( InvalidPathCharValues );
+
+    if ( invalidCharacterIndex >= 0 )
     {
-        option.Option.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateLegalFilePath ) );
-        option.Option.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateCanWriteToPath ) );
+      optionResult.AddError ( new ( token.Value [ invalidCharacterIndex ], 1 ) );
     }
 
-    private OptionResult ValidateLegalFilePath( OptionResult optionResult, Token token )
-    {
-        int invalidCharacterIndex = token.Value.IndexOfAny ( InvalidPathCharValues );
-
-        if ( invalidCharacterIndex >= 0 )
-        {
-            optionResult.AddError ( new ( token.Value [ invalidCharacterIndex ], 1 ) );
-        }
-
-        return optionResult;
-    }
+    return optionResult;
+  }
 }

@@ -28,7 +28,7 @@ using System.CommandLine.Parsing;
 using Interop;
 
 [TestFixture]
-[TestOf ( typeof( SiazCommandLine ) )]
+[TestOf ( typeof ( SiazCommandLine ) )]
 [Category ( "Settings" )]
 [Category ( "Command Line" )]
 public class SiazCommandLineTests

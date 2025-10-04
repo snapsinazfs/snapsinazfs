@@ -10,16 +10,14 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-
-
 // ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable UnusedAutoPropertyAccessor.Global
+
+using PowerArgs;
 
 #pragma warning disable CS1591
 
 namespace SnapsInAZfs;
-
-using PowerArgs;
 
 /// <summary>
 ///     The command line arguments that SnapsInAZfs can accept

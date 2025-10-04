@@ -18,54 +18,54 @@ using System.Runtime.CompilerServices;
 
 public partial class SiazCommandLine
 {
-    [PublicAPI]
-    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public ParseResult Parse( IReadOnlyList<string> args, ParserConfiguration? configuration = null )
-    {
-        return ConfigureCommandLineTree( ).Parse ( args, configuration );
-    }
+  [PublicAPI]
+  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+  public ParseResult Parse ( IReadOnlyList<string> args, ParserConfiguration? configuration = null )
+  {
+    return ConfigureCommandLineTree ( ).Parse ( args, configuration );
+  }
 
-    [PublicAPI]
-    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public ParseResult Parse( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
-    {
-        rootCommand = ConfigureCommandLineTree( );
+  [PublicAPI]
+  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+  public ParseResult Parse ( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
+  {
+    rootCommand = ConfigureCommandLineTree ( );
 
-        return rootCommand.Parse ( args, configuration );
-    }
+    return rootCommand.Parse ( args, configuration );
+  }
 
-    /// <summary>
-    ///     Parses a boolean from more inputs than <see cref="bool" /> is aware of, taken from the first token of an
-    ///     <see cref="ArgumentResult" />.
-    /// </summary>
-    /// <param name="argumentResult">The argument to parse the token from.</param>
-    /// <returns>
-    ///     If the token matches any of the values in <see cref="StandardBooleanTrueValuesSearch" />, returns <see langword="true" />.
-    ///     <br />
-    ///     Returns <see langword="false" /> for all other values.
-    /// </returns>
-    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    private static bool ArgumentStandardBooleanValuesParser( ArgumentResult argumentResult )
-    {
-        return StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value );
-    }
+  /// <summary>
+  ///   Parses a boolean from more inputs than <see cref="bool" /> is aware of, taken from the first token of an
+  ///   <see cref="ArgumentResult" />.
+  /// </summary>
+  /// <param name="argumentResult">The argument to parse the token from.</param>
+  /// <returns>
+  ///   If the token matches any of the values in <see cref="StandardBooleanTrueValuesSearch" />, returns <see langword="true" />.
+  ///   <br />
+  ///   Returns <see langword="false" /> for all other values.
+  /// </returns>
+  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+  private static bool ArgumentStandardBooleanValuesParser ( ArgumentResult argumentResult )
+  {
+    return StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value );
+  }
 
-    /// <summary>
-    ///     Parses a boolean from more inputs than <see cref="bool" /> is aware of, taken from the first token of an
-    ///     <see cref="ArgumentResult" />.
-    /// </summary>
-    /// <param name="argumentResult">The argument to parse the token from.</param>
-    /// <returns>
-    ///     If the token matches any of the values in <see cref="StandardBooleanTrueValuesSearch" />, returns <see langword="true" />.
-    ///     <br />
-    ///     Returns <see langword="false" /> for all other values.
-    /// </returns>
-    private static TriStateOptionValue TriStateArgumentValuesParser( ArgumentResult argumentResult )
-    {
-        return argumentResult.Tokens [ 0 ].Value is "default" or ""
-                   ? TriStateOptionValue.Default
-                   : StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value )
-                       ? TriStateOptionValue.True
-                       : TriStateOptionValue.False;
-    }
+  /// <summary>
+  ///   Parses a boolean from more inputs than <see cref="bool" /> is aware of, taken from the first token of an
+  ///   <see cref="ArgumentResult" />.
+  /// </summary>
+  /// <param name="argumentResult">The argument to parse the token from.</param>
+  /// <returns>
+  ///   If the token matches any of the values in <see cref="StandardBooleanTrueValuesSearch" />, returns <see langword="true" />.
+  ///   <br />
+  ///   Returns <see langword="false" /> for all other values.
+  /// </returns>
+  private static TriStateOptionValue TriStateArgumentValuesParser ( ArgumentResult argumentResult )
+  {
+    return argumentResult.Tokens [ 0 ].Value is "default" or ""
+             ? TriStateOptionValue.Default
+             : StandardBooleanTrueValuesSearch.Contains ( argumentResult.Tokens [ 0 ].Value )
+               ? TriStateOptionValue.True
+               : TriStateOptionValue.False;
+  }
 }

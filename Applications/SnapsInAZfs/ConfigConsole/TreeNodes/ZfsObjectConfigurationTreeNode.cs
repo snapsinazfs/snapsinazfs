@@ -10,19 +10,19 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.ConfigConsole.TreeNodes;
-
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
-using Interop.Zfs.ZfsTypes;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using Terminal.Gui.Trees;
+
+namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 
 /// <summary>
 ///     Represents a node in the tree of datasets in <see cref="ZfsConfigurationWindow" />
 /// </summary>
 public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 {
-    private static readonly Logger                                     Logger                            = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger                                     Logger                            = LogManager.GetCurrentClassLogger ( );
     private readonly        object                                     _childrenLock                     = new ( );
     private readonly        ConcurrentDictionary<string, IZfsProperty> _inheritedPropertiesSinceLastSave = new ( );
 
@@ -41,7 +41,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     ///     A reference to the tree copy of the <see cref="ZfsRecord" /> this tree node will point to. This is the object used for
     ///     display.
     /// </param>
-    public ZfsObjectConfigurationTreeNode( string name, ZfsRecord baseDataset, ZfsRecord treeDataset )
+    public ZfsObjectConfigurationTreeNode ( string name, ZfsRecord baseDataset, ZfsRecord treeDataset )
         : base ( name )
     {
         TreeDataset = treeDataset;
@@ -58,7 +58,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
             lock ( _childrenLock )
             {
                 List<ITreeNode> list = [ ];
-                foreach ( ( string childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets( ) )
+                foreach ( ( string childName, ZfsRecord child ) in TreeDataset.GetSortedChildDatasets ( ) )
                 {
                     if ( !BaseDataset.GetChild ( childName, out ZfsRecord? baseDataset ) )
                     {
@@ -67,7 +67,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                         continue;
                     }
 
-                    ITreeNode node = new ZfsObjectConfigurationTreeNode ( childName.GetLastPathElement( ), baseDataset, child );
+                    ITreeNode node = new ZfsObjectConfigurationTreeNode ( childName.GetLastPathElement ( ), baseDataset, child );
                     list.Add ( node );
                 }
 
@@ -102,7 +102,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </remarks>
     public override string Text
     {
-        get => TreeDataset.Name.GetLastPathElement( );
+        get => TreeDataset.Name.GetLastPathElement ( );
         set
         {
             // Just eat this
@@ -135,7 +135,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="clearChangedPropertiesCollections"></param>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    public void CopyBaseDatasetPropertiesToTreeDataset( bool clearChangedPropertiesCollections = true )
+    public void CopyBaseDatasetPropertiesToTreeDataset ( bool clearChangedPropertiesCollections = true )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -183,8 +183,8 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
             if ( clearChangedPropertiesCollections )
             {
-                _modifiedPropertiesSinceLastSave.Clear( );
-                _inheritedPropertiesSinceLastSave.Clear( );
+                _modifiedPropertiesSinceLastSave.Clear ( );
+                _inheritedPropertiesSinceLastSave.Clear ( );
             }
         }
     }
@@ -196,7 +196,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="clearChangedPropertiesCollections"></param>
     /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-    public void CopyTreeDatasetPropertiesToBaseDataset( bool clearChangedPropertiesCollections = true )
+    public void CopyTreeDatasetPropertiesToBaseDataset ( bool clearChangedPropertiesCollections = true )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -244,8 +244,8 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
             if ( clearChangedPropertiesCollections )
             {
-                _modifiedPropertiesSinceLastSave.Clear( );
-                _inheritedPropertiesSinceLastSave.Clear( );
+                _modifiedPropertiesSinceLastSave.Clear ( );
+                _inheritedPropertiesSinceLastSave.Clear ( );
             }
         }
     }
@@ -263,7 +263,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been modified, this method first reverts the change to that property before inheriting
     ///     from parent.
     /// </remarks>
-    public bool InheritPropertyFromParent( string propertyName )
+    public bool InheritPropertyFromParent ( string propertyName )
     {
         if ( TreeDataset.IsPoolRoot )
         {
@@ -334,14 +334,26 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
             case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
             case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
-                Logger.Error ( new ArgumentException ( $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance", nameof (propertyName) ) );
+                Logger.Error (
+                              new ArgumentException (
+                                                     $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance",
+                                                     nameof (propertyName)
+                                                    )
+                             );
 
                 return false;
             default:
             {
                 if ( IZfsProperty.AllKnownProperties.Contains ( propertyName ) )
                 {
-                    Logger.Error ( new ArgumentOutOfRangeException ( $"Property {propertyName} cannot be inherited", new InvalidOperationException ( $"Property {propertyName} is not currently handled by InheritPropertyFromParent" ) ) );
+                    Logger.Error (
+                                  new ArgumentOutOfRangeException (
+                                                                   $"Property {propertyName} cannot be inherited",
+                                                                   new InvalidOperationException (
+                                                                                                  $"Property {propertyName} is not currently handled by InheritPropertyFromParent"
+                                                                                                 )
+                                                                  )
+                                 );
 
                     return false;
                 }
@@ -354,7 +366,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// <inheritdoc />
     public override string ToString ( )
     {
-        return TreeDataset.Name.GetLastPathElement( );
+        return TreeDataset.Name.GetLastPathElement ( );
     }
 
     /// <summary>
@@ -371,7 +383,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty( string propertyName, in bool propertyValue )
+    public ref readonly ZfsProperty<bool> UpdateTreeNodeProperty ( string propertyName, in bool propertyValue )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -396,7 +408,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty( string propertyName, in int propertyValue )
+    public ref readonly ZfsProperty<int> UpdateTreeNodeProperty ( string propertyName, in int propertyValue )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -421,7 +433,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     ///     If the specified property has already been inherited, this method first reverts the change to that property before making
     ///     this change
     /// </remarks>
-    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty( string propertyName, in string propertyValue )
+    public ref readonly ZfsProperty<string> UpdateTreeNodeProperty ( string propertyName, in string propertyValue )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -435,7 +447,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// <summary>
     ///     Gets a list of the properties that have been changed from local to inherited from the parent for this node
     /// </summary>
-    internal bool GetInheritedZfsProperties( [NotNullWhen ( true )] out List<IZfsProperty>? inheritedProperties )
+    internal bool GetInheritedZfsProperties ( [NotNullWhen ( true )] out List<IZfsProperty>? inheritedProperties )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -445,7 +457,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                 return false;
             }
 
-            inheritedProperties = _inheritedPropertiesSinceLastSave.Values.ToList( );
+            inheritedProperties = _inheritedPropertiesSinceLastSave.Values.ToList ( );
 
             return true;
         }
@@ -454,7 +466,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// <summary>
     ///     Gets a list of the properties that have been changed for this node
     /// </summary>
-    internal bool GetModifiedZfsProperties( [NotNullWhen ( true )] out List<IZfsProperty>? modifiedProperties )
+    internal bool GetModifiedZfsProperties ( [NotNullWhen ( true )] out List<IZfsProperty>? modifiedProperties )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -464,7 +476,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
                 return false;
             }
 
-            modifiedProperties = _modifiedPropertiesSinceLastSave.Values.ToList( );
+            modifiedProperties = _modifiedPropertiesSinceLastSave.Values.ToList ( );
 
             return true;
         }
@@ -476,7 +488,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="changedPropertyCollection"></param>
-    private void RevertBooleanPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    private void RevertBooleanPropertyToBase ( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -503,7 +515,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="changedPropertyCollection"></param>
-    private void RevertIntPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    private void RevertIntPropertyToBase ( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
     {
         lock ( _propertyChangeCollectionsLock )
         {
@@ -530,7 +542,7 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
     /// </summary>
     /// <param name="propertyName"></param>
     /// <param name="changedPropertyCollection"></param>
-    private void RevertStringPropertyToBase( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
+    private void RevertStringPropertyToBase ( string propertyName, ConcurrentDictionary<string, IZfsProperty> changedPropertyCollection )
     {
         lock ( _propertyChangeCollectionsLock )
         {

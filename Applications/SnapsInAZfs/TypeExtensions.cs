@@ -10,9 +10,9 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-using Interop.Zfs.ZfsTypes;
+namespace SnapsInAZfs;
 
 internal static class TypeExtensions
 {
@@ -22,7 +22,7 @@ internal static class TypeExtensions
     /// <param name="terms"></param>
     /// <param name="fallback">Fallback value if the collection is empty</param>
     /// <returns></returns>
-    public static int GreatestCommonFactor( this IList<int> terms, int fallback = 1 )
+    public static int GreatestCommonFactor ( this IList<int> terms, int fallback = 1 )
     {
         int count = terms.Count;
         if ( count <= 1 )
@@ -39,12 +39,12 @@ internal static class TypeExtensions
         return result;
     }
 
-    public static string KeysToCommaSeparatedSingleLineString( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
+    public static string KeysToCommaSeparatedSingleLineString ( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
     {
         return collection.Where ( static kvp => !kvp.Value ).Select ( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString ( withSpaces );
     }
 
-    private static void GreatestCommonFactor( ref int left, int right )
+    private static void GreatestCommonFactor ( ref int left, int right )
     {
         while ( left != 0 && right != 0 )
         {
