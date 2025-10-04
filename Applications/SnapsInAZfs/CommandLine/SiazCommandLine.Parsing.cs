@@ -18,6 +18,20 @@ using System.Runtime.CompilerServices;
 
 public partial class SiazCommandLine
 {
+  /// <summary>
+  ///   Calls <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" /> on the <see cref="RootCommand" /> and returns
+  ///   the result.
+  /// </summary>
+  /// <param name="args">
+  ///   If not <see langword="null" />, specifies an explicit collection of command line arguments to parse, of which the first is
+  ///   interpreted as the executable name.<br />
+  ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
+  ///   explicitly <see langword="null" />.
+  /// </param>
+  /// <param name="configuration">A <see cref="ParserConfiguration" /> to use or default, if not provided or null.</param>
+  /// <returns>
+  ///   The result of <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />.
+  /// </returns>
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ParseResult Parse ( IReadOnlyList<string>? args = null, ParserConfiguration? configuration = null )
@@ -26,6 +40,22 @@ public partial class SiazCommandLine
 
     return RootCommand.Parse ( args, configuration );
   }
+
+  /// <summary>
+  ///   Calls <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" /> on the <see cref="RootCommand" /> and returns
+  ///   the result.
+  /// </summary>
+  /// <param name="args">
+  ///   If not <see langword="null" />, specifies an explicit collection of command line arguments to parse, of which the first is
+  ///   interpreted as the executable name.<br />
+  ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
+  ///   explicitly <see langword="null" />.
+  /// </param>
+  /// <param name="rootCommand">A reference to <see cref="RootCommand"/>, for convenience.</param>
+  /// <param name="configuration">A <see cref="ParserConfiguration" /> to use or default, if not provided or null.</param>
+  /// <returns>
+  ///   The result of <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />.
+  /// </returns>
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ParseResult Parse ( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )

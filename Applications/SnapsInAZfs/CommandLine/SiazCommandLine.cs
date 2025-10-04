@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Extensions;
 using Interop;
@@ -50,6 +51,9 @@ public sealed partial class SiazCommandLine
 {
   private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
 
+  /// <summary>
+  ///   Creates a new instance of <see cref="SiazCommandLine" /> and initializes its structure.
+  /// </summary>
   public SiazCommandLine ( )
   {
     ConfigureCommandLineTree ( );
@@ -75,7 +79,10 @@ public sealed partial class SiazCommandLine
 
   private SnapsInAZfsSettings? _settings;
 
-  public RootCommand? RootCommand { get; private set; }
+  /// <summary>
+  ///   A reference to the <see cref="RootCommand" /> of the command line.
+  /// </summary>
+  public RootCommand RootCommand { get; private set; }
 
   private Command RunCommand { get; } = new (
                                              RunCommandName,
@@ -85,19 +92,38 @@ public sealed partial class SiazCommandLine
                                              """
                                             );
 
+  /// <summary>
+  ///   Parses the command line, updates the internal settings and configuration references, and invokes the System.CommandLine
+  ///   functionality based on the input.
+  /// </summary>
+  /// <param name="rootCommand"></param>
+  /// <param name="rootCommandParseResult"></param>
+  /// <param name="siazSettings"></param>
+  /// <param name="configurationRoot"></param>
+  /// <param name="args">
+  ///   If not <see langword="null" />, specifies an explicit collection of command line arguments to parse, of which the first is
+  ///   interpreted as the executable name.<br />
+  ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
+  ///   explicitly <see langword="null" />.
+  /// </param>
+  /// <param name="parserConfiguration"></param>
+  /// <param name="invocationConfiguration"></param>
+  /// <returns></returns>
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ExitCode Invoke (
-    IReadOnlyList<string>    args,
     out RootCommand          rootCommand,
     out ParseResult          rootCommandParseResult,
     out SnapsInAZfsSettings? siazSettings,
     out IConfigurationRoot?  configurationRoot,
+    IReadOnlyList<string>?   args                    = null,
     ParserConfiguration?     parserConfiguration     = null,
     InvocationConfiguration? invocationConfiguration = null
   )
   {
     _settings = new ( );
+
+    args ??= Environment.GetCommandLineArgs ( );
 
     rootCommandParseResult = Parse ( args, out rootCommand, parserConfiguration );
     int invokeResult = rootCommandParseResult.Invoke ( invocationConfiguration );
@@ -115,6 +141,7 @@ public sealed partial class SiazCommandLine
   ///     See <c>SnapsInAZfs(8)</c> and <c>SnapsInAZfs(5)</c> for operation and configuration details.
   ///   </para>
   /// </remarks>
+  [MemberNotNull ( nameof (RootCommand) )]
   private RootCommand ConfigureCommandLineTree ( )
   {
     return RootCommand = new RootCommand ( "SnapsInAZfs" )

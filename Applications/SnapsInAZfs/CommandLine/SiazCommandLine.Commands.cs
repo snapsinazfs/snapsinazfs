@@ -143,7 +143,7 @@ public partial class SiazCommandLine
     Logger.Debug ( "Getting base configuration from files" );
     ConfigurationBuilder configBuilder = new ( );
 
-    if ( !LoadBaseConfigurationFiles ( cliParseResult, configBuilder, out OptionResult baseConfigOptionResult, out string[]? requestedFiles ) )
+    if ( !LoadBaseConfigurationFiles ( cliParseResult, configBuilder, out OptionResult baseConfigOptionResult, out string[] requestedFiles ) )
     {
       Logger.Error ( "One or more base configuration files could not be loaded. Aborting." );
 
@@ -163,7 +163,7 @@ public partial class SiazCommandLine
                     $"""
                      One or more supplementary configuration files (--additional-config option) could not be loaded. Aborting.
                      Requested files:
-                     {string.Join ( Environment.NewLine, additionalRequestedFiles )}
+                     {string.Join ( Environment.NewLine, additionalRequestedFiles ?? [ "[NO FILES REQUESTED]" ] )}
                      """
                    );
 
