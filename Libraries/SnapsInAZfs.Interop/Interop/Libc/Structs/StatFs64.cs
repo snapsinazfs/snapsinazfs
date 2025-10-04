@@ -23,7 +23,8 @@ using System.Runtime.InteropServices;
 ///     The data structure returned by a call to <see cref="StatFs64" />
 /// </summary>
 [StructLayout ( LayoutKind.Sequential, CharSet = CharSet.Ansi )]
-public class StatFs64
+[System.Diagnostics.CodeAnalysis.SuppressMessage ( "Style", "IDE1006:Naming Styles", Justification = "Names of native fields preserved." )]
+public struct StatFs64
 {
 #pragma warning disable CS1591
     public ulong f_type;
