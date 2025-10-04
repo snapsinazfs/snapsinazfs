@@ -41,6 +41,7 @@ using System.Diagnostics.Contracts;
 // ReSharper disable ArrangeNamespaceBody
 // ReSharper disable InconsistentNaming
 
+// ReSharper disable once CheckNamespace
 namespace JetBrains.Annotations;
 
 /// <summary>

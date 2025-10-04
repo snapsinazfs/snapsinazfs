@@ -14,14 +14,14 @@ namespace SnapsInAZfs.Monitoring;
 
 public enum ApplicationState
 {
-    Init                               = 0,
-    Idle                               = 1,
-    GettingDataFromZfs                 = 2,
-    TakingSnapshots                    = 3,
-    PruningSnapshots                   = 4,
-    CheckingZfsPropertySchema          = 5,
-    Executing                          = 6,
-    UpdatingZfsPropertySchema          = 7,
-    UpdatingZfsPropertySchemaCompleted = 8,
-    Terminating                        = 9
+  Init                               = 0,
+  Idle                               = 1,
+  GettingDataFromZfs                 = 2,
+  TakingSnapshots                    = 3,
+  PruningSnapshots                   = 4,
+  CheckingZfsPropertySchema          = 5,
+  Executing                          = 6,
+  UpdatingZfsPropertySchema          = 7,
+  UpdatingZfsPropertySchemaCompleted = 8,
+  Terminating                        = 9
 }

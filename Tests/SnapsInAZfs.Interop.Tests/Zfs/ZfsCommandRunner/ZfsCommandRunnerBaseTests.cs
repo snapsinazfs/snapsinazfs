@@ -10,14 +10,14 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
+using System.Collections.Concurrent;
+using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
+using SnapsInAZfs.Interop.Zfs.ZfsTypes;
+
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 
-using System.Collections.Concurrent;
-using Interop.Zfs.ZfsCommandRunner;
-using Interop.Zfs.ZfsTypes;
-
 [TestFixture]
-[TestOf ( typeof( ZfsCommandRunnerBase ) )]
+[TestOf ( typeof ( ZfsCommandRunnerBase ) )]
 public class ZfsCommandRunnerBaseTests
 {
     [Test]
@@ -32,7 +32,7 @@ public class ZfsCommandRunnerBaseTests
     [TestCaseSource ( nameof (GetUnformattedStringPropertyTestCases) )]
     [TestCaseSource ( nameof (GetNativeLongPropertyTestCases) )]
     [TestCaseSource ( nameof (GetNativeTypePropertyTestCases) )]
-    public bool CheckIfPropertyIsValid( string propertyName, string propertyValue, string propertySource )
+    public bool CheckIfPropertyIsValid ( string propertyName, string propertyValue, string propertySource )
     {
         return ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy ( propertyName, propertyValue, propertySource );
     }
@@ -40,11 +40,18 @@ public class ZfsCommandRunnerBaseTests
     [Test]
     public void CheckIfPropertyIsValid_ThrowsOnNameOutOfRange ( )
     {
-        Assert.That ( ( ) => ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy ( "BOGUS PROPERTY NAME", "Unimportant Value", ZfsPropertySourceConstants.Local ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+        Assert.That (
+                     ( ) => ZfsCommandRunnerBaseProtectedMethodsTestClass.CheckIfPropertyIsValidProxy (
+                                                                                                       "BOGUS PROPERTY NAME",
+                                                                                                       "Unimportant Value",
+                                                                                                       ZfsPropertySourceConstants.Local
+                                                                                                      ),
+                     Throws.TypeOf<ArgumentOutOfRangeException> ( )
+                    );
     }
 
     [Test]
-    public void ParseAndValidatePoolRootZfsGetLine_ReturnsFalseWhenArrayTooShort( [ValueSource ( nameof (GetShortLineTokenArrays) )] string[] lineTokens )
+    public void ParseAndValidatePoolRootZfsGetLine_ReturnsFalseWhenArrayTooShort ( [ValueSource ( nameof (GetShortLineTokenArrays) )] string[] lineTokens )
     {
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> testCollection = new ( );
         Assume.That ( testCollection, Is.Empty );
@@ -54,7 +61,9 @@ public class ZfsCommandRunnerBaseTests
     }
 
     [Test]
-    public void ParseAndValidatePoolRootZfsGetLine_ReturnsTrueAndContainsPropertyValiditiesWhenValid( [ValueSource ( nameof (GetValidZfsPoolRootLineTokenArrays) )] string[] lineTokens )
+    public void ParseAndValidatePoolRootZfsGetLine_ReturnsTrueAndContainsPropertyValiditiesWhenValid (
+        [ValueSource ( nameof (GetValidZfsPoolRootLineTokenArrays) )] string[] lineTokens
+    )
     {
         ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> testCollection = new ( );
         Assume.That ( testCollection, Is.Empty );
@@ -73,56 +82,114 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetBooleanPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName ];
-        (string, bool)[] propertyValues  = [ ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames =
+            [ ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName ];
+        (string, bool)[] propertyValues = [ ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ) ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetDateTimeOffsetPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", true ), ( "0", false ), ( "1", false ), ( "100", false ), ( int.MaxValue.ToString( ), false ), ( "-1", false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames =
+        [
+            ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+            ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName
+        ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", true ), ( "0", false ), ( "1", false ),
+            ( "100", false ), ( int.MaxValue.ToString ( ), false ), ( "-1", false )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetNativeLongPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsNativePropertyNames.Available, ZfsNativePropertyNames.Used ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), true ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames = [ ZfsNativePropertyNames.Available, ZfsNativePropertyNames.Used ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ),
+            ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ),
+            ( long.MaxValue.ToString ( ), true )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetNativeTypePropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsNativePropertyNames.Type ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.FileSystem, true ), ( ZfsPropertyValueConstants.Volume, true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ), ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString( ), false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames = [ ZfsNativePropertyNames.Type ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ),
+            ( ZfsPropertyValueConstants.FileSystem, true ), ( ZfsPropertyValueConstants.Volume, true ), ( ZfsPropertyValueConstants.SnapsInAZfs, false ),
+            ( ZfsPropertyValueConstants.ZfsRecursion, false ), ( "\t", false ), ( " ", false ), ( long.MaxValue.ToString ( ), false )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetRecursionPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.RecursionPropertyName ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames = [ ZfsPropertyNames.RecursionPropertyName ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ),
+            ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetRestrictedPositiveIntPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), false ), ( "-1", false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames = [ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ),
+            ( "100", true ), ( int.MaxValue.ToString ( ), false ), ( "-1", false )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static IEnumerable<string[]> GetShortLineTokenArrays ( )
@@ -134,20 +201,43 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetUnformattedStringPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem ];
-        (string, bool)[] propertyValues  = [ ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", true ), ( "1970-01-01T00:00:00Z", true ), ( "0", true ), ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ), ( "\t", false ), ( " ", false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames = [ ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", true ), ( "1970-01-01T00:00:00Z", true ), ( "0", true ),
+            ( ZfsPropertyValueConstants.SnapsInAZfs, true ), ( ZfsPropertyValueConstants.ZfsRecursion, true ), ( "\t", false ), ( " ", false )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static List<TestCaseData> GetUnrestrictedPositiveIntPropertyTestCases ( )
     {
-        string[]         propertyNames   = [ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ];
-        (string, bool)[] propertyValues  = [ ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ), ( "100", true ), ( int.MaxValue.ToString( ), true ), ( "-1", false ) ];
-        (string, bool)[] propertySources = [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
+        string[] propertyNames =
+        [
+            ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
+            ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName
+        ];
+        (string, bool)[] propertyValues =
+        [
+            ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ),
+            ( "100", true ), ( int.MaxValue.ToString ( ), true ), ( "-1", false )
+        ];
+        (string, bool)[] propertySources =
+            [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
 
-        return ( from name in propertyNames from val in propertyValues from source in propertySources select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } ).ToList( );
+        return ( from name in propertyNames
+                 from val in propertyValues
+                 from source in propertySources
+                 select new TestCaseData ( name, val.Item1, source.Item1 ) { HasExpectedResult = true, ExpectedResult = val.Item2 && source.Item2 } )
+           .ToList ( );
     }
 
     private static IEnumerable<string[]> GetValidZfsPoolRootLineTokenArrays ( )
@@ -208,75 +298,89 @@ public abstract class ZfsCommandRunnerBaseProtectedMethodsTestClass : ZfsCommand
     /// <param name="propertyValue"></param>
     /// <param name="propertySource"></param>
     /// <returns></returns>
-    public static bool CheckIfPropertyIsValidProxy( string propertyName, string propertyValue, string propertySource )
+    public static bool CheckIfPropertyIsValidProxy ( string propertyName, string propertyValue, string propertySource )
     {
         return CheckIfPropertyIsValid ( propertyName, propertyValue, propertySource );
     }
 
-    public static bool ParseAndValidatePoolRootZfsGetLineProxy( string[] lineTokens, ref ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties )
+    public static bool ParseAndValidatePoolRootZfsGetLineProxy (
+        string[]                                                             lineTokens,
+        ref ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> rootsAndTheirProperties
+    )
     {
         return ParseAndValidatePoolRootZfsGetLine ( lineTokens, ref rootsAndTheirProperties );
     }
 
 #region Overrides of ZfsCommandRunnerBase
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, List<IZfsProperty> properties )
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, List<IZfsProperty> properties )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override Task GetDatasetsAndSnapshotsFromZfsAsync( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots )
+    public override Task GetDatasetsAndSnapshotsFromZfsAsync (
+        SnapsInAZfsSettings                     settings,
+        ConcurrentDictionary<string, ZfsRecord> datasets,
+        ConcurrentDictionary<string, Snapshot>  snapshots
+    )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
     public override Task<ConcurrentDictionary<string, ConcurrentDictionary<string, bool>>> GetPoolRootsAndPropertyValiditiesAsync ( )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
+    public override Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync ( bool dryRun, string zfsPath, IZfsProperty propertyToInherit )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray )
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync ( SnapsInAZfsSettings settings, string poolName, string[] propertyArray )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override IAsyncEnumerable<string> ZpoolExecEnumerator( string verb, string args )
+    public override IAsyncEnumerable<string> ZpoolExecEnumerator ( string verb, string args )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
+    public override IAsyncEnumerable<string> ZfsExecEnumeratorAsync ( string verb, string args )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset dateTimeOffset, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot )
+    public override ZfsCommandRunnerOperationStatus TakeSnapshot (
+        ZfsRecord           ds,
+        SnapshotPeriod      period,
+        in DateTimeOffset   dateTimeOffset,
+        SnapsInAZfsSettings snapsInAZfsSettings,
+        FormattingSettings  datasetFormattingSettings,
+        out Snapshot?       snapshot
+    )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
+    public override Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync ( Snapshot snapshot, SnapsInAZfsSettings settings )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, params IZfsProperty[] properties )
     {
-        throw new NotImplementedException( );
+        throw new NotImplementedException ( );
     }
 #endregion
 }

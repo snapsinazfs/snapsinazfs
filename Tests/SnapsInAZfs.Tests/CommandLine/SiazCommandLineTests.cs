@@ -41,13 +41,16 @@ public class SiazCommandLineTests
         string[]        emptyArgs          = [ ];
 
         _ = siazCli.Invoke (
-                                            emptyArgs,
-                                            out _,
-                                            out ParseResult siazCliParseResult,
-                                            out _,
-                                            out _,
-                                            new ( ) { EnablePosixBundling = true }
-                                           );
+                            out _,
+                            out ParseResult siazCliParseResult,
+                            out _,
+                            out _,
+                            emptyArgs,
+                            parserConfiguration: new ( )
+                                                 {
+                                                   EnablePosixBundling = true
+                                                 }
+                           );
 
         Assert.That ( siazCliParseResult.Errors, Has.Exactly ( 1 ).TypeOf<ParseError>( ) );
     }
@@ -59,12 +62,15 @@ public class SiazCommandLineTests
         SiazCommandLine siazCli            = new ( );
         string[]        emptyArgs          = [ ];
         ExitCode exitCode = siazCli.Invoke (
+                                            out _,
+                                            out _,
+                                            out _,
+                                            out _,
                                             emptyArgs,
-                                            out _,
-                                            out _,
-                                            out _,
-                                            out _,
-                                            new ( ) { EnablePosixBundling = true }
+                                            parserConfiguration: new ( )
+                                                                 {
+                                                                   EnablePosixBundling = true
+                                                                 }
                                            );
 
         Assert.That ( exitCode, Is.EqualTo ( ExitCode.EPERM ) );

@@ -13,13 +13,13 @@
 namespace SnapsInAZfs.Monitoring;
 
 /// <summary>
-///     Interface defining minimum implementation of an object that can be observed by an <see cref="IApplicationStateObserver" />
+///   Interface defining minimum implementation of an object that can be observed by an <see cref="IApplicationStateObserver" />
 /// </summary>
 public interface IApplicationStateObservable
 {
-    DateTimeOffset   ServiceStartTime { get; }
-    ApplicationState State            { get; }
+  DateTimeOffset   ServiceStartTime { get; }
+  ApplicationState State            { get; }
 
-    event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
-    event EventHandler<long>?                             NextRunTimeChanged;
+  event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
+  event EventHandler<long>?                             NextRunTimeChanged;
 }

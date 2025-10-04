@@ -10,59 +10,59 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using Microsoft.AspNetCore.Http.HttpResults;
-
 namespace SnapsInAZfs.Monitoring;
 
+using Microsoft.AspNetCore.Http.HttpResults;
+
 /// <summary>
-///     Interface defining minimum implementation of an object that intends to observe an <see cref="IApplicationStateObservable" />,
-///     via direct polling and by event subscription
+///   Interface defining minimum implementation of an object that intends to observe an <see cref="IApplicationStateObservable" />,
+///   via direct polling and by event subscription
 /// </summary>
 public interface IApplicationStateObserver
 {
-    /// <summary>
-    ///     Gets a string representation of the monitored <see cref="IApplicationStateObservable" />'s current state.
-    /// </summary>
-    /// <returns>
-    ///     A string representing the current state of the monitored observable object.
-    /// </returns>
-    Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync ( );
+  /// <summary>
+  ///   Gets a string representation of the monitored <see cref="IApplicationStateObservable" />'s current state.
+  /// </summary>
+  /// <returns>
+  ///   A string representing the current state of the monitored observable object.
+  /// </returns>
+  Task<Results<Ok<string>, StatusCodeHttpResult>> GetApplicationStateAsync ( );
 
-    Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync ( );
+  Task<Results<Ok<ApplicationStateMetrics>, StatusCodeHttpResult>> GetFullApplicationStateAsync ( );
 
-    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync ( );
+  Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetNextRunTimeAsync ( );
 
-    /// <summary>
-    ///     Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
-    ///     <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />
-    /// </summary>
-    /// <returns></returns>
-    Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync ( );
+  /// <summary>
+  ///   Gets the timestamp, as a <see cref="DateTimeOffset" />, when the service was started or, if no
+  ///   <see cref="IApplicationStateObservable" /> is registered, <see cref="DateTimeOffset.UnixEpoch" />
+  /// </summary>
+  /// <returns></returns>
+  Task<Results<Ok<DateTimeOffset>, StatusCodeHttpResult>> GetServiceStartTimeAsync ( );
 
-    /// <summary>
-    ///     Gets the version of the application
-    /// </summary>
-    /// <returns>The application version, as a <see langword="string" /></returns>
-    /// <remarks>
-    ///     Returns the version of the application owning the <see cref="IApplicationStateObserver" /> object instance.
-    /// </remarks>
-    Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync ( );
+  /// <summary>
+  ///   Gets the version of the application
+  /// </summary>
+  /// <returns>The application version, as a <see langword="string" /></returns>
+  /// <remarks>
+  ///   Returns the version of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+  /// </remarks>
+  Task<Results<Ok<string>, StatusCodeHttpResult>> GetVersionAsync ( );
 
-    /// <summary>
-    ///     Gets the current working set (memory usage) of the application, in bytes
-    /// </summary>
-    /// <returns>The current working set, in bytes, as a <see langword="long" /></returns>
-    /// <remarks>
-    ///     Returns the working set of the application owning the <see cref="IApplicationStateObserver" /> object instance.
-    /// </remarks>
-    Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync ( );
+  /// <summary>
+  ///   Gets the current working set (memory usage) of the application, in bytes
+  /// </summary>
+  /// <returns>The current working set, in bytes, as a <see langword="long" /></returns>
+  /// <remarks>
+  ///   Returns the working set of the application owning the <see cref="IApplicationStateObserver" /> object instance.
+  /// </remarks>
+  Task<Results<Ok<long>, StatusCodeHttpResult>> GetWorkingSetAsync ( );
 
-    /// <summary>
-    ///     Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />
-    /// </summary>
-    /// <remarks>
-    ///     Implementations should typically subscribe the observer object to the observable object's
-    ///     <see cref="IApplicationStateObservable.ApplicationStateChanged" /> <see langword="event" />
-    /// </remarks>
-    public void RegisterApplicationStateObservable( IApplicationStateObservable observableObject, bool subscribeToEvents = true );
+  /// <summary>
+  ///   Registers an instance of an <see cref="IApplicationStateObservable" /> with this <see cref="IApplicationStateObserver" />
+  /// </summary>
+  /// <remarks>
+  ///   Implementations should typically subscribe the observer object to the observable object's
+  ///   <see cref="IApplicationStateObservable.ApplicationStateChanged" /> <see langword="event" />
+  /// </remarks>
+  public void RegisterApplicationStateObservable ( IApplicationStateObservable observableObject, bool subscribeToEvents = true );
 }

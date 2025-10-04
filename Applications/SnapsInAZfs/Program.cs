@@ -162,16 +162,16 @@ internal static class Program
         return exitCode == ExitCode.EOK;
     }
 
-    /// <summary>
-    ///     Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-    ///     the CLI
-    /// </summary>
-    /// <param name="args"></param>
-    /// <param name="programSettings">
-    ///     A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
-    /// </param>
-    internal static void ApplyCommandLineArgumentOverrides ( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
-    {
+  /// <summary>
+  ///   Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+  ///   the CLI
+  /// </summary>
+  /// <param name="args"></param>
+  /// <param name="programSettings">
+  ///   A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
+  /// </param>
+  internal static void ApplyCommandLineArgumentOverrides ( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
+  {
         Logger.Debug ( "Overriding settings using arguments from command line." );
 
         programSettings.DryRun         |= args.DryRun;
@@ -209,15 +209,19 @@ internal static class Program
         ConfigurationBuilder configBuilder = new ( );
 
         IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0
-                                                 ? args.ConfigFiles
-                                                 :
-                                                 [
-                                                     "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json", "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
-                                                     "/etc/SnapsInAZfs/SnapsInAZfs.local.json", "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json", "SnapsInAZfs.json",
-                                                     "SnapsInAZfs.local.json", "SnapsInAZfs.nlog.json"
-                                                 ];
+                                           ? args.ConfigFiles
+                                           :
+                                           [
+                                             "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
+                                             "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
+                                             "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
+                                             "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
+                                             "SnapsInAZfs.json",
+                                             "SnapsInAZfs.local.json",
+                                             "SnapsInAZfs.nlog.json"
+                                           ];
 
-        foreach ( string filePath in requestedFiles )
+    foreach ( string filePath in requestedFiles )
         {
             if ( !File.Exists ( filePath ) )
             {

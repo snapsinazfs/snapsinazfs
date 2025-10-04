@@ -10,26 +10,26 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
 namespace SnapsInAZfs.Monitoring;
+
+using Interop.Zfs.ZfsTypes;
 
 public sealed class SnapshotOperationEventArgs : EventArgs
 {
-    public SnapshotOperationEventArgs( string name, in DateTimeOffset timestamp )
-    {
-        Name      = name;
-        Timestamp = timestamp;
-    }
+  public SnapshotOperationEventArgs ( string name, in DateTimeOffset timestamp )
+  {
+    Name      = name;
+    Timestamp = timestamp;
+  }
 
-    public SnapshotOperationEventArgs( Snapshot snapshot )
-    {
-        Name      = snapshot.Name;
-        Timestamp = snapshot.Timestamp.Value;
-        Snapshot  = snapshot;
-    }
+  public SnapshotOperationEventArgs ( Snapshot snapshot )
+  {
+    Name      = snapshot.Name;
+    Timestamp = snapshot.Timestamp.Value;
+    Snapshot  = snapshot;
+  }
 
-    public string         Name      { get; }
-    public Snapshot?      Snapshot  { get; }
-    public DateTimeOffset Timestamp { get; }
+  public string         Name      { get; }
+  public Snapshot?      Snapshot  { get; }
+  public DateTimeOffset Timestamp { get; }
 }

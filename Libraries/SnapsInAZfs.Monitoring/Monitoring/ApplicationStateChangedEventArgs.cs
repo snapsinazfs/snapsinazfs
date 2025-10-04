@@ -14,12 +14,12 @@ namespace SnapsInAZfs.Monitoring;
 
 public sealed class ApplicationStateChangedEventArgs : EventArgs
 {
-    public ApplicationStateChangedEventArgs( ApplicationState previous, ApplicationState current )
-    {
-        Previous = previous;
-        Current  = current;
-    }
+  public ApplicationStateChangedEventArgs ( ApplicationState previous, ApplicationState current )
+  {
+    Previous = previous;
+    Current  = current;
+  }
 
-    public ApplicationState Current  { get; }
-    public ApplicationState Previous { get; }
+  public ApplicationState Current  { get; }
+  public ApplicationState Previous { get; }
 }
