@@ -59,22 +59,6 @@ public sealed partial class SiazCommandLine
     ConfigureCommandLineTree ( );
   }
 
-  /// <summary>
-  ///   Creates a new instance of <see cref="SiazCommandLine" /> using the provided <paramref name="rootCommand" /> instead of the
-  ///   default implementation.
-  /// </summary>
-  /// <param name="rootCommand">
-  ///   An alternative <see cref="System.CommandLine.RootCommand" /> to use instead of the default implementation.
-  /// </param>
-  /// <remarks>
-  ///   This constructor WILL NOT create the default command line tree and will only have whatever is defined by
-  ///   <paramref name="rootCommand" />.
-  /// </remarks>
-  public SiazCommandLine ( RootCommand rootCommand )
-  {
-    RootCommand = rootCommand;
-  }
-
   private IConfigurationRoot? _configurationRoot;
 
   private SnapsInAZfsSettings? _settings;
