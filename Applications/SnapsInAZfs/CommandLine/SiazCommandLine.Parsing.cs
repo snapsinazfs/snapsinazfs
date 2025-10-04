@@ -20,16 +20,17 @@ public partial class SiazCommandLine
 {
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-  public ParseResult Parse ( IReadOnlyList<string> args, ParserConfiguration? configuration = null )
+  public ParseResult Parse ( IReadOnlyList<string>? args = null, ParserConfiguration? configuration = null )
   {
-    return ConfigureCommandLineTree ( ).Parse ( args, configuration );
-  }
+    args ??= Environment.GetCommandLineArgs ( );
 
+    return RootCommand.Parse ( args, configuration );
+  }
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ParseResult Parse ( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
   {
-    rootCommand = ConfigureCommandLineTree ( );
+    rootCommand = RootCommand;
 
     return rootCommand.Parse ( args, configuration );
   }
