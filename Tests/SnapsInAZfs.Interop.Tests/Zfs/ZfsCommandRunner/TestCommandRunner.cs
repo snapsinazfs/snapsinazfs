@@ -22,7 +22,7 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 
 public class TestCommandRunner : ZfsCommandRunnerBase
 {
-    private new static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+    private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
 
     /// <inheritdoc />
     public override async Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
