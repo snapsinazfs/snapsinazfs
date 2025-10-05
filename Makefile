@@ -20,8 +20,10 @@ SIAZ_SETTINGS_PROJECT_FILE_NAME ?= $(SIAZ_SETTINGS).csproj
 SIAZ_SETTINGS_PROJECT_FILE_PATH ?= $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/$(SIAZ_SETTINGS_PROJECT_FILE_NAME)
 SNAPSINAZFSDOCDIR ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Documentation
 ETCDIR ?= /etc
-SIAZLOCALCONFIGFILENAME ?= SnapsInAZfs.local.json
-SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
+SIAZ_LOCAL_CONFIG_SUFFIX ?= local
+SIAZ_LOCAL_CONFIG_FILE_NAME ?= $(SIAZ).$(SIAZ_LOCAL_CONFIG_SUFFIX).json
+SIAZ_NLOG_CONFIG_FILE_NAME ?= $(SIAZ).nlog.json
+SNAPSINAZFSETCDIR ?= $(ETCDIR)/$(SIAZ)
 # Variables above this line generally should not be changed
 
 # For help on common and recommended build procedures,
@@ -59,8 +61,8 @@ DEBUGPUBLISHDIR ?= $(PUBLISHROOT)/$(DEBUGCONFIG)
 TESTCONFIG ?= $(RELEASECONFIG)
 
 # These variables should generally not be changed and may result in broken or incomplete installs or uninstalls
-PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/SnapsInAZfs.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.schema.json
-PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/SnapsInAZfs.monitoring.schema.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.schema.json
+PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/$(SIAZ).json $(RELEASEPUBLISHDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME) $(RELEASEPUBLISHDIR)/$(SIAZ).schema.json
+PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/$(SIAZ).monitoring.schema.json $(RELEASEPUBLISHDIR)/$(SIAZ).$(SIAZ_LOCAL_CONFIG_SUFFIX).schema.json
 
 # These variables are for the man pages installed by the install-doc recipe (called implicitly by install).
 # If your system uses different directories than these for storing man page sections, set them as appropriate.
@@ -72,10 +74,10 @@ MAN7DIR ?= $(MANDIR)/man7
 MAN8DIR ?= $(MANDIR)/man8
 
 # This is where the executable will be installed, when you run the install recipe
-LOCALSBINDIR ?= /usr/local/sbin
+USR_LOCAL_SBIN_DIR ?= /usr/local/sbin
 
 # This is the base directory where a sub-directory containing base configuration and schema files will be installed, when you run the install recipe
-LOCALSHAREDIR ?= /usr/local/share
+USR_LOCAL_ETC_DIR ?= /usr/local/etc
 
 # These variables are used for creating the default log file destination folder.
 # Be sure to set the same path for log file targets in your local (in /etc/SnapsInAZfs) SnapsInAZfs.nlog.json
@@ -152,23 +154,23 @@ install:	install-release	|	install-config	install-doc
 install-config:	install-config-local	|	install-config-base
 
 install-config-base:
-	install --backup=existing -D -C -v -m 664 -t $(LOCALSHAREDIR)/SnapsInAZfs/ $(PUBLISHBASECONFIGFILELIST)
+	install --backup=existing -D -C -v -m 664 -t $(USR_LOCAL_ETC_DIR)/$(SIAZ)/ $(PUBLISHBASECONFIGFILELIST)
 
 install-config-local:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
-	@test -s $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME) || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZLOCALCONFIGFILENAME) $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME) ; }
-	@test -s $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json ; }
+	@test -s $(SNAPSINAZFSETCDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME) || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME) $(SNAPSINAZFSETCDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME) ; }
+	@test -s $(SNAPSINAZFSETCDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME) || { install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME) $(SNAPSINAZFSETCDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME) ; }
 
 install-config-local-force:
 	[ ! -d $(SNAPSINAZFSETCDIR) ] && [ -w $(ETCDIR) ] && mkdir -p $(SNAPSINAZFSETCDIR) || true
-	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZLOCALCONFIGFILENAME) $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME)
-	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/SnapsInAZfs.nlog.json $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME) $(SNAPSINAZFSETCDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME)
+	install --backup=existing -C -v -m 664 $(RELEASEPUBLISHDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME) $(SNAPSINAZFSETCDIR)/$(SIAZ_NLOG_CONFIG_FILE_NAME)
 
 install-doc:
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs.8 $(MAN8DIR)/$(SIAZ).8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).8 $(MAN8DIR)/$(SIAZ).8
 	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/$(SIAZLC).8
 	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/siaz.8
-	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/SnapsInAZfs-config-console.8 $(MAN8DIR)/$(SIAZ)-config-console.8
+	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZ)-config-console.8
 	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZLC)-config-console.8
 	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/siaz-config-console.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
@@ -185,15 +187,15 @@ install-doc:
 	mandb -q
 
 install-release:	publish-release
-	install --backup=existing -C -D -v -m 754 $(RELEASEPUBLISHDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZ)
-	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/$(SIAZLC)
-	cp -fs $(LOCALSBINDIR)/SnapsInAZfs $(LOCALSBINDIR)/siaz
+	install --backup=existing -C -D -v -m 754 $(RELEASEPUBLISHDIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/$(SIAZ)
+	cp -fs $(USR_LOCAL_SBIN_DIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/$(SIAZLC)
+	cp -fs $(USR_LOCAL_SBIN_DIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/siaz
 	mkdir -p $(LOGPATH)
 
 install-service:
-	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/snapsinazfs.service /usr/lib/systemd/system/snapsinazfs.service
+	install --backup=existing -C -v -m 664 $(SNAPSINAZFS_SOLUTION_ROOT)/$(SIAZLC).service /usr/lib/systemd/system/$(SIAZLC).service
 	systemctl daemon-reload
-	systemctl enable snapsinazfs.service
+	systemctl enable $(SIAZLC).service
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
@@ -202,11 +204,11 @@ publish-release:
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
 uninstall-config-base:
-	rm -fv $(LOCALSHAREDIR)/SnapsInAZfs/*.json 2>/dev/null
+	rm -fv $(USR_LOCAL_ETC_DIR)/$(SIAZ)/*.json 2>/dev/null
 
 uninstall-config-local:
-	rm -fv $(SNAPSINAZFSETCDIR)/$(SIAZLOCALCONFIGFILENAME)* 2>/dev/null
-	rm -fv $(SNAPSINAZFSETCDIR)/SnapsInAZfs.nlog.json* 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/$(SIAZ_LOCAL_CONFIG_FILE_NAME)* 2>/dev/null
+	rm -fv $(SNAPSINAZFSETCDIR)/$(SIAZ).nlog.json* 2>/dev/null
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:
@@ -235,15 +237,15 @@ uninstall-logs:
 	rm -rfv $(LOGPATH) 2>/dev/null
 
 uninstall-release:
-	rm -rfv $(LOCALSHAREDIR)/SnapsInAZfs 2>/dev/null
-	rm -fv $(LOCALSBINDIR)/$(SIAZ) 2>/dev/null
-	rm -fv $(LOCALSBINDIR)/$(SIAZLC) 2>/dev/null
-	rm -fv $(LOCALSBINDIR)/siaz 2>/dev/null
+	rm -rfv $(USR_LOCAL_ETC_DIR)/$(SIAZ) 2>/dev/null
+	rm -fv $(USR_LOCAL_SBIN_DIR)/$(SIAZ) 2>/dev/null
+	rm -fv $(USR_LOCAL_SBIN_DIR)/$(SIAZLC) 2>/dev/null
+	rm -fv $(USR_LOCAL_SBIN_DIR)/siaz 2>/dev/null
 
 uninstall-service:
-	systemctl stop snapsinazfs.service
-	systemctl disable snapsinazfs.service
-	rm -rf /usr/lib/systemd/system/snapsinazfs.service
+	systemctl stop $(SIAZLC).service
+	systemctl disable $(SIAZLC).service
+	rm -rf /usr/lib/systemd/system/$(SIAZLC).service
 	systemctl daemon-reload
 
 test:
