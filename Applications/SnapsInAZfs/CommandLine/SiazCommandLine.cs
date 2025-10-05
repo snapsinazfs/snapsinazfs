@@ -23,26 +23,6 @@ using Interop;
 /// </summary>
 /// <remarks>
 ///   <para>
-///     A design goal of this type is to make use of the <c>System.CommandLine</c> functionality and then hand the results back
-///     to the caller, so that the SCL objects can be short-lived and not stick around for the lifetime of the application.
-///   </para>
-///   <para>
-///     However, SCL does most of its work in delegates provided when the tree is configured, and those delegates are pretty
-///     inflexible with regard to injection of external data.
-///   </para>
-///   <para>
-///     Therefore, to avoid excessive use of static objects, this type is essentially a wrapper for SCL that provides durable
-///     references to common items (to avoid re-creating them, e.g., in validators) and to objects that may be configured in
-///     multiple passes or that may be modified by or relevant to more than one delegate, especially for use in subsequent
-///     execution.<br />
-///     CommandName examples are the <see cref="SnapsInAZfsSettings" /> and <see cref="IConfigurationRoot" /> instances which are
-///     built from a combination of command line input and other configuration sources.
-///   </para>
-///   <para>
-///     In order to avoid SCL essentially owning the whole program, this class is used to set up the CLI, use it for parsing and
-///     validation, and then get out of the way and let the program run as it did prior to the introduction of SCL.
-///   </para>
-///   <para>
 ///     Note that this type has multiple parts in files named SiazCommandLine.[Category].cs.
 ///   </para>
 /// </remarks>
