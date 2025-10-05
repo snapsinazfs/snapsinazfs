@@ -1,6 +1,7 @@
 # These variables generally should not be changed
 MAKEFLAGS := $(filter-out -j,$(MAKEFLAGS))
 MAKEFLAGS := $(filter-out -jobs,$(MAKEFLAGS))
+SHELL := $(shell which bash)
 SNAPSINAZFS_SOLUTION_ROOT ?= .
 SIAZ_SOLUTION_FILE ?= SnapsInAZfs.slnx
 SIAZ_APPLICATIONS_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Applications
@@ -83,6 +84,8 @@ USR_LOCAL_ETC_DIR ?= /usr/local/etc
 # Be sure to set the same path for log file targets in your local (in /etc/SnapsInAZfs) SnapsInAZfs.nlog.json
 LOGROOT ?= /var/log
 LOGPATH ?= $(LOGROOT)/$(SIAZ)
+
+.ONESHELL:
 
 all:	build-release
 
