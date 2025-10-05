@@ -62,8 +62,9 @@ PUBLISHBASECONFIGFILELIST = $(RELEASEPUBLISHDIR)/SnapsInAZfs.json $(RELEASEPUBLI
 PUBLISHBASECONFIGFILELIST += $(RELEASEPUBLISHDIR)/SnapsInAZfs.monitoring.schema.json $(RELEASEPUBLISHDIR)/SnapsInAZfs.local.schema.json
 
 # These variables are for the man pages installed by the install-doc recipe (called implicitly by install).
-# If your system uses different directories than these for storing man page sections, set them as appropriate
-MANDIR ?= /usr/share/man
+# If your system uses different directories than these for storing man page sections, set them as appropriate.
+# However, this should auto-detect a valid man path on most systems, as it takes the first path that man itself reports that it uses.
+MANDIR ?= `man -w | cut -d : -f 1`
 MAN3DIR ?= $(MANDIR)/man3
 MAN5DIR ?= $(MANDIR)/man5
 MAN7DIR ?= $(MANDIR)/man7
