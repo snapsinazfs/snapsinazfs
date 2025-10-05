@@ -83,9 +83,9 @@ LOGPATH ?= $(LOGROOT)/$(SIAZ)
 
 all:	build-release
 
-clean:  clean-all
+clean:	clean-all
 
-clean-all:      clean-debug	clean-release
+clean-all:	clean-debug	clean-release
 
 clean-debug:
 	dotnet clean --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
