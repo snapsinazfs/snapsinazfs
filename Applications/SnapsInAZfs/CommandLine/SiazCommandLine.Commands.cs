@@ -100,15 +100,15 @@ public partial class SiazCommandLine
     ParseResult          parseResult,
     ConfigurationBuilder configurationBuilder,
     out OptionResult     configResult,
-    out string[]         strings
+    out string[]         configFilePaths
   )
   {
     bool success = true;
     configResult = parseResult.CommandResult.GetResult ( ConfigOption ) ??
                    throw new CommandLineInvocationException ( "Could not determine the set of configuration files to load." );
-    strings = configResult.GetValueOrDefault<string[]> ( );
+    configFilePaths = configResult.GetValueOrDefault<string[]> ( );
 
-    foreach ( string filePath in strings )
+    foreach ( string filePath in configFilePaths )
     {
       FileInfo fileInfo = new ( filePath );
       if ( !fileInfo.Exists )
