@@ -64,19 +64,6 @@ public sealed partial class SiazCommandLine
   private SnapsInAZfsSettings? _settings;
 
   /// <summary>
-  ///   A reference to the <see cref="RootCommand" /> of the command line.
-  /// </summary>
-  public RootCommand RootCommand { get; private set; }
-
-  private Command RunCommand { get; } = new (
-                                             RunCommandName,
-                                             """
-                                             Run SIAZ, optionally specifying override options.
-                                             Use this context when executing one-off operations or for custom service/script-based invocations.
-                                             """
-                                            );
-
-  /// <summary>
   ///   Parses the command line, updates the internal settings and configuration references, and invokes the System.CommandLine
   ///   functionality based on the input.
   /// </summary>
