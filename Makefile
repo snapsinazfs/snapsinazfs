@@ -2,6 +2,7 @@
 MAKEFLAGS := $(filter-out -j,$(MAKEFLAGS))
 MAKEFLAGS := $(filter-out -jobs,$(MAKEFLAGS))
 SNAPSINAZFS_SOLUTION_ROOT ?= .
+SIAZ_SOLUTION_FILE ?= SnapsInAZfs.slnx
 SIAZ_APPLICATIONS_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Applications
 SIAZ_LIBRARIES_DIRECTORY ?= $(SNAPSINAZFS_SOLUTION_ROOT)/Libraries
 SIAZ ?= SnapsInAZfs
@@ -26,7 +27,7 @@ SNAPSINAZFSETCDIR ?= $(ETCDIR)/SnapsInAZfs
 # For help on common and recommended build procedures,
 # run `make help`
 
-# Most variables blow this line can be changed, if you understand the consequences of changing them
+# Most variables blow this line can be changed, if you understand the consequences of changing them.
 # Do not change them in this file.
 # Instead, if you wish to override a variable, set it as an environment variable when calling make.
 # Variables are assigned using the ?= operator, which only sets them if they are not already defined,
@@ -88,7 +89,8 @@ clean:	clean-all
 clean-all:	clean-debug	clean-release
 
 clean-debug:
-	dotnet clean --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
+  @echo Cleaning $(DEBUGCONFIG) build artifacts
+	dotnet clean $(SIAZ_SOLUTION_FILE) --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
 	[ -d $(DEBUGDIR) ] && rm -rvf $(DEBUGDIR) || true
 	rmdir -v $(BUILDDIR) || true
 	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
@@ -105,7 +107,8 @@ clean-debug:
 	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj || true
 
 clean-release:
-	dotnet clean --configuration $(RELEASECONFIG) -o $(RELEASEDIR) 2>/dev/null
+  @echo Cleaning $(RELEASECONFIG) build artifacts
+	dotnet clean $(SIAZ_SOLUTION_FILE) --configuration $(RELEASECONFIG) -o $(RELEASEDIR) 2>/dev/null
 	if [ -d $(RELEASEDIR) ] ; then rm -rvf $(RELEASEDIR) ; fi
 	[ -d $(RELEASEPUBLISHDIR) ]  && rm -rvf $(RELEASEPUBLISHDIR) || true
 	[ -d $(PUBLISHROOT) ]  && rm -rvf $(PUBLISHROOT) || true
@@ -132,16 +135,15 @@ extraclean:	clean-debug	clean-release
 	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin 2>/dev/null
 	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj 2>/dev/null
 
-
 build:	build-release
 
 build-debug:
 	mkdir -p $(DEBUGDIR)
-	dotnet build --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build $(SIAZ_SOLUTION_FILE) --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 build-release:
 	mkdir -p $(RELEASEDIR)
-	dotnet build --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
+	dotnet build $(SIAZ_SOLUTION_FILE) --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
 
 reinstall:	uninstall	clean	install
 
@@ -245,13 +247,13 @@ uninstall-service:
 	systemctl daemon-reload
 
 test:
-	dotnet test --configuration=$(TESTCONFIG) --verbosity=quiet --nologo --filter TestCategory\!=Exhaustive
+	dotnet test $(SIAZ_SOLUTION_FILE) --configuration=$(TESTCONFIG) --verbosity=quiet --nologo --filter TestCategory\!=Exhaustive
 
 test-everything:
-	dotnet test --configuration=$(TESTCONFIG) --verbosity=quiet --nologo
+	dotnet test $(SIAZ_SOLUTION_FILE) --configuration=$(TESTCONFIG) --verbosity=quiet --nologo
 
 test-everything-verbose:
-	dotnet test --configuration=$(TESTCONFIG) --verbosity=normal --nologo
+	dotnet test $(SIAZ_SOLUTION_FILE) --configuration=$(TESTCONFIG) --verbosity=normal --nologo
 
 save-snapsinazfs-zfs-properties:
 	@savelog -plnc 20 propWipeUndoScript.sh
