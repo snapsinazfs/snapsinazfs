@@ -25,6 +25,7 @@ SIAZ_LOCAL_CONFIG_SUFFIX ?= local
 SIAZ_LOCAL_CONFIG_FILE_NAME ?= $(SIAZ).$(SIAZ_LOCAL_CONFIG_SUFFIX).json
 SIAZ_NLOG_CONFIG_FILE_NAME ?= $(SIAZ).nlog.json
 SNAPSINAZFSETCDIR ?= $(ETCDIR)/$(SIAZ)
+BUILDCONFIG = Release
 # Variables above this line generally should not be changed
 
 # For help on common and recommended build procedures,
@@ -49,6 +50,7 @@ PUBLISHROOT ?= $(SNAPSINAZFS_SOLUTION_ROOT)/publish
 # If you want to use a different dotnet publish configuration (used for make install), change $RELEASEPUBLISHPROFILE to a valid defined publish profile as well
 RELEASECONFIG ?= Release-R2R
 RELEASEDIR ?= $(BUILDDIR)/$(RELEASECONFIG)
+OUTPUT_DIR = $(RELEASEDIR)
 RELEASEPUBLISHPROFILE ?= Linux-Release-R2R
 RELEASEPUBLISHDIR ?= $(PUBLISHROOT)/$(RELEASECONFIG)
 
@@ -89,68 +91,62 @@ LOGPATH ?= $(LOGROOT)/$(SIAZ)
 
 all:	build-release
 
-clean:	clean-all
+.PHONY:	all	clean	clean-all	clean-debug	clean-release extraclean build build-debug build-release
+
+clean:
+	@echo Cleaning $(BUILDCONFIG) build artifacts in $(OUTPUT_DIR)
+	dotnet clean $(SIAZ_SOLUTION_FILE) --configuration $(BUILDCONFIG) -o $(OUTPUT_DIR) 2>/dev/null
+	[ -d $(OUTPUT_DIR) ] && rm -rvf $(OUTPUT_DIR) || true
+	rmdir -v $(OUTPUT_DIR) || true
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/{bin,obj}/$(BUILDCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/{bin,obj} || true
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/{bin,obj}/$(BUILDCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/{bin,obj} || true
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/{bin,obj}/$(BUILDCONFIG) 2>/dev/null
+	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/{bin,obj} || true
+
 
 clean-all:	clean-debug	clean-release
+	
 
-clean-debug:
-  @echo Cleaning $(DEBUGCONFIG) build artifacts
-	dotnet clean $(SIAZ_SOLUTION_FILE) --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) 2>/dev/null
-	[ -d $(DEBUGDIR) ] && rm -rvf $(DEBUGDIR) || true
-	rmdir -v $(BUILDDIR) || true
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/obj || true
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_INTpEROP_PROJECT_DIRECTORY)/obj || true
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin/$(DEBUGCONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj/$(DEBUGCONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj || true
+clean-debug:	BUILDCONFIG = $(DEBUGCONFIG)
+clean-debug:	OUTPUT_DIR = $(DEBUGDIR)
+clean-debug:	clean
+	
 
-clean-release:
-  @echo Cleaning $(RELEASECONFIG) build artifacts
-	dotnet clean $(SIAZ_SOLUTION_FILE) --configuration $(RELEASECONFIG) -o $(RELEASEDIR) 2>/dev/null
+clean-release:	BUILDCONFIG = $(RELEASECONFIG)
+clean-release:	OUTPUT_DIR = $(RELEASEDIR)
+clean-release:	clean
 	if [ -d $(RELEASEDIR) ] ; then rm -rvf $(RELEASEDIR) ; fi
 	[ -d $(RELEASEPUBLISHDIR) ]  && rm -rvf $(RELEASEPUBLISHDIR) || true
 	[ -d $(PUBLISHROOT) ]  && rm -rvf $(PUBLISHROOT) || true
 	rmdir -v $(PUBLISHROOT) || true
-	rmdir -v $(BUILDDIR) || true
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_PROJECT_DIRECTORY)/obj || true
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj || true
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin/$(RELEASECONFIG) 2>/dev/null
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj/$(RELEASECONFIG) 2>/dev/null
-	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin || true
-	rmdir -v $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj || true
 
 extraclean:	clean-debug	clean-release
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/bin 2>/dev/null
-	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/obj 2>/dev/null
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/bin 2>/dev/null
-	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/obj 2>/dev/null
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/bin 2>/dev/null
-	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/obj 2>/dev/null
+	@echo Removing bin and obj directories for all projects and configurations
+	rm -rfv $(SIAZ_PROJECT_DIRECTORY)/{bin,obj} 2>/dev/null
+	rm -rfv $(SIAZ_INTEROP_PROJECT_DIRECTORY)/{bin,obj} 2>/dev/null
+	rm -rfv $(SIAZ_SETTINGS_PROJECT_DIRECTORY)/{bin,obj} 2>/dev/null
 
-build:	build-release
+build:
+	dotnet build --configuration $(BUILDCONFIG) -o $(OUTPUT_DIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
+	@echo $(BUILDCONFIG) build complete.
+	@echo Build artifacts can be found in $(OUTPUT_DIR)
 
-build-debug:
-	mkdir -p $(DEBUGDIR)
-	dotnet build $(SIAZ_SOLUTION_FILE) --configuration $(DEBUGCONFIG) -o $(DEBUGDIR) -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
+build-debug:	BUILDCONFIG = $(DEBUGCONFIG)
+build-debug:	OUTPUT_DIR = $(DEBUGDIR)
+build-debug:	create-build-directory	.WAIT	restore	.WAIT	build
+	
 
-build-release:
-	mkdir -p $(RELEASEDIR)
-	dotnet build $(SIAZ_SOLUTION_FILE) --configuration $(RELEASECONFIG) -o $(RELEASEDIR) --use-current-runtime --no-self-contained -r linux-x64 $(SIAZ_PROJECT_FILE_PATH)
+build-release:	BUILDCONFIG = $(RELEASECONFIG)
+build-release:	OUTPUT_DIR = $(RELEASEDIR)
+build-release:	create-build-directory	.WAIT	restore	.WAIT	build
+	
 
-reinstall:	uninstall	clean	install
+create-build-directory:
+	mkdir -p $(BUILDCONFIG)
+
+reinstall:	uninstall .WAIT	clean .WAIT	install
 
 install:	install-release	|	install-config	install-doc
 
@@ -171,11 +167,9 @@ install-config-local-force:
 
 install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).8 $(MAN8DIR)/$(SIAZ).8
-	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/$(SIAZLC).8
-	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/siaz.8
+	cp -fl  $(MAN8DIR)/$(SIAZ).8 $(MAN8DIR)/{$(SIAZLC),siaz}.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZ)-config-console.8
-	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZLC)-config-console.8
-	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/siaz-config-console.8
+	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/{$(SIAZLC),siaz}-config-console.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZLC)-zfsprops.7
 	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/siaz-zfsprops.7
@@ -202,7 +196,22 @@ install-service:
 
 publish-release:
 	mkdir -p $(RELEASEPUBLISHDIR)
-	dotnet publish --configuration $(RELEASECONFIG) --use-current-runtime --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
+	dotnet publish --configuration $(RELEASECONFIG) --no-self-contained -r linux-x64 -p:PublishProfile=$(RELEASEPUBLISHPROFILE) -o $(RELEASEPUBLISHDIR) $(SIAZ_PROJECT_FILE_PATH)
+
+# This target is the one used for normal builds in all configurations, and is called by the build-* targets prior to building.
+# The -p:RestoreForceEvaluate=True option makes the build system ignore any packages.lock.json files created by previous builds and to fully
+# re-evaluate all project references against the versions in the project files and what is available from nuget.
+# All official tested release builds use this procedure.
+# You should not need to manually build this target.
+restore:
+	dotnet msbuild $(SIAZ_SOLUTION_FILE) -t:Restore -p:Configuraiton=$(BUILDCONFIG) -p:RestoreForceEvaluate=True
+
+# This target will respect any existing packages.lock.json file produced by prior builds.
+# The resulting build is unsupported unless it matches identically to a supported and tested official release build.
+# Use at your own risk and ONLY if you understand the consequences and are intentionally wanting to restrict specific dependencies to
+# older versions.
+restore-locked:
+	dotnet restore $(SIAZ_SOLUTION_FILE)
 
 uninstall:	uninstall-release	uninstall-config-base	uninstall-doc
 
