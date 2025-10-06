@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.CommandLine.Extensions;
 
 using System.CommandLine;
+using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -347,8 +348,8 @@ public static class CommandExtensions
     ///   instance of an <see cref="Option{TOption}" /> to add to the <see cref="Command" /> this method was called on.
     /// </param>
     /// <param name="skipIfNull">
-    ///   If provided and set to <see langword="true" />, performs no action on <paramref name="command" /> if
-    ///   <paramref name="optionFactory" /> returns a null reference.<br />
+    ///   If provided and set to <see langword="true" />, performs no action when <paramref name="optionFactory" /> returns a null
+    ///   reference.<br />
     ///   Otherwise, a <see cref="NullReferenceException" /> will be thrown if <paramref name="optionFactory" /> returns
     ///   <see langword="null" />.
     /// </param>
@@ -395,6 +396,55 @@ public static class CommandExtensions
   /// </summary>
   extension<TBaseCommand> ( TBaseCommand baseCommand ) where TBaseCommand : Command
   {
+    /// <summary>
+    ///   Adds a simple validator that adds an error to the result if the <see cref="CommandResult" />'s
+    ///   <see cref="CommandResult.Children" /> collection is empty.
+    /// </summary>
+    /// <returns>
+    ///   A reference to the <typeparamref name="TBaseCommand" /> this method was called on.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public TBaseCommand RequiringOneOrMoreOptions ( )
+    {
+      baseCommand.Validators.Add ( static result =>
+                                   {
+                                     if ( !result.Children.Any ( ) )
+                                     {
+                                       result.AddError ( "One or more options must be specified." );
+                                     }
+                                   }
+                                 );
+
+      return baseCommand;
+    }
+
+    /// <summary>
+    ///   Adds a simple validator that adds an error to the result if the <see cref="CommandResult" />'s
+    ///   <see cref="CommandResult.Children" /> collection is empty.
+    /// </summary>
+    /// <returns>
+    ///   A reference to the <typeparamref name="TBaseCommand" /> this method was called on.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public TBaseCommand RequiringOneOrMoreOptionsIn ( params IEnumerable<Option> options )
+    {
+      Option[] optionsArray = [ ..options ];
+      baseCommand.WithOptions ( optionsArray );
+      baseCommand.Validators.Add ( result =>
+                                   {
+                                     // If none of the OptionResults in Children are contained in the optionsArray, add an error.
+                                     if ( !result.Children.OfType<OptionResult> ( ).Any ( o => optionsArray.Contains ( o.Option ) ) )
+                                     {
+                                       result.AddError ( "One or more options must be specified." );
+                                     }
+                                   }
+                                 );
+
+      return baseCommand;
+    }
+
     /// <inheritdoc cref="WithCommand{TCommand}(TCommand, Command)" />
     /// <remarks>
     ///   This method is an alias for <see cref="WithCommand{TCommand}(TCommand, Command)" />.
@@ -444,6 +494,27 @@ public static class CommandExtensions
 
         return cmd;
       }
+    }
+
+    /// <summary>
+    ///   Adds one or more <see cref="Option" />s to this <see cref="Command" /> and returns the same <see cref="Command" /> reference.
+    /// </summary>
+    /// <param name="options">
+    ///   A collection of one or more instances of <see cref="Option" />s to add to the <see cref="Command" />.
+    /// </param>
+    /// <returns>
+    ///   A reference to the same <see cref="Command" /> instance that this method was called on.
+    /// </returns>
+    [PublicAPI]
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public TBaseCommand WithOptions ( params IEnumerable<Option> options )
+    {
+      foreach ( Option option in options )
+      {
+        baseCommand.Add ( option );
+      }
+
+      return baseCommand;
     }
   }
 }
