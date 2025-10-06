@@ -26,13 +26,13 @@ public sealed record SnapsInAZfsSettings
 
     /// <summary>
     ///     Gets or sets how often the timer runs when running as a service. Values greater than 1 minute are not supported and are
-    ///     advised against
+    ///     advised against.
     /// </summary>
     [JsonPropertyOrder ( 6 )]
     public uint DaemonTimerIntervalSeconds { get; set; } = 10;
 
     /// <summary>
-    ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS
+    ///     Gets or sets whether a dry run will be performed, which means no changes will be made to ZFS.
     /// </summary>
     [JsonPropertyOrder ( 1 )]
     public bool DryRun { get; set; }
@@ -91,7 +91,7 @@ public sealed record SnapsInAZfsSettings
     public bool TakeSnapshots { get; set; }
 
     /// <summary>
-    ///     Gets or sets the templates sub-section
+    ///     Gets or sets the templates subsection.
     /// </summary>
 
     // ReSharper disable once CollectionNeverUpdated.Global

@@ -22,6 +22,7 @@ using Interop.Zfs.ZfsTypes;
 /// </summary>
 public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
 {
+    private static Logger Logger = LogManager.GetCurrentClassLogger ( );
     /// <exception cref="ArgumentNullException">Path to zfs or zpool utility cannot be null <paramref name="pathToZfs" /></exception>
     public DummyZfsCommandRunner( string pathToZfs, string pathToZpool )
     {

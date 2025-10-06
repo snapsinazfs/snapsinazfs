@@ -17,6 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Extensions;
 using Interop;
+using F = StringFormattingConstants;
 
 /// <summary>
 ///   The high-level interface to the command line functionality.
@@ -24,6 +25,10 @@ using Interop;
 /// <remarks>
 ///   <para>
 ///     Note that this type has multiple parts in files named SiazCommandLine.[Category].cs.
+///   </para>
+///   <para>
+///     For the configuration portion of the CLI, certain configuration elements are intentionally omitted, to discourage unnecessary
+///     modification without reading the docs.
 ///   </para>
 /// </remarks>
 [PublicAPI]
@@ -105,28 +110,40 @@ public sealed partial class SiazCommandLine
   [MemberNotNull ( nameof (RootCommand) )]
   private RootCommand ConfigureCommandLineTree ( )
   {
-    return RootCommand = new RootCommand ( "SnapsInAZfs" )
-                        .WithOption ( AdditionalConfigOption )
-                        .WithOption ( ConfigOption )
-                        .WithOption ( DaemonizeOption )
-                        .WithOption ( DaemonTimerIntervalOption )
-                        .WithOption ( LogLevelOption )
-                        .WithOption ( MonitorOption )
-                        .WithOption ( PruneSnapshotsOption )
-                        .WithOption ( TakeSnapshotsOption )
+    return RootCommand = new RootCommand (
+                                          $"""
+                                           SnapsInAZfs - A snapshot management system for OpenZFS.
+
+                                           Per POSIX standards, all commands, options, arguments, and values are case-sensitive.
+                                           {F.FGYELLOW}If alternative case or other forms for a token are allowed, they will appear in the usage text below.{F._FGCOLOR}
+                                           """
+                                         )
+                        .WithOptions (
+                                      ConfigOption,
+                                      LogLevelOption
+                                     )
                         .WithCommand
                            (
                             _configCommand
                              .WithCommand
                                 (
                                  _configGlobalCommand
+                                  .RequiringOneOrMoreOptionsIn (
+// TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
+// False positive. Suppress it.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+                                                                _configGlobalCommand_DaemonizeOption,
+                                                                _configGlobalCommand_DaemonTimerIntervalSecondsOption,
+                                                                _configGlobalCommand_DryRunOption,
+                                                                _configGlobalCommand_LocalSystemNameOption,
+                                                                _configGlobalCommand_TakeSnapshotsOption,
+                                                                _configGlobalCommand_PruneSnapshotsOption,
+                                                                _configGlobalCommand_ZfsPathOption,
+                                                                _configGlobalCommand_ZpoolPathOption
+                                                               )
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                                   .WithOption ( ConfigGlobalCommandOutputFileOption )
-                                  .WithCommand
-                                     (
-                                      _configGlobalDryRunCommand
-                                       .WithArgument ( ConfigStateArgument )
-                                       .WithAction ( SetGlobalOption )
-                                     )
+                                  .WithAction ( SetGlobalOptions )
                                 )
                              .WithCommand
                                 (
@@ -139,6 +156,16 @@ public sealed partial class SiazCommandLine
                             RunCommand
                               // The --cron alias is for backward compatibility with the sanoid-compatible CLI only.
                              .WithAlias ( "--cron" )
+// TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
+// False positive. Suppress it.
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
+                             .RequiringOneOrMoreOptionsIn (
+                                                           DaemonizeOption,
+                                                           MonitorOption,
+                                                           PruneSnapshotsOption,
+                                                           TakeSnapshotsOption
+                                                          )
+#pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                              .WithAction ( RunSiaz )
                            )
                         .WithCommand
