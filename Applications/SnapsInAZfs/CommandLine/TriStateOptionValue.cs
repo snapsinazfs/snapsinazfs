@@ -10,51 +10,53 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs;
+namespace SnapsInAZfs.CommandLine;
 
-#pragma warning disable CS1591
+using System.Diagnostics.CodeAnalysis;
+
 /// <summary>
-///     Formal enumeration for handling of tri-state yes/no/default arguments to avoid passing around nullable booleans, which can be
-///     interpreted as false when null and are non-portable.
+///   Formal enumeration for handling of tri-state yes/no/default arguments to avoid passing around nullable booleans, which can be
+///   interpreted as false when null and are non-portable.
 /// </summary>
+[SuppressMessage ( "ReSharper", "UnusedMember.Global", Justification = "Intentionally keeping all those aliases for better CLI UX." )]
 public enum TriStateOptionValue
 {
-    /// <summary>
-    ///     Indicates that an option should explicitly be reset to its pre-defined default value, if any.
-    /// </summary>
-    Default = -1,
+  /// <summary>
+  ///   Indicates that an option should explicitly be reset to its pre-defined default value, if any.
+  /// </summary>
+  Default = -1,
 
-    /// <summary>
-    ///     Indicates that an option should be disabled.
-    /// </summary>
-    False = 0,
+  /// <summary>
+  ///   Indicates that an option should be disabled.
+  /// </summary>
+  False = 0,
 
-    /// <summary>
-    ///     Indicates that an option should be enabled.
-    /// </summary>
-    True = 1,
+  /// <summary>
+  ///   Indicates that an option should be enabled.
+  /// </summary>
+  True = 1,
 
-    /// <inheritdoc cref="True" />
-    On = True,
+  /// <inheritdoc cref="True" />
+  On = True,
 
-    /// <inheritdoc cref="True" />
-    Enable = True,
+  /// <inheritdoc cref="True" />
+  Enable = True,
 
-    /// <inheritdoc cref="True" />
-    Enabled = True,
+  /// <inheritdoc cref="True" />
+  Enabled = True,
 
-    /// <inheritdoc cref="True" />
-    Yes = True,
+  /// <inheritdoc cref="True" />
+  Yes = True,
 
-    /// <inheritdoc cref="False" />
-    Off = False,
+  /// <inheritdoc cref="False" />
+  Off = False,
 
-    /// <inheritdoc cref="False" />
-    Disable = False,
+  /// <inheritdoc cref="False" />
+  Disable = False,
 
-    /// <inheritdoc cref="False" />
-    Disabled = False,
+  /// <inheritdoc cref="False" />
+  Disabled = False,
 
-    /// <inheritdoc cref="False" />
-    No = False
+  /// <inheritdoc cref="False" />
+  No = False
 }
