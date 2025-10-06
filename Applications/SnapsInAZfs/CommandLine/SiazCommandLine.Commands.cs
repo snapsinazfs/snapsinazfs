@@ -223,7 +223,7 @@ public partial class SiazCommandLine
 
   private Task<int> RunSiaz ( ParseResult parseResult, CancellationToken cancellation )
   {
-    LoadConfigurationFiles ( ref Program.Settings, out IConfigurationRoot? rootConfiguration, parseResult );
+    LoadConfigurationFiles ( ref Program.Settings, out _configurationRoot, parseResult );
     string[] configFiles = parseResult.CommandResult.GetRequiredValue<string[]> ( ConfigOptionName );
     Console.WriteLine ( $"Running siaz with command line {string.Join ( ' ', parseResult.Tokens )}." );
     Console.WriteLine ( parseResult.CommandResult.GetResult ( ConfigOptionName ) );
