@@ -134,22 +134,22 @@ public sealed partial class SiazCommandLine
                         .WithCommand
                            (
                             _zfsCommand
-                             .With
+                             .WithCommand
                                 (
                                  _zfsSchemaCommand
-                                  .With
+                                  .WithCommand
                                      (
                                       _zfsSchemaCheckCommand
                                        .WithAction ( ZfsSchemaCheck )
                                        .WithArgument ( PoolsArgument )
                                      )
-                                  .With
+                                  .WithCommand
                                      (
                                       _zfsSchemaInitializeCommand
                                        .WithAction ( ZfsSchemaInitialize )
                                        .WithArgument ( _zfsSchemaInitializeCommand_PoolsArgument )
                                      )
-                                  .With
+                                  .WithCommand
                                      (
                                       _zfsSchemaCleanCommand
                                        .WithAction ( ZfsSchemaClean )
