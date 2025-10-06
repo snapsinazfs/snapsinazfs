@@ -17,6 +17,23 @@ using Extensions;
 
 public partial class SiazCommandLine
 {
+  private Argument<bool> _zfsSchemaCleanCommand_ConfigArgument = new ( "--confirm" )
+                                                                 {
+                                                                   Arity = ArgumentArity.ExactlyOne
+                                                                 };
+
+  private Argument<bool> _zfsSchemaCleanCommand_ConfirmImpactArgument = new ( "--i-understand-this-cannot-be-undone" )
+                                                                        {
+                                                                          Arity = ArgumentArity.ExactlyOne
+                                                                        };
+
+  private Argument<string[]> _zfsSchemaInitializeCommand_PoolsArgument = new ( PoolsArgumentName )
+                                                                         {
+                                                                           Arity               = ArgumentArity.ZeroOrMore,
+                                                                           Description         = "If specified, limits the initialization of the schema to the named pools.",
+                                                                           DefaultValueFactory = static _ => [ ]
+                                                                         };
+
   /// <summary>
   ///   Common argument used for options with binary true/false values with some common aliases for those values, plus a third
   ///   "default" value for explicit reversion to defaults.

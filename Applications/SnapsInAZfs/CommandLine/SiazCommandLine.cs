@@ -147,33 +147,16 @@ public sealed partial class SiazCommandLine
                                      (
                                       _zfsSchemaInitializeCommand
                                        .WithAction ( ZfsSchemaInitialize )
-                                       .WithArgument<string[]>
-                                          (
-                                           new ( PoolsArgumentName )
-                                           {
-                                             Arity               = ArgumentArity.ZeroOrMore,
-                                             Description         = "If specified, limits the initialization of the schema to the named pools.",
-                                             DefaultValueFactory = static _ => [ ]
-                                           }
-                                          )
+                                       .WithArgument ( _zfsSchemaInitializeCommand_PoolsArgument )
                                      )
                                   .With
                                      (
                                       _zfsSchemaCleanCommand
                                        .WithAction ( ZfsSchemaClean )
+                                       .WithArgument ( _zfsSchemaCleanCommand_ConfigArgument )
                                        .WithArgument<bool>
                                           (
-                                           new ( "--confirm" )
-                                           {
-                                             Arity = ArgumentArity.ExactlyOne
-                                           }
-                                          )
-                                       .WithArgument<bool>
-                                          (
-                                           new ( "--i-understand-this-cannot-be-undone" )
-                                           {
-                                             Arity = ArgumentArity.ExactlyOne
-                                           }
+                                           _zfsSchemaCleanCommand_ConfirmImpactArgument
                                           )
                                      )
                                 )
