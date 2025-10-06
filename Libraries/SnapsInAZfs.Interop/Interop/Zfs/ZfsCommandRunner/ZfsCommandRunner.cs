@@ -378,10 +378,13 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
         throw;
       }
 
+      // This usage is safe, here, so we can suppress this warning.
+#pragma warning disable CA2024 // Do not use 'StreamReader.EndOfStream' in async methods
       while ( !zpoolExecProcess.StandardOutput.EndOfStream )
       {
         yield return ( await zpoolExecProcess.StandardOutput.ReadLineAsync ( ).ConfigureAwait ( true ) )!;
       }
+#pragma warning restore CA2024 // Do not use 'StreamReader.EndOfStream' in async methods
     }
   }
 
