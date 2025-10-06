@@ -154,10 +154,7 @@ public sealed partial class SiazCommandLine
                                       _zfsSchemaCleanCommand
                                        .WithAction ( ZfsSchemaClean )
                                        .WithArgument ( _zfsSchemaCleanCommand_ConfigArgument )
-                                       .WithArgument<bool>
-                                          (
-                                           _zfsSchemaCleanCommand_ConfirmImpactArgument
-                                          )
+                                       .WithArgument ( _zfsSchemaCleanCommand_ConfirmImpactArgument )
                                      )
                                 )
                            );
