@@ -13,6 +13,7 @@
 namespace SnapsInAZfs;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -183,9 +184,9 @@ internal static class Program
     Logger.Debug ( "Overriding settings using arguments from command line." );
 
     programSettings.DryRun         |= args.DryRun;
-    programSettings.TakeSnapshots  =  ( programSettings.TakeSnapshots  || args.TakeSnapshots  || args.Cron ) && !args.NoTakeSnapshots;
+    programSettings.TakeSnapshots  =  ( programSettings.TakeSnapshots  || args.TakeSnapshots  || args.Cron )                    && !args.NoTakeSnapshots;
     programSettings.PruneSnapshots =  ( programSettings.PruneSnapshots || args.PruneSnapshots || args.ForcePrune || args.Cron ) && !args.NoPruneSnapshots;
-    programSettings.Daemonize      =  ( programSettings.Daemonize      || args.Daemonize ) && args is { NoDaemonize: false, ConfigConsole: false };
+    programSettings.Daemonize      =  ( programSettings.Daemonize      || args.Daemonize )                                      && args is { NoDaemonize: false, ConfigConsole: false };
     programSettings.Monitoring.EnableHttp
       = ( programSettings.Monitoring.EnableHttp || args.Monitor ) && args is { NoMonitor : false, ConfigConsole: false };
 
@@ -213,32 +214,41 @@ internal static class Program
     // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
     // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
     // 6. Command-line arguments passed on invocation of SnapsInAZfs
-    Logger.Debug ( "Getting base configuration from files" );
+
+    LogDebugOrConsole ( "Loading configuration." );
+
     ConfigurationBuilder configBuilder = new ( );
 
-    IEnumerable<string> requestedFiles = args.ConfigFiles.Length > 0
-                                           ? args.ConfigFiles
-                                           :
-                                           [
-                                             "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
-                                             "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
-                                             "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
-                                             "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
-                                             "SnapsInAZfs.json",
-                                             "SnapsInAZfs.local.json",
-                                             "SnapsInAZfs.nlog.json"
-                                           ];
+    string[] requestedFiles;
+
+    if ( args.ConfigFiles.Length > 0 )
+    {
+      requestedFiles = args.ConfigFiles;
+    }
+    else
+    {
+      requestedFiles =
+      [
+        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
+        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
+        "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
+        "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
+        "SnapsInAZfs.json",
+        "SnapsInAZfs.local.json",
+        "SnapsInAZfs.nlog.json"
+      ];
+    }
 
     foreach ( string filePath in requestedFiles )
     {
       if ( !File.Exists ( filePath ) )
       {
-        Logger.Debug ( "Configuration file not found at {0}", filePath );
+        LogDebugOrConsole ( "Configuration file not found at {0}", filePath );
 
         continue;
       }
 
-      Logger.Trace ( "Loading configuration file {0}", filePath );
+      LogTraceOrConsole ( "Loading configuration file {0}", filePath );
       configBuilder.AddJsonFile ( filePath, false, false );
     }
 
@@ -277,6 +287,32 @@ internal static class Program
     }
 
     return true;
+  }
+
+  [StringFormatMethod ( nameof (message) )]
+  private static void LogDebugOrConsole ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string message, params object?[] args )
+  {
+    if ( LogManager.Configuration is null )
+    {
+      Console.WriteLine ( message, args );
+    }
+    else
+    {
+      Logger.Debug ( CultureInfo.CurrentCulture, message, args );
+    }
+  }
+
+  [StringFormatMethod ( nameof (message) )]
+  private static void LogTraceOrConsole ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string message, params object?[] args )
+  {
+    if ( LogManager.Configuration is null )
+    {
+      Console.WriteLine ( message, args );
+    }
+    else
+    {
+      Logger.Trace ( CultureInfo.CurrentCulture, message, args );
+    }
   }
 
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]

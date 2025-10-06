@@ -26,21 +26,13 @@ public partial class SiazCommandLine
                                                "Launches the configuration console TUI."
                                               );
 
-  private Command _configGlobalCommand = new (
-                                              ConfigGlobalCommandName,
-                                              """
-                                              Modify global settings in the root of the JSON configuration files.
-                                              If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
-                                              """
-                                             );
-
-  private Command _configGlobalDryRunCommand = new (
-                                                    ConfigGlobalDryRunCommandName,
-                                                    "Set the DryRun option, which controls whether SIAZ can make changes (false) or not (true)."
-                                                   )
-                                               {
-                                                 TreatUnmatchedTokensAsErrors = true
-                                               };
+  private Command _configGlobalCommand = new Command (
+                                                      ConfigGlobalCommandName,
+                                                      $"""
+                                                      Modify global settings in the root of the JSON configuration files.
+                                                      If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                                      """
+                                                     );
 
   private Command _zfsCommand = new (
                                      ZfsCommandName,

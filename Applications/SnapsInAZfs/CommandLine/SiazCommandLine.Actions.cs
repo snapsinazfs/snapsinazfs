@@ -14,224 +14,82 @@ namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using ConfigConsole;
 using Interop;
-using Interop.Zfs.ZfsTypes;
-using NLog.Config;
-using NLog.Extensions.Logging;
 
 public partial class SiazCommandLine
 {
-  private bool LoadAdditionalConfigurationFiles (
-    ParseResult                              parseResult,
-    ConfigurationBuilder                     builder,
-    out                        OptionResult? additionalConfigResult,
-    [NotNullWhen ( true )] out string[]?     additionalRequestedFiles
-  )
-  {
-    Unsafe.SkipInit ( out additionalRequestedFiles );
-    bool success = true;
-
-    additionalConfigResult = parseResult.CommandResult.GetResult ( AdditionalConfigOption );
-    if ( additionalConfigResult is { Implicit: true } )
-    {
-      additionalRequestedFiles = [ ];
-
-      return true;
-    }
-
-    if ( additionalConfigResult is not { Implicit: false, Tokens.Count: > 0 } )
-    {
-      return false;
-    }
-
-    additionalRequestedFiles = additionalConfigResult.GetValueOrDefault<string[]> ( );
-
-    if ( additionalRequestedFiles is not { Length: > 0 } )
-    {
-      return false;
-    }
-
-    foreach ( string filePath in additionalRequestedFiles )
-    {
-      FileInfo fileInfo = new ( filePath );
-      if ( !fileInfo.Exists )
-      {
-        Logger.Warn ( $"Configuration file not found at {filePath}." );
-        success = false;
-
-        continue;
-      }
-
-      Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
-      builder.AddJsonFile ( filePath, false, false );
-    }
-
-    return success;
-  }
-
-  private bool LoadBaseConfigurationFiles (
-    ParseResult          parseResult,
-    ConfigurationBuilder configurationBuilder,
-    out OptionResult     configResult,
-    out string[]         configFilePaths
-  )
-  {
-    bool success = true;
-    configResult = parseResult.CommandResult.GetResult ( ConfigOption ) ??
-                   throw new CommandLineInvocationException ( "Could not determine the set of configuration files to load." );
-    configFilePaths = configResult.GetValueOrDefault<string[]> ( );
-
-    foreach ( string filePath in configFilePaths )
-    {
-      FileInfo fileInfo = new ( filePath );
-      if ( !fileInfo.Exists )
-      {
-        Logger.Warn ( $"Configuration file not found at {filePath}." );
-
-        success = false;
-
-        continue;
-      }
-
-      Logger.Trace ( "Adding base configuration file {0} to configuration.", filePath );
-      configurationBuilder.AddJsonFile ( filePath, false, false );
-    }
-
-    return success;
-  }
-
-  private bool LoadConfigurationFiles (
-    [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings,
-    [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
-    in                         ParseResult          cliParseResult
-  )
-  {
-    Unsafe.SkipInit ( out rootConfiguration );
-    // Configuration is built as follows.
-    // There are two classes of configuration files: base and supplementary.
-    // Base configuration files are mandatory, and the program will terminate without taking any action if any are missing or invalid.
-    // Supplementary configuration files are loaded after base configuration files and are not required to exist for the program to execute.
-    // Parsing errors for any class of configuration file MAY result in program termination, however.
-    // All configuration files use the same basic schema. The only differences are load order and missing file behavior.
-
-    // Configurations from all sources are merged in the order the files are specified, and the final configuration that will be used
-    // is the result of the merged configurations.
-    // If conflicting items exist in multiple configuration sources, the values from the configuration source added latest will
-    // override earlier values.
-    // The .net ConfigurationManager API is used for loading and parsing of configuration files.
-    // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-    // See SnapsInAZfs(5) for detailed configuration documentation.
-
-    // If no configuration file override options are specified on the command line, SIAZ default behavior is to look for and treat as
-    // MANDATORY the files installed with it at the following paths:
-    //   /usr/local/share/SnapsInAZfs/SnapsInAZfs.json
-    //   /etc/SnapsInAZfs/SnapsInAZfs.local.json
-    //   /etc/SnapsInAZfs/SnapsInAZfs.nlog.json
-    // and then to look for and treat as SUPPLEMENTAL/OPTIONAL the files at the following paths:
-    //   ~/.config/SnapsInAZfs/SnapsInAZfs.user.json
-    //   ~/.config/SnapsInAZfs/SnapsInAZfs.nlog.user.json
-    //   /usr/local/sbin/SnapsInAZfs/SnapsInAZfs.json
-    //   /usr/local/sbin/SnapsInAZfs/SnapsInAZfs.nlog.json
-    // If the --config option is present on the command line, the default files are ignored unless included on the command line.
-    // 
-    // Configuration order:
-    // 1a. (if --config option provided) Base configuration files specified with the --config option, in the order entered.
-    // 1b. (if no --config option provided):
-    //   ./SnapsInAZfs.local.json
-    //   ~/.config/SnapsInAZfs/SnapsInAZfs.local.json
-    // 2. Supplementary configuration files specified with the --additional-config option, in the order entered.
-    // 3. Environment variables
-    // 4. Command-line options passed to the current invocation of SIAZ.
-    Logger.Debug ( "Getting base configuration from files" );
-    ConfigurationBuilder configBuilder = new ( );
-
-    if ( !LoadBaseConfigurationFiles ( cliParseResult, configBuilder, out OptionResult baseConfigOptionResult, out string[] requestedFiles ) )
-    {
-      Logger.Error ( "One or more base configuration files could not be loaded. Aborting." );
-
-      rootConfiguration = null;
-
-      return false;
-    }
-
-    if ( !LoadAdditionalConfigurationFiles (
-                                            cliParseResult,
-                                            configBuilder,
-                                            out OptionResult? additionalConfigOptionResult,
-                                            out string[]? additionalRequestedFiles
-                                           ) )
-    {
-      Logger.Error (
-                    $"""
-                     One or more supplementary configuration files (--additional-config option) could not be loaded. Aborting.
-                     Requested files:
-                     {string.Join ( Environment.NewLine, additionalRequestedFiles ?? [ "[NO FILES REQUESTED]" ] )}
-                     """
-                   );
-
-      rootConfiguration = null;
-
-      return false;
-    }
-
-    if ( configBuilder.Sources.Count == 0 )
-    {
-      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString ( true ) );
-      rootConfiguration = null;
-
-      return false;
-    }
-
-    rootConfiguration = configBuilder.Build ( );
-
-    Logger.Trace ( "Building settings objects from IConfiguration" );
-
-    try
-    {
-      settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
-      IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( KestrelConfigurationSectionName );
-
-      if ( kestrelSection.Exists ( ) )
-      {
-        IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren ( );
-        settings.Monitoring.Kestrel = kestrelSettings.ToDictionary ( static k => k.Key, static v => v.SerializeToJson ( ) );
-      }
-
-      IConfigurationSection nlogConfigSection = rootConfiguration.GetSection ( "NLog" );
-      LogManager.Configuration = nlogConfigSection.Exists ( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration ( );
-    }
-    catch ( Exception ex )
-    {
-      Logger.Fatal ( ex, "Unable to parse settings from JSON" );
-
-      return false;
-    }
-
-    return true;
-  }
-
   private Task<int> RunSiaz ( ParseResult parseResult, CancellationToken cancellation )
   {
-    LoadConfigurationFiles ( ref Program.Settings, out _configurationRoot, parseResult );
-    string[] configFiles = parseResult.CommandResult.GetRequiredValue<string[]> ( ConfigOptionName );
     Logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
     Logger.Fatal ( "Not yet implemented." );
 
     return Task.FromResult ( (int)ExitCode.ECANCELED );
   }
 
-  private static int SetGlobalOption ( ParseResult parseResult )
+  /// <summary>
+  ///   Scans the symbols under the <c>config global</c> command and handles each according to its type.
+  /// </summary>
+  /// <param name="parseResult"></param>
+  /// <returns></returns>
+  private static int SetGlobalOptions ( ParseResult parseResult )
   {
-    Console.WriteLine ( "Requested to set global option." );
-    Console.WriteLine ( parseResult.CommandResult.ToString ( ) );
-    Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
+    Logger.Debug ( $"Requested to set global configuration options: {parseResult.CommandResult}" );
+    Logger.Debug ( $"Command: {parseResult.CommandResult.Command.Name}" );
+    Logger.Debug ( $"Command Options: {string.Join ( ',', parseResult.CommandResult.Children.OfType<OptionResult> ( ).Select ( static o => o.Option.Name ) )}" );
 
-    TriStateOptionValue dryRun = parseResult.GetValue<TriStateOptionValue> ( ConfigStateArgumentName );
+    foreach ( SymbolResult t in parseResult.CommandResult.Children )
+    {
+      if ( t is not OptionResult result )
+      {
+        continue;
+      }
 
-    return (int)dryRun;
+      switch ( result.Option.Name )
+      {
+        case nameof (SnapsInAZfsSettings.DryRun):
+        case nameof (SnapsInAZfsSettings.Daemonize):
+        case nameof (SnapsInAZfsSettings.PruneSnapshots):
+        case nameof (SnapsInAZfsSettings.TakeSnapshots):
+        {
+          TriStateOptionValue value = result.GetRequiredValue ( (Option<TriStateOptionValue>)result.Option );
+          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+        }
+          break;
+
+        case nameof (SnapsInAZfsSettings.LocalSystemName):
+        {
+          string value = result.GetRequiredValue ( (Option<string>)result.Option );
+          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+        }
+          break;
+
+        case nameof (SnapsInAZfsSettings.ZfsPath):
+        case nameof (SnapsInAZfsSettings.ZpoolPath):
+        {
+          FileInfo value = result.GetRequiredValue ( (Option<FileInfo>)result.Option );
+          Console.WriteLine ( $"{result.Option.Name} value is {value.FullName}" );
+        }
+          break;
+
+        case nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds):
+        {
+          uint value = result.GetRequiredValue ( (Option<uint>)result.Option );
+          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+        }
+          break;
+      }
+    }
+
+    return 0;
+  }
+
+  private static void SetNamedOptionValueIfPresent<TOption> ( ParseResult parseResult, string optionName, TOption? defaultValue = default )
+  {
+    if ( parseResult.GetResult ( optionName ) is OptionResult { IdentifierToken.Value: not null, Option: Option<TOption> } triStateOption
+      && triStateOption.GetValue<TOption> ( optionName ) is { } triStateValue )
+    {
+      Console.WriteLine ( $"Setting {optionName} to {triStateValue}" );
+    }
   }
 
   private static void StartConfigConsole ( ParseResult parseResult )

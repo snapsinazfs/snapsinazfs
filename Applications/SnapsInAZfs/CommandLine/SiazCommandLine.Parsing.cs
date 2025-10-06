@@ -36,9 +36,7 @@ public partial class SiazCommandLine
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ParseResult Parse ( IReadOnlyList<string>? args = null, ParserConfiguration? configuration = null )
   {
-    args ??= Environment.GetCommandLineArgs ( );
-
-    return RootCommand.Parse ( args, configuration );
+    return Parse ( args ?? Environment.GetCommandLineArgs ( ), out _, configuration );
   }
 
   /// <summary>
@@ -51,18 +49,22 @@ public partial class SiazCommandLine
   ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
   ///   explicitly <see langword="null" />.
   /// </param>
-  /// <param name="rootCommand">A reference to <see cref="RootCommand"/>, for convenience.</param>
+  /// <param name="rootCommand">A reference to <see cref="RootCommand" />, for convenience.</param>
   /// <param name="configuration">A <see cref="ParserConfiguration" /> to use or default, if not provided or null.</param>
   /// <returns>
   ///   The result of <see cref="Command.Parse(IReadOnlyList{string}, ParserConfiguration?)" />.
   /// </returns>
   [PublicAPI]
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-  public ParseResult Parse ( IReadOnlyList<string> args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
+  public ParseResult Parse ( IReadOnlyList<string>? args, out RootCommand rootCommand, ParserConfiguration? configuration = null )
   {
     rootCommand = RootCommand;
 
-    return rootCommand.Parse ( args, configuration );
+    _rootCommandParseResult = rootCommand.Parse ( args ?? Environment.GetCommandLineArgs ( ), configuration );
+
+    GetConfigurationFromFiles ( _rootCommandParseResult );
+
+    return _rootCommandParseResult;
   }
 
   /// <summary>

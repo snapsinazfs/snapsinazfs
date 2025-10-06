@@ -41,6 +41,8 @@ public sealed partial class SiazCommandLine
 
   private IConfigurationRoot? _configurationRoot;
 
+  private ParseResult? _rootCommandParseResult;
+
   private SnapsInAZfsSettings? _settings;
 
   /// <summary>
@@ -72,12 +74,20 @@ public sealed partial class SiazCommandLine
     InvocationConfiguration? invocationConfiguration = null
   )
   {
-    _settings = new ( );
+    RootCommand cmd = RootCommand;
 
-    args ??= Environment.GetCommandLineArgs ( );
+    if ( _rootCommandParseResult is null )
+    {
+      _settings ??= new ( );
 
-    rootCommandParseResult = Parse ( args, out rootCommand, parserConfiguration );
-    int invokeResult = rootCommandParseResult.Invoke ( invocationConfiguration );
+      args ??= Environment.GetCommandLineArgs ( );
+
+      _rootCommandParseResult = Parse ( args, out cmd, parserConfiguration );
+    }
+
+    rootCommand            = cmd;
+    rootCommandParseResult = _rootCommandParseResult;
+    int invokeResult = _rootCommandParseResult.Invoke ( invocationConfiguration );
     siazSettings      = _settings;
     configurationRoot = _configurationRoot;
 
@@ -158,5 +168,18 @@ public sealed partial class SiazCommandLine
                                      )
                                 )
                            );
+  }
+
+  private void GetConfigurationFromFiles ( ParseResult rootCommandParseResult )
+  {
+    CommandLineArguments cArgs = new ( );
+
+    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is { Option: Option<FileInfo[]> } configOptionResult )
+    {
+      cArgs.ConfigFiles = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ).Select ( static f => f.Name ) ];
+    }
+
+    Program.LoadConfigurationFromConfigurationFiles ( ref Program.Settings, out _configurationRoot, in cArgs );
+    Logger.Debug ( "Configuration files loaded." );
   }
 }
