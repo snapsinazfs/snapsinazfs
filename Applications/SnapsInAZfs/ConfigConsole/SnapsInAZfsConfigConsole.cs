@@ -17,6 +17,8 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
+#nullable enable
+
 namespace SnapsInAZfs.ConfigConsole;
 
 using System.Text.Json;
