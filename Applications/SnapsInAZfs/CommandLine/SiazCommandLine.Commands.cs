@@ -13,17 +13,60 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
-using System.CommandLine.Parsing;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using ConfigConsole;
-using Interop;
-using Interop.Zfs.ZfsTypes;
-using NLog.Config;
-using NLog.Extensions.Logging;
 
 public partial class SiazCommandLine
 {
+  private Command _configCommand = new (
+                                        ConfigCommandName,
+                                        "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
+                                       );
+
+  private Command _configConsoleCommand = new (
+                                               ConfigConsoleCommandName,
+                                               "Launches the configuration console TUI."
+                                              );
+
+  private Command _configGlobalCommand = new (
+                                              ConfigGlobalCommandName,
+                                              """
+                                              Modify global settings in the root of the JSON configuration files.
+                                              If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                              """
+                                             );
+
+  private Command _configGlobalDryRunCommand = new (
+                                                    ConfigGlobalDryRunCommandName,
+                                                    "Set the DryRun option, which controls whether SIAZ can make changes (false) or not (true)."
+                                                   )
+                                               {
+                                                 TreatUnmatchedTokensAsErrors = true
+                                               };
+
+  private Command _zfsCommand = new (
+                                     ZfsCommandName,
+                                     "Perform operations on ZFS pools and datasets managed by SIAZ."
+                                    );
+
+  private Command _zfsSchemaCheckCommand = new (
+                                                ZfsSchemaCheckCommandName,
+                                                "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
+                                               );
+
+  private Command _zfsSchemaCleanCommand = new (
+                                                ZfsSchemaCleanCommandName,
+                                                "Completely removes all pool and dataset properties that came from SIAZ."
+                                               );
+
+  private Command _zfsSchemaCommand = new (
+                                           ZfsSchemaCommandName,
+                                           "Perform operations on properties of ZFS pools and datasets used by SIAZ."
+                                          );
+
+  private Command _zfsSchemaInitializeCommand = new (
+                                                     ZfsSchemaInitializeCommandName,
+                                                     "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
+                                                    );
+
   /// <summary>
   ///   A reference to the <see cref="RootCommand" /> of the command line.
   /// </summary>

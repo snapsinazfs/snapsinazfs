@@ -106,39 +106,21 @@ public sealed partial class SiazCommandLine
                         .WithOption ( TakeSnapshotsOption )
                         .WithCommand
                            (
-                            new Command (
-                                         ConfigCommandName,
-                                         "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
-                                        )
+                            _configCommand
                              .WithCommand
                                 (
-                                 new Command (
-                                              ConfigGlobalCommandName,
-                                              """
-                                              Modify global settings in the root of the JSON configuration files.
-                                              If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
-                                              """
-                                             )
+                                 _configGlobalCommand
                                   .WithOption ( ConfigGlobalCommandOutputFileOption )
                                   .WithCommand
                                      (
-                                      new Command (
-                                                   ConfigGlobalDryRunCommandName,
-                                                   "Set the DryRun option, which controls whether SIAZ can make changes (false) or not (true)."
-                                                  )
-                                        {
-                                          TreatUnmatchedTokensAsErrors = true
-                                        }
+                                      _configGlobalDryRunCommand
                                        .WithArgument ( ConfigStateArgument )
                                        .WithAction ( SetGlobalOption )
                                      )
                                 )
                              .WithCommand
                                 (
-                                 new Command (
-                                              ConfigConsoleCommandName,
-                                              "Launches the configuration console TUI."
-                                             )
+                                 _configConsoleCommand
                                   .WithAction ( StartConfigConsole )
                                 )
                            )
@@ -151,31 +133,19 @@ public sealed partial class SiazCommandLine
                            )
                         .WithCommand
                            (
-                            new Command (
-                                         ZfsCommandName,
-                                         "Perform operations on ZFS pools and datasets managed by SIAZ."
-                                        )
+                            _zfsCommand
                              .With
                                 (
-                                 new Command (
-                                              ZfsSchemaCommandName,
-                                              "Perform operations on properties of ZFS pools and datasets used by SIAZ."
-                                             )
+                                 _zfsSchemaCommand
                                   .With
                                      (
-                                      new Command (
-                                                   ZfsSchemaCheckCommandName,
-                                                   "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
-                                                  )
+                                      _zfsSchemaCheckCommand
                                        .WithAction ( ZfsSchemaCheck )
                                        .WithArgument ( PoolsArgument )
                                      )
                                   .With
                                      (
-                                      new Command (
-                                                   ZfsSchemaInitializeCommandName,
-                                                   "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
-                                                  )
+                                      _zfsSchemaInitializeCommand
                                        .WithAction ( ZfsSchemaInitialize )
                                        .WithArgument<string[]>
                                           (
@@ -189,10 +159,7 @@ public sealed partial class SiazCommandLine
                                      )
                                   .With
                                      (
-                                      new Command (
-                                                   ZfsSchemaCleanCommandName,
-                                                   "Completely removes all pool and dataset properties that came from SIAZ."
-                                                  )
+                                      _zfsSchemaCleanCommand
                                        .WithAction ( ZfsSchemaClean )
                                        .WithArgument<bool>
                                           (
