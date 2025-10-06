@@ -91,7 +91,7 @@ LOGPATH ?= $(LOGROOT)/$(SIAZ)
 
 all:	build-release
 
-.PHONY:	all	clean	clean-all	clean-debug	clean-release extraclean build build-debug build-release
+.PHONY:	all	clean	clean-all	clean-debug	clean-release extraclean build build-debug build-release install install-doc install-service restore uninstall test
 
 clean:
 	@echo Cleaning $(BUILDCONFIG) build artifacts in $(OUTPUT_DIR)
@@ -171,22 +171,16 @@ install-doc:
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/$(SIAZ)-config-console.8
 	cp -fl  $(MAN8DIR)/$(SIAZ)-config-console.8 $(MAN8DIR)/{$(SIAZLC),siaz}-config-console.8
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZ)-zfsprops.7
-	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/$(SIAZLC)-zfsprops.7
-	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/siaz-zfsprops.7
+	cp -fl  $(MAN7DIR)/$(SIAZ)-zfsprops.7 $(MAN7DIR)/${$(SIAZLC),siaz}-zfsprops.7
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZ)-monitoring.3
-	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/$(SIAZLC)-monitoring.3
-	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/siaz-monitoring.3
+	cp -fl  $(MAN3DIR)/$(SIAZ)-monitoring.3 $(MAN3DIR)/{$(SIAZLC),siaz}-monitoring.3
 	install -C -v -m 644 $(SNAPSINAZFSDOCDIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).5
-	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).5
-	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/siaz.5
-	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZ).json.5
-	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/$(SIAZLC).json.5
+	cp -fl  $(MAN5DIR)/$(SIAZ).5 $(MAN5DIR)/{$(SIAZLC),siaz}{,.json}.5
 	mandb -q
 
 install-release:	publish-release
 	install --backup=existing -C -D -v -m 754 $(RELEASEPUBLISHDIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/$(SIAZ)
-	cp -fs $(USR_LOCAL_SBIN_DIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/$(SIAZLC)
-	cp -fs $(USR_LOCAL_SBIN_DIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/siaz
+	cp -fs $(USR_LOCAL_SBIN_DIR)/$(SIAZ) $(USR_LOCAL_SBIN_DIR)/{$(SIAZLC),siaz}
 	mkdir -p $(LOGPATH)
 
 install-service:
@@ -224,23 +218,12 @@ uninstall-config-local:
 	rmdir -v $(SNAPSINAZFSETCDIR) 2>/dev/null
 
 uninstall-doc:
-	rm -fv $(MAN8DIR)/$(SIAZ).8 2>/dev/null
-	rm -fv $(MAN8DIR)/$(SIAZLC).8 2>/dev/null
-	rm -fv $(MAN8DIR)/siaz.8 2>/dev/null
-	rm -fv $(MAN8DIR)/$(SIAZ)-config-console.8 2>/dev/null
-	rm -fv $(MAN8DIR)/$(SIAZLC)-config-console.8 2>/dev/null
-	rm -fv $(MAN8DIR)/siaz-config-console.8 2>/dev/null
-	rm -fv $(MAN7DIR)/$(SIAZ)-zfsprops.7 2>/dev/null
-	rm -fv $(MAN7DIR)/$(SIAZLC)-zfsprops.7 2>/dev/null
-	rm -fv $(MAN7DIR)/siaz-zfsprops.7 2>/dev/null
-	rm -fv $(MAN3DIR)/$(SIAZ)-monitoring.3 2>/dev/null
-	rm -fv $(MAN3DIR)/$(SIAZLC)-monitoring.3 2>/dev/null
-	rm -fv $(MAN3DIR)/siaz-monitoring.3 2>/dev/null
-	rm -fv $(MAN5DIR)/$(SIAZ).5 2>/dev/null
-	rm -fv $(MAN5DIR)/$(SIAZLC).5 2>/dev/null
-	rm -fv $(MAN5DIR)/siaz.5 2>/dev/null
-	rm -fv $(MAN5DIR)/$(SIAZ).json.5 2>/dev/null
-	rm -fv $(MAN5DIR)/$(SIAZLC).json.5 2>/dev/null
+	rm -fv $(MAN8DIR)/{$(SIAZ),$(SIAZLC),siaz}.8 2>/dev/null
+	rm -fv $(MAN8DIR)/{$(SIAZ),$(SIAZLC),siaz}-config-console.8 2>/dev/null
+	rm -fv $(MAN7DIR)/{$(SIAZ),$(SIAZLC),siaz}-zfsprops.7 2>/dev/null
+	rm -fv $(MAN3DIR)/{$(SIAZ),$(SIAZLC),siaz}-monitoring.3 2>/dev/null
+	rm -fv $(MAN5DIR)/{$(SIAZ),$(SIAZLC),siaz}.5 2>/dev/null
+	rm -fv $(MAN5DIR)/{$(SIAZ),$(SIAZLC)}.json.5 2>/dev/null
 	mandb -q
 
 uninstall-everything:	uninstall-service	uninstall	uninstall-config-local	uninstall-logs
@@ -250,9 +233,7 @@ uninstall-logs:
 
 uninstall-release:
 	rm -rfv $(USR_LOCAL_ETC_DIR)/$(SIAZ) 2>/dev/null
-	rm -fv $(USR_LOCAL_SBIN_DIR)/$(SIAZ) 2>/dev/null
-	rm -fv $(USR_LOCAL_SBIN_DIR)/$(SIAZLC) 2>/dev/null
-	rm -fv $(USR_LOCAL_SBIN_DIR)/siaz 2>/dev/null
+	rm -fv $(USR_LOCAL_SBIN_DIR)/{$(SIAZ),$(SIAZLC),siaz} 2>/dev/null
 
 uninstall-service:
 	systemctl stop $(SIAZLC).service
