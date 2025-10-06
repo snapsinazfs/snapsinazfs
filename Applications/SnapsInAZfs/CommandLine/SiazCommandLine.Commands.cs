@@ -17,6 +17,7 @@ using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using ConfigConsole;
+using Interop;
 using Interop.Zfs.ZfsTypes;
 using NLog.Config;
 using NLog.Extensions.Logging;
@@ -225,12 +226,10 @@ public partial class SiazCommandLine
   {
     LoadConfigurationFiles ( ref Program.Settings, out _configurationRoot, parseResult );
     string[] configFiles = parseResult.CommandResult.GetRequiredValue<string[]> ( ConfigOptionName );
-    Console.WriteLine ( $"Running siaz with command line {string.Join ( ' ', parseResult.Tokens )}." );
-    Console.WriteLine ( parseResult.CommandResult.GetResult ( ConfigOptionName ) );
-    Console.WriteLine ( string.Join ( ',', configFiles ) );
-    Console.WriteLine ( "Not yet implemented." );
+    Logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
+    Logger.Fatal ( "Not yet implemented." );
 
-    return Task.FromResult ( 0 );
+    return Task.FromResult ( (int)ExitCode.ECANCELED );
   }
 
   private static int SetGlobalOption ( ParseResult parseResult )
