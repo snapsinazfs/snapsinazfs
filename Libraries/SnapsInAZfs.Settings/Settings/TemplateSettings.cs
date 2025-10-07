@@ -10,22 +10,37 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using JetBrains.Annotations;
-
 namespace SnapsInAZfs.Settings;
 
-/// <summary>
-///     Settings definitions for templates
-/// </summary>
-public sealed record TemplateSettings
-{
-    /// <summary>
-    ///     Gets or sets the Formatting sub-section for this <see cref="TemplateSettings" /> object
-    /// </summary>
-    public FormattingSettings Formatting { get; set; } = FormattingSettings.GetDefault( );
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
-    /// <summary>
-    ///     Gets or sets the snapshot timing settings sub-section
-    /// </summary>
-    public SnapshotTimingSettings SnapshotTiming { get; set; } = SnapshotTimingSettings.GetDefault( );
+/// <summary>
+///   Settings definitions for templates
+/// </summary>
+[method: SetsRequiredMembers]
+public sealed record TemplateSettings ( FormattingSettings? Formatting = null, SnapshotTimingSettings? SnapshotTiming = null )
+{
+  /// <summary>
+  ///   Gets or sets the Formatting subsection for this <see cref="TemplateSettings" /> object.
+  /// </summary>
+  [Required]
+  public required FormattingSettings Formatting { get; set; } = Formatting ?? FormattingSettings.GetDefault ( );
+
+  /// <summary>
+  ///   Gets or sets the snapshot timing settings subsection.
+  /// </summary>
+  [Required]
+  public required SnapshotTimingSettings SnapshotTiming { get; set; } = SnapshotTiming ?? SnapshotTimingSettings.GetDefault ( );
+
+  /// <summary>
+  ///   The section name for this type in configuration files.
+  /// </summary>
+  [UsedImplicitly ( Reason = "Used by the ConfigurationBinder source generator." )]
+  public const string ConfigurationSectionName = "Templates";
+
+  public static TemplateSettings GetDefaultTemplate ( )
+  {
+    return new ( FormattingSettings.GetDefault ( ), SnapshotTimingSettings.GetDefault ( ) );
+  }
 }

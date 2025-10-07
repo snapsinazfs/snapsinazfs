@@ -182,22 +182,21 @@ public sealed partial class TemplateConfigurationWindow
 
         if ( _modifiedProperties.Overlaps ( _timingProperties ) )
         {
-            SelectedTemplateItem.ViewSettings.SnapshotTiming = new ( )
-                                                               {
-                                                                   FrequentPeriod = int.Parse (
-                                                                                               frequentPeriodRadioGroup.GetSelectedLabelString ( ),
-                                                                                               CultureInfo.InvariantCulture.NumberFormat
-                                                                                              ),
-                                                                   HourlyMinute = hourlyMinuteTextValidateField.Text.ToInt32 ( ),
-                                                                   DailyTime    = dailyTimeTimeField.Time.ToTimeOnly ( ),
-                                                                   WeeklyDay    = (DayOfWeek)weeklyDayComboBox.SelectedItem,
-                                                                   WeeklyTime   = weeklyTimeTimeField.Time.ToTimeOnly ( ),
-                                                                   MonthlyDay   = monthlyDayTextValidateField.Text.ToInt32 ( ),
-                                                                   MonthlyTime  = monthlyTimeTimeField.Time.ToTimeOnly ( ),
-                                                                   YearlyMonth  = yearlyMonthComboBox.SelectedItem + 1,
-                                                                   YearlyDay    = yearlyDayTextValidateField.Text.ToInt32 ( ),
-                                                                   YearlyTime   = yearlyTimeTimeField.Time.ToTimeOnly ( )
-                                                               };
+          SelectedTemplateItem.ViewSettings.SnapshotTiming = new (
+                                                                  FrequentPeriod: int.Parse (
+                                                                                             frequentPeriodRadioGroup.GetSelectedLabelString ( ),
+                                                                                             CultureInfo.InvariantCulture.NumberFormat
+                                                                                            ),
+                                                                  HourlyMinute: hourlyMinuteTextValidateField.Text.ToInt32 ( ),
+                                                                  DailyTime: dailyTimeTimeField.Time.ToTimeOnly ( ),
+                                                                  WeeklyDay: (DayOfWeek)weeklyDayComboBox.SelectedItem,
+                                                                  WeeklyTime: weeklyTimeTimeField.Time.ToTimeOnly ( ),
+                                                                  MonthlyDay: monthlyDayTextValidateField.Text.ToInt32 ( ),
+                                                                  MonthlyTime: monthlyTimeTimeField.Time.ToTimeOnly ( ),
+                                                                  YearlyMonth: yearlyMonthComboBox.SelectedItem + 1,
+                                                                  YearlyDay: yearlyDayTextValidateField.Text.ToInt32 ( ),
+                                                                  YearlyTime: yearlyTimeTimeField.Time.ToTimeOnly ( )
+                                                                 );
         }
 
         _modifiedProperties.Clear ( );

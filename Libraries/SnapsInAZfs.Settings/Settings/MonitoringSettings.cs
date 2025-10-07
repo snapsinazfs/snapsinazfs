@@ -10,16 +10,18 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using System.Text.Json.Serialization;
-
 namespace SnapsInAZfs.Settings;
 
-public sealed class MonitoringSettings
-{
-    [JsonPropertyOrder ( 1 )]
-    public required bool EnableHttp { get; set; }
+using System.Text.Json.Serialization;
 
-    [JsonPropertyOrder ( 2 )]
-    [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingNull )]
-    public object? Kestrel { get; set; }
+public sealed class MonitoringSettings ( bool EnableHttp = false, object? Kestrel = null )
+{
+  [JsonPropertyOrder ( 1 )]
+  public required bool EnableHttp { get; set; } = EnableHttp;
+
+  [JsonPropertyOrder ( 2 )]
+  [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingNull )]
+  public object? Kestrel { get; set; }
+
+  public const string ConfigurationSectionName = "Monitoring";
 }

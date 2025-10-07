@@ -12,6 +12,7 @@
 
 namespace SnapsInAZfs.Settings;
 
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -20,39 +21,61 @@ using System.Text.Json.Serialization;
 /// </summary>
 public sealed record FormattingSettings
 {
+  internal FormattingSettings ( )
+  {
+  }
+
+  public FormattingSettings ( string ComponentSeparator = "_", string Prefix = "autosnap", string TimestampFormatString = @"yyyy-MM-dd_HH\:mm\:ss", string FrequentSuffix = "frequently", string HourlySuffix = "hourly", string DailySuffix = "daily", string WeeklySuffix = "weekly", string MonthlySuffix = "monthly" )
+  {
+    this.ComponentSeparator    = ComponentSeparator;
+    this.Prefix                = Prefix;
+    this.TimestampFormatString = TimestampFormatString;
+    this.FrequentSuffix        = FrequentSuffix;
+    this.HourlySuffix          = HourlySuffix;
+    this.DailySuffix           = DailySuffix;
+    this.WeeklySuffix          = WeeklySuffix;
+    this.MonthlySuffix         = MonthlySuffix;
+  }
+
   /// <summary>
   ///   Gets or sets the string used to separate components of a snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 1 )]
   public required string ComponentSeparator { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the end of a daily snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 6 )]
   public required string DailySuffix { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the end of a frequent snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 4 )]
   public required string FrequentSuffix { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the end of an hourly snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 5 )]
   public required string HourlySuffix { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the end of a monthly snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 8 )]
   public required string MonthlySuffix { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the beginning of a snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 2 )]
   public required string Prefix { get; init; }
 
@@ -60,6 +83,7 @@ public sealed record FormattingSettings
   ///   Gets or sets the format string used in the <see cref="DateTimeOffset.ToString()" /> method, for the timestamp
   ///   portion of a snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 3 )]
   [StringSyntax ( StringSyntaxAttribute.DateTimeFormat )]
   public required string TimestampFormatString { get; init; }
@@ -67,14 +91,18 @@ public sealed record FormattingSettings
   /// <summary>
   ///   Gets or sets the string used at the end of a weekly snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 7 )]
   public required string WeeklySuffix { get; init; }
 
   /// <summary>
   ///   Gets or sets the string used at the end of a yearly snapshot name.
   /// </summary>
+  [Required]
   [JsonPropertyOrder ( 9 )]
   public required string YearlySuffix { get; init; }
+
+  public const string ConfigurationSectionName = "Formatting";
 
   /// <summary>
   ///   Gets a fully-qualified zfs name for a snapshot, using the given <paramref name="datasetName" />, <paramref name="periodKind" />
