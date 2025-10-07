@@ -83,15 +83,6 @@ public partial class SiazCommandLine
     return 0;
   }
 
-  private static void SetNamedOptionValueIfPresent<TOption> ( ParseResult parseResult, string optionName, TOption? defaultValue = default )
-  {
-    if ( parseResult.GetResult ( optionName ) is OptionResult { IdentifierToken.Value: not null, Option: Option<TOption> } triStateOption
-      && triStateOption.GetValue<TOption> ( optionName ) is { } triStateValue )
-    {
-      Console.WriteLine ( $"Setting {optionName} to {triStateValue}" );
-    }
-  }
-
   private static void StartConfigConsole ( ParseResult parseResult )
   {
     Console.WriteLine ( parseResult.CommandResult.ToString ( ) );
