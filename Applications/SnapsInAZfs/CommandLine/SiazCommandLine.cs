@@ -64,7 +64,6 @@ public sealed partial class SiazCommandLine
   ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
   ///   explicitly <see langword="null" />.
   /// </param>
-  /// <param name="parserConfiguration"></param>
   /// <param name="invocationConfiguration"></param>
   /// <returns></returns>
   [PublicAPI]
@@ -75,7 +74,6 @@ public sealed partial class SiazCommandLine
     out SnapsInAZfsSettings? siazSettings,
     out IConfigurationRoot?  configurationRoot,
     IReadOnlyList<string>?   args                    = null,
-    ParserConfiguration?     parserConfiguration     = null,
     InvocationConfiguration? invocationConfiguration = null
   )
   {
@@ -87,7 +85,7 @@ public sealed partial class SiazCommandLine
 
       args ??= Environment.GetCommandLineArgs ( );
 
-      _rootCommandParseResult = Parse ( args, out cmd, parserConfiguration );
+      _rootCommandParseResult = Parse ( args, out cmd );
     }
 
     rootCommand            = cmd;

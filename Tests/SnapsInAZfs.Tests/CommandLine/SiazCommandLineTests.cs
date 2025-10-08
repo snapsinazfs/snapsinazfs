@@ -28,51 +28,43 @@ using System.CommandLine.Parsing;
 using Interop;
 
 [TestFixture]
-[TestOf ( typeof ( SiazCommandLine ) )]
+[TestOf ( typeof( SiazCommandLine ) )]
 [Category ( "Settings" )]
 [Category ( "Command Line" )]
 public class SiazCommandLineTests
 {
-    [Test]
-    [Category ( "Validation" )]
-    public void Invoke_NoArgs_HasExactlyOneParseError ( )
-    {
-        SiazCommandLine siazCli   = new ( );
-        string[]        emptyArgs = [ ];
+  [Test]
+  [Category ( "Validation" )]
+  public void Invoke_NoArgs_HasExactlyOneParseError ( )
+  {
+    SiazCommandLine siazCli   = new ( );
+    string[]        emptyArgs = [ ];
 
-        _ = siazCli.Invoke (
-                            out _,
-                            out ParseResult siazCliParseResult,
-                            out _,
-                            out _,
-                            emptyArgs,
-                            parserConfiguration: new ( )
-                                                 {
-                                                   EnablePosixBundling = true
-                                                 }
-                           );
+    _ = siazCli.Invoke (
+                        out _,
+                        out ParseResult siazCliParseResult,
+                        out _,
+                        out _,
+                        emptyArgs
+                       );
 
-        Assert.That ( siazCliParseResult.Errors, Has.Exactly ( 1 ).TypeOf<ParseError>( ) );
-    }
+    Assert.That ( siazCliParseResult.Errors, Has.Exactly ( 1 ).TypeOf<ParseError> ( ) );
+  }
 
-    [Test]
-    [Category ( "Validation" )]
-    public void Invoke_NoArgs_ReturnsEPERM ( )
-    {
-        SiazCommandLine siazCli   = new ( );
-        string[]        emptyArgs = [ ];
-        ExitCode exitCode = siazCli.Invoke (
-                                            out _,
-                                            out _,
-                                            out _,
-                                            out _,
-                                            emptyArgs,
-                                            parserConfiguration: new ( )
-                                                                 {
-                                                                   EnablePosixBundling = true
-                                                                 }
-                                           );
+  [Test]
+  [Category ( "Validation" )]
+  public void Invoke_NoArgs_ReturnsEPERM ( )
+  {
+    SiazCommandLine siazCli   = new ( );
+    string[]        emptyArgs = [ ];
+    ExitCode exitCode = siazCli.Invoke (
+                                        out _,
+                                        out _,
+                                        out _,
+                                        out _,
+                                        emptyArgs
+                                       );
 
-        Assert.That ( exitCode, Is.EqualTo ( ExitCode.EPERM ) );
-    }
+    Assert.That ( exitCode, Is.EqualTo ( ExitCode.EPERM ) );
+  }
 }

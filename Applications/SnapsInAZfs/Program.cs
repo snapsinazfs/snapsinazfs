@@ -37,11 +37,6 @@ internal static class Program
   internal static         SnapsInAZfsSettings? Settings;
   internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
 
-  private static readonly SCL.ParserConfiguration? ParserConfiguration = new ( )
-                                                                         {
-                                                                           EnablePosixBundling = true
-                                                                         };
-
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
   {
@@ -153,16 +148,14 @@ internal static class Program
     SiazCommandLine siazCli = new ( );
     siazCliParseResult = siazCli.Parse (
                                         arguments,
-                                        out SCL.RootCommand _,
-                                        ParserConfiguration
+                                        out SCL.RootCommand _
                                        );
     exitCode = siazCli.Invoke (
                                out SCL.RootCommand _,
                                out siazCliParseResult,
                                out settings,
                                out configurationRoot,
-                               arguments,
-                               ParserConfiguration
+                               arguments
                               );
 
     return exitCode == ExitCode.EOK;
@@ -244,7 +237,7 @@ internal static class Program
 
   private static SiazService? GetSiazServiceInstance ( SnapsInAZfsSettings settings )
   {
-    if ( !TryGetZfsCommandRunner<ZfsCommandRunner> ( settings, out IZfsCommandRunner zfsCommandRunner ) )
+    if ( !TryGetZfsCommandRunner<ZfsCommandRunner> ( settings, out IZfsCommandRunner? zfsCommandRunner ) )
     {
       return null;
     }
