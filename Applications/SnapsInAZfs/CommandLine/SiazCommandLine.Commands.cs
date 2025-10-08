@@ -90,7 +90,7 @@ public partial class SiazCommandLine
   private const  string ZfsSchemaInitializeCommandName  = "initialize";
 
   internal static bool LoadConfigurationFromConfigurationFiles (
-    [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings,
+    [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
     [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
     string[]                                        configFiles
   )
@@ -136,6 +136,7 @@ public partial class SiazCommandLine
     {
       Logger.Fatal ( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString ( true ) );
       rootConfiguration = null;
+      settings = null;
 
       return false;
     }
@@ -162,6 +163,8 @@ public partial class SiazCommandLine
     catch ( Exception ex )
     {
       Logger.Fatal ( ex, "Unable to parse settings from JSON" );
+
+      settings = null;
 
       return false;
     }
