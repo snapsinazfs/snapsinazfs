@@ -157,12 +157,12 @@ public sealed partial class SiazCommandLine
 // TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
 // False positive. Suppress it.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                             .RequiringOneOrMoreOptionsIn (
-                                                           DaemonizeOption,
-                                                           MonitorOption,
-                                                           PruneSnapshotsOption,
-                                                           TakeSnapshotsOption
-                                                          )
+                             .WithOptions (
+                                           DaemonizeOption,
+                                           MonitorOption,
+                                           PruneSnapshotsOption,
+                                           TakeSnapshotsOption
+                                          )
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                              .WithAction ( RunSiaz )
                            )
