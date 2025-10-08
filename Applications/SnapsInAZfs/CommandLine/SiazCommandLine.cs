@@ -197,16 +197,15 @@ public sealed partial class SiazCommandLine
                            );
   }
 
-  private void GetConfigurationFromFiles ( ParseResult rootCommandParseResult )
+  private FileInfo[] GetConfigurationFileCollection ( ParseResult rootCommandParseResult )
   {
-    CommandLineArguments cArgs = new ( );
-
-    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is { Option: Option<FileInfo[]> } configOptionResult )
+    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is { Option: Option<FileInfo[]>, Tokens: { Count: > 1 } } configOptionResult )
     {
-      cArgs.ConfigFiles = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ).Select ( static f => f.Name ) ];
+      FileInfo[] fileCollection = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ) ];
+      Logger.Debug ( "Configuration will be loaded from these files: {0}", string.Join ( Environment.NewLine, fileCollection.Select ( static f => f.FullName ) ) );
+      return fileCollection;
     }
 
-    Program.LoadConfigurationFromConfigurationFiles ( ref Program.Settings, out _configurationRoot, in cArgs );
-    Logger.Debug ( "Configuration files loaded." );
+    return [ ];
   }
 }

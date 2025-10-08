@@ -13,6 +13,7 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
+using System.Runtime.CompilerServices;
 using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
@@ -121,7 +122,7 @@ public partial class SiazCommandLine
         HelpName            = "path",
         Recursive           = true,
         Required            = false,
-        DefaultValueFactory = static _ => EnvironmentOrDefaultBaseConfigurationFiles.ToArray ( )
+        DefaultValueFactory = static _ => GetConfigFileListFromEnvironmentOrDefault ( ).ToArray ( )
       };
 
   private Option<bool> DaemonizeOption { get; }
@@ -131,21 +132,6 @@ public partial class SiazCommandLine
         Description = "Run SnapsInAZfs as a daemon.",
         Required    = false
       };
-
-  private static IEnumerable<FileInfo> EnvironmentOrDefaultBaseConfigurationFiles { get; }
-    = Environment.GetEnvironmentVariable ( BaseConfigFilesEnvVarName )
-                ?.Split ( ':', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries )
-                 .Select ( static fileName => new FileInfo ( fileName ) )
-    ??
-      [
-        new ( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json" ),
-        new ( "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json" ),
-        new ( "/etc/SnapsInAZfs/SnapsInAZfs.local.json" ),
-        new ( "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json" ),
-        new ( "SnapsInAZfs.json" ),
-        new ( "SnapsInAZfs.local.json" ),
-        new ( "SnapsInAZfs.nlog.json" )
-      ];
 
   private Option<LoggingLevel> LogLevelOption { get; }
     = new ( LogLevelOptionName )
@@ -183,14 +169,39 @@ public partial class SiazCommandLine
         Required = false
       };
 
-  private const string BaseConfigFilesEnvVarName     = "SnapsInAZfs_ConfigFiles";
-  private const string ConfigOptionName              = "--config";
-  private const string DaemonizeOptionName           = "--daemonize";
-  private const string DaemonTimerIntervalOptionName = "--daemon-timer-interval";
-  private const string DebugOptionName               = "--debug";
-  private const string LogLevelOptionName            = "--log-level";
-  private const string MonitorOptionName             = "--monitor";
-  private const string OutputFileOptionName          = "--output-file";
-  private const string PruneSnapshotsOptionName      = "--prune-snapshots";
-  private const string TakeSnapshotsOptionName       = "--take-snapshots";
+  private const string             BaseConfigFilesEnvVarName       = "SnapsInAZfs_ConfigFiles";
+  private const string             ConfigOptionName                = "--config";
+  private const string             DaemonizeOptionName             = "--daemonize";
+  private const string             DaemonTimerIntervalOptionName   = "--daemon-timer-interval";
+  private const string             DebugOptionName                 = "--debug";
+  private const string             LogLevelOptionName              = "--log-level";
+  private const string             MonitorOptionName               = "--monitor";
+  private const string             OutputFileOptionName            = "--output-file";
+  private const string             PruneSnapshotsOptionName        = "--prune-snapshots";
+  private const StringSplitOptions RemoveAndTrimStringSplitEntries = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+  private const string             TakeSnapshotsOptionName         = "--take-snapshots";
+
+  private static IEnumerable<FileInfo> GetConfigFileListFromEnvironmentOrDefault ( )
+  {
+    string[]? configurationFiles = Environment.GetEnvironmentVariable ( BaseConfigFilesEnvVarName )?.SplitAndClean ( Path.PathSeparator );
+
+    configurationFiles ??=
+    [
+      "SnapsInAZfs.json",
+      "SnapsInAZfs.local.json",
+      "SnapsInAZfs.nlog.json",
+      "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
+      "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
+      "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
+      "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json"
+    ];
+
+    return configurationFiles.Select ( StringAsFileInfo );
+  }
+
+  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+  private static FileInfo StringAsFileInfo ( string fileName )
+  {
+    return new ( fileName );
+  }
 }

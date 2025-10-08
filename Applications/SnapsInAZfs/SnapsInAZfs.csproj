@@ -26,6 +26,7 @@
     <UTF8OutPut>True</UTF8OutPut>
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <WarningLevel>9</WarningLevel>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
     <None Remove="DummyZfsCommandRunner.cs" />
     <None Remove="fullZfsGet.txt" />
     <None Remove="poolroots-withproperties.txt" />
+    <Content Include="appsettings.json" />
 
     <Content Include="SnapsInAZfs.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -105,6 +107,7 @@
     <PackageReference Include="NLog" Version="6.0.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.0.4" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="6.0.4" />
     <PackageReference Include="PowerArgs" Version="4.0.3" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />

@@ -13,6 +13,11 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
+using System.Diagnostics.CodeAnalysis;
+using ConfigConsole;
+using Interop.Zfs.ZfsTypes;
+using NLog.Config;
+using NLog.Extensions.Logging;
 
 public partial class SiazCommandLine
 {
@@ -26,13 +31,13 @@ public partial class SiazCommandLine
                                                "Launches the configuration console TUI."
                                               );
 
-  private Command _configGlobalCommand = new Command (
-                                                      ConfigGlobalCommandName,
-                                                      $"""
-                                                      Modify global settings in the root of the JSON configuration files.
-                                                      If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
-                                                      """
-                                                     );
+  private Command _configGlobalCommand = new (
+                                              ConfigGlobalCommandName,
+                                              """
+                                              Modify global settings in the root of the JSON configuration files.
+                                              If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                              """
+                                             );
 
   private Command _zfsCommand = new (
                                      ZfsCommandName,
@@ -83,4 +88,84 @@ public partial class SiazCommandLine
   private const  string ZfsSchemaCleanCommandName       = "clean";
   private const  string ZfsSchemaCommandName            = "schema";
   private const  string ZfsSchemaInitializeCommandName  = "initialize";
+
+  internal static bool LoadConfigurationFromConfigurationFiles (
+    [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings,
+    [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
+    string[]                                        configFiles
+  )
+  {
+    Logger.Trace ( "Loading configuration." );
+
+    ConfigurationBuilder configBuilder = new ( );
+
+    string[] requestedFiles;
+
+    if ( configFiles.Length > 0 )
+    {
+      requestedFiles = configFiles;
+    }
+    else
+    {
+      requestedFiles =
+      [
+        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
+        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
+        "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
+        "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
+        "SnapsInAZfs.json",
+        "SnapsInAZfs.local.json",
+        "SnapsInAZfs.nlog.json"
+      ];
+    }
+
+    foreach ( string filePath in requestedFiles )
+    {
+      if ( !File.Exists ( filePath ) )
+      {
+        Logger.Warn ( "Configuration file not found at {0}", filePath );
+
+        continue;
+      }
+
+      Logger.Debug ( "Loading configuration file {0}", filePath );
+      configBuilder.AddJsonFile ( filePath, false, false );
+    }
+
+    if ( configBuilder.Sources.Count == 0 )
+    {
+      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString ( true ) );
+      rootConfiguration = null;
+
+      return false;
+    }
+
+    rootConfiguration = configBuilder.Build ( );
+
+    Logger.Trace ( "Building settings objects from IConfiguration" );
+
+    try
+    {
+      settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
+      // ReSharper disable once SettingNotFoundInConfiguration
+      IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( "Kestrel" );
+
+      if ( kestrelSection.Exists ( ) )
+      {
+        IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren ( );
+        settings.Monitoring.Kestrel = kestrelSettings.ToDictionary ( static k => k.Key, static v => v.SerializeToJson ( ) );
+      }
+
+      IConfigurationSection nlogConfigSection = rootConfiguration.GetSection ( "NLog" );
+      LogManager.Configuration = nlogConfigSection.Exists ( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration ( );
+    }
+    catch ( Exception ex )
+    {
+      Logger.Fatal ( ex, "Unable to parse settings from JSON" );
+
+      return false;
+    }
+
+    return true;
+  }
 }

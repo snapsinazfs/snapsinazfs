@@ -10,54 +10,77 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-using SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
 namespace SnapsInAZfs;
+
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using Interop.Zfs.ZfsTypes;
 
 internal static class TypeExtensions
 {
+  private const StringSplitOptions TrimAndRemoveBlanks = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+
+  /// <summary>
+  ///   Gets the greatest common factor of all integers in the set.
+  /// </summary>
+  /// <param name="terms"></param>
+  /// <param name="fallback">Fallback value if the collection is empty</param>
+  /// <returns></returns>
+  public static int GreatestCommonFactor ( this IList<int> terms, int fallback = 1 )
+  {
+    int count = terms.Count;
+
+    if ( count <= 1 )
+    {
+      return terms.FirstOrDefault ( fallback );
+    }
+
+    int result = terms [ 0 ];
+
+    for ( int termIndex = 1; termIndex < count; termIndex++ )
+    {
+      GreatestCommonFactor ( ref result, terms [ termIndex ] );
+    }
+
+    return result;
+  }
+
+  public static string KeysToCommaSeparatedSingleLineString ( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
+  {
+    return collection.Where ( static kvp => !kvp.Value ).Select ( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString ( withSpaces );
+  }
+
+  private static void GreatestCommonFactor ( ref int left, int right )
+  {
+    while ( left != 0 && right != 0 )
+    {
+      if ( left > right )
+      {
+        left %= right;
+      }
+      else
+      {
+        right %= left;
+      }
+    }
+
+    left |= right;
+  }
+
+  extension ( string original )
+  {
     /// <summary>
-    ///     Gets the greatest common factor of all integers in the set.
+    ///   Just a proxy for string.Split with both <see cref="StringSplitOptions.RemoveEmptyEntries" /> and
+    ///   <see cref="StringSplitOptions.TrimEntries" /> already specified.
     /// </summary>
-    /// <param name="terms"></param>
-    /// <param name="fallback">Fallback value if the collection is empty</param>
-    /// <returns></returns>
-    public static int GreatestCommonFactor ( this IList<int> terms, int fallback = 1 )
+    /// <param name="separator">The separator character to split on.</param>
+    /// <returns>
+    ///   An array of strings from the source string, split by the <paramref name="separator" />.
+    /// </returns>
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public string[] SplitAndClean ( char separator )
     {
-        int count = terms.Count;
-        if ( count <= 1 )
-        {
-            return terms.FirstOrDefault ( fallback );
-        }
-
-        int result = terms [ 0 ];
-        for ( int termIndex = 1; termIndex < count; termIndex++ )
-        {
-            GreatestCommonFactor ( ref result, terms [ termIndex ] );
-        }
-
-        return result;
+      return original.Split ( separator, TrimAndRemoveBlanks );
     }
-
-    public static string KeysToCommaSeparatedSingleLineString ( this IEnumerable<KeyValuePair<string, bool>> collection, bool withSpaces )
-    {
-        return collection.Where ( static kvp => !kvp.Value ).Select ( static kvp => kvp.Key ).ToCommaSeparatedSingleLineString ( withSpaces );
-    }
-
-    private static void GreatestCommonFactor ( ref int left, int right )
-    {
-        while ( left != 0 && right != 0 )
-        {
-            if ( left > right )
-            {
-                left %= right;
-            }
-            else
-            {
-                right %= left;
-            }
-        }
-
-        left |= right;
-    }
+  }
 }

@@ -52,14 +52,14 @@ public partial class SiazCommandLine
         case nameof (SnapsInAZfsSettings.TakeSnapshots):
         {
           TriStateOptionValue value = result.GetRequiredValue ( (Option<TriStateOptionValue>)result.Option );
-          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
 
         case nameof (SnapsInAZfsSettings.LocalSystemName):
         {
           string value = result.GetRequiredValue ( (Option<string>)result.Option );
-          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
 
@@ -67,14 +67,14 @@ public partial class SiazCommandLine
         case nameof (SnapsInAZfsSettings.ZpoolPath):
         {
           FileInfo value = result.GetRequiredValue ( (Option<FileInfo>)result.Option );
-          Console.WriteLine ( $"{result.Option.Name} value is {value.FullName}" );
+          Logger.Trace ( "{0} value is {1}", result.Option.Name, value.FullName );
         }
           break;
 
         case nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds):
         {
           uint value = result.GetRequiredValue ( (Option<uint>)result.Option );
-          Console.WriteLine ( $"{result.Option.Name} value is {value}" );
+          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
       }
@@ -85,8 +85,7 @@ public partial class SiazCommandLine
 
   private static void StartConfigConsole ( ParseResult parseResult )
   {
-    Console.WriteLine ( parseResult.CommandResult.ToString ( ) );
-    Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
+    Logger.Fatal ( "{0} not implemented.", parseResult.CommandResult.Command.Name );
   }
 
   private static int ZfsSchemaCheck ( ParseResult parseResult )

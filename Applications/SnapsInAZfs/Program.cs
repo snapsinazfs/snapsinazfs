@@ -13,15 +13,10 @@
 namespace SnapsInAZfs;
 
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using CommandLine;
-using ConfigConsole;
 using Interop;
 using Interop.Zfs.ZfsCommandRunner;
-using Interop.Zfs.ZfsTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -29,24 +24,37 @@ using Monitoring;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using PowerArgs;
-using Settings.Logging;
-using LogLevel = NLog.LogLevel;
+using MSLogLevel = Microsoft.Extensions.Logging.LogLevel;
+using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
 
 [UsedImplicitly]
 internal static class Program
 {
-  // Note that logging will be at whatever level is defined in SnapsInAZfs.nlog.json until configuration is initialized, regardless of command-line parameters.
-  // Desired logging parameters should be set in SnapsInAZfs.nlog.json
-  private static readonly Logger               Logger          = LogManager.GetLogger ( "SnapsInAZfs" );
+  private static          Logger               _logger         = LogManager.CreateNullLogger ( );
   private static readonly IMonitor             ServiceObserver = new Monitor ( );
   private static          IConfigurationRoot?  _configurationRoot;
   internal static         SnapsInAZfsSettings? Settings;
-  internal static         IZfsCommandRunner?   ZfsCommandRunnerSingleton;
+  internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
+
+  private static readonly SCL.ParserConfiguration? ParserConfiguration = new ( )
+                                                                         {
+                                                                           EnablePosixBundling = true
+                                                                         };
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
   {
+    // Program startup sequence is:
+    // 1. Immediately set up early logging from appsettings.json before anything else.
+    // 2. Parse the command line
+    //    A. If --config option exists, load those files and set application configuration. Otherwise, load standard files and set configuration.
+    //    B. Apply any overrides to loaded configuration according to options on the command line.
+    // 3. Invoke the command line.
+    // 4. Proceed according to command line invocation result or terminate if command line errors are indicated.
+
+    await using LogFactory earlyLogFactory = InitializeEarlyLogging ( out _logger );
+
     if ( !ProcessCommandLine ( argv, out SCL.ParseResult siazCliParseResult, out Settings, out _configurationRoot, out ExitCode siazCliInvocationExitCode )
       || siazCliInvocationExitCode is not ExitCode.EOK )
     {
@@ -69,51 +77,20 @@ internal static class Program
 
     CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
 
-    // Implicit null check here is important.
-    if ( args is not { Help: false } )
-    {
-      LogManager.Shutdown ( );
-
-      return (int)ExitCode.ECANCELED;
-    }
-
-    if ( !LoadConfigurationFromConfigurationFiles ( ref Settings, out _configurationRoot, in args ) )
-    {
-      LogManager.Shutdown ( );
-
-      return (int)ExitCode.EFTYPE;
-    }
-
-    SetCommandLineLoggingOverride ( args );
-
-    if ( args.Version )
-    {
-      // ReSharper disable once ExceptionNotDocumented
-      // ReSharper disable once HeapView.ObjectAllocation
-      string versionString
-        = $"SnapsInAZfs Version: {Assembly.GetEntryAssembly ( )?.GetCustomAttribute<AssemblyInformationalVersionAttribute> ( )?.InformationalVersion}";
-      Console.WriteLine ( versionString );
-      Logger.Debug ( versionString );
-      Logger.Trace ( "Version argument provided. Exiting." );
-      LogManager.Shutdown ( );
-
-      return (int)ExitCode.ECANCELED;
-    }
-
     ApplyCommandLineArgumentOverrides ( in args, Settings );
 
     if ( args.ConfigConsole )
     {
       try
       {
-        if ( TryGetZfsCommandRunner ( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        if ( TryGetZfsCommandRunner<ZfsCommandRunner> ( Settings, out IZfsCommandRunner zfsCommandRunner ) )
         {
           ConfigConsole.ConfigConsole.RunConsoleInterface ( zfsCommandRunner );
         }
       }
       catch ( Exception e )
       {
-        Logger.Fatal ( e, "Error in configuration console - Exiting" );
+        _logger.Fatal ( e, "Error in configuration console - Exiting" );
         LogManager.Shutdown ( );
 
         return (int)ExitCode.GenericError;
@@ -129,14 +106,40 @@ internal static class Program
       return (int)badResult;
     }
 
-    Logger.Debug ( "Settings passed basic validation checks." );
-    Logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
+    _logger.Debug ( "Settings passed basic validation checks." );
+    _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
 
     return Settings.Monitoring.EnableHttp switch
            {
              true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
              _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
            };
+  }
+
+  /// <summary>
+  ///   Loads the appsettings.json file from the working directory and configures logging ONLY.
+  /// </summary>
+  /// <remarks>
+  ///   After this method is called, the LogManager will have the configuration from appsettings.json.<br />
+  ///   Any configuration changes made after this need to be followed by a call to <see cref="LogManager.ReconfigExistingLoggers()" />
+  ///   to continue.
+  /// </remarks>
+  /// <returns>The <see cref="ISetupBuilder" /> created from the configuration.</returns>
+  [MustDisposeResource]
+  private static LogFactory InitializeEarlyLogging ( out Logger logger )
+  {
+    IConfigurationRoot appSettingsJson = new ConfigurationBuilder ( )
+                                        .SetBasePath ( Directory.GetCurrentDirectory ( ) )
+                                        .AddJsonFile ( "appsettings.json", false, false )
+                                        .AddEnvironmentVariables ( )
+                                        .Build ( );
+    ISetupBuilder builder = LogManager.Setup ( )
+                                      .LoadConfigurationFromSection ( appSettingsJson );
+
+    logger = LogManager.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
+    LogManager.ReconfigExistingLoggers ( true );
+
+    return builder.LogFactory;
   }
 
   private static bool ProcessCommandLine (
@@ -151,10 +154,7 @@ internal static class Program
     siazCliParseResult = siazCli.Parse (
                                         arguments,
                                         out SCL.RootCommand _,
-                                        new ( )
-                                        {
-                                          EnablePosixBundling = true
-                                        }
+                                        ParserConfiguration
                                        );
     exitCode = siazCli.Invoke (
                                out SCL.RootCommand _,
@@ -162,10 +162,7 @@ internal static class Program
                                out settings,
                                out configurationRoot,
                                arguments,
-                               new ( )
-                               {
-                                 EnablePosixBundling = true
-                               }
+                               ParserConfiguration
                               );
 
     return exitCode == ExitCode.EOK;
@@ -173,7 +170,7 @@ internal static class Program
 
   /// <summary>
   ///   Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-  ///   the CLI
+  ///   the CLI.
   /// </summary>
   /// <param name="args"></param>
   /// <param name="programSettings">
@@ -181,7 +178,7 @@ internal static class Program
   /// </param>
   internal static void ApplyCommandLineArgumentOverrides ( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
   {
-    Logger.Debug ( "Overriding settings using arguments from command line." );
+    _logger.Debug ( "Overriding settings using arguments from command line." );
 
     programSettings.DryRun         |= args.DryRun;
     programSettings.TakeSnapshots  =  ( programSettings.TakeSnapshots  || args.TakeSnapshots  || args.Cron )                    && !args.NoTakeSnapshots;
@@ -196,184 +193,37 @@ internal static class Program
     }
   }
 
-  internal static bool LoadConfigurationFromConfigurationFiles (
-    [NotNullWhen ( true )] ref SnapsInAZfsSettings? settings,
-    [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
-    in                         CommandLineArguments args
+  internal static bool TryGetZfsCommandRunner<TRunner> (
+    SnapsInAZfsSettings   settings,
+    out IZfsCommandRunner zfsCommandRunner,
+    bool                  reuseSingleton = true
   )
+    where TRunner : IZfsCommandRunner<TRunner>, new ( )
   {
-    // Configuration is built in the following order from various sources.
-    // Configurations from all sources are merged, and the final configuration that will be used is the result of the merged configurations.
-    // If conflicting items exist in multiple configuration sources, the configuration of the configuration source added latest will
-    // override earlier values.
-    // Note that nlog-specific configuration is separate, in SnapsInAZfs.nlog.json, and is not affected by the configuration specified below,
-    // and is loaded/parsed FIRST, before any configuration specified below.
-    // See the SnapsInAZfs.Settings.Logging.LoggingSettings class for nlog configuration details.
-    // See snapsinazfs(5) for detailed configuration documentation.
-    // Configuration order, if not overridden by command-line options:
-    // 1. /usr/local/share/SnapsInAZfs/SnapsInAZfs.json   #(Required - Base configuration - Should not be modified by the user)
-    // 2. /etc/SnapsInAZfs/SnapsInAZfs.local.json
-    // 6. Command-line arguments passed on invocation of SnapsInAZfs
-
-    LogDebugOrConsole ( "Loading configuration." );
-
-    ConfigurationBuilder configBuilder = new ( );
-
-    string[] requestedFiles;
-
-    if ( args.ConfigFiles.Length > 0 )
-    {
-      requestedFiles = args.ConfigFiles;
-    }
-    else
-    {
-      requestedFiles =
-      [
-        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
-        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
-        "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
-        "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
-        "SnapsInAZfs.json",
-        "SnapsInAZfs.local.json",
-        "SnapsInAZfs.nlog.json"
-      ];
-    }
-
-    foreach ( string filePath in requestedFiles )
-    {
-      if ( !File.Exists ( filePath ) )
-      {
-        LogDebugOrConsole ( "Configuration file not found at {0}", filePath );
-
-        continue;
-      }
-
-      LogTraceOrConsole ( "Loading configuration file {0}", filePath );
-      configBuilder.AddJsonFile ( filePath, false, false );
-    }
-
-    if ( configBuilder.Sources.Count == 0 )
-    {
-      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString ( true ) );
-      rootConfiguration = null;
-
-      return false;
-    }
-
-    rootConfiguration = configBuilder.Build ( );
-
-    Logger.Trace ( "Building settings objects from IConfiguration" );
-
-    try
-    {
-      settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
-      // ReSharper disable once SettingNotFoundInConfiguration
-      IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( "Kestrel" );
-
-      if ( kestrelSection.Exists ( ) )
-      {
-        IEnumerable<IConfigurationSection> kestrelSettings = kestrelSection.GetChildren ( );
-        settings.Monitoring.Kestrel = kestrelSettings.ToDictionary ( static k => k.Key, static v => v.SerializeToJson ( ) );
-      }
-
-      IConfigurationSection nlogConfigSection = rootConfiguration.GetSection ( "NLog" );
-      LogManager.Configuration = nlogConfigSection.Exists ( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration ( );
-    }
-    catch ( Exception ex )
-    {
-      Logger.Fatal ( ex, "Unable to parse settings from JSON" );
-
-      return false;
-    }
-
-    return true;
-  }
-
-  [StringFormatMethod ( nameof (message) )]
-  private static void LogDebugOrConsole ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string message, params object?[] args )
-  {
-    if ( LogManager.Configuration is null )
-    {
-      Console.WriteLine ( message, args );
-    }
-    else
-    {
-      Logger.Debug ( CultureInfo.CurrentCulture, message, args );
-    }
-  }
-
-  [StringFormatMethod ( nameof (message) )]
-  private static void LogTraceOrConsole ( [StringSyntax ( StringSyntaxAttribute.CompositeFormat )] string message, params object?[] args )
-  {
-    if ( LogManager.Configuration is null )
-    {
-      Console.WriteLine ( message, args );
-    }
-    else
-    {
-      Logger.Trace ( CultureInfo.CurrentCulture, message, args );
-    }
-  }
-
-  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-  private static void SetCommandLineLoggingOverride ( CommandLineArguments args )
-  {
-    if ( args.Debug )
-    {
-      LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Debug );
-    }
-
-    if ( args.Quiet )
-    {
-      LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Warn );
-    }
-
-    if ( args.ReallyQuiet )
-    {
-      LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Off );
-    }
-
-    if ( args.Trace )
-    {
-      LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Trace );
-    }
-
-    if ( args.Verbose )
-    {
-      LoggingSettings.OverrideConsoleLoggingLevel ( LogLevel.Info );
-    }
-  }
-
-  internal static bool TryGetZfsCommandRunner (
-    SnapsInAZfsSettings                           settings,
-    [NotNullWhen ( true )] out IZfsCommandRunner? zfsCommandRunner,
-    bool                                          reuseSingleton = true
-  )
-  {
-    if ( reuseSingleton && ZfsCommandRunnerSingleton is { } singleton )
+    if ( reuseSingleton && ZfsCommandRunnerSingleton is IZfsCommandRunner<TRunner> singleton )
     {
       zfsCommandRunner = singleton;
 
       return true;
     }
 
-    Logger.Trace ( "Getting ZFS command runner for the current environment" );
+    _logger.Trace ( "Getting ZFS command runner for the current environment" );
 
     try
     {
-      GetZfsCommandRunner ( settings, out zfsCommandRunner );
+      zfsCommandRunner = TRunner.Create ( settings.ZfsPath, settings.ZpoolPath );
     }
     catch ( ArgumentNullException ex )
     {
-      Logger.Fatal ( ex, "Null or empty string provided for ZfsPath or ZpoolPath - Cannot continue" );
-      zfsCommandRunner = null;
+      _logger.Fatal ( ex, "Null or empty string provided for ZfsPath or ZpoolPath - Cannot continue" );
+      zfsCommandRunner = null!;
 
       return false;
     }
     catch ( FileNotFoundException ex )
     {
-      Logger.Fatal ( ex, ex.Message );
-      zfsCommandRunner = null;
+      _logger.Fatal ( ex, ex.Message );
+      zfsCommandRunner = null!;
 
       return false;
     }
@@ -388,7 +238,7 @@ internal static class Program
 
   private static SiazService? GetSiazServiceInstance ( SnapsInAZfsSettings settings )
   {
-    if ( !TryGetZfsCommandRunner ( settings, out IZfsCommandRunner? zfsCommandRunner ) )
+    if ( !TryGetZfsCommandRunner<ZfsCommandRunner> ( settings, out IZfsCommandRunner zfsCommandRunner ) )
     {
       return null;
     }
@@ -401,17 +251,6 @@ internal static class Program
     return new ( settings, zfsCommandRunner );
   }
 
-  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-  private static void GetZfsCommandRunner ( SnapsInAZfsSettings settings, out IZfsCommandRunner zfsCommandRunner )
-  {
-    // This conditional is to avoid compiling the DummyZfsCommandRunner class if it isn't needed.
-  #if INCLUDE_DUMMY_ZFSCOMMANDRUNNER || WINDOWS
-    zfsCommandRunner = new DummyZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
-  #else
-    zfsCommandRunner = new ZfsCommandRunner ( settings.ZfsPath, settings.ZpoolPath );
-  #endif
-  }
-
   private static async Task<int> RunWithKestrelAsync ( SnapsInAZfsSettings settings, IConfigurationRoot configurationRoot )
   {
     SiazService.Timestamp = DateTimeOffset.Now;
@@ -419,7 +258,7 @@ internal static class Program
 
     if ( serviceInstance is null )
     {
-      Logger.Fatal ( "Failed to create service instance - exiting" );
+      _logger.Fatal ( "Failed to create service instance - exiting" );
       LogManager.Shutdown ( );
 
       return (int)ExitCode.ENOATTR;
@@ -497,7 +336,7 @@ internal static class Program
 
     if ( serviceInstance is null )
     {
-      Logger.Fatal ( "Failed to create service instance - exiting" );
+      _logger.Fatal ( "Failed to create service instance - exiting" );
       LogManager.Shutdown ( );
 
       return (int)ExitCode.ENOATTR;
@@ -523,7 +362,7 @@ internal static class Program
 
     if ( validator.IsSettingsObjectNull )
     {
-      Logger.Fatal ( "Failed to validate settings. Settings null. SnapsInAZfs will now terminate." );
+      _logger.Fatal ( "Failed to validate settings. Settings null. SnapsInAZfs will now terminate." );
 
       return ExitCode.EFTYPE;
     }
@@ -550,7 +389,7 @@ internal static class Program
 
     if ( autoDetectionInvoked )
     {
-      Logger.Debug ( "Re-validating configuration after one or more auto-detected settings altered." );
+      _logger.Debug ( "Re-validating configuration after one or more auto-detected settings altered." );
       SettingsValidator.Validate ( in settings, validator );
     }
 
@@ -559,11 +398,11 @@ internal static class Program
       return ExitCode.EOK;
     }
 
-    Logger.Fatal ( "Failed to validate settings." );
-    Logger.Debug ( $"{validator.ValidationErrors} errors found in validation." );
-    Logger.Debug ( $"Validation status: {JsonSerializer.Serialize ( validator )}" );
-    Logger.Debug ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
-    Logger.Fatal ( "SnapsInAZfs will now terminate." );
+    _logger.Fatal ( "Failed to validate settings." );
+    _logger.Debug ( $"{validator.ValidationErrors} errors found in validation." );
+    _logger.Debug ( $"Validation status: {JsonSerializer.Serialize ( validator )}" );
+    _logger.Debug ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
+    _logger.Fatal ( "SnapsInAZfs will now terminate." );
 
     return ExitCode.EFTYPE;
   }

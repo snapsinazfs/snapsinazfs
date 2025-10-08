@@ -62,7 +62,7 @@ public partial class SiazCommandLine
 
     _rootCommandParseResult = rootCommand.Parse ( args ?? Environment.GetCommandLineArgs ( ), configuration );
 
-    GetConfigurationFromFiles ( _rootCommandParseResult );
+    GetConfigurationFileCollection ( _rootCommandParseResult );
 
     return _rootCommandParseResult;
   }
