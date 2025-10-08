@@ -92,16 +92,14 @@ public partial class SiazCommandLine
   internal static bool LoadConfigurationFromConfigurationFiles (
     [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
     [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
-    string[]                                        configFiles
+    FileInfo[]                                        configFiles
   )
   {
     Logger.Trace ( "Loading configuration." );
 
     ConfigurationBuilder configBuilder = new ( );
 
-    FileInfo[] requestedFiles = GetConfigFileListFromEnvironmentOrDefault ( ).ToArray ( );
-
-    foreach ( FileInfo file in requestedFiles )
+    foreach ( FileInfo file in configFiles )
     {
       if ( !file.Exists )
       {
@@ -116,7 +114,7 @@ public partial class SiazCommandLine
 
     if ( configBuilder.Sources.Count == 0 )
     {
-      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", requestedFiles.ToCommaSeparatedSingleLineString ( true ) );
+      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", configFiles.ToCommaSeparatedSingleLineString ( true ) );
       rootConfiguration = null;
       settings = null;
 

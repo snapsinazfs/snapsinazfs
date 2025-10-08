@@ -197,12 +197,18 @@ public sealed partial class SiazCommandLine
 
   private FileInfo[] GetConfigurationFileCollection ( ParseResult rootCommandParseResult )
   {
-    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is not { Option: Option<FileInfo[]>, Tokens.Count: > 1 } configOptionResult )
+    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is not { Option: Option<FileInfo[]> } fileInfoResult )
     {
       return [ ];
     }
 
-    FileInfo[] fileCollection = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ) ];
+    if ( fileInfoResult is { Implicit: false, Tokens.Count: < 2 } )
+    {
+      fileInfoResult.AddError ( $"One or more configuration files must be given to the {ConfigOptionName} option." );
+      return [ ];
+    }
+
+    FileInfo[] fileCollection = [ ..fileInfoResult.GetValueOrDefault<FileInfo[]> ( ) ];
     Logger.Debug ( "Configuration will be loaded from these files: {0}", string.Join ( Environment.NewLine, fileCollection.Select ( static f => f.FullName ) ) );
 
     return fileCollection;
