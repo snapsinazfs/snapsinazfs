@@ -156,15 +156,13 @@ public static class TypeExtensions
   ///   operations.
   /// </summary>
   /// <param name="properties">
-  ///   An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string
-  ///   for
+  ///   An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string for.
   /// </param>
-  /// <returns></returns>
   public static string ToStringForZfsSet ( this List<IZfsProperty> properties )
   {
     ArgumentNullException.ThrowIfNull ( properties );
 
-    if ( !properties.Any ( ) )
+    if ( properties.Count == 0 )
     {
       throw new ArgumentException ( "Empty collection provided", nameof (properties) );
     }
