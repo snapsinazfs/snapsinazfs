@@ -37,8 +37,8 @@ public class SiazCommandLineTests
     [Category ( "Validation" )]
     public void Invoke_NoArgs_HasExactlyOneParseError ( )
     {
-        SiazCommandLine siazCli            = new ( );
-        string[]        emptyArgs          = [ ];
+        SiazCommandLine siazCli   = new ( );
+        string[]        emptyArgs = [ ];
 
         _ = siazCli.Invoke (
                             out _,
@@ -59,8 +59,8 @@ public class SiazCommandLineTests
     [Category ( "Validation" )]
     public void Invoke_NoArgs_ReturnsEPERM ( )
     {
-        SiazCommandLine siazCli            = new ( );
-        string[]        emptyArgs          = [ ];
+        SiazCommandLine siazCli   = new ( );
+        string[]        emptyArgs = [ ];
         ExitCode exitCode = siazCli.Invoke (
                                             out _,
                                             out _,

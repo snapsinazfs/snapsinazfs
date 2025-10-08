@@ -1189,7 +1189,7 @@ public sealed partial class ZfsConfigurationWindow
 
         ref readonly ZfsProperty<string> newProperty
             = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, ConfigConsole.TemplateListItems [ args.Item ].TemplateName );
-        viewData.SourceTextField.Text = newProperty.InheritedFrom;
+        viewData.SourceTextField.Text = newProperty.InheritedFrom.ToString ( );
         UpdateFieldsForSelectedZfsTreeNode ( );
         UpdateButtonState ( );
     }
@@ -1212,7 +1212,7 @@ public sealed partial class ZfsConfigurationWindow
         enabledRadioGroup.SelectedItem = treeDataset.Enabled.AsTrueFalseRadioIndex ( );
         enabledRadioGroup.ColorScheme  = treeDataset.Enabled.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
         enabledRadioGroup.Enabled      = true;
-        enabledSourceTextField.Text    = treeDataset.Enabled.InheritedFrom;
+        enabledSourceTextField.Text    = treeDataset.Enabled.InheritedFrom.ToString ( );
         enabledInheritButton.Enabled   = treeDataset is { IsPoolRoot: false, Enabled.IsLocal: true };
     }
 
@@ -1241,7 +1241,7 @@ public sealed partial class ZfsConfigurationWindow
                                                    };
                 recursionRadioGroup.ColorScheme
                     = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-                recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom;
+                recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom.ToString ();
             }
             catch ( InvalidOperationException e )
             {
@@ -1263,7 +1263,7 @@ public sealed partial class ZfsConfigurationWindow
                         UpdateSelectedItemStringRadioGroupProperty ( recursionRadioGroup );
                         recursionRadioGroup.ColorScheme
                             = treeDataset.Recursion.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
-                        recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom;
+                        recursionSourceTextField.Text = treeDataset.Recursion.InheritedFrom.ToString ();
                         UpdateButtonState ( );
 
                         break;
@@ -1299,7 +1299,7 @@ public sealed partial class ZfsConfigurationWindow
             templateListView.ColorScheme  = treeDataset.Template.IsInherited ? inheritedPropertyListViewColorScheme : localPropertyListViewColorScheme;
             templateListView.EnsureSelectedItemVisible ( );
             templateListView.Enabled      = true;
-            templateSourceTextField.Text  = treeDataset.Template.InheritedFrom;
+            templateSourceTextField.Text  = treeDataset.Template.InheritedFrom.ToString ();
             templateInheritButton.Enabled = treeDataset is { IsPoolRoot: false, Template.IsLocal: true };
 
             retentionFrequentTextField.Text = treeDataset.SnapshotRetentionFrequent.ValueString;
@@ -1364,7 +1364,7 @@ public sealed partial class ZfsConfigurationWindow
         pruneSnapshotsRadioGroup.ColorScheme
             = treeDataset.PruneSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
         pruneSnapshotsRadioGroup.Enabled    = true;
-        pruneSnapshotsSourceTextField.Text  = treeDataset.PruneSnapshots.InheritedFrom;
+        pruneSnapshotsSourceTextField.Text  = treeDataset.PruneSnapshots.InheritedFrom.ToString ();
         pruneSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, PruneSnapshots.IsLocal: true };
     }
 
@@ -1381,7 +1381,7 @@ public sealed partial class ZfsConfigurationWindow
         }
 
         ref readonly ZfsProperty<bool> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedBooleanFromLabel ( ) );
-        viewData.SourceTextField.Text = newProperty.InheritedFrom;
+        viewData.SourceTextField.Text = newProperty.InheritedFrom.ToString ();
     }
 
     private void UpdateSelectedItemIntProperty ( TextValidateField field, string propertyName, int propertyValue )
@@ -1408,7 +1408,7 @@ public sealed partial class ZfsConfigurationWindow
         }
 
         ref readonly ZfsProperty<string> newProperty = ref node.UpdateTreeNodeProperty ( viewData.PropertyName, radioGroup.GetSelectedLabelString ( ) );
-        viewData.SourceTextField.Text = newProperty.InheritedFrom;
+        viewData.SourceTextField.Text = newProperty.InheritedFrom.ToString ();
     }
 
     private void UpdateTakeSnapshotFields ( ZfsRecord treeDataset )
@@ -1417,7 +1417,7 @@ public sealed partial class ZfsConfigurationWindow
         takeSnapshotsRadioGroup.ColorScheme
             = treeDataset.TakeSnapshots.IsInherited ? inheritedPropertyRadioGroupColorScheme : localPropertyRadioGroupColorScheme;
         takeSnapshotsRadioGroup.Enabled    = true;
-        takeSnapshotsSourceTextField.Text  = treeDataset.TakeSnapshots.InheritedFrom;
+        takeSnapshotsSourceTextField.Text  = treeDataset.TakeSnapshots.InheritedFrom.ToString ( );
         takeSnapshotsInheritButton.Enabled = treeDataset is { IsPoolRoot: false, TakeSnapshots.IsLocal: true };
     }
 

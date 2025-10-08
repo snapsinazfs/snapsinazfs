@@ -18,7 +18,22 @@ using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
-public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
+/// <summary>
+/// Type representing a zfsprop.
+/// </summary>
+/// <typeparam name="T">The type of the value of the property.</typeparam>
+/// <remarks>The size of this struct as an element in an array is fixed when <typeparamref name="T"/> is a reference type.<br/>
+///  When <typeparamref name="T"/> is a value type, the element size in a collection is dependent on <typeparamref name="T"/>.
+/// </remarks>
+public readonly partial struct ZfsProperty<T>
+  : IZfsProperty,
+    IEquatable<int>,
+    IEquatable<string>,
+    IEquatable<bool>,
+    IEquatable<DateTimeOffset>,
+    IEquatable<ZfsProperty<T>>,
+    IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool>
+  where T : notnull
 {
     // ReSharper disable once StaticMemberInGenericType
     private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsProperty<T>)}" );
@@ -38,8 +53,7 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
         IsLocal = isLocal;
     }
 
-    // ReSharper disable once HeapView.ObjectAllocation
-    public string InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source [ 15.. ];
+    public ReadOnlySpan<char> InheritedFrom => IsLocal ? ZfsPropertySourceConstants.Local : Source [ 15.. ];
 
     [JsonIgnore]
     public bool IsInherited => !IsLocal;
@@ -78,7 +92,10 @@ public readonly partial struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, I
     // ReSharper disable once HeapView.ObjectAllocation
     public string SetString => $"{Name}={ValueString}";
 
+    /// <inheritdoc />
     public string Name    { get; init; }
+
+    /// <inheritdoc />
     public bool   IsLocal { get; init; }
 
     public static ZfsProperty<bool> CreateWithoutParent( string name, in bool value, bool isLocal = true )

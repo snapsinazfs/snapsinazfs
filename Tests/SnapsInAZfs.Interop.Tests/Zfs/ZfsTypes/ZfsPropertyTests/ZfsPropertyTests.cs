@@ -138,7 +138,7 @@ public class ZfsPropertyTests
         ZfsProperty<bool> gen2Enabled = gen2Record.Enabled;
         Assume.That ( gen1Enabled.IsLocal, Is.True );
         Assume.That ( gen2Enabled.IsLocal, Is.False );
-        Assert.That ( gen2Enabled.InheritedFrom, Is.EqualTo ( "gen1" ) );
+        Assert.That ( gen2Enabled.InheritedFrom.ToString (  ), Is.EqualTo ( "gen1" ) );
     }
 
     [Test]
@@ -153,7 +153,7 @@ public class ZfsPropertyTests
         Assume.That ( gen1Enabled.IsLocal, Is.True );
         Assume.That ( gen2Enabled.IsLocal, Is.False );
         Assume.That ( gen3Enabled.IsLocal, Is.False );
-        Assert.That ( gen3Enabled.InheritedFrom, Is.EqualTo ( "gen1" ) );
+        Assert.That ( gen3Enabled.InheritedFrom.ToString (), Is.EqualTo ( "gen1" ) );
     }
 
     [Test]
@@ -161,7 +161,7 @@ public class ZfsPropertyTests
     {
         ZfsRecord         gen1Record  = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( "gen1" );
         ZfsProperty<bool> gen1Enabled = gen1Record.Enabled;
-        Assert.That ( gen1Enabled.InheritedFrom, Is.EqualTo ( ZfsPropertySourceConstants.Local ) );
+        Assert.That ( gen1Enabled.InheritedFrom.ToString (), Is.EqualTo ( ZfsPropertySourceConstants.Local ) );
     }
 
     [Test]
@@ -177,7 +177,7 @@ public class ZfsPropertyTests
         Assume.That ( gen2Enabled.IsLocal, Is.False );
         Assume.That ( gen2Enabled.Source,  Is.EqualTo ( "inherited from gen1" ) );
         Assume.That ( gen3Enabled.IsLocal, Is.True );
-        Assert.That ( gen3Enabled.InheritedFrom, Is.EqualTo ( ZfsPropertySourceConstants.Local ) );
+        Assert.That ( gen3Enabled.InheritedFrom.ToString (), Is.EqualTo ( ZfsPropertySourceConstants.Local ) );
     }
 
     [Test]
