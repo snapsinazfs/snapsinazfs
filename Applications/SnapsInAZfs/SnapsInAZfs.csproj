@@ -27,6 +27,7 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <WarningLevel>9</WarningLevel>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
+    <NoWarn>1701;1702;NU1510</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
