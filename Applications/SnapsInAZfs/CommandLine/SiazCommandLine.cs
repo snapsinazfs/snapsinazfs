@@ -197,13 +197,14 @@ public sealed partial class SiazCommandLine
 
   private FileInfo[] GetConfigurationFileCollection ( ParseResult rootCommandParseResult )
   {
-    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is { Option: Option<FileInfo[]>, Tokens: { Count: > 1 } } configOptionResult )
+    if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is not { Option: Option<FileInfo[]>, Tokens.Count: > 1 } configOptionResult )
     {
-      FileInfo[] fileCollection = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ) ];
-      Logger.Debug ( "Configuration will be loaded from these files: {0}", string.Join ( Environment.NewLine, fileCollection.Select ( static f => f.FullName ) ) );
-      return fileCollection;
+      return [ ];
     }
 
-    return [ ];
+    FileInfo[] fileCollection = [ ..configOptionResult.GetValueOrDefault<FileInfo[]> ( ) ];
+    Logger.Debug ( "Configuration will be loaded from these files: {0}", string.Join ( Environment.NewLine, fileCollection.Select ( static f => f.FullName ) ) );
+
+    return fileCollection;
   }
 }
