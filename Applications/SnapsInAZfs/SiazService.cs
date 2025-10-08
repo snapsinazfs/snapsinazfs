@@ -817,7 +817,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
       // Handle taking new snapshots, if requested
       if ( _settings is { TakeSnapshots: true } )
       {
-        Logger.Debug ( "TakeSnapshots is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
+        Logger.Debug ( $"{nameof (SnapsInAZfsSettings.TakeSnapshots)} is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
         State = ApplicationState.TakingSnapshots;
         await TakeAllConfiguredSnapshotsAsync ( currentTimestamp, datasets, snapshots ).ConfigureAwait ( true );
         State = ApplicationState.Executing;
@@ -835,7 +835,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
       // Handle pruning old snapshots, if requested
       if ( _settings is { PruneSnapshots: true } )
       {
-        Logger.Debug ( "PruneSnapshots is true. Pruning configured snapshots" );
+        Logger.Debug ( $"{nameof (SnapsInAZfsSettings.PruneSnapshots)} is true. Pruning configured snapshots" );
         State = ApplicationState.PruningSnapshots;
         await PruneAllConfiguredSnapshotsAsync ( zfsCommandRunner, _settings, datasets ).ConfigureAwait ( true );
         State = ApplicationState.Executing;
@@ -911,7 +911,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   private bool TakeSnapshot ( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, out Snapshot? snapshot )
   {
   #if DEBUG
-    Logger.Trace ( "TakeSnapshot called for {0} with period {1}", ds.Name, period );
+    Logger.Trace ( $"{nameof (TakeSnapshot)} called for {{0}} with period {{1}}", ds.Name, period );
   #endif
     snapshot = null;
 
