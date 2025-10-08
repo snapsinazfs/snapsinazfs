@@ -14,17 +14,17 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Text.Json;
 using ZfsTypes;
 
-/// <summary>
-///   Base class for classes that call native ZFS utilities from the system.
-/// </summary>
-/// <remarks>
-///   Default implementations of command functions return mocked values.
-/// </remarks>
 public interface IZfsCommandRunner
 {
+  string ZfsPath { get; init; }
+
+  /// <summary>
+  ///   Gets the path to the zpool utility, set at initialization.
+  /// </summary>
+  string ZpoolPath { get; init; }
+
   /// <summary>
   ///   Destroys a zfs snapshot.
   /// </summary>
@@ -39,7 +39,7 @@ public interface IZfsCommandRunner
   /// <param name="settings"></param>
   /// <param name="datasets">A collection of datasets for this method to finish populating.</param>
   /// <param name="snapshots">A collection of snapshots for this method to populate</param>
-  public Task GetDatasetsAndSnapshotsFromZfsAsync (
+  Task GetDatasetsAndSnapshotsFromZfsAsync (
     SnapsInAZfsSettings                     settings,
     ConcurrentDictionary<string, ZfsRecord> datasets,
     ConcurrentDictionary<string, Snapshot>  snapshots
@@ -70,7 +70,7 @@ public interface IZfsCommandRunner
   ///   If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
   ///   Otherwise, a <see langword="bool" /> indicating success or failure of the operation.
   /// </returns>
-  public Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync ( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
+  Task<ZfsCommandRunnerOperationStatus> InheritZfsPropertyAsync ( bool dryRun, string zfsPath, IZfsProperty propertyToInherit );
 
   bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync ( SnapsInAZfsSettings settings, string poolName, string[] propertyArray );
 
@@ -82,11 +82,12 @@ public interface IZfsCommandRunner
   ///   it <em>would</em> have done.
   /// </param>
   /// <param name="zfsPath">The fully-qualified path to operate on</param>
+  /// <param name="taskSemaphore">A semaphore to signal completion of all outstanding async operations.</param>
   /// <param name="properties">A parameterized array of <see cref="IZfsProperty" /> objects to set</param>
   /// <returns>
   ///   A <see langword="bool" /> indicating success or failure of the operation.
   /// </returns>
-  public Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, params IZfsProperty[] properties );
+  Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties );
 
   /// <summary>
   ///   Sets the provided <see cref="IZfsProperty" /> values for <paramref name="zfsPath" />
@@ -104,7 +105,7 @@ public interface IZfsCommandRunner
   ///   If <paramref name="dryRun" /> is <see langword="true" />: Always returns <see langword="false" /><br />
   ///   Otherwise, a <see langword="bool" /> indicating success or failure of the operation.
   /// </returns>
-  public Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, List<IZfsProperty> properties );
+  Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, List<IZfsProperty> properties );
 
   /// <summary>
   ///   Creates a zfs snapshot
@@ -112,7 +113,7 @@ public interface IZfsCommandRunner
   /// <returns>
   ///   A boolean value indicating whether the operation succeeded (i.e., no exceptions were thrown).
   /// </returns>
-  public ZfsCommandRunnerOperationStatus TakeSnapshot (
+  ZfsCommandRunnerOperationStatus TakeSnapshot (
     ZfsRecord           ds,
     SnapshotPeriod      period,
     in DateTimeOffset   timestamp,
@@ -121,23 +122,29 @@ public interface IZfsCommandRunner
     out Snapshot?       snapshot
   );
 
-  public IAsyncEnumerable<string> ZfsExecEnumeratorAsync ( string verb, string args );
+  IAsyncEnumerable<string> ZfsExecEnumeratorAsync ( string verb, string args );
 
+  IAsyncEnumerable<string> ZpoolExecEnumerator ( string verb, string args );
+}
+
+/// <summary>
+///   Base class for classes that call native ZFS utilities from the system.
+/// </summary>
+/// <typeparam name="TRunner">Self-reference of the type, for support of static abstract properties.</typeparam>
+/// <remarks>
+///   Default implementations of command functions return mocked values.
+/// </remarks>
+public interface IZfsCommandRunner<out TRunner> : IZfsCommandRunner
+  where TRunner : IZfsCommandRunner<TRunner>
+{
   /// <summary>
-  ///   Gets a list of ZFS datasets (filesystems and volumes)
+  ///   Creates a new instance of <typeparamref name="TRunner" />.
   /// </summary>
+  /// <param name="zfsPath">The path to the zfs utility.</param>
+  /// <param name="zpoolPath">The path to the zpool utility.</param>
   /// <returns>
-  ///   An <see cref="ImmutableSortedSet{T}" /> of <see langword="string" />s, each representing the ZFS path of a dataset
-  ///   on the system.
+  ///   A new instance of <typeparamref name="TRunner" />, with <see cref="ZfsPath" /> and <see cref="ZpoolPath" /> initialized to the
+  ///   provided values.
   /// </returns>
-  ImmutableSortedSet<string> ZfsListAll ( )
-  {
-    ImmutableSortedSet<string> dataSets
-      = ImmutableSortedSet<string>.Empty.Union ( [ "pool1", "pool1/dataset1", "pool1/dataset1/leaf", "pool1/dataset2", "pool1/dataset3", "pool1/zvol1" ] );
-    LogManager.GetCurrentClassLogger ( ).Warn ( "Running on windows. Returning fake datasets: {0}", JsonSerializer.Serialize ( dataSets ) );
-
-    return dataSets;
-  }
-
-  public IAsyncEnumerable<string> ZpoolExecEnumerator ( string verb, string args );
+  public static abstract TRunner Create ( string zfsPath, string zpoolPath );
 }

@@ -16,6 +16,8 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 
+using System.Diagnostics.CodeAnalysis;
+
 [TestFixture]
 [TestOf ( typeof ( ZfsCommandRunnerBase ) )]
 public class ZfsCommandRunnerBaseTests
@@ -289,9 +291,15 @@ public class ZfsCommandRunnerBaseTests
 /// <remarks>
 ///     Overridden abstract member functions all throw <see cref="NotImplementedException" />
 /// </remarks>
-public abstract class ZfsCommandRunnerBaseProtectedMethodsTestClass : ZfsCommandRunnerBase
+public abstract record ZfsCommandRunnerBaseProtectedMethodsTestClass : ZfsCommandRunnerBase
 {
-    /// <summary>
+  /// <inheritdoc />
+  [SetsRequiredMembers]
+  protected ZfsCommandRunnerBaseProtectedMethodsTestClass ( string ZfsPath, string ZpoolPath ) : base ( ZfsPath, ZpoolPath )
+  {
+  }
+
+  /// <summary>
     ///     Calls the protected <see cref="ZfsCommandRunnerBase.CheckIfPropertyIsValid" /> function directly, and returns its value.
     /// </summary>
     /// <param name="propertyName"></param>
@@ -378,7 +386,7 @@ public abstract class ZfsCommandRunnerBaseProtectedMethodsTestClass : ZfsCommand
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties )
     {
         throw new NotImplementedException ( );
     }

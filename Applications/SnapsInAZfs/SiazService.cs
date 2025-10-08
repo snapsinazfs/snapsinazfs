@@ -397,6 +397,8 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     State = ApplicationState.TakingSnapshots;
     //Need to operate on a sorted collection
     ImmutableSortedDictionary<string, ZfsRecord> sortedDatasets = datasets.ToImmutableSortedDictionary ( );
+    using SemaphoreSlim                          taskSemaphore  = new ( Environment.ProcessorCount );
+
     foreach ( ( string _, ZfsRecord ds ) in sortedDatasets )
     {
       //OK to disable this warning here. We don't use it if the result is false, and we don't put null in the collection in the first place
@@ -410,6 +412,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 #pragma warning restore CS8600
 
       List<IZfsProperty> propsToSet = [ ];
+
       if ( ds is not { TakeSnapshots.Value: true } )
       {
         Logger.Debug ( "Dataset {0} not configured to take snapshots - skipping", ds.Name );
@@ -452,6 +455,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
       {
         Logger.Debug ( "Daily snapshot needed for dataset {0}", ds.Name );
         ( bool success, Snapshot? snapshot ) = TakeSnapshotKind ( ds, SnapshotPeriod.Daily, propsToSet );
+
         if ( success && snapshot is not null )
         {
           snapshots [ snapshot.Name ] = snapshot;
@@ -499,21 +503,27 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                       propsToSet.Select ( static p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString ( )
                      );
         ZfsCommandRunnerOperationStatus setPropertiesResult
-          = await _zfsCommandRunner.SetZfsPropertiesAsync ( _settings.DryRun, ds.Name, propsToSet.ToArray ( ) ).ConfigureAwait ( true );
+          = await _zfsCommandRunner
+                 .SetZfsPropertiesAsync ( _settings.DryRun, ds.Name, taskSemaphore, propsToSet.ToArray ( ) )
+                 .ConfigureAwait ( true );
+
         switch ( setPropertiesResult )
         {
           case ZfsCommandRunnerOperationStatus.Success:
             Logger.Debug ( "Property set successful" );
 
             continue;
+
           case ZfsCommandRunnerOperationStatus.DryRun:
             Logger.Info ( "DRY RUN: No properties were set on actual datasets" );
 
             continue;
+
           case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
             Logger.Warn ( "Set property request contained 0 elements for {0}", ds.Name );
 
             continue;
+
           default:
             Logger.Error ( "Error setting properties for dataset {0}", ds.Name );
 
@@ -535,6 +545,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     {
       Logger.Trace ( "Requested to take {0} snapshot of {1}", period, ds.Name );
       bool snapshotTaken = TakeSnapshot ( ds, period, timestamp, out Snapshot? snapshot );
+
       switch ( snapshotTaken )
       {
         case true:
@@ -542,11 +553,13 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
           propsToSet.Add ( ds.UpdateProperty ( period.GetMostRecentSnapshotZfsPropertyName ( ), in timestamp ) );
 
           return ( true, snapshot );
+
         case false when _settings.DryRun:
           Logger.Debug ( "DRY RUN: Pretending {0} snapshot {1} taken successfully", period, snapshot?.Name ?? $"of {ds.Name}" );
           propsToSet.Add ( ds.UpdateProperty ( period.GetMostRecentSnapshotZfsPropertyName ( ), in timestamp ) );
 
           return ( true, null );
+
         default:
           return ( false, null );
       }

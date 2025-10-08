@@ -13,6 +13,7 @@
 namespace SnapsInAZfs;
 
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using Interop.Zfs.ZfsCommandRunner;
 using Interop.Zfs.ZfsTypes;
@@ -20,25 +21,13 @@ using Interop.Zfs.ZfsTypes;
 /// <summary>
 ///     Dummy command runner used for testing when running on windows or wherever zfs isn't installed.
 /// </summary>
-public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
+public sealed record DummyZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 {
     private static Logger Logger = LogManager.GetCurrentClassLogger ( );
     /// <exception cref="ArgumentNullException">Path to zfs or zpool utility cannot be null <paramref name="pathToZfs" /></exception>
-    public DummyZfsCommandRunner( string pathToZfs, string pathToZpool )
+    [SetsRequiredMembers]
+    public DummyZfsCommandRunner( string pathToZfs, string pathToZpool ) : base(pathToZfs, pathToZpool)
     {
-        if ( string.IsNullOrWhiteSpace ( pathToZfs ) )
-        {
-            throw new ArgumentNullException ( nameof (pathToZfs), "Path to zfs utility cannot be null" );
-        }
-
-        if ( string.IsNullOrWhiteSpace ( pathToZpool ) )
-        {
-            throw new ArgumentNullException ( nameof (pathToZpool), "Path to zpool utility cannot be null" );
-        }
-
-        _zfsPath   = pathToZfs;
-        _zpoolPath = pathToZpool;
-        Logger.Debug ( "DummyZfsCommandRunner created with fake ZFS utilities at {0} and {1}", _zfsPath, _zpoolPath );
     }
 
     // ReSharper disable RedundantAwait
@@ -95,10 +84,13 @@ public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    public override async Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties )
     {
-        // Just pretend it succeeded or, if dryRun specified, return that for consistency with the real thing
-        return Task.FromResult ( dryRun ? ZfsCommandRunnerOperationStatus.DryRun : ZfsCommandRunnerOperationStatus.Success );
+      await taskSemaphore.WaitAsync ( );
+      // Just pretend it succeeded or, if dryRun specified, return that for consistency with the real thing
+      ZfsCommandRunnerOperationStatus dummyTask = await Task.FromResult ( dryRun ? ZfsCommandRunnerOperationStatus.DryRun : ZfsCommandRunnerOperationStatus.Success );
+      taskSemaphore.Release ( );
+      return dummyTask;
     }
 
     /// <inheritdoc />
@@ -147,10 +139,4 @@ public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
     {
         throw new NotImplementedException( );
     }
-
-    // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-    private readonly string _zfsPath;
-
-    private readonly string _zpoolPath;
-    // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
 }

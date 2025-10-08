@@ -20,9 +20,24 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 
-public class TestCommandRunner : ZfsCommandRunnerBase
+using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
+
+public record TestCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner<TestCommandRunner>
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
+
+    /// <inheritdoc />
+    [SetsRequiredMembers]
+    public TestCommandRunner ( string ZfsPath, string ZpoolPath ) : base ( ZfsPath, ZpoolPath )
+    {
+    }
+
+    /// <inheritdoc />
+    public static TestCommandRunner Create ( string zfsPath, string zpoolPath )
+    {
+      return new ( zfsPath, zpoolPath );
+    }
 
     /// <inheritdoc />
     public override async Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync( Snapshot snapshot, SnapsInAZfsSettings settings )
@@ -60,7 +75,7 @@ public class TestCommandRunner : ZfsCommandRunnerBase
     }
 
     /// <inheritdoc />
-    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+    public override Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties )
     {
         throw new NotImplementedException( );
     }

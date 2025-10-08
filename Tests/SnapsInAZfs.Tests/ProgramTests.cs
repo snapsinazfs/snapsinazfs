@@ -127,10 +127,10 @@ public class ProgramTests
     {
         SnapsInAZfsSettings initialSettings = new ( );
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
-        bool createSingletonResult = Program.TryGetZfsCommandRunner ( initialSettings, out IZfsCommandRunner? zfsCommandRunnerA );
+        bool createSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerA );
         Assume.That ( createSingletonResult,             Is.True );
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Not.Null );
-        bool getSingletonResult = Program.TryGetZfsCommandRunner ( initialSettings, out IZfsCommandRunner? zfsCommandRunnerB );
+        bool getSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerB );
 
         Assert.Multiple ( ( ) =>
                           {
@@ -146,7 +146,7 @@ public class ProgramTests
     {
         SnapsInAZfsSettings initialSettings = new ( );
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
-        bool createSingletonResult = Program.TryGetZfsCommandRunner ( initialSettings, out IZfsCommandRunner? zfsCommandRunnerA, false );
+        bool createSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerA, false );
         Assume.That ( createSingletonResult, Is.True );
 
         Assert.Multiple ( ( ) =>
@@ -155,7 +155,7 @@ public class ProgramTests
                               Assert.That ( zfsCommandRunnerA,                 Is.Not.Null );
                           }
                         );
-        bool getSingletonResult = Program.TryGetZfsCommandRunner ( initialSettings, out IZfsCommandRunner? zfsCommandRunnerB, false );
+        bool getSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerB, false );
 
         Assert.Multiple ( ( ) =>
                           {
@@ -175,7 +175,7 @@ public class ProgramTests
                                                   ZfsPath = zfsPath
                                               };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
-        bool result = Program.TryGetZfsCommandRunner ( initialSettings, out _ );
+        bool result = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out _ );
         Assert.That ( result, Is.False );
     }
 
@@ -187,7 +187,7 @@ public class ProgramTests
                                                   ZpoolPath = zpoolPath
                                               };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
-        bool result = Program.TryGetZfsCommandRunner ( initialSettings, out _ );
+        bool result = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out _ );
         Assert.That ( result, Is.False );
     }
 

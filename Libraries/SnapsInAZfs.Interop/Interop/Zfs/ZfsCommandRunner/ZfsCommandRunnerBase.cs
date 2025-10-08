@@ -12,13 +12,35 @@
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
+using System.Buffers;
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using ZfsTypes;
 
-public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
+
+public abstract record ZfsCommandRunnerBase : IZfsCommandRunner
 {
+  [method: SetsRequiredMembers]
+  protected ZfsCommandRunnerBase ( [Required] string ZfsPath, [Required] string ZpoolPath )
+  {
+    ArgumentException.ThrowIfNullOrWhiteSpace ( ZfsPath );
+    ArgumentException.ThrowIfNullOrWhiteSpace ( ZpoolPath );
+
+    this.ZfsPath   = ZfsPath;
+    this.ZpoolPath = ZpoolPath;
+
+    Logger.Trace ( "DummyZfsCommandRunner created with fake ZFS utilities at {0} and {1}", ZfsPath, ZpoolPath );
+  }
+
+  [SetsRequiredMembers]
+  protected ZfsCommandRunnerBase ( ) : this ( "", "" ){}
+
   private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
+  public required         string ZfsPath   { get; init; }
+  public required         string ZpoolPath { get; init; }
 
   /// <inheritdoc />
   public abstract ZfsCommandRunnerOperationStatus TakeSnapshot ( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot );
@@ -27,7 +49,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
   public abstract Task<ZfsCommandRunnerOperationStatus> DestroySnapshotAsync ( Snapshot snapshot, SnapsInAZfsSettings settings );
 
   /// <inheritdoc />
-  public abstract Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, params IZfsProperty[] properties );
+  public abstract Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties );
 
   /// <inheritdoc />
   public abstract Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, List<IZfsProperty> properties );
@@ -35,6 +57,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
   /// <inheritdoc />
   public abstract Task GetDatasetsAndSnapshotsFromZfsAsync ( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets, ConcurrentDictionary<string, Snapshot> snapshots );
 
+  /// <inheritdoc />
   public abstract IAsyncEnumerable<string> ZpoolExecEnumerator ( string verb, string args );
 
   /// <inheritdoc />
@@ -49,49 +72,75 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
   /// <inheritdoc />
   public abstract bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync ( SnapsInAZfsSettings settings, string poolName, string[] propertyArray );
 
-  protected void CheckAndUpdateLastSnapshotTimesForDatasets ( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
+  protected async Task CheckAndUpdateLastSnapshotTimesForDatasets ( SnapsInAZfsSettings settings, ConcurrentDictionary<string, ZfsRecord> datasets )
   {
     Logger.Trace ( "Checking all dataset last snapshot times" );
+
+    // Do the worst-case allocation, and take it from the pool, to avoid the otherwise significant amount of reallocation building this list often will have.
+    // It's a pointer array, so it isn't a big allocation even if there are hundreds of datasets.
+    IZfsProperty[] propertiesToSet          = ArrayPool<IZfsProperty>.Shared.Rent ( datasets.Count * 6 );
+    int            endIndex            = 0;
+    using SemaphoreSlim  propertySetTaskSemaphore = new ( datasets.Count );
+
     foreach ( ZfsRecord ds in datasets.Values )
     {
-      List<IZfsProperty> propertiesToSet = [ ];
+      int startIndex      = endIndex;
+      int propertiesCount = 0;
+
       if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp ) );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp );
+        propertiesCount++;
       }
 
       if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp ) );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp );
+        propertiesCount++;
       }
 
       if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp ) );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp );
+        propertiesCount++;
       }
 
       if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp ) );
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp);
+        propertiesCount++;
       }
 
       if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp ) );
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp);
+        propertiesCount++;
       }
 
       if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
       {
-        propertiesToSet.Add ( ds.UpdateProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp ) );
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp);
+        propertiesCount++;
       }
 
       // ReSharper disable once InvertIf
-      if ( propertiesToSet.Count > 0 )
+      if ( propertiesCount > 0 )
       {
-        Logger.Debug ( "Timestamps are out of sync for {0} - updating properties", ds.Name );
-        SetZfsPropertiesAsync ( settings.DryRun, ds.Name, propertiesToSet );
+        Logger.Debug ( "Timestamps older than latest snapshot for {0} - updating properties", ds.Name );
+        _ = SetZfsPropertiesAsync ( settings.DryRun, ds.Name, propertySetTaskSemaphore, propertiesToSet [ startIndex..endIndex ] );
       }
     }
+
+    // Enter the semaphore and wait 100ms at a time until only this line holds the semaphore before we return the array back to the pool.
+    await propertySetTaskSemaphore.WaitAsync ( );
+
+    while ( propertySetTaskSemaphore.CurrentCount > 1 )
+    {
+      await Task.Delay ( 100 );
+    }
+
+    propertySetTaskSemaphore.Release ( );
+    ArrayPool<IZfsProperty>.Shared.Return ( propertiesToSet );
   }
 
   /// <summary>
@@ -172,6 +221,7 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
 
       string objectName    = lineTokens [ 0 ];
       string propertyValue = lineTokens [ 2 ];
+
       if ( !rawObjects.TryGetValue ( objectName, out RawZfsObject? obj ) )
       {
         rawObjects.Add ( objectName, new ( propertyValue ) );
@@ -228,11 +278,18 @@ public abstract class ZfsCommandRunnerBase : IZfsCommandRunner
           obj.ConvertToDatasetAndAddToCollection ( objName, datasets );
 
           break;
+
         case ZfsPropertyValueConstants.Snapshot:
           obj.ConvertToSnapshotAndAddToCollections ( objName, datasets, snapshots );
 
           break;
       }
     }
+  }
+
+  public void Deconstruct ( out string ZfsPath, out string ZpoolPath )
+  {
+    ZfsPath   = this.ZfsPath;
+    ZpoolPath = this.ZpoolPath;
   }
 }

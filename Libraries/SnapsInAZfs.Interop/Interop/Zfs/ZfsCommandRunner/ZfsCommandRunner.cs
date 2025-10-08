@@ -13,14 +13,16 @@
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using ZfsTypes;
 
 /// <summary>
 /// </summary>
-public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
+public sealed record ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner<ZfsCommandRunner>
 {
   private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
 
@@ -42,34 +44,13 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
   ///   If either <paramref name="pathToZfs" /> or <paramref name="pathToZpool" /> do
   ///   not refer to a valid existing file path
   /// </exception>
-  public ZfsCommandRunner ( string pathToZfs, string pathToZpool )
+  [SetsRequiredMembers]
+  public ZfsCommandRunner ( string pathToZfs, string pathToZpool ) : base(pathToZfs,pathToZpool)
   {
-    if ( string.IsNullOrWhiteSpace ( pathToZfs ) )
-    {
-      throw new ArgumentNullException ( nameof (pathToZfs), "Path to zfs utility cannot be null" );
-    }
-
-    if ( !File.Exists ( pathToZfs ) )
-    {
-      throw new FileNotFoundException ( "Path to zfs utility must be a valid and accessible path." );
-    }
-
-    if ( string.IsNullOrWhiteSpace ( pathToZpool ) )
-    {
-      throw new ArgumentNullException ( nameof (pathToZpool), "Path to zpool utility cannot be null" );
-    }
-
-    if ( !File.Exists ( pathToZpool ) )
-    {
-      throw new FileNotFoundException ( "Path to zpool utility must be a valid and accessible path." );
-    }
-
-    PathToZfsUtility   = pathToZfs;
-    PathToZpoolUtility = pathToZpool;
   }
 
-  private string PathToZfsUtility   { get; }
-  private string PathToZpoolUtility { get; }
+  [SetsRequiredMembers]
+  public ZfsCommandRunner ( ) : this ( "", "" ){}
 
   /// <inheritdoc />
   public override ZfsCommandRunnerOperationStatus TakeSnapshot (
@@ -111,23 +92,23 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot ( )} {snapshot.Name}";
-    ProcessStartInfo zfsSnapshotStartInfo = new ( PathToZfsUtility, arguments )
+    ProcessStartInfo zfsSnapshotStartInfo = new ( ZfsPath, arguments )
                                             {
                                               CreateNoWindow         = true,
                                               RedirectStandardOutput = false
                                             };
     if ( snapsInAZfsSettings.DryRun )
     {
-      Logger.Info ( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
+      Logger.Info ( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
 
       return ZfsCommandRunnerOperationStatus.DryRun;
     }
 
-    Logger.Debug ( "Calling `{0} {1}`", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
+    Logger.Debug ( "Calling `{0} {1}`", ZfsPath, zfsSnapshotStartInfo.Arguments );
     try
     {
       using Process? snapshotProcess = Process.Start ( zfsSnapshotStartInfo );
-      Logger.Debug ( "Waiting for {0} {1} to finish", PathToZfsUtility, zfsSnapshotStartInfo.Arguments );
+      Logger.Debug ( "Waiting for {0} {1} to finish", ZfsPath, zfsSnapshotStartInfo.Arguments );
       snapshotProcess?.WaitForExit ( );
       if ( snapshotProcess?.ExitCode == 0 )
       {
@@ -144,6 +125,12 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
       return ZfsCommandRunnerOperationStatus.ZfsProcessFailure;
     }
+  }
+
+  /// <inheritdoc />
+  public static ZfsCommandRunner Create ( string zfsPath, string zpoolPath )
+  {
+    return new ( zfsPath, zpoolPath );
   }
 
   /// <inheritdoc />
@@ -169,23 +156,23 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     string arguments = $"destroy -d {snapshot.Name}";
-    ProcessStartInfo zfsDestroyStartInfo = new ( PathToZfsUtility, arguments )
+    ProcessStartInfo zfsDestroyStartInfo = new ( ZfsPath, arguments )
                                            {
                                              CreateNoWindow         = true,
                                              RedirectStandardOutput = false
                                            };
     if ( settings.DryRun )
     {
-      Logger.Info ( "DRY RUN: Would execute `{0} {1}`", PathToZfsUtility, zfsDestroyStartInfo.Arguments );
+      Logger.Info ( "DRY RUN: Would execute `{0} {1}`", ZfsPath, zfsDestroyStartInfo.Arguments );
 
       return ZfsCommandRunnerOperationStatus.DryRun;
     }
 
-    Logger.Debug ( "Calling `{0} {1}`", PathToZfsUtility, arguments );
+    Logger.Debug ( "Calling `{0} {1}`", ZfsPath, arguments );
     try
     {
       using Process? zfsDestroyProcess = Process.Start ( zfsDestroyStartInfo );
-      Logger.Debug ( "Waiting for {0} {1} to finish", PathToZfsUtility, arguments );
+      Logger.Debug ( "Waiting for {0} {1} to finish", ZfsPath, arguments );
       if ( zfsDestroyProcess is not null )
       {
         await zfsDestroyProcess.WaitForExitAsync ( ).ConfigureAwait ( true );
@@ -208,7 +195,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
   }
 
   /// <inheritdoc />
-  public override async Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync ( bool dryRun, string zfsPath, params IZfsProperty[] properties )
+  public override async Task<ZfsCommandRunnerOperationStatus> SetZfsPropertiesAsync( bool dryRun, string zfsPath, SemaphoreSlim taskSemaphore, params IZfsProperty[] properties )
   {
     // Ignoring the ArgumentOutOfRangeException that this throws because it's not possible here
     // ReSharper disable once ExceptionNotDocumentedOptional
@@ -232,7 +219,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     string propertiesSetString = properties.ToStringForZfsSet ( );
     Logger.Trace ( "Attempting to set properties on {0}: {1}", zfsPath, propertiesSetString );
-    ProcessStartInfo zfsSetStartInfo = new ( PathToZfsUtility, $"set {propertiesSetString} {zfsPath}" )
+    ProcessStartInfo zfsSetStartInfo = new ( ZfsPath, $"set {propertiesSetString} {zfsPath}" )
                                        {
                                          CreateNoWindow         = true,
                                          RedirectStandardOutput = true
@@ -306,12 +293,12 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
       throw new ArgumentOutOfRangeException ( nameof (verb), "Only get and list verbs are permitted for zfs enumerator operations" );
     }
 
-    ProcessStartInfo zfsProcessStartInfo = new ( PathToZfsUtility, $"{verb} {args}" )
+    ProcessStartInfo zfsProcessStartInfo = new ( ZfsPath, $"{verb} {args}" )
                                            {
                                              CreateNoWindow         = true,
                                              RedirectStandardOutput = true
                                            };
-    Logger.Trace ( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZfsUtility, verb, args );
+    Logger.Trace ( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZfsPath, verb, args );
     using Process zfsProcess = new ( );
     zfsProcess.StartInfo = zfsProcessStartInfo;
     Logger.Debug ( "Calling {0} {1}", zfsProcessStartInfo.FileName, zfsProcessStartInfo.Arguments );
@@ -356,12 +343,12 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
       throw new ArgumentOutOfRangeException ( nameof (verb), "Only get and list verbs are permitted for zpool enumerator operations" );
     }
 
-    ProcessStartInfo zpoolExecStartInfo = new ( PathToZpoolUtility, $"{verb} {args}" )
+    ProcessStartInfo zpoolExecStartInfo = new ( ZpoolPath, $"{verb} {args}" )
                                           {
                                             CreateNoWindow         = true,
                                             RedirectStandardOutput = true
                                           };
-    Logger.Debug ( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", PathToZpoolUtility, verb, args );
+    Logger.Debug ( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", ZpoolPath, verb, args );
     using ( Process zpoolExecProcess = new ( ) )
     {
       zpoolExecProcess.StartInfo = zpoolExecStartInfo;
@@ -407,7 +394,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     Logger.Trace ( "Attempting to inherit property {0} on {1} from {2}", propertyToInherit.Name, zfsPath, propertyToInherit.Owner.ParentDataset.Name );
-    ProcessStartInfo zfsInheritStartInfo = new ( PathToZfsUtility, $"inherit {propertyToInherit.Name} {zfsPath}" )
+    ProcessStartInfo zfsInheritStartInfo = new ( ZfsPath, $"inherit {propertyToInherit.Name} {zfsPath}" )
                                            {
                                              CreateNoWindow         = true,
                                              RedirectStandardOutput = true
@@ -465,7 +452,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
                                                         : IZfsProperty.DefaultDatasetProperties [ propName ].SetString
                                         ).ToList ( ).ToSpaceSeparatedSingleLineString ( );
     Logger.Trace ( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
-    ProcessStartInfo zfsSetStartInfo = new ( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
+    ProcessStartInfo zfsSetStartInfo = new ( ZfsPath, $"set {propertiesSetString} {dsName}" )
                                        {
                                          CreateNoWindow         = true,
                                          RedirectStandardOutput = true
@@ -519,7 +506,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
 
     string propertiesToSet = properties.ToStringForZfsSet ( );
     Logger.Trace ( "Attempting to set properties on {0}: {1}", zfsPath, propertiesToSet );
-    ProcessStartInfo zfsSetStartInfo = new ( PathToZfsUtility, $"set {propertiesToSet} {zfsPath}" )
+    ProcessStartInfo zfsSetStartInfo = new ( ZfsPath, $"set {propertiesToSet} {zfsPath}" )
                                        {
                                          CreateNoWindow         = true,
                                          RedirectStandardOutput = true
