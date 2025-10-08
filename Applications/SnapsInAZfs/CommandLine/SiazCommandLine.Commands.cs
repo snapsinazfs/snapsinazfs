@@ -141,6 +141,7 @@ public partial class SiazCommandLine
 
       IConfigurationSection nlogConfigSection = rootConfiguration.GetSection ( "NLog" );
       LogManager.Configuration = nlogConfigSection.Exists ( ) ? new NLogLoggingConfiguration ( nlogConfigSection ) : new LoggingConfiguration ( );
+      LogManager.ReconfigExistingLoggers ( true );
     }
     catch ( Exception ex )
     {
