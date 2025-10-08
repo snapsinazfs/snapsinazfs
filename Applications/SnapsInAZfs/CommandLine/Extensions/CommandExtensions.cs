@@ -86,11 +86,11 @@ public static class CommandExtensions
   extension ( Command command )
   {
     /// <inheritdoc
-    ///   cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}}, TOptionFactoryArgs?, bool)" />
+    ///   cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}?}, TOptionFactoryArgs?, bool)" />
     /// <remarks>
     ///   This method is an alias for
     ///   <see
-    ///     cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}}, TOptionFactoryArgs?, bool)" />
+    ///   cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}?}, TOptionFactoryArgs?, bool)" />
     ///   .
     /// </remarks>
     [PublicAPI]

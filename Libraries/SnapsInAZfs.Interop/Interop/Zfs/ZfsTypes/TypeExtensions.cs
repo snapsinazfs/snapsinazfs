@@ -13,163 +13,178 @@
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 /// <summary>
-///     Extension methods for various types
+///   Extension methods for various types
 /// </summary>
 public static class TypeExtensions
 {
+  /// <summary>
+  ///   Gets an integer index for radio button groups assuming the order of true, false from this
+  ///   <see cref="ZfsProperty{T}" />
+  /// </summary>
+  /// <param name="property">
+  ///   The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups
+  /// </param>
+  /// <returns>
+  ///   An <see langword="int" /> representing the index in a radio button group for this property's source<br />
+  ///   0: true<br />
+  ///   1: false<br />
+  /// </returns>
+  public static int AsTrueFalseRadioIndex ( this ZfsProperty<bool> property )
+  {
+    return property.Value ? 0 : 1;
+  }
+
+  public static string GetMostRecentSnapshotZfsPropertyName ( this SnapshotPeriod period )
+  {
+    return period.Kind switch
+           {
+             SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Hourly   => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Daily    => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Weekly   => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Monthly  => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Yearly   => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.NotSet   => throw new ArgumentOutOfRangeException ( nameof (period) ),
+             _                           => throw new FormatException ( "Unrecognized SnapshotPeriod value" )
+           };
+  }
+
+  public static string GetZfsPathParent ( this string value )
+  {
+    int endIndex = value.LastIndexOfAny ( [ '/', '@', '#' ] );
+
+    return endIndex == -1
+             ?
+
+             // This is a pool root.
+             // Returned value is the same as input
+             value
+             :
+
+             // This is a non-root dataset, snapshot, or bookmark
+             // Return its parent dataset name
+             // ReSharper disable once HeapView.ObjectAllocation
+             value [ ..endIndex ];
+  }
+
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  /// <exception cref="OutOfMemoryException">
+  ///   The length of the resulting string overflows the maximum allowed length (
+  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+  /// </exception>
+  public static string ToCommaSeparatedSingleLineString ( this IEnumerable<string> strings, bool withSpaces = false )
+  {
+    return withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
+  }
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  /// <exception cref="OutOfMemoryException">
+  ///   The length of the resulting string overflows the maximum allowed length (
+  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+  /// </exception>
+  public static string ToCommaSeparatedSingleLineString<T> ( this IEnumerable<T> fsInfos, bool withSpaces = false )
+    where T : FileSystemInfo
+  {
+    return ToCommaSeparatedSingleLineString ( fsInfos.Select ( static f => f.FullName ).Order ( ), withSpaces );
+  }
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  /// <exception cref="OutOfMemoryException">
+  ///   The length of the resulting string overflows the maximum allowed length (
+  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+  /// </exception>
+  public static string ToCommaSeparatedSingleLineString ( this IEnumerable<ZfsRecord> records, bool withSpaces = false )
+  {
+    return ToCommaSeparatedSingleLineString ( records.Order ( ).Select ( static r => r.Name ), withSpaces );
+  }
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  /// <exception cref="OutOfMemoryException">
+  ///   The length of the resulting string overflows the maximum allowed length (
+  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+  /// </exception>
+  public static string ToNewlineSeparatedString ( this IEnumerable<string> strings )
+  {
+    return string.Join ( '\n', strings );
+  }
+
+  /// <summary>
+  ///   Reflection-free conversion of string to <see cref="SnapshotPeriodKind" />.
+  /// </summary>
+  public static SnapshotPeriodKind ToSnapshotPeriodKind ( this string input )
+  {
+    return SnapshotPeriod.StringToSnapshotPeriodKind ( input );
+  }
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  /// <exception cref="OutOfMemoryException">
+  ///   The length of the resulting string overflows the maximum allowed length (
+  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+  /// </exception>
+  public static string ToSpaceSeparatedSingleLineString ( this IEnumerable<string> strings )
+  {
+    return string.Join ( ' ', strings );
+  }
+
+  /// <summary>
+  ///   Totally unnecessary convenience proxy method for
+  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+  /// </summary>
+  public static string ToStringForZfsSet ( this IEnumerable<IZfsProperty> properties )
+  {
+    return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( );
+  }
+
+  /// <summary>
+  ///   Gets a string of all <see cref="IZfsProperty.SetString" /> values, separated by spaces, to be used in zfs set
+  ///   operations.
+  /// </summary>
+  /// <param name="properties">
+  ///   An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string
+  ///   for
+  /// </param>
+  /// <returns></returns>
+  public static string ToStringForZfsSet ( this List<IZfsProperty> properties )
+  {
+    ArgumentNullException.ThrowIfNull ( properties );
+
+    if ( !properties.Any ( ) )
+    {
+      throw new ArgumentException ( "Empty collection provided", nameof (properties) );
+    }
+
+    return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( );
+  }
+
+  extension ( ZfsProperty<int> retentionProperty )
+  {
     /// <summary>
-    ///     Gets an integer index for radio button groups assuming the order of true, false from this
-    ///     <see cref="ZfsProperty{T}" />
+    ///   Returns a boolean indicating whether <paramref name="retentionProperty" /> is NOT wanted, by checking if its value is 0.
     /// </summary>
-    /// <param name="property">
-    ///     The <see cref="ZfsProperty{T}" /> to convert to an integer index for radio button groups
-    /// </param>
-    /// <returns>
-    ///     An <see langword="int" /> representing the index in a radio button group for this property's source<br />
-    ///     0: true<br />
-    ///     1: false<br />
-    /// </returns>
-    public static int AsTrueFalseRadioIndex( this ZfsProperty<bool> property )
-    {
-        return property.Value ? 0 : 1;
-    }
-
-    public static string GetMostRecentSnapshotZfsPropertyName( this SnapshotPeriod period )
-    {
-        return period.Kind switch
-               {
-                   SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.Hourly   => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.Daily    => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.Weekly   => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.Monthly  => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.Yearly   => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
-                   SnapshotPeriodKind.NotSet   => throw new ArgumentOutOfRangeException ( nameof (period) ),
-                   _                           => throw new FormatException ( "Unrecognized SnapshotPeriod value" )
-               };
-    }
-
-    public static string GetZfsPathParent( this string value )
-    {
-        int endIndex = value.LastIndexOfAny ( [ '/', '@', '#' ] );
-
-        return endIndex == -1
-                   ?
-
-                   // This is a pool root.
-                   // Returned value is the same as input
-                   value
-                   :
-
-                   // This is a non-root dataset, snapshot, or bookmark
-                   // Return its parent dataset name
-                   // ReSharper disable once HeapView.ObjectAllocation
-                   value [ ..endIndex ];
-    }
+    /// <remarks>
+    ///   This method is an extension because it is only intended to apply for specific types of ZfsProperties.
+    /// </remarks>
+    public bool IsNotWanted => retentionProperty.Value == 0;
 
     /// <summary>
-    ///     Returns a boolean indicating whether <paramref name="retentionProperty" /> is NOT wanted, by checking if its value is 0.
+    ///   Returns a boolean indicating whether <paramref name="retentionProperty" /> IS wanted, by checking if its value is not 0.
     /// </summary>
-    public static bool IsNotWanted( this ZfsProperty<int> retentionProperty )
-    {
-        return retentionProperty.Value == 0;
-    }
-
-    /// <summary>
-    ///     Returns a boolean indicating whether <paramref name="retentionProperty" /> IS wanted, by checking if its value is not 0.
-    /// </summary>
-    public static bool IsWanted( this ZfsProperty<int> retentionProperty )
-    {
-        return retentionProperty.Value != 0;
-    }
-
-    /// <summary>
-    ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-    /// </summary>
-    /// <exception cref="OutOfMemoryException">
-    ///     The length of the resulting string overflows the maximum allowed length (
-    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-    /// </exception>
-    public static string ToCommaSeparatedSingleLineString( this IEnumerable<string> strings, bool withSpaces = false )
-    {
-        return withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
-    }
-
-    /// <summary>
-    ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-    /// </summary>
-    /// <exception cref="OutOfMemoryException">
-    ///     The length of the resulting string overflows the maximum allowed length (
-    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-    /// </exception>
-    public static string ToCommaSeparatedSingleLineString( this IEnumerable<ZfsRecord> records, bool withSpaces = false )
-    {
-        return ToCommaSeparatedSingleLineString ( records.Order( ).Select ( static r => r.Name ), withSpaces );
-    }
-
-    /// <summary>
-    ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-    /// </summary>
-    /// <exception cref="OutOfMemoryException">
-    ///     The length of the resulting string overflows the maximum allowed length (
-    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-    /// </exception>
-    public static string ToNewlineSeparatedString( this IEnumerable<string> strings )
-    {
-        return string.Join ( '\n', strings );
-    }
-
-    /// <summary>
-    ///     Reflection-free conversion of string to <see cref="SnapshotPeriodKind" />.
-    /// </summary>
-    public static SnapshotPeriodKind ToSnapshotPeriodKind( this string input )
-    {
-        return SnapshotPeriod.StringToSnapshotPeriodKind ( input );
-    }
-
-    /// <summary>
-    ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-    /// </summary>
-    /// <exception cref="OutOfMemoryException">
-    ///     The length of the resulting string overflows the maximum allowed length (
-    ///     <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-    /// </exception>
-    public static string ToSpaceSeparatedSingleLineString( this IEnumerable<string> strings )
-    {
-        return string.Join ( ' ', strings );
-    }
-
-    /// <summary>
-    ///     Totally unnecessary convenience proxy method for
-    ///     <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-    /// </summary>
-    public static string ToStringForZfsSet( this IEnumerable<IZfsProperty> properties )
-    {
-        return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
-    }
-
-    /// <summary>
-    ///     Gets a string of all <see cref="IZfsProperty.SetString" /> values, separated by spaces, to be used in zfs set
-    ///     operations
-    /// </summary>
-    /// <param name="properties">
-    ///     An <see cref="IEnumerable{T}" /> of <see cref="IZfsProperty" /> objects to get a set string
-    ///     for
-    /// </param>
-    /// <returns></returns>
-    public static string ToStringForZfsSet( this List<IZfsProperty> properties )
-    {
-        ArgumentNullException.ThrowIfNull ( properties, nameof (properties) );
-
-        if ( !properties.Any( ) )
-        {
-            throw new ArgumentException ( "Empty collection provided", nameof (properties) );
-        }
-
-        return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString( );
-    }
+    public bool IsWanted => retentionProperty.Value != 0;
+  }
 }

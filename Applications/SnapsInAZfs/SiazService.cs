@@ -961,7 +961,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     switch ( period.Kind )
     {
       case SnapshotPeriodKind.Frequent:
-        if ( ds.SnapshotRetentionFrequent.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionFrequent.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
@@ -971,7 +971,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         break;
       case SnapshotPeriodKind.Hourly:
-        if ( ds.SnapshotRetentionHourly.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionHourly.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
@@ -981,7 +981,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         break;
       case SnapshotPeriodKind.Daily:
-        if ( ds.SnapshotRetentionDaily.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionDaily.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
@@ -991,7 +991,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         break;
       case SnapshotPeriodKind.Weekly:
-        if ( ds.SnapshotRetentionWeekly.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionWeekly.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
@@ -1001,7 +1001,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         break;
       case SnapshotPeriodKind.Monthly:
-        if ( ds.SnapshotRetentionMonthly.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionMonthly.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );
@@ -1011,7 +1011,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         break;
       case SnapshotPeriodKind.Yearly:
-        if ( ds.SnapshotRetentionYearly.IsNotWanted ( ) )
+        if ( ds.SnapshotRetentionYearly.IsNotWanted )
         {
         #if DEBUG
           Logger.Trace ( "Requested {0} snapshot, but dataset {1} does not want them. Skipping", period, ds.Name );

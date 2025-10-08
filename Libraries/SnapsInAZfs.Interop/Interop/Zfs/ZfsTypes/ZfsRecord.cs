@@ -772,7 +772,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsDailySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no dailies
-        if ( !SnapshotRetentionDaily.IsWanted( ) )
+        if ( !SnapshotRetentionDaily.IsWanted )
         {
             return false;
         }
@@ -824,7 +824,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsFrequentSnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no frequent
-        if ( !SnapshotRetentionFrequent.IsWanted( ) )
+        if ( !SnapshotRetentionFrequent.IsWanted )
         {
             return false;
         }
@@ -870,7 +870,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsHourlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no hourlies
-        if ( !SnapshotRetentionHourly.IsWanted( ) )
+        if ( !SnapshotRetentionHourly.IsWanted )
         {
             return false;
         }
@@ -921,7 +921,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsMonthlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !SnapshotRetentionMonthly.IsWanted( ) )
+        if ( !SnapshotRetentionMonthly.IsWanted )
         {
             return false;
         }
@@ -980,7 +980,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsWeeklySnapshotNeeded( SnapshotTimingSettings template, in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no weeklies
-        if ( !SnapshotRetentionWeekly.IsWanted( ) )
+        if ( !SnapshotRetentionWeekly.IsWanted )
         {
             Logger.Debug ( "Weekly snapshot not wanted for {0} {1}", Kind, Name );
 
@@ -1025,7 +1025,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     public bool IsYearlySnapshotNeeded( in DateTimeOffset timestamp )
     {
         //Exit early if retention settings say no monthlies
-        if ( !SnapshotRetentionYearly.IsWanted( ) )
+        if ( !SnapshotRetentionYearly.IsWanted )
         {
             return false;
         }
