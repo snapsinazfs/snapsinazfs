@@ -45,7 +45,7 @@ public sealed record ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner<
   ///   not refer to a valid existing file path
   /// </exception>
   [SetsRequiredMembers]
-  public ZfsCommandRunner ( string pathToZfs, string pathToZpool ) : base(pathToZfs,pathToZpool)
+  public ZfsCommandRunner ( string pathToZfs, string pathToZpool ) : base (pathToZfs,pathToZpool)
   {
   }
 

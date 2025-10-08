@@ -125,7 +125,7 @@ public class ProgramTests
     [RequiresThread ( ApartmentState.MTA )]
     public void TryGetZfsCommandRunner_CanGetSingleton ( )
     {
-        SnapsInAZfsSettings initialSettings = new ( );
+      SnapsInAZfsSettings initialSettings = new ( ) { ZpoolPath = ";", ZfsPath = ";" };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool createSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerA );
         Assume.That ( createSingletonResult,             Is.True );
@@ -144,7 +144,7 @@ public class ProgramTests
     [Test]
     public void TryGetZfsCommandRunner_DoesNotCreateSingletonWhenReuseSingletonFalse ( )
     {
-        SnapsInAZfsSettings initialSettings = new ( );
+      SnapsInAZfsSettings initialSettings = new ( ) { ZpoolPath = ";", ZfsPath = ";" };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool createSingletonResult = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out IZfsCommandRunner zfsCommandRunnerA, false );
         Assume.That ( createSingletonResult, Is.True );
@@ -170,10 +170,11 @@ public class ProgramTests
     [Test]
     public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZfsPaths( [Values ( "", " ", "\t", "\n", "\r" )] string zfsPath )
     {
-        SnapsInAZfsSettings initialSettings = new ( )
-                                              {
-                                                  ZfsPath = zfsPath
-                                              };
+      SnapsInAZfsSettings initialSettings = new ( )
+                                            {
+                                              ZfsPath   = zfsPath,
+                                              ZpoolPath = ";"
+                                            };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool result = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out _ );
         Assert.That ( result, Is.False );
@@ -182,10 +183,11 @@ public class ProgramTests
     [Test]
     public void TryGetZfsCommandRunner_ReturnsFalseOnEmptyZpoolPaths( [Values ( "", " ", "\t", "\n", "\r" )] string zpoolPath )
     {
-        SnapsInAZfsSettings initialSettings = new ( )
-                                              {
-                                                  ZpoolPath = zpoolPath
-                                              };
+      SnapsInAZfsSettings initialSettings = new ( )
+                                            {
+                                              ZfsPath   = ";",
+                                              ZpoolPath = zpoolPath
+                                            };
         Assume.That ( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool result = Program.TryGetZfsCommandRunner<ZfsCommandRunner> ( initialSettings, out _ );
         Assert.That ( result, Is.False );

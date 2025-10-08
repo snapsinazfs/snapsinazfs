@@ -194,9 +194,9 @@ internal static class Program
   }
 
   internal static bool TryGetZfsCommandRunner<TRunner> (
-    SnapsInAZfsSettings   settings,
-    out IZfsCommandRunner zfsCommandRunner,
-    bool                  reuseSingleton = true
+    SnapsInAZfsSettings                           settings,
+    [NotNullWhen ( true )] out IZfsCommandRunner? zfsCommandRunner,
+    bool                                          reuseSingleton = true
   )
     where TRunner : IZfsCommandRunner<TRunner>, new ( )
   {
@@ -209,6 +209,12 @@ internal static class Program
 
     _logger.Trace ( "Getting ZFS command runner for the current environment" );
 
+    if ( string.IsNullOrWhiteSpace ( settings.ZfsPath ) || string.IsNullOrWhiteSpace ( settings.ZpoolPath ) )
+    {
+      zfsCommandRunner = null;
+      return false;
+    }
+
     try
     {
       zfsCommandRunner = TRunner.Create ( settings.ZfsPath, settings.ZpoolPath );
@@ -216,14 +222,14 @@ internal static class Program
     catch ( ArgumentNullException ex )
     {
       _logger.Fatal ( ex, "Null or empty string provided for ZfsPath or ZpoolPath - Cannot continue" );
-      zfsCommandRunner = null!;
+      zfsCommandRunner = null;
 
       return false;
     }
     catch ( FileNotFoundException ex )
     {
       _logger.Fatal ( ex, ex.Message );
-      zfsCommandRunner = null!;
+      zfsCommandRunner = null;
 
       return false;
     }
