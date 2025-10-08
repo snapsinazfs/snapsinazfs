@@ -106,7 +106,7 @@ public sealed partial class SiazCommandLine
   ///   </para>
   /// </remarks>
   [MemberNotNull ( nameof (RootCommand) )]
-  private RootCommand ConfigureCommandLineTree ( )
+  internal RootCommand ConfigureCommandLineTree ( )
   {
     return RootCommand = new RootCommand (
                                           $"""

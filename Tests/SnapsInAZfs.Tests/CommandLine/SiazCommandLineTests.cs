@@ -34,6 +34,35 @@ using Interop;
 public class SiazCommandLineTests
 {
   [Test]
+  [Category ( "Exceptions" )]
+  public void ConfigureCommandLineTree_DoesNotThrow ( )
+  {
+    SiazCommandLine siazCli = new ( );
+    Assert.DoesNotThrow ( ( ) => siazCli.ConfigureCommandLineTree ( ) );
+  }
+
+  [Test]
+  public void ConfigureCommandLineTree_CreatesNewRootCommand ( )
+  {
+    SiazCommandLine siazCli             = new ( );
+    RootCommand     originalRootCommand = siazCli.RootCommand;
+    Assume.That ( siazCli.RootCommand, Is.Not.Null.And.InstanceOf<RootCommand> ( ) );
+
+    siazCli.ConfigureCommandLineTree ( );
+
+    Assert.That ( siazCli.RootCommand, Is.Not.Null.And.Not.SameAs ( originalRootCommand ) );
+  }
+
+  [Test]
+  [Category ( "Null Handling" )]
+  public void Constructor_SetsRootCommand_InstanceOf_SCLRootCommand ( )
+  {
+    SiazCommandLine siazCli = new ( );
+    Assert.That ( siazCli.RootCommand, Is.Not.Null );
+    Assert.That ( siazCli.RootCommand, Is.InstanceOf<RootCommand> ( ) );
+  }
+
+  [Test]
   [Category ( "Validation" )]
   public void Invoke_NoArgs_HasExactlyOneParseError ( )
   {
