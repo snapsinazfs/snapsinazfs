@@ -207,4 +207,28 @@ public sealed partial class SiazCommandLine
 
     return fileCollection;
   }
+
+  private static IEnumerable<FileInfo> GetConfigFileListFromEnvironmentOrDefault ( )
+  {
+    string[]? configurationFiles = Environment.GetEnvironmentVariable ( BaseConfigFilesEnvVarName )?.SplitAndClean ( Path.PathSeparator );
+
+    configurationFiles ??=
+    [
+      "SnapsInAZfs.json",
+      "SnapsInAZfs.local.json",
+      "SnapsInAZfs.nlog.json",
+      "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
+      "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
+      "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
+      "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json"
+    ];
+
+    return configurationFiles.Select ( StringAsFileInfo );
+  }
+
+  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+  private static FileInfo StringAsFileInfo ( string fileName )
+  {
+    return new ( fileName );
+  }
 }
