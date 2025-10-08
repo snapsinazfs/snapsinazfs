@@ -18,6 +18,7 @@ using ConfigConsole;
 using Interop.Zfs.ZfsTypes;
 using NLog.Config;
 using NLog.Extensions.Logging;
+using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
 {
@@ -38,6 +39,22 @@ public partial class SiazCommandLine
                                               If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
                                               """
                                              );
+
+  private Command _cronCommand = new (
+                                      "--cron",
+                                      $"""
+                                       {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
+                                       Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
+                                       """
+                                     );
+
+  private Command _runCommand = new (
+                                     RunCommandName,
+                                     """
+                                     Run SIAZ, optionally specifying override options.
+                                     Use this context when executing one-off operations or for custom service/script-based invocations.
+                                     """
+                                    );
 
   private Command _zfsCommand = new (
                                      ZfsCommandName,
@@ -69,14 +86,6 @@ public partial class SiazCommandLine
   /// </summary>
   public RootCommand RootCommand { get; private set; }
 
-  private Command RunCommand { get; } = new (
-                                             RunCommandName,
-                                             """
-                                             Run SIAZ, optionally specifying override options.
-                                             Use this context when executing one-off operations or for custom service/script-based invocations.
-                                             """
-                                            );
-
   internal const string RunCommandName                  = "run";
   private const  string ConfigCommandName               = "config";
   private const  string ConfigConsoleCommandName        = "console";
@@ -92,7 +101,7 @@ public partial class SiazCommandLine
   internal static bool LoadConfigurationFromConfigurationFiles (
     [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
     [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
-    FileInfo[]                                        configFiles
+    FileInfo[]                                      configFiles
   )
   {
     Logger.Trace ( "Loading configuration." );
@@ -116,7 +125,7 @@ public partial class SiazCommandLine
     {
       Logger.Fatal ( "Configuration files not found at any of these locations: {0}", configFiles.ToCommaSeparatedSingleLineString ( true ) );
       rootConfiguration = null;
-      settings = null;
+      settings          = null;
 
       return false;
     }
