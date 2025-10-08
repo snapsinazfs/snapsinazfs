@@ -45,6 +45,22 @@ public class SiazServiceTests
                     );
   }
 
+  [Test]
+  public void GetNextTickTimestamp_AliasesToMinuteInterval_Minutes ( [Range ( 0, 59 )] int minutesPastHour, [Values ( 1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30 )] int timerIntervalMinutes )
+  {
+    DateTimeOffset initialValue = DateTimeOffset.UnixEpoch.AddMinutes ( minutesPastHour );
+    TimeSpan       interval     = TimeSpan.FromMinutes ( timerIntervalMinutes );
+    SiazService.GetNextTickTimestamp ( in initialValue, in interval, out DateTimeOffset result );
+
+    // Final minute value should always be exactly a multiple of timer interval.
+    Assert.That ( result.Minute % timerIntervalMinutes, Is.Zero );
+
+    int initialIntervalNumber = initialValue.Minute / timerIntervalMinutes;
+
+    // Final minute value should always be either zero (if hour rolled) or (interval * (initial interval number + 1)).
+    Assert.That ( result.Minute, Is.EqualTo ( ( initialIntervalNumber + 1 ) * timerIntervalMinutes ).Or.Zero );
+  }
+
   private static IEnumerable<TestCaseData> GetGreatestCommonFrequentIntervalFactor_TestCases ( )
   {
     yield return new (
