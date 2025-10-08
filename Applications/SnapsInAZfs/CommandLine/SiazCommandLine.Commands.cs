@@ -99,37 +99,19 @@ public partial class SiazCommandLine
 
     ConfigurationBuilder configBuilder = new ( );
 
-    string[] requestedFiles;
+    FileInfo[] requestedFiles = GetConfigFileListFromEnvironmentOrDefault ( ).ToArray ( );
 
-    if ( configFiles.Length > 0 )
+    foreach ( FileInfo file in requestedFiles )
     {
-      requestedFiles = configFiles;
-    }
-    else
-    {
-      requestedFiles =
-      [
-        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.json",
-        "/usr/local/share/SnapsInAZfs/SnapsInAZfs.nlog.json",
-        "/etc/SnapsInAZfs/SnapsInAZfs.local.json",
-        "/etc/SnapsInAZfs/SnapsInAZfs.nlog.json",
-        "SnapsInAZfs.json",
-        "SnapsInAZfs.local.json",
-        "SnapsInAZfs.nlog.json"
-      ];
-    }
-
-    foreach ( string filePath in requestedFiles )
-    {
-      if ( !File.Exists ( filePath ) )
+      if ( !file.Exists )
       {
-        Logger.Warn ( "Configuration file not found at {0}", filePath );
+        Logger.Warn ( "Configuration file not found at {0}", file.FullName );
 
         continue;
       }
 
-      Logger.Debug ( "Loading configuration file {0}", filePath );
-      configBuilder.AddJsonFile ( filePath, false, false );
+      Logger.Debug ( "Loading configuration file {0}", file.FullName );
+      configBuilder.AddJsonFile ( file.FullName, true, false );
     }
 
     if ( configBuilder.Sources.Count == 0 )
