@@ -130,13 +130,17 @@ public partial class SiazCommandLine
       return false;
     }
 
+    Logger.Trace ( $"Building {nameof (IConfigurationRoot)} from configuration sources." );
+
     rootConfiguration = configBuilder.Build ( );
 
-    Logger.Trace ( "Building settings objects from IConfiguration" );
+    Logger.Trace ( $"Building settings objects from {nameof(IConfigurationRoot)}." );
 
     try
     {
       settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
+
+      Logger.ConditionalDebug ( "Configuration built from parsed files: {0}", rootConfiguration.SerializeToJson ( ) );
       // ReSharper disable once SettingNotFoundInConfiguration
       IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( "Kestrel" );
 
