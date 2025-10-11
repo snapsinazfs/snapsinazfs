@@ -18,6 +18,31 @@ using Interop;
 
 public partial class SiazCommandLine
 {
+  /// <summary>
+  ///   Event raised when the global configuration is changed from the command line.
+  /// </summary>
+  public event EventHandler<GlobalConfigChangeEventArgs>? GlobalConfigurationChangeRequested;
+
+  /// <summary>
+  ///   Event raised when the action for <see cref="RunCommand" /> is invoked by System.CommandLine.
+  /// </summary>
+  public event EventHandler<RunSiazActionEventArgs>? RunSiazInvoked;
+
+  /// <summary>
+  ///   Event raised when the action for <see cref="ZfsSchemaCheckCommand" /> is invoked by System.CommandLine.
+  /// </summary>
+  public event EventHandler<ZfsSchemaActionEventArgs>? ZfsSchemaCheckInvoked;
+
+  /// <summary>
+  ///   Event raised when the action for <see cref="ZfsSchemaCleanCommand" /> is invoked by System.CommandLine.
+  /// </summary>
+  public event EventHandler<ZfsSchemaChangeEventArgs>? ZfsSchemaCleanInvoked;
+
+  /// <summary>
+  ///   Event raised when the action for <see cref="ZfsSchemaInitializeCommand" /> is invoked by System.CommandLine.
+  /// </summary>
+  public event EventHandler<ZfsSchemaChangeEventArgs>? ZfsSchemaInitializeInvoked;
+
   private Task<int> RunSiaz ( ParseResult parseResult, CancellationToken cancellation )
   {
     Logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
