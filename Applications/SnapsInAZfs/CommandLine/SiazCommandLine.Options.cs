@@ -17,7 +17,7 @@ using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
 {
-  private Option<TriStateOptionValue> _configGlobalCommand_DaemonizeOption =
+  private Option<TriStateOptionValue> ConfigGlobalCommand_DaemonizeOption { get; } =
     new ( nameof (SnapsInAZfsSettings.Daemonize), nameof (SnapsInAZfsSettings.Daemonize).ToLowerInvariant ( ), "-D" )
     {
       Arity       = ArgumentArity.ExactlyOne,
@@ -25,7 +25,7 @@ public partial class SiazCommandLine
       Required    = false
     };
 
-  private Option<uint> _configGlobalCommand_DaemonTimerIntervalSecondsOption =
+  private Option<uint> ConfigGlobalCommand_DaemonTimerIntervalSecondsOption { get; } =
     new ( nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds) )
     {
       Arity       = ArgumentArity.ExactlyOne,
@@ -34,7 +34,7 @@ public partial class SiazCommandLine
       Required    = false
     };
 
-  private Option<TriStateOptionValue> _configGlobalCommand_DryRunOption =
+  private Option<TriStateOptionValue> ConfigGlobalCommand_DryRunOption { get; } =
     new ( nameof (SnapsInAZfsSettings.DryRun), nameof (SnapsInAZfsSettings.DryRun).ToLowerInvariant ( ), "-n" )
     {
       Arity       = ArgumentArity.ExactlyOne,
@@ -42,7 +42,7 @@ public partial class SiazCommandLine
       Required    = false
     };
 
-  private Option<string> _configGlobalCommand_LocalSystemNameOption =
+  private Option<string> ConfigGlobalCommand_LocalSystemNameOption { get; } =
     new ( nameof (SnapsInAZfsSettings.LocalSystemName) )
     {
       Arity = ArgumentArity.ExactlyOne,
@@ -54,7 +54,7 @@ public partial class SiazCommandLine
       Required = false
     };
 
-  private Option<TriStateOptionValue> _configGlobalCommand_PruneSnapshotsOption =
+  private Option<TriStateOptionValue> ConfigGlobalCommand_PruneSnapshotsOption { get; } =
     new ( nameof (SnapsInAZfsSettings.PruneSnapshots) )
     {
       Arity       = ArgumentArity.ExactlyOne,
@@ -62,7 +62,7 @@ public partial class SiazCommandLine
       Required    = false
     };
 
-  private Option<TriStateOptionValue> _configGlobalCommand_TakeSnapshotsOption =
+  private Option<TriStateOptionValue> ConfigGlobalCommand_TakeSnapshotsOption { get; } =
     new ( nameof (SnapsInAZfsSettings.TakeSnapshots) )
     {
       Arity       = ArgumentArity.ExactlyOne,
@@ -70,7 +70,7 @@ public partial class SiazCommandLine
       Required    = false
     };
 
-  private Option<FileInfo> _configGlobalCommand_ZfsPathOption =
+  private Option<FileInfo> ConfigGlobalCommand_ZfsPathOption { get; } =
     new ( nameof (SnapsInAZfsSettings.ZfsPath) )
     {
       Arity    = ArgumentArity.ExactlyOne,
@@ -82,7 +82,7 @@ public partial class SiazCommandLine
       Required = false
     };
 
-  private Option<FileInfo> _configGlobalCommand_ZpoolPathOption =
+  private Option<FileInfo> ConfigGlobalCommand_ZpoolPathOption { get; } =
     new ( nameof (SnapsInAZfsSettings.ZpoolPath) )
     {
       Arity    = ArgumentArity.ExactlyOne,

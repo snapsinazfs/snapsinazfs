@@ -94,14 +94,14 @@ public sealed partial class SiazCommandLine
 // TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
 // False positive. Suppress it.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                                                                _configGlobalCommand_DaemonizeOption,
-                                                                _configGlobalCommand_DaemonTimerIntervalSecondsOption,
-                                                                _configGlobalCommand_DryRunOption,
-                                                                _configGlobalCommand_LocalSystemNameOption,
-                                                                _configGlobalCommand_TakeSnapshotsOption,
-                                                                _configGlobalCommand_PruneSnapshotsOption,
-                                                                _configGlobalCommand_ZfsPathOption,
-                                                                _configGlobalCommand_ZpoolPathOption
+                                                                ConfigGlobalCommand_DaemonizeOption,
+                                                                ConfigGlobalCommand_DaemonTimerIntervalSecondsOption,
+                                                                ConfigGlobalCommand_DryRunOption,
+                                                                ConfigGlobalCommand_LocalSystemNameOption,
+                                                                ConfigGlobalCommand_TakeSnapshotsOption,
+                                                                ConfigGlobalCommand_PruneSnapshotsOption,
+                                                                ConfigGlobalCommand_ZfsPathOption,
+                                                                ConfigGlobalCommand_ZpoolPathOption
                                                                )
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                                   .WithOption ( ConfigGlobalCommandOutputFileOption )
