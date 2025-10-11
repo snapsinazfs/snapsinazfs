@@ -29,7 +29,6 @@
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <NoWarn>1701;1702;NU1510</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="appsettings.Development.json" />
     <Compile Remove="DummyZfsCommandRunner.cs" />
@@ -83,16 +82,14 @@
     </Content>
   </ItemGroup>
 
-  <Choose>
-    <When Condition="$(Configuration)=='Debug-NoZFS' Or $(Configuration)=='Debug-Windows'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
-        <Compile Include="DummyZfsCommandRunner.cs" />
-      </ItemGroup>
-    </When>
-  </Choose>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug-Windows|net10.0|x64'">
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;WINDOWS;DEBUG</DefineConstants>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug-Windows|net10.0|x64'">
+    <Compile Include="DummyZfsCommandRunner.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <!--<PackageReference Include="JetBrains.Annotations" Version="2025.2.3" />-->
@@ -118,13 +115,6 @@
   <Choose>
     <When Condition="$(Configuration.StartsWith('Debug'))">
       <PropertyGroup>
-        <DefineDebug>True</DefineDebug>
-        <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
-      </PropertyGroup>
-
-      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG_WINDOWS</DefineConstants>
-        <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
       </PropertyGroup>
 
       <ItemGroup>

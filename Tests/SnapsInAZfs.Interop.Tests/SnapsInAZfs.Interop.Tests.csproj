@@ -24,6 +24,14 @@
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug-Windows|net10.0|x64'">
+    <DefineConstants>$(DefineConstants);WINDOWS;INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug-NoZFS|net10.0|x64'">
+    <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="SnapsInAZfs.json" />
     <None Remove="SnapsInAZfs.local.json" />
