@@ -85,36 +85,19 @@ public static class CommandExtensions
   /// <param name="command"></param>
   extension ( Command command )
   {
-    /// <inheritdoc
-    ///   cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}?}, TOptionFactoryArgs?, bool)" />
-    /// <remarks>
-    ///   This method is an alias for
-    ///   <see
-    ///   cref="WithOption{TOption, TOptionFactoryArgs}(Command, Func{TOptionFactoryArgs?, Option{TOption}?}, TOptionFactoryArgs?, bool)" />
-    ///   .
-    /// </remarks>
-    [PublicAPI]
-    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-    public Command With<TOption, TOptionFactoryArgs> (
-      Func<TOptionFactoryArgs?, Option<TOption>> optionFactory,
-      TOptionFactoryArgs?                        optionFactoryArgs,
-      bool                                       skipIfNull = false
-    )
-      where TOption : notnull
-    {
-      return command.WithOption ( optionFactory, optionFactoryArgs, skipIfNull );
-    }
-
-    /// <summary></summary>
-    /// <remarks>
-    ///   This method is an alias for <see cref="WithOption{TOption}(Command, string?, Func{string?, Option{TOption}?}, bool)" />.
-    /// </remarks>
+    /// <summary>
+    ///   Adds an <see cref="Option{T}" /> of type <typeparamref name="TOption" /> to the command and returns a reference to the same
+    ///   command.
+    /// </summary>
     /// <param name="name">The name of the option to create and add.</param>
     /// <param name="optionFactory">
     ///   A delegate that accepts a single string parameter and returns an
-    ///   <see cref="Option{T}">Option&lt;<typeparamref name="TOption" />&gt;</see>
+    ///   <see cref="Option{T}">Option&lt;<typeparamref name="TOption" />&gt;</see>.
     /// </param>
     /// <param name="skipIfNull"></param>
+    /// <remarks>
+    ///   This method is an alias for <see cref="WithOption{TOption}(Command, string?, Func{string?, Option{TOption}?}, bool)" />.
+    /// </remarks>
     [PublicAPI]
     [MethodImpl ( MethodImplOptions.AggressiveInlining )]
     public Command With<TOption> ( string? name, Func<string?, Option<TOption>> optionFactory, bool skipIfNull = false )
@@ -288,7 +271,11 @@ public static class CommandExtensions
     ///   Adds a single <see cref="Option{TOption}" /> returned by the <paramref name="optionFactory" /> delegate to this
     ///   <see cref="Command" /> and returns the same <see cref="Command" /> reference.
     /// </summary>
-    /// <param name="name"></param>
+    /// <param name="name">
+    ///   The name of the command as it will be used on the command line.<br />
+    ///   <paramref name="optionFactory" /> is not required to respect this parameter if it handles creation of the option name through
+    ///   other means.
+    /// </param>
     /// <param name="optionFactory">
     ///   A delegate that accepts no arguments and returns a single non-null instance of an <see cref="Option{TOption}" /> to add to
     ///   the <see cref="Command" /> this method was called on.<br />

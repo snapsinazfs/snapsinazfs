@@ -8,17 +8,54 @@
 //
 // See https://opensource.org/license/MIT/
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 namespace SnapsInAZfs;
 
 internal static class StringFormattingConstants
 {
-  internal const string U        = "\e[4m";
-  internal const string _U       = "\e[24m";
-  internal const string B        = "\e[1m";
-  internal const string _B       = "\e[22m";
-  internal const string FGYELLOW = "\e[93m";
+  /// <summary>
+  ///   End bold
+  /// </summary>
+  internal const string _B = "\e[22m";
+
+  /// <summary>
+  ///   End colored text
+  /// </summary>
   internal const string _FGCOLOR = "\e[39m";
-  internal const string N        = "\e[7m";
-  internal const string P        = "\e[27m";
-  internal const string FGRED    = "\e[91m";
+
+  /// <summary>
+  ///   End underline
+  /// </summary>
+  internal const string _U = "\e[24m";
+
+  /// <summary>
+  ///   Bold
+  /// </summary>
+  internal const string B = "\e[1m";
+
+  /// <summary>
+  ///   Foreground color red
+  /// </summary>
+  internal const string FGRED = "\e[91m";
+
+  /// <summary>
+  ///   Foreground color yellow
+  /// </summary>
+  internal const string FGYELLOW = "\e[93m";
+
+  /// <summary>
+  ///   Negative/Inverted foreground and background colors.
+  /// </summary>
+  internal const string N = "\e[7m";
+
+  /// <summary>
+  ///   Reset to non-inverted foreground and background colors.
+  /// </summary>
+  internal const string P = "\e[27m";
+
+  /// <summary>
+  ///   Underline
+  /// </summary>
+  internal const string U = "\e[4m";
 }

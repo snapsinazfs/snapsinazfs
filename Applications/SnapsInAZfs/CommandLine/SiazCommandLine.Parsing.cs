@@ -19,34 +19,6 @@ using System.Runtime.CompilerServices;
 public partial class SiazCommandLine
 {
   /// <summary>
-  ///   Calls <see cref="Command.Parse(IReadOnlyList{string}, System.CommandLine.ParserConfiguration?)" /> on the <see cref="RootCommand" /> and returns
-  ///   the result.
-  /// </summary>
-  /// <param name="args">
-  ///   If not <see langword="null" />, specifies an explicit collection of command line arguments to parse, of which the first is
-  ///   interpreted as the executable name.<br />
-  ///   Otherwise, the result of <see cref="Environment.GetCommandLineArgs" /> will be used if this parameter is not provided or is
-  ///   explicitly <see langword="null" />.
-  /// </param>
-  /// <param name="rootCommand">A reference to <see cref="RootCommand" />, for convenience.</param>
-  /// <returns>
-  ///   The result of <see cref="Command.Parse(IReadOnlyList{string}, System.CommandLine.ParserConfiguration?)" />.
-  /// </returns>
-  [PublicAPI]
-  [MethodImpl ( MethodImplOptions.AggressiveInlining )]
-  public ParseResult Parse ( IReadOnlyList<string>? args, out RootCommand rootCommand )
-  {
-    rootCommand = RootCommand;
-
-    _rootCommandParseResult = rootCommand.Parse ( args ?? Environment.GetCommandLineArgs ( ), ParserConfiguration );
-
-    FileInfo[] configFiles = GetConfigurationFileCollection ( _rootCommandParseResult );
-    LoadConfigurationFromConfigurationFiles ( out _settings, out _configurationRoot, configFiles );
-
-    return _rootCommandParseResult;
-  }
-
-  /// <summary>
   ///   Parses a boolean from more inputs than <see cref="bool" /> is aware of, taken from the first token of an
   ///   <see cref="ArgumentResult" />.
   /// </summary>

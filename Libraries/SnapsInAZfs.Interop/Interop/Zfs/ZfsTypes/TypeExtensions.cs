@@ -12,6 +12,8 @@
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
+using System.Runtime.CompilerServices;
+
 /// <summary>
 ///   Extension methods for various types
 /// </summary>
@@ -67,20 +69,6 @@ public static class TypeExtensions
              value [ ..endIndex ];
   }
 
-
-  /// <summary>
-  ///   Totally unnecessary convenience proxy method for
-  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-  /// </summary>
-  /// <exception cref="OutOfMemoryException">
-  ///   The length of the resulting string overflows the maximum allowed length (
-  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-  /// </exception>
-  public static string ToCommaSeparatedSingleLineString ( this IEnumerable<string> strings, bool withSpaces = false )
-  {
-    return withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
-  }
-
   /// <summary>
   ///   Totally unnecessary convenience proxy method for
   ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
@@ -109,37 +97,11 @@ public static class TypeExtensions
   }
 
   /// <summary>
-  ///   Totally unnecessary convenience proxy method for
-  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-  /// </summary>
-  /// <exception cref="OutOfMemoryException">
-  ///   The length of the resulting string overflows the maximum allowed length (
-  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-  /// </exception>
-  public static string ToNewlineSeparatedString ( this IEnumerable<string> strings )
-  {
-    return string.Join ( '\n', strings );
-  }
-
-  /// <summary>
   ///   Reflection-free conversion of string to <see cref="SnapshotPeriodKind" />.
   /// </summary>
   public static SnapshotPeriodKind ToSnapshotPeriodKind ( this string input )
   {
     return SnapshotPeriod.StringToSnapshotPeriodKind ( input );
-  }
-
-  /// <summary>
-  ///   Totally unnecessary convenience proxy method for
-  ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
-  /// </summary>
-  /// <exception cref="OutOfMemoryException">
-  ///   The length of the resulting string overflows the maximum allowed length (
-  ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
-  /// </exception>
-  public static string ToSpaceSeparatedSingleLineString ( this IEnumerable<string> strings )
-  {
-    return string.Join ( ' ', strings );
   }
 
   /// <summary>
@@ -168,6 +130,80 @@ public static class TypeExtensions
     }
 
     return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( );
+  }
+
+  extension ( IEnumerable<string> strings )
+  {
+    /// <summary>
+    ///   Totally unnecessary convenience proxy method for
+    ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+    /// </summary>
+    /// <exception cref="OutOfMemoryException">
+    ///   The length of the resulting string overflows the maximum allowed length (
+    ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
+    public string ToCommaSeparatedSingleLineString ( bool withSpaces = false )
+    {
+      return withSpaces ? string.Join ( ", ", strings ) : string.Join ( ',', strings );
+    }
+
+    /// <summary>
+    ///   Totally unnecessary convenience proxy method for
+    ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+    /// </summary>
+    /// <exception cref="OutOfMemoryException">
+    ///   The length of the resulting string overflows the maximum allowed length (
+    ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
+    public string ToNewlineSeparatedString ( )
+    {
+      return strings.ToString ( true );
+    }
+
+    /// <summary>
+    ///   Totally unnecessary convenience proxy method for
+    ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" />
+    /// </summary>
+    /// <exception cref="OutOfMemoryException">
+    ///   The length of the resulting string overflows the maximum allowed length (
+    ///   <see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
+    public string ToSpaceSeparatedSingleLineString ( )
+    {
+      return strings.ToString ( withSpaces: true );
+    }
+
+    /// <summary>
+    ///   Totally unnecessary convenience proxy method for
+    ///   <see cref="string.Join(string?,System.Collections.Generic.IEnumerable{string?})" /> that provides canned forms for consistency.
+    /// </summary>
+    /// <param name="withNewlines">
+    ///   If <see langword="true" />, include a newline character as the last component of the separator.
+    /// </param>
+    /// <param name="withCommas">
+    ///   If <see langword="true" />, include a comma as the first component of the separator.
+    /// </param>
+    /// <param name="withSpaces">
+    ///   If <see langword="true" />, include a space as the last component of the separator.<br />
+    ///   Spaces will not be included if <paramref name="withNewlines" /> is also <see langword="true" />.
+    /// </param>
+    /// <exception cref="OutOfMemoryException">
+    ///   The length of the resulting string overflows the maximum allowed length
+    ///   (<see cref="System.Int32.MaxValue">Int32.MaxValue</see>).
+    /// </exception>
+    public string ToString ( bool withNewlines = false, bool withCommas = false, bool withSpaces = false )
+    {
+      return ( withNewlines, withCommas, withSpaces ) switch
+             {
+               (false, false, false) => string.Join ( ", ",         strings ),
+               (false, false, true)  => string.Join ( ',',          strings ),
+               (false, true, false)  => string.Join ( ' ',          strings ),
+               (false, true, true)   => string.Join ( string.Empty, strings ),
+               // These two will ignore spaces since they make no sense with a newline
+               (true, false, _) => string.Join ( "\n",  strings ),
+               (true, true, _)  => string.Join ( ",\n", strings )
+             };
+    }
   }
 
   extension ( ZfsProperty<int> retentionProperty )
