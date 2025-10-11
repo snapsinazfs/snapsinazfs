@@ -13,7 +13,6 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
-using System.Runtime.CompilerServices;
 using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
@@ -169,15 +168,32 @@ public partial class SiazCommandLine
         Required = false
       };
 
-  private const string             BaseConfigFilesEnvVarName       = "SnapsInAZfs_ConfigFiles";
-  private const string             ConfigOptionName                = "--config";
-  private const string             DaemonizeOptionName             = "--daemonize";
-  private const string             DaemonTimerIntervalOptionName   = "--daemon-timer-interval";
-  private const string             DebugOptionName                 = "--debug";
-  private const string             LogLevelOptionName              = "--log-level";
-  private const string             MonitorOptionName               = "--monitor";
-  private const string             OutputFileOptionName            = "--output-file";
-  private const string             PruneSnapshotsOptionName        = "--prune-snapshots";
-  private const StringSplitOptions RemoveAndTrimStringSplitEntries = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-  private const string             TakeSnapshotsOptionName         = "--take-snapshots";
+  private Option<bool> ZfsSchemaChangeCommands_ConfirmImpactOption { get; } = new ( ZfsSchemaChangeCommands_ConfirmImpactOptionName )
+                                                                              {
+                                                                                Arity       = ArgumentArity.ExactlyOne,
+                                                                                Required    = true,
+                                                                                Description = "Required option to indicate that you want this action to be carried out without further interaction."
+                                                                              };
+
+  private Option<bool> ZfsSchemaChangeCommands_ReallyConfirmImpactOption { get; } = new ( ZfsSchemaChangeCommands_ReallyConfirmImpactOptionName )
+                                                                                    {
+                                                                                      Arity       = ArgumentArity.ExactlyOne,
+                                                                                      Required    = true,
+                                                                                      Hidden      = true,
+                                                                                      Description = "Required option to indicate that you understand this is an immediate, permanent, and unrecoverable action without complete backups and that you accept all responsibility for anything that happens, including data loss."
+                                                                                    };
+
+  private const string             BaseConfigFilesEnvVarName                             = "SIAZ_ConfigFiles_";
+  private const string             ConfigOptionName                                      = "--config";
+  private const string             DaemonizeOptionName                                   = "--daemonize";
+  private const string             DaemonTimerIntervalOptionName                         = "--daemon-timer-interval";
+  private const string             DebugOptionName                                       = "--debug";
+  private const string             LogLevelOptionName                                    = "--log-level";
+  private const string             MonitorOptionName                                     = "--monitor";
+  private const string             OutputFileOptionName                                  = "--output-file";
+  private const string             PruneSnapshotsOptionName                              = "--prune-snapshots";
+  private const StringSplitOptions RemoveAndTrimStringSplitEntries                       = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+  private const string             TakeSnapshotsOptionName                               = "--take-snapshots";
+  private const string             ZfsSchemaChangeCommands_ConfirmImpactOptionName       = "--confirm";
+  private const string             ZfsSchemaChangeCommands_ReallyConfirmImpactOptionName = "--i-understand-this-cannot-be-undone";
 }

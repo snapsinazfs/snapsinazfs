@@ -15,6 +15,8 @@ namespace SnapsInAZfs.CommandLine;
 /// <summary>
 ///   Logging levels matching the values defined by NLog, for command line autocompletion.
 /// </summary>
+[PublicAPI]
+[UsedImplicitly ( ImplicitUseTargetFlags.WithMembers )]
 public enum LoggingLevel
 {
   /// <inheritdoc cref="NLog.LogLevel.Trace" />

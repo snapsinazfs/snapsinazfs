@@ -12,7 +12,7 @@
 
 namespace SnapsInAZfs;
 
-using System.Diagnostics.CodeAnalysis;
+using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 using Interop.Zfs.ZfsTypes;
 
@@ -81,6 +81,14 @@ internal static class TypeExtensions
     public string[] SplitAndClean ( char separator )
     {
       return original.Split ( separator, TrimAndRemoveBlanks );
+    }
+  }
+
+  extension ( IReadOnlyList<Token> tokens )
+  {
+    public string ToString ( bool withSpaces = false, bool withCommas = false, bool withNewlines = false )
+    {
+      return tokens.Select ( static t => t.Value ).ToString ( withSpaces, withCommas, withNewlines );
     }
   }
 }

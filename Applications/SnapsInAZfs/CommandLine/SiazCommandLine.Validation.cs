@@ -76,25 +76,25 @@ public partial class SiazCommandLine
     {
       string message
         = $"Unable to open file {token.Value} for writing. The parent directory {file.Directory?.FullName ?? "(unknown)"} does not exist or is inaccessible.";
-      Logger.Warn ( directoryNotFoundException, message );
+      _logger.Warn ( directoryNotFoundException, message );
       optionResult.AddError ( $"{message} See log for detailed exception data." );
     }
     catch ( FileNotFoundException fileNotFoundException )
     {
       string message = $"The file {token.Value} does not exist.";
-      Logger.Warn ( fileNotFoundException, message );
+      _logger.Warn ( fileNotFoundException, message );
       optionResult.AddError ( $"{message} See log for detailed exception data." );
     }
     catch ( UnauthorizedAccessException unauthorizedAccessException )
     {
       string message = $"Unable to open file {token.Value} for writing. Access is denied.";
-      Logger.Warn ( unauthorizedAccessException, message );
+      _logger.Warn ( unauthorizedAccessException, message );
       optionResult.AddError ( $"{message} See log for detailed exception data." );
     }
     catch ( IOException ioException )
     {
       string message = $"Unable to open file {token.Value} for writing. The result was {ioException.HResult}.";
-      Logger.Warn ( ioException, message );
+      _logger.Warn ( ioException, message );
       optionResult.AddError ( $"{message} See log for detailed exception data." );
     }
 

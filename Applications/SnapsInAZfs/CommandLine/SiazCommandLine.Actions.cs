@@ -14,7 +14,9 @@ namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Globalization;
 using Interop;
+using Interop.Zfs.ZfsTypes;
 
 public partial class SiazCommandLine
 {
@@ -45,10 +47,11 @@ public partial class SiazCommandLine
 
   private Task<int> RunSiaz ( ParseResult parseResult, CancellationToken cancellation )
   {
-    Logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
-    Logger.Fatal ( "Not yet implemented." );
+    _logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
 
-    return Task.FromResult ( (int)ExitCode.ECANCELED );
+    RunSiazInvoked?.Invoke ( this, new ( ) );
+
+    return Task.FromResult ( (int)ExitCode.EOK );
   }
 
   /// <summary>
@@ -56,11 +59,20 @@ public partial class SiazCommandLine
   /// </summary>
   /// <param name="parseResult"></param>
   /// <returns></returns>
-  private static int SetGlobalOptions ( ParseResult parseResult )
+  private int SetGlobalOptions ( ParseResult parseResult )
   {
-    Logger.Debug ( $"Requested to set global configuration options: {parseResult.CommandResult}" );
-    Logger.Debug ( $"Command: {parseResult.CommandResult.Command.Name}" );
-    Logger.Debug ( $"Command Options: {string.Join ( ',', parseResult.CommandResult.Children.OfType<OptionResult> ( ).Select ( static o => o.Option.Name ) )}" );
+    _logger.Debug (
+                   "Requested to set global configuration options: {0}",
+                   parseResult
+                    .CommandResult
+                    .Children
+                    .OfType<OptionResult> ( )
+                    .Select ( static o => $"{o.IdentifierToken?.Value}={o.Tokens [ 0 ].Value}" )
+                    .ToSpaceSeparatedSingleLineString ( )
+                  );
+
+    Dictionary<string, string?> settings = [ ];
+    ConfigurationBuilder        builder  = new ( );
 
     foreach ( SymbolResult t in parseResult.CommandResult.Children )
     {
@@ -77,14 +89,16 @@ public partial class SiazCommandLine
         case nameof (SnapsInAZfsSettings.TakeSnapshots):
         {
           TriStateOptionValue value = result.GetRequiredValue ( (Option<TriStateOptionValue>)result.Option );
-          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
+          settings [ result.Option.Name ] = value.ToString ( "G" );
+          _logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
 
         case nameof (SnapsInAZfsSettings.LocalSystemName):
         {
           string value = result.GetRequiredValue ( (Option<string>)result.Option );
-          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
+          settings [ result.Option.Name ] = value;
+          _logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
 
@@ -92,46 +106,78 @@ public partial class SiazCommandLine
         case nameof (SnapsInAZfsSettings.ZpoolPath):
         {
           FileInfo value = result.GetRequiredValue ( (Option<FileInfo>)result.Option );
-          Logger.Trace ( "{0} value is {1}", result.Option.Name, value.FullName );
+          settings [ result.Option.Name ] = value.FullName;
+          _logger.Trace ( "{0} value is {1}", result.Option.Name, value.FullName );
         }
           break;
 
         case nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds):
         {
           uint value = result.GetRequiredValue ( (Option<uint>)result.Option );
-          Logger.Trace ( "{0} value is {1}", result.Option.Name, value );
+          settings [ result.Option.Name ] = value.ToString ( NumberFormatInfo.CurrentInfo );
+          _logger.Trace ( "{0} value is {1}", result.Option.Name, value );
         }
           break;
       }
     }
+
+    builder.AddInMemoryCollection ( settings );
+    GlobalConfigChangeEventArgs eventArgs = new ( builder.Build ( ) );
+
+    _logger.ConditionalDebug (
+                              $"""
+                               Configuration parsed from command line:
+                               {eventArgs.ModifiedConfiguration.GetDebugView ( )}
+                               """
+                             );
+
+    GlobalConfigurationChangeRequested?.Invoke ( this, eventArgs );
 
     return 0;
   }
 
   private static void StartConfigConsole ( ParseResult parseResult )
   {
-    Logger.Fatal ( "{0} not implemented.", parseResult.CommandResult.Command.Name );
+    _logger.Fatal ( "{0} not implemented.", parseResult.CommandResult.Command.Name );
   }
 
-  private static int ZfsSchemaCheck ( ParseResult parseResult )
+  private int ZfsSchemaCheck ( ParseResult parseResult )
   {
-    Console.WriteLine ( parseResult.CommandResult.ToString ( ) );
-    Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
+    string[] poolsArgumentResult = parseResult.CommandResult.GetValue ( PoolsArgument ) ?? [ ];
+
+    ZfsSchemaCheckInvoked?.Invoke ( this, new ( poolsArgumentResult ) );
 
     return 0;
   }
 
-  private static int ZfsSchemaClean ( ParseResult arg )
+  private int ZfsSchemaClean ( ParseResult parseResult )
   {
-    Console.WriteLine ( "Cleaning SIAZ schema from ZFS" );
+    bool confirmOptionPresentAndTrue = parseResult.CommandResult.GetResult ( ZfsSchemaChangeCommands_ConfirmImpactOption )
+                                         is { Implicit: false } confirmOptionResult
+                                    && confirmOptionResult.GetValueOrDefault<bool> ( );
+    bool reallyConfirmOptionPresentAndTrue = parseResult.CommandResult.GetResult ( ZfsSchemaChangeCommands_ReallyConfirmImpactOption )
+                                               is { Implicit: false } reallyConfirmOptionResult
+                                          && reallyConfirmOptionResult.GetValueOrDefault<bool> ( );
+
+    string[] poolsArgumentResult = parseResult.CommandResult.GetValue ( PoolsArgument ) ?? [ ];
+
+    ZfsSchemaCleanInvoked?.Invoke ( this, new ( poolsArgumentResult, confirmOptionPresentAndTrue, reallyConfirmOptionPresentAndTrue ) );
 
     return 0;
   }
 
-  private static int ZfsSchemaInitialize ( ParseResult parseResult )
+  private int ZfsSchemaInitialize ( ParseResult parseResult )
   {
-    Console.WriteLine ( parseResult.CommandResult.ToString ( ) );
-    Console.WriteLine ( $"{parseResult.CommandResult.Command.Name} not implemented." );
+    bool confirmOptionPresentAndTrue = parseResult.CommandResult.GetResult ( ZfsSchemaChangeCommands_ConfirmImpactOption )
+                                         is { Implicit: false } confirmOptionResult
+                                    && confirmOptionResult.GetValueOrDefault<bool> ( );
+    bool reallyConfirmOptionPresentAndTrue = parseResult.CommandResult.GetResult ( ZfsSchemaChangeCommands_ReallyConfirmImpactOption )
+                                               is { Implicit: false } reallyConfirmOptionResult
+                                          && reallyConfirmOptionResult.GetValueOrDefault<bool> ( );
+
+    string[] poolsArgumentResult = parseResult.CommandResult.GetValue ( PoolsArgument ) ?? [ ];
+
+    ZfsSchemaInitializeInvoked?.Invoke ( this, new ( poolsArgumentResult, confirmOptionPresentAndTrue, reallyConfirmOptionPresentAndTrue ) );
 
     return 0;
   }

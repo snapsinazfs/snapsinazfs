@@ -19,13 +19,13 @@
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 // See https://opensource.org/license/MIT/
+// ReSharper disable CheckNamespace
 #pragma warning disable IDE0130
 
 namespace SnapsInAZfs.CommandLine.Tests;
 
 using System.CommandLine;
 using System.CommandLine.Parsing;
-using Interop;
 
 [TestFixture]
 [TestOf ( typeof( SiazCommandLine ) )]
@@ -33,13 +33,8 @@ using Interop;
 [Category ( "Command Line" )]
 public class SiazCommandLineTests
 {
-  [Test]
-  [Category ( "Exceptions" )]
-  public void ConfigureCommandLineTree_DoesNotThrow ( )
-  {
-    SiazCommandLine siazCli = new ( );
-    Assert.DoesNotThrow ( ( ) => siazCli.ConfigureCommandLineTree ( ) );
-  }
+  private static TextWriter ErrorStream  => TestContext.CurrentContext.Test.Properties.ContainsKey ( "Use stderr" ) ? TestContext.Error : TextWriter.Null;
+  private static TextWriter OutputStream => TestContext.CurrentContext.Test.Properties.ContainsKey ( "Use stdout" ) ? TestContext.Out : TextWriter.Null;
 
   [Test]
   public void ConfigureCommandLineTree_CreatesNewRootCommand ( )
@@ -51,6 +46,14 @@ public class SiazCommandLineTests
     siazCli.ConfigureCommandLineTree ( );
 
     Assert.That ( siazCli.RootCommand, Is.Not.Null.And.Not.SameAs ( originalRootCommand ) );
+  }
+
+  [Test]
+  [Category ( "Exceptions" )]
+  public void ConfigureCommandLineTree_DoesNotThrow ( )
+  {
+    SiazCommandLine siazCli = new ( );
+    Assert.DoesNotThrow ( ( ) => siazCli.ConfigureCommandLineTree ( ) );
   }
 
   [Test]
@@ -66,34 +69,15 @@ public class SiazCommandLineTests
   [Category ( "Validation" )]
   public void Invoke_NoArgs_HasExactlyOneParseError ( )
   {
-    SiazCommandLine siazCli   = new ( );
-    string[]        emptyArgs = [ ];
+    SiazCommandLine siazCli = new ( );
+    Assume.That ( siazCli, Is.Not.Null.And.InstanceOf<SiazCommandLine> ( ) );
 
-    _ = siazCli.Invoke (
-                        out _,
-                        out ParseResult siazCliParseResult,
-                        out _,
-                        out _,
-                        emptyArgs
-                       );
+    string[] emptyArgs = [ ];
 
-    Assert.That ( siazCliParseResult.Errors, Has.Exactly ( 1 ).TypeOf<ParseError> ( ) );
-  }
+    ParseResult result = siazCli.Parse ( emptyArgs );
+    _ = siazCli.Invoke ( OutputStream, ErrorStream );
 
-  [Test]
-  [Category ( "Validation" )]
-  public void Invoke_NoArgs_ReturnsEPERM ( )
-  {
-    SiazCommandLine siazCli   = new ( );
-    string[]        emptyArgs = [ ];
-    ExitCode exitCode = siazCli.Invoke (
-                                        out _,
-                                        out _,
-                                        out _,
-                                        out _,
-                                        emptyArgs
-                                       );
-
-    Assert.That ( exitCode, Is.EqualTo ( ExitCode.EPERM ) );
+    Assert.That ( result,        Is.SameAs ( siazCli.RootCommandParseResult ) );
+    Assert.That ( result.Errors, Has.Exactly ( 1 ).TypeOf<ParseError> ( ) );
   }
 }

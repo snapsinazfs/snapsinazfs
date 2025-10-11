@@ -22,64 +22,64 @@ using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
 {
-  private Command _configCommand = new (
-                                        ConfigCommandName,
-                                        "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
-                                       );
+  private Command ConfigCommand { get; } = new (
+                                                 ConfigCommandName,
+                                                 "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
+                                                );
 
-  private Command _configConsoleCommand = new (
-                                               ConfigConsoleCommandName,
-                                               "Launches the configuration console TUI."
+  private Command ConfigConsoleCommand { get; } = new (
+                                                        ConfigConsoleCommandName,
+                                                        "Launches the configuration console TUI."
+                                                       );
+
+  private Command ConfigGlobalCommand { get; } = new (
+                                                       ConfigGlobalCommandName,
+                                                       """
+                                                       Modify global settings in the root of the JSON configuration files.
+                                                       If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                                       """
+                                                      );
+
+  private Command CronCommand { get; } = new (
+                                               "--cron",
+                                               $"""
+                                                {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
+                                                Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
+                                                """
                                               );
 
-  private Command _configGlobalCommand = new (
-                                              ConfigGlobalCommandName,
+  private Command RunCommand { get; } = new (
+                                              RunCommandName,
                                               """
-                                              Modify global settings in the root of the JSON configuration files.
-                                              If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                              Run SIAZ, optionally specifying override options.
+                                              Use this context when executing one-off operations or for custom service/script-based invocations.
                                               """
                                              );
 
-  private Command _cronCommand = new (
-                                      "--cron",
-                                      $"""
-                                       {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
-                                       Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
-                                       """
-                                     );
+  private Command ZfsCommand { get; } = new (
+                                              ZfsCommandName,
+                                              "Perform operations on ZFS pools and datasets managed by SIAZ."
+                                             );
 
-  private Command _runCommand = new (
-                                     RunCommandName,
-                                     """
-                                     Run SIAZ, optionally specifying override options.
-                                     Use this context when executing one-off operations or for custom service/script-based invocations.
-                                     """
-                                    );
+  private Command ZfsSchemaCheckCommand { get; } = new (
+                                                         ZfsSchemaCheckCommandName,
+                                                         "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
+                                                        );
 
-  private Command _zfsCommand = new (
-                                     ZfsCommandName,
-                                     "Perform operations on ZFS pools and datasets managed by SIAZ."
-                                    );
+  private Command ZfsSchemaCleanCommand { get; } = new (
+                                                         ZfsSchemaCleanCommandName,
+                                                         "Completely removes all pool and dataset properties that came from SIAZ."
+                                                        );
 
-  private Command _zfsSchemaCheckCommand = new (
-                                                ZfsSchemaCheckCommandName,
-                                                "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
-                                               );
+  private Command ZfsSchemaCommand { get; } = new (
+                                                    ZfsSchemaCommandName,
+                                                    "Perform operations on properties of ZFS pools and datasets used by SIAZ."
+                                                   );
 
-  private Command _zfsSchemaCleanCommand = new (
-                                                ZfsSchemaCleanCommandName,
-                                                "Completely removes all pool and dataset properties that came from SIAZ."
-                                               );
-
-  private Command _zfsSchemaCommand = new (
-                                           ZfsSchemaCommandName,
-                                           "Perform operations on properties of ZFS pools and datasets used by SIAZ."
-                                          );
-
-  private Command _zfsSchemaInitializeCommand = new (
-                                                     ZfsSchemaInitializeCommandName,
-                                                     "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
-                                                    );
+  private Command ZfsSchemaInitializeCommand { get; } = new (
+                                                              ZfsSchemaInitializeCommandName,
+                                                              "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
+                                                             );
 
   /// <summary>
   ///   A reference to the <see cref="RootCommand" /> of the command line.
@@ -98,13 +98,14 @@ public partial class SiazCommandLine
   private const  string ZfsSchemaCommandName            = "schema";
   private const  string ZfsSchemaInitializeCommandName  = "initialize";
 
+  [MemberNotNullWhen ( true )]
   internal static bool LoadConfigurationFromConfigurationFiles (
     [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
     [NotNullWhen ( true )] out IConfigurationRoot?  rootConfiguration,
     FileInfo[]                                      configFiles
   )
   {
-    Logger.Trace ( "Loading configuration." );
+    _logger.Trace ( "Loading configuration." );
 
     ConfigurationBuilder configBuilder = new ( );
 
@@ -112,35 +113,37 @@ public partial class SiazCommandLine
     {
       if ( !file.Exists )
       {
-        Logger.Warn ( "Configuration file not found at {0}", file.FullName );
+        _logger.Warn ( "Configuration file not found at {0}", file.FullName );
 
         continue;
       }
 
-      Logger.Debug ( "Loading configuration file {0}", file.FullName );
+      _logger.Debug ( "Loading configuration file {0}", file.FullName );
+
       configBuilder.AddJsonFile ( file.FullName, true, false );
     }
 
     if ( configBuilder.Sources.Count == 0 )
     {
-      Logger.Fatal ( "Configuration files not found at any of these locations: {0}", configFiles.ToCommaSeparatedSingleLineString ( true ) );
+      _logger.Fatal ( "Configuration files not found at any of these locations: {0}", configFiles.ToCommaSeparatedSingleLineString ( true ) );
       rootConfiguration = null;
       settings          = null;
 
       return false;
     }
 
-    Logger.Trace ( $"Building {nameof (IConfigurationRoot)} from configuration sources." );
+    _logger.Trace ( $"Building {nameof (IConfigurationRoot)} from configuration files." );
 
     rootConfiguration = configBuilder.Build ( );
 
-    Logger.Trace ( $"Building settings objects from {nameof(IConfigurationRoot)}." );
+    _logger.Trace ( $"Binding settings objects from {nameof (IConfigurationRoot)}." );
 
     try
     {
       settings = rootConfiguration.Get<SnapsInAZfsSettings> ( ) ?? throw new InvalidOperationException ( );
 
-      Logger.ConditionalDebug ( "Configuration built from parsed files: {0}", rootConfiguration.SerializeToJson ( ) );
+      _logger.ConditionalDebug ( "Initial configuration built from parsed files: {0}", rootConfiguration.SerializeToJson ( ) );
+
       // ReSharper disable once SettingNotFoundInConfiguration
       IConfigurationSection kestrelSection = rootConfiguration.GetRequiredSection ( "Monitoring" ).GetSection ( "Kestrel" );
 
@@ -156,7 +159,7 @@ public partial class SiazCommandLine
     }
     catch ( Exception ex )
     {
-      Logger.Fatal ( ex, "Unable to parse settings from JSON" );
+      _logger.Fatal ( ex, "Unable to parse settings from JSON" );
 
       settings = null;
 

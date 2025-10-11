@@ -12,9 +12,11 @@
 
 namespace SnapsInAZfs.Settings;
 
+using System.Numerics;
 using System.Text.Json.Serialization;
 
-public sealed class MonitoringSettings ( bool EnableHttp = false, object? Kestrel = null )
+public sealed record MonitoringSettings ( bool EnableHttp = false, object? Kestrel = null )
+  : IEqualityOperators<MonitoringSettings, MonitoringSettings, bool>
 {
   [JsonPropertyOrder ( 1 )]
   public required bool EnableHttp { get; set; } = EnableHttp;
@@ -23,5 +25,6 @@ public sealed class MonitoringSettings ( bool EnableHttp = false, object? Kestre
   [JsonIgnore ( Condition = JsonIgnoreCondition.WhenWritingNull )]
   public object? Kestrel { get; set; }
 
+  [UsedImplicitly]
   public const string ConfigurationSectionName = "Monitoring";
 }

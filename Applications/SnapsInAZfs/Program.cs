@@ -13,10 +13,12 @@
 namespace SnapsInAZfs;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 using CommandLine;
 using Interop;
 using Interop.Zfs.ZfsCommandRunner;
+using Interop.Zfs.ZfsTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
@@ -29,13 +31,15 @@ using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
 
 [UsedImplicitly]
-internal static class Program
+internal class Program
 {
-  private static          Logger               _logger         = LogManager.CreateNullLogger ( );
-  private static readonly IMonitor             ServiceObserver = new Monitor ( );
-  private static          IConfigurationRoot?  _configurationRoot;
-  internal static         SnapsInAZfsSettings? Settings;
-  internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
+  internal const          string                  SnapsInAZfsAppName = "SnapsInAZfs";
+  private static          Logger                  _logger            = LogManager.CreateNullLogger ( );
+  private static readonly IMonitor                ServiceObserver    = new Monitor ( );
+  private static          IConfigurationRoot?     _configurationRoot;
+  internal static         SnapsInAZfsSettings?    Settings;
+  internal static         IZfsCommandRunner       ZfsCommandRunnerSingleton = null!;
+  internal static         IHost?                  ServiceContainer;
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
@@ -48,25 +52,56 @@ internal static class Program
     // 3. Invoke the command line.
     // 4. Proceed according to command line invocation result or terminate if command line errors are indicated.
 
-    await using LogFactory earlyLogFactory = InitializeEarlyLogging ( out _logger );
+    InitializeEarlyLogging ( out _logger );
+    SiazCommandLine       siazCli    = new ( );
 
-    if ( !ProcessCommandLine ( argv, out SCL.ParseResult siazCliParseResult, out Settings, out _configurationRoot, out ExitCode siazCliInvocationExitCode )
-      || siazCliInvocationExitCode is not ExitCode.EOK )
+    siazCli.Parse ( argv );
+    FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
+
+    WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
+
+    foreach ( FileInfo configFile in configFiles )
     {
-      LogManager.Shutdown ( );
-
-      return (int)siazCliInvocationExitCode;
+      appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
     }
 
-    switch ( siazCliParseResult )
-    {
-      case { RootCommandResult.IdentifierToken.Value: SiazCommandLine.RunCommandName }:
-        return Settings.Monitoring.EnableHttp switch
-               {
-                 true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
-                 _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
-               };
-    }
+    _logger.Debug ( "Adding environment variables to configuration." );
+    appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
+
+    // TODO: Apply any relevant command line options to config
+
+    siazCli.ZfsSchemaCheckInvoked      += SiazCli_ZfsSchemaCheckInvoked;
+    siazCli.ZfsSchemaCleanInvoked      += SiazCli_ZfsSchemaCleanInvoked;
+    siazCli.ZfsSchemaInitializeInvoked += SiazCli_ZfsSchemaInitializeInvoked;
+
+    siazCli.Invoke ( Console.Out, Console.Error );
+
+    return 0;
+    WebApplication webApp = appBuilder.Build ( );
+
+    await webApp.DisposeAsync ( ).ConfigureAwait ( true );
+
+    //WebApplicationBuilder applicationBuilder = WebApplication.CreateBuilder ( );
+
+    //if ( !ProcessCommandLine ( argv, out  siazCliParseResult, out Settings, out _configurationRoot, hostBuilder, out ExitCode siazCliInvocationExitCode )
+    //  || siazCliInvocationExitCode is not ExitCode.EOK )
+    //{
+    //  LogManager.Shutdown ( );
+
+    //  return (int)siazCliInvocationExitCode;
+    //}
+
+    //hostBuilder.Configuration.AddConfiguration ( _configurationRoot );
+
+    //switch ( siazCliParseResult )
+    //{
+    //  case { RootCommandResult.IdentifierToken.Value: SiazCommandLine.RunCommandName }:
+    //    return Settings.Monitoring.EnableHttp switch
+    //           {
+    //             true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
+    //             _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
+    //           };
+    //}
 
     return 0;
 
@@ -111,54 +146,93 @@ internal static class Program
            };
   }
 
+  private static void SiazCli_ZfsSchemaInitializeInvoked ( object? sender, ZfsSchemaChangeEventArgs e )
+  {
+    _logger.Fatal ( new NotImplementedException ( $"zfs schema initialize not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+  }
+
+  private static void SiazCli_ZfsSchemaCleanInvoked ( object? sender, ZfsSchemaChangeEventArgs e )
+  {
+    _logger.Fatal ( new NotImplementedException ( $"zfs schema clean not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+  }
+
+  private static void SiazCli_ZfsSchemaCheckInvoked ( object? sender, ZfsSchemaActionEventArgs e )
+  {
+    _logger.Fatal ( new NotImplementedException ( $"zfs schema check not yet implemented. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+  }
+
   /// <summary>
   ///   Loads the appsettings.json file from the working directory and configures logging ONLY.
   /// </summary>
   /// <remarks>
-  ///   After this method is called, the LogManager will have the configuration from appsettings.json.<br />
-  ///   Any configuration changes made after this need to be followed by a call to <see cref="LogManager.ReconfigExistingLoggers()" />
-  ///   to continue.
+  ///   <para>
+  ///     After this method is called, the LogManager will have the hard-coded configuration in <see cref="NLogInitialConfiguration" />
+  ///     .<br />
+  ///     This is only used until the real configuration has been loaded, as a fallback to protect against missing configuration.<br />
+  ///     The configuration is written to a temporary file, loaded, and then the file is deleted.
+  ///   </para>
+  ///   <para>
+  ///     The file is opened with <see cref="FileShare.None" /> and will be truncated before writing the initial configuration to it.
+  ///   </para>
+  ///   <para>
+  ///     The configuration can be overridden with environment variables using the prefix <c>SnapsInAZfs_NLog__</c> (note the
+  ///     double-underscore).<br />
+  ///     The possible variables are all settings that appear in the JSON configuration.<br />
+  ///     They are case-sensitive, and the key for a setting is its JSON path, with each level of the hierarchy separated with a
+  ///     double-underscore on Linux or a colon on Windows.<br />
+  ///     For example, the NLog.variables.var_logdir, as an environment variable name, is:
+  ///     <c>SnapsInAZfs_NLog__variables__var_logdir</c> on Linux or <c>SnapsInAZfs_NLog:variables:var_logdir</c> on Windows.
+  ///   </para>
   /// </remarks>
   /// <returns>The <see cref="ISetupBuilder" /> created from the configuration.</returns>
-  [MustDisposeResource]
-  private static LogFactory InitializeEarlyLogging ( out Logger logger )
+  private static bool InitializeEarlyLogging ( out Logger logger )
   {
-    IConfigurationRoot appSettingsJson = new ConfigurationBuilder ( )
-                                        .SetBasePath ( Directory.GetCurrentDirectory ( ) )
-                                        .AddJsonFile ( "appsettings.json", false, false )
-                                        .AddEnvironmentVariables ( )
-                                        .Build ( );
-    ISetupBuilder builder = LogManager.Setup ( )
-                                      .LoadConfigurationFromSection ( appSettingsJson );
+    FileInfo tempNLogConfigFile = new ( Path.GetTempFileName ( ) );
 
-    logger = LogManager.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
-    LogManager.ReconfigExistingLoggers ( true );
+    if ( Environment.GetEnvironmentVariable ( $"{EnvironmentVariableFilterPrefix}EnableEarlyLogging" ) is "1" )
+    {
+      // Write to stdout since we don't have a logger yet.
+      Console.WriteLine ( $"Initial logging configuration temporary file: {tempNLogConfigFile.FullName}" );
+    }
 
-    return builder.LogFactory;
-  }
+    using FileStream tempNLogConfigFileStream = tempNLogConfigFile.Open ( FileMode.Truncate, FileAccess.ReadWrite, FileShare.None );
+    Logger?          earlyLogger              = null;
 
-  private static bool ProcessCommandLine (
-    string[]                                        arguments,
-    out                        SCL.ParseResult      siazCliParseResult,
-    [NotNullWhen ( true )] out SnapsInAZfsSettings? settings,
-    [NotNullWhen ( true )] out IConfigurationRoot?  configurationRoot,
-    out                        ExitCode             exitCode
-  )
-  {
-    SiazCommandLine siazCli = new ( );
-    siazCliParseResult = siazCli.Parse (
-                                        arguments,
-                                        out SCL.RootCommand _
-                                       );
-    exitCode = siazCli.Invoke (
-                               out SCL.RootCommand _,
-                               out siazCliParseResult,
-                               out settings,
-                               out configurationRoot,
-                               arguments
-                              );
+    try
+    {
+      using ( StreamWriter tempNLogConfigWriter = new ( tempNLogConfigFileStream, Encoding.UTF8, 2048 ) )
+      {
+        tempNLogConfigWriter.Write ( NLogInitialConfiguration );
+      }
 
-    return exitCode == ExitCode.EOK;
+      IConfigurationRoot appSettingsJson = new ConfigurationBuilder ( )
+                                          .SetBasePath ( Directory.GetCurrentDirectory ( ) )
+                                          .AddJsonFile ( tempNLogConfigFile.FullName, false, false )
+                                          .AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix )
+                                          .Build ( );
+
+      ISetupBuilder? builder = LogManager.Setup ( )
+                                         .LoadConfigurationFromSection ( appSettingsJson );
+
+      earlyLogger = builder.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
+      LogManager.ReconfigExistingLoggers ( true );
+
+      tempNLogConfigFileStream.Close ( );
+    }
+    finally
+    {
+      earlyLogger ??= LogManager.CreateNullLogger ( );
+
+      if ( Environment.GetEnvironmentVariable ( $"{EnvironmentVariableFilterPrefix}EnableEarlyLogging" ) is "1" )
+      {
+        earlyLogger.Debug ( $"Deleting initial logging configuration temporary file {tempNLogConfigFile.FullName}." );
+      }
+
+      logger = earlyLogger;
+      tempNLogConfigFile.Delete ( );
+    }
+
+    return true;
   }
 
   /// <summary>
@@ -327,6 +401,68 @@ internal static class Program
 
     return SiazService.ExitStatus;
   }
+
+  private const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
+
+  private const string NLogInitialConfiguration = """
+                                                  {
+                                                    "NLog": {
+                                                      "autoReload": false,
+                                                      "throwConfigExceptions": true,
+                                                      "internalLogLevel": "Warn",
+                                                      "internalLogFile": "${basedir}/internal-nlog.txt",
+                                                      "extensions": [
+                                                        { "assembly": "NLog.Extensions.Logging" }
+                                                      ],
+                                                      "variables": {
+                                                        "var_logdir": "/var/log/SnapsInAZfs"
+                                                      },
+                                                      "time": {
+                                                        "type": "FastLocal"
+                                                      },
+                                                      "default-wrapper": {
+                                                        "type": "AsyncWrapper",
+                                                        "overflowAction": "Block"
+                                                      },
+                                                      "targets": {
+                                                        "early-console": {
+                                                          "type": "ColoredConsole",
+                                                          "detectConsoleAvailable": true,
+                                                          "enableAnsiOutput ": true,
+                                                          "StdErr": true,
+                                                          "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${message} ${exception:format=tostring}",
+                                                          "rowHighlightingRules": [
+                                                            {
+                                                              "condition": "level == LogLevel.Warn",
+                                                              "foregroundColor": "Yellow"
+                                                            },
+                                                            {
+                                                              "condition": "level == LogLevel.Error",
+                                                              "foregroundColor": "Red"
+                                                            },
+                                                            {
+                                                              "condition": "level == LogLevel.Fatal",
+                                                              "foregroundColor": "White",
+                                                              "backgroundColor": "DarkRed"
+                                                            }
+                                                          ]
+                                                        }
+                                                      },
+                                                      "rules": [
+                                                        {
+                                                          "ruleName": "Console",
+                                                          "logger": "*",
+                                                          "minLevel": "Debug",
+                                                          "writeTo": "early-console",
+                                                          "filterDefaultAction": "Log",
+                                                          "enabled": true
+                                                        }
+                                                      ]
+                                                    }
+                                                  }
+
+
+                                                  """;
 
   private static async Task<int> RunWithoutKestrelAsync ( SnapsInAZfsSettings settings )
   {

@@ -17,16 +17,6 @@ using Extensions;
 
 public partial class SiazCommandLine
 {
-  private Argument<bool> _zfsSchemaCleanCommand_ConfigArgument = new ( "--confirm" )
-                                                                 {
-                                                                   Arity = ArgumentArity.ExactlyOne
-                                                                 };
-
-  private Argument<bool> _zfsSchemaCleanCommand_ConfirmImpactArgument = new ( "--i-understand-this-cannot-be-undone" )
-                                                                        {
-                                                                          Arity = ArgumentArity.ExactlyOne
-                                                                        };
-
   private Argument<string[]> _zfsSchemaInitializeCommand_PoolsArgument = new ( PoolsArgumentName )
                                                                          {
                                                                            Arity               = ArgumentArity.ZeroOrMore,
@@ -68,14 +58,15 @@ public partial class SiazCommandLine
   ///   This argument is not explicitly required in this definition, as it is used as a filter. The absence of this argument is
   ///   interpreted as no filter - i.e., all pools.
   /// </remarks>
-  private Argument<string[]> PoolsArgument { get; }
   // IDEA: It would be cool and user-friendly to have this call `zpool list` in a completion source to enable rich tab-completion for pool names. Any such functionality would need to fail gracefully if the `zpool` command isn't in the PATH environment variable, to avoid a dependency on building the full configuration before doing it. Perhaps caching the results of it in a file could help with responsiveness?
+  private Argument<string[]> PoolsArgument { get; }
     = new
       ( PoolsArgumentName )
       {
         Arity               = ArgumentArity.ZeroOrMore,
-        Description         = "If specified, limits the check to the named pools.",
-        DefaultValueFactory = static _ => [ ]
+        Description         = "If specified, limits the operation to the named pools.",
+        DefaultValueFactory = static _ => [ ],
+        HelpName = PoolsArgumentName
       };
 
   private const string ConfigStateArgumentName = "state";
