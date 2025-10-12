@@ -13,6 +13,8 @@
 namespace SnapsInAZfs.CommandLine;
 
 using System.CommandLine;
+using System.CommandLine.Completions;
+using Extensions;
 using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
@@ -29,8 +31,11 @@ public partial class SiazCommandLine
     new ( nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds) )
     {
       Arity       = ArgumentArity.ExactlyOne,
-      Description = $"The {nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds)} option controls the interval, in seconds, of timer ticks for the daemon's operation scheduling." + $".",
-      Hidden      = true,
+      Description = $"""
+                     The {nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds)} option controls the interval, in seconds, of timer ticks for the daemon's operation scheduling.
+                     Values other than the suggested values may be used but sticking to the suggested values is strongly recommended.
+                     """,
+      Hidden      = false,
       Required    = false
     };
 
@@ -135,11 +140,9 @@ public partial class SiazCommandLine
   private Option<LoggingLevel> LogLevelOption { get; }
     = new ( LogLevelOptionName )
       {
-        Description = """
-                      Override global logging level.
-                      """,
-        Recursive = true,
-        Arity     = ArgumentArity.ZeroOrOne
+        Description = "Override global logging level.",
+        Recursive   = true,
+        Arity       = ArgumentArity.ZeroOrOne
       };
 
   private Option<bool> MonitorOption { get; }
@@ -147,7 +150,8 @@ public partial class SiazCommandLine
       {
         Arity       = ArgumentArity.ZeroOrOne,
         Description = "Enable the monitoring endpoints.",
-        Recursive   = true
+        Recursive   = false,
+        Required    = false
       };
 
   private Option<bool> PruneSnapshotsOption { get; }
@@ -196,4 +200,43 @@ public partial class SiazCommandLine
   private const string             TakeSnapshotsOptionName                               = "--take-snapshots";
   private const string             ZfsSchemaChangeCommands_ConfirmImpactOptionName       = "--confirm";
   private const string             ZfsSchemaChangeCommands_ReallyConfirmImpactOptionName = "--i-understand-this-cannot-be-undone";
+
+  /// <inheritdoc cref="CompletionItemExtensions.ToOrderableCompletionItem{TEnum}(TEnum)" />
+  /// <remarks>
+  ///   This method is just a proxy to <see cref="CompletionItemExtensions.ToOrderableCompletionItem{TEnum}(TEnum)" /> for concise
+  ///   syntax in LINQ method calls.
+  /// </remarks>
+  /// <typeparam name="TEnum">An <see langword="enum" /> type.</typeparam>
+  /// <param name="enumMember">
+  ///   The <see langword="enum" /> member of type <typeparamref name="TEnum" /> from which to create the <see cref="CompletionItem" />
+  ///   .
+  /// </param>
+  /// <returns>
+  ///   A <see cref="CompletionItem" /> with <see cref="CompletionItem.Label" /> set to the name of the <see langword="enum" /> member
+  ///   and <see cref="CompletionItem.SortText" /> set to the value of the <see langword="enum" /> member.
+  /// </returns>
+  private static CompletionItem EnumToOrderableCompletionItem<TEnum> ( TEnum enumMember ) where TEnum : unmanaged, Enum
+  {
+    return enumMember.ToOrderableCompletionItem ( );
+  }
+
+  /// <summary>
+  ///   Collection of <see cref="LoggingLevel" /> completions in value order.
+  /// </summary>
+  private static IEnumerable<CompletionItem> GetLoggingLevelCompletionItems ( CompletionContext context )
+  {
+    return Enum
+          .GetValues<LoggingLevel> ( )
+          .Select ( EnumToOrderableCompletionItem );
+  }
+
+  /// <summary>
+  ///   Collection of <see cref="TriStateOptionValue" /> completions in value order.
+  /// </summary>
+  private static IEnumerable<CompletionItem> GetTriStateOptionValueCompletions ( CompletionContext context )
+  {
+    return Enum
+          .GetValues<TriStateOptionValue> ( )
+          .Select ( EnumToOrderableCompletionItem );
+  }
 }

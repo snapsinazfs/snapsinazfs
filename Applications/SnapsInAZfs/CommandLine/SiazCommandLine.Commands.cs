@@ -22,81 +22,82 @@ using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
 {
-  private Command ConfigCommand { get; } = new (
-                                                 ConfigCommandName,
-                                                 "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
-                                                );
-
-  private Command ConfigConsoleCommand { get; } = new (
-                                                        ConfigConsoleCommandName,
-                                                        "Launches the configuration console TUI."
-                                                       );
-
-  private Command ConfigGlobalCommand { get; } = new (
-                                                       ConfigGlobalCommandName,
-                                                       """
-                                                       Modify global settings in the root of the JSON configuration files.
-                                                       If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
-                                                       """
-                                                      );
-
-  private Command CronCommand { get; } = new (
-                                               "--cron",
-                                               $"""
-                                                {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
-                                                Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
-                                                """
-                                              );
-
-  private Command RunCommand { get; } = new (
-                                              RunCommandName,
-                                              """
-                                              Run SIAZ, optionally specifying override options.
-                                              Use this context when executing one-off operations or for custom service/script-based invocations.
-                                              """
-                                             );
-
-  private Command ZfsCommand { get; } = new (
-                                              ZfsCommandName,
-                                              "Perform operations on ZFS pools and datasets managed by SIAZ."
-                                             );
-
-  private Command ZfsSchemaCheckCommand { get; } = new (
-                                                         ZfsSchemaCheckCommandName,
-                                                         "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
-                                                        );
-
-  private Command ZfsSchemaCleanCommand { get; } = new (
-                                                         ZfsSchemaCleanCommandName,
-                                                         "Completely removes all pool and dataset properties that came from SIAZ."
-                                                        );
-
-  private Command ZfsSchemaCommand { get; } = new (
-                                                    ZfsSchemaCommandName,
-                                                    "Perform operations on properties of ZFS pools and datasets used by SIAZ."
-                                                   );
-
-  private Command ZfsSchemaInitializeCommand { get; } = new (
-                                                              ZfsSchemaInitializeCommandName,
-                                                              "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
-                                                             );
-
   /// <summary>
   ///   A reference to the <see cref="RootCommand" /> of the command line.
   /// </summary>
   public RootCommand RootCommand { get; private set; }
 
+  private Command ConfigCommand { get; } = new (
+                                                ConfigCommandName,
+                                                "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
+                                               );
+
+  private Command ConfigConsoleCommand { get; } = new (
+                                                       ConfigConsoleCommandName,
+                                                       "Launches the configuration console TUI."
+                                                      );
+
+  private Command ConfigGlobalCommand { get; } = new (
+                                                      ConfigGlobalCommandName,
+                                                      """
+                                                      Modify global settings in the root of the JSON configuration files.
+                                                      If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                                      """
+                                                     );
+
+  private Command CronCommand { get; } = new (
+                                              CronCommandName,
+                                              $"""
+                                               {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
+                                               Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
+                                               """
+                                             );
+
+  private Command RunCommand { get; } = new (
+                                             RunCommandName,
+                                             """
+                                             Run SIAZ, optionally specifying override options.
+                                             Use this context when executing one-off operations or for custom service/script-based invocations.
+                                             """
+                                            );
+
+  private Command ZfsCommand { get; } = new (
+                                             ZfsCommandName,
+                                             "Perform operations on ZFS pools and datasets managed by SIAZ."
+                                            );
+
+  private Command ZfsSchemaCheckCommand { get; } = new (
+                                                        ZfsSchemaCheckCommandName,
+                                                        "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
+                                                       );
+
+  private Command ZfsSchemaCleanCommand { get; } = new (
+                                                        ZfsSchemaCleanCommandName,
+                                                        "Completely removes all pool and dataset properties that came from SIAZ."
+                                                       );
+
+  private Command ZfsSchemaCommand { get; } = new (
+                                                   ZfsSchemaCommandName,
+                                                   "Perform operations on properties of ZFS pools and datasets used by SIAZ."
+                                                  );
+
+  private Command ZfsSchemaInitializeCommand { get; } = new (
+                                                             ZfsSchemaInitializeCommandName,
+                                                             "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
+                                                            );
+
+  internal const string ConfigCommandName               = "config";
+  internal const string ConfigConsoleCommandName        = "console";
+  internal const string ConfigGlobalCommandName         = "global";
+  internal const string ConfigGlobalDryRunCommandName   = "dry-run";
+  internal const string CronCommandName                 = "--cron";
+  internal const string KestrelConfigurationSectionName = "Kestrel";
   internal const string RunCommandName                  = "run";
-  private const  string ConfigCommandName               = "config";
-  private const  string ConfigConsoleCommandName        = "console";
-  private const  string ConfigGlobalCommandName         = "global";
-  private const  string ConfigGlobalDryRunCommandName   = "dry-run";
-  private const  string KestrelConfigurationSectionName = "Kestrel";
-  private const  string ZfsCommandName                  = "zfs";
-  private const  string ZfsSchemaCheckCommandName       = "check";
-  private const  string ZfsSchemaCleanCommandName       = "clean";
-  private const  string ZfsSchemaCommandName            = "schema";
-  private const  string ZfsSchemaInitializeCommandName  = "initialize";
+  internal const string ZfsCommandName                  = "zfs";
+  internal const string ZfsSchemaCheckCommandName       = "check";
+  internal const string ZfsSchemaCleanCommandName       = "clean";
+  internal const string ZfsSchemaCommandName            = "schema";
+  internal const string ZfsSchemaInitializeCommandName  = "initialize";
 
   [MemberNotNullWhen ( true )]
   internal static bool LoadConfigurationFromConfigurationFiles (

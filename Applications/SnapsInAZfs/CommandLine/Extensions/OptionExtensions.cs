@@ -13,7 +13,12 @@
 namespace SnapsInAZfs.CommandLine.Extensions;
 
 using System.CommandLine;
+using System.CommandLine.Completions;
 using System.CommandLine.Parsing;
+using System.ComponentModel;
+using System.Globalization;
+using System.Numerics;
+using System.Reflection.Emit;
 
 /// <summary>
 ///   Extension methods for <see cref="Option{T}" />, enabling fluent usage.
@@ -40,4 +45,67 @@ public static class OptionExtensions
 
     return option;
   }
+
+  extension<T> ( Option<T> option )
+  {
+    public Option<T> WithCompletionSource ( Func<CompletionContext,IEnumerable<CompletionItem>> completionItemFactory )
+    {
+      option.CompletionSources.Add( completionItemFactory );
+      return option;
+    }
+  }
+
+
+  extension<T> ( Option<T> option )
+  where T : IBinaryInteger<T>
+  {
+    public Option<T> WithSuggestedCompletionValues ( params int[] values )
+    {
+      option.CompletionSources.Add ( c =>
+                                     {
+                                       return values.Select ( static i => new CompletionItem ( label: i.ToString ( "D", CultureInfo.CurrentCulture ), sortText: i.ToString ( "D10", CultureInfo.CurrentCulture ) ) ).ToArray ( );
+                                     }
+                                   );
+      return option;
+    }
+  }
+  
+  extension<T> ( Option<T> option )
+  where T : unmanaged, Enum
+  {
+    public Option<T> WithValueOrderedEnumHelpText ( )
+    {
+      option.HelpName = string.Join ( '|', Enum.GetValues<T> ( ).Select ( static e => e.ToString ( "G" ) ) );
+      return option;
+    }
+  }
+  
+  extension<T> ( T enumType )
+  where T : struct, Enum
+  {
+    public IEnumerable<CompletionItem> GetOrderedEnumCompletionItems ( )
+    {
+      
+      return Enum.GetValues<T> ( ).Select ( static e => new CompletionItem ( e.ToString ( "G" ), sortText: e.ToString ( "D" ) ) );
+    }
+  }
+
+  extension ( LoggingLevel level )
+  {
+    public string ToNameString ( )
+    {
+      return level switch
+             {
+               LoggingLevel.Trace => "Trace",
+               LoggingLevel.Debug => "Debug",
+               LoggingLevel.Info  => "Info",
+               LoggingLevel.Warn  => "Warn",
+               LoggingLevel.Error => "Error",
+               LoggingLevel.Fatal => "Fatal",
+               LoggingLevel.Off   => "Off",
+               _                  => throw new ArgumentOutOfRangeException ( nameof (level), level, $"Value {(int)level} is invalid for {nameof (LoggingLevel)}." )
+             };
+    }
+  }
+  
 }

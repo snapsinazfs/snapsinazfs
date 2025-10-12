@@ -82,6 +82,7 @@ public sealed partial class SiazCommandLine
                         .WithOptions (
                                       ConfigOption,
                                       LogLevelOption
+                                       .WithValueOrderedEnumHelpText ( )
                                      )
 #pragma warning restore CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                         .WithCommand
@@ -94,12 +95,17 @@ public sealed partial class SiazCommandLine
 // TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
 // False positive. Suppress it.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                                                                ConfigGlobalCommand_DaemonizeOption,
-                                                                ConfigGlobalCommand_DaemonTimerIntervalSecondsOption,
-                                                                ConfigGlobalCommand_DryRunOption,
+                                                                ConfigGlobalCommand_DaemonizeOption
+                                                                 .WithCompletionSource ( GetTriStateOptionValueCompletions ),
+                                                                ConfigGlobalCommand_DaemonTimerIntervalSecondsOption
+                                                                 .WithSuggestedCompletionValues ( 5, 6, 10, 15, 20, 30 ),
+                                                                ConfigGlobalCommand_DryRunOption
+                                                                 .WithCompletionSource ( GetTriStateOptionValueCompletions ),
                                                                 ConfigGlobalCommand_LocalSystemNameOption,
-                                                                ConfigGlobalCommand_TakeSnapshotsOption,
-                                                                ConfigGlobalCommand_PruneSnapshotsOption,
+                                                                ConfigGlobalCommand_TakeSnapshotsOption
+                                                                 .WithCompletionSource ( GetTriStateOptionValueCompletions ),
+                                                                ConfigGlobalCommand_PruneSnapshotsOption
+                                                                 .WithCompletionSource ( GetTriStateOptionValueCompletions ),
                                                                 ConfigGlobalCommand_ZfsPathOption,
                                                                 ConfigGlobalCommand_ZpoolPathOption
                                                                )
@@ -218,8 +224,12 @@ public sealed partial class SiazCommandLine
   [MethodImpl ( MethodImplOptions.AggressiveInlining )]
   public ExitCode Invoke ( TextWriter outputStream, TextWriter errorStream )
   {
-    return (ExitCode)( RootCommandParseResult?.Invoke ( new ( ) { Error = errorStream, Output = outputStream } ) ?? -1 );
+    ExitCode exitCode = (ExitCode)( RootCommandParseResult?.Invoke ( new ( ) { Error = errorStream, Output = outputStream } ) ?? -1 );
+    ThreadPool.QueueUserWorkItem ( _ => InvokeCompleted?.Invoke ( this, this ) );
+    return exitCode;
   }
+
+  public event EventHandler<SiazCommandLine>? InvokeCompleted;
 
   /// <summary>
   ///   Parses the command line and returns the result.

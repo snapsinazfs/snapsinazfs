@@ -31,78 +31,104 @@ using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
 
 [UsedImplicitly]
-internal class Program
+internal static class Program
 {
-  internal const          string                  SnapsInAZfsAppName = "SnapsInAZfs";
-  private static          Logger                  _logger            = LogManager.CreateNullLogger ( );
-  private static readonly IMonitor                ServiceObserver    = new Monitor ( );
-  private static          IConfigurationRoot?     _configurationRoot;
-  internal static         SnapsInAZfsSettings?    Settings;
-  internal static         IZfsCommandRunner       ZfsCommandRunnerSingleton = null!;
-  internal static         IHost?                  ServiceContainer;
+  private const           string               SnapsInAZfsAppName = "SnapsInAZfs";
+  private static          Logger               _logger            = LogManager.CreateNullLogger ( );
+  private static readonly IMonitor             ServiceObserver    = new Monitor ( );
+  private static          IConfigurationRoot?  _configurationRoot;
+  internal static         SnapsInAZfsSettings? Settings;
+  internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
+  internal static         IHost?               ServiceContainer;
+  private static readonly ManualResetEventSlim Blocker = new ( false );
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
   {
-    // Program startup sequence is:
-    // 1. Immediately set up early logging from appsettings.json before anything else.
+    // Rough program execution outline:
+    // 1. Immediately set up early logging from hard-coded default and environment variable override before anything else.
+    //   * This writes to stderr, at warn level, unless overridden by environment variables.
+    //   * Environment variables use dotnet configuration style. Early logging uses the prefix SnapsInAZfs_EarlyLogger_
+    //     SnapsInAZfs_EarlyLogger_NLog would therefore correspond to the NLog section, SnapsInAZfs_EarlyLogger_NLog:rules
+    //     would be the NLog:rules section, and so on.
+    //   * Much of the early logging is conditionally compiled only if the DEBUG symbol is set at compile time, as some of it can interfere with
+    //     normal command line interactions - particularly tab completion.
     // 2. Parse the command line
-    //    A. If --config option exists, load those files and set application configuration. Otherwise, load standard files and set configuration.
-    //    B. Apply any overrides to loaded configuration according to options on the command line.
-    // 3. Invoke the command line.
-    // 4. Proceed according to command line invocation result or terminate if command line errors are indicated.
+    //   A. If --config option exists, load those files and set application configuration. Otherwise, load standard files and set configuration.
+    //   B. Apply any overrides from environment variables to configuration.
+    //   C. Apply any global overrides from command line options to configuration.
+    //     * NOTE: Only global options are applied at this stage. Individual commands are responsible for any further configuration
+    //       relevant to them based on their options and arguments.
+    // 3. Register handlers for the various commands via events on the command line wrapper class.
+    //   * Handlers get invoked when Invoke is called on the ParseResult from step 2. The actions raise the events, which are subscribed to here.
+    //     Invoke happens in a following step.
+    // 4. Invoke the command line, which will raise events as appropriate.
+    //   * These events are raised asynchronously, so handlers are responsible for application lifetime from that point on and will
+    //     signal the wait handle the wait handle as appropriate.
+    //   * SCL creates and passes a CancellationToken with a default 2 second timeout. May need to deal with that.
+    //   * Event handlers SHOULD destroy the SiazCommandLine object, once it is no longer needed, so it doesn't live forever.
+    // 5. Event handlers either carry out their operations directly or signal that program execution should continue in some specific way.
+    //   A. If running as a service, set up a wait handle and block on it to keep the app alive. When stop is requested, shut down the service host
+    //      and signal the wait handle, so the program can clean up and exit.
+    //   B. If running as a one-shot invocation, be sure not to prompt the user in a blocking way if the terminal has been redirected.
 
     InitializeEarlyLogging ( out _logger );
-    SiazCommandLine       siazCli    = new ( );
 
-    siazCli.Parse ( argv );
-    FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
+    SiazCommandLine? siazCli = new ( );
 
-    WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
-
-    foreach ( FileInfo configFile in configFiles )
+    try
     {
-      appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
+      siazCli.Parse ( argv );
+      FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
+
+      WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
+
+      foreach ( FileInfo configFile in configFiles )
+      {
+        appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
+      }
+
+      _logger.Debug ( "Adding environment variables to configuration." );
+      appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
+
+      siazCli.ZfsSchemaCheckInvoked              += SiazCli_ZfsSchemaCheckInvoked;
+      siazCli.ZfsSchemaCleanInvoked              += SiazCli_ZfsSchemaCleanInvoked;
+      siazCli.ZfsSchemaInitializeInvoked         += SiazCli_ZfsSchemaInitializeInvoked;
+      siazCli.GlobalConfigurationChangeRequested += SiazCli_GlobalConfigurationChangeRequested;
+      siazCli.RunSiazInvoked                     += SiazCli_RunSiazInvoked;
+      siazCli.InvokeCompleted                    += SiazCli_InvokeCompleted;
+      
+      Blocker.Reset ( );
+      ExitCode siazCliExitCode = siazCli.Invoke ( Console.Out, Console.Error );
+      Blocker.Wait ( );
+
+      if ( siazCli.RootCommandParseResult.Errors.Count > 0 )
+      {
+        return (int)siazCliExitCode;
+      }
+
+      switch ( siazCli.RootCommandParseResult.CommandResult.Command.Name )
+      {
+        case SiazCommandLine.ConfigConsoleCommandName:
+          _logger.Debug ( "Would have launched the config console." );
+          break;
+
+        case SiazCommandLine.ConfigGlobalCommandName:
+          _logger.Debug ( "Would have modified config files." );
+          break;
+
+        case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
+          _logger.Debug ( "Would have built and run the appBuilder." );
+          break;
+      }
+    }
+    finally
+    {
+      await siazCli.DisposeAsync ( );
+      siazCli = null;
     }
 
-    _logger.Debug ( "Adding environment variables to configuration." );
-    appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
-
-    // TODO: Apply any relevant command line options to config
-
-    siazCli.ZfsSchemaCheckInvoked      += SiazCli_ZfsSchemaCheckInvoked;
-    siazCli.ZfsSchemaCleanInvoked      += SiazCli_ZfsSchemaCleanInvoked;
-    siazCli.ZfsSchemaInitializeInvoked += SiazCli_ZfsSchemaInitializeInvoked;
-
-    siazCli.Invoke ( Console.Out, Console.Error );
-
-    return 0;
-    WebApplication webApp = appBuilder.Build ( );
-
-    await webApp.DisposeAsync ( ).ConfigureAwait ( true );
-
-    //WebApplicationBuilder applicationBuilder = WebApplication.CreateBuilder ( );
-
-    //if ( !ProcessCommandLine ( argv, out  siazCliParseResult, out Settings, out _configurationRoot, hostBuilder, out ExitCode siazCliInvocationExitCode )
-    //  || siazCliInvocationExitCode is not ExitCode.EOK )
-    //{
-    //  LogManager.Shutdown ( );
-
-    //  return (int)siazCliInvocationExitCode;
-    //}
-
-    //hostBuilder.Configuration.AddConfiguration ( _configurationRoot );
-
-    //switch ( siazCliParseResult )
-    //{
-    //  case { RootCommandResult.IdentifierToken.Value: SiazCommandLine.RunCommandName }:
-    //    return Settings.Monitoring.EnableHttp switch
-    //           {
-    //             true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
-    //             _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
-    //           };
-    //}
-
+    // Just cutting it off here for now.
     return 0;
 
     CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
@@ -146,19 +172,42 @@ internal class Program
            };
   }
 
+  private static async void SiazCli_InvokeCompleted ( object? sender, SiazCommandLine siazCommandLine )
+  {
+    try
+    {
+      _logger.Trace ( "Command line invocation completed. Signaling wait handle." );
+      Blocker.Set ( );
+    }
+    catch ( Exception e )
+    {
+      _logger.Error ( e );
+    }
+  }
+
+  private static void SiazCli_RunSiazInvoked ( object? sender, RunSiazActionEventArgs e )
+  {
+    _logger.Fatal ( "run not yet implemented. No operations have been carried out." );
+  }
+
+  private static void SiazCli_GlobalConfigurationChangeRequested ( object? sender, GlobalConfigChangeEventArgs e )
+  {
+    _logger.Fatal ( "config global not yet implemented. No settings have been modified." );
+  }
+
   private static void SiazCli_ZfsSchemaInitializeInvoked ( object? sender, ZfsSchemaChangeEventArgs e )
   {
-    _logger.Fatal ( new NotImplementedException ( $"zfs schema initialize not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+    _logger.Fatal ( $"zfs schema initialize not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" );
   }
 
   private static void SiazCli_ZfsSchemaCleanInvoked ( object? sender, ZfsSchemaChangeEventArgs e )
   {
-    _logger.Fatal ( new NotImplementedException ( $"zfs schema clean not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+    _logger.Fatal ( $"zfs schema clean not yet implemented. Would {( e.AllowedToProceed ? string.Empty : "not " )}execute, as entered. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" );
   }
 
   private static void SiazCli_ZfsSchemaCheckInvoked ( object? sender, ZfsSchemaActionEventArgs e )
   {
-    _logger.Fatal ( new NotImplementedException ( $"zfs schema check not yet implemented. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" ) );
+    _logger.Fatal ( $"zfs schema check not yet implemented. Requested pools: {( e.Pools.Length > 0 ? e.Pools : [ "<all pools>" ] ).ToSpaceSeparatedSingleLineString ( )}" );
   }
 
   /// <summary>
@@ -189,7 +238,7 @@ internal class Program
   {
     FileInfo tempNLogConfigFile = new ( Path.GetTempFileName ( ) );
 
-    if ( Environment.GetEnvironmentVariable ( $"{EnvironmentVariableFilterPrefix}EnableEarlyLogging" ) is "1" )
+    if ( Environment.GetEnvironmentVariable ( "SnapsInAZfs_EnableEarlyLogging" ) is "1" )
     {
       // Write to stdout since we don't have a logger yet.
       Console.WriteLine ( $"Initial logging configuration temporary file: {tempNLogConfigFile.FullName}" );
@@ -208,7 +257,7 @@ internal class Program
       IConfigurationRoot appSettingsJson = new ConfigurationBuilder ( )
                                           .SetBasePath ( Directory.GetCurrentDirectory ( ) )
                                           .AddJsonFile ( tempNLogConfigFile.FullName, false, false )
-                                          .AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix )
+                                          .AddEnvironmentVariables ( static filter => filter.Prefix = EarlyLoggingOverrideEnvironmentVariableFilterPrefix )
                                           .Build ( );
 
       ISetupBuilder? builder = LogManager.Setup ( )
@@ -218,6 +267,7 @@ internal class Program
       LogManager.ReconfigExistingLoggers ( true );
 
       tempNLogConfigFileStream.Close ( );
+      earlyLogger.Debug ( $"Early Logging config:\n{appSettingsJson.GetDebugView ( )}" );
     }
     finally
     {
@@ -402,7 +452,8 @@ internal class Program
     return SiazService.ExitStatus;
   }
 
-  private const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
+  internal const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
+  internal const string? EarlyLoggingOverrideEnvironmentVariableFilterPrefix = $"{EnvironmentVariableFilterPrefix}EarlyLogger_";
 
   private const string NLogInitialConfiguration = """
                                                   {
@@ -427,7 +478,7 @@ internal class Program
                                                       "targets": {
                                                         "early-console": {
                                                           "type": "ColoredConsole",
-                                                          "detectConsoleAvailable": true,
+                                                          "detectConsoleAvailable": false,
                                                           "enableAnsiOutput ": true,
                                                           "StdErr": true,
                                                           "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${message} ${exception:format=tostring}",
@@ -448,16 +499,16 @@ internal class Program
                                                           ]
                                                         }
                                                       },
-                                                      "rules": [
-                                                        {
+                                                      "rules": {
+                                                        "0": {
                                                           "ruleName": "Console",
                                                           "logger": "*",
-                                                          "minLevel": "Debug",
+                                                          "minLevel": "Warn",
                                                           "writeTo": "early-console",
                                                           "filterDefaultAction": "Log",
                                                           "enabled": true
                                                         }
-                                                      ]
+                                                      }
                                                     }
                                                   }
 
