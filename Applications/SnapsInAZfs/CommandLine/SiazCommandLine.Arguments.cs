@@ -17,13 +17,6 @@ using Extensions;
 
 public partial class SiazCommandLine
 {
-  private Argument<string[]> _zfsSchemaInitializeCommand_PoolsArgument = new ( PoolsArgumentName )
-                                                                         {
-                                                                           Arity               = ArgumentArity.ZeroOrMore,
-                                                                           Description         = "If specified, limits the initialization of the schema to the named pools.",
-                                                                           DefaultValueFactory = static _ => [ ]
-                                                                         };
-
   /// <summary>
   ///   Common argument used for options with binary true/false values with some common aliases for those values, plus a third
   ///   "default" value for explicit reversion to defaults.
@@ -66,7 +59,15 @@ public partial class SiazCommandLine
         Arity               = ArgumentArity.ZeroOrMore,
         Description         = "If specified, limits the operation to the named pools.",
         DefaultValueFactory = static _ => [ ],
-        HelpName = PoolsArgumentName
+        HelpName            = PoolsArgumentName
+      };
+
+  private Argument<string[]> ZfsSchemaInitializeCommand_PoolsArgument { get; }
+    = new ( PoolsArgumentName )
+      {
+        Arity               = ArgumentArity.ZeroOrMore,
+        Description         = "If specified, limits the initialization of the schema to the named pools.",
+        DefaultValueFactory = static _ => [ ]
       };
 
   private const string ConfigStateArgumentName = "state";
