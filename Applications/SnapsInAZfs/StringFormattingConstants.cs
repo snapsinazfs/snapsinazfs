@@ -10,6 +10,7 @@
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+
 namespace SnapsInAZfs;
 
 internal static class StringFormattingConstants
@@ -33,6 +34,11 @@ internal static class StringFormattingConstants
   ///   Bold
   /// </summary>
   internal const string B = "\e[1m";
+
+  /// <summary>
+  ///   Foreground color "bright black"
+  /// </summary>
+  internal const string FGGREY = "\e[90m";
 
   /// <summary>
   ///   Foreground color red
