@@ -76,10 +76,8 @@ internal static class Program
 
     SiazCommandLine? siazCli = new ( );
 
-    try
-    {
-      siazCli.Parse ( argv );
-      FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
+    siazCli.Parse ( argv );
+    FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
 
       WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
 
@@ -118,15 +116,11 @@ internal static class Program
           break;
 
         case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
-          _logger.Debug ( "Would have built and run the appBuilder." );
-          break;
-      }
+        _logger.Debug ( "Would have built and run the appBuilder." );
+        break;
     }
-    finally
-    {
-      await siazCli.DisposeAsync ( );
-      siazCli = null;
-    }
+
+    siazCli = null;
 
     // Just cutting it off here for now.
     return 0;
