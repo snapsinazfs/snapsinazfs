@@ -61,6 +61,48 @@ public partial class SiazCommandLine
                                              """
                                             );
 
+  private Command TemplatesCommand { get; } = new (
+                                                   TemplatesCommandName,
+                                                   """
+                                                   View, modify, create, or remove templates.
+                                                   """
+                                                  );
+
+  private Command TemplatesCreateCommand { get; } = new (
+                                                         TemplatesCreateCommandName,
+                                                         """
+                                                         Create a new template.
+                                                         """
+                                                        );
+
+  private Command TemplatesListCommand { get; } = new (
+                                                       TemplatesListCommandName,
+                                                       """
+                                                       List existing templates.
+                                                       """
+                                                      );
+
+  private Command TemplatesModifyCommand { get; } = new (
+                                                         TemplatesModifyCommandName,
+                                                         """
+                                                         Modify an existing template.
+                                                         """
+                                                        );
+
+  private Command TemplatesRemoveCommand { get; } = new (
+                                                         TemplatesRemoveCommandName,
+                                                         """
+                                                         Remove an existing template.
+                                                         """
+                                                        );
+
+  private Command TemplatesShowCommand { get; } = new (
+                                                       TemplatesShowCommandName,
+                                                       """
+                                                       Show the full configuration of an existing template.
+                                                       """
+                                                      );
+
   private Command ZfsCommand { get; } = new (
                                              ZfsCommandName,
                                              "Perform operations on ZFS pools and datasets managed by SIAZ."
@@ -93,6 +135,12 @@ public partial class SiazCommandLine
   internal const string CronCommandName                 = "--cron";
   internal const string KestrelConfigurationSectionName = "Kestrel";
   internal const string RunCommandName                  = "run";
+  internal const string TemplatesCommandName            = "templates";
+  internal const string TemplatesCreateCommandName      = "create";
+  internal const string TemplatesListCommandName        = "list";
+  internal const string TemplatesModifyCommandName      = "modify";
+  internal const string TemplatesRemoveCommandName      = "remove";
+  internal const string TemplatesShowCommandName        = "show";
   internal const string ZfsCommandName                  = "zfs";
   internal const string ZfsSchemaCheckCommandName       = "check";
   internal const string ZfsSchemaCleanCommandName       = "clean";

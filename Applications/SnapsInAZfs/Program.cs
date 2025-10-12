@@ -79,43 +79,43 @@ internal static class Program
     siazCli.Parse ( argv );
     FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
 
-      WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
+    WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
 
-      foreach ( FileInfo configFile in configFiles )
-      {
-        appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
-      }
+    foreach ( FileInfo configFile in configFiles )
+    {
+      appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
+    }
 
-      _logger.Debug ( "Adding environment variables to configuration." );
-      appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
+    _logger.Debug ( "Adding environment variables to configuration." );
+    appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
 
-      siazCli.ZfsSchemaCheckInvoked              += SiazCli_ZfsSchemaCheckInvoked;
-      siazCli.ZfsSchemaCleanInvoked              += SiazCli_ZfsSchemaCleanInvoked;
-      siazCli.ZfsSchemaInitializeInvoked         += SiazCli_ZfsSchemaInitializeInvoked;
-      siazCli.GlobalConfigurationChangeRequested += SiazCli_GlobalConfigurationChangeRequested;
-      siazCli.RunSiazInvoked                     += SiazCli_RunSiazInvoked;
-      siazCli.InvokeCompleted                    += SiazCli_InvokeCompleted;
-      
-      Blocker.Reset ( );
-      ExitCode siazCliExitCode = siazCli.Invoke ( Console.Out, Console.Error );
-      Blocker.Wait ( );
+    siazCli.ZfsSchemaCheckInvoked              += SiazCli_ZfsSchemaCheckInvoked;
+    siazCli.ZfsSchemaCleanInvoked              += SiazCli_ZfsSchemaCleanInvoked;
+    siazCli.ZfsSchemaInitializeInvoked         += SiazCli_ZfsSchemaInitializeInvoked;
+    siazCli.GlobalConfigurationChangeRequested += SiazCli_GlobalConfigurationChangeRequested;
+    siazCli.RunSiazInvoked                     += SiazCli_RunSiazInvoked;
+    siazCli.InvokeCompleted                    += SiazCli_InvokeCompleted;
 
-      if ( siazCli.RootCommandParseResult.Errors.Count > 0 )
-      {
-        return (int)siazCliExitCode;
-      }
+    Blocker.Reset ( );
+    ExitCode siazCliExitCode = siazCli.Invoke ( Console.Out, Console.Error );
+    Blocker.Wait ( );
 
-      switch ( siazCli.RootCommandParseResult.CommandResult.Command.Name )
-      {
-        case SiazCommandLine.ConfigConsoleCommandName:
-          _logger.Debug ( "Would have launched the config console." );
-          break;
+    if ( siazCli.RootCommandParseResult.Errors.Count > 0 )
+    {
+      return (int)siazCliExitCode;
+    }
 
-        case SiazCommandLine.ConfigGlobalCommandName:
-          _logger.Debug ( "Would have modified config files." );
-          break;
+    switch ( siazCli.RootCommandParseResult.CommandResult.Command.Name )
+    {
+      case SiazCommandLine.ConfigConsoleCommandName:
+        _logger.Debug ( "Would have launched the config console." );
+        break;
 
-        case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
+      case SiazCommandLine.ConfigGlobalCommandName:
+        _logger.Debug ( "Would have modified config files." );
+        break;
+
+      case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
         _logger.Debug ( "Would have built and run the appBuilder." );
         break;
     }
@@ -446,8 +446,9 @@ internal static class Program
     return SiazService.ExitStatus;
   }
 
-  internal const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
   internal const string? EarlyLoggingOverrideEnvironmentVariableFilterPrefix = $"{EnvironmentVariableFilterPrefix}EarlyLogger_";
+
+  internal const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
 
   private const string NLogInitialConfiguration = """
                                                   {

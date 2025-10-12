@@ -153,6 +153,35 @@ public sealed partial class SiazCommandLine
                            )
                         .WithCommand
                            (
+                            TemplatesCommand
+                             .WithCommand
+                                (
+                                 TemplatesCreateCommand
+                                  .WithAction ( CommandNotImplemented )
+                                )
+                             .WithCommand
+                                (
+                                 TemplatesModifyCommand
+                                  .WithAction ( CommandNotImplemented )
+                                )
+                             .WithCommand
+                                (
+                                 TemplatesRemoveCommand
+                                  .WithAction ( CommandNotImplemented )
+                                )
+                             .WithCommand
+                                (
+                                 TemplatesListCommand
+                                  .WithAction ( CommandNotImplemented )
+                                )
+                             .WithCommand
+                                (
+                                 TemplatesShowCommand
+                                  .WithAction ( CommandNotImplemented )
+                                )
+                           )
+                        .WithCommand
+                           (
                             ZfsCommand
                              .WithCommand
                                 (

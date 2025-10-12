@@ -45,10 +45,15 @@ public partial class SiazCommandLine
   /// </summary>
   public event EventHandler<ZfsSchemaChangeEventArgs>? ZfsSchemaInitializeInvoked;
 
+  private static int CommandNotImplemented ( ParseResult parseResult )
+  {
+    _logger.Error ( "This command is not yet implemented." );
+    return -1;
+  }
+
   private Task<int> RunSiaz ( ParseResult parseResult, CancellationToken cancellation )
   {
     _logger.Debug ( "Running siaz with command line {0}", ( ) => string.Join ( ' ', parseResult.Tokens ) );
-
     RunSiazInvoked?.Invoke ( this, new ( ) );
 
     return Task.FromResult ( (int)ExitCode.EOK );
