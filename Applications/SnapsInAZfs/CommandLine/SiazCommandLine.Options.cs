@@ -137,7 +137,7 @@ public partial class SiazCommandLine
         Required    = false
       };
 
-  private Option<LoggingLevel> LogLevelOption { get; }
+  internal Option<LoggingLevel> LogLevelOption { get; }
     = new ( LogLevelOptionName )
       {
         Description = "Override global logging level.",

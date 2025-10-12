@@ -109,6 +109,14 @@ internal static class Program
       return (int)siazCliExitCode;
     }
 
+    if ( noErrorsParseResult.RootCommandResult.GetResult ( siazCli.LogLevelOption ) is { Implicit: false, Tokens.Count: 1 } logLevelOptionResult )
+    {
+      foreach ( LoggingRule rule in LogManager.Configuration!.LoggingRules )
+      {
+        rule.EnableLoggingForLevels ( logLevelOptionResult.GetValue ( siazCli.LogLevelOption ).ToNLogLevel ( ), NLogLevel.Off );
+      }
+    }
+
     switch ( noErrorsParseResult.CommandResult.Command.Name )
     {
       case SiazCommandLine.ConfigConsoleCommandName:
