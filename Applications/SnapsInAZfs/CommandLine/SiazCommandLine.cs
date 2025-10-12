@@ -266,6 +266,9 @@ public sealed partial class SiazCommandLine
     return exitCode;
   }
 
+  /// <summary>
+  ///   Event raised when the <see cref="Invoke" /> method has completed, just before it returns the result of CLI invocation.
+  /// </summary>
   public event EventHandler<SiazCommandLine>? InvokeCompleted;
 
   /// <summary>

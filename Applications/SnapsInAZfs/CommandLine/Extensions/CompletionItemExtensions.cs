@@ -12,6 +12,9 @@ namespace SnapsInAZfs.CommandLine.Extensions;
 
 using System.CommandLine.Completions;
 
+/// <summary>
+///   Extensions for <see cref="CompletionItem" />.
+/// </summary>
 public static class CompletionItemExtensions
 {
   /// <param name="enumMember">
