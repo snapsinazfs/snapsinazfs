@@ -159,7 +159,7 @@ public partial class SiazCommandLine
       {
         Arity = ArgumentArity.ZeroOrOne,
         Description
-          = $"({F.B}{F.FGRED}DEPRECATED{F._FGCOLOR}{F._B}) Enables expired snapshot pruning. If dry-run is enabled, reports snapshots that would be destroyed but does not perform the destroy operations.{Environment.NewLine}This option is deprecated in this context. Use in the `siaz run` context instead.",
+          = $"Enables expired snapshot pruning, {F.U}overriding{F._U} the PruneSnapshots setting from configuration. If dry-run is enabled, reports snapshots that would be destroyed but does not perform the destroy operations.",
         Required = false
       };
 
@@ -168,7 +168,7 @@ public partial class SiazCommandLine
       {
         Arity = ArgumentArity.ZeroOrOne,
         Description
-          = $"(DEPRECATED) Enables new snapshot processing. If dry-run is enabled, reports snapshots that would be taken but does not perform the snapshot operations.{Environment.NewLine}This option is deprecated in this context. Use in the `siaz run` context instead.",
+          = $"Enables new snapshot processing, {F.U}overriding{F._U} the TakeSnapshots setting from configuration. If dry-run is enabled, reports snapshots that would be taken but does not perform the snapshot operations.",
         Required = false
       };
 
