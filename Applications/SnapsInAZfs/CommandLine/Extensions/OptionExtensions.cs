@@ -141,34 +141,4 @@ public static class OptionExtensions
       return Enum.GetValues<T> ( ).Select ( static e => new CompletionItem ( e.ToString ( "G" ), sortText: $"{Convert.ToInt64 ( e, NumberFormatInfo.CurrentInfo ):D20}" ) );
     }
   }
-
-  /// <param name="level">
-  ///   The logging level to get the <see langword="string" /> name of without reflection.
-  /// </param>
-  extension ( LoggingLevel level )
-  {
-    // False positive
-    // TODO: Remove this when fixed version of .net is released.
-#pragma warning disable CS1734
-    /// <summary>
-    ///   Reflection-free conversion of <see cref="LoggingLevel" /> values to their <see langword="string" /> representations.
-    /// </summary>
-    /// <returns>The <see langword="string" /> representation of <paramref name="level" />.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">If <paramref name="level" /> is set to an undefined value.</exception>
-#pragma warning restore CS1734
-    public string ToNameString ( )
-    {
-      return level switch
-             {
-               LoggingLevel.Trace => "Trace",
-               LoggingLevel.Debug => "Debug",
-               LoggingLevel.Info  => "Info",
-               LoggingLevel.Warn  => "Warn",
-               LoggingLevel.Error => "Error",
-               LoggingLevel.Fatal => "Fatal",
-               LoggingLevel.Off   => "Off",
-               _                  => throw new ArgumentOutOfRangeException ( nameof (level), level, $"Value {(int)level} is invalid for {nameof (LoggingLevel)}." )
-             };
-    }
-  }
 }
