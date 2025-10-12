@@ -36,10 +36,8 @@ internal static class Program
   private const           string               SnapsInAZfsAppName = "SnapsInAZfs";
   private static          Logger               _logger            = LogManager.CreateNullLogger ( );
   private static readonly IMonitor             ServiceObserver    = new Monitor ( );
-  private static          IConfigurationRoot?  _configurationRoot;
   internal static         SnapsInAZfsSettings? Settings;
   internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
-  internal static         IHost?               ServiceContainer;
   private static readonly ManualResetEventSlim Blocker = new ( false );
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
@@ -159,11 +157,11 @@ internal static class Program
     _logger.Debug ( "Settings passed basic validation checks." );
     _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
 
-    return Settings.Monitoring.EnableHttp switch
-           {
-             true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
-             _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
-           };
+    //return Settings.Monitoring.EnableHttp switch
+    //       {
+    //         true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
+    //         _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
+    //       };
   }
 
   private static async void SiazCli_InvokeCompleted ( object? sender, SiazCommandLine siazCommandLine )

@@ -44,8 +44,6 @@ public sealed partial class SiazCommandLine
     ConfigureCommandLineTree ( );
   }
 
-  private IConfigurationRoot? _configurationRoot;
-
   /// <summary>
   ///   A reference to the result of parsing the root command, for convenience.
   /// </summary>
