@@ -54,7 +54,7 @@ public sealed record DummyZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRu
         SortedDictionary<string, RawZfsObject>      rawObjects   = new ( );
         await GetRawZfsObjectsAsync ( lineProvider, rawObjects ).ConfigureAwait ( true );
         ProcessRawObjects ( rawObjects, datasets, snapshots );
-        CheckAndUpdateLastSnapshotTimesForDatasets ( settings, datasets );
+        _ = CheckAndUpdateLastSnapshotTimesForDatasets ( settings, datasets );
     }
 
     /// <inheritdoc />
