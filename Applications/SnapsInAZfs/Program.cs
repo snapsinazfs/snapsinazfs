@@ -98,12 +98,12 @@ internal static class Program
     ExitCode siazCliExitCode = siazCli.Invoke ( Console.Out, Console.Error );
     Blocker.Wait ( );
 
-    if ( siazCli.RootCommandParseResult.Errors.Count > 0 )
+    if ( siazCli.RootCommandParseResult is not { Errors.Count: 0 } noErrorsParseResult )
     {
       return (int)siazCliExitCode;
     }
 
-    switch ( siazCli.RootCommandParseResult.CommandResult.Command.Name )
+    switch ( noErrorsParseResult.CommandResult.Command.Name )
     {
       case SiazCommandLine.ConfigConsoleCommandName:
         _logger.Debug ( "Would have launched the config console." );
