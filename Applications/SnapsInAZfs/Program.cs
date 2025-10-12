@@ -75,6 +75,7 @@ internal static class Program
     SiazCommandLine? siazCli = new ( );
 
     siazCli.Parse ( argv );
+
     FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
 
     WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
@@ -87,6 +88,11 @@ internal static class Program
     _logger.Debug ( "Adding environment variables to configuration." );
     appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
 
+    if ( siazCli.RootCommandParseResult is not { Errors.Count: 0 } noErrorsParseResult )
+    {
+      return (int)siazCli.Invoke ( Console.Out, Console.Error );
+    }
+
     siazCli.ZfsSchemaCheckInvoked              += SiazCli_ZfsSchemaCheckInvoked;
     siazCli.ZfsSchemaCleanInvoked              += SiazCli_ZfsSchemaCleanInvoked;
     siazCli.ZfsSchemaInitializeInvoked         += SiazCli_ZfsSchemaInitializeInvoked;
@@ -98,7 +104,7 @@ internal static class Program
     ExitCode siazCliExitCode = siazCli.Invoke ( Console.Out, Console.Error );
     Blocker.Wait ( );
 
-    if ( siazCli.RootCommandParseResult is not { Errors.Count: 0 } noErrorsParseResult )
+    if ( siazCliExitCode != ExitCode.EOK )
     {
       return (int)siazCliExitCode;
     }
