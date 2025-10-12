@@ -62,6 +62,13 @@ public partial class SiazCommandLine
         HelpName            = PoolsArgumentName
       };
 
+  private Argument<string> RunCommandModeArgument { get; }
+    = new ( RunCommandModeArgumentName )
+      {
+        Arity       = ArgumentArity.ExactlyOne,
+        Description = "Run SIAZ once or as a service."
+      };
+
   private Argument<string[]> ZfsSchemaInitializeCommand_PoolsArgument { get; }
     = new ( PoolsArgumentName )
       {
@@ -70,6 +77,7 @@ public partial class SiazCommandLine
         DefaultValueFactory = static _ => [ ]
       };
 
-  private const string ConfigStateArgumentName = "state";
-  private const string PoolsArgumentName       = "pools";
+  private const string ConfigStateArgumentName    = "state";
+  private const string PoolsArgumentName          = "pools";
+  private const string RunCommandModeArgumentName = "mode";
 }
