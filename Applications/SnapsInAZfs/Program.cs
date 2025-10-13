@@ -120,8 +120,34 @@ internal static class Program
     switch ( noErrorsParseResult.CommandResult.Command.Name )
     {
       case SiazCommandLine.ConfigConsoleCommandName:
-        _logger.Debug ( "Would have launched the config console." );
-        break;
+      {
+        siazCli  = null;
+        Settings = appBuilder.Configuration.Get<SnapsInAZfsSettings> ( );
+
+        if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
+        {
+          return (int)badResult;
+        }
+
+        _logger.Debug ( "Settings passed basic validation checks." );
+        _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
+
+        try
+        {
+          if ( TryGetZfsCommandRunner<ZfsCommandRunner> ( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
+          {
+            ConfigConsole.ConfigConsole.RunConsoleInterface ( zfsCommandRunner );
+          }
+        }
+        catch ( Exception e )
+        {
+          _logger.Fatal ( e, "Error in configuration console - Exiting" );
+          LogManager.Shutdown ( );
+
+          return (int)ExitCode.GenericError;
+        }
+      }
+        return 0;
 
       case SiazCommandLine.ConfigGlobalCommandName:
         _logger.Debug ( "Would have modified config files." );

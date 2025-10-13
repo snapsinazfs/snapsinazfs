@@ -143,7 +143,7 @@ public partial class SiazCommandLine
 
   private static void StartConfigConsole ( ParseResult parseResult )
   {
-    _logger.Fatal ( "{0} not implemented.", parseResult.CommandResult.Command.Name );
+    _logger.Debug ( "Starting config console" );
   }
 
   private int ZfsSchemaCheck ( ParseResult parseResult )
