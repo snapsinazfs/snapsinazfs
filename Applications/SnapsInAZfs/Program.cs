@@ -564,6 +564,12 @@ internal static class Program
 
   private static ExitCode ValidateSettings ( ref readonly SnapsInAZfsSettings settings )
   {
+    if ( Environment.GetEnvironmentVariable ( $"{EnvironmentVariableFilterPrefix}DisableConfigurationValidation" ) is not null )
+    {
+      _logger.Warn ( "Configuration validation has been disabled. This is unsupported and intended for debugging and development only." );
+      return ExitCode.EOK;
+    }
+
     SettingsValidator validator = SettingsValidator.Validate ( in settings );
 
     if ( validator.IsSettingsObjectNull )
