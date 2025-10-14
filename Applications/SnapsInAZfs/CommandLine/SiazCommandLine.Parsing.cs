@@ -12,7 +12,6 @@
 
 namespace SnapsInAZfs.CommandLine;
 
-using System.CommandLine;
 using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 

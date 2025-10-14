@@ -17,6 +17,5 @@ using System.Diagnostics.CodeAnalysis;
 /// <summary>
 ///   EventArgs type for the <see cref="SiazCommandLine.RunSiazInvoked" /> event.
 /// </summary>
-public record RunSiazActionEventArgs : EventArgsRecord
-{
-}
+[SuppressMessage ( "ReSharper", "CA1711", Justification = "This is an event args type." )]
+public sealed record RunSiazActionEventArgs : EventArgsRecord;

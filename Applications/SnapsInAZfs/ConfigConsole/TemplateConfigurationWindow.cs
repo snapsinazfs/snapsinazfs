@@ -51,11 +51,11 @@ public sealed partial class TemplateConfigurationWindow
         InitializeTemplateEditorView ( );
     }
 
-    private         bool _templateConfigurationEventsEnabled;
-    internal static bool IsAnyTemplateModified => ConfigConsole.TemplateListItems.Any ( static t => t.IsModified );
-    internal        TemplateConfigurationListItem SelectedTemplateItem => ConfigConsole.TemplateListItems [ templateListView.SelectedItem ];
-    private         bool IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll ( static tvf => tvf.Field.IsValid );
-    private         bool IsSelectedTemplateInUse => ConfigConsole.BaseDatasets.Any ( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
+    private         bool                          _templateConfigurationEventsEnabled;
+    internal static bool                          IsAnyTemplateModified                 => ConfigConsole.TemplateListItems.Any ( static t => t.IsModified );
+    private         TemplateConfigurationListItem SelectedTemplateItem                  => ConfigConsole.TemplateListItems [ templateListView.SelectedItem ];
+    private         bool                          IsEveryPropertyTextValidateFieldValid => _templateConfigurationTextValidateFieldList.TrueForAll ( static tvf => tvf.Field.IsValid );
+    private         bool                          IsSelectedTemplateInUse               => ConfigConsole.BaseDatasets.Any ( kvp => kvp.Value.Template.Value == SelectedTemplateItem.TemplateName );
 
     private const string ComponentSeparator                 = "Component Separator";
     private const string DailySuffixTitleCase               = "Daily Suffix";

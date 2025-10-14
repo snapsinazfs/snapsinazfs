@@ -46,7 +46,7 @@ public static class CultureTimeHelpers
     ///     Gets a <see cref="List{T}" /> of string values for all full and standard abbreviated month names for the current
     ///     culture of the executing thread.
     /// </summary>
-    public static List<string> MonthNamesLongAndAbbreviated { get; } = DateTimeFormatInfo.CurrentInfo.AllMonthNames;
+    private static List<string> MonthNamesLongAndAbbreviated { get; } = DateTimeFormatInfo.CurrentInfo.AllMonthNames;
 
     /// <summary>
     ///     Gets the month number of this <see cref="DateTime" />, for the current culture of the executing thread.

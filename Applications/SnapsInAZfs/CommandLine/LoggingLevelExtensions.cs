@@ -33,6 +33,7 @@ public static class LoggingLevelExtensions
     /// <returns>The <see langword="string" /> representation of <paramref name="level" />.</returns>
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="level" /> is set to an undefined value.</exception>
 #pragma warning restore CS1734
+    [PublicAPI]
     public string ToNameString ( )
     {
       return level switch

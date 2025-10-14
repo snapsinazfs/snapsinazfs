@@ -17,14 +17,15 @@
 //  </auto-generated>
 // -----------------------------------------------------------------------------
 
-#nullable enable
-
 namespace SnapsInAZfs.ConfigConsole;
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui;
 
+/// <summary>
+///   The configuration console main window.
+/// </summary>
 public sealed partial class SnapsInAZfsConfigConsole
 {
   private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
@@ -36,6 +37,9 @@ public sealed partial class SnapsInAZfsConfigConsole
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
       };
 
+  /// <summary>
+  ///   Creates and initializes a new instance of the <see cref="SnapsInAZfsConfigConsole" />.
+  /// </summary>
   public SnapsInAZfsConfigConsole ( )
   {
     // ReSharper disable HeapView.ObjectAllocation.Possible
@@ -62,6 +66,13 @@ public sealed partial class SnapsInAZfsConfigConsole
   private ZfsConfigurationWindow?      _zfsConfigurationWindow;
   private bool                         _zfsConfigurationWindowShown;
 
+  /// <summary>
+  ///   Gets or sets a <see langword="bool" /> indicating whether the ZFS Configuration Window is disabled due to errors encountered
+  ///   while running an operation.
+  /// </summary>
+  /// <remarks>
+  ///   Used to guard against running anything else that might be dangerous after such errors.
+  /// </remarks>
   public static bool ZfsConfigurationWindowDisabledDueToError { get; set; }
 
   private void DisableEventHandlers ( )
@@ -123,9 +134,9 @@ public sealed partial class SnapsInAZfsConfigConsole
       bool onlyGlobalWindowNotNullAndNoChanges   = !globalWindowNull && !globalConfigurationIsChanged && templateWindowNull;
       bool isAnyTemplateModified                 = TemplateConfigurationWindow.IsAnyTemplateModified;
       bool templatesAddedRemovedOrModified       = TemplateConfigurationWindow.TemplatesAddedRemovedOrModified;
-      bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull && !templateWindowNull && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
-      bool bothWindowsNotNullAndNoChanges = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified &&
-                                            !templatesAddedRemovedOrModified;
+      bool onlyTemplateWindowNotNullAndNoChanges = globalWindowNull  && !templateWindowNull && !isAnyTemplateModified        && !templatesAddedRemovedOrModified;
+      bool bothWindowsNotNullAndNoChanges        = !globalWindowNull && !templateWindowNull && !globalConfigurationIsChanged && !isAnyTemplateModified && !templatesAddedRemovedOrModified;
+
       if ( bothWindowsNull || onlyGlobalWindowNotNullAndNoChanges || onlyTemplateWindowNotNullAndNoChanges || bothWindowsNotNullAndNoChanges )
       {
         SaveWithNoChangesMade ( );
@@ -138,6 +149,7 @@ public sealed partial class SnapsInAZfsConfigConsole
           _globalConfigurationWindow = new ( );
 
           break;
+
         case false when !_globalConfigurationWindow!.ValidateGlobalConfigValues ( ):
           Logger.Warn ( "Global configuration input validation failed. Configuration not saved." );
           MessageBox.ErrorQuery (
@@ -157,6 +169,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                                              "Cancel Save",
                                              "Commit Templates"
                                             );
+
         if ( dialogResult != 1 )
         {
           return;
@@ -186,14 +199,17 @@ public sealed partial class SnapsInAZfsConfigConsole
           Logger.Info ( "Configuration saved to {0}", reasonOrFile );
 
           return;
+
         case (false, "canceled"):
           Logger.Debug ( "Canceled configuration save dialog" );
 
           return;
+
         case (false, "no file name"):
           Logger.Error ( "No file name provided in save dialog. Configuration not saved." );
 
           return;
+
         default:
           Logger.Error ( "Failed to save configuration." );
 
@@ -210,6 +226,7 @@ public sealed partial class SnapsInAZfsConfigConsole
   {
     Logger.Warn ( "Save configuration requested when no changes were made." );
     int messageBoxResult = MessageBox.Query ( "Are You Sure?", "No changes have been made to global configuration. Save anyway?", "Cancel", "Save" );
+
     if ( messageBoxResult == 0 )
     {
       return;
@@ -219,6 +236,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                                                 {
                                                 };
     (bool status, string reasonOrFile) copyConfigResult = ShowSaveDialog ( copyOfCurrentSettings );
+
     if ( copyConfigResult.status )
     {
       Logger.Info ( "Copy of existing configuration saved to {0}", copyConfigResult.reasonOrFile );
@@ -232,10 +250,12 @@ public sealed partial class SnapsInAZfsConfigConsole
         Logger.ConditionalDebug ( "Canceled configuration save dialog" );
 
         return;
+
       case "no file name":
         Logger.Error ( "No file name provided in save dialog. Configuration copy not saved." );
 
         return;
+
       default:
         Logger.Error ( "Failed to save copy of configuration." );
 
@@ -274,6 +294,7 @@ public sealed partial class SnapsInAZfsConfigConsole
       globalConfigSaveDialog.CanCreateDirectories = true;
       globalConfigSaveDialog.Modal                = true;
       Application.Run ( globalConfigSaveDialog );
+
       if ( globalConfigSaveDialog.Canceled )
       {
         return ( false, "canceled" );
@@ -294,6 +315,7 @@ public sealed partial class SnapsInAZfsConfigConsole
                                                      "Cancel",
                                                      "Overwrite"
                                                     );
+
         if ( overwriteResult == 0 )
         {
           return ( false, "canceled" );

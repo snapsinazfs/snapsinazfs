@@ -56,6 +56,7 @@ public static class OptionExtensions
     /// <returns>
     ///   A reference to <paramref name="option" />, after appending <paramref name="validator" />.
     /// </returns>
+    [PublicAPI]
     public Option<T> WithValidator ( Action<OptionResult> validator )
     {
       option.Validators.Add ( validator );
@@ -136,6 +137,7 @@ public static class OptionExtensions
     /// <returns>
     ///   An ordered collection of <see cref="CompletionItem" />s, sorted by numeric value.
     /// </returns>
+    [PublicAPI]
     public IEnumerable<CompletionItem> GetOrderedEnumCompletionItems ( )
     {
       return Enum.GetValues<T> ( ).Select ( static e => new CompletionItem ( e.ToString ( "G" ), sortText: $"{Convert.ToInt64 ( e, NumberFormatInfo.CurrentInfo ):D20}" ) );

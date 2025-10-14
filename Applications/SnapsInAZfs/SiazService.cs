@@ -30,10 +30,8 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   private static readonly AutoResetEvent       SnapshotAutoResetEvent = new ( true );
   private readonly        CommandLineArguments _commandLineArguments;
   private readonly        TimeSpan             _daemonTimerInterval;
-
   private readonly SnapsInAZfsSettings _settings;
   private readonly IZfsCommandRunner   _zfsCommandRunner;
-
   private static SiazExecutionResultCode _lastExecutionResultCode = SiazExecutionResultCode.None;
 
   /// <summary>
@@ -294,7 +292,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   }
 
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-  internal bool UpdateZfsDatasetSchema (
+  private bool UpdateZfsDatasetSchema (
     SnapsInAZfsSettings                                              settings,
     ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities,
     IZfsCommandRunner                                                zfsCommandRunner

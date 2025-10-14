@@ -12,7 +12,6 @@
 
 namespace SnapsInAZfs;
 
-using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
 using CommandLine;
 using Interop.Zfs.ZfsTypes;

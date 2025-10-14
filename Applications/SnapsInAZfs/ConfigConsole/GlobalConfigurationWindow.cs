@@ -12,98 +12,104 @@
 
 namespace SnapsInAZfs.ConfigConsole;
 
+/// <summary>
+///   The configuration window for global settings.
+/// </summary>
 public sealed partial class GlobalConfigurationWindow
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (GlobalConfigurationWindow)}" );
+  private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (GlobalConfigurationWindow)}" );
 
-    public GlobalConfigurationWindow ( )
+  /// <summary>
+  ///   Creates and initializes a new instance of the <see cref="GlobalConfigurationWindow" /> class.
+  /// </summary>
+  public GlobalConfigurationWindow ( )
+  {
+    // ReSharper disable once HeapView.ObjectAllocation.Possible
+    // ReSharper disable once HeapView.DelegateAllocation
+    Initialized += GlobalConfigurationWindowOnInitialized;
+    InitializeComponent ( );
+    EnableEventHandlers ( );
+  }
+
+  private bool _eventsEnabled;
+
+  internal bool IsConfigurationChanged =>
+    ValidateGlobalConfigValues ( )
+ && ( Program.Settings!.DryRun               != dryRunRadioGroup.GetSelectedBooleanFromLabel ( )
+   || Program.Settings.TakeSnapshots         != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
+   || Program.Settings.PruneSnapshots        != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
+   || Program.Settings.Monitoring.EnableHttp != httpMonitoringRadioGroup.GetSelectedBooleanFromLabel ( )
+   || Program.Settings.LocalSystemName       != localSystemNameTextBox.Text.ToString ( )!
+   || Program.Settings.ZfsPath               != pathToZfsTextField.Text.ToString ( )!
+   || Program.Settings.ZpoolPath             != pathToZpoolTextField.Text.ToString ( )! );
+
+  internal bool ValidateGlobalConfigValues ( )
+  {
+    if ( pathToZfsTextField.Text.IsEmpty || pathToZpoolTextField.Text.IsEmpty || localSystemNameTextBox.Text.IsEmpty )
     {
-        // ReSharper disable once HeapView.ObjectAllocation.Possible
-        // ReSharper disable once HeapView.DelegateAllocation
-        Initialized += GlobalConfigurationWindowOnInitialized;
-        InitializeComponent ( );
-        EnableEventHandlers ( );
+      return false;
     }
 
-    private bool _eventsEnabled;
+    return Environment.OSVersion.Platform != PlatformID.Unix
+        || ( File.Exists ( pathToZfsTextField.Text.ToString ( ) ) && File.Exists ( pathToZpoolTextField.Text.ToString ( ) ) );
+  }
 
-    internal bool IsConfigurationChanged =>
-        ValidateGlobalConfigValues ( )
-     && ( Program.Settings!.DryRun               != dryRunRadioGroup.GetSelectedBooleanFromLabel ( )
-       || Program.Settings.TakeSnapshots         != takeSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
-       || Program.Settings.PruneSnapshots        != pruneSnapshotsRadioGroup.GetSelectedBooleanFromLabel ( )
-       || Program.Settings.Monitoring.EnableHttp != httpMonitoringRadioGroup.GetSelectedBooleanFromLabel ( )
-       || Program.Settings.LocalSystemName       != localSystemNameTextBox.Text.ToString ( )!
-       || Program.Settings.ZfsPath               != pathToZfsTextField.Text.ToString ( )!
-       || Program.Settings.ZpoolPath             != pathToZpoolTextField.Text.ToString ( )! );
-
-    internal bool ValidateGlobalConfigValues ( )
+  private void DisableEventHandlers ( )
+  {
+    if ( !_eventsEnabled )
     {
-        if ( pathToZfsTextField.Text.IsEmpty || pathToZpoolTextField.Text.IsEmpty || localSystemNameTextBox.Text.IsEmpty )
-        {
-            return false;
-        }
-
-        return Environment.OSVersion.Platform != PlatformID.Unix
-            || ( File.Exists ( pathToZfsTextField.Text.ToString ( ) ) && File.Exists ( pathToZpoolTextField.Text.ToString ( ) ) );
+      return;
     }
 
-    private void DisableEventHandlers ( )
+    // ReSharper disable once HeapView.ObjectAllocation.Possible
+    resetGlobalConfigButton.Clicked -= ResetButtonOnClicked;
+
+    _eventsEnabled = false;
+  }
+
+  private void EnableEventHandlers ( )
+  {
+    if ( _eventsEnabled )
     {
-        if ( !_eventsEnabled )
-        {
-            return;
-        }
-
-        // ReSharper disable once HeapView.ObjectAllocation.Possible
-        resetGlobalConfigButton.Clicked -= ResetButtonOnClicked;
-
-        _eventsEnabled = false;
+      return;
     }
 
-    private void EnableEventHandlers ( )
-    {
-        if ( _eventsEnabled )
-        {
-            return;
-        }
+    resetGlobalConfigButton.Clicked += ResetButtonOnClicked;
+    _eventsEnabled                  =  true;
+  }
 
-        resetGlobalConfigButton.Clicked += ResetButtonOnClicked;
-        _eventsEnabled                  =  true;
+  private void GlobalConfigurationWindowOnInitialized ( object? sender, EventArgs e )
+  {
+    SetFieldsFromSettingsObject ( false );
+  }
+
+  private void ResetButtonOnClicked ( )
+  {
+    SetFieldsFromSettingsObject ( );
+  }
+
+  private void SetFieldsFromSettingsObject ( bool manageEventHandlers = true )
+  {
+    if ( manageEventHandlers )
+    {
+      DisableEventHandlers ( );
     }
 
-    private void GlobalConfigurationWindowOnInitialized ( object? sender, EventArgs e )
+    Logger.Debug ( "Setting global configuration fields to values in Settings" );
+
+    dryRunRadioGroup.SelectedItem         = Program.Settings!.DryRun ? 0 : 1;
+    takeSnapshotsRadioGroup.SelectedItem  = Program.Settings.TakeSnapshots ? 0 : 1;
+    pruneSnapshotsRadioGroup.SelectedItem = Program.Settings.PruneSnapshots ? 0 : 1;
+    httpMonitoringRadioGroup.SelectedItem = Program.Settings.Monitoring.EnableHttp ? 0 : 1;
+    localSystemNameTextBox.Text           = Program.Settings.LocalSystemName;
+    pathToZfsTextField.Text               = Program.Settings.ZfsPath;
+    pathToZpoolTextField.Text             = Program.Settings.ZpoolPath;
+
+    Logger.Debug ( "Finished setting global configuration fields to values in Settings" );
+
+    if ( manageEventHandlers )
     {
-        SetFieldsFromSettingsObject ( false );
+      EnableEventHandlers ( );
     }
-
-    private void ResetButtonOnClicked ( )
-    {
-        SetFieldsFromSettingsObject ( );
-    }
-
-    private void SetFieldsFromSettingsObject ( bool manageEventHandlers = true )
-    {
-        if ( manageEventHandlers )
-        {
-            DisableEventHandlers ( );
-        }
-
-        Logger.Debug ( "Setting global configuration fields to values in Settings" );
-
-        dryRunRadioGroup.SelectedItem         = Program.Settings!.DryRun ? 0 : 1;
-        takeSnapshotsRadioGroup.SelectedItem  = Program.Settings.TakeSnapshots ? 0 : 1;
-        pruneSnapshotsRadioGroup.SelectedItem = Program.Settings.PruneSnapshots ? 0 : 1;
-        httpMonitoringRadioGroup.SelectedItem = Program.Settings.Monitoring.EnableHttp ? 0 : 1;
-        localSystemNameTextBox.Text           = Program.Settings.LocalSystemName;
-        pathToZfsTextField.Text               = Program.Settings.ZfsPath;
-        pathToZpoolTextField.Text             = Program.Settings.ZpoolPath;
-
-        Logger.Debug ( "Finished setting global configuration fields to values in Settings" );
-
-        if ( manageEventHandlers )
-        {
-            EnableEventHandlers ( );
-        }
-    }
+  }
 }

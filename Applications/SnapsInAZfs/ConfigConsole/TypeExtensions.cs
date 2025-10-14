@@ -12,7 +12,6 @@
 
 namespace SnapsInAZfs.ConfigConsole;
 
-using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Globalization;

@@ -13,6 +13,9 @@ namespace SnapsInAZfs.CommandLine.Extensions;
 using System.CommandLine;
 using System.CommandLine.Parsing;
 
+/// <summary>
+/// Extensions for <see cref="ParseResult"/>.
+/// </summary>
 public static class ParseResultExtensions
 {
   /// <param name="parseResult"></param>
