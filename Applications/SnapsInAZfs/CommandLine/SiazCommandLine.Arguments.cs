@@ -62,7 +62,7 @@ public partial class SiazCommandLine
         HelpName            = PoolsArgumentName
       };
 
-  private Argument<string> RunCommandModeArgument { get; }
+  internal Argument<string> RunCommandModeArgument { get; }
     = new ( RunCommandModeArgumentName )
       {
         Arity       = ArgumentArity.ExactlyOne,

@@ -27,17 +27,17 @@ public partial class SiazCommandLine
   /// </summary>
   public RootCommand RootCommand { get; private set; }
 
-  private Command ConfigCommand { get; } = new (
+  internal Command ConfigCommand { get; } = new (
                                                 ConfigCommandName,
                                                 "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
                                                );
 
-  private Command ConfigConsoleCommand { get; } = new (
+  internal Command ConfigConsoleCommand { get; } = new (
                                                        ConfigConsoleCommandName,
                                                        "Launches the configuration console TUI."
                                                       );
 
-  private Command ConfigGlobalCommand { get; } = new (
+  internal Command ConfigGlobalCommand { get; } = new (
                                                       ConfigGlobalCommandName,
                                                       """
                                                       Modify global settings in the root of the JSON configuration files.
@@ -45,7 +45,7 @@ public partial class SiazCommandLine
                                                       """
                                                      );
 
-  private Command CronCommand { get; } = new (
+  internal Command CronCommand { get; } = new (
                                               CronCommandName,
                                               $"""
                                                {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
@@ -53,7 +53,7 @@ public partial class SiazCommandLine
                                                """
                                              );
 
-  private Command RunCommand { get; } = new (
+  internal Command RunCommand { get; } = new (
                                              RunCommandName,
                                              """
                                              Run SIAZ, optionally specifying override options.
@@ -61,69 +61,69 @@ public partial class SiazCommandLine
                                              """
                                             );
 
-  private Command TemplatesCommand { get; } = new (
+  internal Command TemplatesCommand { get; } = new (
                                                    TemplatesCommandName,
                                                    """
                                                    View, modify, create, or remove templates.
                                                    """
                                                   );
 
-  private Command TemplatesCreateCommand { get; } = new (
+  internal Command TemplatesCreateCommand { get; } = new (
                                                          TemplatesCreateCommandName,
                                                          """
                                                          Create a new template.
                                                          """
                                                         );
 
-  private Command TemplatesListCommand { get; } = new (
+  internal Command TemplatesListCommand { get; } = new (
                                                        TemplatesListCommandName,
                                                        """
                                                        List existing templates.
                                                        """
                                                       );
 
-  private Command TemplatesModifyCommand { get; } = new (
+  internal Command TemplatesModifyCommand { get; } = new (
                                                          TemplatesModifyCommandName,
                                                          """
                                                          Modify an existing template.
                                                          """
                                                         );
 
-  private Command TemplatesRemoveCommand { get; } = new (
+  internal Command TemplatesRemoveCommand { get; } = new (
                                                          TemplatesRemoveCommandName,
                                                          """
                                                          Remove an existing template.
                                                          """
                                                         );
 
-  private Command TemplatesShowCommand { get; } = new (
+  internal Command TemplatesShowCommand { get; } = new (
                                                        TemplatesShowCommandName,
                                                        """
                                                        Show the full configuration of an existing template.
                                                        """
                                                       );
 
-  private Command ZfsCommand { get; } = new (
+  internal Command ZfsCommand { get; } = new (
                                              ZfsCommandName,
                                              "Perform operations on ZFS pools and datasets managed by SIAZ."
                                             );
 
-  private Command ZfsSchemaCheckCommand { get; } = new (
+  internal Command ZfsSchemaCheckCommand { get; } = new (
                                                         ZfsSchemaCheckCommandName,
                                                         "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
                                                        );
 
-  private Command ZfsSchemaCleanCommand { get; } = new (
+  internal Command ZfsSchemaCleanCommand { get; } = new (
                                                         ZfsSchemaCleanCommandName,
                                                         "Completely removes all pool and dataset properties that came from SIAZ."
                                                        );
 
-  private Command ZfsSchemaCommand { get; } = new (
+  internal Command ZfsSchemaCommand { get; } = new (
                                                    ZfsSchemaCommandName,
                                                    "Perform operations on properties of ZFS pools and datasets used by SIAZ."
                                                   );
 
-  private Command ZfsSchemaInitializeCommand { get; } = new (
+  internal Command ZfsSchemaInitializeCommand { get; } = new (
                                                              ZfsSchemaInitializeCommandName,
                                                              "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
                                                             );
