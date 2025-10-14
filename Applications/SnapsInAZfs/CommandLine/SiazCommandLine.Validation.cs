@@ -118,9 +118,4 @@ public partial class SiazCommandLine
 
     return optionResult;
   }
-
-  internal static readonly System.CommandLine.ParserConfiguration? ParserConfiguration = new ( )
-                                                                                         {
-                                                                                           EnablePosixBundling = true
-                                                                                         };
 }

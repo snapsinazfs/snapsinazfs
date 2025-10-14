@@ -50,6 +50,11 @@ public sealed partial class SiazCommandLine
   public ParseResult? RootCommandParseResult { get; private set; }
 
   /// <summary>
+  ///   A shared instance of <see cref="System.CommandLine.ParserConfiguration" /> for all SCL operations.
+  /// </summary>
+  internal static readonly ParserConfiguration? ParserConfiguration = new ( ) { EnablePosixBundling = true };
+
+  /// <summary>
   ///   Builds the command line parser configuration.
   /// </summary>
   /// <remarks>
