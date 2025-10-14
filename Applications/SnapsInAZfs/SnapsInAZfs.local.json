@@ -8,7 +8,6 @@
   "LocalSystemName": "StandaloneSiazSystem",
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",
-  "Daemonize": false,
   "Monitoring": {
     "EnableHttp": false,
     "Kestrel": {

@@ -315,53 +315,6 @@ Overrides this setting, forcing its value to \fBfalse\fP.
 .
 .
 .TQ
-.B /Daemonize
-.RS
-.TP
-Type: boolean
-.IP
-This setting controls whether \*[SIAZ] will execute as a daemon or not.\&
-.TQ
-Values:
-.RS
-.TP 4
-.B \(bu true
-\*[SIAZ] will run as a daemon.\&
-That is, it will not exit after the first execution of the main loop,
-and will continue running and dispatching events on a timer,
-as appropriate,
-until it receives a \fBSIGINT\fP, \fBSIGKILL\fP, or \fBSIGTERM\fP signal,
-either from the service controller or,
-if executed on the command-line,
-as the ctrl+c key sequence.\&
-.IP
-The timer that governs execution of configured actions runs on the period specified in the \fBDaemonTimerIntervalSeconds\fP property,
-and is aliased to the top of the minute (that is, starting from the exact minute and zero seconds, to the nearest multiple of the timer period).\&
-It is not recommended to adjust the value of the timer interval.\&
-.IP
-The timer monitors for clock/time drift at each elapsed interval and,
-if it is more than 500 milliseconds off from a whole-number multiple of its period setting,
-will re-adjust as close to the target time as possible.\&
-.IP
-The timer is very light-weight and there is no appreciable benefit to adjusting it.\&
-.TQ 4
-.B \(bu false
-\*[SIAZ] will run once and then terminate.\&
-.RE
-.TQ
-Command-line options:
-.RS
-.TP 4
-.B \-\-daemonize
-Overrides this setting, forcing its value to \fBtrue\fP.
-.TQ 4
-.B \-\-no\-daemonize
-Overrides this setting, forcing its value to \fBfalse\fP.
-.RE
-.RE
-.
-.
-.TQ
 .B /DaemonTimerIntervalSeconds
 .RS
 .TP

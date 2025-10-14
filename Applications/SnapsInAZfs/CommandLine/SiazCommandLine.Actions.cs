@@ -89,7 +89,6 @@ public partial class SiazCommandLine
       switch ( result.Option.Name )
       {
         case nameof (SnapsInAZfsSettings.DryRun):
-        case nameof (SnapsInAZfsSettings.Daemonize):
         case nameof (SnapsInAZfsSettings.PruneSnapshots):
         case nameof (SnapsInAZfsSettings.TakeSnapshots):
         {

@@ -98,8 +98,6 @@ public sealed partial class SiazCommandLine
 // TODO: Remove this suppression once the next .net 10 build is released (fix provided in https://github.com/dotnet/roslyn/pull/80433)
 // False positive. Suppress it.
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                                                                ConfigGlobalCommand_DaemonizeOption
-                                                                 .WithCompletionSource ( GetTriStateOptionValueCompletions ),
                                                                 ConfigGlobalCommand_DaemonTimerIntervalSecondsOption
                                                                  .WithSuggestedCompletionValues ( 5, 6, 10, 15, 20, 30 ),
                                                                 ConfigGlobalCommand_DryRunOption

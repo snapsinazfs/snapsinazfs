@@ -6,7 +6,6 @@
   "TakeSnapshots": false,
   "PruneSnapshots": false,
   "LocalSystemName": "StandaloneSiazSystem",
-  "Daemonize": false,
   "DaemonTimerIntervalSeconds": 10,
   "ZfsPath": "/usr/local/sbin/zfs",
   "ZpoolPath": "/usr/local/sbin/zpool",

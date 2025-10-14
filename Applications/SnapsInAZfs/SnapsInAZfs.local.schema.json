@@ -1,4 +1,4 @@
-﻿{
+{
     "$schema": "https://json-schema.org/draft/2019-09/schema",
     "$id": "SnapsInAZfs.local.schema.json",
     "type": "object",
@@ -42,11 +42,6 @@
             "type": "string",
             "description": "The path to the zpool utility",
             "default": "/usr/local/sbin/zpool"
-        },
-        "Daemonize": {
-            "type": "boolean",
-            "description": "If SnapsInAZfs will run as a service",
-            "default": false
         },
         "DaemonTimerIntervalSeconds": {
             "type": "integer",
