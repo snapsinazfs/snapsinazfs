@@ -564,10 +564,11 @@ internal static class Program
     }
 
     _logger.Fatal ( "Failed to validate settings." );
-    _logger.Debug ( $"{validator.ValidationErrors} errors found in validation." );
-    _logger.Debug ( $"Validation status: {JsonSerializer.Serialize ( validator )}" );
-    _logger.Debug ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
+    _logger.ConditionalDebug ( $"{validator.ValidationErrors} errors found in validation." );
+    _logger.ConditionalTrace ( $"Validation status: {JsonSerializer.Serialize ( validator )}" );
+    _logger.ConditionalTrace ( $"Settings object including all files and overrides: {JsonSerializer.Serialize ( settings )}: " );
     _logger.Fatal ( "SnapsInAZfs will now terminate." );
+    _logger.Factory.Flush ( );
 
     return ExitCode.EFTYPE;
   }
