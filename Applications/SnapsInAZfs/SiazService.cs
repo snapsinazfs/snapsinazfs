@@ -24,7 +24,7 @@ using PowerArgs;
 /// <summary>
 ///   The service class for running everything but the configuration console
 /// </summary>
-public sealed class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable
+public sealed class SiazService : BackgroundService, IApplicationStateObservable, ISnapshotOperationsObservable, ISiazService
 {
   private static readonly Logger               Logger                 = LogManager.GetCurrentClassLogger ( );
   private static readonly AutoResetEvent       SnapshotAutoResetEvent = new ( true );
@@ -106,12 +106,10 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     }
   } = ApplicationState.Init;
 
-  /// <inheritdoc />
+  /// <inheritdoc cref="ISiazService.ServiceStartTime" />
   public DateTimeOffset ServiceStartTime { get; } = DateTimeOffset.Now;
 
-  /// <summary>
-  /// Event raised when the value of <see cref="State"/> changes.
-  /// </summary>
+  /// <inheritdoc />
   public event EventHandler<ApplicationStateChangedEventArgs>? ApplicationStateChanged;
 
   /// <inheritdoc />
