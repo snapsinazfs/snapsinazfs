@@ -268,51 +268,23 @@ internal static class Program
   /// <returns>The <see cref="ISetupBuilder" /> created from the configuration.</returns>
   private static bool InitializeEarlyLogging ( out Logger logger )
   {
-    FileInfo tempNLogConfigFile = new ( Path.GetTempFileName ( ) );
+    Logger? earlyLogger = null;
 
-    if ( Environment.GetEnvironmentVariable ( "SnapsInAZfs_EnableEarlyLogging" ) is "1" )
-    {
-      // Write to stdout since we don't have a logger yet.
-      Console.WriteLine ( $"Initial logging configuration temporary file: {tempNLogConfigFile.FullName}" );
-    }
-
-    using FileStream tempNLogConfigFileStream = tempNLogConfigFile.Open ( FileMode.Truncate, FileAccess.ReadWrite, FileShare.None );
-    Logger?          earlyLogger              = null;
-
-    try
-    {
-      using ( StreamWriter tempNLogConfigWriter = new ( tempNLogConfigFileStream, Encoding.UTF8, 2048 ) )
-      {
-        tempNLogConfigWriter.Write ( NLogInitialConfiguration );
-      }
-
-      IConfigurationRoot appSettingsJson = new ConfigurationBuilder ( )
-                                          .SetBasePath ( Directory.GetCurrentDirectory ( ) )
-                                          .AddJsonFile ( tempNLogConfigFile.FullName, false, false )
+    IConfigurationRoot earlyLoggerConfig = new ConfigurationBuilder ( )
+                                          .AddInMemoryCollection ( EarlyNLogConfiguration )
                                           .AddEnvironmentVariables ( static filter => filter.Prefix = EarlyLoggingOverrideEnvironmentVariableFilterPrefix )
                                           .Build ( );
+    ISetupBuilder builder = LogManager.Setup ( )
+                                      .LoadConfigurationFromSection
+                                         (
+                                          earlyLoggerConfig
+                                         );
 
-      ISetupBuilder? builder = LogManager.Setup ( )
-                                         .LoadConfigurationFromSection ( appSettingsJson );
+    earlyLogger = builder.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
+    LogManager.ReconfigExistingLoggers ( true );
 
-      earlyLogger = builder.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
-      LogManager.ReconfigExistingLoggers ( true );
-
-      tempNLogConfigFileStream.Close ( );
-      earlyLogger.Debug ( $"Early Logging config:\n{appSettingsJson.GetDebugView ( )}" );
-    }
-    finally
-    {
-      earlyLogger ??= LogManager.CreateNullLogger ( );
-
-      if ( Environment.GetEnvironmentVariable ( $"{EnvironmentVariableFilterPrefix}EnableEarlyLogging" ) is "1" )
-      {
-        earlyLogger.Debug ( $"Deleting initial logging configuration temporary file {tempNLogConfigFile.FullName}." );
-      }
-
+    earlyLogger.Debug ( ( ) => $"Early logging config:\n{earlyLoggerConfig.GetDebugView ( )}" );
       logger = earlyLogger;
-      tempNLogConfigFile.Delete ( );
-    }
 
     return true;
   }
@@ -488,65 +460,35 @@ internal static class Program
 
   internal const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
 
-  private const string NLogInitialConfiguration = """
-                                                  {
-                                                    "NLog": {
-                                                      "autoReload": false,
-                                                      "throwConfigExceptions": true,
-                                                      "internalLogLevel": "Warn",
-                                                      "internalLogFile": "${basedir}/internal-nlog.txt",
-                                                      "extensions": [
-                                                        { "assembly": "NLog.Extensions.Logging" }
-                                                      ],
-                                                      "variables": {
-                                                        "var_logdir": "/var/log/SnapsInAZfs"
-                                                      },
-                                                      "time": {
-                                                        "type": "FastLocal"
-                                                      },
-                                                      "default-wrapper": {
-                                                        "type": "AsyncWrapper",
-                                                        "overflowAction": "Block"
-                                                      },
-                                                      "targets": {
-                                                        "early-console": {
-                                                          "type": "ColoredConsole",
-                                                          "detectConsoleAvailable": false,
-                                                          "enableAnsiOutput ": true,
-                                                          "StdErr": true,
-                                                          "layout": "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${message} ${exception:format=tostring}",
-                                                          "rowHighlightingRules": [
-                                                            {
-                                                              "condition": "level == LogLevel.Warn",
-                                                              "foregroundColor": "Yellow"
-                                                            },
-                                                            {
-                                                              "condition": "level == LogLevel.Error",
-                                                              "foregroundColor": "Red"
-                                                            },
-                                                            {
-                                                              "condition": "level == LogLevel.Fatal",
-                                                              "foregroundColor": "White",
-                                                              "backgroundColor": "DarkRed"
-                                                            }
-                                                          ]
-                                                        }
-                                                      },
-                                                      "rules": {
-                                                        "0": {
-                                                          "ruleName": "Console",
-                                                          "logger": "*",
-                                                          "minLevel": "Warn",
-                                                          "writeTo": "early-console",
-                                                          "filterDefaultAction": "Log",
-                                                          "enabled": true
-                                                        }
-                                                      }
-                                                    }
-                                                  }
-
-
-                                                  """;
+  private static Dictionary<string, string?> EarlyNLogConfiguration { get; }
+    = new ( )
+      {
+        [ "NLog:autoReload" ]                                             = "false",
+        [ "NLog:throwConfigurationExceptions" ]                           = "true",
+        [ "NLog:internalLogLevel" ]                                       = "Warn",
+        [ "NLog:internalLogFile" ]                                        = "${basedir}/internal-nlog.txt",
+        [ "NLog:variables:var_logdir" ]                                   = "/var/log/SnapsInAZfs",
+        [ "NLog:time:type" ]                                              = "FastLocal",
+        [ "NLog:default-wrapper:type" ]                                   = "AsyncWrapper",
+        [ "NLog:default-wrapper:overflowAction" ]                         = "Block",
+        [ "NLog:targets:console:type" ]                                   = "ColoredConsole",
+        [ "NLog:targets:console:detectConsoleAvailable" ]                 = "false",
+        [ "NLog:targets:console:enableAnsiOutput" ]                       = "true",
+        [ "NLog:targets:console:layout" ]                                 = "${longdate}|${pad:padding=-6:${uppercase:${level}}}|${message} ${exception:format=tostring}",
+        [ "NLog:targets:console:rowHighlightingRules:0:condition" ]       = "level == LogLevel.Warn",
+        [ "NLog:targets:console:rowHighlightingRules:0:foregroundColor" ] = "Yellow",
+        [ "NLog:targets:console:rowHighlightingRules:1:condition" ]       = "level == LogLevel.Error",
+        [ "NLog:targets:console:rowHighlightingRules:1:foregroundColor" ] = "Red",
+        [ "NLog:targets:console:rowHighlightingRules:2:condition" ]       = "level == LogLevel.Fatal",
+        [ "NLog:targets:console:rowHighlightingRules:2:foregroundColor" ] = "White",
+        [ "NLog:targets:console:rowHighlightingRules:2:backgroundColor" ] = "DarkRed",
+        [ "NLog:rules:0:ruleName" ]                                       = "Console",
+        [ "NLog:rules:0:logger" ]                                         = "*",
+        [ "NLog:rules:0:minLevel" ]                                       = "Warn",
+        [ "NLog:rules:0:writeTo" ]                                        = "console",
+        [ "NLog:rules:0:filterDefaultAction" ]                            = "Log",
+        [ "NLog:rules:0:enabled" ]                                        = "true"
+      };
 
   private static async Task<int> RunWithoutKestrelAsync ( SnapsInAZfsSettings settings )
   {
