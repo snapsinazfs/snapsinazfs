@@ -10,7 +10,7 @@
 // See https://opensource.org/license/MIT/
 #endregion
 
-namespace SnapsInAZfs.Settings;
+namespace SnapsInAZfs.Settings.Validation;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
