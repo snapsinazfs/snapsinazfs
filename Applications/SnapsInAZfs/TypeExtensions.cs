@@ -14,6 +14,7 @@ namespace SnapsInAZfs;
 
 using System.CommandLine.Parsing;
 using System.Runtime.CompilerServices;
+using CommandLine;
 using Interop.Zfs.ZfsTypes;
 
 internal static class TypeExtensions
@@ -84,11 +85,17 @@ internal static class TypeExtensions
     }
   }
 
-  extension ( IReadOnlyList<Token> tokens )
+  extension ( TriStateOptionValue value )
   {
-    public string ToString ( bool withSpaces = false, bool withCommas = false, bool withNewlines = false )
+    public bool ToBoolean ( bool valueIfDefault = true, bool valueIfUnknown = false )
     {
-      return tokens.Select ( static t => t.Value ).ToString ( withSpaces, withCommas, withNewlines );
+      return value switch
+             {
+               TriStateOptionValue.Default => valueIfDefault,
+               TriStateOptionValue.False   => false,
+               TriStateOptionValue.True    => true,
+               _                           => valueIfUnknown
+             };
     }
   }
 }
