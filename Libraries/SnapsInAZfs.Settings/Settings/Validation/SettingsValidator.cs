@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 ///     instance of <see cref="SnapsInAZfsSettings" />.
 /// </remarks>
 [ComponentGuarantees ( ComponentGuaranteesOptions.None )]
-public partial record SettingsValidator
+public sealed partial record SettingsValidator
 {
     private static readonly Logger Logger = LogManager.GetLogger ( $"SnapsInAZfs.Settings.{nameof (SettingsValidator)}" )!;
 
