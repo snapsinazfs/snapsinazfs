@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.Routing;
 using Monitoring;
 using NLog.Config;
 using NLog.Extensions.Logging;
+using Settings.Validation;
 using MSLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
