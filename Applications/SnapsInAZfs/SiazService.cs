@@ -1064,10 +1064,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     }
   }
 
-  private sealed record CheckZfsPropertiesSchemaResult (
-    ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> PoolRootsWithPropertyValidities,
-    bool                                                             MissingPropertiesFound
-  );
 
   // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
   private readonly ISnapshotOperationsObserver? _snapshotOperationsObserver;
