@@ -194,6 +194,7 @@ public sealed partial record SettingsValidator
     }
 
     public int ValidationErrors => _validationErrorCount;
+  private const string MissingSettingErrorMessage = "Missing, empty, or all-whitespace value for {0}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements.";
 
     public void AutoDetectAndSetLocalSystemName( ref readonly SnapsInAZfsSettings settings )
     {
@@ -234,7 +235,7 @@ public sealed partial record SettingsValidator
 
         if ( settings is not { } nonNullSettings )
         {
-            Logger.Error ( "Null reference provided to settings validator. SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+      Logger.Error ( "Null reference provided to settings validator. SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements." );
             validator.IsSettingsObjectNull = true;
 
             return validator;
@@ -277,7 +278,7 @@ public sealed partial record SettingsValidator
     {
         if ( string.IsNullOrWhiteSpace ( localSystemName ) )
         {
-            Logger.Error ( $"Missing, empty, or all-whitespace value for {nameof (SnapsInAZfsSettings.LocalSystemName)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+      Logger.Error ( MissingSettingErrorMessage, nameof (SnapsInAZfsSettings.LocalSystemName) );
             IsLocalSystemNameInvalid = true;
 
             return;
@@ -292,7 +293,7 @@ public sealed partial record SettingsValidator
 
                 return;
             case { Length: > 255 }:
-                Logger.Error ( $"{nameof (SnapsInAZfsSettings.LocalSystemName)} value \"{localSystemName}\" is longer than the maximum allowed length of 255 characters. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+        Logger.Error ( $"{nameof (SnapsInAZfsSettings.LocalSystemName)} value \"{localSystemName}\" is longer than the maximum allowed length of 255 characters. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements." );
                 IsLocalSystemNameInvalid = true;
 
                 return;
@@ -302,7 +303,7 @@ public sealed partial record SettingsValidator
 
                 return;
             default:
-                Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.LocalSystemName)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+        Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.LocalSystemName)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements." );
                 IsLocalSystemNameInvalid = true;
 
                 return;
@@ -313,7 +314,7 @@ public sealed partial record SettingsValidator
     {
         if ( string.IsNullOrWhiteSpace ( zfsPath ) )
         {
-            Logger.Error ( $"Missing, empty, or all-whitespace value for {nameof (SnapsInAZfsSettings.ZfsPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+      Logger.Error ( MissingSettingErrorMessage, nameof (SnapsInAZfsSettings.ZfsPath) );
             IsZfsPathInvalid = true;
 
             return;
@@ -333,7 +334,7 @@ public sealed partial record SettingsValidator
 
                 return;
             default:
-                Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.ZfsPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+        Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.ZfsPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements." );
                 IsZfsPathInvalid = true;
 
                 return;
@@ -344,7 +345,7 @@ public sealed partial record SettingsValidator
     {
         if ( string.IsNullOrWhiteSpace ( zpoolPath ) )
         {
-            Logger.Error ( $"Missing, empty, or all-whitespace value for {nameof (SnapsInAZfsSettings.ZpoolPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+      Logger.Error ( MissingSettingErrorMessage, nameof (SnapsInAZfsSettings.ZpoolPath) );
             IsZpoolPathInvalid = true;
 
             return;
@@ -364,7 +365,7 @@ public sealed partial record SettingsValidator
 
                 return;
             default:
-                Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.ZpoolPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`--config-console` option). See documentation for requirements." );
+        Logger.Error ( $"Invalid value for {nameof (SnapsInAZfsSettings.ZpoolPath)}. This setting is required and must be valid or SIAZ will terminate except when run in configuration mode (`[siaz] config console` command). See documentation for requirements." );
                 IsZpoolPathInvalid = true;
 
                 return;
