@@ -185,9 +185,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
         if ( differenceBetweenCurrentAndConfiguredInterval.TotalMilliseconds > maxDriftMilliseconds )
         {
-        #if DEBUG
-          Logger.Debug ( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
-        #endif
+          Logger.ConditionalDebug ( "Restarting timer after adjustment - Old interval: {0:G}, New interval: {1:G}", timerInterval, _daemonTimerInterval );
           daemonRunTimer.Dispose ( );
           daemonRunTimer = new ( _daemonTimerInterval );
           timerInterval  = _daemonTimerInterval;
@@ -196,9 +194,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
         try
         {
           Timestamp = DateTimeOffset.Now;
-        #if DEBUG
-          Logger.Debug ( "Timer ticked at {0:O} - Interval: {1:G}", Timestamp, timerInterval );
-        #endif
+          Logger.ConditionalDebug ( "Timer ticked at {0:O} - Interval: {1:G}", Timestamp, timerInterval );
           TimeSpan drift = ( Timestamp - expectedTickTimestamp ).Duration ( );
           GetNextTickTimestamp ( in Timestamp, in _daemonTimerInterval, out expectedTickTimestamp );
 
@@ -363,20 +359,14 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
       {
         if ( !IZfsProperty.DefaultDatasetProperties.ContainsKey ( propName ) )
         {
-        #if DEBUG
-          Logger.Trace ( "Not interested in property {0} for pool root schema check", propName );
-        #endif
+          Logger.ConditionalTrace ( "Not interested in property {0} for pool root schema check", propName );
           continue;
         }
 
-      #if DEBUG
-        Logger.Trace ( "Checking validity of property {0} in pool root {1}", propName, poolName );
-      #endif
+        Logger.ConditionalTrace ( "Checking validity of property {0} in pool root {1}", propName, poolName );
         if ( propValue )
         {
-        #if DEBUG
-          Logger.Trace ( "Pool root {0} has property {1} with a valid value", poolName, propName );
-        #endif
+          Logger.ConditionalTrace ( "Pool root {0} has property {1} with a valid value", poolName, propName );
           continue;
         }
 
@@ -920,9 +910,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
   private bool TakeSnapshot ( ZfsRecord ds, SnapshotPeriod period, DateTimeOffset timestamp, out Snapshot? snapshot )
   {
-  #if DEBUG
-    Logger.Trace ( $"{nameof (TakeSnapshot)} called for {{0}} with period {{1}}", ds.Name, period );
-  #endif
+    Logger.ConditionalTrace ( $"{nameof (TakeSnapshot)} called for {{0}} with period {{1}}", ds.Name, period );
     snapshot = null;
 
     switch ( ds )
