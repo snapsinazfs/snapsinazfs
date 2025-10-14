@@ -33,10 +33,7 @@ public sealed partial record SettingsValidator
 
     // Initial state has 1 error, which is null settings object, which will be cleared the first time
     // validation is performed against a non-null settings object.
-    private bool _isLocalSystemNameInvalid;
     private bool _isSettingsObjectNull = true;
-    private bool _isZfsPathInvalid;
-    private bool _isZpoolPathInvalid;
     private int  _validationErrorCount = 1;
 
     /// <summary>
@@ -94,15 +91,15 @@ public sealed partial record SettingsValidator
     /// </summary>
     public bool IsLocalSystemNameInvalid
     {
-        get => _isLocalSystemNameInvalid;
+    get;
         set
         {
-            if ( value == _isLocalSystemNameInvalid && !_isSettingsObjectNull )
+      if ( value == field && !_isSettingsObjectNull )
             {
                 return;
             }
 
-            _isLocalSystemNameInvalid = value;
+      field = value;
 
             if ( value )
             {
@@ -148,15 +145,15 @@ public sealed partial record SettingsValidator
     /// </summary>
     public bool IsZfsPathInvalid
     {
-        get => _isZfsPathInvalid;
+    get;
         set
         {
-            if ( value == _isZfsPathInvalid || _isSettingsObjectNull )
+      if ( value == field || _isSettingsObjectNull )
             {
                 return;
             }
 
-            _isZfsPathInvalid = value;
+      field = value;
 
             if ( value )
             {
@@ -175,15 +172,15 @@ public sealed partial record SettingsValidator
     /// </summary>
     public bool IsZpoolPathInvalid
     {
-        get => _isZpoolPathInvalid;
+    get;
         set
         {
-            if ( value == _isZpoolPathInvalid || _isSettingsObjectNull )
+      if ( value == field || _isSettingsObjectNull )
             {
                 return;
             }
 
-            _isZpoolPathInvalid = value;
+      field = value;
 
             if ( value )
             {
