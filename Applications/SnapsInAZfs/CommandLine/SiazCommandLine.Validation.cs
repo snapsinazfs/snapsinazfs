@@ -33,7 +33,6 @@ public partial class SiazCommandLine
     "off"
   ];
 
-  // ReSharper disable once MemberCanBePrivate.Global
   internal static readonly string[] StandardBooleanTrueStrings =
   [
     "1",
@@ -54,12 +53,15 @@ public partial class SiazCommandLine
   // ReSharper disable once MemberCanBePrivate.Global
 
   // ReSharper disable once MemberCanBePrivate.Global
+
+  // ReSharper disable once MemberCanBePrivate.Global
   internal static readonly SearchValues<string> StandardBooleanTrueValuesSearch
     = SearchValues.Create ( StandardBooleanTrueStrings.AsSpan ( ), StringComparison.OrdinalIgnoreCase );
 
   private OptionResult ValidateCanWriteToPath ( OptionResult optionResult, Token token )
   {
     FileInfo file = new ( Path.GetFullPath ( token.Value ) );
+
     try
     {
       using FileStream testFile = file.Open (

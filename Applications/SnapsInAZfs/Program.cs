@@ -12,10 +12,12 @@
 
 namespace SnapsInAZfs;
 
+using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Text.Json;
 using CommandLine;
+using CommandLine.Extensions;
 using Interop;
 using Interop.Zfs.ZfsCommandRunner;
 using Interop.Zfs.ZfsTypes;
@@ -25,7 +27,6 @@ using Microsoft.AspNetCore.Routing;
 using Monitoring;
 using NLog.Config;
 using NLog.Extensions.Logging;
-using PowerArgs;
 using MSLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
@@ -38,7 +39,7 @@ internal static class Program
   private static readonly IMonitor             ServiceObserver    = new Monitor ( );
   internal static         SnapsInAZfsSettings? Settings;
   internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
-  private static readonly ManualResetEventSlim Blocker = new ( false );
+  private static readonly ManualResetEventSlim Blocker                   = new ( false );
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
@@ -154,48 +155,44 @@ internal static class Program
         break;
 
       case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
-        _logger.Debug ( "Would have built and run the appBuilder." );
-        break;
-    }
-
-    siazCli = null;
-
-    // Just cutting it off here for now.
-    return 0;
-
-    CommandLineArguments args = await Args.ParseAsync<CommandLineArguments> ( argv ).ConfigureAwait ( true );
-
-    ApplyCommandLineArgumentOverrides ( in args, Settings );
-
-    if ( args.ConfigConsole )
-    {
-      try
       {
-        if ( TryGetZfsCommandRunner<ZfsCommandRunner> ( Settings, out IZfsCommandRunner zfsCommandRunner ) )
+        Settings = appBuilder.Configuration.Get<SnapsInAZfsSettings> ( );
+
+        if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
-          ConfigConsole.ConfigConsole.RunConsoleInterface ( zfsCommandRunner );
+          return (int)badResult;
         }
+
+        _logger.Debug ( "Settings passed basic validation checks." );
+        _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
+
+        string mode = noErrorsParseResult.GetRequiredValue ( siazCli.RunCommandModeArgument );
+
+        OptionResult[] options = noErrorsParseResult.CommandResult.Children.OfType<OptionResult> ( ).Where ( static o => o.Option is ISiazSettingsKeyedOption ).ToArray ( );
+
+        if ( options.Length > 0 )
+        {
+          ApplyCommandLineOverridesToSettings ( appBuilder.Configuration, options, ref Settings );
+        }
+
+        if ( Settings.Monitoring.EnableHttp && mode == "service" )
+        {
+          goto case "RunWithKestrel";
+        }
+
+        goto case "RunWithoutKestrel";
       }
-      catch ( Exception e )
-      {
-        _logger.Fatal ( e, "Error in configuration console - Exiting" );
-        LogManager.Shutdown ( );
 
-        return (int)ExitCode.GenericError;
-      }
+      case "RunWithKestrel":
+        return 0;
+        return await RunWithKestrelAsync ( Settings, appBuilder.Configuration ).ConfigureAwait ( true );
 
-      LogManager.Shutdown ( );
-
-      return 0;
+      case "RunWithoutKestrel":
+        return 0;
+        return await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true );
     }
 
-    if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
-    {
-      return (int)badResult;
-    }
-
-    _logger.Debug ( "Settings passed basic validation checks." );
-    _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
+    return 0;
 
     //return Settings.Monitoring.EnableHttp switch
     //       {
@@ -219,7 +216,7 @@ internal static class Program
 
   private static void SiazCli_RunSiazInvoked ( object? sender, RunSiazActionEventArgs e )
   {
-    _logger.Fatal ( "run not yet implemented. No operations have been carried out." );
+    _logger.Debug ( "Running SIAZ." );
   }
 
   private static void SiazCli_GlobalConfigurationChangeRequested ( object? sender, GlobalConfigChangeEventArgs e )
@@ -284,9 +281,56 @@ internal static class Program
     LogManager.ReconfigExistingLoggers ( true );
 
     earlyLogger.Debug ( ( ) => $"Early logging config:\n{earlyLoggerConfig.GetDebugView ( )}" );
-      logger = earlyLogger;
+    logger = earlyLogger;
 
     return true;
+  }
+
+  /// <summary>
+  ///   Overrides configuration values specified in configuration files or environment variables with arguments supplied on
+  ///   the CLI.
+  /// </summary>
+  /// <param name="baseConfig"></param>
+  /// <param name="optionResults"></param>
+  /// <param name="programSettings">
+  ///   A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
+  /// </param>
+  internal static void ApplyCommandLineOverridesToSettings ( in IConfigurationRoot baseConfig, OptionResult[] optionResults, ref SnapsInAZfsSettings programSettings )
+  {
+    _logger.Debug ( "Overriding settings using options from command line." );
+
+    ConfigurationBuilder builder = new ( );
+    builder.AddConfiguration ( baseConfig );
+    Dictionary<string, string?> settingsOverrides = [ ];
+
+    foreach ( OptionResult optionResult in optionResults )
+    {
+      ISiazSettingsKeyedOption option = (ISiazSettingsKeyedOption)optionResult.Option;
+
+      switch ( option )
+      {
+        case SiazSettingsOption<bool>:
+          settingsOverrides.Add ( option.SettingsKey, $"{optionResult.GetValueOrDefault ( false )}" );
+          continue;
+
+        case SCL.Option<uint>:
+          settingsOverrides.Add ( option.SettingsKey, $"{optionResult.GetValueOrDefault<uint> ( ):D}" );
+          continue;
+
+        case SCL.Option<TriStateOptionValue>:
+          settingsOverrides.Add ( option.SettingsKey, $"{optionResult.GetValueOrDefault<TriStateOptionValue> ( ).ToBoolean ( )}" );
+          continue;
+
+        case SCL.Option<string>:
+          settingsOverrides.Add ( option.SettingsKey, optionResult.GetValueOrDefault<string> ( ) );
+          continue;
+      }
+    }
+
+    builder.AddInMemoryCollection ( settingsOverrides );
+    IConfigurationRoot overriddenConfig = builder.Build ( );
+
+    programSettings = overriddenConfig.Get<SnapsInAZfsSettings> ( ) ?? programSettings;
   }
 
   /// <summary>

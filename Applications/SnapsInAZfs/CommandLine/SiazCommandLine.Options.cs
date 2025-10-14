@@ -19,28 +19,48 @@ using F = StringFormattingConstants;
 
 public partial class SiazCommandLine
 {
-  private Option<TriStateOptionValue> ConfigGlobalCommand_DaemonizeOption { get; } =
-    new ( nameof (SnapsInAZfsSettings.Daemonize), nameof (SnapsInAZfsSettings.Daemonize).ToLowerInvariant ( ), "-D" )
-    {
-      Arity       = ArgumentArity.ExactlyOne,
-      Description = $"The {nameof (SnapsInAZfsSettings.Daemonize)} option controls whether SIAZ executes interactively or as a service.",
-      Required    = false
-    };
+  internal SiazSettingsOption<bool> DryRunOption { get; } = new ( DryRunOptionName, DryRunOptionSettingsKey, "-n" );
+
+  internal Option<LoggingLevel> LogLevelOption { get; }
+    = new ( LogLevelOptionName )
+      {
+        Description = "Override global logging level.",
+        Recursive   = true,
+        Arity       = ArgumentArity.ZeroOrOne
+      };
+
+  internal SiazSettingsOption<bool> MonitorOption { get; }
+    = new ( MonitorOptionName, MonitorOptionSettingsKey )
+      {
+        Arity       = ArgumentArity.ZeroOrOne,
+        Description = "Enable or disable the monitoring endpoints.",
+        Recursive   = false,
+        Required    = false
+      };
+
+  internal SiazSettingsOption<bool> TakeSnapshotsOption { get; }
+    = new ( TakeSnapshotsOptionName, TakeSnapshotsOptionSettingsKey )
+      {
+        Arity = ArgumentArity.ZeroOrOne,
+        Description
+          = $"Enables new snapshot processing, {F.U}overriding{F._U} the {TakeSnapshotsOptionSettingsKey} setting from configuration. If dry-run is enabled, reports snapshots that would be taken but does not perform the snapshot operations.",
+        Required = false
+      };
 
   private Option<uint> ConfigGlobalCommand_DaemonTimerIntervalSecondsOption { get; } =
     new ( nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds) )
     {
-      Arity       = ArgumentArity.ExactlyOne,
+      Arity = ArgumentArity.ExactlyOne,
       Description = $"""
                      The {nameof (SnapsInAZfsSettings.DaemonTimerIntervalSeconds)} option controls the interval, in seconds, of timer ticks for the daemon's operation scheduling.
                      Values other than the suggested values may be used but sticking to the suggested values is strongly recommended.
                      """,
-      Hidden      = false,
-      Required    = false
+      Hidden   = false,
+      Required = false
     };
 
   private Option<TriStateOptionValue> ConfigGlobalCommand_DryRunOption { get; } =
-    new ( nameof (SnapsInAZfsSettings.DryRun), nameof (SnapsInAZfsSettings.DryRun).ToLowerInvariant ( ), "-n" )
+    new ( nameof (SnapsInAZfsSettings.DryRun), nameof (SnapsInAZfsSettings.DryRun).ToLowerInvariant ( ) )
     {
       Arity       = ArgumentArity.ExactlyOne,
       Description = $"The {nameof (SnapsInAZfsSettings.DryRun)} option controls whether SIAZ can make changes.",
@@ -137,38 +157,12 @@ public partial class SiazCommandLine
         Required    = false
       };
 
-  internal Option<LoggingLevel> LogLevelOption { get; }
-    = new ( LogLevelOptionName )
-      {
-        Description = "Override global logging level.",
-        Recursive   = true,
-        Arity       = ArgumentArity.ZeroOrOne
-      };
-
-  private Option<bool> MonitorOption { get; }
-    = new ( MonitorOptionName )
-      {
-        Arity       = ArgumentArity.ZeroOrOne,
-        Description = "Enable the monitoring endpoints.",
-        Recursive   = false,
-        Required    = false
-      };
-
-  private Option<bool> PruneSnapshotsOption { get; }
-    = new ( PruneSnapshotsOptionName )
+  private SiazSettingsOption<bool> PruneSnapshotsOption { get; }
+    = new ( PruneSnapshotsOptionName, PruneSnapshotsOptionSettingsKey )
       {
         Arity = ArgumentArity.ZeroOrOne,
         Description
           = $"Enables expired snapshot pruning, {F.U}overriding{F._U} the PruneSnapshots setting from configuration. If dry-run is enabled, reports snapshots that would be destroyed but does not perform the destroy operations.",
-        Required = false
-      };
-
-  private Option<bool> TakeSnapshotsOption { get; }
-    = new ( TakeSnapshotsOptionName )
-      {
-        Arity = ArgumentArity.ZeroOrOne,
-        Description
-          = $"Enables new snapshot processing, {F.U}overriding{F._U} the TakeSnapshots setting from configuration. If dry-run is enabled, reports snapshots that would be taken but does not perform the snapshot operations.",
         Required = false
       };
 
@@ -187,6 +181,14 @@ public partial class SiazCommandLine
                                                                                       Description = "Required option to indicate that you understand this is an immediate, permanent, and unrecoverable action without complete backups and that you accept all responsibility for anything that happens, including data loss."
                                                                                     };
 
+  internal const string DryRunOptionName                = "--dry-run";
+  internal const string DryRunOptionSettingsKey         = nameof (SnapsInAZfsSettings.DryRun);
+  internal const string MonitorOptionSettingsKey        = "Monitoring:EnableHttp";
+  internal const string PruneSnapshotsOptionName        = "--prune-snapshots";
+  internal const string PruneSnapshotsOptionSettingsKey = nameof (SnapsInAZfsSettings.PruneSnapshots);
+  internal const string TakeSnapshotsOptionName         = "--take-snapshots";
+  internal const string TakeSnapshotsOptionSettingsKey  = nameof (SnapsInAZfsSettings.TakeSnapshots);
+
   private const string             BaseConfigFilesEnvVarName                             = "SIAZ_ConfigFiles_";
   private const string             ConfigOptionName                                      = "--config";
   private const string             DaemonizeOptionName                                   = "--daemonize";
@@ -195,9 +197,7 @@ public partial class SiazCommandLine
   private const string             LogLevelOptionName                                    = "--log-level";
   private const string             MonitorOptionName                                     = "--monitor";
   private const string             OutputFileOptionName                                  = "--output-file";
-  private const string             PruneSnapshotsOptionName                              = "--prune-snapshots";
   private const StringSplitOptions RemoveAndTrimStringSplitEntries                       = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-  private const string             TakeSnapshotsOptionName                               = "--take-snapshots";
   private const string             ZfsSchemaChangeCommands_ConfirmImpactOptionName       = "--confirm";
   private const string             ZfsSchemaChangeCommands_ReallyConfirmImpactOptionName = "--i-understand-this-cannot-be-undone";
 
