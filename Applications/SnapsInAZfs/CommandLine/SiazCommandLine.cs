@@ -224,30 +224,34 @@ public sealed partial class SiazCommandLine
   }
 
   /// <summary>
-  ///   Gets the collection of configuration files to load, after considering any given on the command line.
+  ///   Gets the collection of configuration files to load, after considering any given on the command line, and indicates if they came
+  ///   from the CLI or not.
   /// </summary>
-  /// <param name="rootCommandParseResult"></param>
-  /// <returns></returns>
-  public FileInfo[] GetConfigurationFileCollection ( ParseResult? rootCommandParseResult = null )
+  /// <param name="rootCommandParseResult">The <see cref="ParseResult" /> to examine for the --config option.</param>
+  /// <returns>
+  ///   A <see cref="ValueTuple" /> containing an array of <see cref="FileInfo" /> and whether the specified files came from the CLI
+  ///   (<see langword="false" />) or not (<see langword="true" />).
+  /// </returns>
+  public (FileInfo[] Files, bool Implicit) GetConfigurationFileCollection ( ParseResult? rootCommandParseResult = null )
   {
     rootCommandParseResult ??= RootCommandParseResult ??= Parse ( Environment.GetCommandLineArgs ( ) );
 
     if ( rootCommandParseResult.RootCommandResult.GetResult ( ConfigOption ) is not { Option: Option<FileInfo[]> } fileInfoResult )
     {
       rootCommandParseResult.RootCommandResult.AddError ( $"Unexpected input to {ConfigOptionName} option." );
-      return [ ];
+      return ( [ ], true );
     }
 
     if ( fileInfoResult is { Implicit: false, Tokens.Count: < 1 } )
     {
       fileInfoResult.AddError ( $"One or more configuration files must be given to the {ConfigOptionName} option." );
-      return [ ];
+      return ( [ ], true );
     }
 
     FileInfo[] fileCollection = [ ..fileInfoResult.GetValueOrDefault<FileInfo[]> ( ) ];
     _logger.Debug ( "Configuration will be loaded from these files: {0}", string.Join ( Environment.NewLine, fileCollection.Select ( static f => f.FullName ) ) );
 
-    return fileCollection;
+    return ( fileCollection, fileInfoResult.Implicit );
   }
 
   /// <summary>

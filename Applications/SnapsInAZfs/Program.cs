@@ -14,7 +14,6 @@ namespace SnapsInAZfs;
 
 using System.CommandLine.Parsing;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Text.Json;
 using CommandLine;
 using CommandLine.Extensions;
@@ -31,6 +30,7 @@ using Settings.Validation;
 using MSLogLevel = Microsoft.Extensions.Logging.LogLevel;
 using NLogLevel = NLog.LogLevel;
 using SCL = System.CommandLine;
+using F = StringFormattingConstants;
 
 [UsedImplicitly]
 internal static class Program
@@ -41,6 +41,7 @@ internal static class Program
   internal static         SnapsInAZfsSettings? Settings;
   internal static         IZfsCommandRunner    ZfsCommandRunnerSingleton = null!;
   private static readonly ManualResetEventSlim Blocker                   = new ( false );
+  private static          IConfigurationRoot?  _configurationRoot;
 
   [ExcludeFromCodeCoverage ( Justification = "Largely un-testable" )]
   public static async Task<int> Main ( string[] argv )
@@ -78,17 +79,27 @@ internal static class Program
 
     siazCli.Parse ( argv );
 
-    FileInfo[] configFiles = siazCli.GetConfigurationFileCollection ( );
+    ( FileInfo[] configFiles, bool configFilesImplicit ) = siazCli.GetConfigurationFileCollection ( );
 
-    WebApplicationBuilder appBuilder = WebApplication.CreateBuilder ( new WebApplicationOptions { ApplicationName = SnapsInAZfsAppName, Args = argv } );
+    ConfigurationBuilder configBuilder = new ( );
 
     foreach ( FileInfo configFile in configFiles )
     {
-      appBuilder.Configuration.AddJsonFile ( configFile.FullName, true, false );
+      configBuilder.AddJsonFile ( configFile.FullName, configFilesImplicit, false );
     }
 
-    _logger.Debug ( "Adding environment variables to configuration." );
-    appBuilder.Configuration.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
+    _logger.Debug ( $"Adding environment variables with prefix {F.U}{EnvironmentVariableFilterPrefix}{F._U} to configuration." );
+    configBuilder.AddEnvironmentVariables ( static filter => filter.Prefix = EnvironmentVariableFilterPrefix );
+
+    _configurationRoot = configBuilder.Build ( );
+    LogManager.Flush ( );
+    LogManager.Setup ( static logConfigBuilder => { logConfigBuilder.LoadConfigurationFromSection ( _configurationRoot ).ReloadConfiguration ( ); }
+                     );
+    LogManager.ReconfigExistingLoggers ( true );
+
+    _logger = LogManager.GetCurrentClassLogger ( );
+
+    _logger.Debug ( "Logging reconfigured." );
 
     if ( siazCli.RootCommandParseResult is not { Errors.Count: 0 } noErrorsParseResult )
     {
@@ -123,8 +134,7 @@ internal static class Program
     {
       case SiazCommandLine.ConfigConsoleCommandName:
       {
-        siazCli  = null;
-        Settings = appBuilder.Configuration.Get<SnapsInAZfsSettings> ( );
+        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( );
 
         if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
@@ -132,7 +142,7 @@ internal static class Program
         }
 
         _logger.Debug ( "Settings passed basic validation checks." );
-        _logger.Trace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
+        _logger.ConditionalTrace ( $"Final settings object: {JsonSerializer.Serialize ( Settings )}" );
 
         try
         {
@@ -149,7 +159,7 @@ internal static class Program
           return (int)ExitCode.GenericError;
         }
       }
-        return 0;
+        break;
 
       case SiazCommandLine.ConfigGlobalCommandName:
         _logger.Debug ( "Would have modified config files." );
@@ -157,7 +167,7 @@ internal static class Program
 
       case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
       {
-        Settings = appBuilder.Configuration.Get<SnapsInAZfsSettings> ( );
+        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( );
 
         if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
@@ -169,44 +179,50 @@ internal static class Program
 
         string mode = noErrorsParseResult.GetRequiredValue ( siazCli.RunCommandModeArgument );
 
-        OptionResult[] options = noErrorsParseResult.CommandResult.Children.OfType<OptionResult> ( ).Where ( static o => o.Option is ISiazSettingsKeyedOption ).ToArray ( );
+        OptionResult[] options = noErrorsParseResult.GetExplicitSettingsKeyedResults ( );
 
         if ( options.Length > 0 )
         {
-          ApplyCommandLineOverridesToSettings ( appBuilder.Configuration, options, ref Settings );
+          _logger.Debug ( "Explicit options provided to {0} command. Processing overrides.", noErrorsParseResult.CommandResult.Command.Name );
+          ApplyCommandLineOverridesToSettings ( _configurationRoot, options, ref Settings );
         }
 
         if ( Settings.Monitoring.EnableHttp && mode == "service" )
         {
-          goto case "RunWithKestrel";
+          return await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true );
         }
 
-        goto case "RunWithoutKestrel";
+        await RunWithoutMonitoring ( ).ConfigureAwait ( true );
+
+        return SiazService.ExitStatus;
       }
-
-      case "RunWithKestrel":
-        return 0;
-        return await RunWithKestrelAsync ( Settings, appBuilder.Configuration ).ConfigureAwait ( true );
-
-      case "RunWithoutKestrel":
-        return 0;
-        return await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true );
     }
 
     return 0;
-
-    //return Settings.Monitoring.EnableHttp switch
-    //       {
-    //         true => await RunWithKestrelAsync ( Settings, _configurationRoot ).ConfigureAwait ( true ),
-    //         _    => await RunWithoutKestrelAsync ( Settings ).ConfigureAwait ( true )
-    //       };
   }
 
-  private static async void SiazCli_InvokeCompleted ( object? sender, SiazCommandLine siazCommandLine )
+  private static async Task RunWithoutMonitoring ( )
+  {
+    IHost appHost = Host.CreateDefaultBuilder ( )
+                        .UseSystemd ( )
+                        .ConfigureAppConfiguration ( static builder => builder.AddConfiguration ( _configurationRoot ?? throw new InvalidOperationException ( "Configuration not built." ) ) )
+                        .ConfigureServices
+                           ( static serviceCollection => serviceCollection.AddHostedService<ISiazService>
+                               ( static _ => GetSiazServiceInstance ( Settings! ) ?? throw new InvalidOperationException ( "Unable to get service instance." ) )
+                           )
+                        .Build ( );
+
+    using CancellationTokenSource tokenSource = new ( );
+    CancellationToken             masterToken = tokenSource.Token;
+    await appHost.StartAsync ( masterToken ).ConfigureAwait ( true );
+    await appHost.WaitForShutdownAsync ( masterToken ).ConfigureAwait ( true );
+  }
+
+  private static void SiazCli_InvokeCompleted ( object? sender, SiazCommandLine siazCommandLine )
   {
     try
     {
-      _logger.Trace ( "Command line invocation completed. Signaling wait handle." );
+      _logger.Trace ( "Invoked event received. Signaling wait handle." );
       Blocker.Set ( );
     }
     catch ( Exception e )
@@ -241,17 +257,13 @@ internal static class Program
   }
 
   /// <summary>
-  ///   Loads the appsettings.json file from the working directory and configures logging ONLY.
+  ///   Loads the built-in NLog configuration, allowing environment variable overrides.
   /// </summary>
   /// <remarks>
   ///   <para>
-  ///     After this method is called, the LogManager will have the hard-coded configuration in <see cref="NLogInitialConfiguration" />
-  ///     .<br />
+  ///     After this method is called, the LogManager will have the hard-coded configuration in
+  ///     <see cref="EarlyNLogConfiguration" />.<br />
   ///     This is only used until the real configuration has been loaded, as a fallback to protect against missing configuration.<br />
-  ///     The configuration is written to a temporary file, loaded, and then the file is deleted.
-  ///   </para>
-  ///   <para>
-  ///     The file is opened with <see cref="FileShare.None" /> and will be truncated before writing the initial configuration to it.
   ///   </para>
   ///   <para>
   ///     The configuration can be overridden with environment variables using the prefix <c>SnapsInAZfs_NLog__</c> (note the
@@ -264,27 +276,19 @@ internal static class Program
   ///   </para>
   /// </remarks>
   /// <returns>The <see cref="ISetupBuilder" /> created from the configuration.</returns>
-  private static bool InitializeEarlyLogging ( out Logger logger )
+  private static void InitializeEarlyLogging ( out Logger logger )
   {
-    Logger? earlyLogger = null;
-
     IConfigurationRoot earlyLoggerConfig = new ConfigurationBuilder ( )
                                           .AddInMemoryCollection ( EarlyNLogConfiguration )
                                           .AddEnvironmentVariables ( static filter => filter.Prefix = EarlyLoggingOverrideEnvironmentVariableFilterPrefix )
                                           .Build ( );
-    ISetupBuilder builder = LogManager.Setup ( )
-                                      .LoadConfigurationFromSection
-                                         (
-                                          earlyLoggerConfig
-                                         );
+    ISetupBuilder builder = LogManager.Setup ( ).LoadConfigurationFromSection ( earlyLoggerConfig );
 
-    earlyLogger = builder.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
+    Logger earlyLogger = builder.GetLogger ( $"{nameof (SnapsInAZfs)}.{nameof (Program)}" );
     LogManager.ReconfigExistingLoggers ( true );
 
     earlyLogger.Debug ( ( ) => $"Early logging config:\n{earlyLoggerConfig.GetDebugView ( )}" );
     logger = earlyLogger;
-
-    return true;
   }
 
   /// <summary>
@@ -296,7 +300,7 @@ internal static class Program
   /// <param name="programSettings">
   ///   A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
   /// </param>
-  internal static void ApplyCommandLineOverridesToSettings ( in IConfigurationRoot baseConfig, OptionResult[] optionResults, ref SnapsInAZfsSettings programSettings )
+  private static void ApplyCommandLineOverridesToSettings ( in IConfigurationRoot baseConfig, OptionResult[] optionResults, ref SnapsInAZfsSettings programSettings )
   {
     _logger.Debug ( "Overriding settings using options from command line." );
 
@@ -332,31 +336,6 @@ internal static class Program
     IConfigurationRoot overriddenConfig = builder.Build ( );
 
     programSettings = overriddenConfig.Get<SnapsInAZfsSettings> ( ) ?? programSettings;
-  }
-
-  /// <summary>
-  ///   Overrides configuration values specified in configuration files or environment variables with arguments supplied on
-  ///   the CLI.
-  /// </summary>
-  /// <param name="args"></param>
-  /// <param name="programSettings">
-  ///   A reference to an instance of a <see cref="SnapsInAZfsSettings" /> object to modify
-  /// </param>
-  internal static void ApplyCommandLineArgumentOverrides ( in CommandLineArguments args, SnapsInAZfsSettings programSettings )
-  {
-    _logger.Debug ( "Overriding settings using arguments from command line." );
-
-    programSettings.DryRun         |= args.DryRun;
-    programSettings.TakeSnapshots  =  ( programSettings.TakeSnapshots  || args.TakeSnapshots  || args.Cron )                    && !args.NoTakeSnapshots;
-    programSettings.PruneSnapshots =  ( programSettings.PruneSnapshots || args.PruneSnapshots || args.ForcePrune || args.Cron ) && !args.NoPruneSnapshots;
-    programSettings.Daemonize      =  ( programSettings.Daemonize      || args.Daemonize )                                      && args is { NoDaemonize: false, ConfigConsole: false };
-    programSettings.Monitoring.EnableHttp
-      = ( programSettings.Monitoring.EnableHttp || args.Monitor ) && args is { NoMonitor : false, ConfigConsole: false };
-
-    if ( args.DaemonTimerInterval > 0 )
-    {
-      programSettings.DaemonTimerIntervalSeconds = Math.Clamp ( args.DaemonTimerInterval, 1u, 60u );
-    }
   }
 
   internal static bool TryGetZfsCommandRunner<TRunner> (
@@ -501,10 +480,7 @@ internal static class Program
     return SiazService.ExitStatus;
   }
 
-  internal const string? EarlyLoggingOverrideEnvironmentVariableFilterPrefix = $"{EnvironmentVariableFilterPrefix}EarlyLogger_";
-
-  internal const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
-
+  [SuppressMessage ( "ReSharper", "StringLiteralTypo", Justification = "It's nlog configuration syntax..." )]
   private static Dictionary<string, string?> EarlyNLogConfiguration { get; }
     = new ( )
       {
@@ -535,32 +511,9 @@ internal static class Program
         [ "NLog:rules:0:enabled" ]                                        = "true"
       };
 
-  private static async Task<int> RunWithoutKestrelAsync ( SnapsInAZfsSettings settings )
-  {
-    SiazService.Timestamp = DateTimeOffset.Now;
-    using SiazService? serviceInstance = GetSiazServiceInstance ( settings );
+  private const string? EarlyLoggingOverrideEnvironmentVariableFilterPrefix = $"{EnvironmentVariableFilterPrefix}EarlyLogger_";
 
-    if ( serviceInstance is null )
-    {
-      _logger.Fatal ( "Failed to create service instance - exiting" );
-      LogManager.Shutdown ( );
-
-      return (int)ExitCode.ENOATTR;
-    }
-
-    // Disposal happens after service shutdown, so this inspection can be ignored here
-    // ReSharper disable once AccessToDisposedClosure
-    IHost serviceHost = Host.CreateDefaultBuilder ( )
-                            .UseSystemd ( )
-                            .ConfigureServices ( ( _, services ) => services.AddHostedService ( _ => serviceInstance ) )
-                            .Build ( );
-    using CancellationTokenSource tokenSource = new ( );
-    CancellationToken             masterToken = tokenSource.Token;
-    await serviceHost.StartAsync ( masterToken ).ConfigureAwait ( true );
-    await serviceHost.WaitForShutdownAsync ( masterToken ).ConfigureAwait ( true );
-
-    return SiazService.ExitStatus;
-  }
+  private const string? EnvironmentVariableFilterPrefix = $"{SnapsInAZfsAppName}_";
 
   private static ExitCode ValidateSettings ( ref readonly SnapsInAZfsSettings settings )
   {

@@ -22,12 +22,17 @@ public static class OptionResultExtensions
   extension ( OptionResult result )
   {
     /// <summary>
-    /// Gets the value of the <see cref="OptionResult.Option"/> in <paramref name="result"/> as an instance of <typeparamref name="T"/>.<br/>
-    /// If the option is not of the requested type or does not exist in the result, <paramref name="defaultValue"/> is returned.
+    ///   Gets the value of the <see cref="OptionResult.Option" /> in <paramref name="result" /> as an instance of
+    ///   <typeparamref name="T" />.<br />
+    ///   If the option is not of the requested type or does not exist in the result, <paramref name="defaultValue" /> is returned.
     /// </summary>
-    /// <param name="defaultValue">The value to return if the option's type differs, or if the option does not exist.</param>
+    /// <param name="defaultValue">
+    ///   The value to return if the option's type differs, or if the option does not exist.
+    /// </param>
     /// <typeparam name="T">The type of the value requested.</typeparam>
-    /// <remarks>This overrides the built-in behavior of <see cref="Option{T}.DefaultValueFactory"/> at the call site.</remarks>
+    /// <remarks>
+    ///   This overrides the built-in behavior of <see cref="Option{T}.DefaultValueFactory" /> at the call site.
+    /// </remarks>
     /// <returns></returns>
     public T GetValueOrDefault<T> ( T defaultValue )
     {
