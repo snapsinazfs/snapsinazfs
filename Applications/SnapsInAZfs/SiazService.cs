@@ -28,7 +28,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 {
   private static readonly Logger               Logger                 = LogManager.GetCurrentClassLogger ( );
   private static readonly AutoResetEvent       SnapshotAutoResetEvent = new ( true );
-  private readonly        CommandLineArguments _commandLineArguments;
   private readonly        TimeSpan             _daemonTimerInterval;
   private readonly SnapsInAZfsSettings _settings;
   private readonly IZfsCommandRunner   _zfsCommandRunner;
@@ -43,7 +42,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   {
     _settings                            = settings;
     _zfsCommandRunner                    = zfsCommandRunner;
-    _commandLineArguments                = Args.GetAmbientArgs<CommandLineArguments> ( );
     _settings.DaemonTimerIntervalSeconds = Math.Clamp ( _settings.DaemonTimerIntervalSeconds, 1, 60 );
 
     // The clamp immediately above this makes this exception not possible
@@ -67,7 +65,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   {
     _settings                            = settings;
     _zfsCommandRunner                    = zfsCommandRunner;
-    _commandLineArguments                = Args.GetAmbientArgs<CommandLineArguments> ( );
     _settings.DaemonTimerIntervalSeconds = Math.Clamp ( _settings.DaemonTimerIntervalSeconds, 1, 60 );
 
     // The clamp immediately above this makes this exception not possible
@@ -150,7 +147,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     // Run once, unconditionally
     // Afterward, only continue if we're running as a daemon, stop hasn't been requested, and there wasn't an error.
     _lastExecutionResultCode
-      = await ExecuteSiazAsync ( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken ).ConfigureAwait ( true );
+      = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken ).ConfigureAwait ( true );
 
     if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || _lastExecutionResultCode is not SiazExecutionResultCode.Completed )
     {
@@ -233,7 +230,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             SetNextRunTime ( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
             // Fire this off asynchronously
-            _lastExecutionResultCode = await ExecuteSiazAsync ( _zfsCommandRunner, _commandLineArguments, Timestamp, serviceCancellationToken )
+            _lastExecutionResultCode = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken )
                                         .ConfigureAwait ( true );
 
             if ( _lastExecutionResultCode is SiazExecutionResultCode.CancelledByToken
@@ -349,10 +346,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     return !errorsEncountered;
   }
 
-  private static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync (
-    IZfsCommandRunner    zfsCommandRunner,
-    CommandLineArguments args
-  )
+  private static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync ( IZfsCommandRunner zfsCommandRunner )
   {
     Logger.Debug ( "Checking zfs properties schema" );
 
@@ -459,7 +453,6 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
   private async Task<SiazExecutionResultCode> ExecuteSiazAsync (
     IZfsCommandRunner    zfsCommandRunner,
-    CommandLineArguments args,
     DateTimeOffset       currentTimestamp,
     CancellationToken    cancellationToken
   )
