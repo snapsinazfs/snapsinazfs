@@ -19,7 +19,6 @@ using Interop;
 using Interop.Zfs.ZfsCommandRunner;
 using Interop.Zfs.ZfsTypes;
 using Monitoring;
-using PowerArgs;
 
 /// <summary>
 ///   The service class for running everything but the configuration console
@@ -285,7 +284,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   }
 
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-  private bool UpdateZfsDatasetSchema (
+  internal bool UpdateZfsDatasetSchema (
     SnapsInAZfsSettings                                              settings,
     ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities,
     IZfsCommandRunner                                                zfsCommandRunner
@@ -342,7 +341,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     return !errorsEncountered;
   }
 
-  private static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync ( IZfsCommandRunner zfsCommandRunner )
+  internal static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync ( IZfsCommandRunner zfsCommandRunner )
   {
     Logger.Debug ( "Checking zfs properties schema" );
 
