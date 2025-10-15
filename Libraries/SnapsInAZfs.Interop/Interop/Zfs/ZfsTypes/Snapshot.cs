@@ -125,8 +125,8 @@ public sealed partial record Snapshot : ZfsRecord, IComparable<Snapshot>, IEqual
             throw new ArgumentException ( "sourceSystem must have a non-null, non-whitespace-only Value", nameof (sourceSystem) );
         }
 
-        _period    = new ( this, ZfsPropertyNames.SnapshotPeriodPropertyName, snapshotPeriod );
-        _timestamp = new ( this, ZfsPropertyNames.SnapshotTimestampPropertyName, snapshotTimestamp );
+        _period    = new ( this, ZfsPropertyNames.SnapshotPeriod, snapshotPeriod );
+        _timestamp = new ( this, ZfsPropertyNames.SnapshotTimestamp, snapshotTimestamp );
     }
 
     /// <summary>

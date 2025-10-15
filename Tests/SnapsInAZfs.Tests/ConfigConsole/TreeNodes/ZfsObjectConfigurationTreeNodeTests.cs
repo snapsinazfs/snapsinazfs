@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 // Copyright 2025 Brandon Thetford
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -26,9 +26,9 @@ public class ZfsObjectConfigurationTreeNodeTests
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord baseRecordGen1, out ZfsRecord baseRecordGen2, out ZfsRecord treeRecordGen1, out ZfsRecord treeRecordGen2, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
 
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName ),                   Is.True );
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ), Is.True );
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.RecursionPropertyName ),                 Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.Enabled ),                   Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequent ), Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.Recursion ),                 Is.True );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.Value,                                                            Is.False );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.IsInherited,                                                      Is.True );
         Assume.That ( testNodeGen2.TreeDataset.SnapshotRetentionFrequent.Value,                                          Is.EqualTo ( -1 ) );
@@ -65,7 +65,7 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         FieldInfo                                  inheritedPropertiesFieldInfo     = typeof( ZfsObjectConfigurationTreeNode ).GetField ( "_inheritedPropertiesSinceLastSave", BindingFlags.Instance | BindingFlags.NonPublic )!;
         ConcurrentDictionary<string, IZfsProperty> inheritedPropertiesSinceLastSave = (ConcurrentDictionary<string, IZfsProperty>)inheritedPropertiesFieldInfo.GetValue ( testNodeGen2 )!;
-        inheritedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.Now, false );
+        inheritedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.Now, false );
 
         Assert.That ( ( ) => testNodeGen2.CopyBaseDatasetPropertiesToTreeDataset( ), Throws.InvalidOperationException );
     }
@@ -75,9 +75,9 @@ public class ZfsObjectConfigurationTreeNodeTests
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord baseRecordGen1, out ZfsRecord baseRecordGen2, out ZfsRecord treeRecordGen1, out ZfsRecord treeRecordGen2, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
 
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.EnabledPropertyName,                   false );
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 0 );
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.RecursionPropertyName,                 ZfsPropertyValueConstants.SnapsInAZfs );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.Enabled,                   false );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 0 );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.Recursion,                 ZfsPropertyValueConstants.SnapsInAZfs );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.Value,                         Is.False );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.IsInherited,                   Is.False );
         Assume.That ( testNodeGen2.TreeDataset.SnapshotRetentionFrequent.Value,       Is.EqualTo ( 0 ) );
@@ -114,7 +114,7 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         FieldInfo                                  modifiedPropertiesFieldInfo     = typeof( ZfsObjectConfigurationTreeNode ).GetField ( "_modifiedPropertiesSinceLastSave", BindingFlags.Instance | BindingFlags.NonPublic )!;
         ConcurrentDictionary<string, IZfsProperty> modifiedPropertiesSinceLastSave = (ConcurrentDictionary<string, IZfsProperty>)modifiedPropertiesFieldInfo.GetValue ( testNodeGen2 )!;
-        modifiedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.Now, false );
+        modifiedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.Now, false );
 
         Assert.That ( ( ) => testNodeGen2.CopyBaseDatasetPropertiesToTreeDataset( ), Throws.InvalidOperationException );
     }
@@ -124,9 +124,9 @@ public class ZfsObjectConfigurationTreeNodeTests
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord baseRecordGen1, out ZfsRecord baseRecordGen2, out ZfsRecord treeRecordGen1, out ZfsRecord treeRecordGen2, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
 
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName ),                   Is.True );
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ), Is.True );
-        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.RecursionPropertyName ),                 Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.Enabled ),                   Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequent ), Is.True );
+        Assume.That ( testNodeGen2.InheritPropertyFromParent ( ZfsPropertyNames.Recursion ),                 Is.True );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.Value,                                                            Is.False );
         Assume.That ( testNodeGen2.TreeDataset.SnapshotRetentionFrequent.Value,                                          Is.EqualTo ( -1 ) );
         Assume.That ( testNodeGen2.TreeDataset.Recursion.Value,                                                          Is.EqualTo ( ZfsPropertyValueConstants.SnapsInAZfs ) );
@@ -157,7 +157,7 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         FieldInfo                                  inheritedPropertiesFieldInfo     = typeof( ZfsObjectConfigurationTreeNode ).GetField ( "_inheritedPropertiesSinceLastSave", BindingFlags.Instance | BindingFlags.NonPublic )!;
         ConcurrentDictionary<string, IZfsProperty> inheritedPropertiesSinceLastSave = (ConcurrentDictionary<string, IZfsProperty>)inheritedPropertiesFieldInfo.GetValue ( testNodeGen2 )!;
-        inheritedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.Now, false );
+        inheritedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.Now, false );
 
         Assert.That ( ( ) => testNodeGen2.CopyTreeDatasetPropertiesToBaseDataset( ), Throws.InvalidOperationException );
     }
@@ -167,9 +167,9 @@ public class ZfsObjectConfigurationTreeNodeTests
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord baseRecordGen2, out ZfsRecord _, out ZfsRecord treeRecordGen2, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
 
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.EnabledPropertyName,                   false );
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 0 );
-        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.RecursionPropertyName,                 ZfsPropertyValueConstants.SnapsInAZfs );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.Enabled,                   false );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 0 );
+        testNodeGen2.UpdateTreeNodeProperty ( ZfsPropertyNames.Recursion,                 ZfsPropertyValueConstants.SnapsInAZfs );
         Assume.That ( testNodeGen2.TreeDataset.Enabled.Value,                   Is.False );
         Assume.That ( testNodeGen2.TreeDataset.SnapshotRetentionFrequent.Value, Is.EqualTo ( 0 ) );
         Assume.That ( testNodeGen2.TreeDataset.Recursion.Value,                 Is.EqualTo ( ZfsPropertyValueConstants.SnapsInAZfs ) );
@@ -202,18 +202,18 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         FieldInfo                                  modifiedPropertiesFieldInfo     = typeof( ZfsObjectConfigurationTreeNode ).GetField ( "_modifiedPropertiesSinceLastSave", BindingFlags.Instance | BindingFlags.NonPublic )!;
         ConcurrentDictionary<string, IZfsProperty> modifiedPropertiesSinceLastSave = (ConcurrentDictionary<string, IZfsProperty>)modifiedPropertiesFieldInfo.GetValue ( testNodeGen2 )!;
-        modifiedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.Now, false );
+        modifiedPropertiesSinceLastSave [ ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp ] = ZfsProperty<DateTimeOffset>.CreateWithoutParent ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.Now, false );
 
         Assert.That ( ( ) => testNodeGen2.CopyTreeDatasetPropertiesToBaseDataset( ), Throws.InvalidOperationException );
     }
 
     [Test]
-    [TestCase ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ExpectedResult = false )]
-    [TestCase ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,   ExpectedResult = false )]
-    [TestCase ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,    ExpectedResult = false )]
-    [TestCase ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,   ExpectedResult = false )]
-    [TestCase ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,  ExpectedResult = false )]
-    [TestCase ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,   ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp,   ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastDailySnapshotTimestamp,    ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp,   ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp,  ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp,   ExpectedResult = false )]
     public bool InheritPropertyFromParent_ReturnsFalseForInvalidProperties( string propertyName )
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
@@ -222,7 +222,7 @@ public class ZfsObjectConfigurationTreeNodeTests
     }
 
     [Test]
-    [TestCase ( ZfsPropertyNames.SnapshotTimestampPropertyName, ExpectedResult = false )]
+    [TestCase ( ZfsPropertyNames.SnapshotTimestamp, ExpectedResult = false )]
     public bool InheritPropertyFromParent_ReturnsFalseForKnownButNotAcceptedProperties( string propertyName )
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsObjectConfigurationTreeNode _, out ZfsObjectConfigurationTreeNode testNodeGen2 );
@@ -234,7 +234,7 @@ public class ZfsObjectConfigurationTreeNodeTests
     public void InheritPropertyFromParent_ReturnsFalseForRootNode ( )
     {
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsRecord _, out ZfsObjectConfigurationTreeNode testNodeGen1, out ZfsObjectConfigurationTreeNode _ );
-        Assert.That ( testNodeGen1.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName ), Is.False );
+        Assert.That ( testNodeGen1.InheritPropertyFromParent ( ZfsPropertyNames.Enabled ), Is.False );
     }
 
     [Test]
@@ -452,27 +452,27 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out ZfsObjectConfigurationTreeNode? testNodeGen1, out ZfsObjectConfigurationTreeNode? testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.EnabledPropertyName, testNodeGen1, testNodeGen2, enabledPropertyInfo, false, false, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_BoolProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Enabled, testNodeGen1, testNodeGen2, enabledPropertyInfo, false, false, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_BoolProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.TakeSnapshotsPropertyName, testNodeGen1, testNodeGen2, takeSnapshotsPropertyInfo, false, false, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_BoolProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.TakeSnapshots, testNodeGen1, testNodeGen2, takeSnapshotsPropertyInfo, false, false, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_BoolProperty_Inherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, testNodeGen1, testNodeGen2, snapshotRetentionFrequentPropertyInfo, -1, -1, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_IntProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionFrequent, testNodeGen1, testNodeGen2, snapshotRetentionFrequentPropertyInfo, -1, -1, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_IntProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, testNodeGen1, testNodeGen2, snapshotRetentionHourlyPropertyInfo, -1, -1, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_IntProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionHourly, testNodeGen1, testNodeGen2, snapshotRetentionHourlyPropertyInfo, -1, -1, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_IntProperty_Inherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.RecursionPropertyName, testNodeGen1, testNodeGen2, recursionPropertyInfo, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.SnapsInAZfs, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_StringProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Recursion, testNodeGen1, testNodeGen2, recursionPropertyInfo, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.SnapsInAZfs, true ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_StringProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.TemplatePropertyName, testNodeGen1, testNodeGen2, templatePropertyInfo, ZfsPropertyValueConstants.Default, ZfsPropertyValueConstants.Default, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_StringProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Template, testNodeGen1, testNodeGen2, templatePropertyInfo, ZfsPropertyValueConstants.Default, ZfsPropertyValueConstants.Default, false ) { TestName = "InheritPropertyFromParent_ValuesAndInheritanceCorrect_StringProperty_Inherited" };
     }
 
     private static IEnumerable<TestCaseData> GetCasesFor_UpdateTreeNodeProperty_ValuesAndInheritanceCorrect ( )
@@ -486,27 +486,27 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out ZfsObjectConfigurationTreeNode? testNodeGen1, out ZfsObjectConfigurationTreeNode? testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.EnabledPropertyName, testNodeGen1, testNodeGen2, enabledPropertyInfo, true, true, true, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_BoolProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Enabled, testNodeGen1, testNodeGen2, enabledPropertyInfo, true, true, true, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_BoolProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.TakeSnapshotsPropertyName, testNodeGen1, testNodeGen2, takeSnapshotsPropertyInfo, true, true, true, true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_BoolProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.TakeSnapshots, testNodeGen1, testNodeGen2, takeSnapshotsPropertyInfo, true, true, true, true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_BoolProperty_Inherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, testNodeGen1, testNodeGen2, snapshotRetentionFrequentPropertyInfo, 0, 0, 99, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_IntProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionFrequent, testNodeGen1, testNodeGen2, snapshotRetentionFrequentPropertyInfo, 0, 0, 99, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_IntProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, testNodeGen1, testNodeGen2, snapshotRetentionHourlyPropertyInfo, 0, 0, 0, true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_IntProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.SnapshotRetentionHourly, testNodeGen1, testNodeGen2, snapshotRetentionHourlyPropertyInfo, 0, 0, 0, true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_IntProperty_Inherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.RecursionPropertyName, testNodeGen1, testNodeGen2, recursionPropertyInfo, ZfsPropertyValueConstants.ZfsRecursion, ZfsPropertyValueConstants.ZfsRecursion, ZfsPropertyValueConstants.ZfsRecursion, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_StringProperty_NotInherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Recursion, testNodeGen1, testNodeGen2, recursionPropertyInfo, ZfsPropertyValueConstants.ZfsRecursion, ZfsPropertyValueConstants.ZfsRecursion, ZfsPropertyValueConstants.ZfsRecursion, false ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_StringProperty_NotInherited" };
 
         GetStandardTestNodesTwoGenerations ( out ZfsRecord _, out ZfsRecord _, out _, out _, out testNodeGen1, out testNodeGen2 );
 
-        yield return new TestCaseData ( ZfsPropertyNames.TemplatePropertyName, testNodeGen1, testNodeGen2, templatePropertyInfo, "newString", "newString", "newString", true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_StringProperty_Inherited" };
+        yield return new TestCaseData ( ZfsPropertyNames.Template, testNodeGen1, testNodeGen2, templatePropertyInfo, "newString", "newString", "newString", true ) { TestName = "UpdateTreeNodeProperty_ValuesAndInheritanceCorrect_StringProperty_Inherited" };
     }
 
     private static void GetStandardTestNodesTwoGenerations( out ZfsRecord baseRecordGen1, out ZfsRecord baseRecordGen2, out ZfsRecord treeRecordGen1, out ZfsRecord treeRecordGen2, out ZfsObjectConfigurationTreeNode testNodeGen1, out ZfsObjectConfigurationTreeNode testNodeGen2 )
@@ -515,30 +515,30 @@ public class ZfsObjectConfigurationTreeNodeTests
 
         baseRecordGen1 = new ZfsRecord ( "gen1", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
         baseRecordGen2 = baseRecordGen1.CreateChildDataset ( "gen1/gen2", ZfsPropertyValueConstants.FileSystem, "host.domain.tld" );
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName,                   true );
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 99 );
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.RecursionPropertyName,                 ZfsPropertyValueConstants.ZfsRecursion );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.Enabled,                   true );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 99 );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.Recursion,                 ZfsPropertyValueConstants.ZfsRecursion );
         treeRecordGen1 = new ZfsRecord ( "gen1", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
         treeRecordGen2 = treeRecordGen1.CreateChildDataset ( "gen1/gen2", ZfsPropertyValueConstants.FileSystem, "host.domain.tld" );
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName,                   true );
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 99 );
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.RecursionPropertyName,                 ZfsPropertyValueConstants.ZfsRecursion );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.Enabled,                   true );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 99 );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.Recursion,                 ZfsPropertyValueConstants.ZfsRecursion );
 
         // Set up property values for the base record of gen2
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName, true );
-        baseRecordGen2.InheritBoolPropertyFromParent ( ZfsPropertyNames.TakeSnapshotsPropertyName );
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 99 );
-        baseRecordGen2.InheritIntPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
-        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.ZfsRecursion );
-        baseRecordGen2.InheritStringPropertyFromParent ( ZfsPropertyNames.TemplatePropertyName );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.Enabled, true );
+        baseRecordGen2.InheritBoolPropertyFromParent ( ZfsPropertyNames.TakeSnapshots );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 99 );
+        baseRecordGen2.InheritIntPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourly );
+        baseRecordGen2.UpdateProperty ( ZfsPropertyNames.Recursion, ZfsPropertyValueConstants.ZfsRecursion );
+        baseRecordGen2.InheritStringPropertyFromParent ( ZfsPropertyNames.Template );
 
         // Set the same property values for the tree record of gen2
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName, true );
-        treeRecordGen2.InheritBoolPropertyFromParent ( ZfsPropertyNames.TakeSnapshotsPropertyName );
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, 99 );
-        treeRecordGen2.InheritIntPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
-        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.ZfsRecursion );
-        treeRecordGen2.InheritStringPropertyFromParent ( ZfsPropertyNames.TemplatePropertyName );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.Enabled, true );
+        treeRecordGen2.InheritBoolPropertyFromParent ( ZfsPropertyNames.TakeSnapshots );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.SnapshotRetentionFrequent, 99 );
+        treeRecordGen2.InheritIntPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourly );
+        treeRecordGen2.UpdateProperty ( ZfsPropertyNames.Recursion, ZfsPropertyValueConstants.ZfsRecursion );
+        treeRecordGen2.InheritStringPropertyFromParent ( ZfsPropertyNames.Template );
 
         testNodeGen1 = new ZfsObjectConfigurationTreeNode ( "gen1",      baseRecordGen1, treeRecordGen1 );
         testNodeGen2 = new ZfsObjectConfigurationTreeNode ( "gen1/gen2", baseRecordGen2, treeRecordGen2 );

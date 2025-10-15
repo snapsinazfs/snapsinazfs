@@ -40,12 +40,12 @@ public static class TypeExtensions
   {
     return period.Kind switch
            {
-             SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName,
-             SnapshotPeriodKind.Hourly   => ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-             SnapshotPeriodKind.Daily    => ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName,
-             SnapshotPeriodKind.Weekly   => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-             SnapshotPeriodKind.Monthly  => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName,
-             SnapshotPeriodKind.Yearly   => ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName,
+             SnapshotPeriodKind.Frequent => ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp,
+             SnapshotPeriodKind.Hourly   => ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp,
+             SnapshotPeriodKind.Daily    => ZfsPropertyNames.DatasetLastDailySnapshotTimestamp,
+             SnapshotPeriodKind.Weekly   => ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp,
+             SnapshotPeriodKind.Monthly  => ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp,
+             SnapshotPeriodKind.Yearly   => ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp,
              SnapshotPeriodKind.NotSet   => throw new ArgumentOutOfRangeException ( nameof (period) ),
              _                           => throw new FormatException ( "Unrecognized SnapshotPeriod value" )
            };

@@ -267,86 +267,86 @@ public readonly partial struct ZfsProperty<T>
 
         // TODO: This can likely be done more cleanly and efficiently.
         // Just remember that the point is it bails as soon as any parse fails. It can't just be a simple switch.
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.EnabledPropertyName, rawZfsObject, out enabled ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.Enabled, rawZfsObject, out enabled ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.TakeSnapshotsPropertyName, rawZfsObject, out takeSnapshots ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.TakeSnapshots, rawZfsObject, out takeSnapshots ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.PruneSnapshotsPropertyName, rawZfsObject, out pruneSnapshots ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.PruneSnapshots, rawZfsObject, out pruneSnapshots ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, rawZfsObject, out lastFrequentSnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, rawZfsObject, out lastFrequentSnapshotTimestamp ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, rawZfsObject, out lastHourlySnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, rawZfsObject, out lastHourlySnapshotTimestamp ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, rawZfsObject, out lastDailySnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, rawZfsObject, out lastDailySnapshotTimestamp ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, rawZfsObject, out lastWeeklySnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, rawZfsObject, out lastWeeklySnapshotTimestamp ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, rawZfsObject, out lastMonthlySnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, rawZfsObject, out lastMonthlySnapshotTimestamp ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, rawZfsObject, out lastYearlySnapshotTimestamp ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp, rawZfsObject, out lastYearlySnapshotTimestamp ) )
         {
             return false;
         }
 
-        recursion    = ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.RecursionPropertyName, rawZfsObject.Properties [ ZfsPropertyNames.RecursionPropertyName ].Value, rawZfsObject.Properties [ ZfsPropertyNames.RecursionPropertyName ].Source == ZfsPropertySourceConstants.Local );
+        recursion    = ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.Recursion, rawZfsObject.Properties [ ZfsPropertyNames.Recursion ].Value, rawZfsObject.Properties [ ZfsPropertyNames.Recursion ].Source == ZfsPropertySourceConstants.Local );
         sourceSystem = ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SourceSystem,          rawZfsObject.Properties [ ZfsPropertyNames.SourceSystem ].Value,          rawZfsObject.Properties [ ZfsPropertyNames.SourceSystem ].Source          == ZfsPropertySourceConstants.Local );
-        template     = ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.TemplatePropertyName,  rawZfsObject.Properties [ ZfsPropertyNames.TemplatePropertyName ].Value,  rawZfsObject.Properties [ ZfsPropertyNames.TemplatePropertyName ].Source  == ZfsPropertySourceConstants.Local );
+        template     = ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.Template,  rawZfsObject.Properties [ ZfsPropertyNames.Template ].Value,  rawZfsObject.Properties [ ZfsPropertyNames.Template ].Source  == ZfsPropertySourceConstants.Local );
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, rawZfsObject, out retentionFrequent ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionFrequent, rawZfsObject, out retentionFrequent ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, rawZfsObject, out retentionHourly ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionHourly, rawZfsObject, out retentionHourly ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, rawZfsObject, out retentionDaily ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionDaily, rawZfsObject, out retentionDaily ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, rawZfsObject, out retentionWeekly ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionWeekly, rawZfsObject, out retentionWeekly ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, rawZfsObject, out retentionMonthly ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionMonthly, rawZfsObject, out retentionMonthly ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, rawZfsObject, out retentionYearly ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionYearly, rawZfsObject, out retentionYearly ) )
         {
             return false;
         }
 
-        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, rawZfsObject, out retentionPruneDeferral ) )
+        if ( !TryParsePropertyByName ( dsName, ZfsPropertyNames.SnapshotRetentionPruneDeferral, rawZfsObject, out retentionPruneDeferral ) )
         {
             return false;
         }

@@ -41,7 +41,7 @@ public class ZfsRecordTests
 #pragma warning disable NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
         ZfsProperty<bool> originalEnabledProperty                  = originalChild.Enabled;
         ZfsProperty<bool> updatedChildEnabledProperty_BeforeUpdate = updatedChild.Enabled;
-        ZfsProperty<bool> updatedChildEnabledProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName, false );
+        ZfsProperty<bool> updatedChildEnabledProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.Enabled, false );
         Assert.That ( updatedChildEnabledProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildEnabledProperty_BeforeUpdate ) );
         updatedChildEnabledProperty_BeforeUpdate = updatedChildEnabledProperty_AfterUpdate;
 
@@ -55,7 +55,7 @@ public class ZfsRecordTests
 
         ZfsProperty<bool> originalTakeSnapshotsProperty                  = originalChild.TakeSnapshots;
         ZfsProperty<bool> updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChild.TakeSnapshots;
-        ZfsProperty<bool> updatedChildTakeSnapshotsProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, false );
+        ZfsProperty<bool> updatedChildTakeSnapshotsProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.TakeSnapshots, false );
         Assert.That ( updatedChildTakeSnapshotsProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildTakeSnapshotsProperty_BeforeUpdate ) );
         updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChildTakeSnapshotsProperty_AfterUpdate;
 
@@ -69,7 +69,7 @@ public class ZfsRecordTests
 
         ZfsProperty<bool> originalPruneSnapshotsProperty                  = originalChild.PruneSnapshots;
         ZfsProperty<bool> updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChild.PruneSnapshots;
-        ZfsProperty<bool> updatedChildPruneSnapshotsProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, false );
+        ZfsProperty<bool> updatedChildPruneSnapshotsProperty_AfterUpdate  = updatedParent.UpdateProperty ( ZfsPropertyNames.PruneSnapshots, false );
         Assert.That ( updatedChildPruneSnapshotsProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildPruneSnapshotsProperty_BeforeUpdate ) );
         updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChildPruneSnapshotsProperty_AfterUpdate;
 
@@ -84,7 +84,7 @@ public class ZfsRecordTests
     }
 
     [Test]
-    [TestCase ( ZfsPropertyNames.EnabledPropertyName )]
+    [TestCase ( ZfsPropertyNames.Enabled )]
     public void BoolPropertyChangedEventHandler_SubscribersReceiveEventAndUpdateProperties_ChildPropertyIsLocal( string propertyName )
     {
         ZfsRecord gen1Ds = ZfsRecordTestHelpers.GetNewTestRootFileSystem ( "gen1" );
@@ -246,7 +246,7 @@ public class ZfsRecordTests
 #pragma warning disable NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
         Assume.That ( updatedRecord.Equals ( originalRecord ), Is.True );
         ZfsProperty<bool> originalEnabledProperty = originalRecord.Enabled;
-        ZfsProperty<bool> updatedEnabledProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName, false );
+        ZfsProperty<bool> updatedEnabledProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.Enabled, false );
 
         Assert.Multiple ( ( ) =>
                           {
@@ -256,7 +256,7 @@ public class ZfsRecordTests
                           }
                         );
         ZfsProperty<bool> originalTakeSnapshotsProperty = originalRecord.TakeSnapshots;
-        ZfsProperty<bool> updatedTakeSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, false );
+        ZfsProperty<bool> updatedTakeSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.TakeSnapshots, false );
 
         Assert.Multiple ( ( ) =>
                           {
@@ -266,7 +266,7 @@ public class ZfsRecordTests
                           }
                         );
         ZfsProperty<bool> originalPruneSnapshotsProperty = originalRecord.TakeSnapshots;
-        ZfsProperty<bool> updatedPruneSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, false );
+        ZfsProperty<bool> updatedPruneSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.PruneSnapshots, false );
 
         Assert.Multiple ( ( ) =>
                           {
@@ -280,7 +280,7 @@ public class ZfsRecordTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_Bool( [Values ( ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName )] string propertyName, [Values] bool propertyValue, [Values] bool isLocal )
+    public void UpdateProperty_Bool( [Values ( ZfsPropertyNames.Enabled, ZfsPropertyNames.TakeSnapshots, ZfsPropertyNames.PruneSnapshots )] string propertyName, [Values] bool propertyValue, [Values] bool isLocal )
     {
         ZfsRecord         originalParent       = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         ZfsRecord         originalRecord       = originalParent.CreateChildDataset ( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
@@ -336,7 +336,7 @@ public class ZfsRecordTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_DateTimeOffset( [Values ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName )] string propertyName, [ValueSource ( nameof (UpdateProperty_DateTimeOffset_Values) )] string propertyValueString, [Values] bool isLocal )
+    public void UpdateProperty_DateTimeOffset( [Values ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp )] string propertyName, [ValueSource ( nameof (UpdateProperty_DateTimeOffset_Values) )] string propertyValueString, [Values] bool isLocal )
     {
         DateTimeOffset              propertyValue                  = DateTimeOffset.ParseExact ( propertyValueString, "O", DateTimeFormatInfo.CurrentInfo );
         ZfsRecord                   originalParent                 = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
@@ -393,7 +393,7 @@ public class ZfsRecordTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_Int( [Values ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName )] string propertyName, [Values ( 0, 1, 2, 10, 100 )] int propertyValue, [Values] bool isLocal )
+    public void UpdateProperty_Int( [Values ( ZfsPropertyNames.SnapshotRetentionFrequent, ZfsPropertyNames.SnapshotRetentionHourly, ZfsPropertyNames.SnapshotRetentionDaily, ZfsPropertyNames.SnapshotRetentionWeekly, ZfsPropertyNames.SnapshotRetentionMonthly, ZfsPropertyNames.SnapshotRetentionYearly, ZfsPropertyNames.SnapshotRetentionPruneDeferral )] string propertyName, [Values ( 0, 1, 2, 10, 100 )] int propertyValue, [Values] bool isLocal )
     {
         ZfsRecord        originalParent      = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         ZfsRecord        originalRecord      = originalParent.CreateChildDataset ( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
@@ -449,7 +449,7 @@ public class ZfsRecordTests
 
     [Test]
     [Combinatorial]
-    public void UpdateProperty_String( [Values ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyNames.TemplatePropertyName )] string propertyName, [Values ( "default", "testTemplate", "template with spaces" )] string propertyValue, [Values] bool isLocal )
+    public void UpdateProperty_String( [Values ( ZfsPropertyNames.Recursion, ZfsPropertyNames.Template )] string propertyName, [Values ( "default", "testTemplate", "template with spaces" )] string propertyValue, [Values] bool isLocal )
     {
         ZfsRecord           originalParent         = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         ZfsRecord           originalRecord         = originalParent.CreateChildDataset ( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );

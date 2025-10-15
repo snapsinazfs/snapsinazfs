@@ -141,7 +141,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.EnabledPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.Enabled );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -220,7 +220,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.PruneSnapshotsPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.PruneSnapshots );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -255,7 +255,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.RecursionPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.Recursion );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -369,7 +369,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionDaily );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -388,12 +388,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionDailyTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionDailyPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionDaily ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDailyPropertyName}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionDaily}: {retentionDailyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -407,7 +407,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionDaily.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionDailyTextField, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionDailyTextField, ZfsPropertyNames.SnapshotRetentionDaily, fieldIntValue );
             }
         }
         finally
@@ -438,7 +438,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionFrequent );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -457,12 +457,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionFrequentTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionFrequentPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionFrequent ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequentPropertyName}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionFrequent}: {retentionFrequentTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
 
                 MessageBox.ErrorQuery (
@@ -477,7 +477,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionFrequent.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionFrequentTextField, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionFrequentTextField, ZfsPropertyNames.SnapshotRetentionFrequent, fieldIntValue );
             }
         }
         finally
@@ -508,7 +508,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionHourly );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -527,12 +527,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionHourlyTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionHourlyPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionHourly ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourlyPropertyName}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionHourly}: {retentionHourlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -546,7 +546,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionHourly.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionHourlyTextField, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionHourlyTextField, ZfsPropertyNames.SnapshotRetentionHourly, fieldIntValue );
             }
         }
         finally
@@ -577,7 +577,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionMonthly );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -596,12 +596,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionMonthlyTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionMonthly ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionMonthly}: {retentionMonthlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -615,7 +615,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionMonthly.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionMonthlyTextField, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionMonthlyTextField, ZfsPropertyNames.SnapshotRetentionMonthly, fieldIntValue );
             }
         }
         finally
@@ -646,7 +646,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferral );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -667,12 +667,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionPruneDeferralTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionPruneDeferral ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionPruneDeferral}: {retentionPruneDeferralTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -687,7 +687,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionPruneDeferral.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionPruneDeferralTextField, ZfsPropertyNames.SnapshotRetentionPruneDeferral, fieldIntValue );
             }
         }
         finally
@@ -720,7 +720,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionWeekly );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -741,12 +741,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionWeeklyTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionWeekly ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionWeekly}: {retentionWeeklyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -760,7 +760,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionWeekly.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionWeeklyTextField, ZfsPropertyNames.SnapshotRetentionWeekly, fieldIntValue );
             }
         }
         finally
@@ -791,7 +791,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.SnapshotRetentionYearly );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -810,12 +810,12 @@ public sealed partial class ZfsConfigurationWindow
         {
             DisableEventHandlers ( );
             int fieldIntValue = retentionYearlyTextField.Text.ToInt32 ( -1 );
-            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionYearlyPropertyName ];
+            ( int min, int max ) = ZfsPropertyValueConstants.IntPropertyRanges [ ZfsPropertyNames.SnapshotRetentionYearly ];
 
             if ( fieldIntValue < min || fieldIntValue > max )
             {
                 Logger.Warn (
-                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearlyPropertyName}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
+                             $"Invalid value entered for {ZfsPropertyNames.SnapshotRetentionYearly}: {retentionYearlyTextField.Text ?? "(null)"}. Must be a valid integer between {min:D} and {max:D}"
                             );
                 MessageBox.ErrorQuery (
                                        "Invalid Retention Property Value",
@@ -829,7 +829,7 @@ public sealed partial class ZfsConfigurationWindow
 
             if ( fieldIntValue != node.TreeDataset.SnapshotRetentionYearly.Value )
             {
-                UpdateSelectedItemIntProperty ( retentionYearlyTextField, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, fieldIntValue );
+                UpdateSelectedItemIntProperty ( retentionYearlyTextField, ZfsPropertyNames.SnapshotRetentionYearly, fieldIntValue );
             }
         }
         finally
@@ -1095,19 +1095,19 @@ public sealed partial class ZfsConfigurationWindow
 
     private void SetTagsForPropertyFields ( )
     {
-        enabledRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.EnabledPropertyName, enabledRadioGroup, enabledSourceTextField );
+        enabledRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.Enabled, enabledRadioGroup, enabledSourceTextField );
         takeSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData (
-                                                                         ZfsPropertyNames.TakeSnapshotsPropertyName,
+                                                                         ZfsPropertyNames.TakeSnapshots,
                                                                          takeSnapshotsRadioGroup,
                                                                          takeSnapshotsSourceTextField
                                                                         );
         pruneSnapshotsRadioGroup.Data = new RadioGroupWithSourceViewData (
-                                                                          ZfsPropertyNames.PruneSnapshotsPropertyName,
+                                                                          ZfsPropertyNames.PruneSnapshots,
                                                                           pruneSnapshotsRadioGroup,
                                                                           pruneSnapshotsSourceTextField
                                                                          );
-        recursionRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.RecursionPropertyName, recursionRadioGroup, recursionSourceTextField );
-        templateListView.Data    = new ListViewWithSourceViewData ( ZfsPropertyNames.TemplatePropertyName, templateSourceTextField );
+        recursionRadioGroup.Data = new RadioGroupWithSourceViewData ( ZfsPropertyNames.Recursion, recursionRadioGroup, recursionSourceTextField );
+        templateListView.Data    = new ListViewWithSourceViewData ( ZfsPropertyNames.Template, templateSourceTextField );
     }
 
     private void TakeSnapshotsInheritButtonClick ( )
@@ -1130,7 +1130,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.TakeSnapshotsPropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.TakeSnapshots );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 
@@ -1165,7 +1165,7 @@ public sealed partial class ZfsConfigurationWindow
             case 0:
                 return;
             case 1:
-                node.InheritPropertyFromParent ( ZfsPropertyNames.TemplatePropertyName );
+                node.InheritPropertyFromParent ( ZfsPropertyNames.Template );
                 UpdateFieldsForSelectedZfsTreeNode ( );
                 UpdateButtonState ( );
 

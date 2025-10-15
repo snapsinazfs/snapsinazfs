@@ -85,7 +85,7 @@ public class ZfsCommandRunnerBaseTests
     private static List<TestCaseData> GetBooleanPropertyTestCases ( )
     {
         string[] propertyNames =
-            [ ZfsPropertyNames.EnabledPropertyName, ZfsPropertyNames.TakeSnapshotsPropertyName, ZfsPropertyNames.PruneSnapshotsPropertyName ];
+            [ ZfsPropertyNames.Enabled, ZfsPropertyNames.TakeSnapshots, ZfsPropertyNames.PruneSnapshots ];
         (string, bool)[] propertyValues = [ ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ) ];
         (string, bool)[] propertySources =
             [ ( ZfsPropertySourceConstants.Local, true ), ( ZfsPropertySourceConstants.None, false ), ( "inherited from something", true ) ];
@@ -101,9 +101,9 @@ public class ZfsCommandRunnerBaseTests
     {
         string[] propertyNames =
         [
-            ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName,
-            ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName,
-            ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName
+            ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp,
+            ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp,
+            ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp
         ];
         (string, bool)[] propertyValues =
         [
@@ -160,7 +160,7 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetRecursionPropertyTestCases ( )
     {
-        string[] propertyNames = [ ZfsPropertyNames.RecursionPropertyName ];
+        string[] propertyNames = [ ZfsPropertyNames.Recursion ];
         (string, bool)[] propertyValues =
         [
             ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", false ),
@@ -178,7 +178,7 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetRestrictedPositiveIntPropertyTestCases ( )
     {
-        string[] propertyNames = [ ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName ];
+        string[] propertyNames = [ ZfsPropertyNames.SnapshotRetentionPruneDeferral ];
         (string, bool)[] propertyValues =
         [
             ( "true", false ), ( "false", false ), ( "", false ), ( "Plain Text", false ), ( "1970-01-01T00:00:00Z", false ), ( "0", true ), ( "1", true ),
@@ -203,7 +203,7 @@ public class ZfsCommandRunnerBaseTests
 
     private static List<TestCaseData> GetUnformattedStringPropertyTestCases ( )
     {
-        string[] propertyNames = [ ZfsPropertyNames.TemplatePropertyName, ZfsPropertyNames.SourceSystem ];
+        string[] propertyNames = [ ZfsPropertyNames.Template, ZfsPropertyNames.SourceSystem ];
         (string, bool)[] propertyValues =
         [
             ( "true", true ), ( "false", true ), ( "", false ), ( "Plain Text", true ), ( "1970-01-01T00:00:00Z", true ), ( "0", true ),
@@ -223,9 +223,9 @@ public class ZfsCommandRunnerBaseTests
     {
         string[] propertyNames =
         [
-            ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName,
-            ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName,
-            ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName
+            ZfsPropertyNames.SnapshotRetentionFrequent, ZfsPropertyNames.SnapshotRetentionHourly,
+            ZfsPropertyNames.SnapshotRetentionDaily, ZfsPropertyNames.SnapshotRetentionWeekly,
+            ZfsPropertyNames.SnapshotRetentionMonthly, ZfsPropertyNames.SnapshotRetentionYearly
         ];
         (string, bool)[] propertyValues =
         [

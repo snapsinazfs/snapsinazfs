@@ -93,11 +93,11 @@ public class SnapshotTests
     public void GetSnapshotOptionsStringForZfsSnapshot_IsCorrect( [ValueSource ( nameof (GetRelevantSnapshotPeriodKinds) )] SnapshotPeriodKind period, [Values ( "2023-01-01T00:00:00.0000000", "2024-01-01T00:00:00.0000000" )] DateTimeOffset timestamp, [Values ( ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.ZfsRecursion )] string recursion )
     {
         ZfsRecord parent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
-        parent.UpdateProperty ( ZfsPropertyNames.RecursionPropertyName, recursion );
+        parent.UpdateProperty ( ZfsPropertyNames.Recursion, recursion );
         Snapshot snapshot              = SnapshotTestHelpers.GetStandardTestSnapshotForParent ( period, timestamp, parent );
         string   periodString          = (SnapshotPeriod)period;
         string   sourceSystem          = ZfsPropertyValueConstants.StandaloneSiazSystem;
-        string   testOptionsString     = $"-o {ZfsPropertyNames.SnapshotPeriodPropertyName}={periodString} -o {ZfsPropertyNames.SnapshotTimestampPropertyName}={timestamp:O} -o {ZfsPropertyNames.RecursionPropertyName}={recursion} -o {ZfsPropertyNames.SourceSystem}={sourceSystem}";
+        string   testOptionsString     = $"-o {ZfsPropertyNames.SnapshotPeriod}={periodString} -o {ZfsPropertyNames.SnapshotTimestamp}={timestamp:O} -o {ZfsPropertyNames.Recursion}={recursion} -o {ZfsPropertyNames.SourceSystem}={sourceSystem}";
         string   snapshotOptionsString = snapshot.GetSnapshotOptionsStringForZfsSnapshot( );
         Assert.That ( snapshotOptionsString, Is.EqualTo ( testOptionsString ) );
     }
@@ -120,7 +120,7 @@ public class SnapshotTests
 
         Assert.Multiple ( ( ) =>
                           {
-                              Assert.That ( ( ) => snapshot.UpdateProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName, (SnapshotPeriod)newPeriod ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+                              Assert.That ( ( ) => snapshot.UpdateProperty ( ZfsPropertyNames.SnapshotPeriod, (SnapshotPeriod)newPeriod ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
                               Assert.That ( snapshot.Period,                                                                                           Is.EqualTo ( original ) );
                           }
                         );
@@ -138,7 +138,7 @@ public class SnapshotTests
 
         Assert.Multiple ( ( ) =>
                           {
-                              Assert.That ( ( ) => snapshot.UpdateProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, in newTimestamp ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
+                              Assert.That ( ( ) => snapshot.UpdateProperty ( ZfsPropertyNames.SnapshotTimestamp, in newTimestamp ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
                               Assert.That ( snapshot.Timestamp,                                                                                 Is.EqualTo ( original ) );
                           }
                         );

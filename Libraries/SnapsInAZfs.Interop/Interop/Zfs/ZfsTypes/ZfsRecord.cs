@@ -72,25 +72,25 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         }
         else
         {
-            _enabled                        = new ( this, ZfsPropertyNames.EnabledPropertyName, false );
-            _lastDailySnapshotTimestamp     = new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastFrequentSnapshotTimestamp  = new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastHourlySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastMonthlySnapshotTimestamp   = new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastWeeklySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastYearlySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _pruneSnapshotsField            = new ( this, ZfsPropertyNames.PruneSnapshotsPropertyName, false );
-            _recursion                      = new ( this, ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs );
-            _snapshotRetentionDaily         = new ( this, ZfsPropertyNames.SnapshotRetentionDailyPropertyName, -1 );
-            _snapshotRetentionFrequent      = new ( this, ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, -1 );
-            _snapshotRetentionHourly        = new ( this, ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, -1 );
-            _snapshotRetentionMonthly       = new ( this, ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, -1 );
-            _snapshotRetentionPruneDeferral = new ( this, ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 );
-            _snapshotRetentionWeekly        = new ( this, ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, -1 );
-            _snapshotRetentionYearly        = new ( this, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, -1 );
+            _enabled                        = new ( this, ZfsPropertyNames.Enabled, false );
+            _lastDailySnapshotTimestamp     = new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastFrequentSnapshotTimestamp  = new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastHourlySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastMonthlySnapshotTimestamp   = new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastWeeklySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastYearlySnapshotTimestamp    = new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _pruneSnapshotsField            = new ( this, ZfsPropertyNames.PruneSnapshots, false );
+            _recursion                      = new ( this, ZfsPropertyNames.Recursion, ZfsPropertyValueConstants.SnapsInAZfs );
+            _snapshotRetentionDaily         = new ( this, ZfsPropertyNames.SnapshotRetentionDaily, -1 );
+            _snapshotRetentionFrequent      = new ( this, ZfsPropertyNames.SnapshotRetentionFrequent, -1 );
+            _snapshotRetentionHourly        = new ( this, ZfsPropertyNames.SnapshotRetentionHourly, -1 );
+            _snapshotRetentionMonthly       = new ( this, ZfsPropertyNames.SnapshotRetentionMonthly, -1 );
+            _snapshotRetentionPruneDeferral = new ( this, ZfsPropertyNames.SnapshotRetentionPruneDeferral, 0 );
+            _snapshotRetentionWeekly        = new ( this, ZfsPropertyNames.SnapshotRetentionWeekly, -1 );
+            _snapshotRetentionYearly        = new ( this, ZfsPropertyNames.SnapshotRetentionYearly, -1 );
             _sourceSystem                   = new ( this, ZfsPropertyNames.SourceSystem, sourceSystem );
-            _takeSnapshots                  = new ( this, ZfsPropertyNames.TakeSnapshotsPropertyName, false );
-            _template                       = new ( this, ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default );
+            _takeSnapshots                  = new ( this, ZfsPropertyNames.TakeSnapshots, false );
+            _template                       = new ( this, ZfsPropertyNames.Template, ZfsPropertyValueConstants.Default );
         }
     }
 
@@ -154,27 +154,27 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
             _lastFrequentSnapshotTimestamp = notASnapshot && lastFrequentSnapshotTimestamp.IsLocal
                                                  ? lastFrequentSnapshotTimestamp with { Owner = this }
-                                                 : new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                                 : new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _lastHourlySnapshotTimestamp = notASnapshot && lastHourlySnapshotTimestamp.IsLocal
                                                ? lastHourlySnapshotTimestamp with { Owner = this }
-                                               : new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                               : new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _lastDailySnapshotTimestamp = notASnapshot && lastDailySnapshotTimestamp.IsLocal
                                               ? lastDailySnapshotTimestamp with { Owner = this }
-                                              : new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                              : new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _lastWeeklySnapshotTimestamp = notASnapshot && lastWeeklySnapshotTimestamp.IsLocal
                                                ? lastWeeklySnapshotTimestamp with { Owner = this }
-                                               : new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                               : new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _lastMonthlySnapshotTimestamp = notASnapshot && lastMonthlySnapshotTimestamp.IsLocal
                                                 ? lastMonthlySnapshotTimestamp with { Owner = this }
-                                                : new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                                : new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _lastYearlySnapshotTimestamp = notASnapshot && lastYearlySnapshotTimestamp.IsLocal
                                                ? lastYearlySnapshotTimestamp with { Owner = this }
-                                               : new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+                                               : new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _recursion    = recursion with { Owner = this, IsLocal = isASnapshot || recursion.IsLocal };
             _template     = template with { Owner = this, IsLocal = isASnapshot  || template.IsLocal };
@@ -198,12 +198,12 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
             _pruneSnapshotsField = pruneSnapshots;
 
             // If local, take what we were given. Otherwise, construct a default property, as this should NEVER be inherited.
-            _lastFrequentSnapshotTimestamp = lastFrequentSnapshotTimestamp.IsLocal ? lastFrequentSnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastHourlySnapshotTimestamp   = lastHourlySnapshotTimestamp.IsLocal ? lastHourlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastDailySnapshotTimestamp    = lastDailySnapshotTimestamp.IsLocal ? lastDailySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastWeeklySnapshotTimestamp   = lastWeeklySnapshotTimestamp.IsLocal ? lastWeeklySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastMonthlySnapshotTimestamp  = lastMonthlySnapshotTimestamp.IsLocal ? lastMonthlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
-            _lastYearlySnapshotTimestamp   = lastYearlySnapshotTimestamp.IsLocal ? lastYearlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, DateTimeOffset.UnixEpoch );
+            _lastFrequentSnapshotTimestamp = lastFrequentSnapshotTimestamp.IsLocal ? lastFrequentSnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastHourlySnapshotTimestamp   = lastHourlySnapshotTimestamp.IsLocal ? lastHourlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastDailySnapshotTimestamp    = lastDailySnapshotTimestamp.IsLocal ? lastDailySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastWeeklySnapshotTimestamp   = lastWeeklySnapshotTimestamp.IsLocal ? lastWeeklySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastMonthlySnapshotTimestamp  = lastMonthlySnapshotTimestamp.IsLocal ? lastMonthlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
+            _lastYearlySnapshotTimestamp   = lastYearlySnapshotTimestamp.IsLocal ? lastYearlySnapshotTimestamp : new ( this, ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp, DateTimeOffset.UnixEpoch );
 
             _recursion    = recursion;
             _template     = template;

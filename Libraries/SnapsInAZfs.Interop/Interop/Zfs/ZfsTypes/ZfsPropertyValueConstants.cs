@@ -29,12 +29,12 @@ public static class ZfsPropertyValueConstants
     public static readonly FrozenDictionary<string, (int Min, int Max)> IntPropertyRanges =
         new Dictionary<string, (int Min, int Max)>
         {
-            { ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionDailyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, ZeroToIntMax },
-            { ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, new ValueTuple<int, int> ( 0, 100 ) }
+            { ZfsPropertyNames.SnapshotRetentionFrequent, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionHourly, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionDaily, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionWeekly, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionMonthly, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionYearly, ZeroToIntMax },
+            { ZfsPropertyNames.SnapshotRetentionPruneDeferral, new ValueTuple<int, int> ( 0, 100 ) }
         }.ToFrozenDictionary( );
 }

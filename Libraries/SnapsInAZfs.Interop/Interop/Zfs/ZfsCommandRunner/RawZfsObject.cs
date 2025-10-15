@@ -191,9 +191,9 @@ public sealed class RawZfsObject
       return false;
     }
 
-    if ( !DateTimeOffset.TryParse ( Properties [ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, out DateTimeOffset snapshotTimestamp ) )
+    if ( !DateTimeOffset.TryParse ( Properties [ ZfsPropertyNames.SnapshotTimestamp ].Value, out DateTimeOffset snapshotTimestamp ) )
     {
-      Logger.Debug ( "{0} value {1} not valid for snapshot {2} - Skipping object", ZfsPropertyNames.SnapshotTimestampPropertyName, Properties [ ZfsPropertyNames.SnapshotTimestampPropertyName ].Value, snapName );
+      Logger.Debug ( "{0} value {1} not valid for snapshot {2} - Skipping object", ZfsPropertyNames.SnapshotTimestamp, Properties [ ZfsPropertyNames.SnapshotTimestamp ].Value, snapName );
 
       return false;
     }
@@ -220,7 +220,7 @@ public sealed class RawZfsObject
                                                            retentionMonthly.Value,
                                                            retentionYearly.Value,
                                                            retentionPruneDeferral.Value,
-                                                           Properties [ ZfsPropertyNames.SnapshotPeriodPropertyName ].Value,
+                                                           Properties [ ZfsPropertyNames.SnapshotPeriod ].Value,
                                                            sourceSystem.Value,
                                                            in snapshotTimestamp,
                                                            dataset

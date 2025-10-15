@@ -32,7 +32,7 @@ public sealed partial record Snapshot
     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
     switch ( propertyName )
     {
-      case ZfsPropertyNames.SnapshotPeriodPropertyName:
+      case ZfsPropertyNames.SnapshotPeriod:
         throw new ArgumentOutOfRangeException ( nameof (propertyName), "Snapshot period cannot be changed." );
       default:
         return ref base.UpdateProperty ( propertyName, propertyValue, isLocal );
@@ -49,7 +49,7 @@ public sealed partial record Snapshot
     // ReSharper disable once ConvertSwitchStatementToSwitchExpression
     switch ( propertyName )
     {
-      case ZfsPropertyNames.SnapshotTimestampPropertyName:
+      case ZfsPropertyNames.SnapshotTimestamp:
         throw new ArgumentOutOfRangeException ( nameof (propertyName), "Snapshot timestamp cannot be changed." );
       default:
         return ref base.UpdateProperty ( propertyName, propertyValue, isLocal );
@@ -64,8 +64,8 @@ public sealed partial record Snapshot
 
     if ( updatedProperty.Name switch
          {
-           ZfsPropertyNames.TemplatePropertyName  => Template.IsInherited,
-           ZfsPropertyNames.RecursionPropertyName => Recursion.IsInherited,
+           ZfsPropertyNames.Template  => Template.IsInherited,
+           ZfsPropertyNames.Recursion => Recursion.IsInherited,
            _                                      => throw new ArgumentOutOfRangeException ( nameof (updatedProperty), "Unsupported property name {0} when updating string property", updatedProperty.Name )
          } )
     {

@@ -284,9 +284,9 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
     switch ( propertyName )
     {
-      case ZfsPropertyNames.EnabledPropertyName:
-      case ZfsPropertyNames.TakeSnapshotsPropertyName:
-      case ZfsPropertyNames.PruneSnapshotsPropertyName:
+      case ZfsPropertyNames.Enabled:
+      case ZfsPropertyNames.TakeSnapshots:
+      case ZfsPropertyNames.PruneSnapshots:
       {
         using Lock.Scope propertyChangeCollectionsLockScope = _propertyChangeCollectionsLock.EnterScope ( );
         RevertBooleanPropertyToBase ( propertyName, _modifiedPropertiesSinceLastSave );
@@ -303,8 +303,8 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
         return true;
 
-      case ZfsPropertyNames.RecursionPropertyName:
-      case ZfsPropertyNames.TemplatePropertyName:
+      case ZfsPropertyNames.Recursion:
+      case ZfsPropertyNames.Template:
       {
         using Lock.Scope propertyChangeCollectionsLockScope = _propertyChangeCollectionsLock.EnterScope ( );
         RevertStringPropertyToBase ( propertyName, _modifiedPropertiesSinceLastSave );
@@ -321,13 +321,13 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
         return true;
 
-      case ZfsPropertyNames.SnapshotRetentionFrequentPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionHourlyPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionDailyPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionYearlyPropertyName:
-      case ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName:
+      case ZfsPropertyNames.SnapshotRetentionFrequent:
+      case ZfsPropertyNames.SnapshotRetentionHourly:
+      case ZfsPropertyNames.SnapshotRetentionDaily:
+      case ZfsPropertyNames.SnapshotRetentionWeekly:
+      case ZfsPropertyNames.SnapshotRetentionMonthly:
+      case ZfsPropertyNames.SnapshotRetentionYearly:
+      case ZfsPropertyNames.SnapshotRetentionPruneDeferral:
       {
         using Lock.Scope propertyChangeCollectionsLockScope = _propertyChangeCollectionsLock.EnterScope ( );
         RevertIntPropertyToBase ( propertyName, _modifiedPropertiesSinceLastSave );
@@ -344,12 +344,12 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
         return true;
 
-      case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName:
-      case ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName:
-      case ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName:
-      case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName:
-      case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName:
-      case ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName:
+      case ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp:
+      case ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp:
+      case ZfsPropertyNames.DatasetLastDailySnapshotTimestamp:
+      case ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp:
+      case ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp:
+      case ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp:
         Logger.Error (
                       new ArgumentException (
                                              $"Cannot inherit {propertyName}. Last Snapshot Timestamp properties have no meaning to inheritors and are not valid for inheritance",
@@ -580,14 +580,14 @@ public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 
     switch ( propertyName )
     {
-      case ZfsPropertyNames.RecursionPropertyName:
+      case ZfsPropertyNames.Recursion:
       {
         TreeDataset.UpdateProperty ( propertyName, BaseDataset.Recursion.Value, BaseDataset.Recursion.IsLocal );
       }
 
         return;
 
-      case ZfsPropertyNames.TemplatePropertyName:
+      case ZfsPropertyNames.Template:
       {
         TreeDataset.UpdateProperty ( propertyName, BaseDataset.Template.Value, BaseDataset.Template.IsLocal );
       }

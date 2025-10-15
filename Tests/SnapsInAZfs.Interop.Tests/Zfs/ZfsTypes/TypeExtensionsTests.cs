@@ -38,32 +38,32 @@ public class TypeExtensionsTests
         return;
 
       case SnapshotPeriod.FrequentString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp ) );
 
         return;
 
       case SnapshotPeriod.HourlyString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp ) );
 
         return;
 
       case SnapshotPeriod.DailyString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastDailySnapshotTimestamp ) );
 
         return;
 
       case SnapshotPeriod.WeeklyString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp ) );
 
         return;
 
       case SnapshotPeriod.MonthlyString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp ) );
 
         return;
 
       case SnapshotPeriod.YearlyString:
-        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName ) );
+        Assert.That ( kind.GetMostRecentSnapshotZfsPropertyName ( ), Is.EqualTo ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp ) );
 
         return;
 

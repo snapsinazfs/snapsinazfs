@@ -89,37 +89,37 @@ public abstract record ZfsCommandRunnerBase : IZfsCommandRunner
 
       if ( ds.LastFrequentSnapshotTimestamp.Value != ds.LastObservedFrequentSnapshotTimestamp )
       {
-        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, ds.LastObservedFrequentSnapshotTimestamp );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp, ds.LastObservedFrequentSnapshotTimestamp );
         propertiesCount++;
       }
 
       if ( ds.LastHourlySnapshotTimestamp.Value != ds.LastObservedHourlySnapshotTimestamp )
       {
-        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, ds.LastObservedHourlySnapshotTimestamp );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp, ds.LastObservedHourlySnapshotTimestamp );
         propertiesCount++;
       }
 
       if ( ds.LastDailySnapshotTimestamp.Value != ds.LastObservedDailySnapshotTimestamp )
       {
-        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, ds.LastObservedDailySnapshotTimestamp );
+        propertiesToSet [ endIndex++ ] = ds.UpdateProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestamp, ds.LastObservedDailySnapshotTimestamp );
         propertiesCount++;
       }
 
       if ( ds.LastWeeklySnapshotTimestamp.Value != ds.LastObservedWeeklySnapshotTimestamp )
       {
-        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, ds.LastObservedWeeklySnapshotTimestamp);
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp, ds.LastObservedWeeklySnapshotTimestamp);
         propertiesCount++;
       }
 
       if ( ds.LastMonthlySnapshotTimestamp.Value != ds.LastObservedMonthlySnapshotTimestamp )
       {
-        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, ds.LastObservedMonthlySnapshotTimestamp);
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp, ds.LastObservedMonthlySnapshotTimestamp);
         propertiesCount++;
       }
 
       if ( ds.LastYearlySnapshotTimestamp.Value != ds.LastObservedYearlySnapshotTimestamp )
       {
-        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, ds.LastObservedYearlySnapshotTimestamp);
+        propertiesToSet [endIndex++] = ds.UpdateProperty (ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp, ds.LastObservedYearlySnapshotTimestamp);
         propertiesCount++;
       }
 
@@ -163,25 +163,25 @@ public abstract record ZfsCommandRunnerBase : IZfsCommandRunner
     return name switch
            {
              "type"                                                            => !string.IsNullOrWhiteSpace ( value ) && value is ZfsPropertyValueConstants.FileSystem or ZfsPropertyValueConstants.Volume,
-             ZfsPropertyNames.EnabledPropertyName                              => bool.TryParse ( value, out _ ),
-             ZfsPropertyNames.TakeSnapshotsPropertyName                        => bool.TryParse ( value, out _ ),
-             ZfsPropertyNames.PruneSnapshotsPropertyName                       => bool.TryParse ( value, out _ ),
-             ZfsPropertyNames.RecursionPropertyName                            => !string.IsNullOrWhiteSpace ( value ) && value is ZfsPropertyValueConstants.SnapsInAZfs or ZfsPropertyValueConstants.ZfsRecursion,
-             ZfsPropertyNames.TemplatePropertyName                             => !string.IsNullOrWhiteSpace ( value ),
+             ZfsPropertyNames.Enabled                              => bool.TryParse ( value, out _ ),
+             ZfsPropertyNames.TakeSnapshots                        => bool.TryParse ( value, out _ ),
+             ZfsPropertyNames.PruneSnapshots                       => bool.TryParse ( value, out _ ),
+             ZfsPropertyNames.Recursion                            => !string.IsNullOrWhiteSpace ( value ) && value is ZfsPropertyValueConstants.SnapsInAZfs or ZfsPropertyValueConstants.ZfsRecursion,
+             ZfsPropertyNames.Template                             => !string.IsNullOrWhiteSpace ( value ),
              ZfsPropertyNames.SourceSystem                                     => !string.IsNullOrWhiteSpace ( value ),
-             ZfsPropertyNames.SnapshotRetentionFrequentPropertyName            => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionHourlyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionDailyPropertyName               => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName             => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionYearlyPropertyName              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
-             ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName       => int.TryParse ( value, out int intValue )                       && intValue is >= 0 and <= 100,
-             ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-             ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-             ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName    => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-             ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-             ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName  => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
-             ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.SnapshotRetentionFrequent            => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionHourly              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionDaily               => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionWeekly              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionMonthly             => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionYearly              => int.TryParse ( value, out int intValue )                       && intValue >= 0,
+             ZfsPropertyNames.SnapshotRetentionPruneDeferral       => int.TryParse ( value, out int intValue )                       && intValue is >= 0 and <= 100,
+             ZfsPropertyNames.DatasetLastFrequentSnapshotTimestamp => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.DatasetLastHourlySnapshotTimestamp   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.DatasetLastDailySnapshotTimestamp    => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.DatasetLastWeeklySnapshotTimestamp   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.DatasetLastMonthlySnapshotTimestamp  => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
+             ZfsPropertyNames.DatasetLastYearlySnapshotTimestamp   => DateTimeOffset.TryParse ( value, out DateTimeOffset dtoValue ) && dtoValue >= DateTimeOffset.UnixEpoch,
              "used"                                                            => long.TryParse ( value, out _ ),
              "available"                                                       => long.TryParse ( value, out _ ),
              _                                                                 => throw new ArgumentOutOfRangeException ( nameof (name) )
