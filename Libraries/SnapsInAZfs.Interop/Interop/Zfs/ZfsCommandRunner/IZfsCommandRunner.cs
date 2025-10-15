@@ -13,7 +13,6 @@
 namespace SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 using System.Collections.Concurrent;
-using System.Collections.Immutable;
 using ZfsTypes;
 
 public interface IZfsCommandRunner
@@ -143,8 +142,7 @@ public interface IZfsCommandRunner<out TRunner> : IZfsCommandRunner
   /// <param name="zfsPath">The path to the zfs utility.</param>
   /// <param name="zpoolPath">The path to the zpool utility.</param>
   /// <returns>
-  ///   A new instance of <typeparamref name="TRunner" />, with <see cref="ZfsPath" /> and <see cref="ZpoolPath" /> initialized to the
-  ///   provided values.
+  ///   A new instance of <typeparamref name="TRunner" />, with <see cref="IZfsCommandRunner.ZfsPath" /> and <see cref="IZfsCommandRunner.ZpoolPath" /> initialized to the provided values.
   /// </returns>
   public static abstract TRunner Create ( string zfsPath, string zpoolPath );
 }

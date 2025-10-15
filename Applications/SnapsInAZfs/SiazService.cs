@@ -146,7 +146,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     // Run once, unconditionally
     // Afterward, only continue if we're running as a daemon, stop hasn't been requested, and there wasn't an error.
     _lastExecutionResultCode
-      = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken ).ConfigureAwait ( true );
+      = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken, ( CheckZfsProperties: true, PrepareZfsProperties: false ) ).ConfigureAwait ( true );
 
     if ( !_settings.Daemonize || serviceCancellationToken.IsCancellationRequested || _lastExecutionResultCode is not SiazExecutionResultCode.Completed )
     {
@@ -225,7 +225,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
             SetNextRunTime ( in greatestCommonFrequentIntervalMinutes, in Timestamp, in _lastRunTime, out _nextRunTime );
 
             // Fire this off asynchronously
-            _lastExecutionResultCode = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken )
+            _lastExecutionResultCode = await ExecuteSiazAsync ( _zfsCommandRunner, Timestamp, serviceCancellationToken, ( CheckZfsProperties: true, PrepareZfsProperties: false ) )
                                         .ConfigureAwait ( true );
 
             if ( _lastExecutionResultCode is SiazExecutionResultCode.CancelledByToken
@@ -341,7 +341,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
     return !errorsEncountered;
   }
 
-  internal static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync ( IZfsCommandRunner zfsCommandRunner )
+  internal static async Task<CheckZfsPropertiesSchemaResult> CheckZfsPoolRootPropertiesSchemaAsync ( IZfsCommandRunner zfsCommandRunner, (bool CheckZfsProperties, bool PrepareZfsProperties) args )
   {
     Logger.Debug ( "Checking zfs properties schema" );
 
@@ -441,9 +441,10 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
   private async Task<SiazExecutionResultCode> ExecuteSiazAsync (
-    IZfsCommandRunner    zfsCommandRunner,
-    DateTimeOffset       currentTimestamp,
-    CancellationToken    cancellationToken
+    IZfsCommandRunner zfsCommandRunner,
+    DateTimeOffset    currentTimestamp,
+    CancellationToken cancellationToken,
+    (bool CheckZfsProperties, bool PrepareZfsProperties) args
   )
   {
     try
