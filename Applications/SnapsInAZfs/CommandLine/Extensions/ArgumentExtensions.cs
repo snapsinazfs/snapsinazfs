@@ -15,6 +15,7 @@ namespace SnapsInAZfs.CommandLine.Extensions;
 using System.Buffers;
 using System.CommandLine;
 using System.CommandLine.Parsing;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 ///   Extension methods for <see cref="Argument" />, enabling fluent usage.
@@ -24,70 +25,13 @@ public static class ArgumentExtensions
 {
   private static readonly Logger Logger = LogManager.GetCurrentClassLogger ( );
 
-  /// <inheritdoc cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />
-  /// <remarks>
-  ///   This method is a direct proxy for <see cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />, only
-  ///   provided here for a more natural fluent grammar.
-  /// </remarks>
-  public static Argument<T> AcceptingOnlyValuesIn<T> ( this Argument<T> argument, params string[] acceptedValues )
-  {
-    return argument.AcceptOnlyFromAmong ( acceptedValues );
-  }
-
-  /// <summary>
-  ///   Validates that the tokens provided for the argument represent normal files that exist and are writeable by the process.
-  /// </summary>
-  /// <param name="argument">The <see cref="Argument{T}" /> to validate.</param>
-  /// <returns>An <see cref="ArgumentResult" /> with any validation errors appended.</returns>
-  /// <remarks>
-  ///   <para>
-  ///     This method combines the functionality of
-  ///     <see cref="ArgumentValidation.AcceptLegalFileNamesOnly{T}(Argument{T})" /> with an optimized implementation of
-  ///     <see cref="ArgumentValidation.AcceptExistingOnly{T}(Argument{T})" /> that uses a cached <see cref="SearchValues{T}" />
-  ///     for more efficient matching on longer or multiple inputs.<br />
-  ///     Short or single-item inputs generally achieve comparable performance as the built-in validators as well.
-  ///   </para>
-  ///   <para>
-  ///     The tests for legality of the path and existence of/access to the file are added as separate validators, with path name
-  ///     validation being before existence/access in the validation pipeline.
-  ///   </para>
-  ///   <para>
-  ///     This implementation tests access via actually attempting to open the target file(s) for more reliable results.<br />
-  ///     If this is too costly or is otherwise undesirable for your application, use the built-in validators instead.
-  ///   </para>
-  /// </remarks>
-  public static Argument<IEnumerable<string>> OnlyAcceptingLegalExistingWriteableFiles ( this Argument<IEnumerable<string>> argument )
-  {
-    argument.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateLegalFilePath ) );
-    argument.Validators.Add ( result => _ = result.Tokens.Aggregate ( result, ValidateCanWriteToPath ) );
-
-    return argument;
-  }
-
-  /// <summary>
-  ///   Sets a custom parser for this <see cref="Argument{T}" /> and returns the same <see cref="Argument{T}" /> reference.
-  /// </summary>
-  /// <param name="argument">
-  ///   The <see cref="Argument{T}" /> whose <see cref="Argument{T}.CustomParser" /> property will be set to
-  ///   <paramref name="customParser" />.
-  /// </param>
-  /// <param name="customParser">
-  ///   A custom argument parser to assign to this <see cref="Argument{T}" />.<br />
-  ///   See <see cref="Argument{T}.CustomParser" />.
-  /// </param>
-  /// <returns>
-  ///   A reference to the same <see cref="Argument{T}" /> instance that this method was called on.
-  /// </returns>
-  public static Argument<T> WithCustomParser<T> ( this Argument<T> argument, Func<ArgumentResult, T?>? customParser )
-  {
-    argument.CustomParser = customParser;
-
-    return argument;
-  }
+  private static Lazy<SearchValues<char>> _invalidPathCharValues = new ( static ( ) => SearchValues.Create ( Path.GetInvalidPathChars ( ) ), LazyThreadSafetyMode.PublicationOnly );
+  private static SearchValues<char>       InvalidPathCharValues => _invalidPathCharValues.Value;
 
   private static ArgumentResult ValidateCanWriteToPath ( ArgumentResult argumentResult, Token token )
   {
     FileInfo file = new ( Path.GetFullPath ( token.Value ) );
+
     try
     {
       using FileStream testFile = file.Open (
@@ -131,9 +75,7 @@ public static class ArgumentExtensions
 
   private static ArgumentResult ValidateLegalFilePath ( ArgumentResult argumentResult, Token token )
   {
-    SearchValues<char> invalidPathCharValues = SearchValues.Create ( Path.GetInvalidPathChars ( ) );
-
-    int invalidCharacterIndex = token.Value.IndexOfAny ( invalidPathCharValues );
+    int invalidCharacterIndex = token.Value.IndexOfAny ( InvalidPathCharValues );
 
     if ( invalidCharacterIndex >= 0 )
     {
@@ -147,6 +89,34 @@ public static class ArgumentExtensions
   /// <param name="argument">An <see cref="Argument{T}" /> instance.</param>
   extension<TArgument> ( Argument<TArgument> argument )
   {
+    /// <inheritdoc cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />
+    /// <remarks>
+    ///   This method is a direct proxy for <see cref="ArgumentValidation.AcceptOnlyFromAmong{T}(Argument{T}, string[])" />, only
+    ///   provided here for a more natural fluent grammar.
+    /// </remarks>
+    [MethodImpl ( MethodImplOptions.AggressiveInlining )]
+    public Argument<TArgument> AcceptingOnlyValuesIn ( params string[] acceptedValues )
+    {
+      return argument.AcceptOnlyFromAmong ( acceptedValues );
+    }
+
+    /// <summary>
+    ///   Sets a custom parser for this <see cref="Argument{T}" /> and returns the same <see cref="Argument{T}" /> reference.
+    /// </summary>
+    /// <param name="customParser">
+    ///   A custom argument parser to assign to this <see cref="Argument{T}" />.<br />
+    ///   See <see cref="Argument{T}.CustomParser" />.
+    /// </param>
+    /// <returns>
+    ///   A reference to the same <see cref="Argument{T}" /> instance that this method was called on.
+    /// </returns>
+    public Argument<TArgument> WithCustomParser ( Func<ArgumentResult, TArgument?>? customParser )
+    {
+      argument.CustomParser = customParser;
+
+      return argument;
+    }
+
     /// <summary>
     ///   Adds a validator to the current <see cref="Argument{T}" /> instance.
     /// </summary>
