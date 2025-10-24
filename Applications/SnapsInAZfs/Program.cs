@@ -196,6 +196,31 @@ internal static class Program
 
         return SiazService.ExitStatus;
       }
+
+      case SiazCommandLine.ZfsSchemaCheckCommandName when noErrorsParseResult.CommandResult.Command == siazCli.ZfsSchemaCheckCommand:
+      {
+        if ( !TryGetZfsCommandRunner<ZfsCommandRunner> ( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
+        {
+          ApplicationStartupException ase = new ( "Failed to get ZFS command runner instance. No action has been taken. SIAZ will terminate." );
+          _logger.Fatal ( ase, ase.Message );
+          return (int)ExitCode.GenericError;
+        }
+
+        // Grab entire zfsprop schema for all datasets.
+        // For every pool:
+        // 1 Get current ZFS schema with prefix `snapsinazfs.com:` as set ZFS
+        // 2 Get SIAZ schema (hard-coded), as set SIAZ
+        // 3 Get SIAZ schema version from each pool and compare to current (hard-coded).
+        // 4 Get the set MISSING = SIAZ - ZFS
+        // 4a Any results are returned in a collection of missing properties.
+        // 5 Get the set EXTRA = ZFS - SIAZ
+        // 5a If ZFS schema version is < current schema version, report properties as obsolete.
+        // 5b If ZFS schema version is >= current schema version, report properties as unknown.
+        // 6 Get the set FOUND = SIAZ ⋂ ZFS
+        // 6a Report as being present, but leave it up to the caller to interpret them.
+
+      }
+        return 0;
     }
 
     return 0;
