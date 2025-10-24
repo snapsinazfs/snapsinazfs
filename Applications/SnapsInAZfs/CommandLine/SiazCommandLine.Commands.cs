@@ -28,105 +28,93 @@ public partial class SiazCommandLine
   public RootCommand RootCommand { get; private set; }
 
   internal Command ConfigCommand { get; } = new (
-                                                ConfigCommandName,
-                                                "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
-                                               );
+                                                 ConfigCommandName,
+                                                 "Perform configuration operations on SIAZ and managed pools/datasets directly or via the configuration console."
+                                                );
 
   internal Command ConfigConsoleCommand { get; } = new (
-                                                       ConfigConsoleCommandName,
-                                                       "Launches the configuration console TUI."
-                                                      );
+                                                        ConfigConsoleCommandName,
+                                                        "Launches the configuration console TUI."
+                                                       );
 
   internal Command ConfigGlobalCommand { get; } = new (
-                                                      ConfigGlobalCommandName,
-                                                      """
-                                                      Modify global settings in the root of the JSON configuration files.
-                                                      If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
-                                                      """
-                                                     );
+                                                       ConfigGlobalCommandName,
+                                                       """
+                                                       Modify global settings in the root of the JSON configuration files.
+                                                       If no --output-file option is specified, resulting changes will be written to the last configuration file loaded, including any specified on the command line.
+                                                       """
+                                                      );
 
   internal Command CronCommand { get; } = new (
-                                              CronCommandName,
-                                              $"""
-                                               {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
-                                               Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
-                                               """
-                                             );
+                                               CronCommandName,
+                                               $"""
+                                                {F.FGYELLOW}(DEPRECATED){F._FGCOLOR} An alias for the {F.B}run{F._B} command.
+                                                Update to use the {F.B}run{F._B} command, as this alias will be removed in a future version.
+                                                """
+                                              );
 
   internal Command RunCommand { get; } = new (
-                                             RunCommandName,
-                                             """
-                                             Run SIAZ, optionally specifying override options.
-                                             Use this context when executing one-off operations or for custom service/script-based invocations.
-                                             """
-                                            );
+                                              RunCommandName,
+                                              """
+                                              Run SIAZ, optionally specifying override options.
+                                              Use this context when executing one-off operations or for custom service/script-based invocations.
+                                              """
+                                             );
 
   internal Command TemplatesCommand { get; } = new (
-                                                   TemplatesCommandName,
-                                                   """
-                                                   View, modify, create, or remove templates.
-                                                   """
-                                                  );
+                                                    TemplatesCommandName,
+                                                    "View, modify, create, or remove templates."
+                                                   );
 
   internal Command TemplatesCreateCommand { get; } = new (
-                                                         TemplatesCreateCommandName,
-                                                         """
-                                                         Create a new template.
-                                                         """
-                                                        );
+                                                          TemplatesCreateCommandName,
+                                                          "Create a new template."
+                                                         );
 
   internal Command TemplatesListCommand { get; } = new (
-                                                       TemplatesListCommandName,
-                                                       """
-                                                       List existing templates.
-                                                       """
-                                                      );
+                                                        TemplatesListCommandName,
+                                                        "List existing templates."
+                                                       );
 
   internal Command TemplatesModifyCommand { get; } = new (
-                                                         TemplatesModifyCommandName,
-                                                         """
-                                                         Modify an existing template.
-                                                         """
-                                                        );
+                                                          TemplatesModifyCommandName,
+                                                          "Modify an existing template."
+                                                         );
 
   internal Command TemplatesRemoveCommand { get; } = new (
-                                                         TemplatesRemoveCommandName,
-                                                         """
-                                                         Remove an existing template.
-                                                         """
-                                                        );
+                                                          TemplatesRemoveCommandName,
+                                                          "Remove an existing template."
+                                                         );
 
   internal Command TemplatesShowCommand { get; } = new (
-                                                       TemplatesShowCommandName,
-                                                       """
-                                                       Show the full configuration of an existing template.
-                                                       """
-                                                      );
+                                                        TemplatesShowCommandName,
+                                                        "Show the full configuration of an existing template."
+                                                       );
 
   internal Command ZfsCommand { get; } = new (
-                                             ZfsCommandName,
-                                             "Perform operations on ZFS pools and datasets managed by SIAZ."
-                                            );
+                                              ZfsCommandName,
+                                              "Perform operations on ZFS pools and datasets managed by SIAZ."
+                                             );
 
   internal Command ZfsSchemaCheckCommand { get; } = new (
-                                                        ZfsSchemaCheckCommandName,
-                                                        "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
-                                                       );
+                                                         ZfsSchemaCheckCommandName,
+                                                         "Checks the property schema for SnapsInAZfs in ZFS and reports any missing properties for pool roots. Checks all pools by default."
+                                                        );
 
   internal Command ZfsSchemaCleanCommand { get; } = new (
-                                                        ZfsSchemaCleanCommandName,
-                                                        "Completely removes all pool and dataset properties that came from SIAZ."
-                                                       );
+                                                         ZfsSchemaCleanCommandName,
+                                                         "Completely removes all pool and dataset properties that came from SIAZ."
+                                                        );
 
   internal Command ZfsSchemaCommand { get; } = new (
-                                                   ZfsSchemaCommandName,
-                                                   "Perform operations on properties of ZFS pools and datasets used by SIAZ."
-                                                  );
+                                                    ZfsSchemaCommandName,
+                                                    "Perform operations on properties of ZFS pools and datasets used by SIAZ."
+                                                   );
 
   internal Command ZfsSchemaInitializeCommand { get; } = new (
-                                                             ZfsSchemaInitializeCommandName,
-                                                             "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
-                                                            );
+                                                              ZfsSchemaInitializeCommandName,
+                                                              "Updates the property schema for SnapsInAZfs in ZFS, using default values. Will not overwrite StandardBooleanOptions that are already set."
+                                                             );
 
   internal const string ConfigCommandName               = "config";
   internal const string ConfigConsoleCommandName        = "console";

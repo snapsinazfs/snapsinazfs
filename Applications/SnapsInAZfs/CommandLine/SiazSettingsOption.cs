@@ -31,7 +31,7 @@ public sealed class SiazSettingsOption<T> : Option<T>, ISiazSettingsKeyedOption
   }
 
   /// <summary>
-  ///   Gets or sets the .net configuration key for the associated setting in <see cref="SnapsInAZfsSettings" />.
+  ///   Gets the .net configuration key for the associated setting in <see cref="SnapsInAZfsSettings" />.
   /// </summary>
-  public string SettingsKey { get; set; }
+  public string SettingsKey { get; }
 }
