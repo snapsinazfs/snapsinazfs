@@ -6,7 +6,14 @@ namespace SnapsInAZfs.Interop.Zfs.Json;
 /// <remarks>
 ///   This type is not used by SIAZ, and is included solely for JSON serialization source generator use.
 /// </remarks>
-public class OutputVersion
+[UsedImplicitly (
+                  ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature
+                | ImplicitUseKindFlags.Access,
+                  ImplicitUseTargetFlags.WithMembers
+                | ImplicitUseTargetFlags.WithInheritors,
+                  Reason = "Used by the JSON serializer."
+                )]
+public sealed record OutputVersion
 {
   /// <summary>
   ///   The command that was run to obtain the output.
