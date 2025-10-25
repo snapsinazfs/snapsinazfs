@@ -8,12 +8,10 @@
 //
 // See https://opensource.org/license/MIT/
 
-namespace SnapsInAZfs.Interop.Zfs.Json.Zfs.Generic;
+namespace SnapsInAZfs.Interop.Zfs.Json.Zfs;
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
-
-using SnapsInAZfs.Interop.Zfs.Json.Zfs;
 
 [JsonSerializable ( typeof( ZfsGetSiazSchemaResult ) )]
 [JsonSerializable ( typeof( ZfsGetSiazDatasetSchemaBase ) )]
@@ -26,6 +24,13 @@ using SnapsInAZfs.Interop.Zfs.Json.Zfs;
                                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                                RespectNullableAnnotations = true
                              )]
+[UsedImplicitly (
+                  ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature
+                | ImplicitUseKindFlags.Access,
+                  ImplicitUseTargetFlags.WithMembers
+                | ImplicitUseTargetFlags.WithInheritors,
+                  Reason = "Used by the JSON serializer."
+                )]
 public partial class ZfsGetSiazSchemaResultSerializationContext : JsonSerializerContext
 {
 }

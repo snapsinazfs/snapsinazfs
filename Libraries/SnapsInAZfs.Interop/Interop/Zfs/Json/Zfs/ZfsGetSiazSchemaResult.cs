@@ -12,16 +12,20 @@
 
 namespace SnapsInAZfs.Interop.Zfs.Json.Zfs;
 
-public record ZfsGetSiazSchemaResult
-{ 
+using System.Text.Json.Serialization;
+
+public sealed record ZfsGetSiazSchemaResult
+{
   /// <summary>
   ///   The output_version property.
   /// </summary>
   /// <remarks>This property is not used by SIAZ.</remarks>
-  public OutputVersion output_version { get; set; }
+  [JsonPropertyName ( "output_version" )]
+  public OutputVersion? OutputVersion { get; set; }
 
   /// <summary>
   ///   A mapping of dataset names to <see cref="ZfsGetSiazDatasetSchemaBase" /> objects.
   /// </summary>
-  public Dictionary<string, ZfsGetSiazDatasetSchemaBase> datasets { get; set; }
+  [JsonPropertyName ( "datasets" )]
+  public Dictionary<string, ZfsGetSiazDatasetSchemaBase>? Datasets { get; set; }
 }

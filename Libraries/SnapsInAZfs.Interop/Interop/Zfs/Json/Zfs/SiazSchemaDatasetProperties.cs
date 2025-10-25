@@ -1,5 +1,6 @@
 namespace SnapsInAZfs.Interop.Zfs.Json.Zfs;
 
+using System.Numerics;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 using ZfsTypes;
@@ -15,23 +16,12 @@ using ZfsTypes;
 /// </remarks>
 [UsedImplicitly ( ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature | ImplicitUseKindFlags.Access, ImplicitUseTargetFlags.WithMembers | ImplicitUseTargetFlags.WithInheritors, Reason = "Used by the JSON serializer." )]
 public record SiazSchemaDatasetProperties
+  : ISiazSchemaDatasetProperties,
+    IEqualityOperators<SiazSchemaDatasetProperties, SiazSchemaDatasetProperties, bool>
 {
   /// <summary>
-  ///   Gets or sets the value of the JSON element for <see cref="EnabledString" /> as a <see langword="bool" />.
-  /// </summary>
-  /// <remarks>
-  ///   This property is ignored by the JSON serializer.<br />
-  ///   See <see cref="EnabledString" /> for why this exists.
-  /// </remarks>
-  [JsonIgnore]
-  public bool Enabled
-  {
-    get => bool.Parse ( EnabledString?.Value ?? bool.FalseString );
-    set => EnabledString?.Value = value.ToString ( );
-  }
-
-  /// <summary>
-  ///   Gets or sets whether the dataset is enabled for processing by SIAZ, as a string.
+  ///   Gets or sets whether the dataset is enabled for processing by SIAZ, as a string.<br />
+  ///   Use the <see cref="Enabled" /> property instead.
   /// </summary>
   /// <remarks>
   ///   Source-generated JSON serialization does not handle booleans well if the value isn't all lower-case.<br />
@@ -42,6 +32,27 @@ public record SiazSchemaDatasetProperties
   /// </remarks>
   [JsonPropertyName ( ZfsPropertyNames.Enabled )]
   public DatasetProperty<string>? EnabledString { get; set; }
+
+  [JsonPropertyName ( ZfsPropertyNames.PruneSnapshots )]
+  public DatasetProperty<string>? PruneSnapshotsString { get; set; }
+
+  [JsonPropertyName ( ZfsNativePropertyNames.SnapshotsChanged )]
+  public DatasetProperty<long>? SnapshotsChangedUnix { get; set; }
+
+  [JsonPropertyName ( ZfsPropertyNames.TakeSnapshots )]
+  public DatasetProperty<string>? TakeSnapshotsString { get; set; }
+
+  /// <inheritdoc />
+  /// <remarks>
+  ///   This property is ignored by the JSON serializer.<br />
+  ///   See <see cref="EnabledString" /> for why this exists.
+  /// </remarks>
+  [JsonIgnore]
+  public bool Enabled
+  {
+    get => bool.Parse ( EnabledString?.Value ?? bool.FalseString );
+    set => EnabledString?.Value = value.ToString ( );
+  }
 
   [JsonPropertyName ( ZfsPropertyNames.DatasetLastDailySnapshotTimestamp )]
   public DatasetProperty<DateTimeOffset>? LastDailySnapshotTimestamp { get; set; }
@@ -67,9 +78,6 @@ public record SiazSchemaDatasetProperties
     get => bool.Parse ( PruneSnapshotsString?.Value ?? bool.FalseString );
     set => PruneSnapshotsString?.Value = value.ToString ( );
   }
-
-  [JsonPropertyName ( ZfsPropertyNames.PruneSnapshots )]
-  public DatasetProperty<string>? PruneSnapshotsString { get; set; }
 
   [JsonPropertyName ( ZfsPropertyNames.Recursion )]
   public DatasetProperty<string>? Recursion { get; set; }
@@ -102,9 +110,6 @@ public record SiazSchemaDatasetProperties
     set => SnapshotsChangedUnix?.Value = value.ToUnixTimeSeconds ( );
   }
 
-  [JsonPropertyName ( ZfsNativePropertyNames.SnapshotsChanged )]
-  public DatasetProperty<long>? SnapshotsChangedUnix { get; set; }
-
   [JsonPropertyName ( ZfsPropertyNames.SourceSystem )]
   public DatasetProperty<string>? SourceSystem { get; set; }
 
@@ -114,9 +119,6 @@ public record SiazSchemaDatasetProperties
     get => bool.Parse ( TakeSnapshotsString?.Value ?? bool.FalseString );
     set => TakeSnapshotsString?.Value = value.ToString ( );
   }
-
-  [JsonPropertyName ( ZfsPropertyNames.TakeSnapshots )]
-  public DatasetProperty<string>? TakeSnapshotsString { get; set; }
 
   [JsonPropertyName ( ZfsPropertyNames.Template )]
   public DatasetProperty<string>? Template { get; set; }
