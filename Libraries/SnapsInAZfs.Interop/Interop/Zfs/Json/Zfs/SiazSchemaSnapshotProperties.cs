@@ -1,4 +1,5 @@
 // ReSharper disable StringLiteralTypo
+
 namespace SnapsInAZfs.Interop.Zfs.Json.Zfs;
 
 using System.Text.Json.Serialization;
@@ -13,6 +14,6 @@ public record SiazSchemaSnapshotProperties : SiazSchemaDatasetProperties
   [JsonPropertyName ( ZfsPropertyNames.SnapshotTimestamp )]
   public DatasetProperty<DateTimeOffset>? SnapshotTimestamp { get; set; }
 
-  [JsonPropertyName ( "userrefs" )]
+  [JsonPropertyName ( ZfsNativePropertyNames.UserRefs )]
   public DatasetProperty<int>? UserRefs { get; set; }
 }

@@ -18,4 +18,7 @@ public static class ZfsNativePropertyNames
   public const string SnapshotsChanged = "snapshots_changed";
   public const string Type             = "type";
   public const string Used             = "used";
+  public const string UserRefs         = "userrefs";
+  public const string SnapshotName     = "snapshot_name";
+  public const string Dataset          = "dataset";
 }
