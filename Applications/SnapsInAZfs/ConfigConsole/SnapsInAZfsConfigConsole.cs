@@ -1,3 +1,4 @@
+#nullable enable
 #region MIT LICENSE
 // Copyright 2025 Brandon Thetford
 // 

@@ -134,7 +134,7 @@ internal static class Program
     {
       case SiazCommandLine.ConfigConsoleCommandName:
       {
-        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( );
+        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( ) ?? throw new ApplicationStartupException ( "Unable to retrieve settings. Exiting." );
 
         if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
@@ -167,7 +167,7 @@ internal static class Program
 
       case SiazCommandLine.CronCommandName or SiazCommandLine.RunCommandName:
       {
-        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( );
+        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( ) ?? throw new ApplicationStartupException ( "Unable to retrieve settings. Exiting." );
 
         if ( ValidateSettings ( in Settings ) is not ExitCode.EOK and var badResult )
         {
@@ -199,6 +199,8 @@ internal static class Program
 
       case SiazCommandLine.ZfsSchemaCheckCommandName when noErrorsParseResult.CommandResult.Command == siazCli.ZfsSchemaCheckCommand:
       {
+        Settings = _configurationRoot.Get<SnapsInAZfsSettings> ( ) ?? throw new ApplicationStartupException ( "Unable to retrieve settings. Exiting." );
+
         if ( !TryGetZfsCommandRunner<ZfsCommandRunner> ( Settings, out IZfsCommandRunner? zfsCommandRunner ) )
         {
           ApplicationStartupException ase = new ( "Failed to get ZFS command runner instance. No action has been taken. SIAZ will terminate." );

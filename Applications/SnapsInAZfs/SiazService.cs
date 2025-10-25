@@ -284,7 +284,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
   }
 
   /// <exception cref="Exception">A delegate callback throws an exception.</exception>
-  internal bool UpdateZfsDatasetSchema (
+  private bool UpdateZfsDatasetSchema (
     SnapsInAZfsSettings                                              settings,
     ConcurrentDictionary<string, ConcurrentDictionary<string, bool>> poolRootsWithPropertyValidities,
     IZfsCommandRunner                                                zfsCommandRunner
@@ -539,7 +539,10 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
       // Handle taking new snapshots, if requested
       if ( _settings is { TakeSnapshots: true } )
       {
+        // This warning is a false positive. The string is a constant.
+#pragma warning disable CA2254
         Logger.Debug ( $"{nameof (SnapsInAZfsSettings.TakeSnapshots)} is true. Taking configured snapshots using timestamp {0:O}", currentTimestamp );
+#pragma warning restore CA2254
         State = ApplicationState.TakingSnapshots;
         await TakeAllConfiguredSnapshotsAsync ( currentTimestamp, datasets, snapshots ).ConfigureAwait ( true );
         State = ApplicationState.Executing;
