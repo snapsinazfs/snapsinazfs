@@ -45,8 +45,6 @@
     <Compile Include="Interop\Libc\bits\Types.cs" />
     <Compile Include="Interop\Libc\Enums\UnixFileFlags.cs" />
     <Compile Include="Interop\Libc\NativeMethods.cs" />
-    <Compile Include="Interop\Libc\Structs\Stat64.cs" />
-    <Compile Include="Interop\Libc\Structs\StatFs64.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -65,7 +63,8 @@
   
   <!-- C stdlib typedefs -->
   <ItemGroup>
-    <Using Alias="__uid_t" Include="System.UInt32" />
+    <Using Alias="__mode_t" Include="System.IO.UnixFileMode" />
+    <!--<Using Alias="__uid_t" Include="System.UInt32" />
     <Using Alias="__gid_t" Include="System.UInt32" />
     <Using Alias="__ino_t" Include="System.UInt64" />
     <Using Alias="__dev_t" Include="System.UInt64" />
@@ -76,9 +75,8 @@
     <Using Alias="__blkcnt64_t" Include="System.Int64" />
     <Using Alias="__off_t" Include="System.Int64" />
     <Using Alias="__off64_t" Include="System.Int64" />
-    <Using Alias="__mode_t" Include="System.IO.UnixFileMode" />
     <Using Alias="timespec" Include="System.Int64" />
-    <Using Alias="__time_t" Include="System.Int64" />
+    <Using Alias="__time_t" Include="System.Int64" />-->
   </ItemGroup>
 
   <ItemGroup>
