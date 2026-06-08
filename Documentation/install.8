@@ -166,13 +166,7 @@ While these builds may run on Linux, compatibility with Linux is neither intende
 .B Release
 This configuration results in a build which is optimized,
 is \fBNOT\fP combined into a single executable file,
-is \fBNOT\fP pre\-compiled to native code,
-and has \(dqTiered Compilation\(dq enabled.\&
-See
-.UR https://learn.microsoft.com/en\-us/dotnet/core/runtime\-config/compilation
-the Microsoft Learn Documentation on Tiered Compilation
-.UE
-for details.\&
+and is \fBNOT\fP pre\-compiled to native code.\&
 .IP
 These builds are likely to be larger, overall, than \fBRelease\-R2R\fP builds,
 are not supported or used by the Makefile for build or install,
@@ -191,8 +185,7 @@ recipes, is \fBRelease\-R2R\fP (see below).\&
 .B Release\-R2R
 This configuration results in a build which is optimized,
 is combined into a single executable file,
-is partially pre\-compiled to native code,
-and has Tiered Compilation disabled (which helps with native pre\-compilation).\&
+and is partially pre\-compiled to native code.\&
 .IP
 This is the recommended build configuration and is the configuration used by the
 .BR all ", " *\-release ", and " install
