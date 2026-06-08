@@ -16,7 +16,7 @@
 
  ## Requirements
 
- SIAZ is built in c\# on .net 10, and strives to require no other external dependencies to be manually installed other than the .net 10 runtim or .net 10 SDK (to build from source), and a supported version of ZFS (currently 2.1 and up).\
+  SIAZ is built in C# on .NET 8, and strives to require no other external dependencies to be manually installed other than the .NET 8 runtime or .NET 8 SDK (to build from source), and a supported version of ZFS (currently 2.1 and up).\
  Building SIAZ also requires standard command-line utilities that typically exist on any supported Linux distribution, such as `install`, `cp`, and the like.
 
  SIAZ will likely build and run on any modern Linux system that supports the required .NET version and ZFS on Linux version.\
