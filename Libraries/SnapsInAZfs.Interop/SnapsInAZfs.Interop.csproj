@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    <LangVersion>12</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
@@ -31,7 +29,6 @@
     <PublishReadyToRun>True</PublishReadyToRun>
     <PublishSingleFile>True</PublishSingleFile>
     <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-    <TieredCompilation>False</TieredCompilation>
     <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
   </PropertyGroup>
 
@@ -43,10 +40,6 @@
 
   <ItemGroup>
     <Compile Include="Libc\Enums\Errno.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="NLog" Version="5.4.0" />
   </ItemGroup>
 
   <ItemGroup>

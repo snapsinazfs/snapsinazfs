@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" IsTrimmable="False" />
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <LangVersion>12</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Release-R2R;Debug-Windows;Debug-NoZFS</Configurations>
@@ -84,17 +82,9 @@
   </Choose>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.2" />
-    <PackageReference Include="NLog" Version="5.4.0" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
     <PackageReference Include="NLog.Targets.Journald" Version="1.2.2" />
     <PackageReference Include="PowerArgs" Version="4.0.3" />
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
@@ -146,7 +136,7 @@
     <When Condition="'$(Configuration)|$(Platform)'=='Release-R2R|x64'">
 
       <PropertyGroup>
-        <AnalysisLevel>7-minimum</AnalysisLevel>
+        <AnalysisLevel>8-minimum</AnalysisLevel>
         <ContinuousIntegrationBuild>True</ContinuousIntegrationBuild>
         <DefineConstants>$(DefineConstants)</DefineConstants>
         <Optimize>True</Optimize>
@@ -155,7 +145,6 @@
         <PublishSingleFile>True</PublishSingleFile>
         <ResponseFile>Release-R2R.rsp</ResponseFile>
         <RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
-        <TieredCompilation>False</TieredCompilation>
       </PropertyGroup>
 
     </When>
