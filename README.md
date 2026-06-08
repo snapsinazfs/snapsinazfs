@@ -7,8 +7,8 @@
 [![Latest 'build' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-build-tag.yml)
 [![Latest 'release' Tag Status](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml/badge.svg)](https://github.com/snapsinazfs/snapsinazfs/actions/workflows/build-and-test-release-tag.yml)
  
- Current stable release version: 2.0.2\
- Current development branch: siaz-2.0
+ Current stable release version: 2.0.3\
+ Current development branch: siaz-2.1
 
  Stable and pre-release versions are available on GitHub in the Releases section. Cloning the repository for local builds is only recommended from release-\* tags.
 
@@ -16,7 +16,7 @@
 
  ## Requirements
 
- SIAZ is built in c\# on .net 8, and strives to require no other external dependencies to be manually installed other than the .net 8 runtim or .net 8 SDK (to build from source), and a supported version of ZFS (currently 2.0 and up).\
+ SIAZ is built in c\# on .net 10, and strives to require no other external dependencies to be manually installed other than the .net 10 runtim or .net 10 SDK (to build from source), and a supported version of ZFS (currently 2.1 and up).\
  Building SIAZ also requires standard command-line utilities that typically exist on any supported Linux distribution, such as `install`, `cp`, and the like.
 
  SIAZ will likely build and run on any modern Linux system that supports the required .NET version and ZFS on Linux version.\
@@ -24,16 +24,16 @@
 
  - An x64 CPU
  - An x64 build of one of the following Linux distributions:
-   - Ubuntu 22.04 or higher
+   - Ubuntu 24.04 or higher
      - This includes equivalent KUbuntu releases
      - This also includes KDE Neon releases with equivalent Ubuntu versions as their upstream
-   - RHEL 8.6 or higher
-   - CentOS Stream 8.6 or higher
- - Microsoft .net 8.0 or higher
+   - RHEL 9.2 or higher
+   - CentOS Stream 9.2 or higher
+ - Microsoft .net 10.0 or higher
    - x64 versions of .net are the only versions SIAZ is supported on and it will refuse to build on other platforms
    - The releases made available in your package manager are preferred, but any properly installed .net runtime _should_ work
-   - If you are using a pre-built version of SIAZ (not yet provided here), the .net 8.0 runtime is sufficient
-   - If you are building from source, the .net 8.0 SDK is required. `make` is an optional dependency for a simplified build workflow familiar to Linux users.
+   - If you are using a pre-built version of SIAZ (not yet provided here), the .net 10.0 runtime is sufficient
+   - If you are building from source, the .net 10.0 SDK is required. `make` is an optional dependency for a simplified build workflow familiar to Linux users.
    - If you are using a pre-built AOT-compiled version of SIAZ or a pre-build framework-independent version of SIAZ (not yet provided here), you do not need ANY .net components installed, but it is your responsibility to ensure binary compatibility with the target system.
  - ZFS version 2.1 or higher
    - Some features may require higher ZFS versions. That is and will be documented when relevant. It is your responsibility to ensure ZFS compatibility, in the version of the kernel module, the userspace utilities, and in the necessary feature flags on pools/datasets, where relevant.
