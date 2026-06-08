@@ -1,0 +1,56 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Debug-NoZFS" />
+    <BuildType Name="Debug-Windows" />
+    <BuildType Name="Release" />
+    <BuildType Name="Release-R2R" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Applications/">
+    <Project Path="Applications/SnapsInAZfs/SnapsInAZfs.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Documentation/">
+    <File Path="Documentation/install.8" />
+    <File Path="Documentation/SnapsInAZfs-config-console.8" />
+    <File Path="Documentation/SnapsInAZfs-monitoring.3" />
+    <File Path="Documentation/SnapsInAZfs-zfsprops.7" />
+    <File Path="Documentation/SnapsInAZfs.5" />
+    <File Path="Documentation/SnapsInAZfs.8" />
+  </Folder>
+  <Folder Name="/Libraries/">
+    <Project Path="Libraries/SnapsInAZfs.Interop/SnapsInAZfs.Interop.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Libraries/SnapsInAZfs.Monitoring/SnapsInAZfs.Monitoring.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Libraries/SnapsInAZfs.Settings/SnapsInAZfs.Settings.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="INSTALL.md" />
+    <File Path="Makefile" />
+    <File Path="README.md" />
+    <File Path="snapsinazfs.service" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/SnapsInAZfs.Interop.Tests/SnapsInAZfs.Interop.Tests.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tests/SnapsInAZfs.Monitoring.Tests/SnapsInAZfs.Monitoring.Tests.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tests/SnapsInAZfs.Settings.Tests/SnapsInAZfs.Settings.Tests.csproj">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Tests/SnapsInAZfs.Tests/SnapsInAZfs.Tests.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+</Solution>
