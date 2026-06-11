@@ -56,6 +56,8 @@ internal static unsafe class NativeMemoryHelpers
     [MustUseReturnValue]
     public byte* GetUnmanagedNativeBytes ( bool omitTerminatingZero = false )
     {
+      ArgumentOutOfRangeException.ThrowIfZero ( value.Length );
+
       int        valueByteCount  = value.Length;
       int        bufferByteCount = omitTerminatingZero ? valueByteCount : valueByteCount + 1;
       byte*      buffer          = (byte*)NativeMemory.Alloc ( (nuint)bufferByteCount );
