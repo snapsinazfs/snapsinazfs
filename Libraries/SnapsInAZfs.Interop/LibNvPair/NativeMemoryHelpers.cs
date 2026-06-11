@@ -62,7 +62,10 @@ internal static unsafe class NativeMemoryHelpers
       Span<byte> bufferSpan      = new ( buffer, bufferByteCount );
 
       Unsafe.CopyBlock ( ref bufferSpan [ 0 ], in value [ 0 ], (uint)valueByteCount );
-      buffer [ valueByteCount ] = 0;
+      if ( !omitTerminatingZero )
+      {
+        bufferSpan [ valueByteCount ] = 0;
+      }
 
       return buffer;
     }
