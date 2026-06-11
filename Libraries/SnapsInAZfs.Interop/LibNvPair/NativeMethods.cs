@@ -18,7 +18,7 @@ namespace SnapsInAZfs.Interop.LibNvPair;
 
 internal static unsafe class NativeMethods
 {
-  private const string Lib = "libnvpair";
+  private const string Lib = "nvpair";
 
   [DllImport ( Lib, ExactSpelling = true )]
   public static extern int nvlist_add_boolean ( nvlist_t* nvl, byte* name );
