@@ -9,6 +9,7 @@
     <DebugType>embedded</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
+    <DisableRuntimeMarshaling>True</DisableRuntimeMarshaling>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
