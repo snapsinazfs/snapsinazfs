@@ -36,11 +36,19 @@ internal static unsafe class NativeMemoryHelpers
       int   byteCount = Encoding.UTF8.GetByteCount ( value );
       byte* buffer    = (byte*)NativeMemory.Alloc ( (nuint)( byteCount + 1 ) );
 
-      Span<byte> bufferSpan = new ( buffer, byteCount + 1 );
-      Encoding.UTF8.GetBytes ( value, bufferSpan );
-      buffer [ byteCount ] = 0;
+      try
+      {
+        Span<byte> bufferSpan = new ( buffer, byteCount + 1 );
+        Encoding.UTF8.GetBytes ( value, bufferSpan );
+        bufferSpan [ ^1 ] = 0;
 
-      return buffer;
+        return buffer;
+      }
+      catch
+      {
+        NativeMemory.Free ( buffer );
+        throw;
+      }
     }
   }
 
