@@ -12,11 +12,11 @@
     <AnalysisLevel>8-minimum</AnalysisLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <VersionPrefix>2.0.3</VersionPrefix>
-    <VersionSuffix></VersionSuffix>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionSuffix>alpha1</VersionSuffix>
   </PropertyGroup>
   <PropertyGroup>
-    <Copyright>2023 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
+    <Copyright>2026 Brandon Thetford and the SnapsInAZfs Organization</Copyright>
     <Description>SnapsInAZfs - Snapshot manager for ZFS on Linux</Description>
     <Product>SnapsInAZfs</Product>
   </PropertyGroup>

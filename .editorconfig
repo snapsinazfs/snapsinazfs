@@ -22,8 +22,8 @@ dotnet_diagnostic.IDE0079.severity = silent
 csharp_indent_labels = one_less_than_current
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:silent
-csharp_prefer_braces = true:silent
-csharp_style_namespace_declarations = file_scoped:silent
+csharp_prefer_braces = true:warning
+csharp_style_namespace_declarations = file_scoped:warning
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_top_level_statements = true:silent
 csharp_style_expression_bodied_methods = false:silent
@@ -62,17 +62,62 @@ csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
 csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
 csharp_style_prefer_not_pattern = true:suggestion
 csharp_style_prefer_extended_property_pattern = true:suggestion
-csharp_style_var_for_built_in_types = false:silent
-csharp_style_var_when_type_is_apparent = false:silent
-csharp_style_var_elsewhere = false:silent
+csharp_style_var_for_built_in_types = false:error
+csharp_style_var_when_type_is_apparent = false:error
+csharp_style_var_elsewhere = false:error
 dotnet_diagnostic.CA1001.severity = warning
 dotnet_diagnostic.CA1805.severity = warning
 dotnet_diagnostic.IDE0004.severity = suggestion
 dotnet_diagnostic.IDE0008.severity = warning
 csharp_style_prefer_readonly_struct_member = true:suggestion
 
-[*.{cs,vb}]
-#### Naming styles ####
+# Microsoft .NET properties
+dotnet_style_predefined_type_for_locals_parameters_members = true:error
+dotnet_style_predefined_type_for_member_access = true:error
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:warning
+
+# ReSharper properties
+resharper_braces_redundant = true
+resharper_csharp_max_line_length = 240
+resharper_csharp_outdent_commas = true
+resharper_csharp_outdent_dots = true
+resharper_csharp_wrap_after_invocation_lpar = true
+resharper_csharp_wrap_before_binary_opsign = true
+resharper_csharp_wrap_before_declaration_lpar = true
+resharper_csharp_wrap_before_invocation_lpar = true
+resharper_csharp_wrap_before_invocation_rpar = true
+resharper_int_align_fields = true
+resharper_int_align_parameters = true
+resharper_int_align_properties = true
+resharper_int_align_property_patterns = true
+resharper_int_align_switch_sections = true
+resharper_keep_existing_attribute_arrangement = true
+resharper_keep_existing_embedded_arrangement = false
+resharper_keep_existing_switch_expression_arrangement = false
+resharper_max_attribute_length_for_same_line = 3
+resharper_max_formal_parameters_on_line = 5
+resharper_max_primary_constructor_parameters_on_line = 10000
+resharper_outdent_binary_pattern_ops = true
+resharper_prefer_roslyn_rules_for_parentheses_clarity = true
+resharper_treat_case_statement_with_break_as_simple = false
+resharper_wrap_before_first_method_call = true
+resharper_wrap_before_primary_constructor_declaration_lpar = false
+resharper_wrap_chained_method_calls = chop_if_long
+resharper_wrap_comments = true
+resharper_xmldoc_linebreaks_inside_tags_for_elements_longer_than = 120
+resharper_xmldoc_max_line_length = 240
+resharper_xmldoc_space_after_last_pi_attribute = true
+resharper_xml_allow_far_alignment = true
+resharper_xml_insert_final_newline = true
+resharper_xml_max_blank_lines_between_tags = 1
+resharper_xml_max_line_length = 240
+
+# ReSharper inspection severities
+resharper_arrange_empty_string_highlighting = suggestion
+resharper_arrange_object_creation_when_type_evident_highlighting = warning
+resharper_arrange_object_creation_when_type_not_evident_highlighting = suggestion
+resharper_arrange_trailing_comma_in_multiline_lists_highlighting = suggestion
+resharper_arrange_trailing_comma_in_singleline_lists_highlighting = suggestion
 
 # Naming rules
 
@@ -119,9 +164,8 @@ dotnet_naming_style.pascal_case.required_suffix =
 dotnet_naming_style.pascal_case.word_separator = 
 dotnet_naming_style.pascal_case.capitalization = pascal_case
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
-tab_width = 4
-indent_size = 4
-end_of_line = lf
+tab_width = 2
+indent_size = 2
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
