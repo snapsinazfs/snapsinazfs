@@ -414,50 +414,55 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     }
 
     /// <inheritdoc />
-    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string dsName, string[] properties )
+    public override bool SetDefaultValuesForMissingZfsPropertiesOnPoolAsync( SnapsInAZfsSettings settings, string poolName, string[] propertyArray )
     {
-        if ( properties.Length == 0 )
+      if ( propertyArray is not { Length: > 0 } )
+      {
+        Logger.Warn ( "Asked to set properties for {0} but no properties provided", poolName );
+        return false;
+      }
+
+      string propertiesSetString = propertyArray.Select ( propName => propName == ZfsPropertyNames.SourceSystem
+                                                                        ? ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SourceSystem, settings.LocalSystemName ).SetString
+                                                                        : IZfsProperty.DefaultDatasetProperties [ propName ].SetString
+                                                        )
+                                                .ToList ( )
+                                                .ToSpaceSeparatedSingleLineString ( );
+      Logger.Trace ( "Attempting to set properties on {0}: {1}", poolName, propertiesSetString );
+      ProcessStartInfo zfsSetStartInfo = new ( PathToZfsUtility, $"set {propertiesSetString} {poolName}" )
+                                         {
+                                           CreateNoWindow         = true,
+                                           RedirectStandardOutput = true
+                                         };
+      if ( settings.DryRun )
+      {
+        Logger.Info ( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+        return false;
+      }
+
+      using ( Process zfsSetProcess = new ( ) )
+      {
+        zfsSetProcess.StartInfo = zfsSetStartInfo;
+        Logger.Debug ( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
+        try
         {
-            Logger.Warn( "Asked to set properties for {0} but no properties provided", dsName );
-            return false;
+          zfsSetProcess.Start ( );
+        }
+        catch ( InvalidOperationException ioex )
+        {
+          Logger.Error ( ioex, "Error running zfs set operation. The error returned was {0}" );
+          return false;
         }
 
-        string propertiesSetString = properties.Select( propName => propName == ZfsPropertyNames.SourceSystem ? ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, settings.LocalSystemName ).SetString : IZfsProperty.DefaultDatasetProperties[ propName ].SetString ).ToList( ).ToSpaceSeparatedSingleLineString( );
-        Logger.Trace( "Attempting to set properties on {0}: {1}", dsName, propertiesSetString );
-        ProcessStartInfo zfsSetStartInfo = new( PathToZfsUtility, $"set {propertiesSetString} {dsName}" )
+        if ( !zfsSetProcess.HasExited )
         {
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-        if ( settings.DryRun )
-        {
-            Logger.Info( "DRY RUN: Would execute `{0} {1}`", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-            return false;
+          Logger.Trace ( "Waiting for zfs set process to exit" );
+          zfsSetProcess.WaitForExit ( 3000 );
         }
 
-        using ( Process zfsSetProcess = new( ) )
-        {
-            zfsSetProcess.StartInfo = zfsSetStartInfo;
-            Logger.Debug( "Calling {0} {1}", zfsSetStartInfo.FileName, zfsSetStartInfo.Arguments );
-            try
-            {
-                zfsSetProcess.Start( );
-            }
-            catch ( InvalidOperationException ioex )
-            {
-                Logger.Error( ioex, "Error running zfs set operation. The error returned was {0}" );
-                return false;
-            }
-
-            if ( !zfsSetProcess.HasExited )
-            {
-                Logger.Trace( "Waiting for zfs set process to exit" );
-                zfsSetProcess.WaitForExit( 3000 );
-            }
-
-            Logger.Trace( "zfs set process finished" );
-            return true;
-        }
+        Logger.Trace ( "zfs set process finished" );
+        return true;
+      }
     }
 
     /// <inheritdoc cref="SetZfsPropertiesAsync(bool,string,SnapsInAZfs.Interop.Zfs.ZfsTypes.IZfsProperty[])" />
