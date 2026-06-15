@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <!-- Paths used by the build system. Do not modify unless necessary and you know what you are doing. -->
+    <!-- Only modify their text values, if modifying them at all. -->
+    <!-- Absolutely do not modify the XML element names. -->
+    <!-- MSBuild XML variable substitution syntax is similar to Makefiles, and the names come from the   -->
+    <!-- XML element names themselves.  -->
+    <!-- Defaults are based on the Linux FHS spec, so you really shouldn't need to touch these. -->
+    <_BinariesDir>/bin</_BinariesDir>
+    <_PrivilegedBinariesDir>/sbin</_PrivilegedBinariesDir>
+    <_AddOnSoftwareDir>/opt</_AddOnSoftwareDir>
+    <_UsrDir>/usr</_UsrDir>
+    <_LocalDir>$(_UsrDir)/local</_LocalDir>
+    <_LocalBinariesDir>$(_LocalDir)/bin</_LocalBinariesDir>
+    <_LocalPrivilegedBinariesDir>$(_LocalDir)/sbin</_LocalPrivilegedBinariesDir>
+    <_SharedArchIndependentResourcesDir>$(_UsrDir)/share</_SharedArchIndependentResourcesDir>
+    <_ManPagesBaseDir>$(_SharedArchIndependentResourcesDir)/man</_ManPagesBaseDir>
+    <_ManPagesLibFunctionsDir>$(_ManPagesBaseDir)/man3</_ManPagesLibFunctionsDir>
+    <_ManPagesFileFormatsDir>$(_ManPagesBaseDir)/man5</_ManPagesFileFormatsDir>
+    <_ManPagesMiscDir>$(_ManPagesBaseDir)/man7</_ManPagesMiscDir>
+    <_ManPagesAdminToolsDir>$(_ManPagesBaseDir)/man8</_ManPagesAdminToolsDir>
+    <_HostConfigDir>/etc</_HostConfigDir>
+  </PropertyGroup>
+</Project>

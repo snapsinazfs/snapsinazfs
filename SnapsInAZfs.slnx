@@ -38,6 +38,7 @@
     <File Path="Makefile" />
     <File Path="README.md" />
     <File Path="snapsinazfs.service" />
+    <File Path="SystemSpecific.Build.props" />
   </Folder>
   <Folder Name="/Solution Items/GitHub Workflows/">
     <File Path=".github/workflows/build-and-test-build-tag.yml" />
