@@ -138,7 +138,7 @@ public static class TypeExtensions
     /// <returns></returns>
     public static string ToStringForZfsSet ( this List<IZfsProperty> properties )
     {
-        ArgumentNullException.ThrowIfNull ( properties, nameof (properties) );
+        ArgumentNullException.ThrowIfNull ( properties );
 
         if ( !properties.Any ( ) )
         {

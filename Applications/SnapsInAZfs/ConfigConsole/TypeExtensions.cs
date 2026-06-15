@@ -186,7 +186,7 @@ public static class TypeExtensions
     [Pure]
     public static int ToInt32( this ustring value )
     {
-        ArgumentNullException.ThrowIfNull( value, nameof( value ) );
+        ArgumentNullException.ThrowIfNull( value );
         if ( value.IsEmpty )
         {
             throw new ArgumentException( "Empty ustring cannot be converted to int", nameof( value ) );

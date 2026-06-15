@@ -35,7 +35,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     /// </exception>
     public ZfsRecord ( string Name, string Kind, string sourceSystem = "", bool inheritProperties = true, ZfsRecord? parent = null )
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace ( sourceSystem, nameof (sourceSystem) );
+        ArgumentException.ThrowIfNullOrWhiteSpace ( sourceSystem );
 
         this.Name     = Name;
         IsPoolRoot    = parent is null;
