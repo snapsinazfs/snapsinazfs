@@ -106,7 +106,7 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     [JsonIgnore]
     public string ValueString => Value switch
                                  {
-                                     int intValue            => intValue.ToString ( ),
+                                     int intValue            => intValue.ToString ( CultureInfo.InvariantCulture ),
                                      string value            => value,
                                      bool boolValue          => boolValue.ToString ( ).ToLowerInvariant ( ),
                                      DateTimeOffset dtoValue => dtoValue.ToString ( "O" )
