@@ -34,9 +34,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="LibAbigail\**" />
+    <Compile Remove="LibNvPair\**" />
+    <Compile Remove="LibZfsCore\**" />
+    <Compile Remove="LibZfs\**" />
     <Compile Remove="Zfs\Structs\**" />
     <Compile Remove="Zfs\Native\**" />
     <Compile Remove="Libc\**" />
+    <EmbeddedResource Remove="LibAbigail\**" />
+    <EmbeddedResource Remove="LibNvPair\**" />
+    <EmbeddedResource Remove="LibZfsCore\**" />
+    <EmbeddedResource Remove="LibZfs\**" />
+    <None Remove="LibAbigail\**" />
+    <None Remove="LibNvPair\**" />
+    <None Remove="LibZfsCore\**" />
+    <None Remove="LibZfs\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -55,5 +67,5 @@
   <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Settings.Tests" />
   </ItemGroup>
-
+  
 </Project>
