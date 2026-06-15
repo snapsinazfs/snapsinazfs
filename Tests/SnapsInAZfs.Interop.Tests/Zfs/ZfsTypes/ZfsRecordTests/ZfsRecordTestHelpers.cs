@@ -13,7 +13,7 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 [Order( 1 )]
 public class ZfsRecordTestHelpers
 {
-    public static SnapsInAZfsSettings Settings { get; set; }
+    public static SnapsInAZfsSettings? Settings { get; set; }
     private static string GetHostName( )
     {
         IPGlobalProperties hostIpGlobalProps = IPGlobalProperties.GetIPGlobalProperties( );
