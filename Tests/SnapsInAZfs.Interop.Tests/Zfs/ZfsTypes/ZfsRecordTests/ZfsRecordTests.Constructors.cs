@@ -66,10 +66,8 @@ public class ZfsRecordTests_Constructors
         Assert.That ( dataset, Is.Not.Null );
         Assert.That ( dataset, Is.InstanceOf<ZfsRecord> ( ) );
 
-        Assert.Multiple (
-                         [SuppressMessage ( "ReSharper", "HeapView.BoxingAllocation" )]
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( dataset.Name,                                  Is.EqualTo ( name ) );
                              Assert.That ( dataset.Kind,                                  Is.EqualTo ( kind ) );
                              Assert.That ( dataset.ParentDataset,                         Is.SameAs ( dataset ) );
@@ -101,7 +99,7 @@ public class ZfsRecordTests_Constructors
                              Assert.That ( dataset.SnapshotRetentionYearly,               Is.EqualTo ( new ZfsProperty<int> ( dataset, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,        -1 ) ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                              Assert.That ( dataset.TakeSnapshots,                         Is.EqualTo ( new ZfsProperty<bool> ( dataset, ZfsPropertyNames.TakeSnapshotsPropertyName, false ) ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                              Assert.That ( dataset.Template,                              Is.EqualTo ( new ZfsProperty<string> ( dataset, ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default ) ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
-                         } );
+                         }
     }
 
     [Test]
@@ -119,17 +117,14 @@ public class ZfsRecordTests_Constructors
         Assume.That ( parentDataset, Is.TypeOf<ZfsRecord> ( ) );
         ZfsRecord dataset = new ( name, kind, "testSystem", true, parentDataset );
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( dataset, Is.Not.Null );
                              Assert.That ( dataset, Is.InstanceOf<ZfsRecord> ( ) );
-                         } );
+                         }
 
-        Assert.Multiple (
-                         [SuppressMessage ( "ReSharper", "HeapView.BoxingAllocation" )]
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( dataset.Name,                                  Is.EqualTo ( name ) );
                              Assert.That ( dataset.Kind,                                  Is.EqualTo ( kind ) );
                              Assert.That ( dataset.ParentDataset,                         Is.SameAs ( parentDataset ) );
@@ -161,6 +156,6 @@ public class ZfsRecordTests_Constructors
                              Assert.That ( dataset.SnapshotRetentionYearly,               Is.EqualTo ( new ZfsProperty<int> ( dataset, ZfsPropertyNames.SnapshotRetentionYearlyPropertyName,        -1, false ) ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                              Assert.That ( dataset.TakeSnapshots,                         Is.EqualTo ( new ZfsProperty<bool> ( dataset, ZfsPropertyNames.TakeSnapshotsPropertyName, false, false ) ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                              Assert.That ( dataset.Template,                              Is.EqualTo ( new ZfsProperty<string> ( dataset, ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, false ) ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
-                         } );
+                         }
     }
 }

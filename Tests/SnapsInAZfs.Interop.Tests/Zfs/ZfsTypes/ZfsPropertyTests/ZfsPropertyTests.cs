@@ -97,11 +97,11 @@ public class ZfsPropertyTests
         dict.Add( property1, "value 1" );
         dict.Add( property2, "value 2" );
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( dict[ property1 ], Is.EqualTo( "value 1" ) );
             Assert.That( dict[ property2 ], Is.EqualTo( "value 2" ) );
-        } );
+        }
     }
 
     [Test]
@@ -361,13 +361,13 @@ public class ZfsPropertyTests
     {
         RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.True );
             Assert.That( property, Is.Not.Null );
             Assert.That( property, Is.InstanceOf<ZfsProperty<bool>>( ) );
             Assert.That( property.HasValue, Is.True );
-        } );
+        }
         return property!.Value.Value;
     }
 
@@ -383,12 +383,12 @@ public class ZfsPropertyTests
         RawProperty input = new( ZfsPropertyNames.EnabledPropertyName, value, ZfsPropertySourceConstants.Local );
 #pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<bool>.TryParse( input, out ZfsProperty<bool>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.False );
             Assert.That( property, Is.Null );
             Assert.That( property.HasValue, Is.False );
-        } );
+        }
     }
 
     [Test]
@@ -398,14 +398,14 @@ public class ZfsPropertyTests
         DateTimeOffset value = DateTimeOffset.Parse( valueString );
         RawProperty input = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, valueString, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.True );
             Assert.That( property, Is.Not.Null );
             Assert.That( property, Is.InstanceOf<ZfsProperty<DateTimeOffset>>( ) );
             Assert.That( property.HasValue, Is.True );
             Assert.That( property!.Value.Value, Is.EqualTo( value ) );
-        } );
+        }
     }
 
     [Test]
@@ -422,12 +422,12 @@ public class ZfsPropertyTests
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
 #pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.False );
             Assert.That( property, Is.Null );
             Assert.That( property.HasValue, Is.False );
-        } );
+        }
     }
 
     [Test]
@@ -440,13 +440,13 @@ public class ZfsPropertyTests
     {
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.True );
             Assert.That( property, Is.Not.Null );
             Assert.That( property, Is.InstanceOf<ZfsProperty<int>>( ) );
             Assert.That( property.HasValue, Is.True );
-        } );
+        }
         return property!.Value.Value;
     }
 
@@ -463,12 +463,12 @@ public class ZfsPropertyTests
         RawProperty input = new( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, value, ZfsPropertySourceConstants.Local );
 #pragma warning restore CS8604 // Possible null reference argument - Intentional
         bool success = ZfsProperty<int>.TryParse( input, out ZfsProperty<int>? property );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( success, Is.False );
             Assert.That( property, Is.Null );
             Assert.That( property.HasValue, Is.False );
-        } );
+        }
     }
 
     [Test]

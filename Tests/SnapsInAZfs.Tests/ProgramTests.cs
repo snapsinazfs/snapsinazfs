@@ -132,12 +132,12 @@ public class ProgramTests
         Assume.That( createSingletonResult, Is.True );
         Assume.That( Program.ZfsCommandRunnerSingleton, Is.Not.Null );
         bool getSingletonResult = Program.TryGetZfsCommandRunner( initialSettings, out IZfsCommandRunner? zfsCommandRunnerB );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( getSingletonResult, Is.True );
             Assert.That( zfsCommandRunnerB, Is.SameAs( zfsCommandRunnerA ) );
             Assert.That( zfsCommandRunnerB, Is.SameAs( Program.ZfsCommandRunnerSingleton ) );
-        } );
+        }
     }
 
     [Test]
@@ -147,19 +147,19 @@ public class ProgramTests
         Assume.That( Program.ZfsCommandRunnerSingleton, Is.Null );
         bool createSingletonResult = Program.TryGetZfsCommandRunner( initialSettings, out IZfsCommandRunner? zfsCommandRunnerA, false );
         Assume.That( createSingletonResult, Is.True );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( Program.ZfsCommandRunnerSingleton, Is.Null );
             Assert.That( zfsCommandRunnerA, Is.Not.Null );
-        } );
+        }
         bool getSingletonResult = Program.TryGetZfsCommandRunner( initialSettings, out IZfsCommandRunner? zfsCommandRunnerB, false );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( getSingletonResult, Is.True );
             Assert.That( zfsCommandRunnerB, Is.Not.Null );
             Assert.That( zfsCommandRunnerB, Is.Not.SameAs( zfsCommandRunnerA ) );
             Assert.That( Program.ZfsCommandRunnerSingleton, Is.Null );
-        } );
+        }
     }
 
     [Test]

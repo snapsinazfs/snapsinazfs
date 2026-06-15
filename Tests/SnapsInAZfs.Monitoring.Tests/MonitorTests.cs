@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -137,11 +137,11 @@ public partial class MonitorTests
         Assume.That( observable.IsApplicationStateChangedSubscribed, Is.False );
         Assume.That( observable.IsNextRunTimeChangedSubscribed, Is.False );
         testMonitor.RegisterApplicationStateObservable( observable );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( observable.IsApplicationStateChangedSubscribed, Is.True );
             Assert.That( observable.IsNextRunTimeChangedSubscribed, Is.True );
-        } );
+        }
     }
 
     [Test]
@@ -177,8 +177,8 @@ public partial class MonitorTests
         Assume.That( observable.IsTakeSnapshotFailedRegistered, Is.True );
         Assume.That( observable.IsTakeSnapshotSucceededRegistered, Is.True );
         testMonitor.RegisterSnapshotOperationsObservable( observable );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( observable.DidBeginPruningSnapshotsRegisterMultiple, Is.False );
             Assert.That( observable.DidBeginTakingSnapshotsRegisterMultiple, Is.False );
             Assert.That( observable.DidEndPruningSnapshotsRegisterMultiple, Is.False );
@@ -187,7 +187,7 @@ public partial class MonitorTests
             Assert.That( observable.DidPruneSnapshotSucceededRegisterMultiple, Is.False );
             Assert.That( observable.DidTakeSnapshotFailedRegisterMultiple, Is.False );
             Assert.That( observable.DidTakeSnapshotSucceededRegisterMultiple, Is.False );
-        } );
+        }
     }
 
     [Test]
@@ -204,8 +204,8 @@ public partial class MonitorTests
         Assume.That( observable.IsTakeSnapshotFailedRegistered, Is.False );
         Assume.That( observable.IsTakeSnapshotSucceededRegistered, Is.False );
         testMonitor.RegisterSnapshotOperationsObservable( observable );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( observable.IsBeginPruningSnapshotsRegistered, Is.True );
             Assert.That( observable.IsBeginTakingSnapshotsRegistered, Is.True );
             Assert.That( observable.IsEndPruningSnapshotsRegistered, Is.True );
@@ -214,7 +214,7 @@ public partial class MonitorTests
             Assert.That( observable.IsPruneSnapshotSucceededRegistered, Is.True );
             Assert.That( observable.IsTakeSnapshotFailedRegistered, Is.True );
             Assert.That( observable.IsTakeSnapshotSucceededRegistered, Is.True );
-        } );
+        }
     }
 
     [Test]
@@ -255,8 +255,8 @@ public partial class MonitorTests
 
         DateTimeOffset now = DateTimeOffset.Now;
         observable.RaisePruneSnapshotFailedEvent( "snapshot name", in now );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.Zero );
@@ -265,11 +265,11 @@ public partial class MonitorTests
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
-        } );
+        }
 
         observable.RaiseTakeSnapshotFailedEvent( "snapshot name", in now );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
@@ -278,11 +278,11 @@ public partial class MonitorTests
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
-        } );
+        }
 
         observable.RaisePruneSnapshotSucceededEvent( "snapshot name", in now );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
@@ -291,11 +291,11 @@ public partial class MonitorTests
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.Zero );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.Zero );
-        } );
+        }
 
         observable.RaiseTakeSnapshotSucceededEvent( "snapshot name", in now );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testMonitor.SnapshotsPrunedFailedLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsPrunedFailedSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenFailedLastRun, Is.EqualTo( 1 ) );
@@ -304,7 +304,7 @@ public partial class MonitorTests
             Assert.That( testMonitor.SnapshotsPrunedSucceededSinceStart, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenSucceededLastRun, Is.EqualTo( 1 ) );
             Assert.That( testMonitor.SnapshotsTakenSucceededSinceStart, Is.EqualTo( 1 ) );
-        } );
+        }
     }
 
     private sealed class ApplicationStateObservableMock : IApplicationStateObservable

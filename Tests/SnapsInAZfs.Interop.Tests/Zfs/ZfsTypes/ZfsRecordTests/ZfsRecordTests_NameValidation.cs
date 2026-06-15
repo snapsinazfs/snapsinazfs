@@ -87,11 +87,11 @@ public class ZfsRecordTests_NameValidation
         string nameToTest = name;
         bool fsValidationResult = ZfsRecord.ValidateName( ZfsPropertyValueConstants.FileSystem, nameToTest ) == valid;
         bool volValidationResult = ZfsRecord.ValidateName( ZfsPropertyValueConstants.Volume, nameToTest ) == valid;
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( fsValidationResult, Is.True );
             Assert.That( volValidationResult, Is.True );
-        } );
+        }
     }
 
     [Test]

@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -43,8 +43,8 @@ public class ZfsObjectConfigurationTreeNodeTests
         Assume.That( treeRecordGen2 == baseRecordGen2, Is.False );
 
         testNodeGen2.CopyBaseDatasetPropertiesToTreeDataset( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testNodeGen2.IsModified, Is.False );
             Assert.That( testNodeGen2.IsLocallyModified, Is.False );
             Assert.That( testNodeGen2.TreeDataset.Enabled.Value, Is.True );
@@ -56,7 +56,7 @@ public class ZfsObjectConfigurationTreeNodeTests
             Assert.That( baseRecordGen2 == treeRecordGen2, Is.True );
             Assert.That( testNodeGen2.TreeDataset, Is.Not.SameAs( baseRecordGen2 ) );
             Assert.That( testNodeGen2.TreeDataset, Is.SameAs( treeRecordGen2 ) );
-        } );
+        }
     }
 
     [Test]
@@ -91,8 +91,8 @@ public class ZfsObjectConfigurationTreeNodeTests
         Assume.That( treeRecordGen2 == baseRecordGen2, Is.False );
 
         testNodeGen2.CopyBaseDatasetPropertiesToTreeDataset( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testNodeGen2.IsModified, Is.False );
             Assert.That( testNodeGen2.IsLocallyModified, Is.False );
             Assert.That( testNodeGen2.TreeDataset.Enabled.Value, Is.True );
@@ -104,7 +104,7 @@ public class ZfsObjectConfigurationTreeNodeTests
             Assert.That( baseRecordGen2 == treeRecordGen2, Is.True );
             Assert.That( testNodeGen2.TreeDataset, Is.Not.SameAs( baseRecordGen2 ) );
             Assert.That( testNodeGen2.TreeDataset, Is.SameAs( treeRecordGen2 ) );
-        } );
+        }
     }
 
     [Test]
@@ -136,8 +136,8 @@ public class ZfsObjectConfigurationTreeNodeTests
         Assume.That( treeRecordGen2 == baseRecordGen2, Is.False );
 
         testNodeGen2.CopyTreeDatasetPropertiesToBaseDataset( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testNodeGen2.IsModified, Is.False );
             Assert.That( testNodeGen2.IsLocallyModified, Is.False );
             Assert.That( baseRecordGen2.Enabled.Value, Is.False );
@@ -146,7 +146,7 @@ public class ZfsObjectConfigurationTreeNodeTests
             Assert.That( treeRecordGen2 == baseRecordGen2, Is.True );
             Assert.That( testNodeGen2.TreeDataset, Is.Not.SameAs( baseRecordGen2 ) );
             Assert.That( testNodeGen2.TreeDataset, Is.SameAs( treeRecordGen2 ) );
-        } );
+        }
     }
 
     [Test]
@@ -177,8 +177,8 @@ public class ZfsObjectConfigurationTreeNodeTests
         Assume.That( treeRecordGen2 == baseRecordGen2, Is.False );
 
         testNodeGen2.CopyTreeDatasetPropertiesToBaseDataset( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( testNodeGen2.IsModified, Is.False );
             Assert.That( testNodeGen2.IsLocallyModified, Is.False );
             Assert.That( baseRecordGen2.Enabled.Value, Is.False );
@@ -190,7 +190,7 @@ public class ZfsObjectConfigurationTreeNodeTests
             Assert.That( treeRecordGen2 == baseRecordGen2, Is.True );
             Assert.That( testNodeGen2.TreeDataset, Is.Not.SameAs( baseRecordGen2 ) );
             Assert.That( testNodeGen2.TreeDataset, Is.SameAs( treeRecordGen2 ) );
-        } );
+        }
     }
 
     [Test]
@@ -257,8 +257,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 ConcurrentDictionary<string, IZfsProperty> inheritedPropertiesGen2 = (ConcurrentDictionary<string, IZfsProperty>)inheritedPropertiesFieldInfo.GetValue( gen2 )!;
                 ZfsProperty<bool> gen1UpdatedProperty = (ZfsProperty<bool>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<bool> gen2UpdatedProperty = (ZfsProperty<bool>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( inheritedPropertiesGen2.ContainsKey( propertyName ), Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
@@ -269,7 +269,7 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.False );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen2.IsLocallyModified, Is.EqualTo( expectedGen2PropertyChanged ) );
-                } );
+                }
             }
                 break;
             case (int gen1Expected, int gen2Expected):
@@ -279,8 +279,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 ConcurrentDictionary<string, IZfsProperty> inheritedPropertiesGen2 = (ConcurrentDictionary<string, IZfsProperty>)inheritedPropertiesFieldInfo.GetValue( gen2 )!;
                 ZfsProperty<int> gen1UpdatedProperty = (ZfsProperty<int>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<int> gen2UpdatedProperty = (ZfsProperty<int>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( inheritedPropertiesGen2.ContainsKey( propertyName ), Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
@@ -291,7 +291,7 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.False );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen2.IsLocallyModified, Is.EqualTo( expectedGen2PropertyChanged ) );
-                } );
+                }
             }
                 break;
             case (string gen1Expected, string gen2Expected):
@@ -301,8 +301,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 ConcurrentDictionary<string, IZfsProperty> inheritedPropertiesGen2 = (ConcurrentDictionary<string, IZfsProperty>)inheritedPropertiesFieldInfo.GetValue( gen2 )!;
                 ZfsProperty<string> gen1UpdatedProperty = (ZfsProperty<string>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<string> gen2UpdatedProperty = (ZfsProperty<string>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( inheritedPropertiesGen2.ContainsKey( propertyName ), Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
@@ -313,7 +313,7 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.False );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyChanged ) );
                     Assert.That( gen2.IsLocallyModified, Is.EqualTo( expectedGen2PropertyChanged ) );
-                } );
+                }
             }
                 break;
         }
@@ -346,8 +346,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 gen1.UpdateTreeNodeProperty( propertyName, newGen1Value );
                 ZfsProperty<bool> gen1UpdatedProperty = (ZfsProperty<bool>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<bool> gen2UpdatedProperty = (ZfsProperty<bool>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
                     Assert.That( gen2UpdatedProperty.Value == gen2InitialValue, Is.Not.EqualTo( expectedGen2PropertyInheritance ) );
@@ -357,7 +357,7 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.True );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyInheritance ) );
                     Assert.That( gen2.IsLocallyModified, Is.False );
-                } );
+                }
             }
                 break;
             case (int newGen1Value, int gen1Expected, int gen2Expected):
@@ -366,8 +366,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 gen1.UpdateTreeNodeProperty( propertyName, newGen1Value );
                 ZfsProperty<int> gen1UpdatedProperty = (ZfsProperty<int>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<int> gen2UpdatedProperty = (ZfsProperty<int>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
                     Assert.That( gen2UpdatedProperty.Value == gen2InitialValue, Is.Not.EqualTo( expectedGen2PropertyInheritance ) );
@@ -377,7 +377,7 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.True );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyInheritance ) );
                     Assert.That( gen2.IsLocallyModified, Is.False );
-                } );
+                }
             }
                 break;
             case (string newGen1Value, string gen1Expected, string gen2Expected):
@@ -386,8 +386,8 @@ public class ZfsObjectConfigurationTreeNodeTests
                 gen1.UpdateTreeNodeProperty( propertyName, newGen1Value );
                 ZfsProperty<string> gen1UpdatedProperty = (ZfsProperty<string>)testPropertyInfo.GetValue( gen1.TreeDataset )!;
                 ZfsProperty<string> gen2UpdatedProperty = (ZfsProperty<string>)testPropertyInfo.GetValue( gen2.TreeDataset )!;
-                Assert.Multiple( ( ) =>
-                {
+          using (Assert.EnterMultipleScope())
+          {
                     Assert.That( gen1UpdatedProperty.Value, Is.EqualTo( gen1Expected ) );
                     Assert.That( gen2UpdatedProperty.Value, Is.EqualTo( gen2Expected ) );
                     Assert.That( gen2UpdatedProperty.Value == gen2InitialValue, Is.Not.EqualTo( expectedGen2PropertyInheritance ) );
@@ -397,30 +397,30 @@ public class ZfsObjectConfigurationTreeNodeTests
                     Assert.That( gen1.IsLocallyModified, Is.True );
                     Assert.That( gen2.IsModified, Is.EqualTo( expectedGen2PropertyInheritance ) );
                     Assert.That( gen2.IsLocallyModified, Is.False );
-                } );
+                }
             }
                 break;
         }
     }
 
     [Test]
-    public void ZfsObjectConfigurationTreeNode_Constructor( )
+    public void ZfsObjectConfigurationTreeNode_Constructor ( )
     {
-        ZfsRecord baseRecord = new( "testRoot", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
-        ZfsRecord treeRecord = new( "testRoot", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
-        Assume.That( baseRecord == treeRecord, Is.True );
-        ZfsObjectConfigurationTreeNode testNode = new( "testRoot", baseRecord, treeRecord );
-        PropertyInfo baseDatasetPropertyInfo = typeof( ZfsObjectConfigurationTreeNode ).GetProperty( "BaseDataset", BindingFlags.NonPublic | BindingFlags.Instance )!;
-        Assert.Multiple( ( ) =>
-        {
-            Assert.That( testNode.Text, Is.EqualTo( "testRoot" ) );
-            Assert.That( testNode.Children, Is.Empty );
-            Assert.That( testNode.IsModified, Is.False );
-            Assert.That( testNode.IsLocallyModified, Is.False );
-            Assert.That( testNode.TreeDataset, Is.SameAs( treeRecord ) );
-            Assert.That( baseDatasetPropertyInfo.GetValue( testNode ), Is.SameAs( baseRecord ) );
-            Assert.That( baseDatasetPropertyInfo.GetValue( testNode ), Is.Not.SameAs( treeRecord ) );
-        } );
+      ZfsRecord baseRecord = new ( "testRoot", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
+      ZfsRecord treeRecord = new ( "testRoot", ZfsPropertyValueConstants.FileSystem, "host.domain.tld", false );
+      Assume.That ( baseRecord == treeRecord, Is.True );
+      ZfsObjectConfigurationTreeNode testNode                = new ( "testRoot", baseRecord, treeRecord );
+      PropertyInfo                   baseDatasetPropertyInfo = typeof (ZfsObjectConfigurationTreeNode).GetProperty ( "BaseDataset", BindingFlags.NonPublic | BindingFlags.Instance )!;
+      using ( Assert.EnterMultipleScope ( ) )
+      {
+        Assert.That ( testNode.Text, Is.EqualTo ( "testRoot" ) );
+        Assert.That ( testNode.Children, Is.Empty );
+        Assert.That ( testNode.IsModified, Is.False );
+        Assert.That ( testNode.IsLocallyModified, Is.False );
+        Assert.That ( testNode.TreeDataset, Is.SameAs ( treeRecord ) );
+        Assert.That ( baseDatasetPropertyInfo.GetValue ( testNode ), Is.SameAs ( baseRecord ) );
+        Assert.That ( baseDatasetPropertyInfo.GetValue ( testNode ), Is.Not.SameAs ( treeRecord ) );
+      }
     }
 
     private static IEnumerable<TestCaseData> GetCasesFor_InheritPropertyFromParent_ValuesAndInheritanceCorrect( )

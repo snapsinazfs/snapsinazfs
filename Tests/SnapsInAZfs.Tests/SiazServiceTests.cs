@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -28,11 +28,11 @@ public class SiazServiceTests
         int result = SiazService.GetGreatestCommonFrequentIntervalFactor( templates );
         int[] allPeriods = templates.Select( t => t.Value.SnapshotTiming.FrequentPeriod ).ToArray( );
         Assume.That( result, Is.EqualTo( allPeriods.GreatestCommonFactor( ) ) );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( allPeriods.Select( p => p % result ), Has.All.Zero );
             Assert.That( result, Is.EqualTo( allPeriods.GreatestCommonFactor( ) ) );
-        } );
+        }
     }
 
     [Test]
@@ -40,11 +40,11 @@ public class SiazServiceTests
     public void GetNewTimerInterval_NewValuesWithinTolerance( DateTimeOffset timestamp, TimeSpan configuredTimerInterval, DateTimeOffset expectedNextTickTimestamp, TimeSpan expectedTimerInterval )
     {
         SiazService.GetNewTimerInterval( in timestamp, in configuredTimerInterval, out TimeSpan calculatedTimerInterval, out DateTimeOffset calculatedNextTickTimestamp );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( calculatedTimerInterval, Is.EqualTo( expectedTimerInterval ).Within( 250 ).Milliseconds );
             Assert.That( calculatedNextTickTimestamp, Is.EqualTo( expectedNextTickTimestamp ).Within( 250 ).Milliseconds );
-        } );
+        }
     }
 
     private static IEnumerable<TestCaseData> GetGreatestCommonFrequentIntervalFactor_TestCases( )

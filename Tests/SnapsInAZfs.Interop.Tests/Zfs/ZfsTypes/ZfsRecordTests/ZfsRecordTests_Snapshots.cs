@@ -123,11 +123,11 @@ public class ZfsRecordTests_Snapshots
                 break;
         }
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( lastObservedSnapshotTimestampOfPeriodAfterAddSnapshot, Is.EqualTo( timestamp ) );
             Assert.That( otherLastObservedSnapshotTimestampsAfterAddSnapshot, Has.All.EqualTo( DateTimeOffset.UnixEpoch ) );
-        } );
+        }
     }
 
     [Test]
@@ -144,8 +144,8 @@ public class ZfsRecordTests_Snapshots
         ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, childDs );
         childDs.AddSnapshot( snapshot );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             foreach ( (SnapshotPeriodKind period, ConcurrentDictionary<string, Snapshot>? snapsInPeriod ) in childDs.Snapshots )
             {
                 if ( period != periodKind )
@@ -159,7 +159,7 @@ public class ZfsRecordTests_Snapshots
                     Assert.That( snapsInPeriod, Does.ContainValue( snapshot ) );
                 }
             }
-        });
+        }
     }
 
     [Test]
@@ -278,8 +278,8 @@ public class ZfsRecordTests_Snapshots
         ZfsRecord dataset = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
         Assume.That( dataset, Is.Not.Null );
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( dataset.Snapshots, Is.Not.Null );
             Assert.That( dataset.Snapshots, Is.Not.Empty );
             Assert.That( dataset.Snapshots, Has.Count.EqualTo( 6 ) );
@@ -289,7 +289,7 @@ public class ZfsRecordTests_Snapshots
             Assert.That( dataset.Snapshots, Does.ContainKey( SnapshotPeriodKind.Weekly ) );
             Assert.That( dataset.Snapshots, Does.ContainKey( SnapshotPeriodKind.Monthly ) );
             Assert.That( dataset.Snapshots, Does.ContainKey( SnapshotPeriodKind.Yearly ) );
-        } );
+        }
     }
 
     [Test]
@@ -310,11 +310,11 @@ public class ZfsRecordTests_Snapshots
         Assume.That( dataset.Snapshots, Has.Count.EqualTo( 6 ) );
         Assume.That( dataset.Snapshots, Does.ContainKey( periodKind ) );
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( dataset.Snapshots[ periodKind ], Is.Not.Null );
             Assert.That( dataset.Snapshots[ periodKind ], Is.InstanceOf<ConcurrentDictionary<string, Snapshot>>( ) );
-        } );
+        }
         Assert.That( dataset.Snapshots[ periodKind ], Is.Empty );
     }
 }

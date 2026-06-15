@@ -34,20 +34,20 @@ public class TypeExtensionsTests
     {
         int[] terms = [term1, term2, term3];
         int result = terms.GreatestCommonFactor( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             // Mathematically prove that the result is, in fact, the greatest common factor
             // First, check bounds from 1 to 60 and less than or equal to all terms
             Assert.That( result, Is.InRange( 1, 60 ) );
             Assert.That( result, Is.LessThanOrEqualTo( term1 ).And.LessThanOrEqualTo( term2 ).And.LessThanOrEqualTo( term3 ) );
 
-            // Next, check that all terms are evenly divisible by the result
-            Assert.Multiple( ( ) =>
-            {
+          // Next, check that all terms are evenly divisible by the result
+          using (Assert.EnterMultipleScope())
+          {
                 Assert.That( Math.DivRem( term1, result ).Remainder, Is.Zero );
                 Assert.That( Math.DivRem( term2, result ).Remainder, Is.Zero );
                 Assert.That( Math.DivRem( term3, result ).Remainder, Is.Zero );
-            } );
+            }
 
             // Now, prove, by brute force, that all integers greater than result are not factors of at least one of the terms
             for ( int biggerNumber = result + 1; biggerNumber < 60; biggerNumber++ )
@@ -56,7 +56,7 @@ public class TypeExtensionsTests
                 int number = biggerNumber;
                 Assert.That( terms.Select( t => Math.DivRem( t, number ).Remainder ), Has.Some.Positive );
             }
-        } );
+        }
     }
 
     [Test]
@@ -67,8 +67,8 @@ public class TypeExtensionsTests
     {
         int[] terms = [term1, term2];
         int result = terms.GreatestCommonFactor( );
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( result, Is.GreaterThanOrEqualTo( 1 ) );
             Assert.That( result, Is.LessThanOrEqualTo( 60 ) );
             Assert.That( result, Is.LessThanOrEqualTo( term1 ).And.LessThanOrEqualTo( term2 ) );
@@ -82,7 +82,7 @@ public class TypeExtensionsTests
                 int number = biggerNumber;
                 Assert.That( terms.Select( t => t % number ), Has.Some.Positive );
             }
-        } );
+        }
     }
 
     private static IEnumerable<int[]> GetThreeTermTestCases( )

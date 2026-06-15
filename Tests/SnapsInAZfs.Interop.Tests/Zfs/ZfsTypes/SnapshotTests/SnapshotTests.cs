@@ -111,11 +111,11 @@ public class SnapshotTests
 
         Assume.That( snapshot.Period, Is.EqualTo( original ) );
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotPeriodPropertyName, (SnapshotPeriod)newPeriod ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
             Assert.That( snapshot.Period, Is.EqualTo( original ) );
-        } );
+        }
     }
 
     [Test]
@@ -128,10 +128,10 @@ public class SnapshotTests
 
         Assume.That( snapshot.Timestamp, Is.EqualTo( original ) );
 
-        Assert.Multiple( ( ) =>
-        {
+    using (Assert.EnterMultipleScope())
+    {
             Assert.That( ( ) => snapshot.UpdateProperty( ZfsPropertyNames.SnapshotTimestampPropertyName, in newTimestamp ), Throws.TypeOf<ArgumentOutOfRangeException>( ) );
             Assert.That( snapshot.Timestamp, Is.EqualTo( original ) );
-        } );
+        }
     }
 }

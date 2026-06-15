@@ -48,13 +48,12 @@ public class ZfsRecordTests
         Assert.That ( updatedChildEnabledProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildEnabledProperty_BeforeUpdate ) );
         updatedChildEnabledProperty_BeforeUpdate = updatedChildEnabledProperty_AfterUpdate;
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedChild.Equals ( originalChild ),    Is.False );
                              Assert.That ( updatedChild.Enabled.Value,               Is.EqualTo ( updatedParent.Enabled.Value ) );
                              Assert.That ( updatedChildEnabledProperty_BeforeUpdate, Is.Not.EqualTo ( originalEnabledProperty ) );
-                         } );
+                         }
 
         ZfsProperty<bool> originalTakeSnapshotsProperty                  = originalChild.TakeSnapshots;
         ZfsProperty<bool> updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChild.TakeSnapshots;
@@ -62,13 +61,12 @@ public class ZfsRecordTests
         Assert.That ( updatedChildTakeSnapshotsProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildTakeSnapshotsProperty_BeforeUpdate ) );
         updatedChildTakeSnapshotsProperty_BeforeUpdate = updatedChildTakeSnapshotsProperty_AfterUpdate;
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedChild.Equals ( originalChild ),          Is.False );
                              Assert.That ( updatedChild.TakeSnapshots.Value,               Is.EqualTo ( updatedParent.TakeSnapshots.Value ) );
                              Assert.That ( updatedChildTakeSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo ( originalTakeSnapshotsProperty ) );
-                         } );
+                         }
 
         ZfsProperty<bool> originalPruneSnapshotsProperty                  = originalChild.PruneSnapshots;
         ZfsProperty<bool> updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChild.PruneSnapshots;
@@ -76,13 +74,12 @@ public class ZfsRecordTests
         Assert.That ( updatedChildPruneSnapshotsProperty_AfterUpdate, Is.Not.EqualTo ( updatedChildPruneSnapshotsProperty_BeforeUpdate ) );
         updatedChildPruneSnapshotsProperty_BeforeUpdate = updatedChildPruneSnapshotsProperty_AfterUpdate;
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedChild.Equals ( originalChild ),           Is.False );
                              Assert.That ( updatedChild.PruneSnapshots.Value,               Is.EqualTo ( updatedParent.PruneSnapshots.Value ) );
                              Assert.That ( updatedChildPruneSnapshotsProperty_BeforeUpdate, Is.Not.EqualTo ( originalPruneSnapshotsProperty ) );
-                         } );
+                         }
 #pragma warning restore NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
     }
 
@@ -131,35 +128,32 @@ public class ZfsRecordTests
         ZfsProperty<bool> gen3PropertyAfterChange = GetBoolPropertyByValueFromDataset ( gen3Ds, propertyName );
         ZfsProperty<bool> gen4PropertyAfterChange = GetBoolPropertyByValueFromDataset ( gen4Ds, propertyName );
 
-        // Only gen 1 and 2 event handlers should have fired
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    // Only gen 1 and 2 event handlers should have fired
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( gen1EventFired, Is.True,  "Generation 1 event did not fire." );
                              Assert.That ( gen2EventFired, Is.True,  "Generation 2 event did not fire." );
                              Assert.That ( gen3EventFired, Is.False, "Generation 3 event fired." );
                              Assert.That ( gen4EventFired, Is.False, "Generation 4 event fired." );
-                         } );
+                         }
 
-        // Values of gen 1 and 2 properties should have changed
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    // Values of gen 1 and 2 properties should have changed
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( gen1PropertyAfterChange.Value, Is.Not.EqualTo ( gen1Property.Value ) );
                              Assert.That ( gen2PropertyAfterChange.Value, Is.Not.EqualTo ( gen2Property.Value ) );
                              Assert.That ( gen3PropertyAfterChange.Value, Is.EqualTo ( gen3Property.Value ) );
                              Assert.That ( gen4PropertyAfterChange.Value, Is.EqualTo ( gen4Property.Value ) );
-                         } );
+                         }
 
-        // Sources should not have changed
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    // Sources should not have changed
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( gen1PropertyAfterChange.Source, Is.EqualTo ( gen1Property.Source ) );
                              Assert.That ( gen2PropertyAfterChange.Source, Is.EqualTo ( gen2Property.Source ) );
                              Assert.That ( gen3PropertyAfterChange.Source, Is.EqualTo ( gen3Property.Source ) );
                              Assert.That ( gen4PropertyAfterChange.Source, Is.EqualTo ( gen4Property.Source ) );
-                         } );
+                         }
     }
 
     [Test]
@@ -251,34 +245,31 @@ public class ZfsRecordTests
         ZfsProperty<bool> originalEnabledProperty = originalRecord.Enabled;
         ZfsProperty<bool> updatedEnabledProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.EnabledPropertyName, false );
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedRecord.Equals ( originalRecord ), Is.False );
                              Assert.That ( updatedRecord.Enabled.Value,             Is.EqualTo ( updatedParent.Enabled.Value ) );
                              Assert.That ( updatedEnabledProperty,                  Is.Not.EqualTo ( originalEnabledProperty ) );
-                         } );
+                         }
         ZfsProperty<bool> originalTakeSnapshotsProperty = originalRecord.TakeSnapshots;
         ZfsProperty<bool> updatedTakeSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, false );
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedRecord.Equals ( originalRecord ), Is.False );
                              Assert.That ( updatedRecord.Enabled.Value,             Is.EqualTo ( updatedParent.Enabled.Value ) );
                              Assert.That ( updatedTakeSnapshotsProperty,            Is.Not.EqualTo ( originalTakeSnapshotsProperty ) );
-                         } );
+                         }
         ZfsProperty<bool> originalPruneSnapshotsProperty = originalRecord.TakeSnapshots;
         ZfsProperty<bool> updatedPruneSnapshotsProperty  = updatedParent.UpdateProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, false );
 
-        Assert.Multiple (
-                         ( ) =>
-                         {
+    using (Assert.EnterMultipleScope())
+    {
                              Assert.That ( updatedRecord.Equals ( originalRecord ), Is.False );
 #pragma warning restore NUnit2010 // Use EqualConstraint for better assertion messages in case of failure
                              Assert.That ( updatedRecord.Enabled.Value,   Is.EqualTo ( updatedParent.Enabled.Value ) );
                              Assert.That ( updatedPruneSnapshotsProperty, Is.Not.EqualTo ( originalPruneSnapshotsProperty ) );
-                         } );
+                         }
     }
 
     [Test]
@@ -299,9 +290,8 @@ public class ZfsRecordTests
 
         if ( newTestCaseProperty == originalBoolProperty )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedBoolProperty,         Is.EqualTo ( originalBoolProperty ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedBoolProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedBoolProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -309,13 +299,12 @@ public class ZfsRecordTests
                                  Assert.That ( updatedBoolProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
         else
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedBoolProperty,         Is.Not.EqualTo ( originalBoolProperty ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedBoolProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<bool>> ( ZfsRecordTestHelpers.BoolPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedBoolProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -323,17 +312,16 @@ public class ZfsRecordTests
                                  Assert.That ( updatedBoolProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
 
         if ( !isLocal )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "IsLocal" ).False );
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "Source" ).EqualTo ( $"inherited from {updatedParent.Name}" ) );
-                             } );
+                             }
         }
     }
 
@@ -356,9 +344,8 @@ public class ZfsRecordTests
 
         if ( newTestCaseProperty == originalDateTimeOffsetProperty )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( originalDateTimeOffsetProperty ).Using<ZfsProperty<DateTimeOffset>> ( ZfsRecordTestHelpers.DateTimeOffsetPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<DateTimeOffset>> ( ZfsRecordTestHelpers.DateTimeOffsetPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedDateTimeOffsetProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -366,13 +353,12 @@ public class ZfsRecordTests
                                  Assert.That ( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
         else
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedDateTimeOffsetProperty,         Is.Not.EqualTo ( originalDateTimeOffsetProperty ).Using<ZfsProperty<DateTimeOffset>> ( ZfsRecordTestHelpers.DateTimeOffsetPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedDateTimeOffsetProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<DateTimeOffset>> ( ZfsRecordTestHelpers.DateTimeOffsetPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedDateTimeOffsetProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -380,17 +366,16 @@ public class ZfsRecordTests
                                  Assert.That ( updatedDateTimeOffsetProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
 
         if ( !isLocal )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "IsLocal" ).False );
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "Source" ).EqualTo ( $"inherited from {updatedParent.Name}" ) );
-                             } );
+                             }
         }
     }
 
@@ -412,9 +397,8 @@ public class ZfsRecordTests
 
         if ( newTestCaseProperty == originalIntProperty )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedIntProperty,         Is.EqualTo ( originalIntProperty ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedIntProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedIntProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -422,13 +406,12 @@ public class ZfsRecordTests
                                  Assert.That ( updatedIntProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
         else
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedIntProperty,         Is.Not.EqualTo ( originalIntProperty ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedIntProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<int>> ( ZfsRecordTestHelpers.IntPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedIntProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -436,17 +419,16 @@ public class ZfsRecordTests
                                  Assert.That ( updatedIntProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
 
         if ( !isLocal )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "IsLocal" ).False );
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "Source" ).EqualTo ( $"inherited from {updatedParent.Name}" ) );
-                             } );
+                             }
         }
     }
 
@@ -468,9 +450,8 @@ public class ZfsRecordTests
 
         if ( newTestCaseProperty == originalStringProperty )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedStringProperty,         Is.EqualTo ( originalStringProperty ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedStringProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedStringProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -478,13 +459,12 @@ public class ZfsRecordTests
                                  Assert.That ( updatedStringProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
         else
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedStringProperty,         Is.Not.EqualTo ( originalStringProperty ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedStringProperty,         Is.EqualTo ( newTestCaseProperty ).Using<ZfsProperty<string>> ( ZfsRecordTestHelpers.StringPropertyComparer_Force_op_Equality ) );
                                  Assert.That ( updatedStringProperty.Name,    Is.EqualTo ( propertyName ) );
@@ -492,17 +472,16 @@ public class ZfsRecordTests
                                  Assert.That ( updatedStringProperty.IsLocal, Is.EqualTo ( isLocal ) );
 
                                  Assert.That ( updatedRecord, Is.Not.EqualTo ( originalRecord ) );
-                             } );
+                             }
         }
 
         if ( !isLocal )
         {
-            Assert.Multiple (
-                             ( ) =>
-                             {
+      using (Assert.EnterMultipleScope())
+      {
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "IsLocal" ).False );
                                  Assert.That ( updatedRecord [ propertyName ], Has.Property ( "Source" ).EqualTo ( $"inherited from {updatedParent.Name}" ) );
-                             } );
+                             }
         }
     }
 
