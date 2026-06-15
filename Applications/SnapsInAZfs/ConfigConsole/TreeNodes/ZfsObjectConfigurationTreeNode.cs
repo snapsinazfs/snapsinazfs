@@ -23,11 +23,11 @@ namespace SnapsInAZfs.ConfigConsole.TreeNodes;
 public sealed class ZfsObjectConfigurationTreeNode : TreeNode
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
-    private readonly object _childrenLock = new( );
+    private readonly Lock _childrenLock = new( );
     private readonly ConcurrentDictionary<string, IZfsProperty> _inheritedPropertiesSinceLastSave = new( );
 
     private readonly ConcurrentDictionary<string, IZfsProperty> _modifiedPropertiesSinceLastSave = new( );
-    private readonly object _propertyChangeCollectionsLock = new( );
+    private readonly Lock _propertyChangeCollectionsLock = new( );
 
     /// <summary>
     ///     Creates a new instance of a <see cref="ZfsObjectConfigurationTreeNode" /> having the specified <paramref name="name" /> (used
