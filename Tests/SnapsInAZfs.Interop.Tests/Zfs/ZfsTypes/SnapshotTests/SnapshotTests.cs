@@ -1,6 +1,4 @@
-﻿// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
+using System.Diagnostics.CodeAnalysis;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -84,6 +82,7 @@ public class SnapshotTests
 
     [Test]
     [Combinatorial]
+    [SuppressMessage ( "ReSharper", "NUnit.IncorrectArgumentType", Justification = "NUnit directly supports this conversion, since DateTimeOffsets can't be created as constants.")]
     public void GetSnapshotOptionsStringForZfsSnapshot_IsCorrect( [ValueSource( nameof( GetRelevantSnapshotPeriodKinds ) )] SnapshotPeriodKind period, [Values( "2023-01-01T00:00:00.0000000", "2024-01-01T00:00:00.0000000" )] DateTimeOffset timestamp, [Values( ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertyValueConstants.ZfsRecursion )] string recursion )
     {
         ZfsRecord parent = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );

@@ -1,7 +1,3 @@
-// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
-
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;

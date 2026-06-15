@@ -1,7 +1,3 @@
-// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
-
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using NLog;

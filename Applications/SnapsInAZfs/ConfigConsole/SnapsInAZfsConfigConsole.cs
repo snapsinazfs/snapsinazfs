@@ -307,6 +307,8 @@ public sealed partial class SnapsInAZfsConfigConsole
             HideTemplateConfigurationWindow( );
         }
 
+        // Suppressing the following inspection because Terminal.Gui handles disposal at shutdown.
+        // ReSharper disable once NotDisposedResource
         _zfsConfigurationWindow ??= new( );
         Add( _zfsConfigurationWindow );
         LayoutSubviews( );

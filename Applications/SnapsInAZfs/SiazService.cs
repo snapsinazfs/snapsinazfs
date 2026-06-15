@@ -405,9 +405,11 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
 
                         PruneSnapshotSucceeded?.Invoke( this, new( snapshot.Name, snapshot.Timestamp.Value ) );
                         continue;
+                    // ReSharper disable RedundantEnumCaseLabelForDefaultSection
                     case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
                     case ZfsCommandRunnerOperationStatus.Failure:
                     case ZfsCommandRunnerOperationStatus.NameValidationFailed:
+                    // ReSharper restore RedundantEnumCaseLabelForDefaultSection
                     default:
                         PruneSnapshotFailed?.Invoke( this, new( ds.Name, snapshot.Timestamp.Value ) );
                         Logger.Error( "Failed to destroy snapshot {0}", snapshot.Name );
@@ -667,6 +669,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 }
 
                 break;
+            // ReSharper disable once RedundantEnumCaseLabelForDefaultSection
             case SnapshotPeriodKind.NotSet:
             default:
             {
@@ -690,11 +693,13 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 TakeSnapshotSucceeded?.Invoke( this, new( snapshot!.Name, in timestamp ) );
                 Logger.Info( "Snapshot {0} successfully taken", snapshot!.Name );
                 return true;
+            // ReSharper disable RedundantEnumCaseLabelForDefaultSection
             case ZfsCommandRunnerOperationStatus.Failure:
             case ZfsCommandRunnerOperationStatus.NameValidationFailed:
             case ZfsCommandRunnerOperationStatus.ZfsProcessFailure:
             case ZfsCommandRunnerOperationStatus.ZeroLengthRequest:
             case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
+            // ReSharper restore RedundantEnumCaseLabelForDefaultSection
             default:
                 TakeSnapshotFailed?.Invoke( this, new( ds.Name, in timestamp ) );
                 Logger.Error( "{0} snapshot for {1} {2} not taken", period, ds.Kind, ds.Name );

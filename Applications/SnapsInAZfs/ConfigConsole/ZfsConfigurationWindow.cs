@@ -649,6 +649,7 @@ public sealed partial class ZfsConfigurationWindow
                     case ZfsCommandRunnerOperationStatus.DryRun:
                         Logger.Info( "DRY RUN: Pretending set properties operation was successful for {0}", zfsObjectPath );
                         break;
+                    // ReSharper disable once RedundantEnumCaseLabelForDefaultSection
                     case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
                     default:
                         Logger.Error( "Setting ZFS properties for ZFS object {0} failed", zfsObjectPath );
@@ -667,6 +668,7 @@ public sealed partial class ZfsConfigurationWindow
                     case ZfsCommandRunnerOperationStatus.DryRun:
                         Logger.Info( "DRY RUN: Pretending all requested properties were inherited successfully for {0}", zfsObjectPath );
                         break;
+                    // ReSharper disable once RedundantEnumCaseLabelForDefaultSection
                     case ZfsCommandRunnerOperationStatus.OneOrMoreOperationsFailed:
                     default:
                         Logger.Error( "Inheriting ZFS properties for ZFS object {0} failed", zfsObjectPath );
