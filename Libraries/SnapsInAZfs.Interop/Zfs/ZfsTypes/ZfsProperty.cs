@@ -13,13 +13,13 @@
 #endregion
 
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 
 namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
-
 
 public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatable<string>, IEquatable<bool>, IEquatable<DateTimeOffset>, IEquatable<ZfsProperty<T>>, IEqualityOperators<ZfsProperty<T>, ZfsProperty<T>, bool> where T : notnull
 {
@@ -109,7 +109,8 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
                                      int intValue            => intValue.ToString ( CultureInfo.InvariantCulture ),
                                      string value            => value,
                                      bool boolValue          => boolValue.ToString ( ).ToLowerInvariant ( ),
-                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" )
+                                     DateTimeOffset dtoValue => dtoValue.ToString ( "O" ),
+                                     _                         => throw new ArgumentOutOfRangeException ( )
                                  };
 
     [JsonIgnore]
