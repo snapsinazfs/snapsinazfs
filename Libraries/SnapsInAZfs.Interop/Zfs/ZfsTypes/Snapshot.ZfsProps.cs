@@ -16,7 +16,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public sealed partial record Snapshot
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (Snapshot)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (Snapshot)}" );
 
     private readonly    ZfsProperty<string>         _period;
     private readonly    ZfsProperty<DateTimeOffset> _timestamp;

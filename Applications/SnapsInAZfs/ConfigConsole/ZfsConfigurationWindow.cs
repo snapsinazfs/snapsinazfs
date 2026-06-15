@@ -24,7 +24,7 @@ using JetBrains.Annotations;
 [MustDisposeResource]
 public sealed partial class ZfsConfigurationWindow
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (ZfsConfigurationWindow)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{ConfigConsole.ConfigConsoleNamespace}{nameof (ZfsConfigurationWindow)}" );
 
     private readonly ConcurrentDictionary<string, ZfsRecord> _treeDatasets = [];
 
@@ -860,7 +860,7 @@ public sealed partial class ZfsConfigurationWindow
 
     private void TemplateListViewOnSelectedItemChanged( ListViewItemEventArgs args )
     {
-        ArgumentNullException.ThrowIfNull( args, nameof( args ) );
+        ArgumentNullException.ThrowIfNull( args );
 
         ListViewWithSourceViewData viewData = (ListViewWithSourceViewData)templateListView.Data;
 
