@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -32,8 +32,8 @@ public static class LoggingSettings
 
         for ( int ruleIndex = 0; ruleIndex < LogManager.Configuration.LoggingRules.Count; ruleIndex++ )
         {
-            LoggingRule? rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
-            rule?.SetLoggingLevels( level, LogLevel.Off );
+            LoggingRule rule = LogManager.Configuration.LoggingRules[ ruleIndex ];
+            rule.SetLoggingLevels( level, LogLevel.Off );
         }
     }
 }

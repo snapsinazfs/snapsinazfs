@@ -25,7 +25,7 @@ namespace SnapsInAZfs.Interop.Zfs.ZfsTypes;
 
 public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<ZfsRecord, ZfsRecord, bool>
 {
-    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsRecord)}" )!;
+    private static readonly Logger Logger = LogManager.GetLogger ( $"{StringConstants.ZfsTypesNamespace}.{nameof (ZfsRecord)}" );
 
     /// <summary>
     ///     Represents a node in the ZFS hierarchy.

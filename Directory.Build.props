@@ -9,7 +9,7 @@
     <DebugType>embedded</DebugType>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <RuntimeIdentifiers>linux-x64;win-x64</RuntimeIdentifiers>
-    <AnalysisLevel>8-minimum</AnalysisLevel>
+    <AnalysisLevel>10-recommended</AnalysisLevel>
   </PropertyGroup>
   <PropertyGroup>
     <VersionPrefix>3.0.0</VersionPrefix>
