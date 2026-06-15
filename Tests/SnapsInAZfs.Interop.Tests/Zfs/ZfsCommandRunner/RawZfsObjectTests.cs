@@ -24,6 +24,10 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsCommandRunner;
 [Category ( "General" )]
 public class RawZfsObjectTests
 {
+  private const string UnixEpochZString = "1970-01-01T00:00:00Z";
+  private const string StandaloneSiazSystem = "StandaloneSiazSystem";
+  private const string TestRootPoolName = "testRoot";
+
   [Test]
   [TestCase ( "available", ZfsPropertySourceConstants.None, 0 )]
   [TestCase ( ZfsPropertyNames.EnabledPropertyName, ZfsPropertySourceConstants.Local, 1 )]
@@ -95,7 +99,7 @@ public class RawZfsObjectTests
   public void ConvertToDatasetAndAddToCollection_ChildFileSystem_AddedToParent ( )
   {
     ZfsRecord    expectedRootRecord  = GetTestRootRecord ( );
-    const string dsName              = "testRoot/child";
+    const string dsName              = $"{TestRootPoolName}/child";
     ZfsRecord    expectedChildRecord = expectedRootRecord.CreateChildDataset ( dsName, ZfsPropertyValueConstants.FileSystem, ZfsPropertyValueConstants.StandaloneSiazSystem, false, 54321, 12345 );
     ZfsRecord    testRootRecord      = GetTestRootRecord ( );
     RawZfsObject testObject          = new ( ZfsPropertyValueConstants.FileSystem );
@@ -112,12 +116,12 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "-1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "-1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, ZfsPropertyValueConstants.StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
@@ -149,7 +153,7 @@ public class RawZfsObjectTests
     ZfsRecord    expectedRecord = GetTestRootRecord ( );
     RawZfsObject testObject     = new ( ZfsPropertyValueConstants.FileSystem );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.FileSystem, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, bool.TrueString, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
@@ -161,16 +165,16 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
-    const string                            dsName           = "testRoot";
+    const string                            dsName           = TestRootPoolName;
     ConcurrentDictionary<string, ZfsRecord> datasets         = new ( );
     bool                                    conversionResult = testObject.ConvertToDatasetAndAddToCollection ( dsName, datasets );
     using ( Assert.EnterMultipleScope ( ) )
@@ -206,13 +210,13 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( );
@@ -241,15 +245,15 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "BAD DATE STRING", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, ZfsPropertyValueConstants.StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
-    string                                  dsName           = "testRoot";
+    string                                  dsName           = TestRootPoolName;
     ConcurrentDictionary<string, ZfsRecord> datasets         = new ( );
     bool                                    conversionResult = testObject.ConvertToDatasetAndAddToCollection ( dsName, datasets );
     using ( Assert.EnterMultipleScope ( ) )
@@ -276,13 +280,13 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
-    string                                  dsName   = "testRoot";
+    string                                  dsName   = TestRootPoolName;
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( );
     using ( Assert.EnterMultipleScope ( ) )
     {
@@ -308,16 +312,16 @@ public class RawZfsObjectTests
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, string.Empty, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Available, "54321", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", ZfsPropertySourceConstants.Local );
-    string                                  dsName   = "testRoot";
+    string                                  dsName   = TestRootPoolName;
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( );
     using ( Assert.EnterMultipleScope ( ) )
     {
@@ -332,29 +336,29 @@ public class RawZfsObjectTests
     ZfsRecord    rootRecord = GetTestRootRecord ( );
     RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", $"inherited from {TestRootPoolName}" );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Hourly, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-    const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", $"inherited from {TestRootPoolName}" );
+    const string snapName = $"{TestRootPoolName}@autosnap_{UnixEpochZString}_hourly";
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( )
                                                        {
                                                          [ rootRecord.Name ] = rootRecord
@@ -399,29 +403,29 @@ public class RawZfsObjectTests
     ZfsRecord    rootRecord = GetTestRootRecord ( );
     RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", $"inherited from {TestRootPoolName}" );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Hourly, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, "INVALID DATE VALUE", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-    const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", $"inherited from {TestRootPoolName}" );
+    const string snapName = $"{TestRootPoolName}@autosnap_{UnixEpochZString}_hourly";
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( )
                                                        {
                                                          [ rootRecord.Name ] = rootRecord
@@ -442,29 +446,29 @@ public class RawZfsObjectTests
     ZfsRecord    rootRecord = GetTestRootRecord ( );
     RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", $"inherited from {TestRootPoolName}" );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Hourly, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "INVALID DATE VALUE", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-    const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "INVALID DATE VALUE", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", $"inherited from {TestRootPoolName}" );
+    const string snapName = $"{TestRootPoolName}@autosnap_{UnixEpochZString}_hourly";
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( )
                                                        {
                                                          [ rootRecord.Name ] = rootRecord
@@ -484,30 +488,30 @@ public class RawZfsObjectTests
   {
     RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", $"inherited from {TestRootPoolName}" );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.SnapshotPeriodPropertyName, SnapshotPeriod.Hourly, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", $"inherited from {TestRootPoolName}" );
 
     // Weekly property intentionally missing as the condition of the test
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-    const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", $"inherited from {TestRootPoolName}" );
+    const string snapName = $"{TestRootPoolName}@autosnap_{UnixEpochZString}_hourly";
 
     using ( Assert.EnterMultipleScope ( ) )
     {
@@ -530,28 +534,28 @@ public class RawZfsObjectTests
     ZfsRecord    rootRecord = GetTestRootRecord ( );
     RawZfsObject testObject = new ( ZfsPropertyValueConstants.Snapshot );
     testObject.AddRawProperty ( ZfsNativePropertyNames.Type, ZfsPropertyValueConstants.Snapshot, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", "inherited from testRoot" );
+    testObject.AddRawProperty ( ZfsPropertyNames.EnabledPropertyName, "true", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.TakeSnapshotsPropertyName, "true", $"inherited from {TestRootPoolName}" );
     testObject.AddRawProperty ( ZfsPropertyNames.PruneSnapshotsPropertyName, "true", ZfsPropertySourceConstants.Local );
     testObject.AddRawProperty ( ZfsPropertyNames.RecursionPropertyName, ZfsPropertyValueConstants.SnapsInAZfs, ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, "1970-01-01T00:00:00Z", "inherited from testRoot" );
-    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem", ZfsPropertySourceConstants.Local );
-    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", "inherited from testRoot" );
-    const string snapName = "testRoot@autosnap_1970-01-01T00:00:00Z_hourly";
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotTimestampPropertyName, UnixEpochZString, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsPropertyNames.TemplatePropertyName, ZfsPropertyValueConstants.Default, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionFrequentPropertyName, "6", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, "5", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionDailyPropertyName, "4", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, "3", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, "2", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, "1", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, "0", $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastHourlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastDailySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastWeeklySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastMonthlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.DatasetLastYearlySnapshotTimestampPropertyName, UnixEpochZString, $"inherited from {TestRootPoolName}" );
+    testObject.AddRawProperty ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem, ZfsPropertySourceConstants.Local );
+    testObject.AddRawProperty ( ZfsNativePropertyNames.Used, "12345", $"inherited from {TestRootPoolName}" );
+    const string snapName = $"{TestRootPoolName}@autosnap_{UnixEpochZString}_hourly";
     ConcurrentDictionary<string, ZfsRecord> datasets = new ( )
                                                        {
                                                          [ rootRecord.Name ] = rootRecord
@@ -579,7 +583,7 @@ public class RawZfsObjectTests
   }
 
   private static ZfsRecord GetTestRootRecord ( ) =>
-    ZfsRecord.CreateInstanceFromAllProperties ( "testRoot",
+    ZfsRecord.CreateInstanceFromAllProperties ( TestRootPoolName,
                                                 ZfsPropertyValueConstants.FileSystem,
                                                 ZfsProperty<bool>.CreateWithoutParent ( ZfsPropertyNames.EnabledPropertyName, true ),
                                                 ZfsProperty<bool>.CreateWithoutParent ( ZfsPropertyNames.TakeSnapshotsPropertyName, true ),
@@ -599,7 +603,7 @@ public class RawZfsObjectTests
                                                 ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, 2 ),
                                                 ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, 1 ),
                                                 ZfsProperty<int>.CreateWithoutParent ( ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, 0 ),
-                                                ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SourceSystem, "StandaloneSiazSystem" ),
+                                                ZfsProperty<string>.CreateWithoutParent ( ZfsPropertyNames.SourceSystem, StandaloneSiazSystem),
                                                 54321,
                                                 12345
                                               );
