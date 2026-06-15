@@ -67,16 +67,16 @@ public readonly struct ZfsProperty<T> : IZfsProperty, IEquatable<int>, IEquatabl
     /// <inheritdoc/>
     public bool Equals ( string? other ) => Value is string v && v == other;
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Equals(SnapsInAZfs.Interop.Zfs.ZfsTypes.ZfsProperty{T})"/>
     public bool Equals ( ZfsProperty<bool> other ) => Value is bool v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Equals(SnapsInAZfs.Interop.Zfs.ZfsTypes.ZfsProperty{T})"/>
     public bool Equals ( ZfsProperty<DateTimeOffset> other ) => Value is DateTimeOffset v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Equals(SnapsInAZfs.Interop.Zfs.ZfsTypes.ZfsProperty{T})"/>
     public bool Equals ( ZfsProperty<int> other ) => Value is int v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
 
-    /// <inheritdoc/>
+    /// <inheritdoc cref="Equals(SnapsInAZfs.Interop.Zfs.ZfsTypes.ZfsProperty{T})"/>
     public bool Equals ( ZfsProperty<string> other ) => Value is string v && Name == other.Name && v == other.Value && IsLocal == other.IsLocal;
 
     /// <inheritdoc/>
