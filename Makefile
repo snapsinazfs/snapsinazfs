@@ -257,8 +257,8 @@ save-snapsinazfs-zfs-properties:
 	@echo "#!/bin/bash -x" >propWipeUndoScript.sh
 	zfs get all -s local -rHo name,property,value | grep "snapsinazfs.com:" | while read obj prop val ; do echo zfs set $${prop}\=\"$${val}\" $${obj} >>propWipeUndoScript.sh ; done
 	chmod 774 propWipeUndoScript.sh
-	@echo Undo script saved as ./propWipeUndoScript.sh
-	@echo Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore snapsinazfs.com properties
+	$(info Undo script saved as ./propWipeUndoScript.sh)
+	$(info Run 'make restore-wiped-zfs-properties' or './propWipeUndoScript.sh' if you need to restore snapsinazfs.com properties.)
 
 wipe-snapsinazfs-zfs-properties:	save-snapsinazfs-zfs-properties
 	zfs get all -s local -rHo name,property | grep "snapsinazfs.com:" | while read obj prop ; do echo Removing $${prop} from $${obj} ; zfs inherit $${prop} $${obj} ; done
