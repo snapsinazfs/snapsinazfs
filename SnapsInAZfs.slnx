@@ -39,6 +39,10 @@
     <File Path="README.md" />
     <File Path="snapsinazfs.service" />
   </Folder>
+  <Folder Name="/Solution Items/GitHub Workflows/">
+    <File Path=".github/workflows/build-and-test-build-tag.yml" />
+    <File Path=".github/workflows/build-and-test-release-tag.yml" />
+  </Folder>
   <Folder Name="/Tests/">
     <Project Path="Tests/SnapsInAZfs.Interop.Tests/SnapsInAZfs.Interop.Tests.csproj">
       <Platform Project="x64" />
