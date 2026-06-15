@@ -140,9 +140,9 @@ public static class TypeExtensions
     {
         ArgumentNullException.ThrowIfNull ( properties );
 
-        if ( !properties.Any ( ) )
+        if ( properties is not { Count: > 0 } )
         {
-            throw new ArgumentException ( "Empty collection provided", nameof (properties) );
+          throw new ArgumentException ( "Empty collection provided", nameof (properties) );
         }
 
         return properties.Select ( static p => p.SetString ).ToSpaceSeparatedSingleLineString ( );
