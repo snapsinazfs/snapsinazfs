@@ -1,92 +1,90 @@
 using Terminal.Gui;
+namespace SnapsInAZfs.ConfigConsole;
 
-namespace SnapsInAZfs.ConfigConsole {
-    public sealed partial class SnapsInAZfsConfigConsole : Terminal.Gui.Window {
-        
-        private Terminal.Gui.ColorScheme tgDefault;
-        
-        private Terminal.Gui.ColorScheme midnightColorScheme;
-        
-        private Terminal.Gui.MenuBar topMenuBar;
-        
-        private Terminal.Gui.MenuBarItem fileMenu;
-        
-        private Terminal.Gui.MenuItem saveMenuItem;
-        
-        private Terminal.Gui.MenuItem quitMenuItem;
-        
-        private Terminal.Gui.MenuBarItem windowMenu;
-        
-        private Terminal.Gui.MenuItem globalConfigMenuItem;
-        
-        private Terminal.Gui.MenuItem templateConfigMenuItem;
-        
-        private Terminal.Gui.MenuItem zfsConfigMenuItem;
-        
-        private void InitializeComponent() {
-            this.topMenuBar = new Terminal.Gui.MenuBar();
-            this.tgDefault = new Terminal.Gui.ColorScheme();
-            this.tgDefault.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.White, Terminal.Gui.Color.Blue);
-            this.tgDefault.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightCyan, Terminal.Gui.Color.Blue);
-            this.tgDefault.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Black, Terminal.Gui.Color.Gray);
-            this.tgDefault.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Gray);
-            this.tgDefault.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.Brown, Terminal.Gui.Color.Blue);
-            this.midnightColorScheme = new Terminal.Gui.ColorScheme();
-            this.midnightColorScheme.Normal = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.HotNormal = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.Focus = new Terminal.Gui.Attribute(Terminal.Gui.Color.BrightBlue, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.HotFocus = new Terminal.Gui.Attribute(Terminal.Gui.Color.Cyan, Terminal.Gui.Color.Black);
-            this.midnightColorScheme.Disabled = new Terminal.Gui.Attribute(Terminal.Gui.Color.DarkGray, Terminal.Gui.Color.Black);
-            this.Width = Dim.Fill(0);
-            this.Height = Dim.Fill(0);
-            this.X = 0;
-            this.Y = 0;
-            this.ColorScheme = this.midnightColorScheme;
-            this.Modal = false;
-            this.Border.BorderStyle = Terminal.Gui.BorderStyle.Double;
-            this.Border.BorderBrush = Terminal.Gui.Color.White;
-            this.Border.Effect3D = false;
-            this.Border.Effect3DBrush = null;
-            this.Border.DrawMarginFrame = true;
-            this.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.Title = "SnapsInAZfs Configuration Console";
-            this.topMenuBar.Width = Dim.Fill(0);
-            this.topMenuBar.Height = 1;
-            this.topMenuBar.X = 0;
-            this.topMenuBar.Y = 0;
-            this.topMenuBar.ColorScheme = this.tgDefault;
-            this.topMenuBar.Data = "topMenuBar";
-            this.topMenuBar.TextAlignment = Terminal.Gui.TextAlignment.Left;
-            this.fileMenu = new Terminal.Gui.MenuBarItem();
-            this.fileMenu.Title = "_File";
-            this.saveMenuItem = new Terminal.Gui.MenuItem();
-            this.saveMenuItem.Title = "_Save";
-            this.saveMenuItem.Data = "saveMenuItem";
-            this.quitMenuItem = new Terminal.Gui.MenuItem();
-            this.quitMenuItem.Title = "_Quit";
-            this.quitMenuItem.Data = "quitMenuItem";
-            this.fileMenu.Children = new Terminal.Gui.MenuItem[] {
-                    this.saveMenuItem,
-                    this.quitMenuItem};
-            this.windowMenu = new Terminal.Gui.MenuBarItem();
-            this.windowMenu.Title = "_Window";
-            this.globalConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.globalConfigMenuItem.Title = "Show _Global Configuration Window";
-            this.globalConfigMenuItem.Data = "globalConfigMenuItem";
-            this.templateConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.templateConfigMenuItem.Title = "Show _Template Configuration Window";
-            this.templateConfigMenuItem.Data = "templateConfigMenuItem";
-            this.zfsConfigMenuItem = new Terminal.Gui.MenuItem();
-            this.zfsConfigMenuItem.Title = "Show ZFS Configuration Window";
-            this.zfsConfigMenuItem.Data = "zfsConfigMenuItem";
-            this.windowMenu.Children = new Terminal.Gui.MenuItem[] {
-                    this.globalConfigMenuItem,
-                    this.templateConfigMenuItem,
-                    this.zfsConfigMenuItem};
-            this.topMenuBar.Menus = new Terminal.Gui.MenuBarItem[] {
-                    this.fileMenu,
-                    this.windowMenu};
-            this.Add(this.topMenuBar);
-        }
-    }
+public sealed partial class SnapsInAZfsConfigConsole : Window
+{
+
+  private ColorScheme tgDefault;
+  private ColorScheme midnightColorScheme;
+  private MenuBar topMenuBar;
+  private MenuBarItem fileMenu;
+  private MenuItem saveMenuItem;
+  private MenuItem quitMenuItem;
+  private MenuBarItem windowMenu;
+  private MenuItem globalConfigMenuItem;
+  private MenuItem templateConfigMenuItem;
+  private MenuItem zfsConfigMenuItem;
+
+  private void InitializeComponent ( )
+  {
+    topMenuBar                    = new ( );
+    tgDefault                     = new ( );
+    tgDefault.Normal              = new ( Color.White, Color.Blue );
+    tgDefault.HotNormal           = new ( Color.BrightCyan, Color.Blue );
+    tgDefault.Focus               = new ( Color.Black, Color.Gray );
+    tgDefault.HotFocus            = new ( Color.BrightBlue, Color.Gray );
+    tgDefault.Disabled            = new ( Color.Brown, Color.Blue );
+    midnightColorScheme           = new ( );
+    midnightColorScheme.Normal    = new ( Color.BrightBlue, Color.Black );
+    midnightColorScheme.HotNormal = new ( Color.Cyan, Color.Black );
+    midnightColorScheme.Focus     = new ( Color.BrightBlue, Color.Black );
+    midnightColorScheme.HotFocus  = new ( Color.Cyan, Color.Black );
+    midnightColorScheme.Disabled  = new ( Color.DarkGray, Color.Black );
+    Width                         = Dim.Fill ( 0 );
+    Height                        = Dim.Fill ( 0 );
+    X                             = 0;
+    Y                             = 0;
+    ColorScheme                   = this.midnightColorScheme;
+    Modal                         = false;
+    Border.BorderStyle            = BorderStyle.Double;
+    Border.BorderBrush            = Color.White;
+    Border.Effect3D               = false;
+    Border.Effect3DBrush          = null;
+    Border.DrawMarginFrame        = true;
+    TextAlignment                 = TextAlignment.Left;
+    Title                         = "SnapsInAZfs Configuration Console";
+    topMenuBar.Width              = Dim.Fill ( 0 );
+    topMenuBar.Height             = 1;
+    topMenuBar.X                  = 0;
+    topMenuBar.Y                  = 0;
+    topMenuBar.ColorScheme        = this.tgDefault;
+    topMenuBar.Data               = "topMenuBar";
+    topMenuBar.TextAlignment      = TextAlignment.Left;
+    fileMenu                      = new ( );
+    fileMenu.Title                = "_File";
+    saveMenuItem                  = new ( );
+    saveMenuItem.Title            = "_Save";
+    saveMenuItem.Data             = "saveMenuItem";
+    quitMenuItem                  = new ( );
+    quitMenuItem.Title            = "_Quit";
+    quitMenuItem.Data             = "quitMenuItem";
+    fileMenu.Children =
+    [
+      saveMenuItem,
+      quitMenuItem
+    ];
+    windowMenu                   = new ( );
+    windowMenu.Title             = "_Window";
+    globalConfigMenuItem         = new ( );
+    globalConfigMenuItem.Title   = "Show _Global Configuration Window";
+    globalConfigMenuItem.Data    = "globalConfigMenuItem";
+    templateConfigMenuItem       = new ( );
+    templateConfigMenuItem.Title = "Show _Template Configuration Window";
+    templateConfigMenuItem.Data  = "templateConfigMenuItem";
+    zfsConfigMenuItem            = new ( );
+    zfsConfigMenuItem.Title      = "Show ZFS Configuration Window";
+    zfsConfigMenuItem.Data       = "zfsConfigMenuItem";
+    windowMenu.Children =
+    [
+      globalConfigMenuItem,
+      templateConfigMenuItem,
+      zfsConfigMenuItem
+    ];
+    topMenuBar.Menus =
+    [
+      fileMenu,
+      windowMenu
+    ];
+    Add ( topMenuBar );
+  }
 }
