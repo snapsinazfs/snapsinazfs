@@ -49,7 +49,7 @@ public sealed record SnapsInAZfsSettings
     ///     If this value is invalid upon startup, SnapsInAZfs will log an error and terminate.
     /// </remarks>
     [JsonPropertyOrder( 4 )]
-    public string LocalSystemName { get; set; } = String.Empty;
+    public string LocalSystemName { get; set; } = string.Empty;
 
     /// <summary>
     ///     Gets or sets the global PruneSnapshots setting

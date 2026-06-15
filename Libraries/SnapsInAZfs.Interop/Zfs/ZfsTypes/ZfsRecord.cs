@@ -784,7 +784,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         // Check if more than a day ago or if a different day of the year
         bool lastDailyOnDifferentDayOfYear = LastDailySnapshotTimestamp.Value.LocalDateTime.DayOfYear != timestamp.LocalDateTime.DayOfYear;
         bool dailySnapshotNeeded           = atLeastOneDaySinceLastDailySnapshot || lastDailyOnDifferentDayOfYear;
-        Logger.Debug ( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Daily snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, dailySnapshotNeeded ? string.Empty : "not " );
 
         return dailySnapshotNeeded;
     }
@@ -834,7 +834,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         // Check if more than FrequentPeriod ago or if the period of the hour is different.
         bool frequentSnapshotNeeded = minutesSinceLastFrequentSnapshot >= template.FrequentPeriod || lastFrequentSnapshotPeriodOfHour != currentFrequentPeriodOfHour;
-        Logger.Debug ( "Frequent snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, frequentSnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Frequent snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, frequentSnapshotNeeded ? string.Empty : "not " );
 
         return frequentSnapshotNeeded;
     }
@@ -882,7 +882,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         // Check if more than an hour ago or if hour is different
         bool hourlySnapshotNeeded = atLeastOneHourSinceLastHourlySnapshot
                                  || LastHourlySnapshotTimestamp.Value.LocalDateTime.Hour != timestamp.LocalDateTime.Hour;
-        Logger.Debug ( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Hourly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, hourlySnapshotNeeded ? string.Empty : "not " );
 
         return hourlySnapshotNeeded;
     }
@@ -936,7 +936,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         bool lastMonthlySnapshotInDifferentMonth = lastMonthlySnapshotMonth != currentMonth;
         bool lastMonthlySnapshotInDifferentYear  = currentYear              != lastMonthlySnapshotYear;
         bool monthlySnapshotNeeded               = lastMonthlySnapshotInDifferentMonth || lastMonthlySnapshotInDifferentYear;
-        Logger.Debug ( "Monthly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, monthlySnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Monthly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, monthlySnapshotNeeded ? string.Empty : "not " );
 
         return monthlySnapshotNeeded;
     }
@@ -995,7 +995,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         int  lastWeeklySnapshotWeekNumber = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear ( LastWeeklySnapshotTimestamp.Value.LocalDateTime, CalendarWeekRule.FirstDay, template.WeeklyDay );
         int  currentWeekNumber            = CultureInfo.CurrentCulture.Calendar.GetWeekOfYear ( timestamp.LocalDateTime,                         CalendarWeekRule.FirstDay, template.WeeklyDay );
         bool weeklySnapshotNeeded         = atLeastOneWeekSinceLastWeeklySnapshot || currentWeekNumber != lastWeeklySnapshotWeekNumber;
-        Logger.Debug ( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Weekly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, weeklySnapshotNeeded ? string.Empty : "not " );
 
         return weeklySnapshotNeeded;
     }
@@ -1036,7 +1036,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         // Check if the last yearly snapshot was in a different year
         bool yearlySnapshotNeeded = lastYearlySnapshotYear < currentYear;
-        Logger.Debug ( "Yearly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, yearlySnapshotNeeded ? "" : "not " );
+        Logger.Debug ( "Yearly snapshot is {2}needed for dataset {0} at timestamp {1:O}", Name, timestamp, yearlySnapshotNeeded ? string.Empty : "not " );
 
         return yearlySnapshotNeeded;
     }

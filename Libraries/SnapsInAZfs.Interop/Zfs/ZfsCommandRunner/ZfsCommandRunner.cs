@@ -77,7 +77,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
     public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
-        Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : "" );
+        Logger.Debug( "{0} {2}snapshot requested for dataset {1}", period, ds.Name, zfsRecursionWanted ? "recursive " : string.Empty );
         ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
         snapshot = ds.CreateSnapshot( in period, in timestamp, in datasetFormattingSettings, in snapshotSourceSystem );
         try
@@ -96,7 +96,7 @@ public sealed class ZfsCommandRunner : ZfsCommandRunnerBase, IZfsCommandRunner
             return ZfsCommandRunnerOperationStatus.NameValidationFailed;
         }
 
-        string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
+        string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : string.Empty )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
         ProcessStartInfo zfsSnapshotStartInfo = new( PathToZfsUtility, arguments )
         {
             CreateNoWindow = true,
