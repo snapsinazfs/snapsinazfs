@@ -1,15 +1,10 @@
-// LICENSE:
-// 
-// This software is licensed for use under the Free Software Foundation's GPL v3.0 license
-
 using System.Globalization;
 using System.Net.NetworkInformation;
-
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
 
-// These necessarily have non-private accessibility because this is a helper class..
+// These necessarily have non-private accessibility because this is a helper class.
 #pragma warning disable NUnit1028
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;

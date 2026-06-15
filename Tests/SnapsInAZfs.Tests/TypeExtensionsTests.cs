@@ -12,9 +12,6 @@
 
 #endregion
 
-using System.Runtime.InteropServices;
-using JetBrains.Annotations;
-
 namespace SnapsInAZfs.Tests;
 
 [TestFixture]

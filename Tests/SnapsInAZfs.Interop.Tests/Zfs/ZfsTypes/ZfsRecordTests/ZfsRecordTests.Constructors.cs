@@ -17,8 +17,6 @@ using SnapsInAZfs.Interop.Zfs.ZfsTypes.Validation;
 
 namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 
-using System.Diagnostics.CodeAnalysis;
-
 [TestFixture]
 [TestOf ( typeof (ZfsRecord) )]
 [Category ( "General" )]

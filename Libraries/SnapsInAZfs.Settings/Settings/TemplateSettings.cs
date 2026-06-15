@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -11,8 +11,6 @@
 // See https://opensource.org/license/MIT/
 
 #endregion
-
-using JetBrains.Annotations;
 
 namespace SnapsInAZfs.Settings.Settings;
 
