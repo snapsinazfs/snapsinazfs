@@ -90,9 +90,9 @@ public class ZfsPropertyTests
     }
 
     [Test]
-    public void GetHashCode_PropertyUseableAsDictionaryKey( )
+    public void GetHashCode_PropertyUsableAsDictionaryKey( )
     {
-        Dictionary<ZfsProperty<string>, string> dict = new( );
+        Dictionary<ZfsProperty<string>, string> dict = [];
         ZfsProperty<string> property1 = ZfsProperty<string>.CreateWithoutParent( "property1", "key 1" );
         ZfsProperty<string> property2 = ZfsProperty<string>.CreateWithoutParent( "property2", "key 2" );
         dict.Add( property1, "value 1" );
