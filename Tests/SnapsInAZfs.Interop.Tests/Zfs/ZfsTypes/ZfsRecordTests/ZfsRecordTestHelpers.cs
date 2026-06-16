@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Net.NetworkInformation;
 using Microsoft.Extensions.Configuration;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -14,11 +13,6 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 public class ZfsRecordTestHelpers
 {
     public static SnapsInAZfsSettings? Settings { get; set; }
-    private static string GetHostName( )
-    {
-        IPGlobalProperties hostIpGlobalProps = IPGlobalProperties.GetIPGlobalProperties( );
-        return $"{hostIpGlobalProps.HostName}.{hostIpGlobalProps.DomainName}";
-    }
 
     internal static ZfsRecord GetNewTestRootFileSystem( string name = "testRoot" )
     {
