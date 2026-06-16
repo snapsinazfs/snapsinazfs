@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.SnapshotTests;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
 using SnapsInAZfs.Settings.Settings;
@@ -9,6 +10,8 @@ namespace SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 [Category( "General" )]
 [Parallelizable( ParallelScope.Self )]
 [TestOf( typeof( ZfsRecord ) )]
+// ReSharper disable once UnusedType.Global
+[SuppressMessage ( "ReSharper", "NUnit.IncorrectArgumentType", Justification = "Strings are valid constants with NUnit, for DateTimeOffset parameter arguments." )]
 public class ZfsRecordTests_Snapshots
 {
     [Test]
@@ -22,8 +25,8 @@ public class ZfsRecordTests_Snapshots
     {
         Assume.That( timestamp, Is.GreaterThan( DateTimeOffset.UnixEpoch ) );
         Assume.That( periodKind, Is.Not.EqualTo( SnapshotPeriodKind.NotSet ) );
-        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        ZfsRecord childDs  = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Assume.That( childDs, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Empty );
@@ -140,9 +143,9 @@ public class ZfsRecordTests_Snapshots
     [TestCase( SnapshotPeriodKind.Yearly )]
     public void AddSnapshot_SnapshotsInCorrectCollection( SnapshotPeriodKind periodKind )
     {
-        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
-        Snapshot snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, childDs );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        ZfsRecord childDs  = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
+        Snapshot  snapshot = SnapshotTestHelpers.GetStandardTestSnapshotForParent( periodKind, DateTimeOffset.UnixEpoch, childDs );
         childDs.AddSnapshot( snapshot );
     using (Assert.EnterMultipleScope())
     {
@@ -166,8 +169,8 @@ public class ZfsRecordTests_Snapshots
     [Parallelizable]
     public void GetSnapshotsToPrune_NoSnapshotsInDataset( )
     {
-        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem("testRoot" );
-        ZfsRecord childDs = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
+        ZfsRecord parentDs = ZfsRecordTestHelpers.GetNewTestRootFileSystem( );
+        ZfsRecord childDs  = parentDs.CreateChildDataset( "testRoot/fs1", ZfsPropertyValueConstants.FileSystem, "testSystem" );
         Assume.That( childDs, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Null );
         Assume.That( childDs.Snapshots, Is.Not.Empty );
