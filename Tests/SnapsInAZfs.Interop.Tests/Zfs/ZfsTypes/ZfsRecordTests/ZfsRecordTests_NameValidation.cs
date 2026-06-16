@@ -111,8 +111,11 @@ public class ZfsRecordTests_NameValidation
 
     [SuppressMessage( "ReSharper", "UseCollectionExpression", Justification = "NUnit doesn't understand it if it's just a collection expression here")]
     [Test]
+    // TODO: Rework this one so we can remove this suppression while keeping NUnit happy.
+#pragma warning disable IDE0300
     [TestCaseSource( typeof( ZfsRecordTestHelpers ), nameof( ZfsRecordTestHelpers.GetValidSnapshotCases ), new object?[] { 8, 12, 5 } )]
     [TestCaseSource( typeof( ZfsRecordTestHelpers ), nameof( ZfsRecordTestHelpers.GetIllegalSnapshotCases ), new object?[] { 8, 12, 5 } )]
+#pragma warning restore IDE0300
     [Category( "General" )]
     [Category( "ZFS" )]
     public void CheckSnapshotNameValidation( NameValidationTestCase testCase )
