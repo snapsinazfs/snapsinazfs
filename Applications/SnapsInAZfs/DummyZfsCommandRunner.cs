@@ -123,23 +123,23 @@ public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
     /// <inheritdoc />
     /// <exception cref="ArgumentNullException"><paramref name="verb" /> is <see langword="null" />.</exception>
     /// <exception cref="IOException">Invalid attempt to read when no data present</exception>
-    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync( string verb, string args )
+    /// <exception cref="OperationCanceledException">If the cancellation token is canceled.</exception>
+    public override async IAsyncEnumerable<string> ZfsExecEnumeratorAsync ( string verb, string args )
     {
-        ArgumentException.ThrowIfNullOrEmpty( nameof( verb ), "Verb cannot be null or empty" );
+      ArgumentException.ThrowIfNullOrEmpty ( nameof (verb), "Verb cannot be null or empty" );
 
-        if ( verb is not ("get" or "list") )
-        {
-            yield break;
-        }
+      if ( verb is not ("get" or "list") )
+      {
+        yield break;
+      }
 
-        Logger.Trace( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", "zfs", verb, args );
-        Logger.Debug( "Calling zfs {0} {1}", verb, args );
-        using StreamReader zfsProcess = File.OpenText( args );
-
-        while ( !zfsProcess.EndOfStream )
-        {
-            yield return await zfsProcess.ReadLineAsync( ).ConfigureAwait( true ) ?? throw new IOException( "Invalid attempt to read when no data present" );
-        }
+      Logger.Trace ( "Preparing to execute `{0} {1} {2}` and yield an enumerator for output", "zfs", verb, args );
+      Logger.Debug ( "Calling zfs {0} {1}", verb, args );
+      using CancellationTokenSource cts = new ( 15000 );
+      await foreach ( string line in File.ReadLinesAsync ( args, cts.Token ).ConfigureAwait ( false ) )
+      {
+        yield return line;
+      }
     }
 
     /// <inheritdoc />
