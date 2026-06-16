@@ -34,23 +34,13 @@ public class ZfsRecordTests_Constructors
     [TestCase ( "\r" )]
     public void Constructor_ThrowsArgumentException_OnSourceSystemEmptyOrWhitespace ( string sourceSystem )
     {
-        Assert.That (
-                     ( ) =>
-                     {
-                         ZfsRecord badRecord = new ( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem );
-                     },
-                     Throws.ArgumentException );
+      Assert.That ( ( ) => new ZfsRecord ( "badRecord", ZfsPropertyValueConstants.FileSystem, sourceSystem ), Throws.ArgumentException );
     }
 
     [Test]
     public void Constructor_ThrowsArgumentNullException_OnSourceSystemNull ( )
     {
-        Assert.That (
-                     static ( ) =>
-                     {
-                         ZfsRecord badRecord = new ( "badRecord", ZfsPropertyValueConstants.FileSystem, null! );
-                     },
-                     Throws.ArgumentNullException );
+      Assert.That ( static ( ) => new ZfsRecord ( "badRecord", ZfsPropertyValueConstants.FileSystem, null! ), Throws.ArgumentNullException );
     }
 
     [Test]
