@@ -45,6 +45,7 @@
     <File Path=".github/workflows/build-and-test-release-tag.yml" />
   </Folder>
   <Folder Name="/Tests/">
+    <File Path="Tests/Directory.Build.props" />
     <Project Path="Tests/SnapsInAZfs.Interop.Tests/SnapsInAZfs.Interop.Tests.csproj">
       <Platform Project="x64" />
     </Project>
