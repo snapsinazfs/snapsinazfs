@@ -64,7 +64,7 @@ public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
         string propertiesString = IZfsProperty.KnownDatasetProperties.Union( IZfsProperty.KnownSnapshotProperties ).ToCommaSeparatedSingleLineString( );
         Logger.Debug( "Pretending to run zfs get type,{0},available,used -H -p -r -t filesystem,volume,snapshot", propertiesString );
         ConfiguredCancelableAsyncEnumerable<string> lineProvider = ZfsExecEnumeratorAsync( "get", "fullZfsGet.txt" ).ConfigureAwait( true );
-        SortedDictionary<string, RawZfsObject> rawObjects = new( );
+        SortedDictionary<string, RawZfsObject> rawObjects = [];
         await GetRawZfsObjectsAsync( lineProvider, rawObjects ).ConfigureAwait( true );
         ProcessRawObjects( rawObjects, datasets, snapshots );
         CheckAndUpdateLastSnapshotTimesForDatasets( settings, datasets );
@@ -107,13 +107,13 @@ public sealed class DummyZfsCommandRunner : ZfsCommandRunnerBase
     public override ZfsCommandRunnerOperationStatus TakeSnapshot( ZfsRecord ds, SnapshotPeriod period, in DateTimeOffset timestamp, SnapsInAZfsSettings snapsInAZfsSettings, FormattingSettings datasetFormattingSettings, out Snapshot? snapshot )
     {
         bool zfsRecursionWanted = ds.Recursion.Value == ZfsPropertyValueConstants.ZfsRecursion;
-        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : "" );
+        Logger.Debug( "{0:G} {2}snapshot requested for dataset {1}", period.Kind, ds.Name, zfsRecursionWanted ? "recursive " : string.Empty );
         string snapName = datasetFormattingSettings.GenerateFullSnapshotName( ds.Name, period.Kind, timestamp );
         ZfsProperty<string> snapshotSourceSystem = ZfsProperty<string>.CreateWithoutParent( ZfsPropertyNames.SourceSystem, snapsInAZfsSettings.LocalSystemName );
         snapshot = new( snapName, in period.Kind, in snapshotSourceSystem, in timestamp, ds );
         if ( snapsInAZfsSettings.DryRun )
         {
-            string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : "" )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
+            string arguments = $"snapshot {( zfsRecursionWanted ? "-r " : string.Empty )}{snapshot.GetSnapshotOptionsStringForZfsSnapshot( )} {snapshot.Name}";
             Logger.Info( "DRY RUN: Would execute `{0} {1}`", snapsInAZfsSettings.ZfsPath, $"snapshot {arguments}" );
             return ZfsCommandRunnerOperationStatus.DryRun;
         }
