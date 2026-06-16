@@ -13,6 +13,7 @@
 #endregion
 
 using System.Collections.Concurrent;
+using System.Globalization;
 using NStack;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui;
@@ -159,16 +160,16 @@ public sealed partial class TemplateConfigurationWindow
         {
             SelectedTemplateItem.ViewSettings.SnapshotTiming = new( )
             {
-                FrequentPeriod = int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ) ),
-                HourlyMinute = hourlyMinuteTextValidateField.Text.ToInt32( ),
-                DailyTime = dailyTimeTimeField.Time.ToTimeOnly( ),
-                WeeklyDay = (DayOfWeek)weeklyDayComboBox.SelectedItem,
-                WeeklyTime = weeklyTimeTimeField.Time.ToTimeOnly( ),
-                MonthlyDay = monthlyDayTextValidateField.Text.ToInt32( ),
-                MonthlyTime = monthlyTimeTimeField.Time.ToTimeOnly( ),
-                YearlyMonth = yearlyMonthComboBox.SelectedItem + 1,
-                YearlyDay = yearlyDayTextValidateField.Text.ToInt32( ),
-                YearlyTime = yearlyTimeTimeField.Time.ToTimeOnly( )
+                FrequentPeriod = int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ), NumberFormatInfo.InvariantInfo ),
+                HourlyMinute   = hourlyMinuteTextValidateField.Text.ToInt32( ),
+                DailyTime      = dailyTimeTimeField.Time.ToTimeOnly( ),
+                WeeklyDay      = (DayOfWeek)weeklyDayComboBox.SelectedItem,
+                WeeklyTime     = weeklyTimeTimeField.Time.ToTimeOnly( ),
+                MonthlyDay     = monthlyDayTextValidateField.Text.ToInt32( ),
+                MonthlyTime    = monthlyTimeTimeField.Time.ToTimeOnly( ),
+                YearlyMonth    = yearlyMonthComboBox.SelectedItem + 1,
+                YearlyDay      = yearlyDayTextValidateField.Text.ToInt32( ),
+                YearlyTime     = yearlyTimeTimeField.Time.ToTimeOnly( )
             };
         }
 
@@ -408,7 +409,7 @@ public sealed partial class TemplateConfigurationWindow
             DisableEventHandlers( );
             _modifiedProperties.Remove( FrequentPeriodTitleCase );
 
-            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ) ) )
+            if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.FrequentPeriod != int.Parse( frequentPeriodRadioGroup.GetSelectedLabelString( ), NumberFormatInfo.InvariantInfo ) )
             {
                 _modifiedProperties.Add( FrequentPeriodTitleCase );
             }
@@ -467,7 +468,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse( hourlyMinuteTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.HourlyMinute != int.Parse( hourlyMinuteTextValidateField.Text.ToString( )!, NumberFormatInfo.InvariantInfo ) )
         {
             _modifiedProperties.Add( HourlyMinuteTitleCase );
         }
@@ -569,7 +570,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse( monthlyDayTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.MonthlyDay != int.Parse( monthlyDayTextValidateField.Text.ToString( )!, NumberFormatInfo.InvariantInfo ) )
         {
             _modifiedProperties.Add( MonthlyDayTitleCase );
         }
@@ -670,25 +671,25 @@ public sealed partial class TemplateConfigurationWindow
     private void SetFieldsForSelectedItem( )
     {
         TemplateConfigurationListItem item = SelectedTemplateItem;
-        componentSeparatorValidateField.Text = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
-        prefixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.Prefix );
-        frequentSuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
-        hourlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
-        dailySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
-        weeklySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
-        monthlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
-        yearlySuffixTextValidateField.Text = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
-        timestampFormatTextField.Text = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
+        componentSeparatorValidateField.Text  = ustring.Make( item.ViewSettings.Formatting.ComponentSeparator );
+        prefixTextValidateField.Text          = ustring.Make( item.ViewSettings.Formatting.Prefix );
+        frequentSuffixTextValidateField.Text  = ustring.Make( item.ViewSettings.Formatting.FrequentSuffix );
+        hourlySuffixTextValidateField.Text    = ustring.Make( item.ViewSettings.Formatting.HourlySuffix );
+        dailySuffixTextValidateField.Text     = ustring.Make( item.ViewSettings.Formatting.DailySuffix );
+        weeklySuffixTextValidateField.Text    = ustring.Make( item.ViewSettings.Formatting.WeeklySuffix );
+        monthlySuffixTextValidateField.Text   = ustring.Make( item.ViewSettings.Formatting.MonthlySuffix );
+        yearlySuffixTextValidateField.Text    = ustring.Make( item.ViewSettings.Formatting.YearlySuffix );
+        timestampFormatTextField.Text         = ustring.Make( item.ViewSettings.Formatting.TimestampFormatString );
         frequentPeriodRadioGroup.SelectedItem = TemplateConfigurationFrequentPeriodOptions.IndexOf( item.ViewSettings.SnapshotTiming.FrequentPeriod );
-        hourlyMinuteTextValidateField.Text = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2" );
-        dailyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
-        weeklyDayComboBox.SelectedItem = (int)item.ViewSettings.SnapshotTiming.WeeklyDay;
-        weeklyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
-        monthlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( );
-        monthlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
-        yearlyDayTextValidateField.Text = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( );
-        yearlyTimeTimeField.Time = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
-        yearlyMonthComboBox.SelectedItem = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
+        hourlyMinuteTextValidateField.Text    = item.ViewSettings.SnapshotTiming.HourlyMinute.ToString( "D2", NumberFormatInfo.InvariantInfo );
+        dailyTimeTimeField.Time               = item.ViewSettings.SnapshotTiming.DailyTime.ToTimeSpan( );
+        weeklyDayComboBox.SelectedItem        = (int)item.ViewSettings.SnapshotTiming.WeeklyDay;
+        weeklyTimeTimeField.Time              = item.ViewSettings.SnapshotTiming.WeeklyTime.ToTimeSpan( );
+        monthlyDayTextValidateField.Text      = item.ViewSettings.SnapshotTiming.MonthlyDay.ToString( NumberFormatInfo.InvariantInfo );
+        monthlyTimeTimeField.Time             = item.ViewSettings.SnapshotTiming.MonthlyTime.ToTimeSpan( );
+        yearlyDayTextValidateField.Text       = item.ViewSettings.SnapshotTiming.YearlyDay.ToString( NumberFormatInfo.InvariantInfo );
+        yearlyTimeTimeField.Time              = item.ViewSettings.SnapshotTiming.YearlyTime.ToTimeSpan( );
+        yearlyMonthComboBox.SelectedItem      = item.ViewSettings.SnapshotTiming.YearlyMonth - 1;
     }
 
     private void SetInitialButtonState( )
@@ -768,7 +769,7 @@ public sealed partial class TemplateConfigurationWindow
             string timestampFormatString = timestampFormatTextField.Text.ToString( )!;
             DateTimeOffset now = DateTimeOffset.Now;
             char[] buffer = new char[128];
-            if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+            if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ), DateTimeFormatInfo.InvariantInfo ) )
             {
                 Logger.Warn( "Invalid timestamp format string specified." );
                 const string formatDocumentationUrl = "https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-date-and-time-format-strings";
@@ -799,7 +800,7 @@ public sealed partial class TemplateConfigurationWindow
         string timestampFormatString = timestampFormatTextField.Text.ToString( )!;
         DateTimeOffset now = DateTimeOffset.Now;
         char[] buffer = new char[128];
-        if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ) ) )
+        if ( !now.TryFormat( buffer.AsSpan( ), out _, timestampFormatString.AsSpan( ), DateTimeFormatInfo.InvariantInfo ) )
         {
             Logger.Warn( "Invalid timestamp format string specified." );
             return;
@@ -807,7 +808,7 @@ public sealed partial class TemplateConfigurationWindow
 
         string prefixString = prefixTextValidateField.Text.ToString( )!;
         string componentSeparator = componentSeparatorValidateField.Text.ToString( )!;
-        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString( timestampFormatString )}{componentSeparator}{periodString}";
+        exampleTextField.Text = $"{prefixString}{componentSeparator}{DateTimeOffset.Now.ToString( timestampFormatString, DateTimeFormatInfo.InvariantInfo )}{componentSeparator}{periodString}";
     }
 
     /// <summary>
@@ -911,7 +912,7 @@ public sealed partial class TemplateConfigurationWindow
             return;
         }
 
-        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse( yearlyDayTextValidateField.Text.ToString( )! ) )
+        if ( SelectedTemplateItem.ViewSettings.SnapshotTiming.YearlyDay != int.Parse( yearlyDayTextValidateField.Text.ToString( )!, NumberFormatInfo.InvariantInfo ) )
         {
             _modifiedProperties.Add( YearlyDayTitleCase );
         }

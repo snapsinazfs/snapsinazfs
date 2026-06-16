@@ -1,3 +1,4 @@
+using System.Globalization;
 using SnapsInAZfs.Interop.Tests.Zfs.ZfsTypes.ZfsRecordTests;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -394,10 +395,10 @@ public class ZfsPropertyTests
     [Test]
     public void TryParse_DateTimeOffset_OutputsExpectedValue( )
     {
-        const string valueString = "2023-01-01T12:34:56.7891234";
-        DateTimeOffset value = DateTimeOffset.Parse( valueString );
-        RawProperty input = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, valueString, ZfsPropertySourceConstants.Local );
-        bool success = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
+        const string   valueString = "2023-01-01T12:34:56.7891234";
+        DateTimeOffset value       = DateTimeOffset.Parse( valueString, DateTimeFormatInfo.InvariantInfo );
+        RawProperty    input       = new( ZfsPropertyNames.DatasetLastFrequentSnapshotTimestampPropertyName, valueString, ZfsPropertySourceConstants.Local );
+        bool           success     = ZfsProperty<DateTimeOffset>.TryParse( input, out ZfsProperty<DateTimeOffset>? property );
     using (Assert.EnterMultipleScope())
     {
             Assert.That( success, Is.True );
@@ -490,7 +491,7 @@ public class ZfsPropertyTests
     public void ValueString_AsExpected_IntProperty( [Values( -1, 0, 1 )] int testValue )
     {
         ZfsProperty<int> zfsProperty = ZfsProperty<int>.CreateWithoutParent( "someName", testValue );
-        Assert.That( zfsProperty.ValueString, Is.EqualTo( testValue.ToString( ) ) );
+        Assert.That( zfsProperty.ValueString, Is.EqualTo( testValue.ToString( NumberFormatInfo.InvariantInfo ) ) );
     }
 
     [Test]

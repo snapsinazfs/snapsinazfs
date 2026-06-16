@@ -10,6 +10,7 @@
 // See https://opensource.org/license/MIT/
 #endregion
 using System.Collections.Concurrent;
+using System.Globalization;
 using SnapsInAZfs.ConfigConsole.TreeNodes;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;
@@ -401,7 +402,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionHourlyPropertyName, retentionHourlyTextField.Text, min, max );
                 MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Hourly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value.ToString( );
+                retentionHourlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionHourly.Value.ToString( NumberFormatInfo.InvariantInfo );
                 return;
             }
 
@@ -444,7 +445,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionMonthlyPropertyName, retentionMonthlyTextField.Text, min, max );
                 MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Monthly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value.ToString( );
+                retentionMonthlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionMonthly.Value.ToString( NumberFormatInfo.InvariantInfo );
                 return;
             }
 
@@ -487,7 +488,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionPruneDeferralPropertyName, retentionPruneDeferralTextField.Text, min, max );
                 MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for PruneDeferral snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString( );
+                retentionPruneDeferralTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionPruneDeferral.Value.ToString( NumberFormatInfo.InvariantInfo );
                 return;
             }
 
@@ -530,7 +531,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionWeeklyPropertyName, retentionWeeklyTextField.Text, min, max );
                 MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Weekly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value.ToString( );
+                retentionWeeklyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionWeekly.Value.ToString( NumberFormatInfo.InvariantInfo );
                 return;
             }
 
@@ -573,7 +574,7 @@ public sealed partial class ZfsConfigurationWindow
             {
                 Logger.Warn( "Invalid value entered for {0}: {1}. Must be a valid integer between {2:D} and {3:D}", ZfsPropertyNames.SnapshotRetentionYearlyPropertyName, retentionYearlyTextField.Text, min, max );
                 MessageBox.ErrorQuery( "Invalid Retention Property Value", $"The value for Yearly snapshot retention must be an integer from 0 to {int.MaxValue:D}.\nValue will revert to previous setting.", "OK" );
-                retentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value.ToString( );
+                retentionYearlyTextField.Text = SelectedTreeNode.TreeDataset.SnapshotRetentionYearly.Value.ToString( NumberFormatInfo.InvariantInfo );
                 return;
             }
 
@@ -898,7 +899,7 @@ public sealed partial class ZfsConfigurationWindow
             DisableEventHandlers( );
         }
 
-        if ( (ZfsObjectConfigurationTreeNode)zfsTreeView.SelectedObject is { } )
+        if ( zfsTreeView.SelectedObject is ZfsObjectConfigurationTreeNode { } )
         {
             ZfsRecord treeDataset = SelectedTreeNode.TreeDataset;
             nameTextField.Text = treeDataset.Name;
