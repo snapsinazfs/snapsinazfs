@@ -33,13 +33,13 @@ public sealed partial class Monitor : IMonitor
     private bool _applicationStateObservableEventSubscribed;
     private long _nextRunTime = DateTimeOffset.UnixEpoch.ToUnixTimeMilliseconds( );
     private ISnapshotOperationsObservable? _snapshotOperationsObservable;
-    private uint _snapshotsPrunedFailedLastRun;
+    internal uint _snapshotsPrunedFailedLastRun;
     private uint _snapshotsPrunedFailedSinceStart;
-    private uint _snapshotsPrunedSucceededLastRun;
+    internal uint _snapshotsPrunedSucceededLastRun;
     private uint _snapshotsPrunedSucceededSinceStart;
-    private uint _snapshotsTakenFailedLastRun;
+    internal uint _snapshotsTakenFailedLastRun;
     private uint _snapshotsTakenFailedSinceStart;
-    private uint _snapshotsTakenSucceededLastRun;
+    internal uint _snapshotsTakenSucceededLastRun;
     private uint _snapshotsTakenSucceededSinceStart;
     public uint SnapshotsPrunedFailedLastRun => _snapshotsPrunedFailedLastRun;
     public uint SnapshotsPrunedFailedSinceStart => _snapshotsPrunedFailedSinceStart;
