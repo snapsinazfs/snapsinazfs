@@ -15,7 +15,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 

@@ -35,6 +35,10 @@
     <PackageReference Include="NLog" Version="6.1.3" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.1.3" />
   </ItemGroup>
+  <ItemGroup>
+    <Using Include="NLog" />
+    <Using Include="System.Runtime.CompilerServices" />
+  </ItemGroup>
   <Import Project="$(MSBuildThisFileDirectory)SystemSpecific.Build.props" />
   <PropertyGroup>
     <_SIAZ>$(Product)</_SIAZ>

@@ -12,7 +12,6 @@
 
 #endregion
 
-using NLog;
 using NLog.Config;
 using LogLevel = NLog.LogLevel;
 

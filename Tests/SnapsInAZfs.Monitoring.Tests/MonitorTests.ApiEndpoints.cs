@@ -1,4 +1,4 @@
-﻿#region MIT LICENSE
+#region MIT LICENSE
 
 // Copyright 2023 Brandon Thetford
 // 
@@ -13,7 +13,6 @@
 #endregion
 
 using System.Net;
-using System.Reflection;
 using Microsoft.AspNetCore.Http.HttpResults;
 
 #pragma warning disable CA2007

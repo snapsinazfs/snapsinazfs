@@ -12,8 +12,6 @@
 
 #endregion
 
-using System.Reflection;
-
 namespace SnapsInAZfs.Monitoring.Tests;
 
 [TestFixture]

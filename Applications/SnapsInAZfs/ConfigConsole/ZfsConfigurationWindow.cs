@@ -10,7 +10,6 @@
 // See https://opensource.org/license/MIT/
 #endregion
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
 using SnapsInAZfs.ConfigConsole.TreeNodes;
 using SnapsInAZfs.Interop.Zfs.ZfsCommandRunner;
 using SnapsInAZfs.Interop.Zfs.ZfsTypes;

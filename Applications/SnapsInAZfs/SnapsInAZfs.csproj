@@ -158,9 +158,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="NLog" />
-  </ItemGroup>
-  <ItemGroup>
     <InternalsVisibleTo Include="SnapsInAZfs.Tests" />
   </ItemGroup>
 </Project>
