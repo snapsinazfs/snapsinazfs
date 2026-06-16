@@ -25,9 +25,9 @@ public sealed partial class Monitor : IMonitor
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger( );
     private readonly List<string> _snapshotsPrunedFailedLastRunNames = [];
-    private readonly object _snapshotsPrunedFailedLastRunNamesLock = new( );
+    private readonly Lock _snapshotsPrunedFailedLastRunNamesLock = new( );
     private readonly List<string> _snapshotsTakenFailedLastRunNames = [];
-    private readonly object _snapshotsTakenFailedLastRunNamesLock = new( );
+    private readonly Lock _snapshotsTakenFailedLastRunNamesLock = new( );
     private ApplicationState _applicationState;
     private IApplicationStateObservable? _applicationStateObservable;
     private bool _applicationStateObservableEventSubscribed;
