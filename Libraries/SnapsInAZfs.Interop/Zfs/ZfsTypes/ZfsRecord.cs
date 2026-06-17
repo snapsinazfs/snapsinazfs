@@ -724,12 +724,12 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
 
         List<Snapshot> snapshotsToPrune = [ ];
 
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Frequent, SnapshotRetentionFrequent.Value, snapshotsToPrune );
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Hourly,   SnapshotRetentionHourly.Value,   snapshotsToPrune );
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Daily,    SnapshotRetentionDaily.Value,    snapshotsToPrune );
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Weekly,   SnapshotRetentionWeekly.Value,   snapshotsToPrune );
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Monthly,  SnapshotRetentionMonthly.Value,  snapshotsToPrune );
-        GetSnapshotsToPruneForPeriod ( SnapshotPeriod.Yearly,   SnapshotRetentionYearly.Value,   snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Frequent, SnapshotRetentionFrequent.Value, snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Hourly,   SnapshotRetentionHourly.Value,   snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Daily,    SnapshotRetentionDaily.Value,    snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Weekly,   SnapshotRetentionWeekly.Value,   snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Monthly,  SnapshotRetentionMonthly.Value,  snapshotsToPrune );
+        GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind.Yearly,   SnapshotRetentionYearly.Value,   snapshotsToPrune );
 
         return snapshotsToPrune;
     }
@@ -1140,7 +1140,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
                  { SnapshotPeriodKind.Yearly, [ ] }
              } );
 
-    private void GetSnapshotsToPruneForPeriod ( SnapshotPeriod snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
+    private void GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
         List<Snapshot> snapshotsSetForPruning = [ .. Snapshots [ snapshotPeriod ].Where ( static kvp => kvp.Value.PruneSnapshots.Value ).Select ( static kvp => kvp.Value ) ];
         Logger.Trace ( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString ( true ) );
