@@ -1156,6 +1156,7 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
         Logger.Debug ( "Need to prune oldest {0:D} {1:G} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
         snapshotsSetForPruning.Sort ( );
 
+        snapshotsToPrune.EnsureCapacity ( snapshotsToPrune.Count + numberToPrune );
         for ( int i = 0; i < numberToPrune; i++ )
         {
             Snapshot snap = snapshotsSetForPruning [ i ];
