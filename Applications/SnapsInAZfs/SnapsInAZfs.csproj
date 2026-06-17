@@ -9,7 +9,6 @@
     <Platforms>x64</Platforms>
     <DebugType>embedded</DebugType>
     <DefineTrace>True</DefineTrace>
-    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <StartupObject>SnapsInAZfs.Program</StartupObject>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -67,17 +66,6 @@
     </Content>
   </ItemGroup>
 
-  <Choose>
-    <When Condition="$(Configuration)=='Debug-NoZFS' Or $(Configuration)=='Debug-Windows'">
-      <PropertyGroup>
-        <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
-      </PropertyGroup>
-      <ItemGroup>
-        <Compile Include="DummyZfsCommandRunner.cs" />
-      </ItemGroup>      
-    </When>
-  </Choose>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.8" />
@@ -87,16 +75,23 @@
     <PackageReference Include="Terminal.Gui" Version="1.16.0" />
   </ItemGroup>
   <Choose>
-    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug'">
+    <When Condition="'$(Configuration)'=='Debug-Windows' Or '$(Configuration)'=='Debug' Or '$(Configuration)'=='Debug-NoZFS'">
 
-      <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+      <PropertyGroup>
+        <DefineConstants>$(DefineConstants);DEBUG;JETBRAINS_ANNOTATIONS</DefineConstants>
       </PropertyGroup>
 
       <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Windows|x64'">
-        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG;DEBUG_WINDOWS</DefineConstants>
+        <DefineConstants>$(DefineConstants);WINDOWS;DEBUG_WINDOWS</DefineConstants>
         <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
       </PropertyGroup>
+
+      <PropertyGroup Condition="'$(Configuration)'=='Debug-NoZFS' Or '$(Configuration)'=='Debug-Windows'">
+        <DefineConstants>$(DefineConstants);INCLUDE_DUMMY_ZFSCOMMANDRUNNER</DefineConstants>
+      </PropertyGroup>
+      <ItemGroup Condition="'$(Configuration)'=='Debug-NoZFS' Or '$(Configuration)'=='Debug-Windows'">
+        <Compile Include="DummyZfsCommandRunner.cs" />
+      </ItemGroup>      
 
       <ItemGroup>
         <Content Include="appsettings.Development.json">
