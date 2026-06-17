@@ -1143,17 +1143,17 @@ public partial record ZfsRecord : IComparable<ZfsRecord>, IEqualityOperators<Zfs
     private void GetSnapshotsToPruneForPeriod ( SnapshotPeriodKind snapshotPeriod, int retentionValue, List<Snapshot> snapshotsToPrune )
     {
         List<Snapshot> snapshotsSetForPruning = [ .. Snapshots [ snapshotPeriod ].Where ( static kvp => kvp.Value.PruneSnapshots.Value ).Select ( static kvp => kvp.Value ) ];
-        Logger.Trace ( "{0} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString ( true ) );
+        Logger.Trace ( "{0:G} snapshots of {1} configured for pruning: {2}", snapshotPeriod, Name, snapshotsSetForPruning.ToCommaSeparatedSingleLineString ( true ) );
 
         if ( snapshotsSetForPruning.Count <= retentionValue )
         {
-            Logger.Trace ( "Number of pruning-enabled {0} snapshots for {1} ({2}) does not exceed retention setting ({3})", snapshotPeriod.ToString ( ), Name, snapshotsSetForPruning.Count.ToString ( ), retentionValue.ToString ( ) );
+            Logger.Trace ( "Number of pruning-enabled {0:G} snapshots for {1} ({2:D}) does not exceed retention setting ({3:D})", snapshotPeriod, Name, snapshotsSetForPruning.Count, retentionValue );
 
             return;
         }
 
         int numberToPrune = snapshotsSetForPruning.Count - retentionValue;
-        Logger.Debug ( "Need to prune oldest {0} {1} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
+        Logger.Debug ( "Need to prune oldest {0:D} {1:G} snapshots from {2}", numberToPrune, snapshotPeriod, Name );
         snapshotsSetForPruning.Sort ( );
 
         for ( int i = 0; i < numberToPrune; i++ )
