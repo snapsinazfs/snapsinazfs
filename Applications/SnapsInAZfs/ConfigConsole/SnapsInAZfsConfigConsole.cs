@@ -12,7 +12,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using SnapsInAZfs.Settings.Settings;
 using Terminal.Gui;
 
@@ -254,7 +253,7 @@ public sealed partial class SnapsInAZfsConfigConsole
 
             try
             {
-                File.WriteAllText( path, JsonSerializer.Serialize( settings, new JsonSerializerOptions { WriteIndented = true, DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull } ) );
+                File.WriteAllText( path, JsonSerializer.Serialize( settings, SnapsInAZfsSettingsSerializationContext.Default.SnapsInAZfsSettings ) );
                 return ( true, path );
             }
             catch ( Exception e )
