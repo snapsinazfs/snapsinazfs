@@ -520,7 +520,7 @@ public sealed class SiazService : BackgroundService, IApplicationStateObservable
                 }
             }
 
-            if ( propsToSet.Any( ) )
+            if ( propsToSet.Count > 0)
             {
                 Logger.Debug( "Took snapshots of {0}. Need to set properties: {1}", ds.Name, propsToSet.Select( static p => $"{p.Name}: {p.ValueString}" ).ToCommaSeparatedSingleLineString( ) );
                 ZfsCommandRunnerOperationStatus setPropertiesResult = await _zfsCommandRunner.SetZfsPropertiesAsync( _settings.DryRun, ds.Name, propsToSet.ToArray( ) ).ConfigureAwait( true );

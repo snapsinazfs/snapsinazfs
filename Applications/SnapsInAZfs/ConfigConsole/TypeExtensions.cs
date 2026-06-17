@@ -134,25 +134,25 @@ public static class TypeExtensions
     {
         JsonObject obj = new( );
 
-        IConfigurationSection[] nodeChildren = configSection.GetChildren( ).ToArray( );
+        IConfigurationSection[] nodeChildren = [ .. configSection.GetChildren ( ) ];
         foreach ( IConfigurationSection childSection in nodeChildren )
         {
-            if ( childSection.Path.EndsWith( ":0" ) )
+            if ( childSection.Path.EndsWith( ":0", StringComparison.Ordinal ) )
             {
                 JsonArray arrayNode = [];
 
                 foreach ( IConfigurationSection arrayNodeChild in nodeChildren )
                 {
-                    arrayNode.Add( SerializeToJson( arrayNodeChild ) );
+                    arrayNode.Add( arrayNodeChild.SerializeToJson( ) );
                 }
 
                 return arrayNode;
             }
 
-            obj.Add( childSection.Key, SerializeToJson( childSection ) );
+            obj.Add( childSection.Key, childSection.SerializeToJson( ) );
         }
 
-        if ( obj.Any( ) || configSection is not IConfigurationSection section )
+        if ( obj.Count > 0 || configSection is not IConfigurationSection section )
         {
             return obj;
         }
